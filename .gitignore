@@ -1,5 +1,15 @@
+# Maven
 target/
+
+# Maven Release Plugin
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.next
 release.properties
+
+# IntelliJ IDEA
+*.iml
+
+# Ubuntu/OSX hidden files
+.*
+
