@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="
+		 	http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd
+		 	">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.ihtsdo.snomed.release</groupId>
+		<artifactId>release-assertion-framework</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>runner-example</artifactId>
+	<packaging>pom</packaging>
+
+	<dependencies>
+		<!-- Release Files -->
+		<dependency>
+			<groupId>org.ihtsdo.snomed.release.rf2</groupId>
+			<artifactId>example-refset</artifactId>
+			<version>1.0.0</version>
+			<classifier>rf2</classifier>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<!-- Plugins run in order -->
+		<plugins>
+
+			<!-- Environment Manager -->
+			<plugin>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>assertion-environment-manager</artifactId>
+				<version>${project.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>init</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Column Based Regex Plugin -->
+			<plugin>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>column-regex-test</artifactId>
+				<version>${project.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration></configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+	<repositories>
+		<repository>
+			<name>IHTSDO Release Repository</name>
+			<id>ihtsdo-release-repository</id>
+			<url>http://ire.maven.release.ihtsdo.s3.amazonaws.com/</url>
+		</repository>
+	</repositories>
+
+</project>

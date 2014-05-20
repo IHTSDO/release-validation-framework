@@ -16,10 +16,10 @@
 	</properties>
 
 	<modules>
-		<module>core</module>
-		<module>assertion-resource-manager</module>
-		<module>column-regex</module>
-		<module>runner</module>
+		<module>assertion-environment-manager</module>
+		<module>input-file-resource-provider</module>
+		<module>column-regex-test</module>
+		<module>runner-example</module>
 	</modules>
 
 	<dependencies>
