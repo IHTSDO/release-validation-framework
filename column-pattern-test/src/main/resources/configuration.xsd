@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://release.ihtsdo.org/assertion/1.0.0" xmlns="http://release.ihtsdo.org/assertion/1.0.0">
-
-	<!-- Test config XSD to go here -->
-
-</xs:schema>

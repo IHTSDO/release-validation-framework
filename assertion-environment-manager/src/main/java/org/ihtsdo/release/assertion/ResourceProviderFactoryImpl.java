@@ -9,6 +9,10 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +44,14 @@ public class ResourceProviderFactoryImpl implements ResourceProviderFactory, Con
 		T t = (T) cache.get(resourceProviderClassString);
 		LOGGER.info("Returning ResourceProvider {}", t);
 		return t;
+	}
+
+	@Override
+	public InputStream getConfigurationStream(String filename) throws FileNotFoundException {
+		MavenProject mavenProject = (MavenProject) getCache().get(key(MavenProject.class));
+		File basedir = mavenProject.getBasedir();
+		File file = new File(basedir, filename);
+		return new FileInputStream(file);
 	}
 
 	private <T extends ResourceProvider> T createResourceProvider(Class<T> resourceProviderClass) throws ResourceProviderFactoryException {
@@ -88,7 +100,7 @@ public class ResourceProviderFactoryImpl implements ResourceProviderFactory, Con
 
 	protected void init(MavenProject project, ArtifactRepository artifactRepository) {
 		Map<String, Object> cache = getCache();
-		cache.put(key(project), project);
+		cache.put(key(MavenProject.class), project);
 		cache.put(key(ArtifactRepository.class), artifactRepository);
 	}
 
