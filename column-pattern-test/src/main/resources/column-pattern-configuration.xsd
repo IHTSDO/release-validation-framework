@@ -13,7 +13,7 @@
 										<xs:element name="dateStamp" minOccurs="0">
 											<xs:complexType>
 												<xs:sequence>
-													<xs:element type="xs:string" name="maxDate"/>
+													<xs:element type="xs:nonNegativeInteger" name="maxDate"/>
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>

@@ -19,29 +19,28 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 @Mojo(name = "test", defaultPhase = LifecyclePhase.INTEGRATION_TEST)
 public class ColumnPatternTestMojo extends AbstractMojo {
 
 	@Component
 	private ResourceProviderFactory resourceProviderFactory;
-	private Map<String, Pattern> regexCache;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ColumnPatternTestMojo.class);
+
+	public ColumnPatternTestMojo() {
+	}
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			ColumnPatternTestConfiguration configuration = loadConfiguration();
-			regexCache = testConfigurationByPrecompilingRegexPatterns(configuration);
 
 			InputFileResourceProvider resourceProvider = resourceProviderFactory.getResourceProvider(InputFileResourceProvider.class);
 			File rf2FilesDirectory = resourceProvider.getRF2FilesDirectory();
-			// todo: test files
+
+			ColumnPatternTest columnPatternTest = new ColumnPatternTest(configuration, rf2FilesDirectory);
+			columnPatternTest.runTests();
 		} catch (ResourceProviderFactoryException e) {
 			throw new MojoExecutionException("Failed to get InputFileResourceProvider", e);
 		}
@@ -64,24 +63,6 @@ public class ColumnPatternTestMojo extends AbstractMojo {
 		} catch (FileNotFoundException e) {
 			throw new MojoExecutionException("Could not find XML configuration file.");
 		}
-	}
-
-	private Map<String, Pattern> testConfigurationByPrecompilingRegexPatterns(ColumnPatternTestConfiguration configuration) {
-		Map<String, Pattern> regexCache = new HashMap<>();
-		for (ColumnPatternTestConfiguration.File file : configuration.getFile()) {
-			for (ColumnPatternTestConfiguration.File.Column column : file.getColumn()) {
-				String regex = column.getRegex();
-				if (regex != null) {
-					try {
-						Pattern compiledRegex = Pattern.compile(regex);
-						regexCache.put(regex, compiledRegex);
-					} catch (PatternSyntaxException e) {
-						LOGGER.error("Regex invalid for file {} column {}", file.getName(), column.getName(), e);
-					}
-				}
-			}
-		}
-		return regexCache;
 	}
 
 }

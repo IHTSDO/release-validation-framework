@@ -1,5 +1,5 @@
 <column-pattern-test-configuration xmlns="http://release.ihtsdo.org/assertion/1.0.0">
-	<file name="blaugh.txt">
+	<file name="der2_Refset_SimpleFull_INT_20140131.txt">
 		<column name="id">
 			<uid/>
 		</column>
