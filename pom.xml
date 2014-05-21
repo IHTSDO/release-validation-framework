@@ -18,7 +18,7 @@
 	<modules>
 		<module>assertion-environment-manager</module>
 		<module>input-file-resource-provider</module>
-		<module>column-regex-test</module>
+		<module>column-pattern-test</module>
 		<module>runner-example</module>
 	</modules>
 

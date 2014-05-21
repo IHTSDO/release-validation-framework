@@ -43,10 +43,10 @@
 				</executions>
 			</plugin>
 
-			<!-- Column Based Regex Plugin -->
+			<!-- Column Pattern Test Plugin -->
 			<plugin>
 				<groupId>${project.groupId}</groupId>
-				<artifactId>column-regex-test</artifactId>
+				<artifactId>column-pattern-test</artifactId>
 				<version>${project.version}</version>
 				<executions>
 					<execution>

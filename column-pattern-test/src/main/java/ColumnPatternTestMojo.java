@@ -11,14 +11,13 @@ import org.ihtsdo.release.assertion.setup.InputFileResourceProvider;
 import java.io.File;
 
 @Mojo(name = "test", defaultPhase = LifecyclePhase.TEST)
-public class RegexTestMojo extends AbstractMojo {
+public class ColumnPatternTestMojo extends AbstractMojo {
 
 	@Component
 	private ResourceProviderFactory resourceProviderFactory;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		getLog().info("RegexTestMojo");
 		try {
 			InputFileResourceProvider resourceProvider = resourceProviderFactory.getResourceProvider(InputFileResourceProvider.class);
 			File rf2FilesDirectory = resourceProvider.getRF2FilesDirectory();

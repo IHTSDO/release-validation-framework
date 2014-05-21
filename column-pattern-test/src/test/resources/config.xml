@@ -1,0 +1,24 @@
+<column-pattern-test-configuration>
+	<file name="blaugh.txt">
+		<column name="id">
+			<uid/>
+		</column>
+		<column name="effectiveTime">
+			<dateStamp>
+				<maxDate>20140131</maxDate>
+			</dateStamp>
+		</column>
+		<column name="active">
+			<boolean/>
+		</column>
+		<column name="moduleId">
+			<value>900000000000207008</value>
+		</column>
+		<column name="refSetId">
+			<componentId/>
+		</column>
+		<column name="referencedComponentId">
+			<componentId/>
+		</column>
+	</file>
+</column-pattern-test-configuration>
