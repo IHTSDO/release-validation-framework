@@ -13,7 +13,7 @@
 	</parent>
 
 	<artifactId>runner-example</artifactId>
-	<packaging>jar</packaging>
+	<packaging>jar</packaging><!-- TODO: would pom packaging work now? -->
 
 	<dependencies>
 		<!-- Release Files -->

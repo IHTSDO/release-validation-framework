@@ -37,10 +37,6 @@ public class InputFileResourceProvider implements ResourceProvider {
 		workingDirectory = workingDirectoryResourceProvider.getWorkingDirectoryForClass(getClass());
 	}
 
-	public File getRF2FilesDirectory() {
-		return workingDirectory;
-	}
-
 	@Override
 	public void init() throws ResourceProviderException {
 		Set<Artifact> dependencies = project.getDependencyArtifacts();
@@ -80,6 +76,10 @@ public class InputFileResourceProvider implements ResourceProvider {
 			}
 
 		}
+	}
+
+	public File getRF2FilesDirectory() {
+		return workingDirectory;
 	}
 
 }

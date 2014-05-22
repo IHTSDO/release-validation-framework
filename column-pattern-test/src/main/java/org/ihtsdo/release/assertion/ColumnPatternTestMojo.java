@@ -28,9 +28,6 @@ public class ColumnPatternTestMojo extends AbstractMojo {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ColumnPatternTestMojo.class);
 
-	public ColumnPatternTestMojo() {
-	}
-
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {

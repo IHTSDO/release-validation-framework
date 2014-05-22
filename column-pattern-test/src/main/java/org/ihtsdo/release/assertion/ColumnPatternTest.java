@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,12 @@ public class ColumnPatternTest {
 	}
 
 	public void runTests() {
+
+		// Stats
+		Date startTime = new Date();
+		int filesTested = 0;
+		long linesTested = 0;
+
 		// TODO: Report errors in a machine readable way for error organisation/navigation.
 		for (ColumnPatternTestConfiguration.File file : configuration.getFile()) {
 			String fileName = file.getName();
@@ -47,14 +54,16 @@ public class ColumnPatternTest {
 					List<ColumnPatternTestConfiguration.File.Column> columns = file.getColumn();
 					int expectedColumnCount = columns.size();
 					BufferedReader reader = Files.newBufferedReader(rf2File.toPath(), Charset.forName(UTF_8));
-					String line = null;
+					filesTested++;
+					String line;
 					long lineNumber = 0;
 
 					// Variables outside loop to force memory reuse.
-					String[] columnData = null;
-					String value = null;
+					String[] columnData;
+					String value;
 
 					while ((line = reader.readLine()) != null) {
+						linesTested++;
 						lineNumber++;
 						columnData = line.split("\t");
 						int columnCount = columnData.length;
@@ -81,6 +90,7 @@ public class ColumnPatternTest {
 				LOGGER.error("Unable to locate file {}", fileName);
 			}
 		}
+		LOGGER.info("{} files and {} lines tested in {} milliseconds.", filesTested, linesTested, (new Date().getTime() - startTime.getTime()));
 	}
 
 	private void testDataValue(long lineNumber, String value, ColumnPatternTestConfiguration.File.Column column) {
