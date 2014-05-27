@@ -12,6 +12,10 @@
 
 	<packaging>pom</packaging>
 
+	<properties>
+		<raf-version>1.0-SNAPSHOT</raf-version>
+	</properties>
+
 	<dependencies>
 		<!-- Release Files -->
 		<dependency>
@@ -28,9 +32,9 @@
 
 			<!-- Environment Manager -->
 			<plugin>
-				<groupId>${project.groupId}</groupId>
+				<groupId>org.ihtsdo.snomed.release</groupId>
 				<artifactId>assertion-environment-manager</artifactId>
-				<version>${project.version}</version>
+				<version>${raf-version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -42,9 +46,9 @@
 
 			<!-- Column Pattern Test Plugin -->
 			<plugin>
-				<groupId>${project.groupId}</groupId>
+				<groupId>org.ihtsdo.snomed.release</groupId>
 				<artifactId>column-pattern-test</artifactId>
-				<version>${project.version}</version>
+				<version>${raf-version}</version>
 				<executions>
 					<execution>
 						<goals>
