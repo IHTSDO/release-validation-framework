@@ -10,7 +10,7 @@
 	<artifactId>runner-example</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
-	<packaging>jar</packaging><!-- TODO: would pom packaging work now? -->
+	<packaging>pom</packaging>
 
 	<dependencies>
 		<!-- Release Files -->
