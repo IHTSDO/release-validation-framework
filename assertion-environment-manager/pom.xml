@@ -6,7 +6,7 @@
 
 	<parent>
 		<groupId>org.ihtsdo.snomed.release</groupId>
-		<artifactId>release-assertion-framework</artifactId>
+		<artifactId>release-validation-framework</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
