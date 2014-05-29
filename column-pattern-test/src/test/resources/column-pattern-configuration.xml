@@ -15,10 +15,10 @@
 			<value>900000000000207008</value>
 		</column>
 		<column name="refSetId">
-			<componentId/>
+			<sctid/>
 		</column>
 		<column name="referencedComponentId">
-			<componentId/>
+			<sctid/>
 		</column>
 	</file>
 </column-pattern-test-configuration>

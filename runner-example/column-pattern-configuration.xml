@@ -1,7 +1,7 @@
 <column-pattern-test-configuration xmlns="http://release.ihtsdo.org/assertion/1.0.0">
 	<file name="der2_Refset_SimpleFull_INT_20140131.txt">
 		<column name="id">
-			<uid/>
+			<uuid/>
 		</column>
 		<column name="effectiveTime">
 			<dateStamp>
@@ -15,10 +15,10 @@
 			<value>900000000000207008</value>
 		</column>
 		<column name="refSetId">
-			<componentId/>
+			<sctid/>
 		</column>
 		<column name="referencedComponentId">
-			<componentId/>
+			<sctid/>
 		</column>
 	</file>
 </column-pattern-test-configuration>
