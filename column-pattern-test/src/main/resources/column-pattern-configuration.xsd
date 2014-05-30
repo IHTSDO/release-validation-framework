@@ -28,7 +28,7 @@
 						</xs:sequence>
 						<xs:attribute type="xs:string" name="name"/>
 						<xs:attribute type="xs:string" name="pattern"/>
-						<xs:attribute type="xs:string" name="allowAdditionalColumns"/>
+						<xs:attribute type="xs:boolean" name="allowAdditionalColumns"/>
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>

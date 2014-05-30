@@ -53,7 +53,8 @@ public class ColumnPatternTest {
 				if (rf2File.isFile()) {
 					try {
 						List<ColumnPatternTestConfiguration.File.Column> columns = file.getColumn();
-						int expectedColumnCount = columns.size();
+						int configColumnCount = columns.size();
+						Boolean allowAdditionalColumns = file.isAllowAdditionalColumns();
 						BufferedReader reader = Files.newBufferedReader(rf2File.toPath(), Charset.forName(UTF_8));
 						filesTested++;
 						String line;
@@ -67,9 +68,9 @@ public class ColumnPatternTest {
 							linesTested++;
 							lineNumber++;
 							columnData = line.split("\t");
-							int columnCount = columnData.length;
-							if (columnCount == expectedColumnCount) {
-								for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+							int dataColumnCount = columnData.length;
+							if (dataColumnCount == configColumnCount || (dataColumnCount > configColumnCount && allowAdditionalColumns)) {
+								for (int columnIndex = 0; columnIndex < dataColumnCount; columnIndex++) {
 									ColumnPatternTestConfiguration.File.Column column = columns.get(columnIndex);
 									value = columnData[columnIndex];
 									if (lineNumber == 1) {
@@ -81,7 +82,7 @@ public class ColumnPatternTest {
 									}
 								}
 							} else {
-								validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, columnCount, expectedColumnCount);
+								validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, dataColumnCount, configColumnCount);
 							}
 						}
 					} catch (IOException e) {
