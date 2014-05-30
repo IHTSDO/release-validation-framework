@@ -6,6 +6,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.ihtsdo.release.assertion.log.ValidationLog;
+import org.ihtsdo.release.assertion.log.ValidationLogImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,11 @@ public class ResourceProviderFactoryImpl implements ResourceProviderFactory, Con
 		File basedir = mavenProject.getBasedir();
 		File file = new File(basedir, filename);
 		return new FileInputStream(file);
+	}
+
+	@Override
+	public ValidationLog getValidationLog(Class<?> subject) {
+		return new ValidationLogImpl(subject);
 	}
 
 	private <T extends ResourceProvider> T createResourceProvider(Class<T> resourceProviderClass) throws ResourceProviderFactoryException {
