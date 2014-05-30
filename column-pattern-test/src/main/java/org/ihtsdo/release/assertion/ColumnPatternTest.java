@@ -95,7 +95,7 @@ public class ColumnPatternTest {
 
 	private void testDataValue(long lineNumber, String value, ColumnPatternTestConfiguration.File.Column column) {
 		// UUID
-		if (column.getUid() != null) {
+		if (column.getUuid() != null) {
 			if (!UUID_PATTERN.matcher(value).matches()) {
 				LOGGER.error("Value does not match UUID pattern on line {}, column name '{}': value '{}'", lineNumber, column.getName(), value);
 			}
@@ -133,8 +133,8 @@ public class ColumnPatternTest {
 			}
 		}
 
-		// Component ID
-		if (column.getComponentId() != null) {
+		// Component SCT ID
+		if (column.getSctid() != null) {
 			if (!COMPONENT_ID_PATTERN.matcher(value).matches()) {
 				LOGGER.error("Value does not match Component ID pattern on line {}, column name '{}': value '{}'", lineNumber, column.getName(), value);
 			}
