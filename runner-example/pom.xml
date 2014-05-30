@@ -30,10 +30,10 @@
 		<!-- Plugins run in order -->
 		<plugins>
 
-			<!-- Environment Manager -->
+			<!-- Release Validation Framework Core -->
 			<plugin>
 				<groupId>org.ihtsdo.snomed.release</groupId>
-				<artifactId>assertion-environment-manager</artifactId>
+				<artifactId>release-validation-framework-core</artifactId>
 				<version>${raf-version}</version>
 				<executions>
 					<execution>

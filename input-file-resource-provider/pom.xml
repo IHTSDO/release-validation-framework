@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.ihtsdo.snomed.release</groupId>
-			<artifactId>assertion-environment-manager</artifactId>
+			<artifactId>release-validation-framework-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

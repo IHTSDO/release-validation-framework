@@ -16,7 +16,7 @@
 	</properties>
 
 	<modules>
-		<module>assertion-environment-manager</module>
+		<module>release-validation-framework-core</module>
 		<module>input-file-resource-provider</module>
 		<module>column-pattern-test</module>
 		<module>runner-example</module>
