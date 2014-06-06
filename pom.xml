@@ -13,10 +13,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>3.2.7.RELEASE</spring.version>
 		<slf4j.version>1.7.5</slf4j.version>
+        <jackson.version>2.3.0</jackson.version>
 	</properties>
 
 	<modules>
 		<module>release-validation-framework-core</module>
+		<module>release-validation-framework-web</module>
 		<module>input-file-resource-provider</module>
 		<module>column-pattern-test</module>
 		<module>runner-example</module>
