@@ -10,15 +10,15 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>release-validation-framework-web</artifactId>
-    <!--<packaging>war</packaging>-->
+    <artifactId>api</artifactId>
+    <packaging>war</packaging>
 
-    <name>release-validation-framework-web</name>
+    <name>api</name>
 
-    <!--<properties>-->
-        <!--<execFinalName>exec-${project.build.finalName}.jar</execFinalName>-->
-        <!--<packageName>${project.parent.artifactId}-${project.artifactId}</packageName>-->
-    <!--</properties>-->
+    <properties>
+        <execFinalName>validation-${project.build.finalName}.jar</execFinalName>
+        <packageName>${project.parent.artifactId}-${project.artifactId}</packageName>
+    </properties>
 
     <dependencies>
         <!-- Spring -->
@@ -88,29 +88,35 @@
         </dependency>
     </dependencies>
 
-    <!--<build>-->
-        <!--<finalName>${project.artifactId}</finalName>-->
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.tomcat.maven</groupId>-->
-                <!--<artifactId>tomcat7-maven-plugin</artifactId>-->
-                <!--<version>2.1</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>tomcat-run</id>-->
-                        <!--<goals>-->
-                            <!--<goal>exec-war-only</goal>-->
-                        <!--</goals>-->
-                        <!--<phase>package</phase>-->
-                        <!--<configuration>-->
-                            <!--<path>/web</path>-->
-                            <!--<finalName>${execFinalName}</finalName>-->
-                            <!--<enableNaming>true</enableNaming>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
-    <!--</build>-->
+    <!--
+        tomcat debug run command:
+        java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -jar api/target/validation-api.jar
+    -->
 
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.1</version>
+                <executions>
+                    <execution>
+                        <id>tomcat-run</id>
+                        <goals>
+                            <goal>exec-war-only</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <path>/web</path>
+                            <finalName>${execFinalName}</finalName>
+                            <enableNaming>true</enableNaming>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    
 </project>

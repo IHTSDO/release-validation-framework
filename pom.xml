@@ -14,15 +14,26 @@
 		<spring.version>3.2.7.RELEASE</spring.version>
 		<slf4j.version>1.7.5</slf4j.version>
         <jackson.version>2.3.0</jackson.version>
+        <hibernate.version>3.6.10.Final</hibernate.version>
+        <hsql.version>5.3.0</hsql.version>
 	</properties>
 
 	<modules>
 		<module>release-validation-framework-core</module>
-		<module>release-validation-framework-web</module>
+		<module>api</module>
+		<module>data-service</module>
+		<module>model</module>
 		<module>input-file-resource-provider</module>
 		<module>column-pattern-test</module>
 		<module>runner-example</module>
 	</modules>
+
+    <scm>
+        <connection>scm:git:git@github.com:IHTSDO/release-validation-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:IHTSDO/release-validation-framework.git</developerConnection>
+        <url>http://github.com/IHTSDO/release-validation-framework</url>
+        <tag>HEAD</tag>
+    </scm>
 
 	<dependencies>
         <dependency>
@@ -64,6 +75,16 @@
 
 	<dependencyManagement>
 		<dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
