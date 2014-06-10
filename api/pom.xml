@@ -21,6 +21,12 @@
     </properties>
 
     <dependencies>
+        <!-- Module dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>data-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -89,7 +95,7 @@
     </dependencies>
 
     <!--
-        tomcat debug run command:
+        jar debug run command to enable intelliJ remote debugging:
         java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -jar api/target/validation-api.jar
     -->
 

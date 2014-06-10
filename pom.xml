@@ -26,6 +26,7 @@
 		<module>input-file-resource-provider</module>
 		<module>column-pattern-test</module>
 		<module>runner-example</module>
+        <module>web</module>
 	</modules>
 
     <scm>

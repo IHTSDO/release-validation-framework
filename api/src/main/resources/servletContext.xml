@@ -21,4 +21,11 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
+    <!-- json generator to build json from our objects for the ember output -->
+    <bean factory-bean="objectMapperFactory" factory-method="createObjectMapper"/>
+
+    <bean id="objectMapperFactory" class="org.ihtsdo.rvf.service.mapping.JacksonObjectMapperFactory"/>
+
+    <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>
+
 </beans>

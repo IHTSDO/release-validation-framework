@@ -21,9 +21,6 @@
             <param-value>classpath:DispatcherServlet-servlet.xml</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
-        <multipart-config>
-            <max-file-size>1073741824</max-file-size><!-- 1GB - can be changed later -->
-        </multipart-config>
     </servlet>
 
     <servlet-mapping>

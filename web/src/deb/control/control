@@ -1,0 +1,9 @@
+Package: [[packageName]]
+Version: [[version]]
+Priority: optional
+Architecture: all
+Depends: nginx
+Maintainer: Kai Kewley <kke@ihtsdo.org>
+Description: [[name]]
+Distribution: stable
+Section: web

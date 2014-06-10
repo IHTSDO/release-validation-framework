@@ -3,21 +3,16 @@ package org.ihtsdo.rvf.entity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
-/**
- * An Assertion represents a truth in snomed, it consists of a number of tests to verify
- * that assertion.
- */
 @Entity
-public class Assertion {
+public class Test {
 
-    public Assertion() {
+    public Test() {
     }
 
-    public Assertion(Long id, String name) {
-        this.name = name;
+    public Test(Long id, String name) {
         this.id = id;
+        this.name = name;
     }
 
     public Long getId() {
@@ -36,9 +31,17 @@ public class Assertion {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Id
     @GeneratedValue
     private Long id;
-
     private String name;
+    private String description;
 }

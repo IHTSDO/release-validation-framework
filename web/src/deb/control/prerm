@@ -1,0 +1,11 @@
+#!/bin/sh -e
+
+#For debugging uncomment these two lines
+set -x
+echo $*
+
+case $1 in
+	remove)
+		test -f /srv/http/[[packageName]]/version.txt && rm /srv/http/[[packageName]]/version.txt
+	;;
+esac

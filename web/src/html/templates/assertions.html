@@ -1,0 +1,26 @@
+{{partial "header"}}
+
+<div class="row">
+    <div class="col-xs-4">
+        <h2>Current Assertions</h2>
+
+        <ul>
+            {{#each}}
+                <li>
+                    {{#link-to 'assertion' this}}{{name}}{{/link-to}}
+                </li>
+            {{/each}}
+        </ul>
+    </div>
+    <!--<div class="col-xs-4">-->
+        <!--{{outlet}}-->
+    <!--</div>-->
+</div>
+
+<button class="btn btn-primary btn-md list-align" {{action 'addAssertion' this}}>
+    <span class="glyphicon glyphicon-plus"></span> Add Assertion
+</button>
+
+<button class="btn btn-primary btn-md list-align" {{action 'addAssertion' this}}>
+    <span class="glyphicon glyphicon-plus"></span> Add a Product
+</button>
