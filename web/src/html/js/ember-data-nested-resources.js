@@ -15,6 +15,8 @@ DS.RESTAdapter.reopen({
 		this.setCurrentRecord(record);
 		try {
 			// Call original implementation
+            console.log(" trying to diagnose the issue with PUT so store = ", store);
+            console.log(" trying to diagnose the issue with PUT so record = ", record);
 			return this._super(store, type, record);
 		} finally {
 			this.clearCurrentRecord();

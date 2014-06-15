@@ -7,21 +7,26 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 
-/**
- * User: Bronwen Cassidy
- * Date: 08/06/2014
- * Time: 21:37
- */
 @Repository
 public abstract class EntityDaoImpl<T> implements EntityDao<T> {
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    private final Class<T> type;
+
+    protected EntityDaoImpl(Class<T> type) {
+        this.type = type;
+    }
+
     @Override
     public void save(T entity) {
-
+        getCurrentSession().save(entity);
     }
 
     @Override
     public T load(Serializable id) {
-        return null;
+        return (T) getCurrentSession().get(type, id);
     }
 
     @Override
@@ -32,7 +37,4 @@ public abstract class EntityDaoImpl<T> implements EntityDao<T> {
     protected Session getCurrentSession() {
         return sessionFactory.getCurrentSession();
     }
-
-    @Autowired
-    private SessionFactory sessionFactory;
 }

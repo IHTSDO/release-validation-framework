@@ -1332,7 +1332,7 @@ define("ember-data/lib/adapters/rest_adapter",
 
         var id = get(record, 'id');
 
-        return this.ajax(this.buildURL(type.typeKey, id), "PUT", { data: data });
+        return this.ajax(this.buildURL(type.typeKey, id), "POST", { data: data });
       },
 
       /**

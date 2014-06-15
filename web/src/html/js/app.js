@@ -14,10 +14,13 @@ App.ApplicationController = Ember.ObjectController.extend({
 
 App.Router.map(function() {
     // put your routes here
-    this.resource('assertions');
-    this.resource('assertion', {path: 'assertions/:assertion_id'});
+    this.resource('assertions', function() {
+        this.resource('assertion', {path: 'view/:assertion_id'});
+        this.resource('edit-assertion', {path: 'edit/:assertion_id'});
+    });
     this.resource('tests');
     this.resource('create-assertion');
+
 });
 
 App.AbstractController = Ember.ObjectController.reopen({
@@ -72,20 +75,19 @@ App.AssertionsRoute = Ember.Route.extend({
         return this.store.findAll('assertion');
     },
     actions: {
-//        submit: function() {
-//            var assertion = this.get('model');
-//            assertion.get('assertions').pushObject(assertion);
-//            assertion.save();
-//            this.send('closeModal');
-//        },
         addAssertion: function() {
-            console.log("should be opening the popup");
             this.send('openModal', 'create-assertion');
         }
     }
 });
 
 App.AssertionRoute = Ember.Route.extend({
+    model : function(params) {
+        return this.store.find('assertion', params.assertion_id);
+    }
+});
+
+App.EditAssertionRoute = Ember.Route.extend({
     model : function(params) {
         return this.store.find('assertion', params.assertion_id);
     }
@@ -100,23 +102,55 @@ App.CreateAssertionView = Ember.View.extend({
 });
 
 App.CreateAssertionController = Ember.ObjectController.extend({
+    getModel: function() {
+        var assertion = this.store.createRecord('assertion');
+        return  assertion;
+    },
     actions: {
         submit: function() {
             var assertion = this.get('model');
-            assertion.get('assertions').pushObject(assertion);
             assertion.save();
             this.send('closeModal');
         },
-        addAssertion: function() {
-            console.log("should be opening the popup");
-            this.send('openModal', 'create-assertion');
+        cancel: function() {
+            var assertion = this.get('model');
+            assertion.deleteRecord();
+            this.send('closeModal');
+        },
+        close: function() {
+            var assertion = this.get('model');
+            assertion.deleteRecord();
+            this.send('closeModal');
         }
     }
 });
 
-// tests
 
-// Index
+App.EditAssertionView = Ember.View.extend({
+    templateName: 'edit-assertion'
+});
+
+App.EditAssertionController = Ember.ObjectController.extend({
+    getModel : function(params) {
+        return this.store.find('assertion', params.assertion_id);
+    },
+    actions: {
+        submit: function() {
+            var model = this.get('model');
+            console.log("2 ", model);
+            //this.store.push('assertion', assertion);
+            model.save();
+            this.transitionToRoute('assertions');
+        },
+        cancel: function() {
+            var assertion = this.get('model');
+            console.log("Dont like ember", assertion);
+            assertion.rollback();
+            this.transitionToRoute('assertions');
+        }
+    }
+});
+// tests
 
 // Confirm dialog
 App.ConfirmDialogView = Ember.View.extend({

@@ -21,8 +21,11 @@ App.DSModel = DS.Model.extend(Ember.Validations.Mixin);
 
 App.Assertion = DS.Model.extend({
 	name: DS.attr(),
+	description: DS.attr(),
+	statement: DS.attr(),
+	docLink: DS.attr(),
+	keywords: DS.attr(),
 	tests: DS.hasMany('test', { async: true })
-
 });
 
 App.Test = DS.Model.extend({

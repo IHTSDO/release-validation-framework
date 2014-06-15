@@ -25,15 +25,5 @@ public class EntityServiceImpl<T> implements EntityService<T> {
 
     }
 
-    @Override
-    public List<T> findAll() {
-        return null;
-    }
-
-    @Override
-    public T find(Long id) {
-        return null;
-    }
-
     private final EntityDao dao;
 }

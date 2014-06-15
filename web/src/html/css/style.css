@@ -200,3 +200,9 @@ td.warning {
 	cursor: pointer; 
 	cursor: hand;
 }
+
+
+/* for some reason dialog is misbehaving - i will be using it for forms so probably need some width */
+.modal {
+    width: 620px;
+}

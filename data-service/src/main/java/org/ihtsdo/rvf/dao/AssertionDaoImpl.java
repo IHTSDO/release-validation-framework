@@ -13,13 +13,15 @@ import java.util.List;
  */
 public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements AssertionDao {
 
+    public AssertionDaoImpl() {
+        super(Assertion.class);
+    }
+
     @Override
     public List<Assertion> findAll() {
-        Query query = getCurrentSession().createQuery(
-                "select assertion " +
-                        "from Assertion a " +
-                        "order by a.id ");
-        return query.list();
+        return getCurrentSession()
+                .createQuery("from Assertion assertion order by assertion.name")
+                .list();
     }
 
 }

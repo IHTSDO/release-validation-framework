@@ -1,12 +1,12 @@
-<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" {{action 'close'}} class="close" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="modalLabel">New Assertion</h4>
+{{partial "header"}}
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel panel-default panel-build-input">
+            <div class="panel-heading">
+                <h3 class="panel-title">Edit Assertion {{name}}</h3>
             </div>
             {{#form-for controller}}
-            <div class="modal-body">
+            <div class="panel-body">
                 {{input name label='Assertion Name'}}
                 <label>Statement of Truth</label>
                 {{textarea value=statement cols="80" rows="4"}}
@@ -15,7 +15,7 @@
                 <label>Description</label>
                 {{textarea value=description cols="80" rows="4"}}
             </div>
-            <div class="modal-footer">
+            <div class="panel-footer">
                 <button type="button" {{action 'cancel'}} class="btn btn-default">Cancel</button>
                 {{submit class='btn btn-primary'}}
             </div>

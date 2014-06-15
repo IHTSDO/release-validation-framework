@@ -2,13 +2,16 @@ package org.ihtsdo.rvf.service;
 
 import org.ihtsdo.rvf.entity.Assertion;
 
+import java.util.List;
+import java.util.Map;
+
 /**
- * User: Bronwen Cassidy
- * Date: 08/06/2014
- * Time: 21:05
+ *
  */
 public interface AssertionService extends EntityService<Assertion> {
 
-    Assertion create(String name);
-
+    Assertion create(String name, Map<String, String> properties);
+    Assertion update(Long id, Map<String, String> newValues);
+    List<Assertion> findAll();
+    Assertion find(Long id);
 }
