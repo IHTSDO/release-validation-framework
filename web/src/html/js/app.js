@@ -109,8 +109,15 @@ App.CreateAssertionController = Ember.ObjectController.extend({
     actions: {
         submit: function() {
             var assertion = this.get('model');
-            assertion.save();
-            this.send('closeModal');
+            var nameVal = assertion.get('name');
+            if(!nameVal || nameVal.trim().length < 3) {
+                $('#c_ass_name_error').show();
+            } else {
+                $('#c_ass_name_error').hide();
+                assertion.save();
+                this.send('closeModal');
+                this.transitionToRoute('assertions');
+            }
         },
         cancel: function() {
             var assertion = this.get('model');

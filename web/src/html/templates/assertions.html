@@ -12,7 +12,7 @@
                         <thead>
                         <tr>
                             <th>Name</th>
-                            <!--<th>Tags</th>-->
+                            <th>Satement</th>
                             <!--<th>Version</th>-->
                             <th>Actions</th>
                         </tr>
@@ -21,6 +21,7 @@
                             {{#each}}
                                 <tr>
                                     <td>{{#link-to 'assertion' this}}{{name}}{{/link-to}}</td>
+                                    <td>{{statement}}</td>
                                     <td>{{#link-to 'edit-assertion' this}}<span class="glyphicon glyphicon-edit" title="Edit Assertion"></span>{{/link-to}}</td>
                                 </tr>
                             {{else}}

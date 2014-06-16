@@ -5,9 +5,12 @@
                 <button type="button" {{action 'close'}} class="close" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="modalLabel">New Assertion</h4>
             </div>
-            {{#form-for controller}}
+            {{#form-for controller name='yikes'}}
             <div class="modal-body">
                 {{input name label='Assertion Name'}}
+                <div id="c_ass_name_error" class="alert alert-warning" style="display: none">
+                    Name cannot be blank and must be at least 3 characters long
+                </div>
                 <label>Statement of Truth</label>
                 {{textarea value=statement cols="80" rows="4"}}
                 {{input docLink label='Document Link'}}

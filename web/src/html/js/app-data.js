@@ -25,7 +25,14 @@ App.Assertion = DS.Model.extend({
 	statement: DS.attr(),
 	docLink: DS.attr(),
 	keywords: DS.attr(),
-	tests: DS.hasMany('test', { async: true })
+	tests: DS.hasMany('test', { async: true }),
+    validations: {
+        name: {
+            presence: true,
+            length: { minimum: 3 }
+
+        }
+    }
 });
 
 App.Test = DS.Model.extend({
