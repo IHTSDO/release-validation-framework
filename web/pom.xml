@@ -13,7 +13,7 @@
     <name>Web Front End</name>
 
     <properties>
-        <packageName>${project.parent.artifactId}-${project.artifactId}</packageName>
+        <packageName>rvf-${project.artifactId}</packageName>
     </properties>
 
     <build>
