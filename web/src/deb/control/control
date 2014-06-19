@@ -3,7 +3,7 @@ Version: [[version]]
 Priority: optional
 Architecture: all
 Depends: nginx
-Maintainer: Kai Kewley <kke@ihtsdo.org>
+Maintainer: Delivery Development Team <delivery@ihtsdo.org>
 Description: [[name]]
 Distribution: stable
 Section: web
