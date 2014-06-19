@@ -122,16 +122,6 @@
 							</execution>
 					</executions>
 				</plugin>
-				<plugin>
-					<groupId>external.atlassian.jgitflow</groupId>
-					<artifactId>jgitflow-maven-plugin</artifactId>
-					<version>1.0-m1.1</version>
-					<configuration>
-						<autoVersionSubmodules>true</autoVersionSubmodules>
-						<enableSshAgent>true</enableSshAgent>
-						<noDeploy>true</noDeploy>
-					</configuration>
-				</plugin>
 			</plugins>
 	</build>
 </project>
