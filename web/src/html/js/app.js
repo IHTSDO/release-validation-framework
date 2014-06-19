@@ -144,8 +144,7 @@ App.EditAssertionController = Ember.ObjectController.extend({
     actions: {
         submit: function() {
             var model = this.get('model');
-            console.log("2 ", model);
-            //this.store.push('assertion', assertion);
+
             model.save();
             this.transitionToRoute('assertions');
         },
@@ -181,7 +180,6 @@ function afterRender() {
 	console.log("in function afterRender()");
 	$("[data-toggle='tooltip']").tooltip();
 	effectPulse($('.traffic-light-in-progress'));
-	//initUploadForm();
 }
 
 function effectPulse($selection) {
