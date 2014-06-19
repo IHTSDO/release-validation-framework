@@ -6,5 +6,5 @@ echo $*
 
 APP_NAME=[[packageName]]
 
-supervisorctl update $APP_NAME 2>&1 >/dev/null
-supervisorctl start $APP_NAME 2>&1 >/dev/null
+supervisorctl update $APP_NAME || true
+supervisorctl start $APP_NAME || true
