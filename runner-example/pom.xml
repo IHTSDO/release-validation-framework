@@ -12,11 +12,6 @@
 
 	<packaging>pom</packaging>
 
-	<properties>
-		<!-- Having to keep this in sync with sibling modules otherwise jgitflow gets confused when one changes and the other doesn't -->
-		<rvf-version>${project.version}</rvf-version>
-	</properties>
-
 	<dependencies>
 		<!-- Release Files -->
 		<dependency>
@@ -35,7 +30,7 @@
 			<plugin>
 				<groupId>org.ihtsdo.snomed.rvf</groupId>
 				<artifactId>release-validation-framework-core</artifactId>
-				<version>${rvf-version}</version>
+				<version>${project.version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -49,7 +44,7 @@
 			<plugin>
 				<groupId>org.ihtsdo.snomed.rvf</groupId>
 				<artifactId>column-pattern-test</artifactId>
-				<version>${rvf-version}</version>
+				<version>${project.version}</version>
 				<executions>
 					<execution>
 						<goals>
