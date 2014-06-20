@@ -1,3 +1,3 @@
 Release Validation Framework
 ============================
-A framework for testing SNOMED CT.
+A framework for testing the validity of SNOMED CT files.
