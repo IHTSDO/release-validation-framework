@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" targetNamespace="http://release.ihtsdo.org/assertion/1.0.0" xmlns="http://release.ihtsdo.org/assertion/1.0.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"
+           targetNamespace="http://release.ihtsdo.org/assertion/1.0.0" xmlns="http://release.ihtsdo.org/assertion/1.0.0">
 	<xs:element name="column-pattern-test-configuration">
 		<xs:complexType>
 			<xs:sequence>
