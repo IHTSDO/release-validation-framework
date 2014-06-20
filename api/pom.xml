@@ -5,7 +5,7 @@
 	<parent>
 			<groupId>org.ihtsdo.snomed.rvf</groupId>
 			<artifactId>release-validation-framework</artifactId>
-			<version>0.1.1</version>
+			<version>0.1.2</version>
 	</parent>
 
 	<artifactId>api</artifactId>
@@ -15,7 +15,7 @@
 
 	<properties>
 			<execFinalName>validation-${project.build.finalName}.jar</execFinalName>
-			<packageName>${project.parent.artifactId}-${project.artifactId}</packageName>
+			<packageName>rvf-${project.artifactId}</packageName>
 	</properties>
 
 	<dependencies>
@@ -197,12 +197,12 @@
 										<filemode>0750</filemode>
 									</mapper>
 								</data>
-								<data>
+								<!--								<data>
 									<type>link</type>
 									<linkName>/var/log/${packageName}</linkName>
 									<linkTarget>/var/opt/${packageName}/log</linkTarget>
 									<symlink>true</symlink>
-								</data>
+								</data> -->
 							</dataSet>
 						</configuration>
 					</execution>
