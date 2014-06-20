@@ -2,8 +2,8 @@ Package: [[packageName]]
 Version: [[version]]
 Priority: optional
 Architecture: all
-Depends: nginx
-Maintainer: Delivery Development Team <delivery@ihtsdo.org>
+Depends: openjdk-7-jdk, supervisor
+Maintainer: DevOps Support <devops@ihtsdo.org>
 Description: [[name]]
 Distribution: stable
 Section: web
