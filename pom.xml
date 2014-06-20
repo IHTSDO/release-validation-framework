@@ -22,6 +22,7 @@
 		<module>release-validation-framework-core</module>
 		<module>api</module>
 		<module>data-service</module>
+		<module>validation-service</module>
 		<module>model</module>
 		<module>input-file-resource-provider</module>
 		<module>column-pattern-test</module>
