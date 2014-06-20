@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.validation;
 import org.ihtsdo.release.assertion.ResourceProvider;
 import org.ihtsdo.release.assertion.ResourceProviderFactory;
 import org.ihtsdo.release.assertion.ResourceProviderFactoryException;
+import org.ihtsdo.release.assertion.log.ValidationLog;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,4 +26,10 @@ public class RvfResourceProviderFactoryImpl implements ResourceProviderFactory {
         File file = new File(filename);
         return new FileInputStream(file);
     }
+
+	@Override
+	public ValidationLog getValidationLog(Class<?> arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

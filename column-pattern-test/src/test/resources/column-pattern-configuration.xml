@@ -1,7 +1,7 @@
 <column-pattern-test-configuration xmlns="http://release.ihtsdo.org/assertion/1.0.0">
 	<file name="blaugh.txt">
 		<column name="id">
-			<uid/>
+			<uuid/>
 		</column>
 		<column name="effectiveTime">
 			<dateStamp>

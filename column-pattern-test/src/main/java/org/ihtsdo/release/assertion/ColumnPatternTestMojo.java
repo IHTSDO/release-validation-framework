@@ -7,6 +7,7 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.ihtsdo.release.assertion._1_0.ColumnPatternTestConfiguration;
+import org.ihtsdo.release.assertion.log.ValidationLog;
 import org.ihtsdo.release.assertion.setup.InputFileResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,9 @@ public class ColumnPatternTestMojo extends AbstractMojo {
 			InputFileResourceProvider resourceProvider = resourceProviderFactory.getResourceProvider(InputFileResourceProvider.class);
 			File rf2FilesDirectory = resourceProvider.getRF2FilesDirectory();
 
-			ColumnPatternTest columnPatternTest = new ColumnPatternTest(configuration, rf2FilesDirectory);
+			ValidationLog validationLog = resourceProviderFactory.getValidationLog(ColumnPatternTest.class);
+
+			ColumnPatternTest columnPatternTest = new ColumnPatternTest(validationLog, configuration, rf2FilesDirectory);
 			columnPatternTest.runTests();
 		} catch (ResourceProviderFactoryException e) {
 			throw new MojoExecutionException("Failed to get InputFileResourceProvider", e);
