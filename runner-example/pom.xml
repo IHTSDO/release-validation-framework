@@ -13,7 +13,8 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<rvf-version>0.0.1-SNAPSHOT</rvf-version>
+		<!-- Having to keep this in sync with sibling modules otherwise jgitflow gets confused when one changes and the other doesn't -->
+		<rvf-version>${project.version}</rvf-version>
 	</properties>
 
 	<dependencies>
