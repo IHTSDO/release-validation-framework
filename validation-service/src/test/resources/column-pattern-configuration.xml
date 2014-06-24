@@ -1,24 +1,46 @@
-<test-configuration xmlns="http://release.ihtsdo.org/rvf/1.0.0">
-	<file name="blaugh.txt">
-		<column name="id">
-			<uid/>
-		</column>
-		<column name="effectiveTime">
-			<dateStamp>
-				<maxDate>20140131</maxDate>
-			</dateStamp>
-		</column>
-		<column name="active">
-			<boolean/>
-		</column>
-		<column name="moduleId">
-			<value>900000000000207008</value>
-		</column>
-		<column name="refSetId">
-			<sctid/>
-		</column>
-		<column name="referencedComponentId">
-			<sctid/>
-		</column>
-	</file>
-</test-configuration>
+<column-pattern-configuration xmlns="http://rvf.ihtsdo.org/assertion/1.0.0">
+    <file name="no-file-found.txt">
+        <column name="id">
+            <uuid/>
+        </column>
+        <column name="effectiveTime">
+            <dateStamp>
+                <maxDate>20140131</maxDate>
+            </dateStamp>
+        </column>
+        <column name="active">
+            <boolean/>
+        </column>
+        <column name="moduleId">
+            <value>900000000000207008</value>
+        </column>
+        <column name="refSetId">
+            <sctid/>
+        </column>
+        <column name="referencedComponentId">
+            <sctid/>
+        </column>
+    </file>
+    <file name="der2_Refset_SimpleFull_INT_20140131.txt">
+        <column name="id">
+            <uuid/>
+        </column>
+        <column name="effectiveTime">
+            <dateStamp>
+                <maxDate>20140131</maxDate>
+            </dateStamp>
+        </column>
+        <column name="active">
+            <boolean/>
+        </column>
+        <column name="moduleId">
+            <value>900000000000207008</value>
+        </column>
+        <column name="refSetId">
+            <sctid/>
+        </column>
+        <column name="referencedComponentId">
+            <sctid/>
+        </column>
+    </file>
+</column-pattern-configuration>
