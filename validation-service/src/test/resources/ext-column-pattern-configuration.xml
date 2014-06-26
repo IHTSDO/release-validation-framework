@@ -1,0 +1,45 @@
+<column-pattern-configuration xmlns="http://rvf.ihtsdo.org/assertion/1.0.0">
+    <file name="der2_iisssccRefset_ExtendedMapDelta_INT_20140131.txt" allowAdditionalColumns="true">
+        <column name="id">
+            <uuid/>
+        </column>
+        <column name="effectiveTime">
+            <dateStamp>
+                <maxDate>20140131</maxDate>
+            </dateStamp>
+        </column>
+        <column name="active">
+            <boolean/>
+        </column>
+        <column name="moduleId">
+            <value>449080006</value>
+        </column>
+        <column name="refSetId">
+            <sctid/>
+        </column>
+        <column name="referencedComponentId">
+            <sctid/>
+        </column>
+        <column name="mapGroup">
+            <integer/>
+        </column>
+        <column name="mapPriority">
+            <integer/>
+        </column>
+        <column name="mapRule">
+            <string/>
+        </column>
+        <column name="mapAdvice">
+            <string/>
+        </column>
+        <column name="mapTarget">
+            <string/>
+        </column>
+        <column name="correlationId">
+            <stcid/>
+        </column>
+        <column name="mapCategoryId">
+            <stcid/>
+        </column>
+    </file>
+</column-pattern-configuration>

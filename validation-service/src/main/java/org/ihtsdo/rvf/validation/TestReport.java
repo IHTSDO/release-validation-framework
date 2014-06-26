@@ -22,7 +22,7 @@ public class TestReport implements Serializable {
         return formatter.formatResults(failures, testRuns);
     }
 
-    public void addFailure(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String columnValue) {
+    public void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String columnValue) {
         TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, columnValue);
         failures.add(item);
         testRuns.add(item);
@@ -33,7 +33,7 @@ public class TestReport implements Serializable {
         testRuns.add(item);
     }
 
-    public int getNumFailures() {
+    public int getErrorCount() {
         return failures.size();
     }
 
