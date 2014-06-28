@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.validation;
 
 import org.ihtsdo.release.assertion.ResourceProviderFactoryImpl;
 import org.ihtsdo.release.assertion.log.TestValidationLogImpl;
+import org.ihtsdo.release.assertion.log.ValidationLog;
 import org.ihtsdo.rvf.assertion._1_0.Column;
 import org.ihtsdo.rvf.assertion._1_0.ColumnPatternConfiguration;
 import org.junit.Before;
@@ -23,10 +24,9 @@ public class ColumnPatternTesterTest {
     private ConfigurationFactory factory;
     private TestReport testReport;
 
-    private static final Pattern SIMPLE_REFSET = Pattern.compile("x?der2_sRefset_Simple.*\\.txt");
+    private static final Pattern SIMPLE_REFSET = Pattern.compile("x?der2_sRefset_SimpleMap.*\\.txt");
     private static final Pattern COMPLEX_REFSET = Pattern.compile("x?der2_iissscRefset_ComplexMap.*\\.txt");
     private static final Pattern EXTENDED_REFSET = Pattern.compile("x?der2_iisssccRefset_ExtendedMap.*\\.txt");
-    //
 
     @Before
     public void setup() {
@@ -35,30 +35,13 @@ public class ColumnPatternTesterTest {
         configs.put("/ext-column-pattern-configuration.xml", "x?der2_iisssccRefset_ExtendedMap.*\\.txt");
         configs.put("/complex-column-pattern-configuration.xml", "x?der2_iissscRefset_ComplexMap.*\\.txt");
         factory = new ConfigurationFactory(configs, new ResourceProviderFactoryImpl());
+        ResourceManager resourceManager = new TestFileResourceProvider(new File(""));
+        testReport = new TestReport(new CsvResultFormatter());
+        tester = new ColumnPatternTester(new TestValidationLogImpl(ColumnPatternTester.class), factory, resourceManager, testReport);
     }
 
     @Test
     public void testFileNotFound() throws Exception {
-
-        ResourceManager resourceManager = new TestFileResourceProvider(new File(""));
-        testReport = new TestReport(new CsvResultFormatter());
-        tester = new ColumnPatternTester(new TestValidationLogImpl(ColumnPatternTester.class), factory, resourceManager, testReport);
-
-        ColumnPatternConfiguration.File file = new ColumnPatternConfiguration.File();
-        Column column = new Column();
-        column.setName("id");
-        column.setSctid("");
-        file.getColumn().add(column);
-        ColumnPatternConfiguration configuration = factory.getConfiguration(SIMPLE_REFSET);
-        configuration.getFile().add(file);
-        tester.runTests();
-
-        assertEquals(1, testReport.getErrorCount());
-        assertEquals(0, testReport.getNumSuccesses());
-    }
-
-    @Test
-    public void testInvalidSctId() throws Exception {
 
         ColumnPatternConfiguration.File file = new ColumnPatternConfiguration.File();
         Column column = new Column();
