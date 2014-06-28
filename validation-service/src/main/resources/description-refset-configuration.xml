@@ -18,5 +18,11 @@
         <column name="referencedComponentId">
             <sctid/>
         </column>
+        <column name="descriptionFormat">
+            <sctid/>
+        </column>
+        <column name="descriptionLength">
+            <integer/>
+        </column>
     </file>
 </column-pattern-configuration>

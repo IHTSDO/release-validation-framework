@@ -1,0 +1,4 @@
+testExecutionId, testExecutionStartDate, fileName, filePath, columnName, testType, testPattern, testResult, failureCount, failureExample
+der2_Refset_SimpleFull_INT_20140131.txt, 28/06/14 17:01, der2_Refset_SimpleFull_INT_20140131.txt, C:\Users\gesheba\AppData\Local\Temp\SnomedCT_Release_INT_20140831.zip2434824390942436164.zip, null, FileNameTest, null, true, 3, need to get failure examples
+der2_Refset_SimpleSnapshot_INT_20140131.txt, 28/06/14 17:01, der2_Refset_SimpleSnapshot_INT_20140131.txt, C:\Users\gesheba\AppData\Local\Temp\SnomedCT_Release_INT_20140831.zip2434824390942436164.zip, null, FileNameTest, null, true, 3, need to get failure examples
+der2_Refset_SimpleDelta_INT_20140131.txt, 28/06/14 17:01, der2_Refset_SimpleDelta_INT_20140131.txt, C:\Users\gesheba\AppData\Local\Temp\SnomedCT_Release_INT_20140831.zip2434824390942436164.zip, null, FileNameTest, null, true, 3, need to get failure examples

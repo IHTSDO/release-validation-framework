@@ -18,5 +18,11 @@
         <column name="referencedComponentId">
             <sctid/>
         </column>
+        <column name="referencedComponentId">
+            <integer/>
+        </column>
+        <column name="linkToId">
+            <sctid/>
+        </column>
     </file>
 </column-pattern-configuration>

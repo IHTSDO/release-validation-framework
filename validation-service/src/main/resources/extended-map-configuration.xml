@@ -18,5 +18,26 @@
         <column name="referencedComponentId">
             <sctid/>
         </column>
+        <column name="mapGroup">
+            <integer/>
+        </column>
+        <column name="mapPriority">
+            <integer/>
+        </column>
+        <column name="mapRule">
+            <string/>
+        </column>
+        <column name="mapAdvice">
+            <string/>
+        </column>
+        <column name="mapTarget">
+            <string/>
+        </column>
+        <column name="correlationId">
+            <stcid/>
+        </column>
+        <column name="mapCategoryId">
+            <stcid/>
+        </column>
     </file>
 </column-pattern-configuration>

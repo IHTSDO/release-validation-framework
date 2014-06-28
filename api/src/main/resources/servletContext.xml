@@ -21,11 +21,28 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
+    <!--<bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
     <!-- json generator to build json from our objects for the ember output -->
     <bean factory-bean="objectMapperFactory" factory-method="createObjectMapper"/>
 
     <bean id="objectMapperFactory" class="org.ihtsdo.rvf.service.mapping.JacksonObjectMapperFactory"/>
 
     <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>
+    <bean id="resourceProviderFactory" class="org.ihtsdo.release.assertion.ResourceProviderFactoryImpl"/>
+    <bean id="configurationFactory" class="org.ihtsdo.rvf.validation.ConfigurationFactory">
+        <constructor-arg>
+            <map>
+                <!--<entry key="/simple-refset-configuration.xml" value="x?der2_sRefset_SimpleMap.*\.txt"/>-->
+                <entry key="/simple-refset-configuration.xml" value="x?der2_sRefset_Simple.*\.txt"/>
+                <entry key="/extended-map-configuration.xml" value="x?der2_iisssccRefset_ExtendedMap.*\.txt"/>
+                <entry key="/complex-map-configuration.xml" value="x?der2_iissscRefset_ComplexMap.*\.txt"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg ref="resourceProviderFactory"/>
+    </bean>
+
+    <bean id="validationRunner" class="org.ihtsdo.rvf.validation.ValidationTestRunner"/>
 
 </beans>

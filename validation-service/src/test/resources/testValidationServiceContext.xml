@@ -9,6 +9,19 @@
     <context:annotation-config />
 
     <bean id="resourceProviderFactory" class="org.ihtsdo.release.assertion.ResourceProviderFactoryImpl"/>
+
+    <bean id="configurationFactory" class="org.ihtsdo.rvf.validation.ConfigurationFactory">
+        <constructor-arg>
+            <map>
+                <entry key="/column-pattern-configuration.xml" value="x?der2_sRefset_Simple.*\.txt"/>
+                <entry key="/ext-column-pattern-configuration.xml" value="x?der2_iisssccRefset_ExtendedMap.*\.txt"/>
+                <entry key="/complex-column-pattern-configuration.xml" value="x?der2_iisssccRefset_ComplexMap.*\.txt"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg ref="resourceProviderFactory"/>
+    </bean>
+
     <bean id="validationRunner" class="org.ihtsdo.rvf.validation.ValidationTestRunner"/>
+
 
 </beans>
