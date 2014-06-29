@@ -47,11 +47,11 @@ public class TestUploadFileController {
 
         ResourceManager m = new ZipFileResourceProvider(tempFile);
         TestReport report = validationRunner.execute(ResponseType.CSV, m);
-
-        File reportFile  = new File("testReport" + System.currentTimeMillis() + ".csv");
-        try (FileOutputStream out = new FileOutputStream(reportFile)) {
-            IOUtils.write(report.getResult().getBytes(), out);
-        }
+          //Todo do we write this to disk?
+//        File reportFile  = new File("testReport" + System.currentTimeMillis() + ".csv");
+//        try (FileOutputStream out = new FileOutputStream(reportFile)) {
+//            IOUtils.write(report.getResult().getBytes(), out);
+//        }
 
 
         // store the report to disk for now with a timestamp

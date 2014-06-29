@@ -35,25 +35,43 @@ public class ColumnPatternTesterTest {
         configs.put("/ext-column-pattern-configuration.xml", "x?der2_iisssccRefset_ExtendedMap.*\\.txt");
         configs.put("/complex-column-pattern-configuration.xml", "x?der2_iissscRefset_ComplexMap.*\\.txt");
         factory = new ConfigurationFactory(configs, new ResourceProviderFactoryImpl());
-        ResourceManager resourceManager = new TestFileResourceProvider(new File(""));
-        testReport = new TestReport(new CsvResultFormatter());
-        tester = new ColumnPatternTester(new TestValidationLogImpl(ColumnPatternTester.class), factory, resourceManager, testReport);
     }
 
     @Test
     public void testFileNotFound() throws Exception {
+        ResourceManager resourceManager = new TestFileResourceProvider(new File(""));
+        testReport = new TestReport(new CsvResultFormatter());
+        tester = new ColumnPatternTester(new TestValidationLogImpl(ColumnPatternTester.class), factory, resourceManager, testReport);
 
-        ColumnPatternConfiguration.File file = new ColumnPatternConfiguration.File();
-        Column column = new Column();
+        ColumnPatternConfiguration configuration = factory.getConfiguration(SIMPLE_REFSET);
+        ColumnPatternConfiguration.File file = configuration.getFile().get(0);
+        Column column = file.getColumn().get(0);
         column.setName("id");
         column.setSctid("");
-        file.getColumn().add(column);
-        ColumnPatternConfiguration configuration = factory.getConfiguration(SIMPLE_REFSET);
-        configuration.getFile().add(file);
+
         tester.runTests();
 
         assertEquals(1, testReport.getErrorCount());
         assertEquals(0, testReport.getNumSuccesses());
+    }
+
+    @Test
+    public void testInvalidId() throws Exception {
+        String filename = "/der2_sRefset_SimpleMapDelta_INT_20140131.txt";
+        File f = new File(getClass().getResource(filename).toURI());
+
+        ResourceManager resourceManager = new TestFileResourceProvider(f);
+        testReport = new TestReport(new CsvResultFormatter());
+        tester = new ColumnPatternTester(new TestValidationLogImpl(ColumnPatternTester.class), factory, resourceManager, testReport);
+        ColumnPatternConfiguration configuration = factory.getConfiguration(SIMPLE_REFSET);
+        ColumnPatternConfiguration.File file = configuration.getFile().get(0);
+        Column column = file.getColumn().get(0);
+        column.setName("id");
+        column.setSctid("");
+        tester.runTests();
+
+        assertEquals(2, testReport.getErrorCount());
+        assertEquals(161, testReport.getNumSuccesses());
     }
 
     class TestFileResourceProvider implements ResourceManager {
