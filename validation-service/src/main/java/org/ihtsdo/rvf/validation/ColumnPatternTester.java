@@ -93,17 +93,17 @@ public class ColumnPatternTester {
                                         testHeaderValue(value, column, linesTested + "", startTime, fileName);
                                     } else {
                                         // Test data value
-                                        testDataValue(columnData[0], lineNumber, value, column, linesTested + "", startTime, fileName);
+                                        testDataValue(lineNumber + "-" + columnIndex, lineNumber, value, column, linesTested + "", startTime, fileName);
                                     }
                                 }
                             } else {
                                 validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
-                                testReport.addError(linesTested + "", startTime, fileName, resourceManager.getFilePath(), null, COLUMN_COUNT_TEST_TYPE, null, null);
+                                testReport.addError(lineNumber + "-1", startTime, fileName, resourceManager.getFilePath(), null, COLUMN_COUNT_TEST_TYPE, "Column count does not match expected " + configColumnCount, "" + dataColumnCount);
                             }
                         }
                     } catch (IOException e) {
                         validationLog.executionError("Problem reading file {}", fileName, e);
-                        testReport.addError(fileName, startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, null, null);
+                        testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "File with name " + fileName + " not supported", null);
                     }
                 }
             } else {
@@ -135,7 +135,7 @@ public class ColumnPatternTester {
         if (regex != null) {
             if (configurationFactory.getRegexCache().get(regex).matcher(value).matches()) {
                 validationLog.assertionError("Value does not match custom regex pattern on line {}, column name '{}': pattern '{}', value '{}'", lineNumber, column.getName(), regex, value);
-                testReport.addError(linesTested, startTime, fileName, resourceManager.getFilePath(), column.getName(), COLUMN_VALUE_TEST_TYPE, regex, value);
+                testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(), COLUMN_VALUE_TEST_TYPE, regex, value);
             }
         }
     }
@@ -144,7 +144,7 @@ public class ColumnPatternTester {
         String expectedColumnName = column.getName();
         if (!expectedColumnName.equals(value)) {
             validationLog.assertionError("Column name does not match expected value: expected '{}', actual '{}'", expectedColumnName, value);
-            testReport.addError(linesTested, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_NAME_TEST_TYPE, null, null);
+            testReport.addError("1-0", startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_NAME_TEST_TYPE, "Column name does not match " + expectedColumnName, value);
             // TODO: Should we stop testing the file if we reach this point?
         }
     }

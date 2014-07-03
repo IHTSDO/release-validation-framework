@@ -1,5 +1,5 @@
 <column-pattern-configuration xmlns="http://rvf.ihtsdo.org/assertion/1.0.0">
-    <file allowAdditionalColumns="true">
+    <file>
         <column name="id">
             <uuid/>
         </column>
@@ -18,26 +18,8 @@
         <column name="referencedComponentId">
             <sctid/>
         </column>
-        <column name="mapGroup">
-            <integer/>
-        </column>
-        <column name="mapPriority">
-            <integer/>
-        </column>
-        <column name="mapRule">
-            <string/>
-        </column>
-        <column name="mapAdvice">
-            <string/>
-        </column>
         <column name="mapTarget">
-            <string/>
-        </column>
-        <column name="correlationId">
-            <stcid/>
-        </column>
-        <column name="mapCategoryId">
-            <stcid/>
+            <value/>
         </column>
     </file>
 </column-pattern-configuration>

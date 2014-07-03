@@ -20,6 +20,6 @@ public class CsvResultFormatter implements ResultFormatter {
         }
         return output.toString();
     }
-    
-    private static final String headers = "testExecutionId, testExecutionStartDate, fileName, filePath, columnName, testType, testPattern, testResult, failureCount, failureExample";
+
+    private static final String headers = "lineNumber-columnNumber, testExecutionStartDate, fileName, filePath, columnName, testType, testPattern, testResult, failureCount, failed Value";
 }

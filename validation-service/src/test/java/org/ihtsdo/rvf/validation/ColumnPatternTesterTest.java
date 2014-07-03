@@ -31,9 +31,9 @@ public class ColumnPatternTesterTest {
     @Before
     public void setup() {
         Map<String, String> configs = new HashMap<>();
-        configs.put("/column-pattern-configuration.xml", "x?der2_sRefset_SimpleMap.*\\.txt");
-        configs.put("/ext-column-pattern-configuration.xml", "x?der2_iisssccRefset_ExtendedMap.*\\.txt");
-        configs.put("/complex-column-pattern-configuration.xml", "x?der2_iissscRefset_ComplexMap.*\\.txt");
+        configs.put("/simple-map-configuration.xml", "x?der2_sRefset_SimpleMap.*\\.txt");
+        configs.put("/extended-map-configuration.xml", "x?der2_iisssccRefset_ExtendedMap.*\\.txt");
+        configs.put("/complex-map-configuration.xml", "x?der2_iissscRefset_ComplexMap.*\\.txt");
         factory = new ConfigurationFactory(configs, new ResourceProviderFactoryImpl());
     }
 
@@ -71,7 +71,7 @@ public class ColumnPatternTesterTest {
         tester.runTests();
 
         assertEquals(2, testReport.getErrorCount());
-        assertEquals(161, testReport.getNumSuccesses());
+        assertEquals(190, testReport.getNumSuccesses());
     }
 
     class TestFileResourceProvider implements ResourceManager {

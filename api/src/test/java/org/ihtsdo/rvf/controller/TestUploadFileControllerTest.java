@@ -46,4 +46,16 @@ public class TestUploadFileControllerTest {
                 .andExpect(status().isExpectationFailed()).andReturn();
         assertTrue(result.getResponse().getContentAsString().length() > 0);
     }
+
+    @Test
+    public void testUploadTestPackageExtendedMap() throws Exception {
+        MvcResult result = mockMvc.perform(
+                fileUpload("/package-upload")
+                        .file(new MockMultipartFile("file", "SnomedCT_test2_INT_20140131.zip", "application/zip",
+                                getClass().getResourceAsStream("/SnomedCT_test2_INT_20140131.zip")))
+        )
+                .andDo(print())
+                .andExpect(status().isExpectationFailed()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().length() > 0);
+    }
 }

@@ -65,6 +65,10 @@ public class TestRunItem {
         return columnValue;
     }
 
+    public String getFailureMessage() {
+        return failure ? "Failed" : "Success";
+    }
+
     private final String executionId;
     private final Date testTime;
     private final String fileName;
