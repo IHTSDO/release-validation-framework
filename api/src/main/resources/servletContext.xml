@@ -34,6 +34,7 @@
     <bean id="configurationFactory" class="org.ihtsdo.rvf.validation.ConfigurationFactory">
         <constructor-arg>
             <map>
+                <entry key="/simple-refset-configuration.xml" value="x?der2_Refset_Simple.*\.txt"/>
                 <entry key="/simple-map-configuration.xml" value="x?der2_sRefset_SimpleMap.*\.txt"/>
                 <entry key="/extended-map-configuration.xml" value="x?der2_iisssccRefset_ExtendedMap.*\.txt"/>
                 <entry key="/complex-map-configuration.xml" value="x?der2_iissscRefset_ComplexMap.*\.txt"/>
