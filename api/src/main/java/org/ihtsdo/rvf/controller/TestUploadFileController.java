@@ -30,23 +30,29 @@ public class TestUploadFileController {
     @Autowired
     private ValidationTestRunner validationRunner;
 
-    @RequestMapping(value = "/package-upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/test-file", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity uploadTestPackage(@RequestParam(value = "file") MultipartFile file) throws IOException {
         // load the filename
         String filename = file.getOriginalFilename();
-        // must be a zip
-        if (!filename.endsWith(".zip")) throw new IllegalArgumentException("Only zip file accepted");
 
-        final File tempFile = File.createTempFile(filename, ".zip");
-        tempFile.deleteOnExit();
-        try (FileOutputStream out = new FileOutputStream(tempFile)) {
-            InputStream inputStream = file.getInputStream();
-            IOUtils.copy(inputStream, out);
-        }
+		final File tempFile = File.createTempFile(filename, ".zip");
+		tempFile.deleteOnExit();
 
-        ResourceManager m = new ZipFileResourceProvider(tempFile);
-        TestReport report = validationRunner.execute(ResponseType.CSV, m);
+		// must be a zip
+        ResourceManager resourceManager;
+        if (filename.endsWith(".zip")) {
+			copyUploadToDisk(file, tempFile);
+			resourceManager = new ZipFileResourceProvider(tempFile);
+		} else if (filename.endsWith(".txt")) {
+			copyUploadToDisk(file, tempFile);
+			resourceManager = new TextFileResourceProvider(tempFile, filename);
+		} else {
+			throw new IllegalArgumentException("Only zip file accepted");
+		}
+
+
+		TestReport report = validationRunner.execute(ResponseType.CSV, resourceManager);
           //Todo do we write this to disk?
 //        File reportFile  = new File("testReport" + System.currentTimeMillis() + ".csv");
 //        try (FileOutputStream out = new FileOutputStream(reportFile)) {
@@ -64,5 +70,12 @@ public class TestUploadFileController {
 
         return new ResponseEntity<>(report.getResult(), HttpStatus.OK);
     }
+
+	private void copyUploadToDisk(MultipartFile file, File tempFile) throws IOException {
+		try (FileOutputStream out = new FileOutputStream(tempFile)) {
+			InputStream inputStream = file.getInputStream();
+			IOUtils.copy(inputStream, out);
+		}
+	}
 
 }

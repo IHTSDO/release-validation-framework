@@ -38,7 +38,7 @@ public class TestUploadFileControllerTest {
     @Test
     public void testUploadTestPackage() throws Exception {
         MvcResult result = mockMvc.perform(
-                fileUpload("/package-upload")
+                fileUpload("/test-file")
                         .file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140831.zip", "application/zip",
                                 getClass().getResourceAsStream("/SnomedCT_Release_INT_20140831.zip")))
         )
@@ -50,7 +50,7 @@ public class TestUploadFileControllerTest {
     @Test
     public void testUploadTestPackageExtendedMap() throws Exception {
         MvcResult result = mockMvc.perform(
-                fileUpload("/package-upload")
+                fileUpload("/test-file")
                         .file(new MockMultipartFile("file", "SnomedCT_test2_INT_20140131.zip", "application/zip",
                                 getClass().getResourceAsStream("/SnomedCT_test2_INT_20140131.zip")))
         )
