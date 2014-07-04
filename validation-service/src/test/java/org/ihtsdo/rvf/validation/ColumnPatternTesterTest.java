@@ -87,11 +87,6 @@ public class ColumnPatternTesterTest {
         }
 
         @Override
-        public boolean isFile(String filename) {
-            return file == null || !file.isDirectory();
-        }
-
-        @Override
         public String getFilePath() {
             return file.getAbsolutePath();
         }
