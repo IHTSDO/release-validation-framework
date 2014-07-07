@@ -12,7 +12,7 @@
         <column name="moduleId">
             <sctid/>
         </column>
-        <column name="refSetId">
+        <column name="refsetId">
             <sctid/>
         </column>
         <column name="referencedComponentId">

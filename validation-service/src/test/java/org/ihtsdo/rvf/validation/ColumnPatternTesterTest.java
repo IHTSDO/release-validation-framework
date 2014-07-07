@@ -2,7 +2,6 @@ package org.ihtsdo.rvf.validation;
 
 import org.ihtsdo.release.assertion.ResourceProviderFactoryImpl;
 import org.ihtsdo.release.assertion.log.TestValidationLogImpl;
-import org.ihtsdo.release.assertion.log.ValidationLog;
 import org.ihtsdo.rvf.assertion._1_0.Column;
 import org.ihtsdo.rvf.assertion._1_0.ColumnPatternConfiguration;
 import org.junit.Before;
@@ -71,7 +70,7 @@ public class ColumnPatternTesterTest {
         tester.runTests();
 
         assertEquals(2, testReport.getErrorCount());
-        assertEquals(190, testReport.getNumSuccesses());
+        assertEquals(158, testReport.getNumSuccesses());
     }
 
     class TestFileResourceProvider implements ResourceManager {

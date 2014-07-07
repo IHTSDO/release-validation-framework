@@ -43,7 +43,7 @@ public class TestUploadFileControllerTest {
                                 getClass().getResourceAsStream("/SnomedCT_Release_INT_20140831.zip")))
         )
                 .andDo(print())
-                .andExpect(status().isExpectationFailed()).andReturn();
+                .andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().length() > 0);
     }
 
@@ -55,7 +55,7 @@ public class TestUploadFileControllerTest {
                                 getClass().getResourceAsStream("/SnomedCT_test2_INT_20140131.zip")))
         )
                 .andDo(print())
-                .andExpect(status().isExpectationFailed()).andReturn();
+                .andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().length() > 0);
     }
 }
