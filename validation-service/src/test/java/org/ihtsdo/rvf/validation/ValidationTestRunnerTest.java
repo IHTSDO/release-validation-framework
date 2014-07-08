@@ -13,7 +13,7 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/testValidationServiceContext.xml"})
+@ContextConfiguration(locations = {"/validationContext.xml"})
 public class ValidationTestRunnerTest {
 
     @Autowired
@@ -27,7 +27,7 @@ public class ValidationTestRunnerTest {
         ZipFileResourceProvider provider = new ZipFileResourceProvider(file);
         TestReport response = validationRunner.execute(ResponseType.CSV, provider);
         assertTrue(response.getResult() != null);
-        assertEquals(3, response.getErrorCount());
+        assertEquals(0, response.getErrorCount());
     }
 
     @Test
