@@ -70,7 +70,7 @@ public class ColumnPatternTesterTest {
         tester.runTests();
 
         assertEquals(2, testReport.getErrorCount());
-        assertEquals(158, testReport.getNumSuccesses());
+        assertEquals(190, testReport.getNumSuccesses());
     }
 
     class TestFileResourceProvider implements ResourceManager {

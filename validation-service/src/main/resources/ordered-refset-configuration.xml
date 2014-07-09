@@ -19,7 +19,7 @@
             <sctid/>
         </column>
         <column name="referencedComponentId">
-            <integer/>
+            <nonZeroInteger/>
         </column>
         <column name="linkToId">
             <sctid/>

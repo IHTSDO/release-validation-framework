@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -22,14 +22,14 @@ public class ColumnPatternTester {
     private final TestReport testReport;
     private final ConfigurationFactory configurationFactory;
 
-    private Map<String, PatternTest> columnTests;
+    private Map<ColumnType, PatternTest> columnTests;
 
     private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
     private static final Pattern DATE_PATTERN = Pattern.compile("^\\d{8}$");
     private static final Pattern BOOLEAN_PATTERN = Pattern.compile("[0-1]");
     private static final Pattern SCTID_PATTERN = Pattern.compile("^\\d{6,18}$");
     private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
-    private static final Pattern ORDER_PATTERN = Pattern.compile("^[1-9][0-9]*$");
+    private static final Pattern NON_ZERO_INTEGER_PATTERN = Pattern.compile("^[1-9][0-9]*$");
 
     private static final String UTF_8 = "UTF-8";
 
@@ -117,7 +117,8 @@ public class ColumnPatternTester {
 
     private void testDataValue(String id, long lineNumber, String value, Column column, String linesTested, Date startTime, String fileName) {
 
-        ColumnTest columnTest = columnTests.get(column.getName());
+		ColumnType columnType = getColumnType(column);
+        ColumnTest columnTest = columnTests.get(columnType);
 
         if (columnTest != null) {
             if (columnTest.validate(column, lineNumber, value)) {
@@ -140,7 +141,26 @@ public class ColumnPatternTester {
         }
     }
 
-    private void testHeaderValue(String value, Column column, String linesTested, Date startTime, String fileName) {
+	private ColumnType getColumnType(Column column) {
+		if (column.getUuid() != null) {
+			return ColumnType.UUID;
+		} else if (column.getDateStamp() != null) {
+			return ColumnType.Time;
+		} else if (column.getBoolean() != null) {
+			return ColumnType.Boolean;
+		} else if (column.getSctid() != null) {
+			return ColumnType.SCTID;
+		} else if (column.getRegex() != null) {
+			return ColumnType.REGEX;
+		} else if (column.getInteger() != null) {
+			return ColumnType.Integer;
+		} else if (column.getNonZeroInteger() != null) {
+			return ColumnType.NonZeroInteger;
+		}
+		return null;
+	}
+
+	private void testHeaderValue(String value, Column column, String linesTested, Date startTime, String fileName) {
         String expectedColumnName = column.getName();
         if (!expectedColumnName.equals(value)) {
             validationLog.assertionError("Column name does not match expected value: expected '{}', actual '{}'", expectedColumnName, value);
@@ -149,27 +169,14 @@ public class ColumnPatternTester {
         }
     }
 
-    private Map<String, PatternTest> assembleColumnTests() {
-        columnTests = new LinkedHashMap<>();
-        columnTests.put("id", new PatternTest("uuid", UUID_PATTERN, "Value does not match UUID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("effectiveTime", new DateTimeTest("dateStamp", DATE_PATTERN, "Value does not match Date Stamp pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("sourceEffectiveTime", new DateTimeTest("dateStamp", DATE_PATTERN, "Value does not match Date Stamp pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("targetEffectiveTime", new DateTimeTest("dateStamp", DATE_PATTERN, "Value does not match Date Stamp pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("active", new BooleanPatternTest("boolean", BOOLEAN_PATTERN, "Value does not match Boolean pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("moduleId", new PatternTest("sctid", SCTID_PATTERN, "Value does not match SCTID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("refSetId", new PatternTest("sctid", SCTID_PATTERN, "Value does not match SCTID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("referencedComponentId", new PatternTest("sctid", SCTID_PATTERN, "Value does not match SCTID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("mapGroup", new PatternTest("integer", INTEGER_PATTERN, "Value does not match the required pattern of numbers only on line {}, column name '{}': value '{}'"));
-        columnTests.put("mapPriority", new PatternTest("integer", INTEGER_PATTERN, "Value does not match the required pattern of numbers only on line {}, column name '{}': value '{}'"));
-        columnTests.put("descriptionLength", new PatternTest("integer", INTEGER_PATTERN, "descriptionLength does not match the required pattern of numbers only on line {}, column name '{}': value '{}'"));
-        columnTests.put("correlationId", new PatternTest("sctid", SCTID_PATTERN, "Value does not match SCTID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("mapCategoryId", new PatternTest("sctid", SCTID_PATTERN, "Value does not match SCTID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("order", new PatternTest("integer", ORDER_PATTERN, "Value does not match a number other than 0 on line {}, column name '{}': value '{}'"));
-        columnTests.put("linkedToId", new PatternTest("sctid", SCTID_PATTERN, "linkedToId does not match SCTID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("valueId", new PatternTest("sctid", SCTID_PATTERN, "valueId does not match SCTID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("acceptabilityId", new PatternTest("sctid", SCTID_PATTERN, "acceptabilityId does not match SCTID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("targetComponentId", new PatternTest("sctid", SCTID_PATTERN, "targetComponentId does not match SCTID pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put("descriptionFormat", new PatternTest("sctid", SCTID_PATTERN, "descriptionFormat does not match SCTID pattern on line {}, column name '{}': value '{}'"));
+    private Map<ColumnType, PatternTest> assembleColumnTests() {
+        columnTests = new HashMap<>();
+		columnTests.put(ColumnType.UUID, new PatternTest("uuid", UUID_PATTERN, "Value does not match UUID pattern on line {}, column name '{}': value '{}'"));
+		columnTests.put(ColumnType.Time, new DateTimeTest("dateStamp", DATE_PATTERN, "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
+		columnTests.put(ColumnType.Boolean, new BooleanPatternTest("boolean", BOOLEAN_PATTERN, "Value does not match Boolean pattern on line {}, column name '{}': value '{}'"));
+		columnTests.put(ColumnType.SCTID, new PatternTest("sctid", SCTID_PATTERN, "Value does not match SCTID pattern on line {}, column name '{}': value '{}'"));
+        columnTests.put(ColumnType.Integer, new PatternTest("integer", INTEGER_PATTERN, "Value does not match the required pattern of numbers only on line {}, column name '{}': value '{}'"));
+        columnTests.put(ColumnType.NonZeroInteger, new PatternTest("integer", NON_ZERO_INTEGER_PATTERN, "Value does not match a number other than 0 on line {}, column name '{}': value '{}'"));
         return columnTests;
     }
 
