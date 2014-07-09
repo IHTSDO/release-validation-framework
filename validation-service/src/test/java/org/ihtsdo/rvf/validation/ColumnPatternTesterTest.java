@@ -30,9 +30,9 @@ public class ColumnPatternTesterTest {
     @Before
     public void setup() {
         Map<String, String> configs = new HashMap<>();
-        configs.put("/simple-map-configuration.xml", "x?der2_sRefset_SimpleMap.*\\.txt");
-        configs.put("/extended-map-configuration.xml", "x?der2_iisssccRefset_ExtendedMap.*\\.txt");
-        configs.put("/complex-map-configuration.xml", "x?der2_iissscRefset_ComplexMap.*\\.txt");
+        configs.put("x?der2_sRefset_SimpleMap.*\\.txt", "/simple-map-configuration.xml");
+        configs.put("x?der2_iisssccRefset_ExtendedMap.*\\.txt", "/extended-map-configuration.xml");
+        configs.put("x?der2_iissscRefset_ComplexMap.*\\.txt", "/complex-map-configuration.xml");
         factory = new ConfigurationFactory(configs, new ResourceProviderFactoryImpl());
     }
 

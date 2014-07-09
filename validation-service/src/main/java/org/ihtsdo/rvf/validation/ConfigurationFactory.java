@@ -25,12 +25,12 @@ public class ConfigurationFactory {
     private Map<String, Pattern> regexCache;
     private ValidationLog validationLog;
 
-    public ConfigurationFactory(Map<String, String> configs, ResourceProviderFactory resourceProviderFactory) {
+    public ConfigurationFactory(Map<String, String> filenamePatternToConfigMap, ResourceProviderFactory resourceProviderFactory) {
         this.configurations = new HashMap<>();
         this.validationLog = resourceProviderFactory.getValidationLog(this.getClass());
-        for (Map.Entry<String, String> entry : configs.entrySet()) {
-            ColumnPatternConfiguration configuration = loadConfiguration(entry.getKey());
-            configurations.put(Pattern.compile(entry.getValue()), configuration);
+        for (Map.Entry<String, String> entry : filenamePatternToConfigMap.entrySet()) {
+            ColumnPatternConfiguration configuration = loadConfiguration(entry.getValue());
+            configurations.put(Pattern.compile(entry.getKey()), configuration);
             regexCache = testConfigurationByPrecompilingRegexPatterns(configuration);
         }
     }
