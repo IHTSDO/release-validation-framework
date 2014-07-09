@@ -34,10 +34,10 @@
             <string/>
         </column>
         <column name="correlationId">
-            <stcid/>
+            <sctid/>
         </column>
         <column name="mapCategoryId">
-            <stcid/>
+            <sctid/>
         </column>
     </file>
 </column-pattern-configuration>

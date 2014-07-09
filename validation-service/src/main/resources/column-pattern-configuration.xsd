@@ -32,7 +32,6 @@
                 <xs:element type="xs:string" name="boolean" minOccurs="0"/>
                 <xs:element type="xs:string" name="value" minOccurs="0"/>
                 <xs:element type="xs:string" name="sctid" minOccurs="0"/>
-                <xs:element type="xs:string" name="stcid" minOccurs="0"/>
                 <xs:element type="xs:string" name="regex" minOccurs="0"/>
                 <xs:element type="xs:string" name="integer" minOccurs="0"/>
                 <xs:element type="xs:string" name="string" minOccurs="0"/>
