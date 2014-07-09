@@ -2,8 +2,6 @@ package org.ihtsdo.rvf.validation;
 
 import org.ihtsdo.release.assertion.ResourceProviderFactoryImpl;
 import org.ihtsdo.release.assertion.log.TestValidationLogImpl;
-import org.ihtsdo.rvf.assertion._1_0.Column;
-import org.ihtsdo.rvf.assertion._1_0.ColumnPatternConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,10 +19,6 @@ public class ColumnPatternTesterTest {
     private ColumnPatternTester tester;
     private ConfigurationFactory factory;
     private TestReport testReport;
-
-    private static final Pattern SIMPLE_REFSET = Pattern.compile("x?der2_sRefset_SimpleMap.*\\.txt");
-    private static final Pattern COMPLEX_REFSET = Pattern.compile("x?der2_iissscRefset_ComplexMap.*\\.txt");
-    private static final Pattern EXTENDED_REFSET = Pattern.compile("x?der2_iisssccRefset_ExtendedMap.*\\.txt");
 
     @Before
     public void setup() {
@@ -42,12 +35,6 @@ public class ColumnPatternTesterTest {
         testReport = new TestReport(new CsvResultFormatter());
         tester = new ColumnPatternTester(new TestValidationLogImpl(ColumnPatternTester.class), factory, resourceManager, testReport);
 
-        ColumnPatternConfiguration configuration = factory.getConfiguration(SIMPLE_REFSET);
-        ColumnPatternConfiguration.File file = configuration.getFile().get(0);
-        Column column = file.getColumn().get(0);
-        column.setName("id");
-        column.setSctid("");
-
         tester.runTests();
 
         assertEquals(1, testReport.getErrorCount());
@@ -62,12 +49,8 @@ public class ColumnPatternTesterTest {
         ResourceManager resourceManager = new TestFileResourceProvider(f);
         testReport = new TestReport(new CsvResultFormatter());
         tester = new ColumnPatternTester(new TestValidationLogImpl(ColumnPatternTester.class), factory, resourceManager, testReport);
-        ColumnPatternConfiguration configuration = factory.getConfiguration(SIMPLE_REFSET);
-        ColumnPatternConfiguration.File file = configuration.getFile().get(0);
-        Column column = file.getColumn().get(0);
-        column.setName("id");
-        column.setSctid("");
-        tester.runTests();
+
+		tester.runTests();
 
         assertEquals(2, testReport.getErrorCount());
         assertEquals(190, testReport.getNumSuccesses());
@@ -98,4 +81,5 @@ public class ColumnPatternTesterTest {
         private List<String> fileNames = new ArrayList<>();
         private File file;
     }
+
 }

@@ -7,6 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import static junit.framework.TestCase.assertEquals;
@@ -21,23 +22,27 @@ public class ValidationTestRunnerTest {
 
     @Test
     public void testExecute_DataInResponse() throws Exception {
-        String testFileName = "/SnomedCT_Release_INT_20140831.zip";
-        URL zipUrl = ValidationTestRunner.class.getResource(testFileName);
-        File file = new File(zipUrl.toURI());
-        ZipFileResourceProvider provider = new ZipFileResourceProvider(file);
-        TestReport response = validationRunner.execute(ResponseType.CSV, provider);
+		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile("/SnomedCT_Release_INT_20140831.zip"));
+
+		TestReport response = validationRunner.execute(ResponseType.CSV, provider);
+
         assertTrue(response.getResult() != null);
         assertEquals(0, response.getErrorCount());
     }
 
     @Test
     public void testExecute_ExdRefSet() throws Exception {
-        String testFileName = "/der2_iisssccRefset_ExtendedMapDelta_INT_20140131.txt.zip";
-        URL zipUrl = ValidationTestRunner.class.getResource(testFileName);
-        File file = new File(zipUrl.toURI());
-        ZipFileResourceProvider provider = new ZipFileResourceProvider(file);
+		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile("/der2_iisssccRefset_ExtendedMapDelta_INT_20140131.txt.zip"));
+
         TestReport response = validationRunner.execute(ResponseType.CSV, provider);
+
         assertTrue(response.getResult() != null);
         assertEquals(0, response.getErrorCount());
     }
+
+	private File getFile(String testFileName) throws URISyntaxException {
+		URL zipUrl = ValidationTestRunner.class.getResource(testFileName);
+		return new File(zipUrl.toURI());
+	}
+
 }
