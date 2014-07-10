@@ -30,15 +30,26 @@ public class ValidationTestRunnerTest {
         assertEquals(0, response.getErrorCount());
     }
 
-    @Test
-    public void testExecute_ExdRefSet() throws Exception {
+	@Test
+	public void testExecute_ExdRefSet() throws Exception {
 		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile("/der2_iisssccRefset_ExtendedMapDelta_INT_20140131.txt.zip"));
 
-        TestReport response = validationRunner.execute(ResponseType.CSV, provider);
+		TestReport response = validationRunner.execute(ResponseType.CSV, provider);
 
-        assertTrue(response.getResult() != null);
-        assertEquals(0, response.getErrorCount());
-    }
+		assertTrue(response.getResult() != null);
+		assertEquals(0, response.getErrorCount());
+	}
+
+	@Test
+	public void testExecute_rel2SimpleRefset() throws Exception {
+		String fileName = "rel2_Refset_SimpleDelta_INT_20140131.txt";
+		TextFileResourceProvider provider = new TextFileResourceProvider(getFile("/" + fileName), fileName);
+
+		TestReport response = validationRunner.execute(ResponseType.CSV, provider);
+
+		assertTrue(response.getResult() != null);
+		assertEquals(0, response.getErrorCount());
+	}
 
 	private File getFile(String testFileName) throws URISyntaxException {
 		URL zipUrl = ValidationTestRunner.class.getResource(testFileName);

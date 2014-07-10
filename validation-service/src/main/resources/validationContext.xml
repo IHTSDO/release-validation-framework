@@ -16,9 +16,13 @@
 		<constructor-arg>
 			<map>
 				<entry key="x?der2_Refset_Simple.*\.txt" value="/simple-refset-configuration.xml"/>
+				<entry key="rel2_Refset_Simple.*\.txt" value="/simple-refset-configuration.xml"/>
 				<entry key="x?der2_sRefset_SimpleMap.*\.txt" value="/simple-map-configuration.xml"/>
+				<entry key="rel2_sRefset_SimpleMap.*\.txt" value="/simple-map-configuration.xml"/>
 				<entry key="x?der2_iisssccRefset_ExtendedMap.*\.txt" value="/extended-map-configuration.xml"/>
+				<entry key="rel2_iisssccRefset_ExtendedMap.*\.txt" value="/extended-map-configuration.xml"/>
 				<entry key="x?der2_iissscRefset_ComplexMap.*\.txt" value="/complex-map-configuration.xml"/>
+				<entry key="rel2_iissscRefset_ComplexMap.*\.txt" value="/complex-map-configuration.xml"/>
 			</map>
 		</constructor-arg>
 		<constructor-arg ref="resourceProviderFactory"/>
