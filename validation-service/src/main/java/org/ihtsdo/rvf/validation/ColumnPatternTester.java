@@ -1,12 +1,10 @@
 package org.ihtsdo.rvf.validation;
 
 import org.ihtsdo.release.assertion.log.ValidationLog;
-import org.ihtsdo.rvf.assertion._1_0.Column;
-import org.ihtsdo.rvf.assertion._1_0.ColumnPatternConfiguration;
+import org.ihtsdo.snomed.util.rf2.schema.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,10 +14,9 @@ import java.util.regex.Pattern;
 
 public class ColumnPatternTester {
 
-	private final ValidationLog validationLog;
+    private final ValidationLog validationLog;
     private final ResourceManager resourceManager;
     private final TestReport testReport;
-    private final ConfigurationFactory configurationFactory;
 
     private Map<ColumnType, PatternTest> columnTests;
 
@@ -29,24 +26,22 @@ public class ColumnPatternTester {
     private static final Pattern SCTID_PATTERN = Pattern.compile("^\\d{6,18}$");
     private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
     private static final Pattern NON_ZERO_INTEGER_PATTERN = Pattern.compile("^[1-9][0-9]*$");
-	private static final Pattern BLANK = Pattern.compile("^$");
+    private static final Pattern BLANK = Pattern.compile("^$");
+    private static final Pattern NOT_BLANK = Pattern.compile("^(?=\\s*\\S).*$");
 
     private static final String UTF_8 = "UTF-8";
 
     private static final String FILE_NAME_TEST_TYPE = "FileNameTest";
     private static final String COLUMN_COUNT_TEST_TYPE = "ColumnCountTest";
-    private static final String COLUMN_NAME_TEST_TYPE = "ColumnNameTest";
+    private static final String COLUMN_HEADING_TEST = "ColumnHeadingTest";
     private static final String COLUMN_VALUE_TEST_TYPE = "ColumnValuesTest";
     private static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
     private static final String COLUMN_BOOLEAN_TEST_TYPE = "ColumnBooleanTest";
-    private static final String COLUMN_INTEGER_TEST_TYPE = "ColumnIntegerTest";
 
-    public ColumnPatternTester(ValidationLog validationLog, ConfigurationFactory configurationFactory, ResourceManager resourceManager, TestReport testReport) {
+    public ColumnPatternTester(ValidationLog validationLog, ResourceManager resourceManager, TestReport testReport) {
         this.validationLog = validationLog;
-        this.configurationFactory = configurationFactory;
         this.resourceManager = resourceManager;
         this.testReport = testReport;
-
         columnTests = assembleColumnTests();
     }
 
@@ -60,182 +55,210 @@ public class ColumnPatternTester {
         // for each config file (should only the one)
         List<String> fileNames = resourceManager.getFileNames();
         for (String fileName : fileNames) {
+            if (fileName == null) {
+                validationLog.executionError("Null file");
+                continue;
+            }
+            if (!fileName.endsWith("txt")) {
+                testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "Incorrect file extension, should end with a .txt");
+                continue;
+            }
 
-            ColumnPatternConfiguration configuration = configurationFactory.getConfiguration(fileName);
-			boolean releaseInputFile = fileName.startsWith("rel2");
+            SchemaFactory schemaFactory = new SchemaFactory();
+            TableSchema tableSchema;
+            try {
+                tableSchema = schemaFactory.createSchemaBean(fileName);
+            } catch (FileRecognitionException e) {
+                // log the problem and continue to the next file
+                testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, e.getMessage());
+                continue;
+            }
+            if (tableSchema == null) {
+                // log the problem and continue to the next file
+                testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "unexpected filename format.");
+                continue;
+            }
 
-            if (configuration != null) {
-                for (ColumnPatternConfiguration.File file : configuration.getFile()) {
+            boolean releaseInputFile = fileName.startsWith("rel2");
+            List<Field> fields = tableSchema.getFields();
 
-                    try {
-                        List<Column> columns = file.getColumn();
-                        int configColumnCount = columns.size();
-                        Boolean allowAdditionalColumns = file.isAllowAdditionalColumns() != null ? file.isAllowAdditionalColumns() : Boolean.FALSE;
-                        BufferedReader reader = resourceManager.getReader(fileName, Charset.forName(UTF_8));
-                        filesTested++;
-                        String line;
-                        long lineNumber = 0;
+            if (fields != null) {
+                try {
+                    BufferedReader reader = resourceManager.getReader(fileName, Charset.forName(UTF_8));
+                    filesTested++;
+                    String line;
+                    long lineNumber = 0;
 
-                        // Variables outside loop to force memory reuse.
-                        String[] columnData;
-                        String value;
+                    String[] columnData;
+                    int configColumnCount = fields.size();
 
-                        while ((line = reader.readLine()) != null) {
-                            linesTested++;
-                            lineNumber++;
-                            columnData = line.split("\t");
-                            int dataColumnCount = columnData.length;
-                            if (dataColumnCount == configColumnCount || (dataColumnCount > configColumnCount && allowAdditionalColumns)) {
-                                for (int columnIndex = 0; columnIndex < dataColumnCount; columnIndex++) {
-                                    Column column = columns.get(columnIndex);
-                                    value = columnData[columnIndex];
-                                    if (lineNumber == 1) {
-                                        // Test header value
-                                        testHeaderValue(value, column, linesTested + "", startTime, fileName);
-                                    } else {
-                                        // Test data value
-                                        testDataValue(lineNumber + "-" + columnIndex, lineNumber, value, column, linesTested + "", startTime, fileName, releaseInputFile);
-                                    }
-                                }
-                            } else {
-                                validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
-                                testReport.addError(lineNumber + "-1", startTime, fileName, resourceManager.getFilePath(), null, COLUMN_COUNT_TEST_TYPE, "Column count does not match expected " + configColumnCount, "" + dataColumnCount);
-                            }
+                    while ((line = reader.readLine()) != null) {
+                        int columnIndex = 0;
+                        linesTested++;
+                        lineNumber++;
+                        columnData = line.split("\t");
+
+                        int dataColumnCount = columnData.length;
+
+                        if (dataColumnCount != configColumnCount) {
+                            validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
+                            testReport.addError("1-1", startTime, fileName, resourceManager.getFilePath(), null, COLUMN_COUNT_TEST_TYPE, "", "" + configColumnCount, "" + dataColumnCount);
                         }
-                    } catch (IOException e) {
-                        validationLog.executionError("Problem reading file {}", fileName, e);
-                        testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "File with name " + fileName + " not supported", null);
+
+                        for (Field column : fields) {
+                            String value = columnData[columnIndex];
+                            if (lineNumber == 1) {
+                                // Test header value
+                                testHeaderValue(value, column, startTime, fileName, columnIndex + "");
+                            } else {
+                                testDataValue(lineNumber + "-" + columnIndex, lineNumber, value, column, startTime, fileName, releaseInputFile);
+                            }
+                            columnIndex++;
+                        }
                     }
+                } catch (IOException e) {
+                    validationLog.executionError("Problem reading file {}", fileName, e);
+                    testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", fileName, "Unable to read the file");
                 }
+
             } else {
                 validationLog.executionError("Invalid fileName {} does not match the expected pattern ", fileName);
-                testReport.addError(fileName, startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, null, null);
+                testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "", fileName, "valid release 2 filename");
             }
         }
-        // TODO: Use startTest/endTest validation log methods instead.
+
         validationLog.info("{} files and {} lines tested in {} milliseconds.", filesTested, linesTested, (new Date().getTime() - startTime.getTime()));
     }
 
-    private void testDataValue(String id, long lineNumber, String value, Column column, String linesTested, Date startTime, String fileName, boolean isReleaseInputFile) {
+    private void testDataValue(String id, long lineNumber, String value, Field column, Date startTime, String fileName, boolean isReleaseInputFile) {
 
-		ColumnType columnType = getColumnType(column, isReleaseInputFile);
-		PatternTest columnTest = columnTests.get(columnType);
+        ColumnType columnType = getColumnType(column.getType(), isReleaseInputFile);
+
+        PatternTest columnTest = columnTests.get(columnType);
 
         if (columnTest != null) {
-            if (columnTest.validate(column, lineNumber, value)) {
+            if (canBeBlank(value, column) || columnTest.validate(column, lineNumber, value)) {
                 testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
                         columnTest.getTestType(), columnTest.getPatternString());
             } else {
                 validationLog.assertionError(columnTest.getMessage(), columnTest.getErrorArgs());
                 testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
-                        columnTest.getTestType(), columnTest.getPatternString(), value);
-            }
-        }
-
-        // Regex
-        String regex = column.getRegex();
-        if (regex != null) {
-            if (configurationFactory.getRegexCache().get(regex).matcher(value).matches()) {
-                validationLog.assertionError("Value does not match custom regex pattern on line {}, column name '{}': pattern '{}', value '{}'", lineNumber, column.getName(), regex, value);
-                testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(), COLUMN_VALUE_TEST_TYPE, regex, value);
+                        columnTest.getTestType(), columnTest.getPatternString(), value, column.getName());
             }
         }
     }
 
-	private ColumnType getColumnType(Column column, boolean isReleaseInputFile) {
-		if (column.getUuid() != null) {
-			if (isReleaseInputFile) {
-				return ColumnType.REL_UUID;
-			} else {
-				return ColumnType.UUID;
-			}
-		} else if (column.getDateStamp() != null) {
-			if (isReleaseInputFile) {
-				return ColumnType.REL_Time;
-			} else {
-				return ColumnType.Time;
-			}
-		} else if (column.getBoolean() != null) {
-			return ColumnType.Boolean;
-		} else if (column.getSctid() != null) {
-			if (isReleaseInputFile) {
-				return ColumnType.REL_SCTID;
-			} else {
-				return ColumnType.SCTID;
-			}
-		} else if (column.getRegex() != null) {
-			return ColumnType.REGEX;
-		} else if (column.getInteger() != null) {
-			return ColumnType.Integer;
-		} else if (column.getNonZeroInteger() != null) {
-			return ColumnType.NonZeroInteger;
-		}
-		return null;
-	}
+    private boolean canBeBlank(String value, Field column) {
+        return !column.isMandatory() && isBlank(value);
+    }
 
-	private void testHeaderValue(String value, Column column, String linesTested, Date startTime, String fileName) {
+    private ColumnType getColumnType(DataType type, boolean isReleaseInputFile) {
+        switch (type) {
+            case SCTID:
+                return isReleaseInputFile ? ColumnType.REL_SCTID : ColumnType.SCTID;
+            case UUID:
+                return isReleaseInputFile ? ColumnType.REL_UUID : ColumnType.UUID;
+            case BOOLEAN:
+                return ColumnType.BOOLEAN;
+            case STRING:
+                return ColumnType.STRING;
+            case INTEGER:
+                return ColumnType.INTEGER;
+            case TIME:
+                return isReleaseInputFile ? ColumnType.REL_TIME : ColumnType.TIME;
+            case SCTID_OR_UUID:
+                return isReleaseInputFile ? ColumnType.REL_SCTID_OR_UUID : ColumnType.SCTID_OR_UUID;
+        }
+        return null;
+    }
+
+    private void testHeaderValue(String value, Field column, Date startTime, String fileName, String colIndex) {
         String expectedColumnName = column.getName();
-        if (!expectedColumnName.equals(value)) {
+        if (expectedColumnName == null) {
+            validationLog.info("Column name is null actual '{}'", value);
+            column.setName(value);
+        } else if (!expectedColumnName.equalsIgnoreCase(value)) {
             validationLog.assertionError("Column name does not match expected value: expected '{}', actual '{}'", expectedColumnName, value);
-            testReport.addError("1-0", startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_NAME_TEST_TYPE, "Column name does not match " + expectedColumnName, value);
-            // TODO: Should we stop testing the file if we reach this point?
+            testReport.addError("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "", value, expectedColumnName);
+        } else {
+            testReport.addSuccess("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "");
         }
     }
 
     private Map<ColumnType, PatternTest> assembleColumnTests() {
         columnTests = new HashMap<>();
-		columnTests.put(ColumnType.UUID, new PatternTest("uuid", "Value does not match UUID pattern on line {}, column name '{}': value '{}'", UUID_PATTERN));
-		columnTests.put(ColumnType.REL_UUID, new PatternTest("uuid", "Value does not match UUID or Blank patterns on line {}, column name '{}': value '{}'", UUID_PATTERN, BLANK));
-		columnTests.put(ColumnType.Time, new DateTimeTest("dateStamp", "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
-		columnTests.put(ColumnType.REL_Time, new RelDateTimeTest("dateStamp", "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
-		columnTests.put(ColumnType.Boolean, new BooleanPatternTest("boolean", "Value does not match Boolean pattern on line {}, column name '{}': value '{}'", BOOLEAN_PATTERN));
-		columnTests.put(ColumnType.SCTID, new PatternTest("sctid", "Value does not match SCTID pattern on line {}, column name '{}': value '{}'", SCTID_PATTERN));
-		columnTests.put(ColumnType.REL_SCTID, new PatternTest("sctid", "Value does not match SCTID pattern on line {}, column name '{}': value '{}'", SCTID_PATTERN));
-        columnTests.put(ColumnType.Integer, new PatternTest("integer", "Value does not match the required pattern of numbers only on line {}, column name '{}': value '{}'", INTEGER_PATTERN));
-        columnTests.put(ColumnType.NonZeroInteger, new PatternTest("integer", "Value does not match a number other than 0 on line {}, column name '{}': value '{}'", NON_ZERO_INTEGER_PATTERN));
+        columnTests.put(ColumnType.UUID, new PatternTest("uuid", "Value does not match UUID pattern on line {}, column name '{}': value '{}'", UUID_PATTERN));
+        columnTests.put(ColumnType.SCTID_OR_UUID, new PatternTest("uuid", "Value does not match UUID or SCTID pattern on line {}, column name '{}': value '{}'", UUID_PATTERN, SCTID_PATTERN, BLANK));
+        columnTests.put(ColumnType.REL_SCTID_OR_UUID, new PatternTest("uuid", "Value does not match UUID or SCTID pattern on line {}, column name '{}': value '{}'", UUID_PATTERN, SCTID_PATTERN, BLANK));
+        columnTests.put(ColumnType.REL_UUID, new PatternTest("uuid", "Value does not match UUID or Blank patterns on line {}, column name '{}': value '{}'", UUID_PATTERN, BLANK));
+        columnTests.put(ColumnType.TIME, new DateTimeTest("dateStamp", "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
+        columnTests.put(ColumnType.REL_TIME, new RelDateTimeTest("dateStamp", "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
+        columnTests.put(ColumnType.BOOLEAN, new BooleanPatternTest("boolean", "Value does not match Boolean pattern on line {}, column name '{}': value '{}'", BOOLEAN_PATTERN));
+        columnTests.put(ColumnType.SCTID, new PatternTest("sctid", "Value does not match SCTID pattern on line {}, column name '{}': value '{}'", SCTID_PATTERN));
+        columnTests.put(ColumnType.REL_SCTID, new PatternTest("sctid", "Value does not match SCTID pattern on line {}, column name '{}': value '{}'", SCTID_PATTERN, BLANK));
+        columnTests.put(ColumnType.INTEGER, new PatternTest("integer", "Value does not match the required pattern of numbers only on line {}, column name '{}': value '{}'", INTEGER_PATTERN));
+        columnTests.put(ColumnType.NON_ZERO_INTEGER, new PatternTest("integer", "Value does not match a number other than 0 on line {}, column name '{}': value '{}'", NON_ZERO_INTEGER_PATTERN));
+        columnTests.put(ColumnType.STRING, new PatternTest("string", "Value does not match expected on line {}, expected '{}': actual '{}'", NOT_BLANK, BLANK));
         return columnTests;
     }
 
     private class PatternTest {
 
-		protected final Pattern[] patterns;
-		protected final String methodName;
-		protected String errorMessage;
-		protected Object[] errorArgs;
+        protected final Pattern[] patterns;
+        protected final String methodName;
+        protected String errorMessage;
+        protected Object[] errorArgs;
 
-		public PatternTest(String methodName, String errorMessage, Pattern... patterns) {
-			this.methodName = methodName;
-			this.patterns = patterns;
-			this.errorMessage = errorMessage;
+        public PatternTest(String methodName, String errorMessage, Pattern... patterns) {
+            this.methodName = methodName;
+            this.patterns = patterns;
+            this.errorMessage = errorMessage;
         }
 
-        public boolean validate(Column column, long lineNumber, String value) {
+        public boolean validate(Field column, long lineNumber, String value) {
             errorArgs = new String[]{lineNumber + "", column.getName(), value};
-			for (Pattern pattern : patterns) {
-				if (pattern.matcher(value).matches()) {
-					return true;
-				}
-			}
-			validationLog.assertionError(errorMessage, lineNumber, column.getName(), value);
-			return false;
+
+            // ignore a null value if this is the case
+            if ((column.getType() == DataType.SCTID_OR_UUID) && isBlank(value)) return true;
+
+            for (Pattern pattern : patterns) {
+                if (pattern.matcher(value).matches()) {
+                    return true;
+                }
+            }
+            validationLog.assertionError(errorMessage, lineNumber, column.getName(), value);
+            return false;
         }
 
-		public String getTestType() {
-			return COLUMN_VALUE_TEST_TYPE;
-		}
+        public String getTestType() {
+            return COLUMN_VALUE_TEST_TYPE;
+        }
 
-		public String getMessage() {
-			return errorMessage;
-		}
+        public String getMessage() {
+            return errorMessage;
+        }
 
-		public Object[] getErrorArgs() {
-			return errorArgs;
-		}
+        public Object[] getErrorArgs() {
+            return errorArgs;
+        }
 
-		public String getPatternString() {
-			return patterns.toString();
-		}
-	}
+        public String getPatternString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append(patterns[0].toString());
+            if (patterns.length > 1) {
+                for (int i = 1; i < patterns.length; i++) {
+                    Pattern pattern = patterns[i];
+                    builder.append(" | ");
+                    builder.append(pattern.toString());
+                }
+            }
+            return builder.toString();
+        }
+    }
+
+    public boolean isBlank(String value) {
+        return BLANK.matcher(value).matches();
+    }
 
     private class BooleanPatternTest extends PatternTest {
 
@@ -256,25 +279,11 @@ public class ColumnPatternTester {
         }
 
         @Override
-        public boolean validate(Column column, long lineNumber, String value) {
+        public boolean validate(Field column, long lineNumber, String value) {
             // Date Stamp
-            Column.DateStamp dateStamp = column.getDateStamp();
-            if (dateStamp != null) {
-                if (!DATE_PATTERN.matcher(value).matches()) {
-                    errorArgs = new String[]{lineNumber + "", column.getName(), value};
-                    return false;
-                } else {
-                    BigInteger maxDate = dateStamp.getMaxDate();
-                    if (maxDate != null) {
-                        Integer valueInt = Integer.valueOf(value);
-                        int maxDateInt = maxDate.intValue();
-                        if (valueInt > maxDateInt) {
-                            errorArgs = new Object[]{lineNumber, column.getName(), maxDateInt, value};
-                            errorMessage = "Value is a date after the maximum date on line {}, column name '{}': maximum date '', actual date '{}'";
-                            return false;
-                        }
-                    }
-                }
+            if (!DATE_PATTERN.matcher(value).matches()) {
+                errorArgs = new String[]{lineNumber + "", column.getName(), value};
+                return false;
             }
             return true;
         }
@@ -285,21 +294,17 @@ public class ColumnPatternTester {
         }
     }
 
-	private class RelDateTimeTest extends DateTimeTest {
+    private class RelDateTimeTest extends DateTimeTest {
 
-		private RelDateTimeTest(String methodName, String errorMessage) {
-			super(methodName, errorMessage);
-		}
+        private RelDateTimeTest(String methodName, String errorMessage) {
+            super(methodName, errorMessage);
+        }
 
-		@Override
-		public boolean validate(Column column, long lineNumber, String value) {
-			if (value.isEmpty()) {
-				return true;
-			} else {
-				return super.validate(column, lineNumber, value);
-			}
-		}
+        @Override
+        public boolean validate(Field column, long lineNumber, String value) {
+            return value.isEmpty() || super.validate(column, lineNumber, value);
+        }
 
-	}
+    }
 
 }

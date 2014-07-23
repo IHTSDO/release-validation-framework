@@ -13,15 +13,15 @@ public class CsvResultFormatter implements ResultFormatter {
 
         output.append(headers).append(String.format("%n"));
         for (TestRunItem ti : testRuns) {
-            // todo color code
-            output.append(String.format("%s, %s, %s, %s, %s, %s, %s, %s, %d, %s%n",
-					ti.isFailure() ? "fail" : "pass",
+            //  output pass/fail, id,
+            output.append(String.format("%s, %s, %s, %s, %s, %s, %s, %s, %s%n",
+					ti.getFailureMessage(),
 					ti.getExecutionId(),
                     ti.getStartDate(), ti.getFileName(), ti.getFilePath(), ti.getColumnName(), ti.getTestType(),
-                    ti.getTestPattern(), failures.size(), "need to get failure examples"));
+                    ti.getTestPattern(), ti.getActualExpectedValue()));
         }
         return output.toString();
     }
 
-    private static final String headers = "testResult, lineNumber-columnNumber, testExecutionStartDate, fileName, filePath, columnName, testType, testPattern, failureCount, failed Value";
+    private static final String headers = "Result, Line-Column, Execution Start, File Name, File Path, Column Name, Test Type, Test Pattern, Failure Details";
 }

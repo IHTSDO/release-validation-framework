@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.validation;
 
-import javax.swing.text.DateFormatter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -9,7 +8,8 @@ import java.util.Date;
 */
 public class TestRunItem {
 
-    public TestRunItem(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, boolean failure, String columnValue) {
+    public TestRunItem(String executionId, Date testTime, String fileName, String filePath, String columnName,
+                       String testType, String testPattern, boolean failure, String actualValue,  String expectedValue) {
         this.executionId = executionId;
         this.testTime = testTime;
         this.fileName = fileName;
@@ -18,7 +18,8 @@ public class TestRunItem {
         this.testType = testType;
         this.testPattern = testPattern;
         this.failure = failure;
-        this.columnValue = columnValue;
+        this.actualValue = actualValue;
+        this.expectedValue = expectedValue;
     }
 
     public boolean isFailure() {
@@ -61,12 +62,40 @@ public class TestRunItem {
         return new SimpleDateFormat().format(testTime);
     }
 
-    public String getColumnValue() {
-        return columnValue;
+    public String getActualValue() {
+        return actualValue;
     }
 
     public String getFailureMessage() {
         return failure ? "Failed" : "Success";
+    }
+
+    public String getActualExpectedValue() {
+        return failure ? "expected '" + expectedValue + "', actual '" + actualValue + "'" : "";
+    }
+
+    public void setActualValue(String actualValue) {
+        this.actualValue = actualValue;
+    }
+
+    public String getExpectedValue() {
+        return expectedValue;
+    }
+
+    public void setExpectedValue(String expectedValue) {
+        this.expectedValue = expectedValue;
+    }
+
+    @Override
+    public String toString() {
+        return "TestRunItem{" +
+                "executionId='" + executionId + '\'' +
+                ", columnName='" + columnName + '\'' +
+                ", testPattern='" + testPattern + '\'' +
+                ", failure=" + (failure ? "Fail" : "Pass") +
+                ", actualValue='" + actualValue + '\'' +
+                ", expectedValue='" + expectedValue + '\'' +
+                '}';
     }
 
     private final String executionId;
@@ -77,5 +106,6 @@ public class TestRunItem {
     private final String testType;
     private final String testPattern;
     private final boolean failure;
-    private String columnValue;
+    private String actualValue;
+    private String expectedValue;
 }

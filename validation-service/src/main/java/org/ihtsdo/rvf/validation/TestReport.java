@@ -22,14 +22,14 @@ public class TestReport implements Serializable {
         return formatter.formatResults(failures, testRuns);
     }
 
-    public void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String columnValue) {
-        TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, columnValue);
+    public void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue) {
+        TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, actualValue, expectedValue);
         failures.add(item);
         testRuns.add(item);
     }
 
     public void addSuccess(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern) {
-        TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, false, null);
+        TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, false, null, null);
         testRuns.add(item);
     }
 

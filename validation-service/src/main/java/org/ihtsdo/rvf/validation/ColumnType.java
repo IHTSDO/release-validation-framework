@@ -2,6 +2,6 @@ package org.ihtsdo.rvf.validation;
 
 public enum ColumnType {
 
-	UUID, Time, Boolean, Integer, NonZeroInteger, REGEX, REL_UUID, REL_SCTID, REL_Time, SCTID
+	UUID, TIME, BOOLEAN, INTEGER, NON_ZERO_INTEGER, REGEX, REL_UUID, REL_SCTID, REL_TIME, STRING, SCTID_OR_UUID, REL_SCTID_OR_UUID, SCTID
 
 }

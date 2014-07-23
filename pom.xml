@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>3.2.7.RELEASE</spring.version>
 		<slf4j.version>1.7.5</slf4j.version>
-        <jackson.version>2.3.0</jackson.version>
+        <jackson.version>2.4.1</jackson.version>
         <hibernate.version>3.6.10.Final</hibernate.version>
         <hsql.version>5.3.0</hsql.version>
 	</properties>
@@ -128,7 +128,15 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
+    <repositories>
+        <repository>
+            <id>snomed-utilities</id>
+            <name>SNOMED CT Utilities</name>
+            <url>https://github.com/IHTSDO/snomed-utilities/</url>
+        </repository>
+    </repositories>
+
 	<distributionManagement>
 		<repository>
 			<id>ihtsdo-public-nexus</id>

@@ -5,7 +5,6 @@ import org.ihtsdo.rvf.validation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * The controller that handles uploaded files for the validation to run
@@ -32,7 +33,7 @@ public class TestUploadFileController {
 
     @RequestMapping(value = "/test-file", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity uploadTestPackage(@RequestParam(value = "file") MultipartFile file) throws IOException {
+    public ResponseEntity uploadTestPackage(@RequestParam(value = "file") MultipartFile file, HttpServletResponse response) throws IOException {
         // load the filename
         String filename = file.getOriginalFilename();
 
@@ -51,24 +52,20 @@ public class TestUploadFileController {
 			throw new IllegalArgumentException("Only zip file accepted");
 		}
 
-
 		TestReport report = validationRunner.execute(ResponseType.CSV, resourceManager);
-          //Todo do we write this to disk?
-//        File reportFile  = new File("testReport" + System.currentTimeMillis() + ".csv");
-//        try (FileOutputStream out = new FileOutputStream(reportFile)) {
-//            IOUtils.write(report.getResult().getBytes(), out);
-//        }
-
 
         // store the report to disk for now with a timestamp
-
-        // what to do with the report should be a callback method
         if(report.getErrorCount() > 0) {
             LOGGER.error("No Errors expected but got " + report.getErrorCount() + " errors");
-            return new ResponseEntity<>(report.getResult(), HttpStatus.EXPECTATION_FAILED);
+            //return new ResponseEntity<>(report.getResult(), HttpStatus.EXPECTATION_FAILED);
         }
 
-        return new ResponseEntity<>(report.getResult(), HttpStatus.OK);
+        response.setContentType("text/csv;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
+        response.getOutputStream().print(report.getResult());
+
+//        return new ResponseEntity<>(report.getResult(), HttpStatus.OK);
+        return null;
     }
 
 	private void copyUploadToDisk(MultipartFile file, File tempFile) throws IOException {
@@ -77,5 +74,4 @@ public class TestUploadFileController {
 			IOUtils.copy(inputStream, out);
 		}
 	}
-
 }

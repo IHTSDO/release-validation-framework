@@ -37,7 +37,7 @@ public class ValidationTestRunnerTest {
 		TestReport response = validationRunner.execute(ResponseType.CSV, provider);
 
 		assertTrue(response.getResult() != null);
-		assertEquals(0, response.getErrorCount());
+		assertEquals("no errors expected", 0, response.getErrorCount());
 	}
 
 	@Test
@@ -48,7 +48,7 @@ public class ValidationTestRunnerTest {
 		TestReport response = validationRunner.execute(ResponseType.CSV, provider);
 
 		assertTrue(response.getResult() != null);
-		assertEquals(0, response.getErrorCount());
+        assertEquals(0, response.getErrorCount());
 	}
 
 	private File getFile(String testFileName) throws URISyntaxException {
