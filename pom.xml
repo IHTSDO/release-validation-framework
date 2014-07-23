@@ -135,15 +135,12 @@
             <name>SNOMED CT Utilities</name>
             <url>https://github.com/IHTSDO/snomed-utilities/</url>
         </repository>
+        <repository>
+            <id>ihtsdo-public-nexus</id>
+            <name>IHTSDO Public Nexus Releases</name>
+            <url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
+        </repository>
     </repositories>
-
-	<repositories>
-		<repository>
-			<id>ihtsdo-public-nexus</id>
-			<name>IHTSDO Public Nexus Releases</name>
-			<url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
-		</repository>
-	</repositories>
 
 	<distributionManagement>
 		<repository>
