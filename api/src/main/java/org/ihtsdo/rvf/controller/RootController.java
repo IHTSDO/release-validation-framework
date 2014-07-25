@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.controller;
 
-import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.helper.JsonEntityGenerator;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -23,7 +22,7 @@ import java.util.Map;
  */
 
 @Controller
-@RequestMapping("/roots")
+@RequestMapping("/")
 public class RootController {
 
     @RequestMapping

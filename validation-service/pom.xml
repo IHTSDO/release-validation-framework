@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.ihtsdo.snomed.rvf</groupId>
         <artifactId>release-validation-framework</artifactId>
-        <version>0.1.3.1</version>
+        <version>0.1.4</version>
     </parent>
 
     <artifactId>validation-service</artifactId>
@@ -22,6 +22,27 @@
             <artifactId>release-validation-framework-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>input-file-resource-provider</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ihtsdo.snomed.util</groupId>
+            <artifactId>snomed-utilities</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>

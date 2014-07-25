@@ -13,3 +13,5 @@ release.properties
 # Ubuntu/OSX hidden files
 .*
 
+
+api-demo/report.csv

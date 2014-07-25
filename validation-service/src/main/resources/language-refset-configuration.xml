@@ -1,0 +1,28 @@
+<column-pattern-configuration xmlns="http://rvf.ihtsdo.org/assertion/1.0.0">
+    <file>
+        <column name="id">
+            <uuid/>
+        </column>
+        <column name="effectiveTime">
+            <dateStamp/>
+        </column>
+        <column name="active">
+            <boolean/>
+        </column>
+        <column name="moduleId">
+            <sctid/>
+        </column>
+        <column name="refSetId">
+            <sctid/>
+        </column>
+        <column name="referencedComponentId">
+            <sctid/>
+        </column>
+        <column name="referencedComponentId">
+            <integer/>
+        </column>
+        <column name="acceptabilityId">
+            <sctid/>
+        </column>
+    </file>
+</column-pattern-configuration>
