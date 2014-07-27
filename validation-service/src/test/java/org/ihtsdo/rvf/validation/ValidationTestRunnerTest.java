@@ -1,12 +1,16 @@
 package org.ihtsdo.rvf.validation;
 
+import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -24,20 +28,20 @@ public class ValidationTestRunnerTest {
     public void testExecute_DataInResponse() throws Exception {
 		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile("/SnomedCT_Release_INT_20140831.zip"));
 
-		TestReport response = validationRunner.execute(ResponseType.CSV, provider);
+		TestReportable response = validationRunner.execute(ResponseType.CSV, provider);
 
         assertTrue(response.getResult() != null);
-        assertEquals(0, response.getErrorCount());
+        assertEquals(0, response.getNumErrors());
     }
 
 	@Test
 	public void testExecute_ExdRefSet() throws Exception {
 		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile("/der2_iisssccRefset_ExtendedMapDelta_INT_20140131.txt.zip"));
 
-		TestReport response = validationRunner.execute(ResponseType.CSV, provider);
+		TestReportable response = validationRunner.execute(ResponseType.CSV, provider);
 
 		assertTrue(response.getResult() != null);
-		assertEquals("no errors expected", 0, response.getErrorCount());
+		assertEquals("no errors expected", 0, response.getNumErrors());
 	}
 
 	@Test
@@ -45,11 +49,42 @@ public class ValidationTestRunnerTest {
 		String fileName = "rel2_Refset_SimpleDelta_INT_20140131.txt";
 		TextFileResourceProvider provider = new TextFileResourceProvider(getFile("/" + fileName), fileName);
 
-		TestReport response = validationRunner.execute(ResponseType.CSV, provider);
+		TestReportable response = validationRunner.execute(ResponseType.CSV, provider);
 
 		assertTrue(response.getResult() != null);
-        assertEquals(0, response.getErrorCount());
+        assertEquals(0, response.getNumErrors());
 	}
+
+    @Test
+    public void testExecute_validPostCondition_NoErrors() throws Exception {
+        String fileName = "/SnomedCT_Release_INT_20140928.zip";
+        ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile(fileName));
+
+        TestReportable response = validationRunner.execute(ResponseType.CSV, provider);
+        String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
+
+        assertTrue(response.getResult() != null);
+        assertEquals("Not meant to be failures but there are, there are 3 file names that are not valid", 3, response.getNumErrors());
+        assertEquals(invalidFileNames.length, response.getNumErrors());
+    }
+
+    @Test
+    public void testExecute_validPostCondition_Streaming() throws Exception {
+        String fileName = "/SnomedCT_Release_INT_20140928.zip";
+        ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile(fileName));
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        TestReportable response = validationRunner.execute(ResponseType.CSV, provider, bos);
+        String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
+        // check bos contains all our info
+        System.out.println(new String(bos.toByteArray()));
+        assertTrue(bos.toByteArray().length > 0);
+
+        assertTrue(response.getResult() != null);
+        assertEquals("Not meant to be failures but there are, there are 3 file names that are not valid", 3, response.getNumErrors());
+        assertEquals(invalidFileNames.length, response.getNumErrors());
+    }
 
 	private File getFile(String testFileName) throws URISyntaxException {
 		URL zipUrl = ValidationTestRunner.class.getResource(testFileName);

@@ -71,7 +71,7 @@ public class TestRunItem {
     }
 
     public String getActualExpectedValue() {
-        return failure ? "expected '" + expectedValue + "', actual '" + actualValue + "'" : "";
+        return failure ? "expected '" + expectedValue + "' but got '" + actualValue + "'" : "";
     }
 
     public void setActualValue(String actualValue) {
