@@ -48,6 +48,18 @@ public class TestUploadFileControllerTest {
     }
 
     @Test
+    public void testPostUploadTestPackage() throws Exception {
+        MvcResult result = mockMvc.perform(
+                fileUpload("/test-post")
+                        .file(new MockMultipartFile("file", "ValidPostconditionAll.zip", "application/zip",
+                                getClass().getResourceAsStream("/ValidPostconditionAll.zip")))
+        )
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().length() > 0);
+    }
+
+    @Test
     public void testUploadTestPackageExtendedMap() throws Exception {
         MvcResult result = mockMvc.perform(
                 fileUpload("/test-file")
