@@ -70,4 +70,26 @@ public class TestUploadFileControllerTest {
                 .andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().length() > 0);
     }
+    @Test
+    public void testUploadTestDescription() throws Exception {
+        MvcResult result = mockMvc.perform(
+                fileUpload("/test-pre")
+                        .file(new MockMultipartFile("file", "rel2_Description_Delta-en_INT_20240731.txt", "application/zip",
+                                getClass().getResourceAsStream("/rel2_Description_Delta-en_INT_20240731.txt")))
+        )
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().length() > 0);
+    }
+    @Test
+    public void testUploadPre() throws Exception {
+        MvcResult result = mockMvc.perform(
+                fileUpload("/test-file")
+                        .file(new MockMultipartFile("file", "rel2_sRefset_SimpleMapDelta_INT_20140731.txt", "application/zip",
+                                getClass().getResourceAsStream("/rel2_sRefset_SimpleMapDelta_INT_20140731.txt")))
+        )
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().length() > 0);
+    }
 }

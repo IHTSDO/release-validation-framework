@@ -5,6 +5,7 @@ import org.ihtsdo.rvf.validation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Date;
 
 /**
@@ -63,13 +61,13 @@ public class TestUploadFileController {
         // set up the response in order to strean directly to the response
         response.setContentType("text/csv;charset=utf-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
-        ServletOutputStream outputStream = response.getOutputStream();
+        PrintWriter writer = response.getWriter();
 
         // must be a zip
         copyUploadToDisk(file, tempFile);
         ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
 
-        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, outputStream);
+        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, writer);
 
         // store the report to disk for now with a timestamp
         if (report.getNumErrors() > 0) {
@@ -85,6 +83,11 @@ public class TestUploadFileController {
         // load the filename
         String filename = file.getOriginalFilename();
 
+        if(!filename.startsWith("rel")) {
+            LOGGER.error("Not a valid pre condition file " + filename);
+            return null;
+        }
+
         final File tempFile = File.createTempFile(filename, ".txt");
         tempFile.deleteOnExit();
         if (!filename.endsWith(".txt")) {
@@ -93,16 +96,17 @@ public class TestUploadFileController {
 
         response.setContentType("text/csv;charset=utf-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
-        ServletOutputStream outputStream = response.getOutputStream();
+        PrintWriter writer = response.getWriter();
 
         copyUploadToDisk(file, tempFile);
         ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
-        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, outputStream);
+        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, writer);
 
         // store the report to disk for now with a timestamp
         if (report.getNumErrors() > 0) {
             LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
         }
+
 
         return null;
     }

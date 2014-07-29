@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.OutputStream;
+import java.io.PrintWriter;
 
 @Component
 public class ValidationTestRunner {
@@ -27,9 +28,9 @@ public class ValidationTestRunner {
         return report;
     }
 
-    public TestReportable execute(ResponseType csv, ResourceManager resourceManager, OutputStream outputStream) {
+    public TestReportable execute(ResponseType csv, ResourceManager resourceManager, PrintWriter writer) {
         ValidationLog validationLog = resourceProviderFactory.getValidationLog(ColumnPatternTester.class);
-        StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), outputStream);
+        StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), writer);
 
         runTests(resourceManager, validationLog, testReport);
 

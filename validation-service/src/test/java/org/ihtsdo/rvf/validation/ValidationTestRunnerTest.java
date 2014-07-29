@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -73,13 +70,14 @@ public class ValidationTestRunnerTest {
         String fileName = "/SnomedCT_Release_INT_20140928.zip";
         ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile(fileName));
 
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        StringWriter sw = new StringWriter();
+        PrintWriter bos = new PrintWriter(sw);
 
         TestReportable response = validationRunner.execute(ResponseType.CSV, provider, bos);
         String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
         // check bos contains all our info
-        System.out.println(new String(bos.toByteArray()));
-        assertTrue(bos.toByteArray().length > 0);
+        System.out.println(sw.getBuffer());
+        assertTrue(sw.getBuffer().length() > 0);
 
         assertTrue(response.getResult() != null);
         assertEquals("Not meant to be failures but there are, there are 3 file names that are not valid", 3, response.getNumErrors());
