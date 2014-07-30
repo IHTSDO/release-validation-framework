@@ -48,11 +48,45 @@ public class TestUploadFileControllerTest {
     }
 
     @Test
+    public void testPostUploadTestPackage() throws Exception {
+        MvcResult result = mockMvc.perform(
+                fileUpload("/test-post")
+                        .file(new MockMultipartFile("file", "ValidPostconditionAll.zip", "application/zip",
+                                getClass().getResourceAsStream("/ValidPostconditionAll.zip")))
+        )
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().length() > 0);
+    }
+
+    @Test
     public void testUploadTestPackageExtendedMap() throws Exception {
         MvcResult result = mockMvc.perform(
                 fileUpload("/test-file")
                         .file(new MockMultipartFile("file", "SnomedCT_test2_INT_20140131.zip", "application/zip",
                                 getClass().getResourceAsStream("/SnomedCT_test2_INT_20140131.zip")))
+        )
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().length() > 0);
+    }
+    @Test
+    public void testUploadTestDescription() throws Exception {
+        MvcResult result = mockMvc.perform(
+                fileUpload("/test-pre")
+                        .file(new MockMultipartFile("file", "rel2_Description_Delta-en_INT_20240731.txt", "application/zip",
+                                getClass().getResourceAsStream("/rel2_Description_Delta-en_INT_20240731.txt")))
+        )
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().length() > 0);
+    }
+    @Test
+    public void testUploadPre() throws Exception {
+        MvcResult result = mockMvc.perform(
+                fileUpload("/test-file")
+                        .file(new MockMultipartFile("file", "rel2_sRefset_SimpleMapDelta_INT_20140731.txt", "application/zip",
+                                getClass().getResourceAsStream("/rel2_sRefset_SimpleMapDelta_INT_20140731.txt")))
         )
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn();

@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.validation;
 
 import org.ihtsdo.release.assertion.log.ValidationLog;
 import org.ihtsdo.snomed.util.rf2.schema.*;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class ColumnPatternTester {
 
     private final ValidationLog validationLog;
     private final ResourceManager resourceManager;
-    private final TestReport testReport;
+    private final TestReportable testReport;
 
     private Map<ColumnType, PatternTest> columnTests;
 
@@ -38,7 +39,7 @@ public class ColumnPatternTester {
     private static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
     private static final String COLUMN_BOOLEAN_TEST_TYPE = "ColumnBooleanTest";
 
-    public ColumnPatternTester(ValidationLog validationLog, ResourceManager resourceManager, TestReport testReport) {
+    public ColumnPatternTester(ValidationLog validationLog, ResourceManager resourceManager, TestReportable testReport) {
         this.validationLog = validationLog;
         this.resourceManager = resourceManager;
         this.testReport = testReport;
@@ -102,7 +103,9 @@ public class ColumnPatternTester {
 
                         if (dataColumnCount != configColumnCount) {
                             validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
-                            testReport.addError("1-1", startTime, fileName, resourceManager.getFilePath(), null, COLUMN_COUNT_TEST_TYPE, "", "" + configColumnCount, "" + dataColumnCount);
+                            testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), null, COLUMN_COUNT_TEST_TYPE, "", "" + configColumnCount, "" + dataColumnCount);
+                            // todo cannot continue at this point as any validation will be off
+                            continue;
                         }
 
                         for (Field column : fields) {
@@ -141,9 +144,10 @@ public class ColumnPatternTester {
                 testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
                         columnTest.getTestType(), columnTest.getPatternString());
             } else {
+                String testedValue = StringUtils.hasText(value) ? value : "No Value";
                 validationLog.assertionError(columnTest.getMessage(), columnTest.getErrorArgs());
                 testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
-                        columnTest.getTestType(), columnTest.getPatternString(), value, column.getName());
+                        columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue());
             }
         }
     }
@@ -187,14 +191,20 @@ public class ColumnPatternTester {
 
     private Map<ColumnType, PatternTest> assembleColumnTests() {
         columnTests = new HashMap<>();
-        columnTests.put(ColumnType.UUID, new PatternTest("uuid", "Value does not match UUID pattern on line {}, column name '{}': value '{}'", UUID_PATTERN));
-        columnTests.put(ColumnType.SCTID_OR_UUID, new PatternTest("uuid", "Value does not match UUID or SCTID pattern on line {}, column name '{}': value '{}'", UUID_PATTERN, SCTID_PATTERN, BLANK));
-        columnTests.put(ColumnType.REL_SCTID_OR_UUID, new PatternTest("uuid", "Value does not match UUID or SCTID pattern on line {}, column name '{}': value '{}'", UUID_PATTERN, SCTID_PATTERN, BLANK));
-        columnTests.put(ColumnType.REL_UUID, new PatternTest("uuid", "Value does not match UUID or Blank patterns on line {}, column name '{}': value '{}'", UUID_PATTERN, BLANK));
+        columnTests.put(ColumnType.UUID, new PatternTest("uuid", "Value does not match UUID pattern on line {}, column name '{}': value '{}'",
+                UUID_PATTERN));
+        columnTests.put(ColumnType.SCTID_OR_UUID, new PatternTest("uuid", "Value does not match UUID or SCTID pattern on line {}, column name '{}': value '{}'",
+                UUID_PATTERN, SCTID_PATTERN, BLANK));
+        columnTests.put(ColumnType.REL_SCTID_OR_UUID, new PatternTest("uuid", "Value does not match UUID or SCTID pattern on line {}, column name '{}': value '{}'",
+                UUID_PATTERN, SCTID_PATTERN, BLANK));
+        columnTests.put(ColumnType.REL_UUID, new PatternTest("uuid", "Value does not match UUID or Blank patterns on line {}, column name '{}': value '{}'",
+                UUID_PATTERN, BLANK));
         columnTests.put(ColumnType.TIME, new DateTimeTest("dateStamp", "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
         columnTests.put(ColumnType.REL_TIME, new RelDateTimeTest("dateStamp", "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
-        columnTests.put(ColumnType.BOOLEAN, new BooleanPatternTest("boolean", "Value does not match Boolean pattern on line {}, column name '{}': value '{}'", BOOLEAN_PATTERN));
-        columnTests.put(ColumnType.SCTID, new PatternTest("sctid", "Value does not match SCTID pattern on line {}, column name '{}': value '{}'", SCTID_PATTERN));
+        columnTests.put(ColumnType.BOOLEAN, new BooleanPatternTest("boolean", "Value does not match Boolean pattern on line {}, column name '{}': value '{}'",
+                "1 or 0", BOOLEAN_PATTERN));
+        columnTests.put(ColumnType.SCTID, new PatternTest("sctid", "Value does not match SCTID pattern on line {}, column name '{}': value '{}'",
+                SCTID_PATTERN));
         columnTests.put(ColumnType.REL_SCTID, new PatternTest("sctid", "Value does not match SCTID pattern on line {}, column name '{}': value '{}'", SCTID_PATTERN, BLANK));
         columnTests.put(ColumnType.INTEGER, new PatternTest("integer", "Value does not match the required pattern of numbers only on line {}, column name '{}': value '{}'", INTEGER_PATTERN));
         columnTests.put(ColumnType.NON_ZERO_INTEGER, new PatternTest("integer", "Value does not match a number other than 0 on line {}, column name '{}': value '{}'", NON_ZERO_INTEGER_PATTERN));
@@ -206,6 +216,7 @@ public class ColumnPatternTester {
 
         protected final Pattern[] patterns;
         protected final String methodName;
+        private String expectedValue;
         protected String errorMessage;
         protected Object[] errorArgs;
 
@@ -213,6 +224,7 @@ public class ColumnPatternTester {
             this.methodName = methodName;
             this.patterns = patterns;
             this.errorMessage = errorMessage;
+            this.expectedValue = getPatternString();
         }
 
         public boolean validate(Field column, long lineNumber, String value) {
@@ -242,13 +254,21 @@ public class ColumnPatternTester {
             return errorArgs;
         }
 
+        public String getExpectedValue() {
+            return expectedValue;
+        }
+
+        public void setExpectedValue(String expectedValue) {
+            this.expectedValue = expectedValue;
+        }
+
         public String getPatternString() {
             StringBuilder builder = new StringBuilder();
             builder.append(patterns[0].toString());
             if (patterns.length > 1) {
                 for (int i = 1; i < patterns.length; i++) {
                     Pattern pattern = patterns[i];
-                    builder.append(" | ");
+                    builder.append(" or ");
                     builder.append(pattern.toString());
                 }
             }
@@ -262,8 +282,22 @@ public class ColumnPatternTester {
 
     private class BooleanPatternTest extends PatternTest {
 
-        public BooleanPatternTest(String methodName, String errorMessage, Pattern pattern) {
+        public BooleanPatternTest(String methodName, String errorMessage, String expectedValue, Pattern pattern) {
             super(methodName, errorMessage, pattern);
+            setExpectedValue(expectedValue);
+        }
+
+        @Override
+        public boolean validate(Field column, long lineNumber, String value) {
+            errorArgs = new String[]{lineNumber + "", "1 or 2", value};
+
+            for (Pattern pattern : patterns) {
+                if (pattern.matcher(value).matches()) {
+                    return true;
+                }
+            }
+            validationLog.assertionError(errorMessage, lineNumber, "1 or 2", value);
+            return false;
         }
 
         @Override

@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.validation;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,7 +7,7 @@ import java.util.List;
 /**
  *
  */
-public class TestReport implements Serializable {
+public class TestReport implements TestReportable {
 
     private List<TestRunItem> failures = new ArrayList<>();
     private List<TestRunItem> testRuns = new ArrayList<>();
@@ -33,7 +32,7 @@ public class TestReport implements Serializable {
         testRuns.add(item);
     }
 
-    public int getErrorCount() {
+    public int getNumErrors() {
         return failures.size();
     }
 
