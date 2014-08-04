@@ -1,7 +1,5 @@
 package org.ihtsdo.rvf.validation;
 
-import org.springframework.util.StringUtils;
-
 import java.util.List;
 
 /**
@@ -10,30 +8,23 @@ import java.util.List;
 public class CsvResultFormatter implements ResultFormatter {
 
     @Override
-    public String formatResults(List<TestRunItem> failures, List<TestRunItem> testRuns) {
+    public String formatResults(List<TestRunItem> testRuns) {
         StringBuilder output = new StringBuilder();
 
-        output.append(headers).append(String.format("%n"));
+        output.append(headers).append("\n");
         for (TestRunItem ti : testRuns) {
             //  output pass/fail, id,
-            output.append(formatRow(ti));
+            output.append(formatRow(ti, 0));
         }
         return output.toString();
     }
 
-    public String formatRow(TestRunItem ti) {
-        return String.format("%s,%s,%s,%s,%s,%s,%s,\"%s\",\"%s\"%n",
+    public String formatRow(TestRunItem ti, Integer itemErrorCount) {
+        return String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\n",
                 ti.getFailureMessage(),
                 ti.getExecutionId(),
-                ti.getStartDate(), ti.getFileName(), ti.getFilePath(), ti.getColumnName(), ti.getTestType(),
-                ti.getTestPattern(), escape(ti.getActualExpectedValue()));
-    }
-
-    private String escape(String actualExpectedValue) {
-        if (actualExpectedValue.contains(",")) {
-            return StringUtils.replace(actualExpectedValue, ",", " ");
-        }
-        return actualExpectedValue;
+                ti.getFileName(), ti.getFilePath(), ti.getColumnName(), ti.getTestType(),
+                ti.getTestPattern(), ti.getActualExpectedValue(), itemErrorCount);
     }
 
     public String getHeaders() {
@@ -41,5 +32,5 @@ public class CsvResultFormatter implements ResultFormatter {
     }
 
     // no spaces between the commas please as this breaks the , quote escaping
-    private static final String headers = "Result,Line-Column,Execution Start,File Name,File Path,Column Name,Test Type,Test Pattern,Failure Details";
+    private static final String headers = "Result\tRow-Column\tFile Name\tFile Path\tColumn Name\tTest Type\tTest Pattern\tFailure Details\tNumber of occurences";
 }

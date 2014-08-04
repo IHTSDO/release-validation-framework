@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.validation;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +23,7 @@ public class ValidationTestRunnerTest {
     @Test
     public void testExecute_DataInResponse() throws Exception {
 		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile("/SnomedCT_Release_INT_20140831.zip"));
-
-		TestReportable response = validationRunner.execute(ResponseType.CSV, provider);
+		TestReportable response = validationRunner.execute(ResponseType.CSV, provider, new TestWriterDelegate(new StringWriter()), true);
 
         assertTrue(response.getResult() != null);
         assertEquals(0, response.getNumErrors());
@@ -35,7 +33,7 @@ public class ValidationTestRunnerTest {
 	public void testExecute_ExdRefSet() throws Exception {
 		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile("/der2_iisssccRefset_ExtendedMapDelta_INT_20140131.txt.zip"));
 
-		TestReportable response = validationRunner.execute(ResponseType.CSV, provider);
+		TestReportable response = validationRunner.execute(ResponseType.CSV, provider, new TestWriterDelegate(new StringWriter()), true);
 
 		assertTrue(response.getResult() != null);
 		assertEquals("no errors expected", 0, response.getNumErrors());
@@ -46,7 +44,7 @@ public class ValidationTestRunnerTest {
 		String fileName = "rel2_Refset_SimpleDelta_INT_20140131.txt";
 		TextFileResourceProvider provider = new TextFileResourceProvider(getFile("/" + fileName), fileName);
 
-		TestReportable response = validationRunner.execute(ResponseType.CSV, provider);
+		TestReportable response = validationRunner.execute(ResponseType.CSV, provider, new TestWriterDelegate(new StringWriter()), true);
 
 		assertTrue(response.getResult() != null);
         assertEquals(0, response.getNumErrors());
@@ -57,7 +55,7 @@ public class ValidationTestRunnerTest {
         String fileName = "/SnomedCT_Release_INT_20140928.zip";
         ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile(fileName));
 
-        TestReportable response = validationRunner.execute(ResponseType.CSV, provider);
+        TestReportable response = validationRunner.execute(ResponseType.CSV, provider, new TestWriterDelegate(new StringWriter()), true);
         String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
 
         assertTrue(response.getResult() != null);
@@ -73,7 +71,7 @@ public class ValidationTestRunnerTest {
         StringWriter sw = new StringWriter();
         PrintWriter bos = new PrintWriter(sw);
 
-        TestReportable response = validationRunner.execute(ResponseType.CSV, provider, bos);
+        TestReportable response = validationRunner.execute(ResponseType.CSV, provider, bos, false);
         String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
         // check bos contains all our info
         System.out.println(sw.getBuffer());

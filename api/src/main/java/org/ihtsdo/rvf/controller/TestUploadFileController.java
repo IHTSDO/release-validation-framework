@@ -5,7 +5,6 @@ import org.ihtsdo.rvf.validation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.Date;
@@ -32,15 +30,17 @@ public class TestUploadFileController {
 
     @RequestMapping(value = "/test-file", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity uploadTestPackage(@RequestParam(value = "file") MultipartFile file, HttpServletResponse response) throws IOException {
+    public ResponseEntity uploadTestPackage(@RequestParam(value = "file") MultipartFile file,
+                                            @RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
+                                            HttpServletResponse response) throws IOException {
         // load the filename
         String filename = file.getOriginalFilename();
         // must be a zip
         if (filename.endsWith(".zip")) {
-            return uploadPostTestPackage(file, response);
+            return uploadPostTestPackage(file, writeSucceses, response);
 
         } else if (filename.endsWith(".txt")) {
-            return uploadPreTestPackage(file, response);
+            return uploadPreTestPackage(file, writeSucceses, response);
         } else {
             throw new IllegalArgumentException("File should be pre or post and either a .txt or .zip is expected");
         }
@@ -48,7 +48,9 @@ public class TestUploadFileController {
 
     @RequestMapping(value = "/test-post", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity uploadPostTestPackage(@RequestParam(value = "file") MultipartFile file, HttpServletResponse response) throws IOException {
+    public ResponseEntity uploadPostTestPackage(@RequestParam(value = "file") MultipartFile file,
+                                                @RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
+                                                HttpServletResponse response) throws IOException {
         // load the filename
         String filename = file.getOriginalFilename();
 
@@ -67,7 +69,7 @@ public class TestUploadFileController {
         copyUploadToDisk(file, tempFile);
         ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
 
-        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, writer);
+        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, writer, writeSucceses);
 
         // store the report to disk for now with a timestamp
         if (report.getNumErrors() > 0) {
@@ -79,7 +81,9 @@ public class TestUploadFileController {
 
     @RequestMapping(value = "/test-pre", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity uploadPreTestPackage(@RequestParam(value = "file") MultipartFile file, HttpServletResponse response) throws IOException {
+    public ResponseEntity uploadPreTestPackage(@RequestParam(value = "file") MultipartFile file,
+                                               @RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
+                                               HttpServletResponse response) throws IOException {
         // load the filename
         String filename = file.getOriginalFilename();
 
@@ -99,8 +103,9 @@ public class TestUploadFileController {
         PrintWriter writer = response.getWriter();
 
         copyUploadToDisk(file, tempFile);
+
         ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
-        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, writer);
+        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, writer, writeSucceses);
 
         // store the report to disk for now with a timestamp
         if (report.getNumErrors() > 0) {

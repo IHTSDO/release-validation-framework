@@ -13,4 +13,44 @@ public interface TestReportable {
     int getNumErrors();
     int getNumSuccesses();
     int getNumTestRuns();
+    int getNumberRecordedErrors();
+
+    String writeSummary();
+
+    class TestRunItemCount {
+        private TestRunItem item;
+        private Integer count = 0;
+
+        public TestRunItemCount(TestRunItem item) {
+            this.item = item;
+            count = 1;
+        }
+
+        public void addError() {
+            count++;
+        }
+
+        public Integer getErrorCount() {
+            return count;
+        }
+
+        public TestRunItem getItem() {
+            return item;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TestRunItemCount that = (TestRunItemCount) o;
+            return count.equals(that.count) && item.equals(that.item);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = item.hashCode();
+            result = 31 * result + count.hashCode();
+            return result;
+        }
+    }
 }

@@ -1,8 +1,8 @@
 package org.ihtsdo.rvf.validation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.release.assertion.log.ValidationLog;
 import org.ihtsdo.snomed.util.rf2.schema.*;
-import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+//import org.springframework.util.StringUtils;
 
 public class ColumnPatternTester {
 
@@ -34,6 +36,7 @@ public class ColumnPatternTester {
 
     private static final String FILE_NAME_TEST_TYPE = "FileNameTest";
     private static final String COLUMN_COUNT_TEST_TYPE = "ColumnCountTest";
+    private static final String ROW_SPACE_TEST_TYPE = "RowSpaceTest";
     private static final String COLUMN_HEADING_TEST = "ColumnHeadingTest";
     private static final String COLUMN_VALUE_TEST_TYPE = "ColumnValuesTest";
     private static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
@@ -101,10 +104,7 @@ public class ColumnPatternTester {
 
                         int dataColumnCount = columnData.length;
 
-                        if (dataColumnCount != configColumnCount) {
-                            validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
-                            testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), null, COLUMN_COUNT_TEST_TYPE, "", "" + configColumnCount, "" + dataColumnCount);
-                            // todo cannot continue at this point as any validation will be off
+                        if (!(validateRow(startTime, fileName, line, lineNumber, configColumnCount, dataColumnCount))) {
                             continue;
                         }
 
@@ -133,6 +133,27 @@ public class ColumnPatternTester {
         validationLog.info("{} files and {} lines tested in {} milliseconds.", filesTested, linesTested, (new Date().getTime() - startTime.getTime()));
     }
 
+    public boolean validateRow(Date startTime, String fileName, String line, long lineNumber, int configColumnCount, int dataColumnCount) {
+
+        if (dataColumnCount != configColumnCount) {
+            validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
+            testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), null, COLUMN_COUNT_TEST_TYPE, "", "" + configColumnCount, "" + dataColumnCount);
+            // cannot continue at this point as any validation will be off
+            return false;
+        }
+
+        // will catch extra tabs, spaces at the end of a line
+        if (line.endsWith("\t") || line.endsWith(" ")) {
+            // extra spaces lets see if it is at the end, can still continue testing
+            validationLog.assertionError("Extra space at the end of line {}, expected {}, actual {}", lineNumber, line.trim(), line);
+            testReport.addError(lineNumber + "-" + dataColumnCount + 1, startTime, fileName, resourceManager.getFilePath(), null, ROW_SPACE_TEST_TYPE, "", line, line.trim());
+            // continue testing
+            return true;
+        }
+
+        return true;
+    }
+
     private void testDataValue(String id, long lineNumber, String value, Field column, Date startTime, String fileName, boolean isReleaseInputFile) {
 
         ColumnType columnType = getColumnType(column.getType(), isReleaseInputFile);
@@ -144,7 +165,7 @@ public class ColumnPatternTester {
                 testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
                         columnTest.getTestType(), columnTest.getPatternString());
             } else {
-                String testedValue = StringUtils.hasText(value) ? value : "No Value";
+                String testedValue = StringUtils.isNoneEmpty(value) ? value : "No Value";
                 validationLog.assertionError(columnTest.getMessage(), columnTest.getErrorArgs());
                 testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
                         columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue());

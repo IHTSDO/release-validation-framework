@@ -16,23 +16,14 @@ public class ValidationTestRunner {
     @Autowired
     private ResourceProviderFactory resourceProviderFactory;
 
-    public TestReportable execute(ResponseType type, ResourceManager resourceManager) {
-
-        //ColumnPatternConfiguration configuration = loadConfiguration(configurationFile);
+    public TestReportable execute(ResponseType csv, ResourceManager resourceManager, PrintWriter writer, boolean writeSuccesses) {
         ValidationLog validationLog = resourceProviderFactory.getValidationLog(ColumnPatternTester.class);
-        // factory to create this bases on the enumeration or responseType
-        TestReport report = new TestReport(new CsvResultFormatter());
-
-        runTests(resourceManager, validationLog, report);
-
-        return report;
-    }
-
-    public TestReportable execute(ResponseType csv, ResourceManager resourceManager, PrintWriter writer) {
-        ValidationLog validationLog = resourceProviderFactory.getValidationLog(ColumnPatternTester.class);
-        StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), writer);
+        StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), writer, writeSuccesses);
 
         runTests(resourceManager, validationLog, testReport);
+
+        String summary = testReport.writeSummary();
+        validationLog.info(summary);
 
         return testReport;
     }

@@ -41,10 +41,11 @@ public class TestUploadFileControllerTest {
                 fileUpload("/test-file")
                         .file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140831.zip", "application/zip",
                                 getClass().getResourceAsStream("/SnomedCT_Release_INT_20140831.zip")))
-        )
+                .requestAttr("writeSuccess", Boolean.FALSE))
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn();
-        assertTrue(result.getResponse().getContentAsString().length() > 0);
+        String content = result.getResponse().getContentAsString();
+        assertTrue(content.length() > 0);
     }
 
     @Test

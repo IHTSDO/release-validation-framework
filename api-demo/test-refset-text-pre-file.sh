@@ -9,8 +9,8 @@ set -e;
 fileToTest="rel2_Description_Delta-en_INT_20240731.txt"
 
 # Target API Deployment
-#api="http://localhost:8080/api/v1"
-api="https://uat-rvf.ihtsdotools.org/api/v1"
+api="http://localhost:8080/api/v1"
+#api="https://uat-rvf.ihtsdotools.org/api/v1"
 
 #
 echo
