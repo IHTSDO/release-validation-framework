@@ -21,7 +21,7 @@ public class TestWriterDelegate extends PrintWriter {
 
     @Override
     public String toString() {
-        System.out.println(out.toString());
+        //System.out.println(out.toString());
         return buffer.toString();
     }
 }
