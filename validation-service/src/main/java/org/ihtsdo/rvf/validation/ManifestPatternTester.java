@@ -48,7 +48,7 @@ public class ManifestPatternTester {
             boolean match = resourceManager.match(name);
             if (!match) {
                 validationLog.assertionError("Invalid package structure expected directory at {} but found none", name);
-                report.addError(rowNum + "-" + columnNum, startTime, name, name, name, MANIFEST_STRUCTURE_TEST, "", "Folder Not Found", name);
+                report.addError(rowNum + "-" + columnNum, startTime, name, name, name, MANIFEST_STRUCTURE_TEST, "", "No Folder Found", name);
             } else {
                 report.addSuccess(rowNum + "-" + columnNum, startTime, name, name, "", MANIFEST_STRUCTURE_TEST, "");
             }
@@ -59,7 +59,7 @@ public class ManifestPatternTester {
 
                 if (!(resourceManager.match(filename))) {
                     validationLog.assertionError("Invalid package structure expected file at {} but found none", filename);
-                    report.addError(rowNum + "-" + columnNum, startTime, filename, filename, filename, MANIFEST_STRUCTURE_TEST, "", "File Not Found", filename);
+                    report.addError(rowNum + "-" + columnNum, startTime, filename, filename, filename, MANIFEST_STRUCTURE_TEST, "", "No File Found", filename);
                 } else {
                     report.addSuccess(rowNum + "-" + columnNum, startTime, filename, filename, "", MANIFEST_STRUCTURE_TEST, "");
                 }

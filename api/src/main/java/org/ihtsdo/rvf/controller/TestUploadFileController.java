@@ -80,9 +80,10 @@ public class TestUploadFileController {
             report = validationRunner.execute(resourceManager, writer, writeSucceses);
         } else {
             String originalFilename = manifestFile.getOriginalFilename();
-            originalFilename = originalFilename.substring(0, originalFilename.indexOf(".xml"));
             final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
             tempManifestFile.deleteOnExit();
+            copyUploadToDisk(manifestFile, tempManifestFile);
+            
             ManifestFile mf = new ManifestFile(tempManifestFile);
             report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
         }

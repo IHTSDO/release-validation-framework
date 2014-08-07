@@ -83,6 +83,18 @@ public class ValidationTestRunnerTest {
         assertEquals(invalidFileNames.length, response.getNumErrors());
     }
 
+    @Test
+    public void testExecuteWithManifest() throws Exception {
+        String fileName = "/SnomedCT_Release_INT_20140831.zip";
+        ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile(fileName));
+        ManifestFile manifestFile = new ManifestFile(getFile("/manifest_20250731.xml"));
+
+        TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), true, manifestFile);
+
+        assertTrue(response.getResult() != null);
+        assertEquals("should only be manifest errors in this", 54, response.getNumErrors());
+    }
+
 	private File getFile(String testFileName) throws URISyntaxException {
 		URL zipUrl = ValidationTestRunner.class.getResource(testFileName);
 		return new File(zipUrl.toURI());

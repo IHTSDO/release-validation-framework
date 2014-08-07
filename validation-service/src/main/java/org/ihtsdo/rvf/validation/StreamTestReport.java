@@ -39,7 +39,7 @@ public class StreamTestReport implements TestReportable {
             TestRunItemCount value = entry.getValue();
             writer.write(formatter.formatRow(value.getItem(), value.getErrorCount()));
         }
-        writeSummary();
+        //writeSummary();
         return writer.toString();
     }
 
