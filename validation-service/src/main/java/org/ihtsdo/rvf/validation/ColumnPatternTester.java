@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.validation;
 
 import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.release.assertion.log.ValidationLog;
+import org.ihtsdo.rvf.validation.resource.ResourceManager;
 import org.ihtsdo.snomed.util.rf2.schema.*;
 
 import java.io.BufferedReader;
@@ -37,6 +38,7 @@ public class ColumnPatternTester {
     private static final String FILE_NAME_TEST_TYPE = "FileNameTest";
     private static final String COLUMN_COUNT_TEST_TYPE = "ColumnCountTest";
     private static final String ROW_SPACE_TEST_TYPE = "RowSpaceTest";
+    private static final String EMPTY_ROW_TEST = "BlankRowTest";
     private static final String COLUMN_HEADING_TEST = "ColumnHeadingTest";
     private static final String COLUMN_VALUE_TEST_TYPE = "ColumnValuesTest";
     private static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
@@ -134,19 +136,23 @@ public class ColumnPatternTester {
     }
 
     public boolean validateRow(Date startTime, String fileName, String line, long lineNumber, int configColumnCount, int dataColumnCount) {
-
+        if(StringUtils.isEmpty(line)) {
+            validationLog.assertionError("Empty line at line {}", lineNumber);
+            testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Empty Row", EMPTY_ROW_TEST, "", line, "expected data");
+            return false;
+        }
         if (dataColumnCount != configColumnCount) {
             validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
-            testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), null, COLUMN_COUNT_TEST_TYPE, "", "" + configColumnCount, "" + dataColumnCount);
+            testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Column Count Mismatch", COLUMN_COUNT_TEST_TYPE, "", "" + configColumnCount, "" + dataColumnCount);
             // cannot continue at this point as any validation will be off
             return false;
         }
-
+        
         // will catch extra tabs, spaces at the end of a line
         if (line.endsWith("\t") || line.endsWith(" ")) {
             // extra spaces lets see if it is at the end, can still continue testing
             validationLog.assertionError("Extra space at the end of line {}, expected {}, actual {}", lineNumber, line.trim(), line);
-            testReport.addError(lineNumber + "-" + dataColumnCount + 1, startTime, fileName, resourceManager.getFilePath(), null, ROW_SPACE_TEST_TYPE, "", line, line.trim());
+            testReport.addError(lineNumber + "-" + dataColumnCount + 1, startTime, fileName, resourceManager.getFilePath(), "End of Row Space", ROW_SPACE_TEST_TYPE, "", line, line.trim());
             // continue testing
             return true;
         }

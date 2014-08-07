@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.validation;
 
 import org.ihtsdo.release.assertion.log.TestValidationLogImpl;
+import org.ihtsdo.rvf.validation.resource.ResourceManager;
 import org.junit.Test;
 
 import java.io.*;
@@ -35,7 +36,6 @@ public class ColumnPatternTesterTest {
 
         assertEquals("the 2 invalid ids", 2, testReport.getNumErrors());
         assertEquals(228, testReport.getNumSuccesses());
-        System.out.println(testReport.getResult());
     }
 
     @Test
@@ -45,7 +45,6 @@ public class ColumnPatternTesterTest {
 
         assertEquals("Not an RF2 specification file", 1, testReport.getNumErrors());
         assertEquals(0, testReport.getNumSuccesses());
-        System.out.println(testReport.getResult());
     }
 
     @Test
@@ -129,6 +128,22 @@ public class ColumnPatternTesterTest {
         assertEquals("1 row contains a tab a the end + 1 row contains 2 spaces at end + the last column of the row with spaces will fail column pattern test ", 3, testReport.getNumErrors());
     }
 
+    @Test
+    public void testTabsInBetween() throws Exception {
+        String filename = "/rel2_Refset_SimpleDelta_INT_20140428.txt";
+        executeRun(filename, false);
+
+        assertEquals("1 row contains a tab a the end + 1 row contains 2 spaces at end + the last column of the row with spaces will fail column pattern test ", 3, testReport.getNumErrors());
+    }
+
+    @Test
+    public void testBlankRow() throws Exception {
+        String filename = "/rel2_Refset_SimpleDelta_INT_20130422.txt";
+        executeRun(filename, false);
+
+        assertEquals("1 blank row ", 1, testReport.getNumErrors());
+    }
+
     public void executeRun(String filename, boolean writeSucceses) throws URISyntaxException {
         File f = new File(getClass().getResource(filename).toURI());
 
@@ -161,6 +176,11 @@ public class ColumnPatternTesterTest {
         @Override
         public List<String> getFileNames() {
             return fileNames;
+        }
+
+        @Override
+        public boolean match(String name) {
+            return false;
         }
 
         private List<String> fileNames = new ArrayList<>();

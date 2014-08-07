@@ -51,6 +51,11 @@ public class StreamTestReport implements TestReportable {
         return summary;
     }
 
+    @Override
+    public void addNewLine() {
+        writer.write("/n/n");
+    }
+
     public void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue) {
         TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, actualValue, expectedValue);
         if (writeSuccesses) {
@@ -92,5 +97,12 @@ public class StreamTestReport implements TestReportable {
     public int getNumTestRuns() {
         return numTestRuns;
     }
+    
+    public void setFormatter(ResultFormatter formatter) {
+        this.formatter = formatter;
+    }
 
+    public void setWriteSuccesses(boolean writeSuccesses) {
+        this.writeSuccesses = writeSuccesses;
+    }
 }

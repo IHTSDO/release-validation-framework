@@ -17,6 +17,8 @@ public interface TestReportable {
 
     String writeSummary();
 
+    void addNewLine();
+
     class TestRunItemCount {
         private TestRunItem item;
         private Integer count = 0;

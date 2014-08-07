@@ -2,6 +2,9 @@ package org.ihtsdo.rvf.controller;
 
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.validation.*;
+import org.ihtsdo.rvf.validation.resource.ResourceManager;
+import org.ihtsdo.rvf.validation.resource.TextFileResourceProvider;
+import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +35,13 @@ public class TestUploadFileController {
     @ResponseBody
     public ResponseEntity uploadTestPackage(@RequestParam(value = "file") MultipartFile file,
                                             @RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
+                                            @RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
                                             HttpServletResponse response) throws IOException {
         // load the filename
         String filename = file.getOriginalFilename();
         // must be a zip
         if (filename.endsWith(".zip")) {
-            return uploadPostTestPackage(file, writeSucceses, response);
+            return uploadPostTestPackage(file, writeSucceses, manifestFile, response);
 
         } else if (filename.endsWith(".txt")) {
             return uploadPreTestPackage(file, writeSucceses, response);
@@ -50,6 +54,7 @@ public class TestUploadFileController {
     @ResponseBody
     public ResponseEntity uploadPostTestPackage(@RequestParam(value = "file") MultipartFile file,
                                                 @RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
+                                                @RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
                                                 HttpServletResponse response) throws IOException {
         // load the filename
         String filename = file.getOriginalFilename();
@@ -69,7 +74,18 @@ public class TestUploadFileController {
         copyUploadToDisk(file, tempFile);
         ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
 
-        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, writer, writeSucceses);
+        TestReportable report;
+        
+        if (manifestFile == null) {
+            report = validationRunner.execute(resourceManager, writer, writeSucceses);
+        } else {
+            String originalFilename = manifestFile.getOriginalFilename();
+            originalFilename = originalFilename.substring(0, originalFilename.indexOf(".xml"));
+            final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
+            tempManifestFile.deleteOnExit();
+            ManifestFile mf = new ManifestFile(tempManifestFile);
+            report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+        }
 
         // store the report to disk for now with a timestamp
         if (report.getNumErrors() > 0) {
@@ -105,7 +121,7 @@ public class TestUploadFileController {
         copyUploadToDisk(file, tempFile);
 
         ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
-        TestReportable report = validationRunner.execute(ResponseType.CSV, resourceManager, writer, writeSucceses);
+        TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
 
         // store the report to disk for now with a timestamp
         if (report.getNumErrors() > 0) {
