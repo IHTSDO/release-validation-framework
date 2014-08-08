@@ -76,6 +76,7 @@ public class ValidationTestRunnerTest {
         TestReportable response = validationRunner.execute(provider, bos, false);
         String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
         // check bos contains all our info
+        //System.out.println(sw.getBuffer());
         assertTrue(sw.getBuffer().length() > 0);
 
         assertTrue(response.getResult() != null);
