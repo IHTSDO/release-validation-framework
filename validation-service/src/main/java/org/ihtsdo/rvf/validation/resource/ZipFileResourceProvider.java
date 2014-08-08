@@ -1,11 +1,10 @@
-package org.ihtsdo.rvf.validation;
+package org.ihtsdo.rvf.validation.resource;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 /**
  *
@@ -35,6 +34,11 @@ public class ZipFileResourceProvider implements ResourceManager {
                 filenames.put(key, zipEntry);
             }
         }
+    }
+
+    @Override
+    public boolean match(String name) {
+        return zipFile.getEntry(name) != null;
     }
 
     public boolean isFile(String name) {

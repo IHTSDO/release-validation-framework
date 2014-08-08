@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.validation;
+package org.ihtsdo.rvf.validation.resource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,4 +15,6 @@ public interface ResourceManager {
     String getFilePath();
 
     List<String> getFileNames();
+
+    boolean match(String name);
 }

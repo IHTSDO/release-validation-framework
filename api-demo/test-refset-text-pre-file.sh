@@ -18,6 +18,5 @@ echo "Target Release Verification Framework API URL is '${api}'"
 echo
 #
 echo "Upload Simple Refset and Write out report.csv"
-echo -e `curl -F file=@${fileToTest} ${api}/test-file` | tr -d '"'| tee report.csv
-
-echo
+curl -i -X POST "$api/test-file" -F file=@${fileToTest} | tr -d '"'| tee report.csv
+#curl -F file=@${packageToTest} ${api}/test-file | tr -d '"'| tee report.csv

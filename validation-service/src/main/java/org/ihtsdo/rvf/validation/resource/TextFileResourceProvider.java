@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.validation;
+package org.ihtsdo.rvf.validation.resource;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -33,4 +33,8 @@ public class TextFileResourceProvider implements ResourceManager {
 		return fileNames;
 	}
 
+    @Override
+    public boolean match(String name) {
+        return false;
+    }
 }

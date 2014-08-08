@@ -7,6 +7,7 @@ set -e;
 #
 # Declare parameters
 packageToTest="SnomedCT_test1_INT_20140131.zip"
+manifesFile="manifest_20250731.xml"
 
 # Target API Deployment
 api="http://localhost:8080/api/v1"
@@ -19,5 +20,5 @@ echo
 #
 echo "Upload Simple Refset and Write out report.csv"
 #echo -e `curl -F file=@${packageToTest} ${api}/test-file` | tr -d '"'| tee report.csv
-curl -i -X POST "$api/test-file?writeSuccesses=true" -F file=@${packageToTest} | tr -d '"'| tee report.csv
+curl -i -X POST "$api/test-post" -F manifest=@${manifesFile} -F file=@${packageToTest} | tr -d '"'| tee report.csv
 

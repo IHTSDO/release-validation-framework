@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.ihtsdo.snomed.rvf</groupId>
         <artifactId>release-validation-framework</artifactId>
-        <version>0.1.5</version>
+        <version>0.1.6</version>
     </parent>
 
     <artifactId>validation-service</artifactId>
@@ -42,6 +42,17 @@
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-digester3</artifactId>
+            <version>3.2</version>
+            <classifier>with-deps</classifier>
+        </dependency>
 
     </dependencies>
 
@@ -54,12 +65,12 @@
                 <executions>
                     <execution>
                         <goals>
-                           <goal>generate</goal>
+                            <goal>generate</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-    
+
 </project>
