@@ -11,7 +11,9 @@ import java.util.Map;
  */
 public class StreamTestReport implements TestReportable {
 
-    private final PrintWriter writer;
+	public static final String LINE_ENDING = "\r\n";
+
+	private final PrintWriter writer;
     private ResultFormatter formatter;
     private int numFailures = 0;
     private int numTestRuns = 0;
@@ -30,6 +32,7 @@ public class StreamTestReport implements TestReportable {
         this.formatter = formatter;
         this.writer = writer;
         this.writer.write(formatter.getHeaders());
+		this.writer.write(LINE_ENDING);
         this.writeSuccesses = writeSucceses;
     }
 
@@ -58,17 +61,14 @@ public class StreamTestReport implements TestReportable {
 
     public void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue) {
         TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, actualValue, expectedValue);
-        if (writeSuccesses) {
-            String row = formatter.formatRow(item, 0);
-            writer.write(row);
-        } else {
-            if (errorMap.containsKey(columnName)) {
-                TestRunItemCount errorCounter = errorMap.get(columnName);
-                errorCounter.addError();
-            } else {
-                errorMap.put(columnName, new TestRunItemCount(item));
-            }
-        }
+		String row = formatter.formatRow(item, 0);
+		writer.write(row);
+		if (errorMap.containsKey(columnName)) {
+			TestRunItemCount errorCounter = errorMap.get(columnName);
+			errorCounter.addError();
+		} else {
+			errorMap.put(columnName, new TestRunItemCount(item));
+		}
         numFailures++;
         numTestRuns++;
     }
