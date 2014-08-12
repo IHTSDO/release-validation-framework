@@ -11,7 +11,9 @@ import java.util.Map;
  */
 public class StreamTestReport implements TestReportable {
 
-    private final PrintWriter writer;
+	public static final String LINE_ENDING = "\r\n";
+
+	private final PrintWriter writer;
     private ResultFormatter formatter;
     private int numFailures = 0;
     private int numTestRuns = 0;
@@ -30,6 +32,7 @@ public class StreamTestReport implements TestReportable {
         this.formatter = formatter;
         this.writer = writer;
         this.writer.write(formatter.getHeaders());
+		this.writer.write(LINE_ENDING);
         this.writeSuccesses = writeSucceses;
     }
 
