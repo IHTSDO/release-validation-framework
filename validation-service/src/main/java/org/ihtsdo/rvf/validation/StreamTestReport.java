@@ -58,17 +58,14 @@ public class StreamTestReport implements TestReportable {
 
     public void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue) {
         TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, actualValue, expectedValue);
-        if (writeSuccesses) {
-            String row = formatter.formatRow(item, 0);
-            writer.write(row);
-        } else {
-            if (errorMap.containsKey(columnName)) {
-                TestRunItemCount errorCounter = errorMap.get(columnName);
-                errorCounter.addError();
-            } else {
-                errorMap.put(columnName, new TestRunItemCount(item));
-            }
-        }
+		String row = formatter.formatRow(item, 0);
+		writer.write(row);
+		if (errorMap.containsKey(columnName)) {
+			TestRunItemCount errorCounter = errorMap.get(columnName);
+			errorCounter.addError();
+		} else {
+			errorMap.put(columnName, new TestRunItemCount(item));
+		}
         numFailures++;
         numTestRuns++;
     }
