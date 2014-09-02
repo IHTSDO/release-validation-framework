@@ -1,7 +1,6 @@
 package org.ihtsdo.rvf.helper;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.ihtsdo.rvf.entity.Assertion;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,22 +13,21 @@ import java.util.Map;
  */
 public class JsonEntityGenerator {
 
-    public List<Map<String, Object>> getEntityCollection(List<? extends Object> entities, HttpServletRequest request) {
-        List<Map<String, Object>> jsonEntities = new ArrayList<>();
+	@Autowired
+	private ObjectMapper objectMapper;
 
-        for (Object entity : entities) {
-            jsonEntities.add(getEntity(entity));
-        }
+	public List<Map<String, Object>> getEntityCollection(List<? extends Object> entities, HttpServletRequest request) {
+		List<Map<String, Object>> jsonEntities = new ArrayList<>();
 
-        return jsonEntities;
-    }
+		for (Object entity : entities) {
+			jsonEntities.add(getEntity(entity));
+		}
 
-    public Map<String, Object> getEntity(Object entity) {
-        return objectMapper.convertValue(entity, Map.class);
-    }
+		return jsonEntities;
+	}
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
+	public Map<String, Object> getEntity(Object entity) {
+		return objectMapper.convertValue(entity, Map.class);
+	}
 
 }

@@ -25,25 +25,26 @@ import java.util.Map;
 @RequestMapping("/")
 public class RootController {
 
-    @RequestMapping
-    @ResponseBody
-    public List<Map<String, Object>> getAssertions(HttpServletRequest request) {
-        // todo pass through the release center should be part of security
-        List<AssertionTest> assertions = new ArrayList<>();//assertionService.findAll();
+	@Autowired
+	private AssertionService assertionService;
 
-        return entityGenerator.getEntityCollection(assertions, request);
-    }
+	@Autowired
+	private JsonEntityGenerator entityGenerator;
 
-    @RequestMapping("/{id}")
-    @ResponseBody
-    public Map<String, Object> getBuild(@PathVariable Long id) {
-        AssertionTest assertionTest = new AssertionTest(id, "some label"); //assertionService.find(id);
-        return entityGenerator.getEntity(assertionTest);
-    }
+	@RequestMapping
+	@ResponseBody
+	public List<Map<String, Object>> getAssertions(HttpServletRequest request) {
+		// todo pass through the release center should be part of security
+		List<AssertionTest> assertions = new ArrayList<>();//assertionService.findAll();
 
-    @Autowired
-    private AssertionService assertionService;
+		return entityGenerator.getEntityCollection(assertions, request);
+	}
 
-    @Autowired
-    private JsonEntityGenerator entityGenerator;
+	@RequestMapping("/{id}")
+	@ResponseBody
+	public Map<String, Object> getBuild(@PathVariable Long id) {
+		AssertionTest assertionTest = new AssertionTest(id, "some label"); //assertionService.find(id);
+		return entityGenerator.getEntity(assertionTest);
+	}
+
 }

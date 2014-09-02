@@ -1,112 +1,110 @@
 package org.ihtsdo.rvf.validation.model;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- */
 public class Folder {
 
-    public static final String SEPARATOR = "/";
-    private String folderName;
-    private List<Folder> folders = new ArrayList<>();
-    private List<FileElement> files = new ArrayList<>();
-    private Folder parent;
-    private Listing listing;
+	public static final String SEPARATOR = "/";
 
-    public Folder() {
-    }
+	private String folderName;
+	private List<Folder> folders = new ArrayList<>();
+	private List<FileElement> files = new ArrayList<>();
+	private Folder parent;
+	private Listing listing;
 
-    public Folder(String name, List<Folder> folders, List<FileElement> files) {
-        
-        this.folderName = name;
-        this.folders = folders;
-        this.files = files;
-    }
+	public Folder() {
+	}
 
-    public String getFolderName() {
-        if(parent != null) {
-            return parent.getFolderName() + SEPARATOR + folderName;    
-        }
-        return folderName;
-    }
+	public Folder(String name, List<Folder> folders, List<FileElement> files) {
 
-    public void setFolderName(String folderName) {
-        this.folderName = folderName;
-    }
+		this.folderName = name;
+		this.folders = folders;
+		this.files = files;
+	}
 
-    public List<Folder> getFolders() {
-        return folders;
-    }
+	public String getFolderName() {
+		if (parent != null) {
+			return parent.getFolderName() + SEPARATOR + folderName;
+		}
+		return folderName;
+	}
 
-    public void setFolders(List<Folder> folders) {
-        this.folders = folders;
-    }
+	public void setFolderName(String folderName) {
+		this.folderName = folderName;
+	}
 
-    public List<FileElement> getFiles() {
-        return files;
-    }
+	public List<Folder> getFolders() {
+		return folders;
+	}
 
-    public void setFiles(List<FileElement> files) {
-        this.files = files;
-    }
+	public void setFolders(List<Folder> folders) {
+		this.folders = folders;
+	}
 
-    public void addFolder(Folder folder) {
-        folder.setParent(this);
-        this.folders.add(folder);
-    }
+	public List<FileElement> getFiles() {
+		return files;
+	}
 
-    public void addFile(FileElement fileElement) {
-        fileElement.setFolder(this);
-        this.files.add(fileElement);
-    }
+	public void setFiles(List<FileElement> files) {
+		this.files = files;
+	}
 
-    @Override
-    public String toString() {
-        return "Folder{" +
-                "folderName='" + folderName + '\'' +
-                '}';
-    }
+	public void addFolder(Folder folder) {
+		folder.setParent(this);
+		this.folders.add(folder);
+	}
 
-    public void setParent(Folder parent) {
-        this.parent = parent;
-    }
+	public void addFile(FileElement fileElement) {
+		fileElement.setFolder(this);
+		this.files.add(fileElement);
+	}
 
-    public Folder getParent() {
-        return parent;
-    }
+	@Override
+	public String toString() {
+		return "Folder{" +
+				"folderName='" + folderName + '\'' +
+				'}';
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+	public Folder getParent() {
+		return parent;
+	}
 
-        Folder folder = (Folder) o;
+	public void setParent(Folder parent) {
+		this.parent = parent;
+	}
 
-        if (files != null ? !files.equals(folder.files) : folder.files != null) return false;
-        if (!folderName.equals(folder.folderName)) return false;
-        if (folders != null ? !folders.equals(folder.folders) : folder.folders != null) return false;
-        if (parent != null ? !parent.equals(folder.parent) : folder.parent != null) return false;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 
-        return true;
-    }
+		Folder folder = (Folder) o;
 
-    @Override
-    public int hashCode() {
-        int result = folderName.hashCode();
-        result = 31 * result + (folders != null ? folders.hashCode() : 0);
-        result = 31 * result + (files != null ? files.hashCode() : 0);
-        result = 31 * result + (parent != null ? parent.hashCode() : 0);
-        return result;
-    }
+		if (files != null ? !files.equals(folder.files) : folder.files != null) return false;
+		if (!folderName.equals(folder.folderName)) return false;
+		if (folders != null ? !folders.equals(folder.folders) : folder.folders != null) return false;
+		if (parent != null ? !parent.equals(folder.parent) : folder.parent != null) return false;
 
-    public void setListing(Listing listing) {
-        this.listing = listing;
-    }
+		return true;
+	}
 
-    public Listing getListing() {
-        return listing;
-    }
+	@Override
+	public int hashCode() {
+		int result = folderName.hashCode();
+		result = 31 * result + (folders != null ? folders.hashCode() : 0);
+		result = 31 * result + (files != null ? files.hashCode() : 0);
+		result = 31 * result + (parent != null ? parent.hashCode() : 0);
+		return result;
+	}
+
+	public Listing getListing() {
+		return listing;
+	}
+
+	public void setListing(Listing listing) {
+		this.listing = listing;
+	}
+
 }

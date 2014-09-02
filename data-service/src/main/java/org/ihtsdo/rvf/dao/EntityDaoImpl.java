@@ -10,31 +10,32 @@ import java.io.Serializable;
 @Repository
 public abstract class EntityDaoImpl<T> implements EntityDao<T> {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+	private final Class<T> type;
 
-    private final Class<T> type;
+	@Autowired
+	private SessionFactory sessionFactory;
 
-    protected EntityDaoImpl(Class<T> type) {
-        this.type = type;
-    }
+	protected EntityDaoImpl(Class<T> type) {
+		this.type = type;
+	}
 
-    @Override
-    public void save(T entity) {
-        getCurrentSession().save(entity);
-    }
+	@Override
+	public void save(T entity) {
+		getCurrentSession().save(entity);
+	}
 
-    @Override
-    public T load(Serializable id) {
-        return (T) getCurrentSession().get(type, id);
-    }
+	@Override
+	public T load(Serializable id) {
+		return (T) getCurrentSession().get(type, id);
+	}
 
-    @Override
-    public void delete(T entity) {
+	@Override
+	public void delete(T entity) {
 
-    }
+	}
 
-    protected Session getCurrentSession() {
-        return sessionFactory.getCurrentSession();
-    }
+	protected Session getCurrentSession() {
+		return sessionFactory.getCurrentSession();
+	}
+
 }

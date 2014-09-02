@@ -1,6 +1,9 @@
 package org.ihtsdo.rvf.entity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  * Class represents the association between an assertion and a test, here we determine whether the test is active
@@ -12,65 +15,65 @@ import javax.persistence.*;
 @Entity
 public class AssertionTest {
 
-    public AssertionTest() {
-    }
+	@Id
+	@GeneratedValue
+	private Long id;
 
-    public AssertionTest(Long id, String name) {
-    }
+	@ManyToOne
+	private Test test;
 
-    public Long getId() {
-        return id;
-    }
+	@ManyToOne
+	private Assertion assertion;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	@ManyToOne
+	private ReleaseCenter center;
 
-    public Test getTest() {
-        return test;
-    }
+	private boolean inactive;
 
-    public void setTest(Test test) {
-        this.test = test;
-    }
+	public AssertionTest() {
+	}
 
-    public Assertion getAssertion() {
-        return assertion;
-    }
+	public AssertionTest(Long id, String name) {
+	}
 
-    public void setAssertion(Assertion assertion) {
-        this.assertion = assertion;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public ReleaseCenter getCenter() {
-        return center;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setCenter(ReleaseCenter center) {
-        this.center = center;
-    }
+	public Test getTest() {
+		return test;
+	}
 
-    public boolean isInactive() {
-        return inactive;
-    }
+	public void setTest(Test test) {
+		this.test = test;
+	}
 
-    public void setInactive(boolean inactive) {
-        this.inactive = inactive;
-    }
+	public Assertion getAssertion() {
+		return assertion;
+	}
 
-    @Id
-    @GeneratedValue
-    private Long id;
+	public void setAssertion(Assertion assertion) {
+		this.assertion = assertion;
+	}
 
-    @ManyToOne
-    private Test test;
+	public ReleaseCenter getCenter() {
+		return center;
+	}
 
-    @ManyToOne
-    private Assertion assertion;
+	public void setCenter(ReleaseCenter center) {
+		this.center = center;
+	}
 
-    @ManyToOne
-    private ReleaseCenter center;
+	public boolean isInactive() {
+		return inactive;
+	}
 
-    private boolean inactive;
+	public void setInactive(boolean inactive) {
+		this.inactive = inactive;
+	}
 
 }
