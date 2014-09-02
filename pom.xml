@@ -24,9 +24,6 @@
 		<module>data-service</module>
 		<module>validation-service</module>
 		<module>model</module>
-		<module>input-file-resource-provider</module>
-		<module>column-pattern-test</module>
-		<module>runner-example</module>
         <module>web</module>
 	</modules>
 
