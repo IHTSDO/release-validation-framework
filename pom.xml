@@ -19,11 +19,10 @@
 	</properties>
 
 	<modules>
-		<module>release-validation-framework-core</module>
-		<module>api</module>
+		<module>model</module>
 		<module>data-service</module>
 		<module>validation-service</module>
-		<module>model</module>
+		<module>api</module>
         <module>web</module>
 	</modules>
 
