@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.validation;
 
-import org.ihtsdo.release.assertion.ResourceProviderFactory;
-import org.ihtsdo.release.assertion.log.ValidationLog;
+import org.ihtsdo.rvf.validation.log.ValidationLogFactory;
+import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.resource.ResourceManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 public class ValidationTestRunner {
 
     @Autowired
-    private ResourceProviderFactory resourceProviderFactory;
+    private ValidationLogFactory validationLogFactory;
     
     public TestReportable execute(ResourceManager resourceManager, PrintWriter writer, boolean writeSuccesses,
                                   ManifestFile manifest) {
@@ -20,13 +20,13 @@ public class ValidationTestRunner {
         // the information for the manifest testing
         StreamTestReport testReport = new StreamTestReport(new CsvMetadataResultFormatter(), writer, true);
         // run manifest tests
-        runManifestTests(resourceManager, testReport, manifest, resourceProviderFactory.getValidationLog(ManifestPatternTester.class));
+        runManifestTests(resourceManager, testReport, manifest, validationLogFactory.getValidationLog(ManifestPatternTester.class));
         testReport.addNewLine();
         
         // run column tests
         testReport.setFormatter(new CsvResultFormatter());
         testReport.setWriteSuccesses(writeSuccesses);
-        ValidationLog validationLog = resourceProviderFactory.getValidationLog(ColumnPatternTester.class);
+        ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
         runColumnTests(resourceManager, testReport, validationLog);
 
         String summary = testReport.writeSummary();
@@ -38,7 +38,7 @@ public class ValidationTestRunner {
     public TestReportable execute(ResourceManager resourceManager, PrintWriter writer, boolean writeSuccesses) {
         
         StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), writer, writeSuccesses);
-        ValidationLog validationLog = resourceProviderFactory.getValidationLog(ColumnPatternTester.class);
+        ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
         runColumnTests(resourceManager, testReport, validationLog);
         String summary = testReport.writeSummary();
         validationLog.info(summary);

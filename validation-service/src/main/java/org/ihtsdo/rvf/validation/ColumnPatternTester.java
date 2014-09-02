@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.validation;
 
 import org.apache.commons.lang3.StringUtils;
-import org.ihtsdo.release.assertion.log.ValidationLog;
+import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.resource.ResourceManager;
 import org.ihtsdo.snomed.util.rf2.schema.*;
 

@@ -1,6 +1,6 @@
 package org.ihtsdo.rvf.validation;
 
-import org.ihtsdo.release.assertion.log.TestValidationLogImpl;
+import org.ihtsdo.rvf.validation.log.TestValidationLogImpl;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.junit.Test;
 

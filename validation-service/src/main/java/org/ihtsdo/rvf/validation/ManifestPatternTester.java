@@ -1,6 +1,6 @@
 package org.ihtsdo.rvf.validation;
 
-import org.ihtsdo.release.assertion.log.ValidationLog;
+import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.model.FileElement;
 import org.ihtsdo.rvf.validation.model.Folder;
 import org.ihtsdo.rvf.validation.resource.ResourceManager;

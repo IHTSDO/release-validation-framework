@@ -30,7 +30,7 @@
     <bean id="objectMapperFactory" class="org.ihtsdo.rvf.service.mapping.JacksonObjectMapperFactory"/>
 
     <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>
-    <bean id="resourceProviderFactory" class="org.ihtsdo.release.assertion.ResourceProviderFactoryImpl"/>
+    <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.ValidationLogFactoryImpl"/>
 
 	<import resource="validationContext.xml"/>
 
