@@ -157,7 +157,7 @@ public class ColumnPatternTester {
 
 	private void testDataValue(String id, long lineNumber, String value, Field column, Date startTime, String fileName, boolean isReleaseInputFile) {
 
-		ColumnType columnType = getColumnType(column.getType(), isReleaseInputFile);
+		ColumnType columnType = getColumnType(column);
 
 		PatternTest columnTest = columnTests.get(columnType);
 
@@ -178,22 +178,22 @@ public class ColumnPatternTester {
 		return !column.isMandatory() && isBlank(value);
 	}
 
-	private ColumnType getColumnType(DataType type, boolean isReleaseInputFile) {
-		switch (type) {
+	private ColumnType getColumnType(Field field) {
+		switch (field.getType()) {
 			case SCTID:
-				return isReleaseInputFile ? ColumnType.REL_SCTID : ColumnType.SCTID;
+				return ColumnType.SCTID;
+			case SCTID_OR_UUID:
+				return ColumnType.REL_SCTID;
 			case UUID:
-				return isReleaseInputFile ? ColumnType.REL_UUID : ColumnType.UUID;
+				return field.isMandatory() ? ColumnType.UUID : ColumnType.REL_UUID;
+			case TIME:
+				return field.isMandatory() ? ColumnType.TIME : ColumnType.REL_TIME;
 			case BOOLEAN:
 				return ColumnType.BOOLEAN;
-			case STRING:
-				return ColumnType.STRING;
 			case INTEGER:
 				return ColumnType.INTEGER;
-			case TIME:
-				return isReleaseInputFile ? ColumnType.REL_TIME : ColumnType.TIME;
-			case SCTID_OR_UUID:
-				return isReleaseInputFile ? ColumnType.REL_SCTID_OR_UUID : ColumnType.SCTID_OR_UUID;
+			case STRING:
+				return ColumnType.STRING;
 		}
 		return null;
 	}
@@ -213,24 +213,28 @@ public class ColumnPatternTester {
 
 	private Map<ColumnType, PatternTest> assembleColumnTests() {
 		columnTests = new HashMap<>();
-		columnTests.put(ColumnType.UUID, new PatternTest("uuid", "Value does not match UUID pattern on line {}, column name '{}': value '{}'",
-				UUID_PATTERN));
-		columnTests.put(ColumnType.SCTID_OR_UUID, new PatternTest("uuid", "Value does not match UUID or SCTID pattern on line {}, column name '{}': value '{}'",
-				UUID_PATTERN, SCTID_PATTERN, BLANK));
-		columnTests.put(ColumnType.REL_SCTID_OR_UUID, new PatternTest("uuid", "Value does not match UUID or SCTID pattern on line {}, column name '{}': value '{}'",
-				UUID_PATTERN, SCTID_PATTERN, BLANK));
-		columnTests.put(ColumnType.REL_UUID, new PatternTest("uuid", "Value does not match UUID or Blank patterns on line {}, column name '{}': value '{}'",
-				UUID_PATTERN, BLANK));
-		columnTests.put(ColumnType.TIME, new DateTimeTest("dateStamp", "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
-		columnTests.put(ColumnType.REL_TIME, new RelDateTimeTest("dateStamp", "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
-		columnTests.put(ColumnType.BOOLEAN, new BooleanPatternTest("boolean", "Value does not match Boolean pattern on line {}, column name '{}': value '{}'",
-				"1 or 0", BOOLEAN_PATTERN));
+
 		columnTests.put(ColumnType.SCTID, new PatternTest("sctid", "Value does not match SCTID pattern on line {}, column name '{}': value '{}'",
 				SCTID_PATTERN));
-		columnTests.put(ColumnType.REL_SCTID, new PatternTest("sctid", "Value does not match SCTID pattern on line {}, column name '{}': value '{}'", SCTID_PATTERN, BLANK));
+		columnTests.put(ColumnType.REL_SCTID, new PatternTest("sctid", "Value does not match SCTID or UUID pattern on line {}, column name '{}': value '{}'",
+				SCTID_PATTERN, UUID_PATTERN));
+
+		columnTests.put(ColumnType.UUID, new PatternTest("uuid", "Value does not match UUID pattern on line {}, column name '{}': value '{}'",
+				UUID_PATTERN));
+		columnTests.put(ColumnType.REL_UUID, new PatternTest("uuid", "Value does not match UUID or Blank patterns on line {}, column name '{}': value '{}'",
+				UUID_PATTERN, BLANK));
+
+		columnTests.put(ColumnType.TIME, new DateTimeTest("dateStamp", "Value does not match Time pattern on line {}, column name '{}': value '{}'"));
+		columnTests.put(ColumnType.REL_TIME, new RelDateTimeTest("dateStamp", "Value does not match Time or Blank pattern on line {}, column name '{}': value '{}'"));
+
+		columnTests.put(ColumnType.BOOLEAN, new BooleanPatternTest("boolean", "Value does not match Boolean pattern on line {}, column name '{}': value '{}'",
+				"1 or 0", BOOLEAN_PATTERN));
+
 		columnTests.put(ColumnType.INTEGER, new PatternTest("integer", "Value does not match the required pattern of numbers only on line {}, column name '{}': value '{}'", INTEGER_PATTERN));
-		columnTests.put(ColumnType.NON_ZERO_INTEGER, new PatternTest("integer", "Value does not match a number other than 0 on line {}, column name '{}': value '{}'", NON_ZERO_INTEGER_PATTERN));
+
+		// TODO: I think the only thing we can really test here is the length of the string. KK
 		columnTests.put(ColumnType.STRING, new PatternTest("string", "Value does not match expected on line {}, expected '{}': actual '{}'", NOT_BLANK, BLANK));
+
 		return columnTests;
 	}
 
