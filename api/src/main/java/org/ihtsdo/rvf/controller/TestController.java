@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.controller;
 
-import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.helper.JsonEntityGenerator;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -18,20 +17,21 @@ import java.util.Map;
 @RequestMapping("/tests")
 public class TestController {
 
-    @RequestMapping
-    @ResponseBody
-    public List<Map<String, Object>> getAssertions(HttpServletRequest request) {
-        List<Test> tests = new ArrayList<>();//assertionService.findAll();
-        // temporary
-        tests.add(new Test(1L, "First"));
-        tests.add(new Test(2L, "Second"));
-        tests.add(new Test(3L, "Third"));
-        return entityGenerator.getEntityCollection(tests, request);
-    }
+	@Autowired
+	private AssertionService assertionService;
 
-    @Autowired
-    private AssertionService assertionService;
+	@Autowired
+	private JsonEntityGenerator entityGenerator;
 
-    @Autowired
-    private JsonEntityGenerator entityGenerator;
+	@RequestMapping
+	@ResponseBody
+	public List<Map<String, Object>> getAssertions(HttpServletRequest request) {
+		List<Test> tests = new ArrayList<>();//assertionService.findAll();
+		// temporary
+		tests.add(new Test(1L, "First"));
+		tests.add(new Test(2L, "Second"));
+		tests.add(new Test(3L, "Third"));
+		return entityGenerator.getEntityCollection(tests, request);
+	}
+
 }

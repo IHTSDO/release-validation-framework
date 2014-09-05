@@ -33,8 +33,9 @@ public class TextFileResourceProvider implements ResourceManager {
 		return fileNames;
 	}
 
-    @Override
-    public boolean match(String name) {
-        return false;
-    }
+	@Override
+	public boolean match(String name) {
+		return false;
+	}
+
 }

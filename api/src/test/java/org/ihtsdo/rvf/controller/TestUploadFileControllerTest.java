@@ -71,6 +71,7 @@ public class TestUploadFileControllerTest {
                 .andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().length() > 0);
     }
+
     @Test
     public void testUploadTestDescription() throws Exception {
         MvcResult result = mockMvc.perform(
@@ -82,6 +83,7 @@ public class TestUploadFileControllerTest {
                 .andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().length() > 0);
     }
+
     @Test
     public void testUploadPre() throws Exception {
         MvcResult result = mockMvc.perform(
@@ -93,4 +95,5 @@ public class TestUploadFileControllerTest {
                 .andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().length() > 0);
     }
+
 }

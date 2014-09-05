@@ -1,4 +1,4 @@
-package org.ihtsdo.release.assertion.log;
+package org.ihtsdo.rvf.validation.log;
 
 public interface ValidationLog {
 

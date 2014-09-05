@@ -1,44 +1,41 @@
 package org.ihtsdo.rvf.validation.model;
 
-import java.io.File;
-
-/**
- *
- */
 public class FileElement {
-    private String fileName;
-    private Folder folder;
 
-    public FileElement() {
-    }
+	private String fileName;
+	private Folder folder;
 
-    public FileElement(String name) {
-        this.fileName = name;
-    }
+	public FileElement() {
+	}
 
-    public String getFileName() {
-        if(folder != null) {
-            return folder.getFolderName() + Folder.SEPARATOR + fileName;
-        }
-        return fileName;
-    }
+	public FileElement(String name) {
+		this.fileName = name;
+	}
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+	public String getFileName() {
+		if (folder != null) {
+			return folder.getFolderName() + Folder.SEPARATOR + fileName;
+		}
+		return fileName;
+	}
 
-    @Override
-    public String toString() {
-        return "FileElement{" +
-                "fileName='" + fileName + '\'' +
-                '}';
-    }
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 
-    public void setFolder(Folder folder) {
-        this.folder = folder;
-    }
+	@Override
+	public String toString() {
+		return "FileElement{" +
+				"fileName='" + fileName + '\'' +
+				'}';
+	}
 
-    public Folder getFolder() {
-        return folder;
-    }
+	public Folder getFolder() {
+		return folder;
+	}
+
+	public void setFolder(Folder folder) {
+		this.folder = folder;
+	}
+
 }

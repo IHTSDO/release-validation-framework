@@ -1,12 +1,12 @@
-package org.ihtsdo.release.assertion.log;
+package org.ihtsdo.rvf.validation.log;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ValidationLogImpl implements ValidationLog {
 
-	private Class subject;
 	private final Logger logger;
+	private Class subject;
 
 	public ValidationLogImpl(Class subject) {
 		this.subject = subject;

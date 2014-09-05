@@ -2,57 +2,61 @@ package org.ihtsdo.rvf.validation;
 
 import java.util.Date;
 
-/**
- *
- */
 public interface TestReportable {
 
-    void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue);
-    void addSuccess(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern);
-    String getResult();
-    int getNumErrors();
-    int getNumSuccesses();
-    int getNumTestRuns();
-    int getNumberRecordedErrors();
+	void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue);
 
-    String writeSummary();
+	void addSuccess(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern);
 
-    void addNewLine();
+	String getResult();
 
-    class TestRunItemCount {
-        private TestRunItem item;
-        private Integer count = 0;
+	int getNumErrors();
 
-        public TestRunItemCount(TestRunItem item) {
-            this.item = item;
-            count = 1;
-        }
+	int getNumSuccesses();
 
-        public void addError() {
-            count++;
-        }
+	int getNumTestRuns();
 
-        public Integer getErrorCount() {
-            return count;
-        }
+	int getNumberRecordedErrors();
 
-        public TestRunItem getItem() {
-            return item;
-        }
+	String writeSummary();
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            TestRunItemCount that = (TestRunItemCount) o;
-            return count.equals(that.count) && item.equals(that.item);
-        }
+	void addNewLine();
 
-        @Override
-        public int hashCode() {
-            int result = item.hashCode();
-            result = 31 * result + count.hashCode();
-            return result;
-        }
-    }
+	class TestRunItemCount {
+		private TestRunItem item;
+		private Integer count = 0;
+
+		public TestRunItemCount(TestRunItem item) {
+			this.item = item;
+			count = 1;
+		}
+
+		public void addError() {
+			count++;
+		}
+
+		public Integer getErrorCount() {
+			return count;
+		}
+
+		public TestRunItem getItem() {
+			return item;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			TestRunItemCount that = (TestRunItemCount) o;
+			return count.equals(that.count) && item.equals(that.item);
+		}
+
+		@Override
+		public int hashCode() {
+			int result = item.hashCode();
+			result = 31 * result + count.hashCode();
+			return result;
+		}
+	}
+
 }

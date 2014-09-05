@@ -1,4 +1,4 @@
-package org.ihtsdo.release.assertion.log;
+package org.ihtsdo.rvf.validation.log;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,10 +9,9 @@ import java.util.Set;
 
 public class TestValidationLogImpl implements ValidationLog {
 
-	private Map<String, Object[]> errors;
-
-	private Class subject;
 	private final Logger logger;
+	private Map<String, Object[]> errors;
+	private Class subject;
 
 	public TestValidationLogImpl(Class subject) {
 		this.subject = subject;

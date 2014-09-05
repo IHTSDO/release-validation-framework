@@ -2,34 +2,32 @@ package org.ihtsdo.rvf.validation;
 
 import java.util.List;
 
-/**
- *
- */
 public class CsvMetadataResultFormatter implements ResultFormatter {
 
-    @Override
-    public String formatResults(List<TestRunItem> testRuns) {
-        StringBuilder output = new StringBuilder();
+	// no spaces between the commas please as this breaks the , quote escaping
+	private static final String headers = "Result\tRow-Column\tFile Name\tTest Type\tFailure Details";
 
-        output.append(headers).append("\n");
-        for (TestRunItem ti : testRuns) {
-            //  output pass/fail, id,
-            output.append(formatRow(ti, 0));
-        }
-        return output.toString();
-    }
+	@Override
+	public String formatResults(List<TestRunItem> testRuns) {
+		StringBuilder output = new StringBuilder();
 
-    public String formatRow(TestRunItem ti, Integer itemErrorCount) {
-        return String.format("%s\t%s\t%s\t%s\t%s\n",
-                ti.getFailureMessage(),
-                ti.getExecutionId(),
-                ti.getFileName(), ti.getTestType(), ti.getActualExpectedValue());
-    }
+		output.append(headers).append("\n");
+		for (TestRunItem ti : testRuns) {
+			//  output pass/fail, id,
+			output.append(formatRow(ti, 0));
+		}
+		return output.toString();
+	}
 
-    public String getHeaders() {
-        return headers;
-    }
+	public String formatRow(TestRunItem ti, Integer itemErrorCount) {
+		return String.format("%s\t%s\t%s\t%s\t%s\n",
+				ti.getFailureMessage(),
+				ti.getExecutionId(),
+				ti.getFileName(), ti.getTestType(), ti.getActualExpectedValue());
+	}
 
-    // no spaces between the commas please as this breaks the , quote escaping
-    private static final String headers = "Result\tRow-Column\tFile Name\tTest Type\tFailure Details";
+	public String getHeaders() {
+		return headers;
+	}
+
 }
