@@ -18,11 +18,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>release-validation-framework-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.ihtsdo.snomed.util</groupId>
             <artifactId>snomed-utilities</artifactId>
             <version>1.0.3</version>
