@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Repository
 public abstract class EntityDaoImpl<T> implements EntityDao<T> {
@@ -31,8 +32,13 @@ public abstract class EntityDaoImpl<T> implements EntityDao<T> {
 
 	@Override
 	public void delete(T entity) {
-
+        getCurrentSession().delete(entity);
 	}
+
+    @Override
+    public List<T> findAll(T entity){
+        return getCurrentSession().createCriteria(type).list();
+    }
 
 	protected Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();

@@ -2,6 +2,9 @@ package org.ihtsdo.rvf.service;
 
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionTest;
+import org.ihtsdo.rvf.entity.ReleaseCenter;
+import org.ihtsdo.rvf.entity.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,4 +59,23 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 		assertion.setStatement(properties.get("statement"));
 	}
 
+    @Override
+    public List<AssertionTest> getAssertionTests(Assertion assertion, ReleaseCenter releaseCenter){
+        return assertionDao.getAssertionTests(assertion, releaseCenter);
+    }
+
+    @Override
+    public List<AssertionTest> getAssertionTests(Long assertionId, Long releaseCenterId){
+        return assertionDao.getAssertionTests(assertionId, releaseCenterId);
+    }
+
+    @Override
+    public List<Test> getTests(Assertion assertion, ReleaseCenter releaseCenter){
+        return assertionDao.getTests(assertion, releaseCenter);
+    }
+
+    @Override
+    public List<Test> getTests(Long assertionId, Long releaseCenterId){
+        return assertionDao.getTests(assertionId, releaseCenterId);
+    }
 }
