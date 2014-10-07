@@ -23,7 +23,11 @@
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.9.10</version>
         </dependency>
-
+        <!--Utility -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

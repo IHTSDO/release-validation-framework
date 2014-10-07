@@ -1,8 +1,6 @@
 package org.ihtsdo.rvf.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Test {
@@ -12,6 +10,9 @@ public class Test {
 	private Long id;
 	private String name;
 	private String description;
+    private TestType type = TestType.UNKNOWN;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = ExecutionCommand.class)
+    private ExecutionCommand command;
 
 	public Test() {
 	}
@@ -45,4 +46,19 @@ public class Test {
 		this.description = description;
 	}
 
+    public TestType getType() {
+        return type;
+    }
+
+    public void setType(TestType type) {
+        this.type = type;
+    }
+
+    public ExecutionCommand getCommand() {
+        return command;
+    }
+
+    public void setCommand(ExecutionCommand command) {
+        this.command = command;
+    }
 }
