@@ -13,9 +13,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>3.2.7.RELEASE</spring.version>
 		<slf4j.version>1.7.5</slf4j.version>
-        <jackson.version>2.4.1</jackson.version>
-        <hibernate.version>3.6.10.Final</hibernate.version>
-        <hsql.version>5.3.0</hsql.version>
+		<jackson.version>2.4.1</jackson.version>
+		<hibernate.version>3.6.10.Final</hibernate.version>
+		<hsql.version>5.3.0</hsql.version>
 	</properties>
 
 	<modules>
@@ -23,24 +23,25 @@
 		<module>data-service</module>
 		<module>validation-service</module>
 		<module>api</module>
-        <module>web</module>
-        <module>execution-service</module>
-    </modules>
+		<module>web</module>
+		<module>execution-service</module>
+	</modules>
 
-    <scm>
-        <connection>scm:git:git@github.com:IHTSDO/release-validation-framework.git</connection>
-        <developerConnection>scm:git:git@github.com:IHTSDO/release-validation-framework.git</developerConnection>
-        <url>http://github.com/IHTSDO/release-validation-framework</url>
-        <tag>HEAD</tag>
-    </scm>
+
+	<scm>
+		<connection>scm:git:git@github.com:IHTSDO/release-validation-framework.git</connection>
+		<developerConnection>scm:git:git@github.com:IHTSDO/release-validation-framework.git</developerConnection>
+		<url>http://github.com/IHTSDO/release-validation-framework</url>
+		<tag>HEAD</tag>
+	</scm>
 
 	<dependencies>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <!-- Logging -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -74,16 +75,16 @@
 
 	<dependencyManagement>
 		<dependencies>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
@@ -94,7 +95,7 @@
 				<artifactId>guava</artifactId>
 				<version>16.0.1</version>
 			</dependency>
-        </dependencies>
+		</dependencies>
 	</dependencyManagement>
 
 	<build>
@@ -116,7 +117,7 @@
 			<plugin>
 				<groupId>external.atlassian.jgitflow</groupId>
 				<artifactId>jgitflow-maven-plugin</artifactId>
-				<version>1.0-m1.1</version>
+				<version>1.0-m4.3</version>
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<enableSshAgent>true</enableSshAgent>
@@ -126,13 +127,13 @@
 		</plugins>
 	</build>
 
-    <repositories>
-        <repository>
-            <id>ihtsdo-public-nexus</id>
-            <name>IHTSDO Public Nexus Releases</name>
-            <url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>ihtsdo-public-nexus</id>
+			<name>IHTSDO Public Nexus Releases</name>
+			<url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
+		</repository>
+	</repositories>
 
 	<distributionManagement>
 		<repository>
