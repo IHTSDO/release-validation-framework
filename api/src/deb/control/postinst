@@ -8,3 +8,7 @@ APP_NAME=[[packageName]]
 
 supervisorctl update $APP_NAME || true
 supervisorctl start $APP_NAME || true
+
+# Database command safe to run both on install and upgrade
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS rvf; GRANT ALL PRIVILEGES  ON rvf.* TO 'rvf_user'@'localhost' ;"
+
