@@ -1,10 +1,8 @@
 package org.ihtsdo.rvf.entity;
 
-import com.google.common.base.Preconditions;
+import org.ihtsdo.rvf.helper.Configuration;
 
 import javax.persistence.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A class that encapsulate the logic/code that is used to run a {@link org.ihtsdo.rvf.entity.Test}.
@@ -16,18 +14,14 @@ public class ExecutionCommand {
     @Id
     @GeneratedValue
     Long id;
-
-    @ElementCollection(fetch = FetchType.LAZY)
-    @MapKeyColumn(name="key")
-    @Column(name="value")
-    @CollectionTable(name="command_parameters", joinColumns=@JoinColumn(name="command_id"))
-    Map<String, String> parameters = new HashMap<>();
+    @OneToOne(targetEntity = Configuration.class)
+    Configuration configuration;
     String template = null;
-    @Column(columnDefinition = "BLOB")
+    @Transient
     byte[] code = null;
 
-    public ExecutionCommand(Map<String, String> parameters) {
-        this.parameters = parameters;
+    public ExecutionCommand(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     /**
@@ -36,18 +30,31 @@ public class ExecutionCommand {
     public ExecutionCommand() {
     }
 
-    public void validate(TestType type) throws Exception{
+    public boolean validate(TestType type, Configuration testConfiguration){
 
-        Preconditions.checkNotNull(type, "Test type passed can not be null");
-        // do something there to validate the template against the template
+        boolean valid = true;
+        if(type == null){
+            return false;
+        }
+        // get all instances of keys in configuration and see if they have all been set
+        for(String key : configuration.getKeys())
+        {
+            if(testConfiguration.getValue(key) == null)
+            {
+                valid = false;
+                break;
+            }
+        }
+
+        return valid;
     }
 
-    public Map<String, String> getParameters() {
-        return parameters;
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
-    public void setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     public String getTemplate() {

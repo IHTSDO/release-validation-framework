@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.entity;
 
+import org.ihtsdo.rvf.helper.Configuration;
+
 import javax.persistence.*;
 
 @Entity
@@ -11,6 +13,8 @@ public class Test {
 	private String name;
 	private String description;
     private TestType type = TestType.UNKNOWN;
+    @OneToOne(targetEntity = Configuration.class)
+    Configuration configuration;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = ExecutionCommand.class)
     private ExecutionCommand command;
 
@@ -60,5 +64,13 @@ public class Test {
 
     public void setCommand(ExecutionCommand command) {
         this.command = command;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
     }
 }
