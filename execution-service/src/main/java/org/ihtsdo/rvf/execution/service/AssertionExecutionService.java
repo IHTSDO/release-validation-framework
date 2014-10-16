@@ -14,15 +14,15 @@ import java.util.Collection;
  */
 public interface AssertionExecutionService {
 
-    TestRunItem executeAssertionTest(AssertionTest assertionTest);
+    TestRunItem executeAssertionTest(AssertionTest assertionTest, long executionId);
 
-    Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertions);
+    Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertions, long executionId);
 
-    Collection<TestRunItem> executeAssertion(Assertion assertion, ReleaseCenter releaseCenter);
+    Collection<TestRunItem> executeAssertion(Assertion assertion, ReleaseCenter releaseCenter, long executionId);
 
-    Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, ReleaseCenter releaseCenter);
+    Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, ReleaseCenter releaseCenter, long executionId);
 
-    TestRunItem executeTest(Test test, ReleaseCenter releaseCenter);
+    TestRunItem executeTest(Test test, ReleaseCenter releaseCenter, long executionId);
 
-    Collection<TestRunItem> executeTests(Collection<Test> tests, ReleaseCenter releaseCenter);
+    Collection<TestRunItem> executeTests(Collection<Test> tests, ReleaseCenter releaseCenter, long executionId);
 }

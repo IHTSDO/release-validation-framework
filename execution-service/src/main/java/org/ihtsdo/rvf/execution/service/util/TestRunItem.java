@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.execution.service.util;
 
+import org.ihtsdo.rvf.helper.Configuration;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -10,15 +12,12 @@ public class TestRunItem {
 
     private String executionId;
     private Date testTime;
-    private String fileName;
-    private String filePath;
-    private String columnName;
+    private Configuration configuration;
     private String testType;
     private String testPattern;
     private boolean failure = true;
-    private String actualValue;
-    private String expectedValue;
     private long runTime;
+    private String failureMessage;
 
     /**
      * Empty constructor for IOC
@@ -27,18 +26,16 @@ public class TestRunItem {
 
     }
 
-    public TestRunItem(String executionId, Date testTime, String fileName, String filePath, String columnName,
-                       String testType, String testPattern, boolean failure, String actualValue, String expectedValue) {
+    public TestRunItem(String executionId, Date testTime, Configuration configuration,
+                       String testType, String testPattern, boolean failure, long runTime, String failureMessage) {
         this.executionId = executionId;
         this.testTime = testTime;
-        this.fileName = fileName;
-        this.filePath = filePath;
-        this.columnName = columnName;
+        this.configuration = configuration;
         this.testType = testType;
         this.testPattern = testPattern;
         this.failure = failure;
-        this.actualValue = actualValue;
-        this.expectedValue = expectedValue;
+        this.runTime = runTime;
+        this.failureMessage = failureMessage;
     }
 
     public boolean isFailure() {
@@ -57,18 +54,6 @@ public class TestRunItem {
         return testTime;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public String getColumnName() {
-        return columnName;
-    }
-
     public String getTestType() {
         return testType;
     }
@@ -81,39 +66,19 @@ public class TestRunItem {
         return new SimpleDateFormat().format(testTime);
     }
 
-    public String getActualValue() {
-        return actualValue;
-    }
-
-    public void setActualValue(String actualValue) {
-        this.actualValue = actualValue;
-    }
-
     public String getFailureMessage() {
-        return failure ? "Failed" : "Success";
-    }
-
-    public String getActualExpectedValue() {
-        return failure ? "expected '" + expectedValue + "' but got '" + actualValue + "'" : "";
-    }
-
-    public String getExpectedValue() {
-        return expectedValue;
-    }
-
-    public void setExpectedValue(String expectedValue) {
-        this.expectedValue = expectedValue;
+        return failureMessage;
     }
 
     @Override
     public String toString() {
         return "TestRunItem{" +
                 "executionId='" + executionId + '\'' +
-                ", columnName='" + columnName + '\'' +
+                ", testType='" + testType + '\'' +
                 ", testPattern='" + testPattern + '\'' +
                 ", failure=" + (failure ? "Fail" : "Pass") +
-                ", actualValue='" + actualValue + '\'' +
-                ", expectedValue='" + expectedValue + '\'' +
+                ", testTime='" + testTime + '\'' +
+                ", runTime='" + runTime + '\'' +
                 '}';
     }
 
@@ -123,18 +88,6 @@ public class TestRunItem {
 
     public void setTestTime(Date testTime) {
         this.testTime = testTime;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
     }
 
     public void setTestType(String testType) {
@@ -155,5 +108,17 @@ public class TestRunItem {
 
     public void setRunTime(long runTime) {
         this.runTime = runTime;
+    }
+
+    public void setFailureMessage(String failureMessage) {
+        this.failureMessage = failureMessage;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
     }
 }
