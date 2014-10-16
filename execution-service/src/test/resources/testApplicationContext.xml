@@ -12,31 +12,47 @@
 	<context:annotation-config/>
 	<tx:annotation-driven/>
 
+    <bean id="executionServiceProperties"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:snomed-db.properties</value>
+                <value>classpath:rvf-db.properties</value>
+            </list>
+        </property>
+    </bean>
+
 	<!-- service beans will go here -->
 	<bean id="assertionService" class="org.ihtsdo.rvf.service.AssertionServiceImpl"/>
 	<!--<bean id="entityService" class="org.ihtsdo.rvf.service.EntityServiceImpl"/>-->
-    <bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl"/>
+    <bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl">
+        <property name="qaResulTableName" value="${rvf.qa.result.table.name}"/>
+        <property name="assertionDetailsColumnName" value="${rvf.assertion.details.column.name}"/>
+        <property name="assertionIdColumnName" value="${rvf.assertion.id.column.name}"/>
+        <property name="assertionNameColumnName" value="${rvf.assertion.name.column.name}"/>
+    </bean>
 
     <!-- dao mappings here -->
 	<!--<bean class="org.ihtsdo.rvf.dao.helper.TestDatabasePrimerDao"/>-->
 	<bean class="org.ihtsdo.rvf.dao.AssertionDaoImpl"/>
 
 	<!--data source-->
-	<jdbc:embedded-database id="dataSource"/>
+	<!--<jdbc:embedded-database id="dataSource"/>-->
 
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource"/>
 		<property name="packagesToScan">
 			<list>
 				<value>org.ihtsdo.rvf.entity</value>
+				<value>org.ihtsdo.rvf.helper</value>
 			</list>
 		</property>
 
 		<property name="hibernateProperties">
 			<props>
-				<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+				<prop key="hibernate.dialect">${rvf.hibernate.dialect}</prop>
 				<prop key="hibernate.show_sql">false</prop>
-				<prop key="hibernate.hbm2ddl.auto">create</prop>
+				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
 			</props>
 		</property>
 	</bean>
@@ -54,6 +70,14 @@
         <property name="testWhileIdle" value="true"/>
         <property name="validationQuery" value="SELECT 1"/>
         <property name="numTestsPerEvictionRun" value="3"/>
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${rvf.jdbc.driverClassName}"/>
+        <property name="url" value="${rvf.jdbc.url}"/>
+        <property name="defaultCatalog" value="${rvf.schema.name}"/>
+        <property name="username" value="${rvf.jdbc.username}"/>
+        <property name="password" value="${rvf.jdbc.password}"/>
     </bean>
 
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
