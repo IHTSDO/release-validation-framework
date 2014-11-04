@@ -19,6 +19,6 @@ mvn clean test
 ### Integration Testing
 Integration tests expect an actual MySQL SNOMED CT database that contains SNOMED CT data. To run integration tests use: 
 ```
-mvn clean integration-test
+mvn clean integration-test -Dskip.integration.tests=false
 ```
 

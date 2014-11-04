@@ -16,6 +16,7 @@
 		<jackson.version>2.4.1</jackson.version>
 		<hibernate.version>3.6.10.Final</hibernate.version>
 		<hsql.version>5.3.0</hsql.version>
+        <skip.integration.tests>true</skip.integration.tests>
 	</properties>
 
 	<modules>
@@ -121,7 +122,9 @@
                     </excludes>
                 </configuration>
 			</plugin>
-            <!-- To run integration tests use: mvn clean integration-test -->
+            <!--
+                To run integration tests use: mvn clean install -Dskip.integration.tests=false
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
@@ -140,6 +143,7 @@
                         <include>**/*IntegrationTest.java</include>
                         <include>**/*IntegrationSpec.java</include>
                     </includes>
+                    <skipTests>${skip.integration.tests}</skipTests>
                 </configuration>
             </plugin>
 			<plugin>
