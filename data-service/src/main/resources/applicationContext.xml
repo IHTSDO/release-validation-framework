@@ -12,15 +12,28 @@
 	<context:annotation-config/>
 	<tx:annotation-driven/>
 
+    <bean id="dataServiceProperties"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:rvf-db.properties</value>
+            </list>
+        </property>
+    </bean>
+
 	<!-- service beans will go here -->
-	<bean class="org.ihtsdo.rvf.service.AssertionServiceImpl"/>
+	<bean id="assertionService" class="org.ihtsdo.rvf.service.AssertionServiceImpl"/>
+	<bean id="entityService" class="org.ihtsdo.rvf.service.EntityServiceImpl">
+        <constructor-arg ref="entityDao"/>
+    </bean>
 
 	<!-- dao mappings here -->
 	<bean class="org.ihtsdo.rvf.dao.helper.TestDatabasePrimerDao"/>
-	<bean class="org.ihtsdo.rvf.dao.AssertionDaoImpl"/>
+	<bean id="assertionDao" class="org.ihtsdo.rvf.dao.AssertionDaoImpl"/>
+	<bean id="entityDao" class="org.ihtsdo.rvf.dao.EntityDaoImpl"/>
 
 	<!--data source-->
-	<jdbc:embedded-database id="dataSource"/>
+	<!--<jdbc:embedded-database id="dataSource"/>-->
 
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource"/>
@@ -31,14 +44,27 @@
 			</list>
 		</property>
 
-		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
-				<prop key="hibernate.show_sql">false</prop>
-				<prop key="hibernate.hbm2ddl.auto">create</prop>
-			</props>
-		</property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">${rvf.hibernate.dialect}</prop>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">${rvf.hibernate.hbm2ddl.auto}</prop>
+            </props>
+        </property>
 	</bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${rvf.jdbc.driverClassName}"/>
+        <property name="url" value="${rvf.jdbc.url}"/>
+        <property name="defaultCatalog" value="${rvf.schema.name}"/>
+        <property name="username" value="${rvf.jdbc.username}"/>
+        <property name="password" value="${rvf.jdbc.password}"/>
+    </bean>
+
+    <!--<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">-->
+        <!--<property name="dataSource" ref="dataSource"/>-->
+        <!--<property name="sessionFactory" ref="sessionFactory"/>-->
+    <!--</bean>-->
 
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="dataSource" ref="dataSource"/>

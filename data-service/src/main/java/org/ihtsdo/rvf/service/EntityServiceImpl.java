@@ -1,12 +1,19 @@
 package org.ihtsdo.rvf.service;
 
 import org.ihtsdo.rvf.dao.EntityDao;
+import org.ihtsdo.rvf.entity.ReleaseCenter;
+import org.ihtsdo.rvf.helper.MissingEntityException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
+@Transactional
 public class EntityServiceImpl<T> implements EntityService<T> {
 
 	private final EntityDao dao;
+    private ReleaseCenter ihtsdo;
 
 	public EntityServiceImpl(EntityDao dao) {
 		this.dao = dao;
@@ -30,7 +37,43 @@ public class EntityServiceImpl<T> implements EntityService<T> {
     }
 
     @Override
-    public List<T> findAll(T entity) {
-        return dao.findAll(entity);
+    public List<T> findAll(Class clazz) {
+        return dao.findAll(clazz);
+    }
+
+    @Override
+    public T find(Class clazz, Long id){
+        T t = (T) dao.load(clazz, id);
+        if (t == null){
+            throw new MissingEntityException(id);
+        }
+        else{
+            return t;
+        }
+    }
+
+    @Override
+    public Long count(Class clazz){
+        return dao.count(clazz);
+    }
+
+    /**
+     * Utility method that returns a singleton instance of IHTSDO as a release centre, configured with default values.
+     * @return a singleton instance of IHTSDO as a release centre, configured with default values
+     */
+    @Override
+    public ReleaseCenter getIhtsdo(){
+        if(ihtsdo == null){
+            ihtsdo = new ReleaseCenter();
+            ihtsdo.setName("International Health Terminology Standards Development Organisation ");
+            ihtsdo.setShortName("IHTSDO");
+            ihtsdo.setInactivated(false);
+            dao.save(ihtsdo);
+
+            return ihtsdo;
+        }
+        else{
+            return ihtsdo;
+        }
     }
 }
