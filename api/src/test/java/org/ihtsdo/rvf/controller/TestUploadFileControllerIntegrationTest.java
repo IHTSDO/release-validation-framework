@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testDispatcherServletContext.xml"})
 @WebAppConfiguration
-public class TestUploadFileControllerTest {
+public class TestUploadFileControllerIntegrationTest {
 
     protected MockMvc mockMvc;
 
