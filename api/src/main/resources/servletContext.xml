@@ -18,6 +18,8 @@
                     </bean>
                 </property>
             </bean>
+            <bean class="org.springframework.http.converter.ResourceHttpMessageConverter"/>
+            <bean class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter"/>
         </mvc:message-converters>
     </mvc:annotation-driven>
 
@@ -33,5 +35,6 @@
     <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.ValidationLogFactoryImpl"/>
 
 	<import resource="validationContext.xml"/>
+	<import resource="executionServiceContext.xml"/>
 
 </beans>

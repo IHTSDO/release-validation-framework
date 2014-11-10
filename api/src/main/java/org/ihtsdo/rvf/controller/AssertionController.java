@@ -1,19 +1,17 @@
 package org.ihtsdo.rvf.controller;
 
 import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.helper.JsonEntityGenerator;
+import org.ihtsdo.rvf.entity.ReleaseCenter;
+import org.ihtsdo.rvf.entity.Test;
+import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
+import org.ihtsdo.rvf.service.EntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/assertions")
@@ -21,43 +19,90 @@ public class AssertionController {
 
 	@Autowired
 	private AssertionService assertionService;
+    @Autowired
+	private EntityService entityService;
 
-	@Autowired
-	private JsonEntityGenerator entityGenerator;
-
-	@RequestMapping
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getAssertions(HttpServletRequest request) {
-		List<Assertion> assertions = assertionService.findAll();
-		if (assertions.isEmpty()) {
-			return new ArrayList<>();
-		}
-		return entityGenerator.getEntityCollection(assertions, request);
+    @ResponseStatus(HttpStatus.OK)
+    public List<Assertion> getAssertions() {
+		return assertionService.findAll();
+	}
+
+    @RequestMapping(value = "{id}/tests", method = RequestMethod.GET)
+	@ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public List<Test> getTestsForAssertion(@PathVariable Long id) {
+
+        Assertion assertion = assertionService.find(id);
+        return assertionService.getTests(assertion.getId());
+	}
+
+    @RequestMapping(value = "{id}/tests", method = RequestMethod.POST)
+	@ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Assertion setTestsForAssertion(@PathVariable Long id, @RequestBody(required = false) List<Test> tests) {
+
+        // verify if IHTSDO exists as a relese centre, otherwise create it
+        ReleaseCenter releaseCenter = null;
+        try {
+            releaseCenter = (ReleaseCenter) entityService.find(ReleaseCenter.class, assertionService.getIhtsdo().getId());
+        }
+        catch (MissingEntityException e) {
+            e.printStackTrace();
+        }
+
+        if(releaseCenter == null){
+            releaseCenter = (ReleaseCenter) entityService.create(assertionService.getIhtsdo());
+        }
+        Assertion assertion = assertionService.find(id);
+        assertionService.addTests(assertion, releaseCenter, tests);
+
+        return assertion;
+	}
+
+    @RequestMapping(value = "{id}/tests", method = RequestMethod.DELETE)
+	@ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Assertion deleteTestsForAssertion(@PathVariable Long id, @RequestBody(required = false) List<Test> tests) {
+
+        Assertion assertion = assertionService.find(id);
+        assertionService.deleteTests(assertion, assertionService.getIhtsdo(), tests);
+
+        return assertion;
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getAssertion(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.OK)
+    public Assertion getAssertion(@PathVariable Long id) {
+        return assertionService.find(id);
+	}
+
+	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+	@ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Assertion deleteAssertion(@PathVariable Long id) {
 		Assertion assertion = assertionService.find(id);
-		return entityGenerator.getEntity(assertion);
+        assertionService.delete(assertion);
+        return assertion;
 	}
 
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE)
-	public ResponseEntity<Map> createAssertion(HttpServletRequest request, @RequestBody(required = false) Map<String, String> json) {
-		String name = json.get("name");
-
-		Assertion assertion = assertionService.create(name, json);
-
-		Map<String, Object> entityHypermedia = entityGenerator.getEntity(assertion);
-		return new ResponseEntity<Map>(entityHypermedia, HttpStatus.CREATED);
+	@RequestMapping(value = "", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+	public Assertion createAssertion(@RequestBody Assertion assertion) {
+		return assertionService.create(assertion);
 	}
 
-	@RequestMapping(value = "{id}", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE)
-	public ResponseEntity<Map> updateAssertion(@PathVariable Long id,
-			@RequestBody(required = false) Map<String, String> json) {
-		Assertion assertion = assertionService.update(id, json);
-		Map<String, Object> entityHypermedia = entityGenerator.getEntity(assertion);
-		return new ResponseEntity<Map>(entityHypermedia, HttpStatus.OK);
+	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Assertion updateAssertion(@PathVariable Long id,
+			@RequestBody(required = false) Assertion assertion) {
+		Assertion assertion1 = assertionService.find(id);
+        assertion.setId(assertion1.getId());
+        return assertionService.update(assertion);
 	}
 
 }

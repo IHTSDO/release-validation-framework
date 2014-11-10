@@ -9,6 +9,7 @@
 		">
 
     <context:component-scan base-package="org.ihtsdo.rvf.controller" />
+    <context:component-scan base-package="org.ihtsdo.rvf.helper" />
 
     <import resource="servletContext.xml"/>
     <import resource="test/testDataServiceContext.xml"/>
