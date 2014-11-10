@@ -16,6 +16,7 @@ public class ExecutionCommand {
     Long id;
     @OneToOne(targetEntity = Configuration.class)
     Configuration configuration;
+    @Column(columnDefinition = "text")
     String template = null;
     @Transient
     byte[] code = null;

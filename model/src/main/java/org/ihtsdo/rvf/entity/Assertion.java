@@ -3,6 +3,8 @@ package org.ihtsdo.rvf.entity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
 /**
@@ -10,6 +12,7 @@ import java.util.Date;
  * that assertion.
  */
 @Entity
+@XmlRootElement(name = "assertion")
 public class Assertion {
 
 	@Id
@@ -30,7 +33,8 @@ public class Assertion {
 		this.id = id;
 	}
 
-	public Long getId() {
+    @XmlElement
+    public Long getId() {
 		return id;
 	}
 
@@ -38,7 +42,8 @@ public class Assertion {
 		this.id = id;
 	}
 
-	public String getName() {
+    @XmlElement
+    public String getName() {
 		return name;
 	}
 
