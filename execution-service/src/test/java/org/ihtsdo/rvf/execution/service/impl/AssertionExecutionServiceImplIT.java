@@ -38,12 +38,12 @@ public class AssertionExecutionServiceImplIT {
     @Before
     public void setUp() {
         // ensure database is clean
-        assert entityService.findAll(org.ihtsdo.rvf.entity.Test.class).size() == 0;
-        assert entityService.findAll(AssertionTest.class).size() == 0;
-        assert entityService.findAll(ReleaseCenter.class).size() == 0;
-        assert entityService.findAll(Assertion.class).size() == 0;
+        assert entityService.count(org.ihtsdo.rvf.entity.Test.class) == 0;
+        assert entityService.count(AssertionTest.class) == 0;
+        assert entityService.count(ReleaseCenter.class) == 0;
+        assert entityService.count(Assertion.class) == 0;
 
-        assertion = assertionService.create("Assertion 1", new HashMap<String, String>());
+        assertion = assertionService.create(new HashMap<String, String>());
         // create test
         test = new org.ihtsdo.rvf.entity.Test();
         test.setType(TestType.SQL);
@@ -51,7 +51,7 @@ public class AssertionExecutionServiceImplIT {
         test = (org.ihtsdo.rvf.entity.Test) entityService.create(test);
         assert test != null;
         assert test.getId() != null;
-        assert entityService.findAll(org.ihtsdo.rvf.entity.Test.class).size() > 0;
+        assert entityService.count(org.ihtsdo.rvf.entity.Test.class) > 0;
 
         // create release centre
         releaseCenter = new ReleaseCenter();
@@ -59,7 +59,7 @@ public class AssertionExecutionServiceImplIT {
         releaseCenter = (ReleaseCenter) entityService.create(releaseCenter);
         assert releaseCenter != null;
         assert releaseCenter.getId() != null;
-        assert entityService.findAll(releaseCenter).size() > 0;
+        assert entityService.count(releaseCenter.getClass()) > 0;
 
         //create assertion test
         assertionTest = new AssertionTest();
@@ -69,7 +69,7 @@ public class AssertionExecutionServiceImplIT {
         assertionTest = (AssertionTest) entityService.create(assertionTest);
         assert assertionTest != null;
         assert assertionTest.getId() != null;
-        assert entityService.findAll(AssertionTest.class).size() > 0;
+        assert entityService.count(AssertionTest.class) > 0;
     }
 
     @Test
