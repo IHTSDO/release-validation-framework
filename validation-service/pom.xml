@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.ihtsdo.snomed.util</groupId>
             <artifactId>snomed-utilities</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.7-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
