@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(locations = {"/testDispatcherServletContext.xml"})
 @WebAppConfiguration
 @Transactional
-public class ReleaseCentreControllerTest {
+public class ReleaseCentreControllerIntegrationTest {
 
     @Autowired
     private WebApplicationContext ctx;
