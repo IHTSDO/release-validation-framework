@@ -13,27 +13,9 @@
 	<context:annotation-config/>
 	<tx:annotation-driven/>
 
-	<bean id="executionServiceProperties"
-		  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<list>
-				<value>classpath:snomed-db.properties</value>
-				<value>classpath:execution-service.properties</value>
-			</list>
-		</property>
-	</bean>
-
-	<!-- service beans will go here -->
-	<bean id="assertionService" class="org.ihtsdo.rvf.service.AssertionServiceImpl"/>
-	<bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl">
-		<property name="qaResulTableName" value="${rvf.qa.result.table.name}"/>
-		<property name="assertionDetailsColumnName" value="${rvf.assertion.details.column.name}"/>
-		<property name="assertionIdColumnName" value="${rvf.assertion.id.column.name}"/>
-		<property name="assertionNameColumnName" value="${rvf.assertion.name.column.name}"/>
-	</bean>
-
     <import resource="applicationContext.xml"/>
 
+	<!-- value replacement taken care of by Configurer in applicationContext.xml -->
 	<bean id="qaDataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${rvf.snomed.jdbc.driverClassName}"/>
 		<property name="url" value="${rvf.snomed.jdbc.url}"/>
@@ -48,4 +30,15 @@
 		<property name="validationQuery" value="SELECT 1"/>
 		<property name="numTestsPerEvictionRun" value="3"/>
 	</bean>
+
+	<!-- service beans will go here -->
+	<bean id="assertionService" class="org.ihtsdo.rvf.service.AssertionServiceImpl"/>
+
+	<bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl">
+		<property name="qaResulTableName" value="${rvf.qa.result.table.name}"/>
+		<property name="assertionDetailsColumnName" value="${rvf.assertion.details.column.name}"/>
+		<property name="assertionIdColumnName" value="${rvf.assertion.id.column.name}"/>
+		<property name="assertionNameColumnName" value="${rvf.assertion.name.column.name}"/>
+	</bean>
+
 </beans>

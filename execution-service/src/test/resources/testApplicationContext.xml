@@ -34,7 +34,7 @@
     <import resource="applicationContext.xml"/>
 
 	<bean id="qaDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-		<property name="driverClassName" value="${rvf.snomed.jdbc.driverClassName}"/>
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
 		<property name="url" value="${rvf.snomed.jdbc.url}"/>
 		<property name="defaultCatalog" value="${rvf.snomed.schema.name}"/>
 		<property name="username" value="${rvf.snomed.jdbc.username}"/>
