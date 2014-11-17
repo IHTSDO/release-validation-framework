@@ -19,7 +19,7 @@
 	<bean id="qaDataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${rvf.jdbc.driverClassName}"/>
 		<property name="url" value="${rvf.jdbc.url}"/>
-		<property name="defaultCatalog" value="${rvf.config.master.schema.name}"/>
+		<property name="defaultCatalog" value="${rvf.master.schema.name}"/>
 		<property name="username" value="${rvf.jdbc.username}"/>
 		<property name="password" value="${rvf.jdbc.password}"/>
 		<property name="minEvictableIdleTimeMillis" value="1800000"/>
