@@ -5,6 +5,7 @@ import org.ihtsdo.rvf.helper.Configuration;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "test")
 public class Test {
 
 	@Id

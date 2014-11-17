@@ -1,9 +1,6 @@
 package org.ihtsdo.rvf.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * Class represents the association between an assertion and a test, here we determine whether the test is active
@@ -13,6 +10,7 @@ import javax.persistence.ManyToOne;
  */
 
 @Entity
+@Table(name = "assertion_test")
 public class AssertionTest {
 
 	@Id

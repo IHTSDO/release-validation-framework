@@ -2,12 +2,10 @@ package org.ihtsdo.rvf.entity;
 
 import org.ihtsdo.rvf.helper.Configuration;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "release_center")
 public class ReleaseCenter {
 
 	@Id

@@ -9,6 +9,7 @@ import javax.persistence.*;
  */
 @Embeddable
 @Entity
+@Table(name = "execution_command")
 public class ExecutionCommand {
 
     @Id

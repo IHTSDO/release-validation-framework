@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.entity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Date;
  */
 @Entity
 @XmlRootElement(name = "assertion")
+@Table(name = "assertion")
 public class Assertion {
 
 	@Id
