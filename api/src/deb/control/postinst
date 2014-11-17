@@ -11,5 +11,5 @@ supervisorctl start $APP_NAME || true
 
 # Database command safe to run both on install and upgrade
 echo "Creating RVF mysql database and user"
-mysql -u root -e "CREATE DATABASE IF NOT EXISTS rvf; GRANT ALL PRIVILEGES  ON rvf.* TO 'rvf_user'@'localhost' ;"
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS rvf_master; GRANT ALL PRIVILEGES  ON rvf_master.* TO 'rvf_user'@'localhost' ;"
 
