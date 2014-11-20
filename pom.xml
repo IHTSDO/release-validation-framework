@@ -170,6 +170,11 @@
 			<name>IHTSDO Public Nexus Releases</name>
 			<url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
 		</repository>
+		<repository>
+			<id>ihtsdo-public-nexus-snapshot</id>
+			<name>IHTSDO Public Nexus Snapshots</name>
+			<url>https://maven.ihtsdotools.org/content/repositories/snapshots/</url>
+		</repository>
 	</repositories>
 
 	<distributionManagement>
