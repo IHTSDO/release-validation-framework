@@ -4,7 +4,6 @@ import org.hibernate.ObjectNotFoundException;
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
-import org.ihtsdo.rvf.entity.ReleaseCenter;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -80,6 +80,17 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
         }
 	}
 
+	@Override
+	public Assertion find(UUID uuid) {
+        Assertion assertion = assertionDao.findByUuid(Assertion.class, uuid);
+        if(assertion != null){
+            return assertion;
+        }
+        else{
+            throw new MissingEntityException(uuid);
+        }
+	}
+
 	// todo use beanUtils/propertyUtils reflection for each of the properties
 	private void setProperties(Assertion assertion, Map<String, String> properties) {
 		assertion.setName(properties.get("name"));
@@ -87,27 +98,10 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 		assertion.setDocLink(properties.get("docLink"));
 		assertion.setKeywords(properties.get("keywords"));
 		assertion.setStatement(properties.get("statement"));
+        if(properties.get("uuid") != null ){
+            assertion.setUuid(UUID.fromString(properties.get("statement")));
+        }
 	}
-
-    @Override
-    public List<AssertionTest> getAssertionTests(Assertion assertion, ReleaseCenter releaseCenter){
-        return assertionDao.getAssertionTests(assertion, releaseCenter);
-    }
-
-    @Override
-    public List<AssertionTest> getAssertionTests(Long assertionId, Long releaseCenterId){
-        return assertionDao.getAssertionTests(assertionId, releaseCenterId);
-    }
-
-    @Override
-    public List<Test> getTests(Assertion assertion, ReleaseCenter releaseCenter){
-        return assertionDao.getTests(assertion, releaseCenter);
-    }
-
-    @Override
-    public List<Test> getTests(Long assertionId, Long releaseCenterId){
-        return assertionDao.getTests(assertionId, releaseCenterId);
-    }
 
     @Override
     public List<AssertionTest> getAssertionTests(Assertion assertion){
@@ -117,6 +111,11 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
     @Override
     public List<AssertionTest> getAssertionTests(Long assertionId){
         return assertionDao.getAssertionTests(assertionId);
+    }
+
+    @Override
+    public List<AssertionTest> getAssertionTests(UUID uuid){
+        return assertionDao.getAssertionTests(uuid);
     }
 
     @Override
@@ -130,24 +129,35 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
     }
 
     @Override
-    public Assertion addTest(Assertion assertion, ReleaseCenter releaseCenter, Test test){
+    public List<Test> getTests(UUID uuid){
+        return assertionDao.getTests(uuid);
+    }
+
+    @Override
+    public Assertion addTest(Assertion assertion, Test test){
 
         // see if matching assertion test already exists
-        AssertionTest assertionTest = assertionDao.getAssertionTests(assertion, releaseCenter, test);
+        AssertionTest assertionTest = assertionDao.getAssertionTests(assertion, test);
         if(assertionTest == null)
         {
             assertionTest = new AssertionTest();
+            // verify if assertion has been saved - otherwise save it
+            if(assertion.getId() == null){
+                assertionDao.save(assertion);
+            }
+            // verify if test has been saved - otherwise save first
+            if(test.getId() == null){
+                entityService.create(test);
+            }
             assertionTest.setTest(test);
             assertionTest.setInactive(false);
             assertionTest.setAssertion(assertion);
-            assertionTest.setCenter(releaseCenter);
             entityService.create(assertionTest);
         }
         else{
             assertionTest.setTest(test);
             assertionTest.setInactive(false);
             assertionTest.setAssertion(assertion);
-            assertionTest.setCenter(releaseCenter);
             entityService.update(assertionTest);
         }
 
@@ -155,32 +165,10 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
     }
 
     @Override
-    public Assertion addTest(Assertion assertion, Test test){
-        return addTest(assertion, entityService.getIhtsdo(), test);
-    }
-
-    @Override
-    public Assertion addTests(Assertion assertion, ReleaseCenter releaseCenter, Collection<Test> tests){
+    public Assertion addTests(Assertion assertion, Collection<Test> tests){
         for(Test test : tests)
         {
-            addTest(assertion, releaseCenter, test);
-        }
-
-        return assertion;
-    }
-
-    @Override
-    public Assertion addTests(Assertion assertion, Collection<Test> tests){
-        return addTests(assertion, entityService.getIhtsdo(), tests);
-    }
-
-    @Override
-    public Assertion deleteTest(Assertion assertion, ReleaseCenter releaseCenter, Test test){
-
-        // see if matching assertion test already exists
-        AssertionTest assertionTest = assertionDao.getAssertionTests(assertion, releaseCenter, test);
-        if(assertionTest != null){
-            entityService.delete(assertionTest);
+            addTest(assertion, test);
         }
 
         return assertion;
@@ -188,14 +176,11 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 
     @Override
     public Assertion deleteTest(Assertion assertion, Test test){
-        return addTest(assertion, entityService.getIhtsdo(), test);
-    }
-
-    @Override
-    public Assertion deleteTests(Assertion assertion, ReleaseCenter releaseCenter, Collection<Test> tests){
-        for(Test test : tests)
-        {
-            deleteTest(assertion, releaseCenter, test);
+        // get assertion tests for assertion
+        AssertionTest assertionTest = assertionDao.getAssertionTests(assertion, test);
+        // delete assertion test
+        if (assertionTest != null) {
+            entityService.delete(assertionTest);
         }
 
         return assertion;
@@ -203,6 +188,16 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 
     @Override
     public Assertion deleteTests(Assertion assertion, Collection<Test> tests){
-        return deleteTests(assertion, entityService.getIhtsdo(), tests);
+        for(Test test : tests)
+        {
+            deleteTest(assertion, test);
+        }
+
+        return assertion;
+    }
+
+    @Override
+    public Long count() {
+        return super.count(Assertion.class);
     }
 }

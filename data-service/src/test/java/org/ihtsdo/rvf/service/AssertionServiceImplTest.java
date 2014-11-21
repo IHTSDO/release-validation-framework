@@ -14,7 +14,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,7 +61,13 @@ public class AssertionServiceImplTest {
         assert entityService.count(ReleaseCenter.class) == 0;
         assert entityService.count(Assertion.class) == 0;
 
-        assertion = assertionService.create(new HashMap<String, String>());
+        assertion = new Assertion();
+        assertion.setName("Test assertion");
+        assertion.setDescription("Test Description");
+        assertion = assertionService.create(assertion);
+        assertNotNull(assertion.getId());
+        assertNotNull(assertion.getUuid());
+
         // create test
         test = new org.ihtsdo.rvf.entity.Test();
         test.setName("Test 1");
@@ -83,7 +88,7 @@ public class AssertionServiceImplTest {
         assertionTest = new AssertionTest();
         assertionTest.setAssertion(assertion);
         assertionTest.setTest(test);
-        assertionTest.setCenter(releaseCenter);
+//        assertionTest.setCenter(releaseCenter);
         assertionTest = (AssertionTest) entityService.create(assertionTest);
         assert assertionTest != null;
         assert assertionTest.getId() != null;
@@ -96,55 +101,12 @@ public class AssertionServiceImplTest {
         assertNotNull("AssertionTest object must not be null", entityService.find(assertionTest.getClass(), assertionTest.getId()));
         assertNotNull("ReleaseCentre object must not be null", entityService.find(releaseCenter.getClass(), releaseCenter.getId()));
         assertNotNull("Assertion object must not be null", assertionService.find(assertion.getId()));
+        assertNotNull("Assertion object must not be null", assertionService.find(assertion.getUuid()));
     }
 
     @Test
     @Rollback
     public void testFindAssertionTests() throws Exception {
-
-        // use service to find assertion tests associated with assertion
-        List<AssertionTest> assertionTests = assertionService.getAssertionTests(assertion, releaseCenter);
-        assert  assertionTests != null;
-        assert assertionTests.size() > 0;
-        assert assertionTests.contains(assertionTest);
-    }
-
-    @Test
-    @Rollback
-    public void testFindTests() throws Exception {
-
-        // use service to find tests associated with assertion
-        List<org.ihtsdo.rvf.entity.Test> tests = assertionService.getTests(assertion, releaseCenter);
-        assert  tests != null;
-        assert tests.size() > 0;
-        assert tests.contains(test);
-    }
-
-    @Test
-    @Rollback
-    public void testFindAssertionTestsByIds() throws Exception {
-
-        // use service to find assertion tests associated with assertion
-        List<AssertionTest> assertionTests = assertionService.getAssertionTests(assertion.getId(), releaseCenter.getId());
-        assert  assertionTests != null;
-        assert assertionTests.size() > 0;
-        assert assertionTests.contains(assertionTest);
-    }
-
-    @Test
-    @Rollback
-    public void testFindTestsByIds() throws Exception {
-
-        // use service to find tests associated with assertion
-        List<org.ihtsdo.rvf.entity.Test> tests = assertionService.getTests(assertion.getId(), releaseCenter.getId());
-        assert  tests != null;
-        assert tests.size() > 0;
-        assert tests.contains(test);
-    }
-
-    @Test
-    @Rollback
-    public void testFindAssertionTestsWithoutReleaseCentre() throws Exception {
 
         // use service to find assertion tests associated with assertion
         List<AssertionTest> assertionTests = assertionService.getAssertionTests(assertion);
@@ -155,7 +117,7 @@ public class AssertionServiceImplTest {
 
     @Test
     @Rollback
-    public void testFindTestsWithoutReleaseCentre() throws Exception {
+    public void testFindTests() throws Exception {
 
         // use service to find tests associated with assertion
         List<org.ihtsdo.rvf.entity.Test> tests = assertionService.getTests(assertion);
@@ -166,7 +128,7 @@ public class AssertionServiceImplTest {
 
     @Test
     @Rollback
-    public void testFindAssertionTestsByIdsWithoutReleaseCentre() throws Exception {
+    public void testFindAssertionTestsByIds() throws Exception {
 
         // use service to find assertion tests associated with assertion
         List<AssertionTest> assertionTests = assertionService.getAssertionTests(assertion.getId());
@@ -177,7 +139,7 @@ public class AssertionServiceImplTest {
 
     @Test
     @Rollback
-    public void testFindTestsByIdsWithoutReleaseCentre() throws Exception {
+    public void testFindTestsByIds() throws Exception {
 
         // use service to find tests associated with assertion
         List<org.ihtsdo.rvf.entity.Test> tests = assertionService.getTests(assertion.getId());
@@ -186,91 +148,135 @@ public class AssertionServiceImplTest {
         assert tests.contains(test);
     }
 
-//    @Test
-//    @Rollback
-//    public void testAddTestToAssertion() throws Exception {
-//        int originalCount = assertionService.getAssertionTests(assertion).size();
-//        Assertion returnedAssertion = assertionService.addTest(assertion, getRandomTest());
-//        assert returnedAssertion != null;
-//        assert assertionService.getAssertionTests(assertion).size() > originalCount;
-//    }
+    @Test
+    @Rollback
+    public void testFindAssertionTestsUsingUuids() throws Exception {
+
+        // use service to find assertion tests associated with assertion
+        List<AssertionTest> assertionTests = assertionService.getAssertionTests(assertion.getUuid());
+        assert  assertionTests != null;
+        assert assertionTests.size() > 0;
+        assert assertionTests.contains(assertionTest);
+    }
+
+    @Test
+    @Rollback
+    public void testFindTestsByAssertion() throws Exception {
+
+        // use service to find tests associated with assertion
+        List<org.ihtsdo.rvf.entity.Test> tests = assertionService.getTests(assertion);
+        assert  tests != null;
+        assert tests.size() > 0;
+        assert tests.contains(test);
+    }
+
+    @Test
+    @Rollback
+    public void testFindAssertionTestsByUuids() throws Exception {
+
+        // use service to find assertion tests associated with assertion
+        List<AssertionTest> assertionTests = assertionService.getAssertionTests(assertion.getUuid());
+        assert  assertionTests != null;
+        assert assertionTests.size() > 0;
+        assert assertionTests.contains(assertionTest);
+    }
+
+    @Test
+    @Rollback
+    public void testFindTestsByUuids() throws Exception {
+
+        // use service to find tests associated with assertion
+        List<org.ihtsdo.rvf.entity.Test> tests = assertionService.getTests(assertion.getUuid());
+        assert  tests != null;
+        assert tests.size() > 0;
+        assert tests.contains(test);
+    }
+
+    @Test
+    @Rollback
+    public void testAddTestToAssertion() throws Exception {
+        int originalCount = assertionService.getAssertionTests(assertion).size();
+        Assertion returnedAssertion = assertionService.addTest(assertion, getRandomTest());
+        assert returnedAssertion != null;
+        assert assertionService.getAssertionTests(assertion).size() > originalCount;
+    }
 
     @Test
     @Rollback
     public void testAddTestToAssertionWithReleaseCentre() throws Exception {
-        int originalCount = assertionService.getAssertionTests(assertion, releaseCenter).size();
-        Assertion returnedAssertion = assertionService.addTest(assertion, releaseCenter, getRandomTest());
+        int originalCount = assertionService.getAssertionTests(assertion).size();
+        Assertion returnedAssertion = assertionService.addTest(assertion, getRandomTest());
         assert returnedAssertion != null;
-        assert assertionService.getAssertionTests(assertion, releaseCenter).size() > originalCount;
+        assert assertionService.getAssertionTests(assertion).size() > originalCount;
     }
 
-//    @Test
-//    @Rollback
-//    public void testAddTestCollectionToAssertion() throws Exception {
-//        int originalCount = assertionService.getAssertionTests(assertion).size();
-//        List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
-//        tests.add(getRandomTest());
-//        tests.add(getRandomTest());
-//        Assertion returnedAssertion = assertionService.addTests(assertion, tests);
-//        assert returnedAssertion != null;
-//        assert assertionService.getAssertionTests(assertion).size() > originalCount;
-//    }
+    @Test
+    @Rollback
+    public void testAddTestCollectionToAssertion() throws Exception {
+        int originalCount = assertionService.getAssertionTests(assertion).size();
+        List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
+        tests.add(getRandomTest());
+        tests.add(getRandomTest());
+        Assertion returnedAssertion = assertionService.addTests(assertion, tests);
+        assert returnedAssertion != null;
+        assert assertionService.getAssertionTests(assertion).size() > originalCount;
+    }
 
     @Test
     @Rollback
     public void testAddTestCollectionToAssertionWithReleaseCentre() throws Exception {
-        int originalCount = assertionService.getAssertionTests(assertion, releaseCenter).size();
+        int originalCount = assertionService.getAssertionTests(assertion).size();
         List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
         tests.add(getRandomTest());
         tests.add(getRandomTest());
-        Assertion returnedAssertion = assertionService.addTests(assertion, releaseCenter, tests);
+        Assertion returnedAssertion = assertionService.addTests(assertion, tests);
         assert returnedAssertion != null;
-        assert assertionService.getAssertionTests(assertion, releaseCenter).size() > originalCount;
+        assert assertionService.getAssertionTests(assertion).size() > originalCount;
     }
 
     private org.ihtsdo.rvf.entity.Test getRandomTest(){
         org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
         test.setName("Random Test " + UUID.randomUUID());
-        return (org.ihtsdo.rvf.entity.Test) entityService.create(test);
+        return test;
     }
 
-//    @Test
-//    @Rollback
-//    public void testDeleteTestToAssertion() throws Exception {
-//        org.ihtsdo.rvf.entity.Test test = getRandomTest();
-//        Assertion returnedAssertion = assertionService.addTest(assertion, test);
-//        int originalCount = assertionService.getAssertionTests(assertion).size();
-//        assert returnedAssertion != null;
-//
-//        assertionService.deleteTest(assertion, test);
-//        assert assertionService.getAssertionTests(assertion).size() < originalCount;
-//    }
+    @Test
+    @Rollback
+    public void testDeleteTestToAssertion() throws Exception {
+        org.ihtsdo.rvf.entity.Test test = getRandomTest();
+        Assertion returnedAssertion = assertionService.addTest(assertion, test);
+        int originalCount = assertionService.getAssertionTests(assertion).size();
+        assert returnedAssertion != null;
+
+        assertionService.deleteTest(assertion, test);
+        assert assertionService.getAssertionTests(assertion).size() < originalCount;
+    }
 
     @Test
     @Rollback
     public void testDeleteTestToAssertionWithReleaseCentre() throws Exception {
         org.ihtsdo.rvf.entity.Test test = getRandomTest();
-        Assertion returnedAssertion = assertionService.addTest(assertion, releaseCenter, test);
-        int originalCount = assertionService.getAssertionTests(assertion, releaseCenter).size();
+        Assertion returnedAssertion = assertionService.addTest(assertion, test);
+        int originalCount = assertionService.getAssertionTests(assertion).size();
         assert returnedAssertion != null;
 
-        assertionService.deleteTest(assertion, releaseCenter, test);
-        assert assertionService.getAssertionTests(assertion, releaseCenter).size() < originalCount;
+        assertionService.deleteTest(assertion, test);
+        assert assertionService.getAssertionTests(assertion).size() < originalCount;
     }
 
-//    @Test
-//    @Rollback
-//    public void testDeleteTestCollectionToAssertion() throws Exception {
-//        List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
-//        tests.add(getRandomTest());
-//        tests.add(getRandomTest());
-//        Assertion returnedAssertion = assertionService.addTests(assertion, tests);
-//        int originalCount = assertionService.getAssertionTests(assertion).size();
-//        assert returnedAssertion != null;
-//
-//        assertionService.deleteTests(assertion, tests);
-//        assert assertionService.getAssertionTests(assertion).size() < originalCount;
-//    }
+    @Test
+    @Rollback
+    public void testDeleteTestCollectionToAssertion() throws Exception {
+        List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
+        tests.add(getRandomTest());
+        tests.add(getRandomTest());
+        Assertion returnedAssertion = assertionService.addTests(assertion, tests);
+        int originalCount = assertionService.getAssertionTests(assertion).size();
+        assert returnedAssertion != null;
+
+        assertionService.deleteTests(assertion, tests);
+        assert assertionService.getAssertionTests(assertion).size() < originalCount;
+    }
 
     @Test
     @Rollback
@@ -278,13 +284,36 @@ public class AssertionServiceImplTest {
         List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
         tests.add(getRandomTest());
         tests.add(getRandomTest());
-        Assertion returnedAssertion = assertionService.addTests(assertion, releaseCenter, tests);
-        int originalCount = assertionService.getAssertionTests(assertion, releaseCenter).size();
+        Assertion returnedAssertion = assertionService.addTests(assertion, tests);
+        int originalCount = assertionService.getAssertionTests(assertion).size();
         assert returnedAssertion != null;
 
-        assertionService.deleteTests(assertion, releaseCenter, tests);
-        assert assertionService.getAssertionTests(assertion, releaseCenter).size() < originalCount;
+        assertionService.deleteTests(assertion, tests);
+        assert assertionService.getAssertionTests(assertion).size() < originalCount;
     }
+
+//    @Test
+//    @Rollback
+//    public void testSaveForAssertionGroup() throws Exception {
+//        AssertionGroup group = new AssertionGroup();
+//        group.setName("Test assertion group");
+//        assertion.setGroups(Collections.singleton(group));
+//
+//        Assertion assertion2 = new Assertion();
+//        assertion2.setName("Second assertion in group");
+//        assertion2.setDescription("Description of second assertion in group");
+//        assertion2.setGroups(Collections.singleton(group));
+//
+//        // save assertion2
+//        assertion2 = assertionService.addTest(assertion2, getRandomTest());
+//        assertion = assertionService.update(assertion);
+//
+//        assertTrue(assertion.getGroups().size() > 0);
+//        assertTrue(assertion2.getGroups().size() > 0);
+//
+//        Assertion retrievedAssertion = assertionService.find(assertion2.getId());
+//        assertTrue(retrievedAssertion.getGroups().contains(group));
+//    }
 
     @After
     public void tearDown() throws Exception {

@@ -4,14 +4,17 @@ import org.hibernate.Session;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 public interface EntityDao<T> {
 
-	void save(T entity);
+	T save(T entity);
 
 	T load(Class clazz, Serializable id);
 
-	void delete(T entity);
+    T findByUuid(Class clazz, UUID uuid);
+
+    void delete(T entity);
 
     List<T> findAll(Class clazz);
 

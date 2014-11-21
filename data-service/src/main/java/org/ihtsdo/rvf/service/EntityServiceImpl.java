@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -46,6 +47,17 @@ public class EntityServiceImpl<T> implements EntityService<T> {
         T t = (T) dao.load(clazz, id);
         if (t == null){
             throw new MissingEntityException(id);
+        }
+        else{
+            return t;
+        }
+    }
+
+    @Override
+    public T find(Class clazz, UUID uuid){
+        T t = (T) dao.findByUuid(clazz, uuid);
+        if (t == null){
+            throw new MissingEntityException(uuid);
         }
         else{
             return t;

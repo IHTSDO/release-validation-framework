@@ -45,11 +45,11 @@
 			<version>${spring.version}</version>
 		</dependency>
 		<!-- data access-->
-		<dependency>
-			<groupId>org.ow2.jonas</groupId>
-			<artifactId>jonas-db-hsql-core</artifactId>
-			<version>${hsql.version}</version>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.ow2.jonas</groupId>-->
+			<!--<artifactId>jonas-db-hsql-core</artifactId>-->
+			<!--<version>${hsql.version}</version>-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
@@ -64,6 +64,11 @@
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.connector.java.version}</version>
+        </dependency>
 	</dependencies>
 
 </project>
