@@ -65,7 +65,7 @@ public class AssertionExecutionServiceImplIT {
         assertionTest = new AssertionTest();
         assertionTest.setAssertion(assertion);
         assertionTest.setTest(test);
-        assertionTest.setCenter(releaseCenter);
+//        assertionTest.setCenter(releaseCenter);
         assertionTest = (AssertionTest) entityService.create(assertionTest);
         assert assertionTest != null;
         assert assertionTest.getId() != null;
@@ -100,12 +100,12 @@ public class AssertionExecutionServiceImplIT {
         command.setCode("Execute me".getBytes());
         command.setConfiguration(configuration);
         test.setName("Real - Concept has 1 defining relationship but is not primitive");
-        test.setConfiguration(configuration);
+//        test.setConfiguration(configuration);
         test.setCommand(command);
 
         assertionTest.setTest(test);
 
-        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1);
+        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1L);
         assert runItem != null;
         assert ! runItem.isFailure();
     }
@@ -142,12 +142,12 @@ public class AssertionExecutionServiceImplIT {
         command.setCode("Execute me".getBytes());
         command.setConfiguration(configuration);
         test.setName("Fake - Concept has 8 defining relationship but is not primitive");
-        test.setConfiguration(configuration);
+//        test.setConfiguration(configuration);
         test.setCommand(command);
 
         assertionTest.setTest(test);
 
-        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1);
+        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1L);
         assert runItem != null;
         assert runItem.isFailure();
     }
