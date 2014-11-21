@@ -17,8 +17,7 @@
 		<hibernate.version>3.6.10.Final</hibernate.version>
 		<hsql.version>5.3.0</hsql.version>
 		<skip.integration.tests>true</skip.integration.tests>
-        <mysql.connector.java.version>5.1.20</mysql.connector.java.version>
-    </properties>
+	</properties>
 
 	<modules>
 		<module>model</module>
@@ -27,8 +26,7 @@
 		<module>api</module>
 		<module>web</module>
 		<module>execution-service</module>
-        <module>importer</module>
-    </modules>
+	</modules>
 
 
 	<scm>
@@ -172,7 +170,12 @@
 			<name>IHTSDO Public Nexus Releases</name>
 			<url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
 		</repository>
-    </repositories>
+		<repository>
+			<id>ihtsdo-public-nexus-snapshot</id>
+			<name>IHTSDO Public Nexus Snapshots</name>
+			<url>https://maven.ihtsdotools.org/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
 
 	<distributionManagement>
 		<repository>
