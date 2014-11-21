@@ -1,5 +1,9 @@
 package org.ihtsdo.rvf.helper;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.ihtsdo.rvf.entity.ExecutionCommand;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,35 +12,41 @@ import java.util.Set;
  * An object that holds configurable parameters that can be passed to model entities.
  * Interally it is just a collection of {@link org.ihtsdo.rvf.helper.ConfigurationItem}s
  */
-@Entity
+@Embeddable
+@Entity(name = "configuration")
 public class Configuration {
 
     @Id
     @GeneratedValue
     private Long id;
-    @Embedded
-    @ElementCollection(targetClass = ConfigurationItem.class)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "configuration")
+    @JsonManagedReference
     Set<ConfigurationItem> items = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "configuration")
+    @JsonBackReference
+    ExecutionCommand command;
 
     public Set<ConfigurationItem> getItems() {
         return items;
     }
 
     public void setItems(Set<ConfigurationItem> items) {
-        this.items = items;
+        this.items.clear();
+        for(ConfigurationItem item: items){
+            item.setConfiguration(this);
+            this.items.add(item);
+        }
     }
 
-    @Transient
     public boolean addItem(ConfigurationItem item){
+        item.setConfiguration(this);
         return items.add(item);
     }
 
-    @Transient
     public boolean removeItem(ConfigurationItem item){
         return items.remove(item);
     }
 
-    @Transient
     public void clear(){
         items.clear();
     }
@@ -55,6 +65,7 @@ public class Configuration {
         return value;
     }
 
+    @Transient
     public Set<String> getKeys(){
         Set<String> keys = new HashSet<>();
         for(ConfigurationItem item : items)
@@ -71,6 +82,7 @@ public class Configuration {
         for(ConfigurationItem item: items)
         {
             if(item.key.equals(key)){
+                item.setConfiguration(this);
                 item.value = value;
                 foundMatch = true;
                 break;
@@ -79,7 +91,7 @@ public class Configuration {
 
         // if no match found, then add a new item
         if(!foundMatch){
-            foundMatch = items.add(new ConfigurationItem(key, value, false));
+            foundMatch = items.add(new ConfigurationItem(key, value, false, this));
         }
 
         return foundMatch;
@@ -91,5 +103,13 @@ public class Configuration {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ExecutionCommand getCommand() {
+        return command;
+    }
+
+    public void setCommand(ExecutionCommand command) {
+        this.command = command;
     }
 }

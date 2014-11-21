@@ -1,12 +1,10 @@
 package org.ihtsdo.rvf.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * An Assertion represents a truth in snomed, it consists of a number of tests to verify
@@ -15,17 +13,28 @@ import java.util.Date;
 @Entity
 @XmlRootElement(name = "assertion")
 @Table(name = "assertion")
+//@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@assertionId")
 public class Assertion {
 
 	@Id
 	@GeneratedValue
-	private Long id;
+    @Column(name = "assertion_id")
+    private Long id;
 	private String name;
 	private String statement;
 	private String description;
 	private String docLink;
 	private Date effectiveFrom;
 	private String keywords;
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID uuid = UUID.randomUUID();
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(
+//            name="group_assertion_link",
+//            joinColumns = @JoinColumn( name="assertion_id"),
+//            inverseJoinColumns = @JoinColumn( name="group_id")
+//    )
+//    private Set<AssertionGroup> groups;
 
 	public Assertion() {
 	}
@@ -61,7 +70,8 @@ public class Assertion {
 		this.statement = statement;
 	}
 
-	public String getDocLink() {
+    @XmlElement
+    public String getDocLink() {
 		return docLink;
 	}
 
@@ -69,7 +79,8 @@ public class Assertion {
 		this.docLink = docLink;
 	}
 
-	public Date getEffectiveFrom() {
+    @XmlElement
+    public Date getEffectiveFrom() {
 		return effectiveFrom;
 	}
 
@@ -85,7 +96,8 @@ public class Assertion {
 		this.keywords = keywords;
 	}
 
-	public String getDescription() {
+    @XmlElement
+    public String getDescription() {
 		return description;
 	}
 
@@ -93,4 +105,42 @@ public class Assertion {
 		this.description = description;
 	}
 
+    @XmlElement
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+//    public Set<AssertionGroup> getGroups() {
+//        return groups;
+//    }
+//
+//    public void setGroups(Set<AssertionGroup> groups) {
+//        this.groups = groups;
+//    }
+//
+//    /**
+//     * Adds a group to this assertion. Note {@link org.ihtsdo.rvf.entity.Assertion} is always the owner of the bi-directional
+//     * group-assertions link, so there should not be addAssertion method on {@link org.ihtsdo.rvf.entity.AssertionGroup}.
+//     * @param group the group to be added
+//     */
+//    @Transient
+//    public void addGroup(AssertionGroup group){
+//        this.getGroups().add(group);
+//        group.getAssertions().add(this);
+//    }
+//
+//    /**
+//     * Removes a group from this assertion. Note {@link org.ihtsdo.rvf.entity.Assertion} is always the owner of the bi-directional
+//     * group-assertions link, so there should not be removeAssertion method on {@link org.ihtsdo.rvf.entity.AssertionGroup}.
+//     * @param group the group to be added
+//     */
+//    @Transient
+//    public void removeGroup(AssertionGroup group){
+//        this.getGroups().remove(group);
+//        group.getAssertions().remove(this);
+//    }
 }

@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.ihtsdo.rvf.helper.Configuration;
 
 import javax.persistence.*;
@@ -14,9 +15,9 @@ public class Test {
 	private String name;
 	private String description;
     private TestType type = TestType.UNKNOWN;
-    @OneToOne(targetEntity = Configuration.class)
-    Configuration configuration;
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = ExecutionCommand.class)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "command_id")
+    @JsonManagedReference
     private ExecutionCommand command;
 
 	public Test() {
@@ -65,13 +66,31 @@ public class Test {
 
     public void setCommand(ExecutionCommand command) {
         this.command = command;
+        this.command.setTest(this);
     }
 
     public Configuration getConfiguration() {
-        return configuration;
+        if(command == null){
+            setCommand(new ExecutionCommand(new Configuration()));
+            return command.getConfiguration();
+        }
+        else{
+            if(command.getConfiguration() == null){
+                command.setConfiguration(new Configuration());
+                return command.getConfiguration();
+            }
+            else{
+                return command.getConfiguration();
+            }
+        }
     }
 
     public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
+        if(command == null){
+            setCommand(new ExecutionCommand(configuration));
+        }
+        else{
+            command.setConfiguration(configuration);
+        }
     }
 }
