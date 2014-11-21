@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<categoryList>
+	<category name="" purpose="Empty when assertion cannot be further categorized"/>
+	<category name="concept" purpose="Scripts that execute assertions on the concept file"/>
+	<category name="description" purpose="Scripts that execute assertions on the description file"/>
+	<category name="concept/description" purpose="Scripts that execute assertions that are based on both the concept and description files"/>
+</categoryList>
