@@ -74,7 +74,7 @@ public class TestDataBootStrap {
         String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
         org.ihtsdo.rvf.entity.Test executableTest = new org.ihtsdo.rvf.entity.Test();
         executableTest.setName(execTestName);
-        executableTest.setConfiguration(configuration);
+//        executableTest.setConfiguration(configuration);
         executableTest.setCommand(command);
         executableTest.setType(TestType.SQL);
         executableTest = (org.ihtsdo.rvf.entity.Test) entityService.create(executableTest);
@@ -82,6 +82,6 @@ public class TestDataBootStrap {
         assert executableTestId != null;
 
         // associate test with assertion
-        assertionService.addTest(assertion, releaseCenter, executableTest);
+        assertionService.addTest(assertion, executableTest);
     }
 }

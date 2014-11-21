@@ -144,7 +144,7 @@ public class TestControllerIntegrationTest {
         configuration.setValue("active_column_name", "active");
         configuration.setValue("definition_status_id", "definitionstatusid");
         configuration.setValue("source_id_column_name", "sourceid");
-        entityService.create(configuration);
+//        entityService.create(configuration);
         ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(template);
         command.setCode("Execute me".getBytes());
@@ -153,20 +153,21 @@ public class TestControllerIntegrationTest {
         String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
         org.ihtsdo.rvf.entity.Test executableTest = new org.ihtsdo.rvf.entity.Test();
         executableTest.setName(execTestName);
-        executableTest.setConfiguration(configuration);
+//        executableTest.setConfiguration(configuration);
         executableTest.setCommand(command);
         executableTest.setType(TestType.SQL);
-        executableTest = (org.ihtsdo.rvf.entity.Test) entityService.create(executableTest);
-        Long executableTestId = executableTest.getId();
+        org.ihtsdo.rvf.entity.Test returnedTest = objectMapper.readValue(mockMvc.perform(post("/tests").content(objectMapper.writeValueAsString(executableTest)).contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse().getContentAsString(), org.ihtsdo.rvf.entity.Test.class);
+//        executableTest = (org.ihtsdo.rvf.entity.Test) entityService.create(executableTest);
+        Long executableTestId = returnedTest.getId();
         assert executableTestId != null;
 
         mockMvc.perform(get("/tests", executableTestId).contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         // execute test
-        String paramsString = objectMapper.writeValueAsString(executableTest);
+        String paramsString = objectMapper.writeValueAsString(returnedTest);
         System.out.println("paramsString = " + paramsString);
-        mockMvc.perform(post("/tests/{id}/run", 1).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
-        mockMvc.perform(post("/tests/{id}/run", 2).content(paramsString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1").param("schemaName", "postqa").contentType(MediaType.APPLICATION_JSON)).andDo(print());
+        mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1").param("schemaName", "postqa").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("executionId").exists())

@@ -134,8 +134,8 @@ public class AssertionControllerIntegrationTest {
     public void testGetTestsForAssertion() throws Exception {
         Long id = assertion.getId();
         // create and add some tests to assertion
-        assertionService.addTest(assertion, releaseCenter, getRandomTest());
-        assertionService.addTest(assertion, releaseCenter, getRandomTest());
+        assertionService.addTest(assertion, getRandomTest());
+        assertionService.addTest(assertion, getRandomTest());
 
         mockMvc.perform(get("/assertions/{id}/tests", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(get("/assertions/{id}/tests", id).contentType(MediaType.APPLICATION_JSON))

@@ -71,12 +71,13 @@ public class TestController {
     }
 
 
-    @RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}/run", method = RequestMethod.GET)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public TestRunItem executeTest(@PathVariable Long id,
-                                   @RequestBody(required = false) Test test) {
-        Test test1 = (Test) entityService.find(Test.class, test.getId());
-        return assertionExecutionService.executeTest(test1, null, id);
+                                   @RequestBody(required = false) Test test, @RequestParam Long runId, @RequestParam String schemaName) {
+        Test test1 = (Test) entityService.find(Test.class, id);
+        assertionExecutionService.setSchemaName(schemaName);
+        return assertionExecutionService.executeTest(test1, runId);
     }
 }

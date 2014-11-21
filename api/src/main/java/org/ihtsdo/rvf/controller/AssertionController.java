@@ -1,8 +1,9 @@
 package org.ihtsdo.rvf.controller;
 
 import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.ReleaseCenter;
 import org.ihtsdo.rvf.entity.Test;
+import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
@@ -11,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/assertions")
@@ -19,6 +20,8 @@ public class AssertionController {
 
 	@Autowired
 	private AssertionService assertionService;
+    @Autowired
+	private AssertionExecutionService assertionExecutionService;
     @Autowired
 	private EntityService entityService;
 
@@ -43,20 +46,20 @@ public class AssertionController {
     @ResponseStatus(HttpStatus.OK)
     public Assertion setTestsForAssertion(@PathVariable Long id, @RequestBody(required = false) List<Test> tests) {
 
-        // verify if IHTSDO exists as a relese centre, otherwise create it
-        ReleaseCenter releaseCenter = null;
-        try {
-            releaseCenter = (ReleaseCenter) entityService.find(ReleaseCenter.class, assertionService.getIhtsdo().getId());
-        }
-        catch (MissingEntityException e) {
-            e.printStackTrace();
-        }
-
-        if(releaseCenter == null){
-            releaseCenter = (ReleaseCenter) entityService.create(assertionService.getIhtsdo());
-        }
+//        // verify if IHTSDO exists as a relese centre, otherwise create it
+//        ReleaseCenter releaseCenter = null;
+//        try {
+//            releaseCenter = (ReleaseCenter) entityService.find(ReleaseCenter.class, assertionService.getIhtsdo().getId());
+//        }
+//        catch (MissingEntityException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if(releaseCenter == null){
+//            releaseCenter = (ReleaseCenter) entityService.create(assertionService.getIhtsdo());
+//        }
         Assertion assertion = assertionService.find(id);
-        assertionService.addTests(assertion, releaseCenter, tests);
+        assertionService.addTests(assertion, tests);
 
         return assertion;
 	}
@@ -67,7 +70,7 @@ public class AssertionController {
     public Assertion deleteTestsForAssertion(@PathVariable Long id, @RequestBody(required = false) List<Test> tests) {
 
         Assertion assertion = assertionService.find(id);
-        assertionService.deleteTests(assertion, assertionService.getIhtsdo(), tests);
+        assertionService.deleteTests(assertion, tests);
 
         return assertion;
 	}
@@ -105,4 +108,59 @@ public class AssertionController {
         return assertionService.update(assertion);
 	}
 
+    @RequestMapping(value = "/{id}/run", method = RequestMethod.GET)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Object> executeTest(@PathVariable Long id,
+                                           @RequestParam Long runId, @RequestParam String schemaName) {
+        Map<String, Object> responseMap = new HashMap<>();
+        Assertion assertion = assertionService.find(id);
+        assertionExecutionService.setSchemaName(schemaName);
+        List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId));
+        // get only first since we have 1:1 correspondence between Assertion and Test
+        if(items.size() == 1){
+            TestRunItem runItem = items.get(0);
+            if(runItem.isFailure()){
+                responseMap.put("failureMessage", runItem.getFailureMessage());
+            }
+        }
+        responseMap.put("assertion", assertion);
+        responseMap.put("result", items);
+
+        return responseMap;
+    }
+
+    @RequestMapping(value = "/run", method = RequestMethod.GET)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Object> executeTest(@PathVariable List<Long> ids,
+                                           @RequestParam Long runId, @RequestParam String schemaName) {
+        Map<String , Object> responseMap = new HashMap<>();
+        Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
+        assertionExecutionService.setSchemaName(schemaName);
+        int failedAssertionCount = 0;
+        for (Long id: ids) {
+            try {
+                Assertion assertion = assertionService.find(id);
+                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId));
+                // get only first since we have 1:1 correspondence between Assertion and Test
+                if(items.size() == 1){
+                    TestRunItem runItem = items.get(0);
+                    if(runItem.isFailure()){
+                        failedAssertionCount++;
+                    }
+                }
+                map.put(assertion, items);
+            }
+            catch (MissingEntityException e) {
+                failedAssertionCount++;
+            }
+        }
+
+        responseMap.put("assertions", map);
+        responseMap.put("assertionsRun", map.keySet().size());
+        responseMap.put("assertionsFailed", failedAssertionCount);
+
+        return responseMap;
+    }
 }
