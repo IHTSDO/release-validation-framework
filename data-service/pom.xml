@@ -24,9 +24,9 @@
 			<version>3.12.1.GA</version>
 		</dependency>
 		<dependency>
-			<groupId>org.ihtsdo.snomed.util</groupId>
-			<artifactId>snomed-utilities</artifactId>
-			<version>1.0.7-SNAPSHOT</version>
+			<groupId>org.ihtsdo.otf.common</groupId>
+			<artifactId>otf-common</artifactId>
+			<version>0.0.3</version>
 		</dependency>
 		<!--spring dependencies -->
 		<dependency>
