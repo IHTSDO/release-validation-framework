@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.ihtsdo.rvf.helper.Configuration;
 
@@ -69,6 +70,7 @@ public class Test {
         this.command.setTest(this);
     }
 
+    @JsonIgnore
     public Configuration getConfiguration() {
         if(command == null){
             setCommand(new ExecutionCommand(new Configuration()));
