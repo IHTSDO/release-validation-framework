@@ -72,9 +72,9 @@ public class TestController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public TestRunItem executeTest(@PathVariable Long id,
-                                   @RequestParam Long runId, @RequestParam String schemaName) {
+                                   @RequestParam Long runId, @RequestParam String prospectiveReleaseVersion,
+                                   @RequestParam String previousReleaseVersion) {
         Test test1 = (Test) entityService.find(Test.class, id);
-        assertionExecutionService.setSchemaName(schemaName);
-        return assertionExecutionService.executeTest(test1, runId);
+        return assertionExecutionService.executeTest(test1, runId, prospectiveReleaseVersion, previousReleaseVersion);
     }
 }

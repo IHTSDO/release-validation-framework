@@ -120,8 +120,14 @@ public class AssertionControllerIntegrationTest {
     @Test
     public void testCreateAssertion() throws Exception {
 
-        String paramsString = objectMapper.writeValueAsString(params);
+        Assertion assertion1 = new Assertion();
+        assertion1.setName("Testing assertion");
+        assertion1.setDescription("Test description");
+        String paramsString = objectMapper.writeValueAsString(assertion1);
         System.out.println("paramsString = " + paramsString);
+        // we have to strip the id property added by Jackson since this causes conflicts when Spring tries to convert content into Assertion
+        paramsString = paramsString.replaceAll("\"id\":null,", "");
+        System.out.println("paramsString after = " + paramsString);
         mockMvc.perform(post("/assertions").content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(post("/assertions").content(paramsString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())

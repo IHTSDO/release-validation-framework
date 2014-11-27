@@ -97,11 +97,12 @@ public class AssertionController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public Map<String, Object> executeTest(@PathVariable Long id,
-                                           @RequestParam Long runId, @RequestParam String schemaName) {
+                                           @RequestParam Long runId, @RequestParam String prospectiveReleaseVersion,
+                                           @RequestParam String previousReleaseVersion) {
         Map<String, Object> responseMap = new HashMap<>();
         Assertion assertion = assertionService.find(id);
-        assertionExecutionService.setSchemaName(schemaName);
-        List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId));
+        List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
+                prospectiveReleaseVersion, previousReleaseVersion));
         // get only first since we have 1:1 correspondence between Assertion and Test
         if(items.size() == 1){
             TestRunItem runItem = items.get(0);
@@ -119,15 +120,16 @@ public class AssertionController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public Map<String, Object> executeTest(@PathVariable List<Long> ids,
-                                           @RequestParam Long runId, @RequestParam String schemaName) {
+                                           @RequestParam Long runId, @RequestParam String prospectiveReleaseVersion,
+                                           @RequestParam String previousReleaseVersion) {
         Map<String , Object> responseMap = new HashMap<>();
         Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
-        assertionExecutionService.setSchemaName(schemaName);
         int failedAssertionCount = 0;
         for (Long id: ids) {
             try {
                 Assertion assertion = assertionService.find(id);
-                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId));
+                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
+                        prospectiveReleaseVersion, previousReleaseVersion));
                 // get only first since we have 1:1 correspondence between Assertion and Test
                 if(items.size() == 1){
                     TestRunItem runItem = items.get(0);

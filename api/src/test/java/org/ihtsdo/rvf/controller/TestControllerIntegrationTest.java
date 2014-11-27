@@ -140,21 +140,14 @@ public class TestControllerIntegrationTest {
         String template = "" +
                 "select  " +
                 "concat('CONCEPT: id=',a.id, ':Concept has only one defining relationship but is not primitive.')  " +
-                "from curr_concept_table_name a  " +
-                "inner join curr_stated_relationship_table_name b on a.id_column_name = b.source_id_column_name " +
-                "where a.active_column_name = '1' " +
-                "and b.active_column_name = '1' " +
-                "and a.definition_status_id != '900000000000074008' " +
-                "group by b.source_id_column_name " +
+                "from <PROSPECTIVE>.concept_<SNAPSHOT> a  " +
+                "inner join <PROSPECTIVE>.stated_relationship_<SNAPSHOT> b on a.id = b.id " +
+                "where a.active = '1' " +
+                "and b.active = '1' " +
+                "and a.definitionstatusid != '900000000000074008' " +
+                "group by b.sourceid " +
                 "having count(*) = 1;";
         Configuration configuration = new Configuration();
-        configuration.setValue("curr_concept_table_name", "curr_concept_s");
-        configuration.setValue("curr_stated_relationship_table_name", "curr_stated_relationship_s");
-        configuration.setValue("id_column_name", "id");
-        configuration.setValue("active_column_name", "active");
-        configuration.setValue("definition_status_id", "definitionstatusid");
-        configuration.setValue("source_id_column_name", "sourceid");
-//        entityService.create(configuration);
         ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(template);
         command.setCode("Execute me".getBytes());
@@ -174,9 +167,15 @@ public class TestControllerIntegrationTest {
         // execute test
         String paramsString = objectMapper.writeValueAsString(returnedTest);
         System.out.println("paramsString = " + paramsString);
-        mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1").param("schemaName", "postqa").contentType(MediaType.APPLICATION_JSON)).andDo(print());
+        mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1")
+                .param("prospectiveReleaseVersion", "rvf_int_2014073")
+                .param("previousReleaseVersion", "postqa")
+                .contentType(MediaType.APPLICATION_JSON)).andDo(print());
         // this test will fail unless we have a SNOMED CT database configured
-        mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1").param("schemaName", "postqa").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1")
+                .param("prospectiveReleaseVersion", "rvf_int_2014073")
+                .param("previousReleaseVersion", "postqa")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("executionId").exists())

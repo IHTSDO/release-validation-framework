@@ -118,17 +118,18 @@ public class AssertionGroupController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public Map<String, Object> executeAssertions(@PathVariable Long id,
-                                           @RequestParam Long runId, @RequestParam String schemaName) {
+                                           @RequestParam Long runId, @RequestParam String prospectiveReleaseVersion,
+                                           @RequestParam String previousReleaseVersion) {
         Map<String , Object> responseMap = new HashMap<>();
         Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
-        assertionExecutionService.setSchemaName(schemaName);
         AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
 
         int failedAssertionCount = 0;
         for (Assertion assertion: assertionService.getAssertionsForGroup(group)) {
             try
             {
-                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId));
+                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
+                        prospectiveReleaseVersion, previousReleaseVersion));
                 // get only first since we have 1:1 correspondence between Assertion and Test
                 if(items.size() == 1){
                     TestRunItem runItem = items.get(0);
