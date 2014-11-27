@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.dao;
 
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
@@ -29,6 +30,19 @@ public class EntityDaoImpl<T> implements EntityDao<T> {
 	@Override
 	public T save(T entity) {
 		return (T) getCurrentSession().save(entity);
+	}
+
+	@Override
+	public T update(T entity) {
+        try {
+            Object merged = getCurrentSession().merge(entity);
+            getCurrentSession().update(merged);
+            return (T) merged;
+        }
+        catch (ObjectNotFoundException e) {
+            // disappeared already due to cascade
+            return entity;
+        }
 	}
 
 	@Override

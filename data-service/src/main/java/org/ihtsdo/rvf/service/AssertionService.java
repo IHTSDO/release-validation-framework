@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.service;
 
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
 
@@ -61,4 +62,16 @@ public interface AssertionService extends EntityService<Assertion> {
     Assertion deleteTests(Assertion assertion, Collection<Test> tests);
 
     Long count();
+
+    List<AssertionGroup> getGroupsForAssertion(Assertion assertion);
+
+    List<AssertionGroup> getGroupsForAssertion(Long assertionId);
+
+    List<Assertion> getAssertionsForGroup(AssertionGroup group);
+
+    List<Assertion> getAssertionsForGroup(Long groupId);
+
+    AssertionGroup addAssertionToGroup(Assertion assertion, AssertionGroup group);
+
+    AssertionGroup removeAssertionFromGroup(Assertion assertion, AssertionGroup group);
 }

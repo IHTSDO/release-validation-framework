@@ -22,7 +22,7 @@ public class EntityServiceImpl<T> implements EntityService<T> {
 
 	@Override
 	public T update(T entity) {
-        dao.save(entity);
+        dao.update(entity);
         return entity;
 	}
 

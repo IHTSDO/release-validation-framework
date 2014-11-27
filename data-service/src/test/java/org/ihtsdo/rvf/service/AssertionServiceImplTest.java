@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.service;
 
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ReleaseCenter;
 import org.junit.After;
@@ -13,12 +14,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/applicationContext.xml"})
@@ -292,28 +290,79 @@ public class AssertionServiceImplTest {
         assert assertionService.getAssertionTests(assertion).size() < originalCount;
     }
 
-//    @Test
-//    @Rollback
-//    public void testSaveForAssertionGroup() throws Exception {
-//        AssertionGroup group = new AssertionGroup();
-//        group.setName("Test assertion group");
-//        assertion.setGroups(Collections.singleton(group));
-//
-//        Assertion assertion2 = new Assertion();
-//        assertion2.setName("Second assertion in group");
-//        assertion2.setDescription("Description of second assertion in group");
-//        assertion2.setGroups(Collections.singleton(group));
-//
-//        // save assertion2
-//        assertion2 = assertionService.addTest(assertion2, getRandomTest());
-//        assertion = assertionService.update(assertion);
-//
-//        assertTrue(assertion.getGroups().size() > 0);
-//        assertTrue(assertion2.getGroups().size() > 0);
-//
-//        Assertion retrievedAssertion = assertionService.find(assertion2.getId());
-//        assertTrue(retrievedAssertion.getGroups().contains(group));
-//    }
+    @Test
+    @Rollback
+    public void testSaveForAssertionGroup() throws Exception {
+
+        Assertion assertion2 = new Assertion();
+        assertion2.setName("Second assertion in group");
+        assertion2.setDescription("Description of second assertion in group");
+        // save assertion2
+        assertion2 = assertionService.create(assertion2);
+        assertNotNull(assertion2.getId());
+
+
+        Assertion assertion3 = new Assertion();
+        assertion3.setName("Third assertion in group");
+        assertion3.setDescription("Description of third assertion in group");
+        // save assertion3
+        assertion3 = assertionService.create(assertion3);
+        assertNotNull(assertion3.getId());
+
+        Set<Assertion> assertions = new HashSet<>();
+        assertions.add(assertion);
+        assertions.add(assertion2);
+        AssertionGroup group = new AssertionGroup();
+        group.setName("Test assertion group");
+        group.setAssertions(assertions);
+
+
+        group = (AssertionGroup) entityService.create(group);
+        assertNotNull(group.getId());
+
+        Assertion retrievedAssertion = assertionService.find(assertion2.getId());
+        System.out.println("retrievedAssertion = " + retrievedAssertion);
+        System.out.println("retrievedAssertion.getGroups() = " + retrievedAssertion.getGroups());
+        assertTrue(retrievedAssertion.getGroups().contains(group));
+
+        List<Assertion> retrievedAssertions = assertionService.getAssertionsForGroup(group);
+        System.out.println("retrievedAssertions.size() = " + retrievedAssertions.size());
+        assertTrue("Group must contain assertion", retrievedAssertions.contains(assertion));
+        assertTrue("Group must contain assertion2", retrievedAssertions.contains(assertion2));
+        assertTrue("Group must contain 2 assertions", 2 == retrievedAssertions.size());
+
+        List<AssertionGroup> groups = assertionService.getGroupsForAssertion(assertion2);
+        assertNotNull("Groups must have been retrieved", groups);
+        System.out.println("groups.size() = " + groups.size());
+        assertTrue("Groups must contain current group", groups.contains(group));
+
+        // now assertion3 using add method
+        AssertionGroup updatedGroup = assertionService.addAssertionToGroup(assertion3, group);
+        retrievedAssertions = assertionService.getAssertionsForGroup(updatedGroup);
+        System.out.println("retrievedAssertions.size() = " + retrievedAssertions.size());
+        assertTrue("updatedGroup must contain 3 assertions", 3 == retrievedAssertions.size());
+        for(Assertion a : retrievedAssertions){
+            System.out.println("a.getId() = " + a.getId());
+            System.out.println("a.getName() = " + a.getName());
+        }
+        assertTrue("updatedGroup must contain assertion", retrievedAssertions.contains(assertion));
+        assertTrue("updatedGroup must contain assertion2", retrievedAssertions.contains(assertion2));
+        assertTrue("updatedGroup must contain assertion3", retrievedAssertions.contains(assertion3));
+
+        // now remove assertion 3 using remove method
+        updatedGroup = assertionService.removeAssertionFromGroup(assertion3, updatedGroup);
+        retrievedAssertions = assertionService.getAssertionsForGroup(updatedGroup);
+        System.out.println("retrievedAssertions.size() = " + retrievedAssertions.size());
+        for(Assertion a : retrievedAssertions){
+            System.out.println("a.getId() = " + a.getId());
+            System.out.println("a.getName() = " + a.getName());
+        }
+        assertTrue("updatedGroup must contain 2 assertions", 2 == retrievedAssertions.size());
+        assertTrue("updatedGroup must contain assertion", retrievedAssertions.contains(assertion));
+        assertTrue("updatedGroup must contain assertion2", retrievedAssertions.contains(assertion2));
+        assertTrue("updatedGroup must contain assertion3", ! retrievedAssertions.contains(assertion3));
+
+    }
 
     @After
     public void tearDown() throws Exception {

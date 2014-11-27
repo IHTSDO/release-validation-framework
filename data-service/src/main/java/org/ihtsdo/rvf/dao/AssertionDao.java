@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.dao;
 
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
 
@@ -28,4 +29,12 @@ public interface AssertionDao extends EntityDao<Assertion> {
     List<Test> getTests(Long assertionid);
 
     List<Test> getTests(UUID uuid);
+
+    List<AssertionGroup> getGroupsForAssertion(Assertion assertion);
+
+    List<AssertionGroup> getGroupsForAssertion(Long assertionId);
+
+    List<Assertion> getAssertionsForGroup(AssertionGroup group);
+
+    List<Assertion> getAssertionsForGroup(Long groupId);
 }

@@ -10,7 +10,9 @@ public interface EntityDao<T> {
 
 	T save(T entity);
 
-	T load(Class clazz, Serializable id);
+    T update(T entity);
+
+    T load(Class clazz, Serializable id);
 
     T findByUuid(Class clazz, UUID uuid);
 

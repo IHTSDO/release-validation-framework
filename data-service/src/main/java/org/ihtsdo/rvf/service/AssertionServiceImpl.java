@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.service;
 import org.hibernate.ObjectNotFoundException;
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.helper.MissingEntityException;
@@ -199,5 +200,45 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
     @Override
     public Long count() {
         return super.count(Assertion.class);
+    }
+
+    @Override
+    public List<AssertionGroup> getGroupsForAssertion(Assertion assertion) {
+        return assertionDao.getGroupsForAssertion(assertion);
+    }
+
+    @Override
+    public List<AssertionGroup> getGroupsForAssertion(Long assertionId) {
+        return assertionDao.getGroupsForAssertion(assertionId);
+    }
+
+    @Override
+    public List<Assertion> getAssertionsForGroup(AssertionGroup group) {
+        return assertionDao.getAssertionsForGroup(group);
+    }
+
+    @Override
+    public List<Assertion> getAssertionsForGroup(Long groupId) {
+        return assertionDao.getAssertionsForGroup(groupId);
+    }
+
+    @Override
+    public AssertionGroup addAssertionToGroup(Assertion assertion, AssertionGroup group){
+        // see if group already exists
+        group.getAssertions().add(assertion);
+        assertion.getGroups().add(group);
+        assertionDao.update(assertion);
+
+        return (AssertionGroup) entityService.update(group);
+    }
+
+    @Override
+    public AssertionGroup removeAssertionFromGroup(Assertion assertion, AssertionGroup group){
+        // see if group already exists
+        group.getAssertions().remove(assertion);
+        assertion.getGroups().remove(group);
+        assertionDao.update(assertion);
+
+        return (AssertionGroup) entityService.update(group);
     }
 }

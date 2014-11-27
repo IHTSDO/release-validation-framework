@@ -1,9 +1,6 @@
 package org.ihtsdo.rvf.dao;
 
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionTest;
-import org.ihtsdo.rvf.entity.ReleaseCenter;
-import org.ihtsdo.rvf.entity.Test;
+import org.ihtsdo.rvf.entity.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -82,6 +79,34 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
     public List<Test> getTests(UUID uuid) {
         return getCurrentSession().createQuery("select at.test from AssertionTest as at where at.assertion.uuid = :assertionId")
                 .setParameter("assertionId", uuid).list();
+    }
+
+    @Override
+    public List<AssertionGroup> getGroupsForAssertion(Assertion assertion) {
+//        return getCurrentSession().createQuery("from AssertionGroup as g where g.assertions.id in :assertion")
+//                .setParameter("assertion", assertion).list();
+        return getCurrentSession().createQuery("select g from AssertionGroup g inner join g.assertions a where a.id = :assertionId")
+                .setParameter("assertionId", assertion.getId()).list();
+    }
+
+    @Override
+    public List<AssertionGroup> getGroupsForAssertion(Long assertionId) {
+//        return getCurrentSession().createQuery("from AssertionGroup as g where g.assertions.id in :assertionId")
+//                .setParameter("assertionId", assertionId).list();
+        return getCurrentSession().createQuery("select g from AssertionGroup g inner join g.assertions a where a.id = :assertionId")
+                .setParameter("assertionId", assertionId).list();
+    }
+
+    @Override
+    public List<Assertion> getAssertionsForGroup(AssertionGroup group) {
+        return getCurrentSession().createQuery("select g.assertions from AssertionGroup as g where g.id = :groupId")
+                .setParameter("groupId", group.getId()).list();
+    }
+
+    @Override
+    public List<Assertion> getAssertionsForGroup(Long groupId) {
+        return getCurrentSession().createQuery("select g.assertions from AssertionGroup as g where g.id = :groupId")
+                .setParameter("groupId", groupId).list();
     }
 
     AssertionTest validateAndGetFirstEntry(List<AssertionTest> list){
