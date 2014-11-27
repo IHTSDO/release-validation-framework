@@ -24,9 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * An implementation of a {@link org.ihtsdo.snomed.rvf.importer.AssertionsImporter} that imports older
@@ -41,6 +39,7 @@ public class AssertionsImporterImpl implements AssertionsImporter {
     @Autowired
     protected RvfRestClient restClient;
     protected ObjectMapper objectMapper = new ObjectMapper();
+    protected Map<String, String> lookupMap = new HashMap<>();
 
     /**
      * No args constructor for IOC
@@ -59,7 +58,6 @@ public class AssertionsImporterImpl implements AssertionsImporter {
             List<Element> scriptElements = expression.evaluate(xmlDocument);
             if(scriptElements.size() > 0)
             {
-                int counter =0;
                 // get various values from script element
                 for(Element element : scriptElements)
                 {
@@ -98,11 +96,10 @@ public class AssertionsImporterImpl implements AssertionsImporter {
                         logger.error("Error creating assertion");
                     }
 
-                    counter++;
-                    if(counter > 9){
-                        break;
-                    }
                 }
+
+                // finally print all lookup map contents for debugging - //todo save somewhere?
+                logger.info("lookupMap = " + lookupMap);
             }
             else{
                 logger.error("There are no script elements to import in the XML file provided. Please note that the " +
@@ -134,7 +131,9 @@ public class AssertionsImporterImpl implements AssertionsImporter {
 
         try
         {
-            return restClient.post("assertions", objectMapper.writeValueAsString(assertion));
+            String paramsString = objectMapper.writeValueAsString(assertion);
+            paramsString = paramsString.replaceAll("\"id\":null,", "");
+            return restClient.post("assertions", paramsString);
         }
         catch (IOException e) {
             logger.warn("Nested exception is : " + e.fillInStackTrace());
@@ -152,6 +151,19 @@ public class AssertionsImporterImpl implements AssertionsImporter {
 //            cleanedSql = cleanedSql.replaceAll("<RUNID>", "{{run_id}}");
 //            cleanedSql = cleanedSql.replaceAll("<ASSERTIONUUID>", "{{assertion_id}}");
 //            cleanedSql = cleanedSql.replaceAll("<ASSERTIONTEXT>", "{{assertion_text}}");
+
+            // tokenise and process statement
+            StringTokenizer tokenizer = new StringTokenizer(cleanedSql);
+            while(tokenizer.hasMoreTokens())
+            {
+                String token = tokenizer.nextToken();
+                Map<String, String> schemaMapping = getRvfSchemaMapping(token);
+                if(schemaMapping.keySet().size() > 0){
+                    lookupMap.put(token, schemaMapping.get(token));
+                    // now replace all instances with rvf mapping
+                    cleanedSql = cleanedSql.replaceAll(token, schemaMapping.get(token));
+                }
+            }
 
             cleanedSql = cleanedSql.replaceAll("runid", "run_id");
             cleanedSql = cleanedSql.replaceAll("assertionuuid", "assertion_id");
@@ -216,5 +228,47 @@ public class AssertionsImporterImpl implements AssertionsImporter {
             builder.append(buffer, 0, n);
         }
         return builder.toString();
+    }
+
+    protected Map<String, String> getRvfSchemaMapping(String ratSchema){
+        String rvfSchema = "";
+        String originalRatSchema = ratSchema;
+        if(ratSchema.startsWith("curr_")){
+            rvfSchema = "<PROSPECTIVE>";
+            // we strip the prefix - note we don't include _ in length since strings are 0 indexed
+            ratSchema = ratSchema.substring("curr_".length());
+        }
+        else if(ratSchema.startsWith("prev_")){
+            rvfSchema = "<PREVIOUS>";
+            // we strip the prefix - note we don't include _ in length since strings are 0 indexed
+            ratSchema = ratSchema.substring("prev_".length());
+        }
+
+        if(ratSchema.endsWith("_s")){
+            // we strip the suffix
+            ratSchema = ratSchema.substring(0, ratSchema.length() - 2);
+            rvfSchema = rvfSchema + "." + ratSchema + "_<SNAPSHOT>";
+        }
+        else if(ratSchema.endsWith("_d")){
+            // we strip the suffix
+            ratSchema = ratSchema.substring(0, ratSchema.length() - 2);
+            rvfSchema = rvfSchema + "." + ratSchema + "_<DELTA>";
+        }
+        else if(ratSchema.endsWith("_f")){
+            // we strip the suffix
+            ratSchema = ratSchema.substring(0, ratSchema.length() - 2);
+            rvfSchema = rvfSchema + "." + ratSchema + "_<FULL>";
+        }
+
+        if (rvfSchema.length() > 0) {
+            Map<String, String> map = new HashMap<>();
+            map.put(originalRatSchema, rvfSchema);
+
+            return map;
+        }
+        else{
+            return Collections.EMPTY_MAP;
+        }
+
     }
 }
