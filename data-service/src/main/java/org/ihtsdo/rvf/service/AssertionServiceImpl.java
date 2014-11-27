@@ -224,20 +224,37 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 
     @Override
     public AssertionGroup addAssertionToGroup(Assertion assertion, AssertionGroup group){
-        // see if group already exists
-        group.getAssertions().add(assertion);
-        assertion.getGroups().add(group);
-        assertionDao.update(assertion);
+        /*
+            see if group already exists. We get groups for assertion, instead of assertions for group since getting
+            assertions is likely to return a large number of entites. It is likely that a group might have a large
+            number of assertions
+          */
+        List<AssertionGroup> assertionGroups = getGroupsForAssertion(assertion);
+        if(! assertionGroups.contains(group))
+        {
+            group.getAssertions().add(assertion);
+            assertion.getGroups().add(group);
+            assertionDao.update(assertion);
+        }
 
         return (AssertionGroup) entityService.update(group);
     }
 
     @Override
     public AssertionGroup removeAssertionFromGroup(Assertion assertion, AssertionGroup group){
-        // see if group already exists
-        group.getAssertions().remove(assertion);
-        assertion.getGroups().remove(group);
-        assertionDao.update(assertion);
+        /*
+            see if group already exists. We get groups for assertion, instead of assertions for group since getting
+            assertions is likely to return a large number of entites. It is likely that a group might have a large
+            number of assertions
+          */
+
+        List<AssertionGroup> assertionGroups = getGroupsForAssertion(assertion);
+        if(assertionGroups.contains(group))
+        {
+            group.getAssertions().remove(assertion);
+            assertion.getGroups().remove(group);
+            assertionDao.update(assertion);
+        }
 
         return (AssertionGroup) entityService.update(group);
     }
