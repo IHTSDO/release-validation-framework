@@ -6,7 +6,6 @@ import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
-import org.ihtsdo.rvf.service.EntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -22,8 +21,6 @@ public class AssertionController {
 	private AssertionService assertionService;
     @Autowired
 	private AssertionExecutionService assertionExecutionService;
-    @Autowired
-	private EntityService entityService;
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
@@ -46,18 +43,6 @@ public class AssertionController {
     @ResponseStatus(HttpStatus.OK)
     public Assertion setTestsForAssertion(@PathVariable Long id, @RequestBody(required = false) List<Test> tests) {
 
-//        // verify if IHTSDO exists as a relese centre, otherwise create it
-//        ReleaseCenter releaseCenter = null;
-//        try {
-//            releaseCenter = (ReleaseCenter) entityService.find(ReleaseCenter.class, assertionService.getIhtsdo().getId());
-//        }
-//        catch (MissingEntityException e) {
-//            e.printStackTrace();
-//        }
-//
-//        if(releaseCenter == null){
-//            releaseCenter = (ReleaseCenter) entityService.create(assertionService.getIhtsdo());
-//        }
         Assertion assertion = assertionService.find(id);
         assertionService.addTests(assertion, tests);
 

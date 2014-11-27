@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 @Controller
@@ -20,8 +19,6 @@ public class TestController {
     private EntityService entityService;
     @Autowired
     private AssertionExecutionService assertionExecutionService;
-    @Autowired
-    private DataSource qaDataSource;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     @ResponseBody
@@ -75,7 +72,7 @@ public class TestController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public TestRunItem executeTest(@PathVariable Long id,
-                                   @RequestBody(required = false) Test test, @RequestParam Long runId, @RequestParam String schemaName) {
+                                   @RequestParam Long runId, @RequestParam String schemaName) {
         Test test1 = (Test) entityService.find(Test.class, id);
         assertionExecutionService.setSchemaName(schemaName);
         return assertionExecutionService.executeTest(test1, runId);

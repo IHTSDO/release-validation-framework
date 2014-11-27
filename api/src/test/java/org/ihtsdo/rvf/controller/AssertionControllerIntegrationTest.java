@@ -2,7 +2,9 @@ package org.ihtsdo.rvf.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.ReleaseCenter;
+import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
 import org.junit.After;
@@ -23,6 +25,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -99,8 +102,17 @@ public class AssertionControllerIntegrationTest {
     @Test
     public void testDeleteMissingAssertion() throws Exception {
         Long id = 29367234L;
-//        mockMvc.perform(delete("/assertions/delete/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
+        mockMvc.perform(delete("/assertions/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(delete("/assertions/{id}", id).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(containsString("No entity found with given id " + id)));
+    }
+
+    @Test
+    public void testGetMissingAssertion() throws Exception {
+        Long id = 29367234L;
+        mockMvc.perform(get("/assertions/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
+        mockMvc.perform(get("/assertions/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("No entity found with given id " + id)));
     }
@@ -149,9 +161,15 @@ public class AssertionControllerIntegrationTest {
         Long id = assertion.getId();
         // create and add some tests to assertion
         List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
-        tests.add(getRandomTest());
-        tests.add(getRandomTest());
+        org.ihtsdo.rvf.entity.Test test1 = getRandomTest();
+        assertNotNull(test1.getId());
+        tests.add(test1);
+        org.ihtsdo.rvf.entity.Test test2 = getRandomTest();
+        assertNotNull(test2.getId());
+        tests.add(test2);
+
         String paramsString = objectMapper.writeValueAsString(tests);
+        System.out.println("paramsString = " + paramsString);
         mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -169,10 +187,16 @@ public class AssertionControllerIntegrationTest {
         Long id = assertion.getId();
         // create and add some tests to assertion
         List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
-        tests.add(getRandomTest());
-        tests.add(getRandomTest());
+        org.ihtsdo.rvf.entity.Test test1 = getRandomTest();
+        assertNotNull(test1.getId());
+        tests.add(test1);
+        org.ihtsdo.rvf.entity.Test test2 = getRandomTest();
+        assertNotNull(test2.getId());
+        tests.add(test2);
+
         String paramsString = objectMapper.writeValueAsString(tests);
-//        mockMvc.perform(delete("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
+        System.out.println("paramsString = " + paramsString);
+        mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(delete("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8));
@@ -189,6 +213,7 @@ public class AssertionControllerIntegrationTest {
     private org.ihtsdo.rvf.entity.Test getRandomTest(){
         org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
         test.setName("Random Test " + UUID.randomUUID());
+        test.setCommand(new ExecutionCommand(new Configuration()));
         return (org.ihtsdo.rvf.entity.Test) entityService.create(test);
     }
 }

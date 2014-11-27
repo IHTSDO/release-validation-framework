@@ -53,6 +53,9 @@ public class TestControllerIntegrationTest {
         test = new org.ihtsdo.rvf.entity.Test();
         test.setName("Test Name");
         test.setDescription("Example Test Description");
+        Configuration configuration = new Configuration();
+        configuration.setValue("key1", "value 1");
+        test.setCommand(new ExecutionCommand(configuration));
 
         assert entityService != null;
         assert entityService.count(org.ihtsdo.rvf.entity.Test.class) == 0;
@@ -85,7 +88,7 @@ public class TestControllerIntegrationTest {
     @Test
     public void testDeleteTest() throws Exception {
         Long id = test.getId();
-//        mockMvc.perform(delete("/tests/delete/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
+//        mockMvc.perform(delete("/tests/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(delete("/tests/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -93,7 +96,7 @@ public class TestControllerIntegrationTest {
     @Test
     public void testDeleteMissingTest() throws Exception {
         Long id = 29367234L;
-//        mockMvc.perform(delete("/assertions/delete/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
+        mockMvc.perform(delete("/tests/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(delete("/tests/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("No entity found with given id " + id)));
@@ -102,7 +105,14 @@ public class TestControllerIntegrationTest {
     @Test
     public void testCreateTest() throws Exception {
 
+        org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
+        test.setName("Test Name");
+        test.setDescription("Example Test Description");
+        Configuration configuration = new Configuration();
+        configuration.setValue("key1", "value 1");
+        test.setCommand(new ExecutionCommand(configuration));
         String paramsString = objectMapper.writeValueAsString(test);
+
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(post("/tests").content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(post("/tests").content(paramsString).contentType(MediaType.APPLICATION_JSON))
@@ -153,11 +163,9 @@ public class TestControllerIntegrationTest {
         String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
         org.ihtsdo.rvf.entity.Test executableTest = new org.ihtsdo.rvf.entity.Test();
         executableTest.setName(execTestName);
-//        executableTest.setConfiguration(configuration);
         executableTest.setCommand(command);
         executableTest.setType(TestType.SQL);
         org.ihtsdo.rvf.entity.Test returnedTest = objectMapper.readValue(mockMvc.perform(post("/tests").content(objectMapper.writeValueAsString(executableTest)).contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse().getContentAsString(), org.ihtsdo.rvf.entity.Test.class);
-//        executableTest = (org.ihtsdo.rvf.entity.Test) entityService.create(executableTest);
         Long executableTestId = returnedTest.getId();
         assert executableTestId != null;
 
@@ -167,6 +175,7 @@ public class TestControllerIntegrationTest {
         String paramsString = objectMapper.writeValueAsString(returnedTest);
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1").param("schemaName", "postqa").contentType(MediaType.APPLICATION_JSON)).andDo(print());
+        // this test will fail unless we have a SNOMED CT database configured
         mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1").param("schemaName", "postqa").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
