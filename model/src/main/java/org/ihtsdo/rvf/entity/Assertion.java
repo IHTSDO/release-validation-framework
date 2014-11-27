@@ -4,6 +4,8 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -28,13 +30,8 @@ public class Assertion {
 	private String keywords;
     @Column(columnDefinition = "BINARY(16)")
     private UUID uuid = UUID.randomUUID();
-//    @ManyToMany(fetch = FetchType.EAGER)
-//    @JoinTable(
-//            name="group_assertion_link",
-//            joinColumns = @JoinColumn( name="assertion_id"),
-//            inverseJoinColumns = @JoinColumn( name="group_id")
-//    )
-//    private Set<AssertionGroup> groups;
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "assertions")
+    private Set<AssertionGroup> groups = new HashSet<>();
 
 	public Assertion() {
 	}
@@ -114,33 +111,12 @@ public class Assertion {
         this.uuid = uuid;
     }
 
-//    public Set<AssertionGroup> getGroups() {
-//        return groups;
-//    }
-//
-//    public void setGroups(Set<AssertionGroup> groups) {
-//        this.groups = groups;
-//    }
-//
-//    /**
-//     * Adds a group to this assertion. Note {@link org.ihtsdo.rvf.entity.Assertion} is always the owner of the bi-directional
-//     * group-assertions link, so there should not be addAssertion method on {@link org.ihtsdo.rvf.entity.AssertionGroup}.
-//     * @param group the group to be added
-//     */
-//    @Transient
-//    public void addGroup(AssertionGroup group){
-//        this.getGroups().add(group);
-//        group.getAssertions().add(this);
-//    }
-//
-//    /**
-//     * Removes a group from this assertion. Note {@link org.ihtsdo.rvf.entity.Assertion} is always the owner of the bi-directional
-//     * group-assertions link, so there should not be removeAssertion method on {@link org.ihtsdo.rvf.entity.AssertionGroup}.
-//     * @param group the group to be added
-//     */
-//    @Transient
-//    public void removeGroup(AssertionGroup group){
-//        this.getGroups().remove(group);
-//        group.getAssertions().remove(this);
-//    }
+    public Set<AssertionGroup> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<AssertionGroup> groups) {
+        this.groups = groups;
+    }
+
 }

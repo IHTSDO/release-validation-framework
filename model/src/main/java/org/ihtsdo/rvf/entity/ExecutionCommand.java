@@ -28,7 +28,7 @@ public class ExecutionCommand {
     @Transient
     byte[] code = null;
     @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "command")
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "command")
     Test test;
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name="command_statements", joinColumns=@JoinColumn(name="command_id"))

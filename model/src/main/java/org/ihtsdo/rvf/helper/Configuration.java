@@ -22,7 +22,7 @@ public class Configuration {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "configuration")
     @JsonManagedReference
     Set<ConfigurationItem> items = new HashSet<>();
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "configuration")
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "configuration")
     @JsonBackReference
     ExecutionCommand command;
 
