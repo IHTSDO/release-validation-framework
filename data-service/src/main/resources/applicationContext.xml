@@ -21,15 +21,25 @@
 				<!-- Default path to override properties file -->
 				<prop key="dataServicePropertiesPath">classpath:data-service.properties</prop>
 			</props>
-		</property> 
+		</property>
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>
 	</bean>
+    <bean id="dataServicePropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:data-service-defaults.properties</value>
+            </list>
+        </property>
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="order" value="1"/>
+    </bean>
 
 	<bean id="applicationContextConfigurer" class="org.ihtsdo.context.OrderedPropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
-				<value>classpath*:snomed-db.properties</value>
-				<value>classpath*:execution-service.properties</value>
+				<!--<value>classpath*:snomed-db.properties</value>-->
+				<!--<value>classpath*:execution-service.properties</value>-->
 				<!-- Default properties file -->
 				<value>classpath:data-service-defaults.properties</value>
 				<!-- Override properties file -->
