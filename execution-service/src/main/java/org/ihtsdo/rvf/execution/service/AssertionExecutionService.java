@@ -13,17 +13,17 @@ import java.util.Collection;
  */
 public interface AssertionExecutionService {
 
-    TestRunItem executeAssertionTest(AssertionTest assertionTest, Long executionId);
+    TestRunItem executeAssertionTest(AssertionTest assertionTest, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertions, Long executionId);
+    Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertions, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    Collection<TestRunItem> executeAssertion(Assertion assertion, Long executionId);
+    Collection<TestRunItem> executeAssertion(Assertion assertion, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, Long executionId);
+    Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    TestRunItem executeTest(Test test, Long executionId);
+    TestRunItem executeTest(Test test, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId);
+    Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    void setSchemaName(String schemaName);
+//    void setSchemaName(String schemaName);
 }

@@ -12,11 +12,19 @@
 
 	<context:annotation-config/>
 	<tx:annotation-driven/>
-
-    <import resource="applicationContext.xml"/>
+    <bean id="executionServicePropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:execution-service.properties</value>
+            </list>
+        </property>
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="order" value="1"/>
+    </bean>
 
 	<!-- value replacement taken care of by Configurer in applicationContext.xml -->
-	<bean id="qaDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	<bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${rvf.jdbc.driverClassName}"/>
 		<property name="url" value="${rvf.jdbc.url}"/>
 		<property name="defaultCatalog" value="${rvf.master.schema.name}"/>
@@ -39,6 +47,11 @@
 		<property name="assertionDetailsColumnName" value="${rvf.assertion.details.column.name}"/>
 		<property name="assertionIdColumnName" value="${rvf.assertion.id.column.name}"/>
 		<property name="assertionNameColumnName" value="${rvf.assertion.name.column.name}"/>
+		<property name="deltaTableSuffix" value="${rvf.delta.table.suffix}"/>
+		<property name="snapshotTableSuffix" value="${rvf.snapshot.table.suffix}"/>
+		<property name="fullTableSuffix" value="${rvf.full.table.suffix}"/>
 	</bean>
+
+    <import resource="applicationContext.xml"/>
 
 </beans>
