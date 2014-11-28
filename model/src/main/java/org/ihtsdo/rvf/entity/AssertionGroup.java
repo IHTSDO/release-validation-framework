@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "assertion_group")
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = AssertionGroup.class)
 public class AssertionGroup {
 
     @Id

@@ -18,7 +18,7 @@ import java.util.UUID;
 @Entity
 @XmlRootElement(name = "assertion")
 @Table(name = "assertion")
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = Assertion.class)
 public class Assertion {
 
 	@Id
