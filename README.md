@@ -9,6 +9,12 @@ git clone https://github.com/IHTSDO/release-validation-framework.git
 mvn clean install
 ```
 
+How to use the API
+--------------------
+While more comprehensive documentation is being prepared, you can find examples of how use the API in the test cases 
+included in the API module. If you are not a Java developer and want to access the API from a non Java environment, 
+then refer to the curl tests/examples in the API-Demo module.
+
 Testing Instructions
 --------------------
 To run unit tests use: 
