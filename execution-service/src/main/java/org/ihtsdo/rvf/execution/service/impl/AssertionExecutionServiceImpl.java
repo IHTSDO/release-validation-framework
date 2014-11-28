@@ -301,7 +301,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
             }
 
             // get file from jar and write to tmp directory, so we can prepend sql statements and set default schema
-            File file1 = new File(AssertionExecutionServiceImpl.class.getResource("/sql/create-tables-mysql.sql").getFile());
+            InputStream is = getClass().getResourceAsStream("/sql/create-tables-mysql.sql");
             File outputFolder = new File(FileUtils.getTempDirectoryPath(), "scripts_"+versionName);
             logger.info("Setting output folder location = " + outputFolder.getAbsolutePath());
             if(! outputFolder.exists() && outputFolder.isDirectory()) {
@@ -314,12 +314,12 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
             FileUtils.writeStringToFile(outputFile, "drop database if exists rvf_int_"+versionName+";\n", true);
             FileUtils.writeStringToFile(outputFile, "create database if not exists rvf_int_"+versionName+";\n", true);
             FileUtils.writeStringToFile(outputFile, "use rvf_int_"+versionName+";\n", true);
-            FileUtils.writeLines(outputFile, FileUtils.readLines(file1), true);
+            FileUtils.writeLines(outputFile, IOUtils.readLines(is), true);
 
-            File file2 = new File(AssertionExecutionServiceImpl.class.getResource("/sql/load-data-mysql.sql").getFile());
+            InputStream is2 = getClass().getResourceAsStream("/sql/load-data-mysql.sql");
             File outputFile2 = new File(outputFolder.getAbsolutePath(), "load-data-mysql.sql");
             FileUtils.writeStringToFile(outputFile2, "use rvf_int_"+versionName+";\n", true);
-            for(String line : FileUtils.readLines(file2))
+            for(String line : IOUtils.readLines(is2))
             {
                 // process line and add to output file
                 line = line.replaceAll("<release_version>", versionName);
