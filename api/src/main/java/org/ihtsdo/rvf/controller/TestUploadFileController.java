@@ -1,6 +1,13 @@
 package org.ihtsdo.rvf.controller;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
+import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.util.TestRunItem;
+import org.ihtsdo.rvf.helper.MissingEntityException;
+import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.validation.ManifestFile;
 import org.ihtsdo.rvf.validation.TestReportable;
 import org.ihtsdo.rvf.validation.ValidationTestRunner;
@@ -10,17 +17,16 @@ import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.Date;
+import java.util.*;
 
 /**
  * The controller that handles uploaded files for the validation to run
@@ -32,6 +38,11 @@ public class TestUploadFileController {
 
 	@Autowired
 	private ValidationTestRunner validationRunner;
+    @Autowired
+    private AssertionService assertionService;
+    @Autowired
+    private AssertionExecutionService assertionExecutionService;
+    private String dataFolderName = "rvf-api";
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
@@ -98,6 +109,114 @@ public class TestUploadFileController {
 		return null;
 	}
 
+	@RequestMapping(value = "/run-post", method = RequestMethod.POST)
+	@ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Object> runPostTestPackage(
+            @RequestParam(value = "file") MultipartFile file,
+			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
+			@RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
+			@RequestParam(value = "groups") List<AssertionGroup> groups,
+            @RequestParam(value = "prospectiveReleaseVersion") String prospectiveReleaseVersion,
+            @RequestParam(value = "previousReleaseVersion") String previousReleaseVersion,
+            @RequestParam(value = "runId") Long runId) throws IOException {
+
+        Map<String , Object> responseMap = new HashMap<>();
+
+        // load the filename
+		String filename = file.getOriginalFilename();
+        System.out.println("filename = " + filename);
+
+		final File tempFile = File.createTempFile(filename, ".zip");
+		tempFile.deleteOnExit();
+		if (!filename.endsWith(".zip")) {
+            responseMap.put("type", "pre");
+            responseMap.put("assertionsFailed", 0);
+            responseMap.put("report", "Post condition test package has to be zipped up");
+            return responseMap;
+		}
+
+		// set up the response in order to strean directly to the response
+        File dataFolder = new File(FileUtils.getTempDirectoryPath(), dataFolderName);
+        if(!dataFolder.exists()){
+            if(dataFolder.mkdir()){
+                LOGGER.info("Successfully created dataFolder = " + dataFolder.getAbsolutePath());
+            }
+        }
+        File reportFile = new File(dataFolder.getAbsolutePath(), "manifest_validation_"+runId+".txt");
+        PrintWriter writer = new PrintWriter(reportFile);
+
+		// must be a zip
+		copyUploadToDisk(file, tempFile);
+		ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+
+		TestReportable report;
+
+		if (manifestFile == null) {
+			report = validationRunner.execute(resourceManager, writer, writeSucceses);
+		} else {
+			String originalFilename = manifestFile.getOriginalFilename();
+			final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
+			tempManifestFile.deleteOnExit();
+			copyUploadToDisk(manifestFile, tempManifestFile);
+
+			ManifestFile mf = new ManifestFile(tempManifestFile);
+			report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+		}
+
+        // verify if manifest is valid
+        if(report.getNumErrors() > 0){
+
+            LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+            responseMap.put("type", "pre");
+            responseMap.put("assertionsRun", report.getNumTestRuns());
+            responseMap.put("assertionsFailed", report.getNumErrors());
+            responseMap.put("reportUrl", reportFile.getName());
+            responseMap.put("report", report);
+
+            return responseMap;
+        }
+
+        // if we are here, assume manifest is valid, so load data from file
+        assertionExecutionService.loadSnomedData(prospectiveReleaseVersion, false, tempFile);
+        assertionExecutionService.loadSnomedData(previousReleaseVersion, false, tempFile);
+
+        Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
+        int failedAssertionCount = 0;
+        Set<Long> assertionIds = new HashSet<>();
+        for(AssertionGroup group : groups)
+        {
+            for(Assertion assertion : assertionService.getAssertionsForGroup(group)){
+                assertionIds.add(assertion.getId());
+            }
+        }
+        for (Long id: assertionIds) {
+            try
+            {
+                Assertion assertion = assertionService.find(id);
+                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
+                        prospectiveReleaseVersion, previousReleaseVersion));
+                // get only first since we have 1:1 correspondence between Assertion and Test
+                if(items.size() == 1){
+                    TestRunItem runItem = items.get(0);
+                    if(runItem.isFailure()){
+                        failedAssertionCount++;
+                    }
+                }
+                map.put(assertion, items);
+            }
+            catch (MissingEntityException e) {
+                failedAssertionCount++;
+            }
+        }
+
+        responseMap.put("assertions", map);
+        responseMap.put("assertionsRun", map.keySet().size());
+        responseMap.put("assertionsFailed", failedAssertionCount);
+
+        return responseMap;
+	}
+
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity uploadPreTestPackage(@RequestParam(value = "file") MultipartFile file,
@@ -134,6 +253,13 @@ public class TestUploadFileController {
 
 		return null;
 	}
+
+    @RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public FileSystemResource getFile(@PathVariable String id) {
+        return new FileSystemResource(new File(System.getProperty("java.io.tmpdir"), dataFolderName +
+                System.getProperty("file.separator") + id));
+    }
 
 	private void copyUploadToDisk(MultipartFile file, File tempFile) throws IOException {
 		try (FileOutputStream out = new FileOutputStream(tempFile)) {

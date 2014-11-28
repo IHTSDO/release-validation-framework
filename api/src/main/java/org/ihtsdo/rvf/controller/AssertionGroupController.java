@@ -44,7 +44,7 @@ public class AssertionGroupController {
     @RequestMapping(value = "{id}/assertions", method = RequestMethod.POST)
 	@ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = true) List<Assertion> assertions) {
+    public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<Assertion> assertions) {
 
         AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
         for(Assertion assertion : assertions){
@@ -57,7 +57,7 @@ public class AssertionGroupController {
     @RequestMapping(value = "{id}/assertions", method = RequestMethod.DELETE)
 	@ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup removeAssertionsFromGroup(@PathVariable Long id, @RequestBody(required = true) List<Assertion> assertions) {
+    public AssertionGroup removeAssertionsFromGroup(@PathVariable Long id, @RequestBody(required = false) List<Assertion> assertions) {
 
         AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
         for(Assertion assertion : assertions){
