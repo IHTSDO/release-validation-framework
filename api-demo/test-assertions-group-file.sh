@@ -63,34 +63,29 @@ echo "Return assertion with specified id"
 callURL GET ${api}/assertions/${currentAssertion}
 echo
 
-echo "Return assertion with specified id as XML"
-curl --header "Accept: application/xml" ${api}/assertions/1
-echo
-
-echo "Returning assertion with updated name"
-callURL PUT ${api}/assertions/${currentAssertion} json_files/update_assertion_name.json
-echo
-
-askContinue
-
-echo "Creating sample tests"
-callURL POST ${api}/tests json_files/create_test_1.json
-callURL POST ${api}/tests json_files/create_test_2.json
-echo
-
-echo "Linking tests with assertion"
-callURL POST ${api}/assertions/${currentAssertion}/tests json_files/link_tests_to_assertion.json
+echo "Create & Linking executable tests with assertion"
+callURL POST ${api}/assertions/${currentAssertion}/tests json_files/executable_test.json
 echo
 
 echo "Getting tests associated with assertion"
 callURL GET ${api}/assertions/${currentAssertion}/tests
 echo
 
-echo "Deleting assertion with specified id"
-callURL DELETE ${api}/assertions/1
+askContinue
+
+echo "Creating a new Assertion Group"
+curl -X POST --data "name=TestAssertionGroup" ${api}/groups
 echo
 
+currentGroup=1
 
-echo "Return list of all assertions - should be missing assertion with id 1"
-callURL GET ${api}/assertions/
+echo "Create & Linking assertions with group"
+callURL POST ${api}/groups/${currentGroup}/assertions json_files/link_assertions_to_group.json
 echo
+
+packageToTest="SnomedCT_test1_INT_20140131.zip"
+echo "Upload Release Pack and run tests using group id"
+#echo -e `curl -F file=@${packageToTest} ${api}/test-file` | tr -d '"'| tee report.csv
+# load data from external file
+groups= cat json_files/groups_to_execute.json
+curl -X POST -F writeSuccesses="true" -F prospectiveReleaseVersion="20140731" -F previousReleaseVersion="20140731" -F runId="1" -F groups=${groups} -F file=@${packageToTest} ${api}/run-post

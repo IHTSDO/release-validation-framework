@@ -1,4 +1,10 @@
 {
-  "name":"Assertion 1",
-  "description":"My first assertion!"
+    "name": "Concept has 1 defining relationship but is not primitive",
+    "statement": null,
+    "description": "Concept has 1 defining relationship but is not primitive",
+    "docLink": null,
+    "effectiveFrom": null,
+    "keywords": null,
+    "uuid": "d383b8d2-7297-4607-94a1-2fbd2a489f3b",
+    "groups": []
 }
