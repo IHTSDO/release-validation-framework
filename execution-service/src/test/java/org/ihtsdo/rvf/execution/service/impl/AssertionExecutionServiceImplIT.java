@@ -80,7 +80,7 @@ public class AssertionExecutionServiceImplIT {
         assert entityService.count(AssertionTest.class) > 0;
     }
 
-//    @Test
+    @Test
     public void testExecuteAssertionTest() throws Exception {
         assert assertionExecutionService != null;
         assert dataSource != null;
@@ -115,7 +115,7 @@ public class AssertionExecutionServiceImplIT {
         assertTrue("Test must have passed", !runItem.isFailure());
     }
 
-//    @Test
+    @Test
     public void testExecuteAssertionTestWithMultipleStatements() throws Exception {
         assert assertionExecutionService != null;
         assert dataSource != null;
