@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertNotNull;
@@ -77,7 +80,7 @@ public class AssertionExecutionServiceImplIT {
         assert entityService.count(AssertionTest.class) > 0;
     }
 
-    @Test
+//    @Test
     public void testExecuteAssertionTest() throws Exception {
         assert assertionExecutionService != null;
         assert dataSource != null;
@@ -112,7 +115,7 @@ public class AssertionExecutionServiceImplIT {
         assertTrue("Test must have passed", !runItem.isFailure());
     }
 
-    @Test
+//    @Test
     public void testExecuteAssertionTestWithMultipleStatements() throws Exception {
         assert assertionExecutionService != null;
         assert dataSource != null;
@@ -147,5 +150,33 @@ public class AssertionExecutionServiceImplIT {
         TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "rvf_int_20140731", "postqa");
         assertNotNull(runItem);
         assertTrue("Test must have passed", !runItem.isFailure());
+    }
+
+    @Test
+    public void testLoadSctData() throws Exception {
+        assert assertionExecutionService != null;
+        assert dataSource != null;
+        assert snomedDataSource != null;
+
+        File inputFile = new File(AssertionExecutionServiceImplIT.class.getResource("/SnomedCT_test1_INT_20140131.zip").toURI());
+        assertNotNull(inputFile);
+        String versionName = "20140131";
+        String schemaName =assertionExecutionService.loadSnomedData(versionName, true, inputFile);
+        Connection connection = snomedDataSource.getConnection();
+        ResultSet catalogs = connection.getMetaData().getCatalogs();
+        boolean exists = false;
+        while(catalogs.next())
+        {
+            String catalogName = catalogs.getString(1);
+            if(catalogName.equals(schemaName)){
+                exists = true;
+                break;
+            }
+        }
+        catalogs.close();
+        connection.close();
+
+        assertTrue("Schema name must exist : " + schemaName, exists);
+
     }
 }

@@ -2,6 +2,9 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
@@ -16,14 +19,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.IOException;
+import java.io.*;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * An implementation of the {@link org.ihtsdo.rvf.execution.service.AssertionExecutionService}
@@ -70,9 +77,14 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
     }
 
     @Override
-    public Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertions, Long executionId,
+    public Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertionTests, Long executionId,
                                                          String prospectiveReleaseVersion, String previousReleaseVersion) {
-        return null;
+        Collection<TestRunItem> items = new ArrayList<>();
+        for(AssertionTest at: assertionTests){
+            items.add(executeAssertionTest(at, executionId, prospectiveReleaseVersion, previousReleaseVersion));
+        }
+
+        return items;
     }
 
     @Override
@@ -93,8 +105,12 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
     @Override
     public Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, Long executionId,
                                                      String prospectiveReleaseVersion, String previousReleaseVersion) {
-        return null;
+        Collection<TestRunItem> items = new ArrayList<>();
+        for(Assertion assertion : assertions){
+            items.addAll(executeAssertion(assertion, executionId, prospectiveReleaseVersion, previousReleaseVersion));
+        }
 
+        return items;
     }
 
     @Override
@@ -252,8 +268,116 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
     @Override
     public Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId,
                                                 String prospectiveReleaseVersion, String previousReleaseVersion) {
-        return null;
+        Collection<TestRunItem> items = new ArrayList<>();
+        for(Test test: tests){
+            items.add(executeTest(test, executionId, prospectiveReleaseVersion, previousReleaseVersion));
+        }
 
+        return items;
+    }
+
+    @Override
+    public String loadSnomedData(String versionName, boolean purgeExisting, File zipDataFile){
+
+        Calendar startTime = Calendar.getInstance();
+        String createdSchemaName = "rvf_int_"+versionName;
+        try
+        {
+            boolean alreadyExists = false;
+            // first verify if database with name already exists, if it does then we skip
+            ResultSet catalogs = snomedDataSource.getConnection().getMetaData().getCatalogs();
+            while(catalogs.next())
+            {
+                String schemaName = catalogs.getString(1);
+                if((createdSchemaName).equals(schemaName)){
+                    alreadyExists = true;
+                    break;
+                }
+            }
+            catalogs.close();
+
+            if(alreadyExists && !purgeExisting){
+                return createdSchemaName;
+            }
+
+            // get file from jar and write to tmp directory, so we can prepend sql statements and set default schema
+            File file1 = new File(AssertionExecutionServiceImpl.class.getResource("/sql/create-tables-mysql.sql").getFile());
+            File outputFolder = new File(FileUtils.getTempDirectoryPath(), "scripts_"+versionName);
+            logger.info("Setting output folder location = " + outputFolder.getAbsolutePath());
+            if(! outputFolder.exists() && outputFolder.isDirectory()) {
+                outputFolder.mkdir();
+            } else {
+                logger.info("Output folder already exists");
+            }
+            File outputFile = new File(outputFolder.getAbsolutePath(), "create-tables-mysql.sql");
+            // add scheme information
+            FileUtils.writeStringToFile(outputFile, "drop database if exists rvf_int_"+versionName+";\n", true);
+            FileUtils.writeStringToFile(outputFile, "create database if not exists rvf_int_"+versionName+";\n", true);
+            FileUtils.writeStringToFile(outputFile, "use rvf_int_"+versionName+";\n", true);
+            FileUtils.writeLines(outputFile, FileUtils.readLines(file1), true);
+
+            File file2 = new File(AssertionExecutionServiceImpl.class.getResource("/sql/load-data-mysql.sql").getFile());
+            File outputFile2 = new File(outputFolder.getAbsolutePath(), "load-data-mysql.sql");
+            FileUtils.writeStringToFile(outputFile2, "use rvf_int_"+versionName+";\n", true);
+            for(String line : FileUtils.readLines(file2))
+            {
+                // process line and add to output file
+                line = line.replaceAll("<release_version>", versionName);
+                line = line.replaceAll("<data_location>", outputFolder.getAbsolutePath());
+                FileUtils.writeStringToFile(outputFile2, line, true);
+            }
+
+            // extract SNOMED CT content from zip file
+            extractZipFile(zipDataFile, outputFolder.getAbsolutePath());
+
+            logger.info("Executing script located at : " + outputFile.getAbsolutePath());
+            Connection connection = snomedDataSource.getConnection();
+            ScriptRunner runner = new ScriptRunner(connection);
+            InputStreamReader reader = new InputStreamReader(new FileInputStream(outputFile));
+            runner.runScript(reader);
+            reader.close();
+
+            logger.info("Executing script located at : " + outputFile2.getAbsolutePath());
+            InputStreamReader reader2 = new InputStreamReader(new FileInputStream(outputFile2));
+            runner.runScript(reader2);
+            reader2.close();
+            connection.close();
+        }
+        catch (SQLException e) {
+            logger.error("Error creating connection to database. Nested exception is : " + e.fillInStackTrace());
+        }
+        catch (IOException e) {
+            logger.error("Unable to read sql file. Nested exception is : " + e.fillInStackTrace());
+        }
+
+        logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/6000) + " minutes.");
+        return createdSchemaName;
+    }
+
+    protected void extractZipFile(File file, String outputDir){
+        try {
+            ZipFile zipFile = new ZipFile(file);
+
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                File entryDestination = new File(outputDir,  entry.getName());
+                entryDestination.getParentFile().mkdirs();
+                if (entry.isDirectory())
+                    entryDestination.mkdirs();
+                else {
+                    InputStream in = zipFile.getInputStream(entry);
+                    OutputStream out = new FileOutputStream(entryDestination);
+                    IOUtils.copy(in, out);
+                    IOUtils.closeQuietly(in);
+                    IOUtils.closeQuietly(out);
+                }
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            logger.warn("Nested exception is : " + e.fillInStackTrace());
+        }
     }
 
     public void setQaResulTableName(String qaResulTableName) {
