@@ -113,6 +113,49 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
     }
 
     /**
+     * Method that uses a {@link java.io.InputStream}  to copy a known/published release pack into the data folder.
+     * This method is not intended to be used
+     * for uploading prospective releases since they do not need to be stored for later use.
+     *
+     * @param inputStream the release as an input stream
+     * @param overWriteExisting if existing file has to over written
+     * @param purgeExistingDatabase if existing database must be recreated
+     * @return result of the copy operation - false if there are errors.
+     */
+    @Override
+    public boolean uploadPublishedReleaseData(InputStream inputStream, String fileName,
+                                              boolean overWriteExisting, boolean purgeExistingDatabase) {
+        boolean result = false;
+        // copy release pack zip to data location
+        try {
+            if(overWriteExisting){
+                File destinationFile = new File(sctDataFolder, fileName);
+                IOUtils.copy(inputStream, new FileOutputStream(destinationFile));
+                logger.info("Release file copied to : " + destinationFile.getAbsolutePath());
+                result = true;
+            }
+            else{
+                // verify release pack exists
+                File file = new File(sctDataFolder.getAbsolutePath(), fileName);
+                if(file.exists()){
+                    logger.info("Release file already exists at : " + file.getAbsolutePath());
+
+                    result = true;
+                }
+            }
+
+            // regenerate releaseLookup which takes care of data loading if the release not been loaded into the database
+            populateLookupMap(purgeExistingDatabase);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            logger.warn("Error copying release file to " + sctDataFolder +". Nested exception is : \n" + e.fillInStackTrace());
+        }
+
+        return result;
+    }
+
+    /**
      * Method that copies a known/published release pack into the data folder. This method is not intended to be used
      * for uploading prospective releases since they do not need to be stored for later use.
      *

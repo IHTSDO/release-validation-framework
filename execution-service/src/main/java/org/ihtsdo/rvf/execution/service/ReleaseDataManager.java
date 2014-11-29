@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.execution.service;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Set;
 
 /**
@@ -9,6 +10,9 @@ import java.util.Set;
  * without security, because it would allow anonymous users to download SNOMED CT data.
  */
 public interface ReleaseDataManager {
+
+    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName,
+                                       boolean overWriteExisting, boolean purgeExistingDatabase);
 
     boolean uploadPublishedReleaseData(File releasePackZip, boolean overWriteExisting, boolean purgeExistingDatabase);
 
