@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -43,6 +44,8 @@ public class TestUploadFileController {
     @Autowired
     private AssertionExecutionService assertionExecutionService;
     private String dataFolderName = "rvf-api";
+    @Autowired
+    ReleaseDataManager releaseDataManager;
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
@@ -177,9 +180,17 @@ public class TestUploadFileController {
             return responseMap;
         }
 
-        // if we are here, assume manifest is valid, so load data from file
-        assertionExecutionService.loadSnomedData(prospectiveReleaseVersion, false, tempFile);
-        assertionExecutionService.loadSnomedData(previousReleaseVersion, false, tempFile);
+        /*
+            If we are here, assume manifest is valid, so load data from file.
+          */
+        if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion)){
+            releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile);
+        }
+
+        if(!releaseDataManager.isKnownRelease(previousReleaseVersion)){
+            // the previous published release must already be present in database, otherwise we throw an error!
+            throw new IllegalArgumentException("Hey! Please load release data first for version : " + previousReleaseVersion);
+        }
 
         Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
         int failedAssertionCount = 0;
