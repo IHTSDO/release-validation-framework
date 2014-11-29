@@ -16,9 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertNotNull;
@@ -40,7 +37,6 @@ public class AssertionExecutionServiceImplIT {
     @Autowired
     private AssertionService assertionService;
     private Assertion assertion;
-    private ReleaseCenter releaseCenter;
     private AssertionTest assertionTest;
     private org.ihtsdo.rvf.entity.Test test;
 
@@ -61,14 +57,6 @@ public class AssertionExecutionServiceImplIT {
         assert test != null;
         assert test.getId() != null;
         assert entityService.count(org.ihtsdo.rvf.entity.Test.class) > 0;
-
-        // create release centre
-        releaseCenter = new ReleaseCenter();
-        releaseCenter.setName("Test release centre 1");
-        releaseCenter = (ReleaseCenter) entityService.create(releaseCenter);
-        assert releaseCenter != null;
-        assert releaseCenter.getId() != null;
-        assert entityService.count(releaseCenter.getClass()) > 0;
 
         //create assertion test
         assertionTest = new AssertionTest();
@@ -149,34 +137,6 @@ public class AssertionExecutionServiceImplIT {
         // set both prospective and previous release
         TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "rvf_int_20140731", "postqa");
         assertNotNull(runItem);
-        assertTrue("Test must have passed", !runItem.isFailure());
-    }
-
-    @Test
-    public void testLoadSctData() throws Exception {
-        assert assertionExecutionService != null;
-        assert dataSource != null;
-        assert snomedDataSource != null;
-
-        File inputFile = new File(AssertionExecutionServiceImplIT.class.getResource("/SnomedCT_test1_INT_20140131.zip").toURI());
-        assertNotNull(inputFile);
-        String versionName = "20140131";
-        String schemaName =assertionExecutionService.loadSnomedData(versionName, true, inputFile);
-        Connection connection = snomedDataSource.getConnection();
-        ResultSet catalogs = connection.getMetaData().getCatalogs();
-        boolean exists = false;
-        while(catalogs.next())
-        {
-            String catalogName = catalogs.getString(1);
-            if(catalogName.equals(schemaName)){
-                exists = true;
-                break;
-            }
-        }
-        catalogs.close();
-        connection.close();
-
-        assertTrue("Schema name must exist : " + schemaName, exists);
-
+        assertTrue("Test must have passed", runItem.isFailure());
     }
 }

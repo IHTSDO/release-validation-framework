@@ -10,6 +10,7 @@ import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -140,8 +141,6 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
                 try
                 {
                     String[] parts = {""};
-
-
                     if(command.getStatements().size() == 0)
                     {
                         String sql = command.getTemplate();
@@ -274,110 +273,6 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
         }
 
         return items;
-    }
-
-    @Override
-    public String loadSnomedData(String versionName, boolean purgeExisting, File zipDataFile){
-
-        Calendar startTime = Calendar.getInstance();
-        String createdSchemaName = "rvf_int_"+versionName;
-        try
-        {
-            boolean alreadyExists = false;
-            // first verify if database with name already exists, if it does then we skip
-            ResultSet catalogs = snomedDataSource.getConnection().getMetaData().getCatalogs();
-            while(catalogs.next())
-            {
-                String schemaName = catalogs.getString(1);
-                if((createdSchemaName).equals(schemaName)){
-                    alreadyExists = true;
-                    break;
-                }
-            }
-            catalogs.close();
-
-            if(alreadyExists && !purgeExisting){
-                return createdSchemaName;
-            }
-
-            // get file from jar and write to tmp directory, so we can prepend sql statements and set default schema
-            InputStream is = getClass().getResourceAsStream("/sql/create-tables-mysql.sql");
-            File outputFolder = new File(FileUtils.getTempDirectoryPath(), "scripts_"+versionName);
-            logger.info("Setting output folder location = " + outputFolder.getAbsolutePath());
-            if(! outputFolder.exists() && outputFolder.isDirectory()) {
-                outputFolder.mkdir();
-            } else {
-                logger.info("Output folder already exists");
-            }
-            File outputFile = new File(outputFolder.getAbsolutePath(), "create-tables-mysql.sql");
-            // add scheme information
-            FileUtils.writeStringToFile(outputFile, "drop database if exists rvf_int_"+versionName+";\n", true);
-            FileUtils.writeStringToFile(outputFile, "create database if not exists rvf_int_"+versionName+";\n", true);
-            FileUtils.writeStringToFile(outputFile, "use rvf_int_"+versionName+";\n", true);
-            FileUtils.writeLines(outputFile, IOUtils.readLines(is), true);
-
-            InputStream is2 = getClass().getResourceAsStream("/sql/load-data-mysql.sql");
-            File outputFile2 = new File(outputFolder.getAbsolutePath(), "load-data-mysql.sql");
-            FileUtils.writeStringToFile(outputFile2, "use rvf_int_"+versionName+";\n", true);
-            for(String line : IOUtils.readLines(is2))
-            {
-                // process line and add to output file
-                line = line.replaceAll("<release_version>", versionName);
-                line = line.replaceAll("<data_location>", outputFolder.getAbsolutePath());
-                FileUtils.writeStringToFile(outputFile2, line, true);
-            }
-
-            // extract SNOMED CT content from zip file
-            extractZipFile(zipDataFile, outputFolder.getAbsolutePath());
-
-            logger.info("Executing script located at : " + outputFile.getAbsolutePath());
-            Connection connection = snomedDataSource.getConnection();
-            ScriptRunner runner = new ScriptRunner(connection);
-            InputStreamReader reader = new InputStreamReader(new FileInputStream(outputFile));
-            runner.runScript(reader);
-            reader.close();
-
-            logger.info("Executing script located at : " + outputFile2.getAbsolutePath());
-            InputStreamReader reader2 = new InputStreamReader(new FileInputStream(outputFile2));
-            runner.runScript(reader2);
-            reader2.close();
-            connection.close();
-        }
-        catch (SQLException e) {
-            logger.error("Error creating connection to database. Nested exception is : " + e.fillInStackTrace());
-        }
-        catch (IOException e) {
-            logger.error("Unable to read sql file. Nested exception is : " + e.fillInStackTrace());
-        }
-
-        logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/6000) + " minutes.");
-        return createdSchemaName;
-    }
-
-    protected void extractZipFile(File file, String outputDir){
-        try {
-            ZipFile zipFile = new ZipFile(file);
-
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                File entryDestination = new File(outputDir,  entry.getName());
-                entryDestination.getParentFile().mkdirs();
-                if (entry.isDirectory())
-                    entryDestination.mkdirs();
-                else {
-                    InputStream in = zipFile.getInputStream(entry);
-                    OutputStream out = new FileOutputStream(entryDestination);
-                    IOUtils.copy(in, out);
-                    IOUtils.closeQuietly(in);
-                    IOUtils.closeQuietly(out);
-                }
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            logger.warn("Nested exception is : " + e.fillInStackTrace());
-        }
     }
 
     public void setQaResulTableName(String qaResulTableName) {

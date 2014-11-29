@@ -40,8 +40,6 @@
 	</bean>
 
 	<!-- service beans will go here -->
-	<bean id="assertionService" class="org.ihtsdo.rvf.service.AssertionServiceImpl"/>
-
 	<bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl">
 		<property name="qaResulTableName" value="${rvf.qa.result.table.name}"/>
 		<property name="assertionDetailsColumnName" value="${rvf.assertion.details.column.name}"/>
@@ -51,6 +49,11 @@
 		<property name="snapshotTableSuffix" value="${rvf.snapshot.table.suffix}"/>
 		<property name="fullTableSuffix" value="${rvf.full.table.suffix}"/>
 	</bean>
+
+    <bean id="releaseDataManager" class="org.ihtsdo.rvf.execution.service.impl.ReleaseDataManagerImpl">
+        <property name="snomedDataSource" ref="snomedDataSource"/>
+        <property name="sctDataLocation" value="${rvf.data.folder.location}"/>
+    </bean>
 
     <import resource="applicationContext.xml"/>
 

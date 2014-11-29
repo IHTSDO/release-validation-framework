@@ -5,7 +5,6 @@ import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 
-import java.io.File;
 import java.util.Collection;
 
 /**
@@ -25,7 +24,5 @@ public interface AssertionExecutionService {
     TestRunItem executeTest(Test test, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
     Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
-
-    String loadSnomedData(String versionName, boolean purgeExisting, File zipDataFile);
 
 }
