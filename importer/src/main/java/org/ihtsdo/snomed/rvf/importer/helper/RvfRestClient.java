@@ -3,10 +3,7 @@ package org.ihtsdo.snomed.rvf.importer.helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,8 +26,8 @@ public class RvfRestClient {
     public RvfRestClient() {
         this.restTemplate = new RestTemplate();
         this.headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json");
-        headers.add("Accept", "*/*");
+        headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
         // verify server url
         setServerUrl(serverUrl);
     }
