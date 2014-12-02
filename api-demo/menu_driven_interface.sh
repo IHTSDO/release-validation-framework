@@ -12,8 +12,8 @@ fileToTest="rel2_Refset_SimpleDelta_INT_20140131.txt"
 # Target API Deployment
 #TODO - allow the user to change the API at runtime
 #api="http://localhost:8080/api/v1"
-#api="http://localhost:8081/api/v1"
-api="https://dev-rvf.ihtsdotools.org/api/v1"
+api="http://localhost:8081/api/v1"
+#api="https://dev-rvf.ihtsdotools.org/api/v1"
 #api="https://uat-rvf.ihtsdotools.org/api/v1"
 
 #TODO make this function miss out the data if jsonFile is not specified.
@@ -43,6 +43,11 @@ function getReleaseDate() {
 		exit -1
 	fi
 	echo $releaseDate
+}
+
+function listAssertions() {
+	echo "Listing Assertions"
+	callURL GET ${api}/assertions/
 } 
 
 function listKnownReleases() {
@@ -58,10 +63,44 @@ function uploadRelease() {
 	curl -X POST -F file=@${releaseFile} ${url} 
 }
 
+function groupAllAssertions() {
+	read -p "What group name should be used?: " groupName
+	mkdir -p tmp
+	#create the group and recover the ID
+	curl -s -X POST --data "name=${groupName}" ${api}/groups  | tee tmp/group-create-response.txt 
+	newGroupId=`cat tmp/group-create-response.txt | grep "\"id\"" | sed 's/[^0-9]//g'`
+	
+	if [ -n "${newGroupId}" ]
+	then
+		echo "Grouping assertions under id ${newGroupId}"
+		callURL PUT ${api}/groups/${newGroupId}/addAllAssertions
+	else
+		echo "Failed to create group"
+		exit -1
+	fi
+	
+	
+}
+
+function pressAnyKey() {
+	echo 
+	echo
+	echo "Hit any key to continue..."
+	while :
+	do
+		read -s -n 1 user_choice
+		case "$user_choice" in
+			*) break;;
+		esac
+	done
+}
+
 
 function mainMenu() {
 	echo 
 	echo "*****   RVF Menu    ******"
+	echo "a - list known assertions"
+	echo "g - group all assertions"
 	echo "l - List known previous releases"
 	echo "u - Upload a previous release"
 	echo "q - quit"
@@ -70,7 +109,9 @@ function mainMenu() {
 	do
 		read -s -n 1 user_choice
 		case "$user_choice" in
+			a|A) listAssertions ; break ;;
 			l|L) listKnownReleases ; break;;
+			g|G) groupAllAssertions; break;; 
 			u|U) uploadRelease ; break;;
 			q|Q) echo "Quitting..."; exit 0;;
 		*) echo -e 'Option not recognised\n';;
@@ -85,6 +126,7 @@ echo
 while true
 do
 	mainMenu
+	pressAnyKey
 done
 
 echo "Program exited unexpectedly"
