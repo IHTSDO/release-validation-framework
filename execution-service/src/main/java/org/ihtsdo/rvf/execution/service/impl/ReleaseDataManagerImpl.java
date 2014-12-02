@@ -127,20 +127,20 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
                                               boolean overWriteExisting, boolean purgeExistingDatabase) {
         boolean result = false;
         // copy release pack zip to data location
+        logger.info("Receiving release data - " + fileName);
+        File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
         try {
-            if(overWriteExisting){
-                File destinationFile = new File(sctDataFolder, fileName);
-                IOUtils.copy(inputStream, new FileOutputStream(destinationFile));
-                logger.info("Release file copied to : " + destinationFile.getAbsolutePath());
+            if(overWriteExisting || !fileDestination.exists()){
+                IOUtils.copy(inputStream, new FileOutputStream(fileDestination));
+                logger.info("Release file copied to : " + fileDestination.getAbsolutePath());
                 result = true;
-            }
-            else{
+            } else {
                 // verify release pack exists
-                File file = new File(sctDataFolder.getAbsolutePath(), fileName);
-                if(file.exists()){
-                    logger.info("Release file already exists at : " + file.getAbsolutePath());
-
+                if(fileDestination.exists()){
+                    logger.info("Release file already exists at : " + fileDestination.getAbsolutePath());
                     result = true;
+                } else {
+                	throw new RuntimeException ("Unexpected logic condition");
                 }
             }
 
