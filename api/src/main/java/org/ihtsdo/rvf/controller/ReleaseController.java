@@ -30,7 +30,7 @@ public class ReleaseController {
     public ResponseEntity uploadRelease(@RequestParam(value = "file") MultipartFile file,
                                  @PathVariable String version,
                                  @RequestParam(value = "overWriteExisting", required = false) boolean overWriteExisting,
-                                 @RequestParam(value = "purgeExistingDatabase") boolean purgeExistingDatabase) {
+                                 @RequestParam(value = "purgeExistingDatabase", required = false) boolean purgeExistingDatabase) {
         try {
             boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), version, overWriteExisting, purgeExistingDatabase);
             return new ResponseEntity<>(result, HttpStatus.OK);
