@@ -32,7 +32,7 @@ public class ReleaseController {
                                  @RequestParam(value = "overWriteExisting", required = false) boolean overWriteExisting,
                                  @RequestParam(value = "purgeExistingDatabase", required = false) boolean purgeExistingDatabase) {
         try {
-            boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), version, overWriteExisting, purgeExistingDatabase);
+            boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), overWriteExisting, purgeExistingDatabase);
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
         catch (IOException e) {
