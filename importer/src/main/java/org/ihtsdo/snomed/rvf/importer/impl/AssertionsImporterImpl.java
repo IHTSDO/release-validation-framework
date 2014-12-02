@@ -2,6 +2,8 @@ package org.ihtsdo.snomed.rvf.importer.impl;
 
 import com.facebook.presto.sql.parser.SqlParser;
 import com.facebook.presto.sql.parser.StatementSplitter;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
@@ -88,8 +90,14 @@ public class AssertionsImporterImpl implements AssertionsImporter {
                             // add test to assertion
                             addSqlTestToAssertion(assertion, sqlString);
                         }
+                        catch (FileNotFoundException e) {
+                            logger.error("Nested exception is : " + e.getMessage());
+                        }
+                        catch (JsonMappingException | JsonParseException e) {
+                            logger.warn("Error reading or parsing json. Nested exception is : " + e.getMessage());
+                        }
                         catch (Exception e) {
-                            logger.error("Nested exception is : " + e.fillInStackTrace());
+                            logger.warn("Error reading sql from input stream. Nested exception is : " + e.getMessage());
                         }
                     }
                     else{
@@ -159,6 +167,10 @@ public class AssertionsImporterImpl implements AssertionsImporter {
                 String token = tokenizer.nextToken();
                 Map<String, String> schemaMapping = getRvfSchemaMapping(token);
                 if(schemaMapping.keySet().size() > 0){
+                    // we know sometimes tokenizer messed up and leaves a trailing ), so we clena this up
+                    if(token.endsWith(")")){
+                        token = token.substring(0, token.length() - 1);
+                    }
                     lookupMap.put(token, schemaMapping.get(token));
                     // now replace all instances with rvf mapping
                     cleanedSql = cleanedSql.replaceAll(token, schemaMapping.get(token));
@@ -232,18 +244,28 @@ public class AssertionsImporterImpl implements AssertionsImporter {
 
     protected Map<String, String> getRvfSchemaMapping(String ratSchema){
         String rvfSchema = "";
+        ratSchema = ratSchema.trim();
         String originalRatSchema = ratSchema;
+        boolean currOrPrevFound = false;
         if(ratSchema.startsWith("curr_")){
             rvfSchema = "<PROSPECTIVE>";
             // we strip the prefix - note we don't include _ in length since strings are 0 indexed
             ratSchema = ratSchema.substring("curr_".length());
+            currOrPrevFound = true;
         }
         else if(ratSchema.startsWith("prev_")){
             rvfSchema = "<PREVIOUS>";
             // we strip the prefix - note we don't include _ in length since strings are 0 indexed
             ratSchema = ratSchema.substring("prev_".length());
+            currOrPrevFound = true;
         }
 
+        // hack to clean up conditions where tokenisation produces schema mappings with ) at the end
+        if(currOrPrevFound && ratSchema.endsWith(")")){
+            ratSchema = ratSchema.substring(0, ratSchema.lastIndexOf(")"));
+        }
+
+        // now process for release type suffix
         if(ratSchema.endsWith("_s")){
             // we strip the suffix
             ratSchema = ratSchema.substring(0, ratSchema.length() - 2);
