@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.entity.Assertion;
@@ -46,8 +47,9 @@ public class TestUploadFileController {
     private String dataFolderName = "rvf-api";
     @Autowired
     ReleaseDataManager releaseDataManager;
+    ObjectMapper objectMapper = new ObjectMapper();
 
-	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
+    @RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity uploadTestPackage(@RequestParam(value = "file") MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
@@ -119,12 +121,14 @@ public class TestUploadFileController {
             @RequestParam(value = "file") MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
 			@RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
-			@RequestParam(value = "groups") List<AssertionGroup> groups,
+			@RequestParam(value = "groups") List<String> groupsList,
             @RequestParam(value = "prospectiveReleaseVersion") String prospectiveReleaseVersion,
             @RequestParam(value = "previousReleaseVersion") String previousReleaseVersion,
             @RequestParam(value = "runId") Long runId) throws IOException {
 
         Map<String , Object> responseMap = new HashMap<>();
+        // convert groups which is passed as string to assertion groups
+        List<AssertionGroup> groups = getAssertionGroups(groupsList);
 
         // load the filename
 		String filename = file.getOriginalFilename();
@@ -278,4 +282,19 @@ public class TestUploadFileController {
 			IOUtils.copy(inputStream, out);
 		}
 	}
+
+    private List<AssertionGroup> getAssertionGroups(List<String> items){
+
+        List<AssertionGroup> groups = new ArrayList<>();
+        for(String item: items){
+            try {
+                groups.add(objectMapper.readValue(item, AssertionGroup.class));
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return groups;
+    }
 }
