@@ -179,6 +179,8 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
                 if(fileDestination.exists()){
                     logger.info("Release file already exists at : " + fileDestination.getAbsolutePath());
                     result = true;
+                } else {
+                	throw new RuntimeException ("Unexpected logic condition");
                 }
             }
             // regenerate releaseLookup which takes care of data loading if the release not been loaded into the database
