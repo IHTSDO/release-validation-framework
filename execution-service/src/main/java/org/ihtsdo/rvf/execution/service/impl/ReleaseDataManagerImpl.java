@@ -169,22 +169,18 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
         boolean result = false;
         // copy release pack zip to data location
         try {
-            if(overWriteExisting){
-                File destinationFile = new File(sctDataFolder, releasePackZip.getName());
-                FileUtils.copyFile(releasePackZip, destinationFile);
-                logger.info("Release file copied to : " + destinationFile.getAbsolutePath());
+            File fileDestination = new File(sctDataFolder.getAbsolutePath(), releasePackZip.getName());
+            if(overWriteExisting || !fileDestination.exists()){
+                FileUtils.copyFile(releasePackZip, fileDestination);
+                logger.info("Release file copied to : " + fileDestination);
                 result = true;
-            }
-            else{
+            } else {
                 // verify release pack exists
-                File file = new File(sctDataFolder.getAbsolutePath(), releasePackZip.getName());
-                if(file.exists()){
-                    logger.info("Release file already exists at : " + file.getAbsolutePath());
-
+                if(fileDestination.exists()){
+                    logger.info("Release file already exists at : " + fileDestination.getAbsolutePath());
                     result = true;
                 }
             }
-
             // regenerate releaseLookup which takes care of data loading if the release not been loaded into the database
             populateLookupMap(purgeExistingDatabase);
         }
