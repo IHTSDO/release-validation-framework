@@ -43,37 +43,108 @@ function getReleaseDate() {
 		exit -1
 	fi
 	echo $releaseDate
+}
+
+function listAssertions() {
+	echo
+	echo "Listing Assertions"
+	callURL GET ${api}/assertions/
 } 
 
 function listKnownReleases() {
+	echo
 	echo "Listing Known Releases:"	
 	callURL GET ${api}/releases
 }
 
 function uploadRelease() {
+	echo
 	read -p "What file should be uploaded?: " releaseFile
+	#Check file exists
+	if [ ! -e ${releaseFile} ] 
+	then
+		echo "${releaseFile} not found."
+		return
+	fi
 	releaseDate=`getReleaseDate ${releaseFile}`
 	url=" ${api}/releases/${releaseDate}"
 	echo "Uploading release file to ${url}"
 	curl -X POST -F file=@${releaseFile} ${url} 
 }
 
-
-function mainMenu() {
-	echo 
-	echo "*****   RVF Menu    ******"
-	echo "l - List known previous releases"
-	echo "u - Upload a previous release"
-	echo "q - quit"
+function structuralTest() {
 	echo
+	read -p "What archive should be uploaded?: " releaseFile
+	if [ ! -e ${releaseFile} ] 
+	then
+		echo "${releaseFile} not found."
+		return
+	fi
+	releaseDate=`getReleaseDate ${releaseFile}`
+	read -p "What manifest should be uploaded?: " manifestFile
+	if [ ! -e ${manifestFile} ] 
+	then
+		echo "${manifestFile} not found."
+		return
+	fi
+	
+	curl -i -X POST "$api/test-post" -F manifest=@${manifestFile} -F file=@${releaseFile}
+}
+
+function groupAllAssertions() {
+	read -p "What group name should be used?: " groupName
+	mkdir -p tmp
+	#create the group and recover the ID
+	curl -s -X POST --data "name=${groupName}" ${api}/groups  | tee tmp/group-create-response.txt 
+	newGroupId=`cat tmp/group-create-response.txt | grep "\"id\"" | sed 's/[^0-9]//g'`
+	
+	if [ -n "${newGroupId}" ]
+	then
+		echo "Grouping assertions under id ${newGroupId}"
+		callURL PUT ${api}/groups/${newGroupId}/addAllAssertions
+	else
+		echo "Failed to create group"
+		exit -1
+	fi
+	
+	
+}
+
+function pressAnyKey() {
+	echo 
+	echo
+	echo "Hit any key to continue..."
 	while :
 	do
 		read -s -n 1 user_choice
 		case "$user_choice" in
+			*) break;;
+		esac
+	done
+}
+
+
+function mainMenu() {
+	echo 
+	echo "*****   RVF Menu    ******"
+	echo "a - list known assertions"
+	echo "g - group all assertions"
+	echo "l - List known previous releases"
+	echo "s - structural test a package with a manifest"
+	echo "u - Upload a previous release"
+	echo "q - quit"
+	echo
+	echo -n "Please select:"
+	while :
+	do
+		read -s -n 1 user_choice
+		case "$user_choice" in
+			a|A) listAssertions ; break ;;
 			l|L) listKnownReleases ; break;;
+			g|G) groupAllAssertions; break;; 
+			s|S) structuralTest; break;;
 			u|U) uploadRelease ; break;;
 			q|Q) echo "Quitting..."; exit 0;;
-		*) echo -e 'Option not recognised\n';;
 		esac
 	done
 }
@@ -85,6 +156,7 @@ echo
 while true
 do
 	mainMenu
+	pressAnyKey
 done
 
 echo "Program exited unexpectedly"

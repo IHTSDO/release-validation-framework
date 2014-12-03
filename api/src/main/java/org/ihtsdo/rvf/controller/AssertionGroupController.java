@@ -70,7 +70,7 @@ public class AssertionGroupController {
     @RequestMapping(value = "{id}/assertions", method = RequestMethod.PUT)
 	@ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup setAsAssertionsInGroup(@PathVariable Long id, @RequestBody(required = false) Set<Assertion> assertions) {
+    public AssertionGroup setAsAssertionsInGroup(@PathVariable Long id, @RequestBody(required = false) List<Assertion> assertions) {
 
         AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
         // replace all existing assertions with current list
@@ -111,6 +111,16 @@ public class AssertionGroupController {
 			@RequestParam String name) {
         AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
         group.setName(name);
+        return (AssertionGroup) entityService.update(group);
+	}
+	
+	@RequestMapping(value = "{id}/addAllAssertions", method = RequestMethod.PUT)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public AssertionGroup addAllAssertions(@PathVariable Long id) {
+        AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+        List<Assertion> assertionList = (List<Assertion>)entityService.findAll(Assertion.class);
+        group.setAssertions(assertionList);
         return (AssertionGroup) entityService.update(group);
 	}
 
