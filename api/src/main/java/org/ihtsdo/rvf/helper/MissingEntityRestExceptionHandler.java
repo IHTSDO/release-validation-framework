@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class MissingEntityRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = { MissingEntityException.class })
-    protected ResponseEntity<Object> handleMissingCat(
+    protected ResponseEntity<Object> handleMissingEntity(
             final RuntimeException exception, final WebRequest request) {
 
         final String bodyOfResponse = exception.getMessage();
