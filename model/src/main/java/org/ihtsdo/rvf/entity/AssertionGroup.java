@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
-
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,7 +26,7 @@ public class AssertionGroup {
             joinColumns = @JoinColumn( name="group_id"),
             inverseJoinColumns = @JoinColumn( name="assertion_id")
     )
-    List<Assertion> assertions = new ArrayList<>();
+    Set<Assertion> assertions = new HashSet<>();
     String name;
 
     public String getName() {
@@ -40,12 +37,12 @@ public class AssertionGroup {
         this.name = name;
     }
 
-    public List<Assertion> getAssertions() {
+    public Set<Assertion> getAssertions() {
         return assertions;
     }
 
-    public void setAssertions(List<Assertion> assertionList) {
-        this.assertions = assertionList;
+    public void setAssertions(Set<Assertion> assertions) {
+        this.assertions = assertions;
         for(Assertion assertion : this.assertions){
             assertion.getGroups().add(this);
         }

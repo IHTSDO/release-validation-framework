@@ -309,7 +309,7 @@ public class AssertionServiceImplTest {
         assertion3 = assertionService.create(assertion3);
         assertNotNull(assertion3.getId());
 
-        List<Assertion> assertions = new ArrayList<>();
+        Set<Assertion> assertions = new HashSet<>();
         assertions.add(assertion);
         assertions.add(assertion2);
         AssertionGroup group = new AssertionGroup();
