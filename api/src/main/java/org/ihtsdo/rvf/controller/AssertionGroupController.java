@@ -53,6 +53,17 @@ public class AssertionGroupController {
 
         return group;
 	}
+    
+	@RequestMapping(value = "{id}/addAllAssertions", method = RequestMethod.PUT)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
+	public AssertionGroup addAllAssertions(@PathVariable Long id) {
+		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		List<Assertion> assertionList = (List<Assertion>)entityService.findAll(Assertion.class);
+		Set<Assertion> assertionSet = new HashSet<>(assertionList);
+		group.setAssertions(assertionSet);
+		return (AssertionGroup) entityService.update(group);
+	}
 
     @RequestMapping(value = "{id}/assertions", method = RequestMethod.DELETE)
 	@ResponseBody
