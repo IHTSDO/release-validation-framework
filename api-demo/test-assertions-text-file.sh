@@ -90,6 +90,10 @@ echo "Deleting assertion with specified id"
 callURL DELETE ${api}/assertions/1
 echo
 
+echo "Get assertion with missing id - should return 404 status"
+callURL GET ${api}/assertions/233490734633
+echo
+
 
 echo "Return list of all assertions - should be missing assertion with id 1"
 callURL GET ${api}/assertions/
