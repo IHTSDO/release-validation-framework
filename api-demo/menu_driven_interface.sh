@@ -12,8 +12,8 @@ fileToTest="rel2_Refset_SimpleDelta_INT_20140131.txt"
 # Target API Deployment
 #TODO - allow the user to change the API at runtime
 #api="http://localhost:8080/api/v1"
-api="http://localhost:8081/api/v1"
-#api="https://dev-rvf.ihtsdotools.org/api/v1"
+#api="http://localhost:8081/api/v1"
+api="https://dev-rvf.ihtsdotools.org/api/v1"
 #api="https://uat-rvf.ihtsdotools.org/api/v1"
 
 #TODO make this function miss out the data if jsonFile is not specified.
@@ -33,6 +33,7 @@ function callURL() {
 	-X ${httpMethod} \
 	-d "${dataArg}" \
 	${url}
+	echo
 }
 
 function getReleaseDate() {
@@ -108,7 +109,6 @@ function groupAllAssertions() {
 		exit -1
 	fi
 	
-	
 }
 
 function pressAnyKey() {
@@ -144,7 +144,7 @@ function mainMenu() {
 			g|G) groupAllAssertions; break;; 
 			s|S) structuralTest; break;;
 			u|U) uploadRelease ; break;;
-			q|Q) echo "Quitting..."; exit 0;;
+			q|Q) echo -e "\nQuitting..."; exit 0;;
 		esac
 	done
 }
