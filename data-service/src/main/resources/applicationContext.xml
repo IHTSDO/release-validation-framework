@@ -24,16 +24,16 @@
 		</property>
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>
 	</bean>
-    <bean id="dataServicePropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>classpath:data-service-defaults.properties</value>
-            </list>
-        </property>
-        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
-        <property name="order" value="1"/>
-    </bean>
+	<bean id="dataServicePropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:data-service-defaults.properties</value>
+			</list>
+		</property>
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="order" value="1"/>
+	</bean>
 
 	<bean id="applicationContextConfigurer" class="org.ihtsdo.context.OrderedPropertyPlaceholderConfigurer">
 		<property name="locations">
@@ -68,13 +68,29 @@
 		<property name="defaultCatalog" value="${rvf.master.schema.name}"/>
 		<property name="username" value="${rvf.jdbc.username}"/>
 		<property name="password" value="${rvf.jdbc.password}"/>
-        <property name="minEvictableIdleTimeMillis" value="1800000"/>
-        <property name="timeBetweenEvictionRunsMillis" value="1800000"/>
-        <property name="testOnBorrow" value="true"/>
-        <property name="testOnReturn" value="true"/>
-        <property name="testWhileIdle" value="true"/>
-        <property name="validationQuery" value="SELECT 1"/>
-        <property name="numTestsPerEvictionRun" value="3"/>
+		<property name="minEvictableIdleTimeMillis" value="1800000"/>
+		<property name="timeBetweenEvictionRunsMillis" value="1800000"/>
+		<property name="testOnBorrow" value="true"/>
+		<property name="testOnReturn" value="true"/>
+		<property name="testWhileIdle" value="true"/>
+		<property name="validationQuery" value="SELECT 1"/>
+		<property name="numTestsPerEvictionRun" value="3"/>
+	</bean>
+	
+	<!-- A second datasource is required in case the hibernate tables live apart from the snomed data eg during testing -->
+	<bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${rvf.jdbc.driverClassName}"/>
+		<property name="url" value="${rvf.jdbc.url}"/>
+		<property name="defaultCatalog" value="${rvf.master.schema.name}"/>
+		<property name="username" value="${rvf.jdbc.username}"/>
+		<property name="password" value="${rvf.jdbc.password}"/>
+		<property name="minEvictableIdleTimeMillis" value="1800000"/>
+		<property name="timeBetweenEvictionRunsMillis" value="1800000"/>
+		<property name="testOnBorrow" value="true"/>
+		<property name="testOnReturn" value="true"/>
+		<property name="testWhileIdle" value="true"/>
+		<property name="validationQuery" value="SELECT 1"/>
+		<property name="numTestsPerEvictionRun" value="3"/>
 	</bean>
 	
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
