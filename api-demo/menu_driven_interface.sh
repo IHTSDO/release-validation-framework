@@ -52,6 +52,12 @@ function listAssertions() {
 	callURL GET ${api}/assertions/
 } 
 
+function listGroups() {
+	echo
+	echo "Listing Assertions"
+	callURL GET ${api}/groups/
+} 
+
 function listKnownReleases() {
 	echo
 	echo "Listing Known Releases:"	
@@ -73,7 +79,8 @@ function uploadRelease() {
 	curl -X POST -F file=@${releaseFile} ${url} 
 }
 
-function structuralTest() {
+function doTest() {
+	testType=$1
 	echo
 	read -p "What archive should be uploaded?: " releaseFile
 	if [ ! -e ${releaseFile} ] 
@@ -81,7 +88,7 @@ function structuralTest() {
 		echo "${releaseFile} not found."
 		return
 	fi
-	releaseDate=`getReleaseDate ${releaseFile}`
+	prospectiveReleaseVersion=`getReleaseDate ${releaseFile}`
 	read -p "What manifest should be uploaded?: " manifestFile
 	if [ ! -e ${manifestFile} ] 
 	then
@@ -89,7 +96,22 @@ function structuralTest() {
 		return
 	fi
 	
-	curl -i -X POST "$api/test-post" -F manifest=@${manifestFile} -F file=@${releaseFile}
+	if [ ${testType} == "structural" ] 
+	then
+		curl -i -X POST "$api/test-post" -F manifest=@${manifestFile} -F file=@${releaseFile}
+	elif  [ ${testType} == "full" ] 
+	then
+		read -p "What assertion group name should be used?: " assertionGroup
+		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
+		datestamp=`date +%Y%m%d%H%M%S`
+		curl -i -X POST "$api/run-post" -F manifest=@${manifestFile} -F file=@${releaseFile} \
+		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
+		-F "previousReleaseVersion=${currentReleaseVersion}" \
+		-F "groups=${assertionGroup}" \
+		-F "runId=${datestamp}" 
+	else
+		echo "Test type ${testType} not recognised"
+	fi
 }
 
 function groupAllAssertions() {
@@ -97,7 +119,8 @@ function groupAllAssertions() {
 	read -p "What group name should be used?: " groupName
 	mkdir -p tmp
 	#create the group and recover the ID
-	curl -s -X POST --data "name=${groupName}" ${api}/groups  | tee tmp/group-create-response.txt 
+	echo "First creating an empty group using name ${groupName}"
+	curl -X POST --data "name=${groupName}" ${api}/groups  | tee tmp/group-create-response.txt 
 	newGroupId=`cat tmp/group-create-response.txt | grep "\"id\"" | sed 's/[^0-9]//g'`
 	
 	if [ -n "${newGroupId}" ]
@@ -128,9 +151,11 @@ function mainMenu() {
 	echo 
 	echo "*****   RVF Menu    ******"
 	echo "a - list known assertions"
-	echo "g - group all assertions"
+	echo "b - list known groups"
+	echo "g - group all known assertions"
 	echo "l - List known previous releases"
 	echo "s - structural test a package with a manifest"
+	echo "t - full test a package with a manifest"
 	echo "u - Upload a previous release"
 	echo "q - quit"
 	echo
@@ -140,9 +165,11 @@ function mainMenu() {
 		read -s -n 1 user_choice
 		case "$user_choice" in
 			a|A) listAssertions ; break ;;
+			b|B) listGroups ; break ;;
 			l|L) listKnownReleases ; break;;
 			g|G) groupAllAssertions; break;; 
-			s|S) structuralTest; break;;
+			s|S) doTest "structural"; break;;
+			t|T) doTest "full"; break;;
 			u|U) uploadRelease ; break;;
 			q|Q) echo -e "\nQuitting..."; exit 0;;
 		esac
