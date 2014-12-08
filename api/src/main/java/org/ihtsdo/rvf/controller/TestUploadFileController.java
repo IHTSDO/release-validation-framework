@@ -40,16 +40,16 @@ public class TestUploadFileController {
 
 	@Autowired
 	private ValidationTestRunner validationRunner;
-    @Autowired
-    private AssertionService assertionService;
-    @Autowired
-    private AssertionExecutionService assertionExecutionService;
-    private String dataFolderName = "rvf-api";
-    @Autowired
-    ReleaseDataManager releaseDataManager;
-    ObjectMapper objectMapper = new ObjectMapper();
+	@Autowired
+	private AssertionService assertionService;
+	@Autowired
+	private AssertionExecutionService assertionExecutionService;
+	private String dataFolderName = "rvf-api";
+	@Autowired
+	ReleaseDataManager releaseDataManager;
+	ObjectMapper objectMapper = new ObjectMapper();
 
-    @RequestMapping(value = "/test-file", method = RequestMethod.POST)
+	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity uploadTestPackage(@RequestParam(value = "file") MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
@@ -116,42 +116,42 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/run-post", method = RequestMethod.POST)
 	@ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public Map<String, Object> runPostTestPackage(
-            @RequestParam(value = "file") MultipartFile file,
+	@ResponseStatus(HttpStatus.OK)
+	public Map<String, Object> runPostTestPackage(
+			@RequestParam(value = "file") MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
 			@RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
 			@RequestParam(value = "groups") List<String> groupsList,
-            @RequestParam(value = "prospectiveReleaseVersion") String prospectiveReleaseVersion,
-            @RequestParam(value = "previousReleaseVersion") String previousReleaseVersion,
-            @RequestParam(value = "runId") Long runId) throws IOException {
+			@RequestParam(value = "prospectiveReleaseVersion") String prospectiveReleaseVersion,
+			@RequestParam(value = "previousReleaseVersion") String previousReleaseVersion,
+			@RequestParam(value = "runId") Long runId) throws IOException {
 
-        Map<String , Object> responseMap = new HashMap<>();
-        // convert groups which is passed as string to assertion groups
-        List<AssertionGroup> groups = getAssertionGroups(groupsList);
+		Map<String , Object> responseMap = new HashMap<>();
+		// convert groups which is passed as string to assertion groups
+		List<AssertionGroup> groups = getAssertionGroups(groupsList);
 
-        // load the filename
+		// load the filename
 		String filename = file.getOriginalFilename();
-        System.out.println("filename = " + filename);
+		System.out.println("filename = " + filename);
 
 		final File tempFile = File.createTempFile(filename, ".zip");
 		tempFile.deleteOnExit();
 		if (!filename.endsWith(".zip")) {
-            responseMap.put("type", "pre");
-            responseMap.put("assertionsFailed", 0);
-            responseMap.put("report", "Post condition test package has to be zipped up");
-            return responseMap;
+			responseMap.put("type", "pre");
+			responseMap.put("assertionsFailed", 0);
+			responseMap.put("report", "Post condition test package has to be zipped up");
+			return responseMap;
 		}
 
 		// set up the response in order to strean directly to the response
-        File dataFolder = new File(FileUtils.getTempDirectoryPath(), dataFolderName);
-        if(!dataFolder.exists()){
-            if(dataFolder.mkdir()){
-                LOGGER.info("Successfully created dataFolder = " + dataFolder.getAbsolutePath());
-            }
-        }
-        File reportFile = new File(dataFolder.getAbsolutePath(), "manifest_validation_"+runId+".txt");
-        PrintWriter writer = new PrintWriter(reportFile);
+		File dataFolder = new File(FileUtils.getTempDirectoryPath(), dataFolderName);
+		if(!dataFolder.exists()){
+			if(dataFolder.mkdir()){
+				LOGGER.info("Successfully created dataFolder = " + dataFolder.getAbsolutePath());
+			}
+		}
+		File reportFile = new File(dataFolder.getAbsolutePath(), "manifest_validation_"+runId+".txt");
+		PrintWriter writer = new PrintWriter(reportFile);
 
 		// must be a zip
 		copyUploadToDisk(file, tempFile);
@@ -171,65 +171,65 @@ public class TestUploadFileController {
 			report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
 		}
 
-        // verify if manifest is valid
-        if(report.getNumErrors() > 0){
+		// verify if manifest is valid
+		if(report.getNumErrors() > 0){
 
-            LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
-            responseMap.put("type", "pre");
-            responseMap.put("assertionsRun", report.getNumTestRuns());
-            responseMap.put("assertionsFailed", report.getNumErrors());
-            responseMap.put("reportUrl", reportFile.getName());
-            responseMap.put("report", report);
+			LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+			responseMap.put("type", "pre");
+			responseMap.put("assertionsRun", report.getNumTestRuns());
+			responseMap.put("assertionsFailed", report.getNumErrors());
+			responseMap.put("reportUrl", reportFile.getName());
+			responseMap.put("report", report);
 
-            return responseMap;
-        }
+			return responseMap;
+		}
 
-        /*
-            If we are here, assume manifest is valid, so load data from file.
-          */
-        if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion)){
-            releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile);
-        }
+		/*
+			If we are here, assume manifest is valid, so load data from file.
+		  */
+		if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion)){
+			releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile);
+		}
 
-        if(!releaseDataManager.isKnownRelease(previousReleaseVersion)){
-            // the previous published release must already be present in database, otherwise we throw an error!
-            throw new IllegalArgumentException("Hey! Please load release data first for version : " + previousReleaseVersion);
-        }
+		if(!releaseDataManager.isKnownRelease(previousReleaseVersion)){
+			// the previous published release must already be present in database, otherwise we throw an error!
+			throw new IllegalArgumentException("Hey! Please load release data first for version : " + previousReleaseVersion);
+		}
 
-        Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
-        int failedAssertionCount = 0;
-        Set<Long> assertionIds = new HashSet<>();
-        for(AssertionGroup group : groups)
-        {
-            for(Assertion assertion : assertionService.getAssertionsForGroup(group)){
-                assertionIds.add(assertion.getId());
-            }
-        }
-        for (Long id: assertionIds) {
-            try
-            {
-                Assertion assertion = assertionService.find(id);
-                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
-                        prospectiveReleaseVersion, previousReleaseVersion));
-                // get only first since we have 1:1 correspondence between Assertion and Test
-                if(items.size() == 1){
-                    TestRunItem runItem = items.get(0);
-                    if(runItem.isFailure()){
-                        failedAssertionCount++;
-                    }
-                }
-                map.put(assertion, items);
-            }
-            catch (MissingEntityException e) {
-                failedAssertionCount++;
-            }
-        }
+		Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
+		int failedAssertionCount = 0;
+		Set<Long> assertionIds = new HashSet<>();
+		for(AssertionGroup group : groups)
+		{
+			for(Assertion assertion : assertionService.getAssertionsForGroup(group)){
+				assertionIds.add(assertion.getId());
+			}
+		}
+		for (Long id: assertionIds) {
+			try
+			{
+				Assertion assertion = assertionService.find(id);
+				List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
+						prospectiveReleaseVersion, previousReleaseVersion));
+				// get only first since we have 1:1 correspondence between Assertion and Test
+				if(items.size() == 1){
+					TestRunItem runItem = items.get(0);
+					if(runItem.isFailure()){
+						failedAssertionCount++;
+					}
+				}
+				map.put(assertion, items);
+			}
+			catch (MissingEntityException e) {
+				failedAssertionCount++;
+			}
+		}
 
-        responseMap.put("assertions", map);
-        responseMap.put("assertionsRun", map.keySet().size());
-        responseMap.put("assertionsFailed", failedAssertionCount);
+		responseMap.put("assertions", map);
+		responseMap.put("assertionsRun", map.keySet().size());
+		responseMap.put("assertionsFailed", failedAssertionCount);
 
-        return responseMap;
+		return responseMap;
 	}
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
@@ -269,12 +269,12 @@ public class TestUploadFileController {
 		return null;
 	}
 
-    @RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
-    @ResponseBody
-    public FileSystemResource getFile(@PathVariable String id) {
-        return new FileSystemResource(new File(System.getProperty("java.io.tmpdir"), dataFolderName +
-                System.getProperty("file.separator") + id));
-    }
+	@RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
+	@ResponseBody
+	public FileSystemResource getFile(@PathVariable String id) {
+		return new FileSystemResource(new File(System.getProperty("java.io.tmpdir"), dataFolderName +
+				System.getProperty("file.separator") + id));
+	}
 
 	private void copyUploadToDisk(MultipartFile file, File tempFile) throws IOException {
 		try (FileOutputStream out = new FileOutputStream(tempFile)) {
@@ -283,18 +283,18 @@ public class TestUploadFileController {
 		}
 	}
 
-    private List<AssertionGroup> getAssertionGroups(List<String> items){
+	private List<AssertionGroup> getAssertionGroups(List<String> items){
 
-        List<AssertionGroup> groups = new ArrayList<>();
-        for(String item: items){
-            try {
-                groups.add(objectMapper.readValue(item, AssertionGroup.class));
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+		List<AssertionGroup> groups = new ArrayList<>();
+		for(String item: items){
+			try {
+				groups.add(objectMapper.readValue(item, AssertionGroup.class));
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
-        return groups;
-    }
+		return groups;
+	}
 }
