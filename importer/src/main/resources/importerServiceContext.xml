@@ -7,19 +7,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<context:annotation-config/>
-    <!--<bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient">-->
-        <!--<constructor-arg>-->
-            <!--<bean class="org.apache.http.impl.conn.PoolingClientConnectionManager"/>-->
-        <!--</constructor-arg>-->
-    <!--</bean>-->
-
     <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
-        <!--<property name="messageConverters" ref="messageConvertersList"/>-->
-        <!--<constructor-arg>-->
-            <!--<bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">-->
-                <!--<constructor-arg ref="httpClient"/>-->
-            <!--</bean>-->
-        <!--</constructor-arg>-->
     </bean>
 
 	<!-- service beans will go here -->

@@ -13,6 +13,7 @@
 		  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">
 			<list>
+				<value>classpath:rvf-service.properties</value>
 				<value>classpath:snomed-db.properties</value>
 			</list>
 		</property>

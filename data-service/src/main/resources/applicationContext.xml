@@ -12,31 +12,52 @@
 	<context:annotation-config/>
 	<tx:annotation-driven/>
 	
-	<!-- Bean to resolve the 'data-service-properties-path' from a system property -->
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
-		<property name="placeholderPrefix" value="+{"/>
-		<property name="properties">
-			<props>
-				<!-- Default path to override properties file -->
-				<prop key="dataServicePropertiesPath">classpath:data-service.properties</prop>
-			</props>
-		</property>
-		<property name="ignoreUnresolvablePlaceholders" value="true"/>
-	</bean>
+	<!--&lt;!&ndash; Bean to resolve the 'data-service-properties-path' from a system property &ndash;&gt;-->
+	<!--<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+		<!--<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>-->
+		<!--<property name="placeholderPrefix" value="+{"/>-->
+		<!--<property name="properties">-->
+			<!--<props>-->
+				<!--&lt;!&ndash; Default path to override properties file &ndash;&gt;-->
+				<!--<prop key="dataServicePropertiesPath">classpath:data-service.properties</prop>-->
+			<!--</props>-->
+		<!--</property>-->
+		<!--<property name="ignoreUnresolvablePlaceholders" value="true"/>-->
+	<!--</bean>-->
 
-	<bean id="applicationContextConfigurer" class="org.ihtsdo.context.OrderedPropertyPlaceholderConfigurer">
-		<property name="locations">
-			<list>
-				<!-- Default properties file -->
-				<value>classpath:data-service-defaults.properties</value>
-				<!-- Override properties file -->
-				<value>+{dataServicePropertiesPath}</value>
-			</list>
-		</property>
-		<property name="order" value="100"/>
-		<property name="ignoreResourceNotFound" value="true"/>
-	</bean>
+	<!--<bean id="applicationContextConfigurer" class="org.ihtsdo.context.OrderedPropertyPlaceholderConfigurer">-->
+		<!--<property name="locations">-->
+			<!--<list>-->
+				<!--&lt;!&ndash; Default properties file &ndash;&gt;-->
+				<!--<value>classpath:data-service-defaults.properties</value>-->
+				<!--&lt;!&ndash; Override properties file &ndash;&gt;-->
+				<!--<value>+{dataServicePropertiesPath}</value>-->
+			<!--</list>-->
+		<!--</property>-->
+		<!--<property name="order" value="100"/>-->
+		<!--<property name="ignoreResourceNotFound" value="true"/>-->
+	<!--</bean>-->
+
+    <bean id="dataServicePropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:data-service-defaults.properties</value>
+            </list>
+        </property>
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="order" value="1"/>
+    </bean>
+    <bean id="dataServicePropertyConfigurer2" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>${rvfConfigLocation}/data-service.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="order" value="2"/>
+    </bean>
 
 	<!-- service beans will go here -->
 	<bean id="assertionService" class="org.ihtsdo.rvf.service.AssertionServiceImpl"/>

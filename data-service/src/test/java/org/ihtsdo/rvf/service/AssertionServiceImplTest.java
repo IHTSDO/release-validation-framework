@@ -19,7 +19,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/applicationContext.xml"})
+@ContextConfiguration(locations = {"/testDataServiceContext.xml"})
 @Transactional
 public class AssertionServiceImplTest {
 
