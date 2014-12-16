@@ -16,7 +16,7 @@ files. However, it is possible to override the default values by providing prope
 The following is a list of property files that can be used to configure services:
 
 |File name | Description | RVF deployment location |
-| ------------- |:-------------:| -----:|
+|:------------- |:-------------:|:-----|
 data-service.properties | Settings to configure the data store for RVF domain entities (assertions, test, etc) | /etc/opt/rvf-api/ |
 execution-service.properties | Settings to configure the location of SNOMED CT data used by RVF | /etc/opt/rvf-api/ |
 validation-service.properties | Settings to configure structural tests report location and threshold |  /etc/opt/rvf-api/ |
@@ -29,8 +29,8 @@ folder. During startup, the RVF unzips any published release in this folder and 
 The following conventions are used by this feature:
 
 |File name | Schema name generated | Comment |
-| ------------- |:-------------:| -----:|
-SnomedCT\_Release\_INT\_20140731.zip | rvf\_int\_20140731 | Created if there is rvf\_int\_20140731 does not exist |
+|:------------- |:-------------:|:-----|
+SnomedCT\_Release\_INT\_20140731.zip | rvf\_int\_20140731 | Created if database named rvf\_int\_20140731 does not exist |
 SnomedCT\_Release\_INT\_20140731.txt | Not processed | Only zip files are processed |
 
 How to use the API
