@@ -1,4 +1,8 @@
-package org.ihtsdo.rvf.validation;
+package org.ihtsdo.rvf.validation.impl;
+
+import org.ihtsdo.rvf.validation.ResultFormatter;
+import org.ihtsdo.rvf.validation.TestReportable;
+import org.ihtsdo.rvf.validation.TestRunItem;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;

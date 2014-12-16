@@ -1,9 +1,7 @@
-package org.ihtsdo.rvf.validation;
+package org.ihtsdo.rvf.validation.model;
 
 import org.apache.commons.digester3.Digester;
 import org.apache.commons.digester3.binder.DigesterLoader;
-import org.ihtsdo.rvf.validation.model.Listing;
-import org.ihtsdo.rvf.validation.model.ListingBuilder;
 import org.xml.sax.SAXException;
 
 import java.io.File;

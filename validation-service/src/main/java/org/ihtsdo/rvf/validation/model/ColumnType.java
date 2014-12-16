@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.validation;
+package org.ihtsdo.rvf.validation.model;
 
 public enum ColumnType {
 

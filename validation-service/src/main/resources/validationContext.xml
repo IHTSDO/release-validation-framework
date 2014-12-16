@@ -8,7 +8,7 @@
 
     <context:annotation-config />
 
-    <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.ValidationLogFactoryImpl"/>
+    <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.impl.ValidationLogFactoryImpl"/>
 
 	<bean id="validationRunner" class="org.ihtsdo.rvf.validation.ValidationTestRunner"/>
 

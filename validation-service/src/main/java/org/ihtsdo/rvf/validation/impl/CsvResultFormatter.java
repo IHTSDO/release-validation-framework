@@ -1,11 +1,14 @@
-package org.ihtsdo.rvf.validation;
+package org.ihtsdo.rvf.validation.impl;
+
+import org.ihtsdo.rvf.validation.ResultFormatter;
+import org.ihtsdo.rvf.validation.TestRunItem;
 
 import java.util.List;
 
-public class CsvMetadataResultFormatter implements ResultFormatter {
+public class CsvResultFormatter implements ResultFormatter {
 
 	// no spaces between the commas please as this breaks the , quote escaping
-	private static final String headers = "Result\tRow-Column\tFile Name\tTest Type\tFailure Details";
+	private static final String headers = "Result\tRow-Column\tFile Name\tFile Path\tColumn Name\tTest Type\tTest Pattern\tFailure Details\tNumber of occurences";
 
 	@Override
 	public String formatResults(List<TestRunItem> testRuns) {
@@ -20,10 +23,11 @@ public class CsvMetadataResultFormatter implements ResultFormatter {
 	}
 
 	public String formatRow(TestRunItem ti, Integer itemErrorCount) {
-		return String.format("%s\t%s\t%s\t%s\t%s\n",
+		return String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\n",
 				ti.getFailureMessage(),
 				ti.getExecutionId(),
-				ti.getFileName(), ti.getTestType(), ti.getActualExpectedValue());
+				ti.getFileName(), ti.getFilePath(), ti.getColumnName(), ti.getTestType(),
+				ti.getTestPattern(), ti.getActualExpectedValue(), itemErrorCount);
 	}
 
 	public String getHeaders() {

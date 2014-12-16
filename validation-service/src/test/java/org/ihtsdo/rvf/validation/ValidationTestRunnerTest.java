@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.validation;
 
+import org.ihtsdo.rvf.validation.model.ManifestFile;
 import org.ihtsdo.rvf.validation.resource.TextFileResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.junit.Test;

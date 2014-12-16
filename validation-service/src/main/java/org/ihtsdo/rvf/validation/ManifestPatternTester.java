@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.validation;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.model.FileElement;
 import org.ihtsdo.rvf.validation.model.Folder;
+import org.ihtsdo.rvf.validation.model.ManifestFile;
 import org.ihtsdo.rvf.validation.resource.ResourceManager;
 
 import java.util.Date;

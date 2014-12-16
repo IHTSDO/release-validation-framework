@@ -1,6 +1,8 @@
 package org.ihtsdo.rvf.validation;
 
-import org.ihtsdo.rvf.validation.log.TestValidationLogImpl;
+import org.ihtsdo.rvf.validation.impl.CsvResultFormatter;
+import org.ihtsdo.rvf.validation.impl.StreamTestReport;
+import org.ihtsdo.rvf.validation.log.impl.TestValidationLogImpl;
 import org.ihtsdo.rvf.validation.resource.ResourceManager;
 import org.junit.Test;
 
