@@ -6,13 +6,13 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-@Repository
+@Service
 public class EntityDaoImpl<T> implements EntityDao<T> {
 
 	private Class<T> type;
@@ -72,8 +72,7 @@ public class EntityDaoImpl<T> implements EntityDao<T> {
     }
 
 	@Override
-    public Session getCurrentSession() {
-		return sessionFactory.getCurrentSession();
+    public Session getCurrentSession() { return sessionFactory.getCurrentSession();
 	}
 
 }

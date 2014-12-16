@@ -1,10 +1,12 @@
 package org.ihtsdo.rvf.dao;
 
 import org.ihtsdo.rvf.entity.*;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements AssertionDao {
 
 	public AssertionDaoImpl() {
