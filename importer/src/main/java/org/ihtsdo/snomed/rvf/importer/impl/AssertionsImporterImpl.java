@@ -187,12 +187,6 @@ public class AssertionsImporterImpl implements AssertionsImporter {
 
         // set configuration;
         Configuration configuration = new Configuration();
-        configuration.setValue("curr_concept_table_name", "curr_concept_s");
-        configuration.setValue("curr_stated_relationship_table_name", "curr_stated_relationship_s");
-        configuration.setValue("id_column_name", "id");
-        configuration.setValue("active_column_name", "active");
-        configuration.setValue("definition_status_id", "definitionstatusid");
-        configuration.setValue("source_id_column_name", "sourceid");
         ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(sql);
         command.setCode("Execute me".getBytes());
