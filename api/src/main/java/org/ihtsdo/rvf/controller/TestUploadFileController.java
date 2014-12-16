@@ -10,6 +10,7 @@ import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
+import org.ihtsdo.rvf.service.EntityService;
 import org.ihtsdo.rvf.validation.TestReportable;
 import org.ihtsdo.rvf.validation.ValidationTestRunner;
 import org.ihtsdo.rvf.validation.model.ManifestFile;
@@ -43,6 +44,8 @@ public class TestUploadFileController {
 	private ValidationTestRunner validationRunner;
 	@Autowired
 	private AssertionService assertionService;
+    @Autowired
+	private EntityService entityService;
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	@Autowired
@@ -175,10 +178,14 @@ public class TestUploadFileController {
 			responseMap.put("assertionsFailed", report.getNumErrors());
 			responseMap.put("reportPhysicalUrl", reportFile.getAbsolutePath());
             // pass file name without extension - we add this back when we retrieve using controller
-            responseMap.put("reportUrl", request.getContextPath()+"/"+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
+            responseMap.put("reportUrl", request.getContextPath()+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
 
-            return new ResponseEntity<>(responseMap, HttpStatus.OK);
-		}
+            System.out.println("report.getNumErrors()/report.getNumTestRuns() = " + report.getNumErrors() / report.getNumTestRuns());
+            // bail out only if number of test failures exceeds threshold
+            if(report.getNumErrors()/report.getNumTestRuns() > validationRunner.getFailureThreshold()){
+                return new ResponseEntity<>(responseMap, HttpStatus.OK);
+            }
+        }
 
 		/*
 			If we are here, assume manifest is valid, so load data from file.
@@ -191,6 +198,7 @@ public class TestUploadFileController {
 			// the previous published release must already be present in database, otherwise we throw an error!
             responseMap.put("type", "post");
             responseMap.put("failureMessage", "Please load release data first for version : " + previousReleaseVersion);
+            responseMap.put("reportPhysicalUrl", reportFile.getAbsolutePath());
             // pass file name without extension - we add this back when we retrieve using controller
             responseMap.put("reportUrl", request.getContextPath()+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
             return new ResponseEntity<>(responseMap, HttpStatus.OK);
@@ -229,6 +237,7 @@ public class TestUploadFileController {
         responseMap.put("assertions", map);
 		responseMap.put("assertionsRun", map.keySet().size());
 		responseMap.put("assertionsFailed", failedAssertionCount);
+        responseMap.put("reportPhysicalUrl", reportFile.getAbsolutePath());
         // pass file name without extension - we add this back when we retrieve using controller
         responseMap.put("reportUrl", request.getContextPath()+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
 
@@ -289,8 +298,20 @@ public class TestUploadFileController {
 
 		List<AssertionGroup> groups = new ArrayList<>();
 		for(String item: items){
-			try {
-				groups.add(objectMapper.readValue(item, AssertionGroup.class));
+            System.out.println("item = " + item);
+            try
+            {
+                if(item.matches("\\d+")){
+                    System.out.println("Matching item = " + item);
+                    // treat as group id and retrieve associated group
+                    AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, Long.valueOf(item));
+                    if(group != null){
+                        groups.add(group);
+                    }
+                }
+                else{
+                    groups.add(objectMapper.readValue(item, AssertionGroup.class));
+                }
 			}
 			catch (IOException e) {
 				e.printStackTrace();

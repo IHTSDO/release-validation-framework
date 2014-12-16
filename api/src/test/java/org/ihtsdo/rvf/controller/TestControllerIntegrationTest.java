@@ -168,12 +168,12 @@ public class TestControllerIntegrationTest {
         String paramsString = objectMapper.writeValueAsString(returnedTest);
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1")
-                .param("prospectiveReleaseVersion", "rvf_int_2014073")
+                .param("prospectiveReleaseVersion", "rvf_int_20140731")
                 .param("previousReleaseVersion", "postqa")
                 .contentType(MediaType.APPLICATION_JSON)).andDo(print());
         // this test will fail unless we have a SNOMED CT database configured
         mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1")
-                .param("prospectiveReleaseVersion", "rvf_int_2014073")
+                .param("prospectiveReleaseVersion", "rvf_int_20140731")
                 .param("previousReleaseVersion", "postqa")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

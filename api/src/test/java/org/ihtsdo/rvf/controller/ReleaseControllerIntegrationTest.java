@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -17,10 +16,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.Charset;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -52,7 +49,7 @@ public class ReleaseControllerIntegrationTest {
         releaseDataManager.uploadPublishedReleaseData(getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip") ,
                 "SnomedCT_Release_INT_20140131.zip", true, false);
         assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));
-        assertTrue("Relese 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("20140131"));
+        assertTrue("Release 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("20140131"));
     }
 
     @Test
@@ -76,19 +73,19 @@ public class ReleaseControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    public void testUploadRelease() throws Exception {
-
-        mockMvc.perform(
-                fileUpload("/releases/{version}", "20140131")
-                        .file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140131.zip", "application/zip",
-                                getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip")))
-                .param("overWriteExisting", "false")
-                .param("purgeExistingDatabase", "false")
-                )
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("true")))
-                .andDo(print());
-    }
+//    @Test
+//    public void testUploadRelease() throws Exception {
+//
+//        mockMvc.perform(
+//                fileUpload("/releases/{version}", "20140131")
+//                        .file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140131.zip", "application/zip",
+//                                getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip")))
+//                .param("overWriteExisting", "false")
+//                .param("purgeExistingDatabase", "false")
+//                )
+//                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+//                .andExpect(status().isOk())
+//                .andExpect(content().string(containsString("true")))
+//                .andDo(print());
+//    }
 }
