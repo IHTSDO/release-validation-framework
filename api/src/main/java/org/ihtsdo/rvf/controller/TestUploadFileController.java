@@ -130,7 +130,11 @@ public class TestUploadFileController {
 			@RequestParam(value = "runId") Long runId,
             HttpServletRequest request) throws IOException {
 
-		Map<String , Object> responseMap = new HashMap<>();
+        // generate url from request so we can display in response
+        String requestUrl = String.valueOf(request.getRequestURL());
+        String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
+
+        Map<String , Object> responseMap = new HashMap<>();
 		// convert groups which is passed as string to assertion groups
 		List<AssertionGroup> groups = getAssertionGroups(groupsList);
 
@@ -176,9 +180,9 @@ public class TestUploadFileController {
 			responseMap.put("type", "pre");
 			responseMap.put("assertionsRun", report.getNumTestRuns());
 			responseMap.put("assertionsFailed", report.getNumErrors());
-			responseMap.put("reportPhysicalUrl", reportFile.getAbsolutePath());
+			LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
             // pass file name without extension - we add this back when we retrieve using controller
-            responseMap.put("reportUrl", request.getContextPath()+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
+            responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
 
             System.out.println("report.getNumErrors()/report.getNumTestRuns() = " + report.getNumErrors() / report.getNumTestRuns());
             // bail out only if number of test failures exceeds threshold
@@ -198,9 +202,9 @@ public class TestUploadFileController {
 			// the previous published release must already be present in database, otherwise we throw an error!
             responseMap.put("type", "post");
             responseMap.put("failureMessage", "Please load release data first for version : " + previousReleaseVersion);
-            responseMap.put("reportPhysicalUrl", reportFile.getAbsolutePath());
+            LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
             // pass file name without extension - we add this back when we retrieve using controller
-            responseMap.put("reportUrl", request.getContextPath()+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
+            responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
             return new ResponseEntity<>(responseMap, HttpStatus.OK);
         }
 
@@ -237,9 +241,9 @@ public class TestUploadFileController {
         responseMap.put("assertions", map);
 		responseMap.put("assertionsRun", map.keySet().size());
 		responseMap.put("assertionsFailed", failedAssertionCount);
-        responseMap.put("reportPhysicalUrl", reportFile.getAbsolutePath());
+        LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
         // pass file name without extension - we add this back when we retrieve using controller
-        responseMap.put("reportUrl", request.getContextPath()+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
+        responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
 
         return new ResponseEntity<>(responseMap, HttpStatus.OK);
 	}
@@ -298,11 +302,9 @@ public class TestUploadFileController {
 
 		List<AssertionGroup> groups = new ArrayList<>();
 		for(String item: items){
-            System.out.println("item = " + item);
             try
             {
                 if(item.matches("\\d+")){
-                    System.out.println("Matching item = " + item);
                     // treat as group id and retrieve associated group
                     AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, Long.valueOf(item));
                     if(group != null){
