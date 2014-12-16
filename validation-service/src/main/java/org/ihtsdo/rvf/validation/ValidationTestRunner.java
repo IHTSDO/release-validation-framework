@@ -23,6 +23,7 @@ public class ValidationTestRunner implements InitializingBean{
     private final Logger logger = LoggerFactory.getLogger(ValidationTestRunner.class);
     protected String reportFolderLocation;
     protected File reportDataFolder;
+    protected int failureThreshold;
 
     @Autowired
 	private ValidationLogFactory validationLogFactory;
@@ -102,5 +103,13 @@ public class ValidationTestRunner implements InitializingBean{
 
     public File getReportDataFolder() {
         return reportDataFolder;
+    }
+
+    public int getFailureThreshold() {
+        return failureThreshold;
+    }
+
+    public void setFailureThreshold(int failureThreshold) {
+        this.failureThreshold = failureThreshold;
     }
 }
