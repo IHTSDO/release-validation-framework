@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -10,9 +10,9 @@ import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
-import org.ihtsdo.rvf.validation.ManifestFile;
 import org.ihtsdo.rvf.validation.TestReportable;
 import org.ihtsdo.rvf.validation.ValidationTestRunner;
+import org.ihtsdo.rvf.validation.model.ManifestFile;
 import org.ihtsdo.rvf.validation.resource.ResourceManager;
 import org.ihtsdo.rvf.validation.resource.TextFileResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
@@ -44,7 +45,6 @@ public class TestUploadFileController {
 	private AssertionService assertionService;
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
-	private String dataFolderName = "rvf-api";
 	@Autowired
 	ReleaseDataManager releaseDataManager;
 	ObjectMapper objectMapper = new ObjectMapper();
@@ -117,14 +117,15 @@ public class TestUploadFileController {
 	@RequestMapping(value = "/run-post", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	public Map<String, Object> runPostTestPackage(
+	public ResponseEntity runPostTestPackage(
 			@RequestParam(value = "file") MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
 			@RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
 			@RequestParam(value = "groups") List<String> groupsList,
 			@RequestParam(value = "prospectiveReleaseVersion") String prospectiveReleaseVersion,
 			@RequestParam(value = "previousReleaseVersion") String previousReleaseVersion,
-			@RequestParam(value = "runId") Long runId) throws IOException {
+			@RequestParam(value = "runId") Long runId,
+            HttpServletRequest request) throws IOException {
 
 		Map<String , Object> responseMap = new HashMap<>();
 		// convert groups which is passed as string to assertion groups
@@ -140,17 +141,11 @@ public class TestUploadFileController {
 			responseMap.put("type", "pre");
 			responseMap.put("assertionsFailed", 0);
 			responseMap.put("report", "Post condition test package has to be zipped up");
-			return responseMap;
+			return new ResponseEntity<>(responseMap, HttpStatus.OK);
 		}
 
 		// set up the response in order to strean directly to the response
-		File dataFolder = new File(FileUtils.getTempDirectoryPath(), dataFolderName);
-		if(!dataFolder.exists()){
-			if(dataFolder.mkdir()){
-				LOGGER.info("Successfully created dataFolder = " + dataFolder.getAbsolutePath());
-			}
-		}
-		File reportFile = new File(dataFolder.getAbsolutePath(), "manifest_validation_"+runId+".txt");
+		File reportFile = new File(validationRunner.getReportDataFolder(), "manifest_validation_"+runId+".txt");
 		PrintWriter writer = new PrintWriter(reportFile);
 
 		// must be a zip
@@ -178,10 +173,11 @@ public class TestUploadFileController {
 			responseMap.put("type", "pre");
 			responseMap.put("assertionsRun", report.getNumTestRuns());
 			responseMap.put("assertionsFailed", report.getNumErrors());
-			responseMap.put("reportUrl", reportFile.getName());
-			responseMap.put("report", report);
+			responseMap.put("reportPhysicalUrl", reportFile.getAbsolutePath());
+            // pass file name without extension - we add this back when we retrieve using controller
+            responseMap.put("reportUrl", request.getContextPath()+"/"+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
 
-			return responseMap;
+            return new ResponseEntity<>(responseMap, HttpStatus.OK);
 		}
 
 		/*
@@ -193,8 +189,12 @@ public class TestUploadFileController {
 
 		if(!releaseDataManager.isKnownRelease(previousReleaseVersion)){
 			// the previous published release must already be present in database, otherwise we throw an error!
-			throw new IllegalArgumentException("Hey! Please load release data first for version : " + previousReleaseVersion);
-		}
+            responseMap.put("type", "post");
+            responseMap.put("failureMessage", "Please load release data first for version : " + previousReleaseVersion);
+            // pass file name without extension - we add this back when we retrieve using controller
+            responseMap.put("reportUrl", request.getContextPath()+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
+            return new ResponseEntity<>(responseMap, HttpStatus.OK);
+        }
 
 		Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
 		int failedAssertionCount = 0;
@@ -225,11 +225,14 @@ public class TestUploadFileController {
 			}
 		}
 
-		responseMap.put("assertions", map);
+        responseMap.put("type", "post");
+        responseMap.put("assertions", map);
 		responseMap.put("assertionsRun", map.keySet().size());
 		responseMap.put("assertionsFailed", failedAssertionCount);
+        // pass file name without extension - we add this back when we retrieve using controller
+        responseMap.put("reportUrl", request.getContextPath()+request.getServletPath()+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
 
-		return responseMap;
+        return new ResponseEntity<>(responseMap, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
@@ -272,8 +275,7 @@ public class TestUploadFileController {
 	@RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public FileSystemResource getFile(@PathVariable String id) {
-		return new FileSystemResource(new File(System.getProperty("java.io.tmpdir"), dataFolderName +
-				System.getProperty("file.separator") + id));
+		return new FileSystemResource(new File(validationRunner.getReportDataFolder(), id+".txt"));
 	}
 
 	private void copyUploadToDisk(MultipartFile file, File tempFile) throws IOException {
