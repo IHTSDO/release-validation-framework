@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/testApplicationContext.xml"})
+@ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
 public class ReleaseDataManagerImplIntegrationTest {
     @Resource(name = "snomedDataSource")
     private DataSource snomedDataSource;
