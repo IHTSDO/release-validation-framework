@@ -18,13 +18,36 @@
 				<value>classpath:execution-service.properties</value>
 			</list>
 		</property>
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+		<!--<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>-->
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>
 		<property name="order" value="1"/>
 	</bean>
+    <bean id="executionServicePropertyConfigurer2" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>${rvfConfigLocation}/execution-service.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="order" value="-1"/>
+    </bean>
 
-	<import resource="applicationContext.xml"/>
-	
+    <!-- Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing-->
+    <bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${rvf.snomed.jdbc.driverClassName}"/>
+        <property name="url" value="${rvf.snomed.jdbc.url}"/>
+        <property name="username" value="${rvf.snomed.jdbc.username}"/>
+        <property name="password" value="${rvf.snomed.jdbc.password}"/>
+        <property name="minEvictableIdleTimeMillis" value="1800000"/>
+        <property name="timeBetweenEvictionRunsMillis" value="1800000"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="testOnReturn" value="true"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="validationQuery" value="SELECT 1"/>
+        <property name="numTestsPerEvictionRun" value="3"/>
+    </bean>
+
 	<!-- service beans will go here -->
 	<bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl">
 		<property name="qaResulTableName" value="${rvf.qa.result.table.name}"/>
@@ -41,6 +64,6 @@
 		<property name="sctDataLocation" value="${rvf.data.folder.location}"/>
 	</bean>
 
-
+    <import resource="applicationContext.xml"/>
 
 </beans>
