@@ -2,15 +2,13 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -20,18 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.*;
-import java.sql.Connection;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * An implementation of the {@link org.ihtsdo.rvf.execution.service.AssertionExecutionService}
@@ -43,8 +37,10 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
     AssertionService assertionService;
     @Resource(name = "dataSource")
     BasicDataSource dataSource;
-    @Resource(name = "snomedDataSource")
-    BasicDataSource snomedDataSource;
+    @Autowired
+    RvfDynamicDataSource rvfDynamicDataSource;
+    @Autowired
+    ReleaseDataManager releaseDataManager;
     String qaResulTableName;
     String assertionIdColumnName;
     String assertionNameColumnName;
@@ -117,12 +113,14 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
     @Override
     public TestRunItem executeTest(Test test, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion) {
 
+        String initSQL = "USE " + releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion) + ";";
         logger.info("Started execution id = " + executionId);
         Calendar startTime = Calendar.getInstance();
         // initialise result table that stores results
         initialiseResultTable(executionId);
         // set prospective version as default schema to use since SQL has calls that do not specify schema name
-        snomedDataSource.setDefaultCatalog(prospectiveReleaseVersion);
+        String prospectiveSchemaName = releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion);
+        logger.info("Setting default catalog as : " + releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
 
         TestRunItem runItem = new TestRunItem();
         runItem.setTestTime(Calendar.getInstance().getTime());
@@ -161,9 +159,9 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
                         part = part.replaceAll("<RUNID>", String.valueOf(executionId));
                         part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(test.getId()));
                         part = part.replaceAll("<ASSERTIONTEXT>", test.getName());
-                        part = part.replaceAll("qa_result_table", qaResulTableName);
-                        part = part.replaceAll("<PROSPECTIVE>", prospectiveReleaseVersion);
-                        part = part.replaceAll("<PREVIOUS>", previousReleaseVersion);
+                        part = part.replaceAll("qa_result_table", dataSource.getDefaultCatalog()+"."+qaResulTableName);
+                        part = part.replaceAll("<PROSPECTIVE>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
+                        part = part.replaceAll("<PREVIOUS>", releaseDataManager.getSchemaForRelease(previousReleaseVersion));
                         part = part.replaceAll("<DELTA>", deltaTableSuffix);
                         part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
                         part = part.replaceAll("<FULL>", fullTableSuffix);
@@ -178,7 +176,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
                             logger.info("Set select query :" + part);
                             selectSQL = part;
 
-                            PreparedStatement preparedStatement = snomedDataSource.getConnection().prepareStatement(selectSQL);
+                            PreparedStatement preparedStatement = rvfDynamicDataSource.getConnection(prospectiveSchemaName).prepareStatement(selectSQL);
                             logger.info("Created statement");
                             ResultSet execResult = preparedStatement.executeQuery();
                             logger.info("execResult = " + execResult);
@@ -196,7 +194,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
                         }
                         else if(part.startsWith("insert")){
                             logger.info("Executing insert statement : " + part);
-                            PreparedStatement pt = snomedDataSource.getConnection().prepareStatement(part);
+                            PreparedStatement pt = rvfDynamicDataSource.getConnection(prospectiveSchemaName).prepareStatement(part);
                             logger.info("pt = " + pt);
                             int result = pt.executeUpdate();
                             logger.info("result = " + result);
@@ -205,9 +203,10 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
                             if(part.startsWith("create table") || part.startsWith("drop table")){
                                 part = part + " ENGINE = MyISAM";
                             }
+                            rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement().execute(initSQL);
                             logger.info("Executing statement :" + part);
 //                            boolean result = qaDataSource.getConnection().prepareStatement(part).execute();
-                            boolean result = snomedDataSource.getConnection().createStatement().execute(part);
+                            boolean result = rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement().execute(part);
                             if(!result){
                                 logger.error("Error executing sql : " + part);
                             }

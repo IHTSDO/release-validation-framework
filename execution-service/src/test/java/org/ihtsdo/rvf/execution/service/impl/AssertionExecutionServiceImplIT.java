@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -36,17 +37,21 @@ public class AssertionExecutionServiceImplIT {
     private EntityService entityService;
     @Autowired
     private AssertionService assertionService;
+    @Autowired
+    private ReleaseDataManager releaseDataManager;
     private Assertion assertion;
     private AssertionTest assertionTest;
     private org.ihtsdo.rvf.entity.Test test;
 
     @Before
     public void setUp() {
-        // ensure database is clean
-        assert entityService.count(org.ihtsdo.rvf.entity.Test.class) == 0;
-        assert entityService.count(AssertionTest.class) == 0;
-        assert entityService.count(ReleaseCenter.class) == 0;
-        assert entityService.count(Assertion.class) == 0;
+
+        assertNotNull(entityService);
+        assertNotNull(releaseDataManager);
+
+        // register releases with release manager, since they will be used during SQL replacement
+        releaseDataManager.setSchemaForRelease("20140731", "rvf_int_20140731");
+        releaseDataManager.setSchemaForRelease("20140131", "rvf_int_20140131");
 
         assertion = assertionService.create(new HashMap<String, String>());
         // create test
@@ -54,18 +59,18 @@ public class AssertionExecutionServiceImplIT {
         test.setType(TestType.SQL);
         test.setName("Test 1");
         test = (org.ihtsdo.rvf.entity.Test) entityService.create(test);
-        assert test != null;
-        assert test.getId() != null;
-        assert entityService.count(org.ihtsdo.rvf.entity.Test.class) > 0;
+        assertNotNull(test);
+        assertNotNull(test.getId());
+        assertTrue(entityService.count(org.ihtsdo.rvf.entity.Test.class) > 0);
 
         //create assertion test
         assertionTest = new AssertionTest();
         assertionTest.setAssertion(assertion);
         assertionTest.setTest(test);
         assertionTest = (AssertionTest) entityService.create(assertionTest);
-        assert assertionTest != null;
-        assert assertionTest.getId() != null;
-        assert entityService.count(AssertionTest.class) > 0;
+        assertNotNull(assertionTest);
+        assertNotNull(assertionTest.getId());
+        assertTrue(entityService.count(AssertionTest.class) > 0);
     }
 
     @Test
@@ -96,7 +101,7 @@ public class AssertionExecutionServiceImplIT {
         assertionTest.setTest(test);
 
         // set both prospective and previous release
-        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1L, "rvf_int_20140731", "postqa");
+        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1L, "20140731", "20140131");
         assertNotNull(runItem);
         System.out.println("runItem = " + runItem);
         System.out.println("runItem.isFailure() = " + runItem.isFailure());
@@ -135,7 +140,7 @@ public class AssertionExecutionServiceImplIT {
         assertionTest.setTest(test);
 
         // set both prospective and previous release
-        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "rvf_int_20140731", "postqa");
+        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "20140731", "20140131");
         assertNotNull(runItem);
         assertTrue("Test must have passed", runItem.isFailure());
     }

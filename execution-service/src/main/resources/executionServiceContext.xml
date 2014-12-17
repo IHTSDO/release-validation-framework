@@ -34,6 +34,9 @@
     </bean>
 
 	<!-- service beans will go here -->
+    <bean id="rvfDynamicDataSource" class="org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource">
+        <property name="url" value="${rvf.snomed.jdbc.url}"/>
+    </bean>
 	<bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl">
 		<property name="qaResulTableName" value="${rvf.qa.result.table.name}"/>
 		<property name="assertionDetailsColumnName" value="${rvf.assertion.details.column.name}"/>
