@@ -58,7 +58,7 @@
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
+			<version>${dbcp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
