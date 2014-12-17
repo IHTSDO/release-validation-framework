@@ -21,4 +21,8 @@ public interface ReleaseDataManager {
     boolean isKnownRelease(String releaseVersion);
 
     Set<String> getAllKnownReleases();
+
+    String getSchemaForRelease(String releaseVersion);
+
+    void setSchemaForRelease(String releaseVersion, String schemaName);
 }

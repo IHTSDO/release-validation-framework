@@ -30,7 +30,7 @@ import java.util.zip.ZipFile;
 public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingBean{
 
     private final Logger logger = LoggerFactory.getLogger(ReleaseDataManagerImpl.class);
-
+    private static final String RVF_DB_PREFIX = "rvf_int_";
     protected String sctDataLocation;
     protected File sctDataFolder;
     @Resource(name = "snomedDataSource")
@@ -79,6 +79,41 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
     protected void populateLookupMap(boolean purgeExistingDatabase){
         releaseFileNameLookup.clear();
 
+        // now get list of existing RVF_INT like databases
+        Set<String> rvfDatabases = new HashSet<>();
+        try {
+            ResultSet catalogs = snomedDataSource.getConnection().getMetaData().getCatalogs();
+            while(catalogs.next())
+            {
+                String schemaName = catalogs.getString(1);
+                if(schemaName.startsWith(RVF_DB_PREFIX)){
+                    // get the last yyymmdd fragment which indicates release data
+                    String releaseDate = schemaName.substring(RVF_DB_PREFIX.length());
+                    try
+                    {
+                        // we convert to data to verify we have a pattern matching yyyyMMdd
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                        sdf.setLenient(false);
+                        sdf.parse(releaseDate);
+                        // if we are here then release date is a valid date format
+                        logger.info("Registering existing schema as known release: " + schemaName);
+                        releaseSchemaNameLookup.put(releaseDate, schemaName);
+                    }
+                    catch (ParseException e) {
+                        logger.warn("Error processing file. Not a valid release date : " + schemaName);
+                    }
+
+                    // also store for later processing
+                    rvfDatabases.add(schemaName);
+                }
+            }
+            catalogs.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            logger.error("Error getting list of existing schemas. Nested exception is : \n" + e.fillInStackTrace());
+        }
+
         Collection<File> releases = FileUtils.listFiles(sctDataFolder, new String[]{"zip"}, false);
         logger.info("Number of releases in SNOMED CT data folder = " + releases.size());
         // we only want zip files and we do not want to traverse the directory recursively
@@ -94,16 +129,20 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
                 String releaseDate = fileName.substring("SnomedCT_Release_INT_".length() , fileName.length() - 4);
                 try
                 {
+                    // we convert to data to verify we have a pattern matching yyyyMMdd
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                     sdf.setLenient(false);
                     sdf.parse(releaseDate);
                     // if we are here then release date is a valid date format
                     releaseFileNameLookup.put(releaseDate, file.getAbsolutePath());
-                    // now call loadSnomedData method passing release zip
-                    String schemaName = loadSnomedData(releaseDate, purgeExistingDatabase, file);
-                    logger.info("schemaName = " + schemaName);
-                    // now add to releaseSchemaNameLookup
-                    releaseSchemaNameLookup.put(releaseDate, schemaName);
+                    // now call loadSnomedData method passing release zip, if there is no matching database
+                    if(! releaseSchemaNameLookup.keySet().contains(RVF_DB_PREFIX + releaseDate) || purgeExistingDatabase){
+                        logger.info("Loading data into schema " + RVF_DB_PREFIX+releaseDate);
+                        String schemaName = loadSnomedData(releaseDate, purgeExistingDatabase, file);
+                        logger.info("schemaName = " + schemaName);
+                        // now add to releaseSchemaNameLookup
+                        releaseSchemaNameLookup.put(releaseDate, schemaName);
+                    }
                 }
                 catch (ParseException e) {
                     logger.warn("Error processing file. Not a valid release date : " + fileName);
@@ -208,7 +247,15 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
     public String loadSnomedData(String versionName, boolean purgeExisting, File zipDataFile){
 
         Calendar startTime = Calendar.getInstance();
-        String createdSchemaName = "rvf_int_"+versionName;
+        File outputFolder = new File(FileUtils.getTempDirectoryPath(), "rvf_loader_data_"+versionName);
+        logger.info("Setting output folder location = " + outputFolder.getAbsolutePath());
+        if(! outputFolder.exists() && outputFolder.isDirectory()) {
+            outputFolder.mkdir();
+        } else {
+            logger.info("Output folder already exists");
+        }
+
+        String createdSchemaName = RVF_DB_PREFIX+versionName;
         try
         {
             boolean alreadyExists = false;
@@ -230,29 +277,23 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
             // get file from jar and write to tmp directory, so we can prepend sql statements and set default schema
             InputStream is = getClass().getResourceAsStream("/sql/create-tables-mysql.sql");
-            File outputFolder = new File(FileUtils.getTempDirectoryPath(), "scripts_"+versionName);
-            logger.info("Setting output folder location = " + outputFolder.getAbsolutePath());
-            if(! outputFolder.exists() && outputFolder.isDirectory()) {
-                outputFolder.mkdir();
-            } else {
-                logger.info("Output folder already exists");
-            }
+
             File outputFile = new File(outputFolder.getAbsolutePath(), "create-tables-mysql.sql");
             // add scheme information
-            FileUtils.writeStringToFile(outputFile, "drop database if exists rvf_int_"+versionName+";\n", true);
-            FileUtils.writeStringToFile(outputFile, "create database if not exists rvf_int_"+versionName+";\n", true);
-            FileUtils.writeStringToFile(outputFile, "use rvf_int_"+versionName+";\n", true);
+            FileUtils.writeStringToFile(outputFile, "drop database if exists "+RVF_DB_PREFIX+versionName+";\n", true);
+            FileUtils.writeStringToFile(outputFile, "create database if not exists "+RVF_DB_PREFIX+versionName+";\n", true);
+            FileUtils.writeStringToFile(outputFile, "use "+RVF_DB_PREFIX+versionName+";\n", true);
             FileUtils.writeLines(outputFile, IOUtils.readLines(is), true);
 
             InputStream is2 = getClass().getResourceAsStream("/sql/load-data-mysql.sql");
             File outputFile2 = new File(outputFolder.getAbsolutePath(), "load-data-mysql.sql");
-            FileUtils.writeStringToFile(outputFile2, "use rvf_int_"+versionName+";\n", true);
+            FileUtils.writeStringToFile(outputFile2, "use "+RVF_DB_PREFIX+versionName+";\n", true);
             for(String line : IOUtils.readLines(is2))
             {
                 // process line and add to output file
                 line = line.replaceAll("<release_version>", versionName);
                 line = line.replaceAll("<data_location>", outputFolder.getAbsolutePath());
-                FileUtils.writeStringToFile(outputFile2, line, true);
+                FileUtils.writeStringToFile(outputFile2, line+"\n", true);
             }
 
             // extract SNOMED CT content from zip file
@@ -270,6 +311,9 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
             runner.runScript(reader2);
             reader2.close();
             connection.close();
+
+            // add schema name to look up map
+            releaseSchemaNameLookup.put(versionName, createdSchemaName);
         }
         catch (SQLException e) {
             logger.error("Error creating connection to database. Nested exception is : " + e.fillInStackTrace());
@@ -277,8 +321,12 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
         catch (IOException e) {
             logger.error("Unable to read sql file. Nested exception is : " + e.fillInStackTrace());
         }
+        finally {
+            // remove output directory so it does not occupy space
+            FileUtils.deleteQuietly(outputFolder);
+        }
 
-        logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/6000) + " minutes.");
+        logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000) + " minutes.");
         return createdSchemaName;
     }
 
@@ -306,10 +354,43 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
                     IOUtils.closeQuietly(out);
                 }
             }
+
+            // now rename any files with prefix x - possibly pre-release files and flatten directory for easy sql processing
+            renameFilesinFolder(new File(outputDir), new File(outputDir), "x");
         }
         catch (IOException e) {
             e.printStackTrace();
             logger.warn("Nested exception is : " + e.fillInStackTrace());
+        }
+    }
+
+    /**
+     * Utility method for removing the given prefix in all pre release file names and flattening the directory structure
+     *
+     * @param sourceFolder the source folder containing the files to process (recursive)
+     * @param targetFolder the target folder that should contain the final files
+     */
+    private void renameFilesinFolder(File sourceFolder, File targetFolder, String prefix){
+        for(File f: sourceFolder.listFiles())
+        {
+            if(f.isDirectory()){
+                renameFilesinFolder(f, targetFolder, prefix);
+            }
+            else{
+                String fileName = f.getName();
+                if(fileName.startsWith(prefix)){
+                    fileName = fileName.substring(1);
+                }
+
+                // move file to flattened structure
+                try {
+                    FileUtils.moveFile(f, new File(targetFolder, fileName));
+                    logger.info("fileName = " + fileName);
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -339,5 +420,25 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
     public void setSnomedDataSource(BasicDataSource snomedDataSource) {
         this.snomedDataSource = snomedDataSource;
+    }
+
+    /**
+     * Returns the schema name that corresponds to  the given release.
+     * @param releaseVersion the release date as a yyyymmdd string (e.g. 20140731)
+     * @return the corresponding schema name
+     */
+    @Override
+    public String getSchemaForRelease(String releaseVersion){
+        return releaseSchemaNameLookup.get(releaseVersion);
+    }
+
+    /**
+     * Sets the schema name that corresponds to  the given release.
+     * @param releaseVersion the release date as a yyyymmdd string (e.g. 20140731)
+     * @param schemaName the corresponding schema name
+     */
+    @Override
+    public void setSchemaForRelease(String releaseVersion, String schemaName){
+        releaseSchemaNameLookup.put(releaseVersion, schemaName);
     }
 }
