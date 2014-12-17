@@ -19,7 +19,7 @@
 ********************************************************************************/
 	
 
-	create temporary table if not exists tmp_priorfullfromcurrent as
+	create table if not exists tmp_priorfullfromcurrent as
 	select *
 	from prev_simplerefset_f
 	where effectivetime != '<CURRENT-RELEASE-DATE>';

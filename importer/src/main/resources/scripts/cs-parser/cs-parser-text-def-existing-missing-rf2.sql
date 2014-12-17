@@ -6,35 +6,35 @@
 	TextDef Ids found in CS_ but missing in RF2.
 
 ********************************************************************************/
-	drop view if exists v_allid;
-	drop view if exists v_existingid;
-	drop view if exists v_maxidtime;
-	drop view if exists v_existingdescription;
+	drop table if exists v_allid;
+	drop table if exists v_existingid;
+	drop table if exists v_maxidtime;
+	drop table if exists v_existingdescription;
 	drop table if exists existingmaxattribute_tmp;
 	drop table if exists missingrf2existing_tmp;
 	drop table if exists exactexistingmatchcsrf2_tmp;
 
 	-- All distinct Ids in CS
-	create view v_allid as
+	create table if not exists v_allid as
 	select distinct(a.id) 
 	from cs_description a
 	where type_uuid in ('700546a3-09c7-3fc2-9eb9-53d318659a09');
 
 
 	-- SCTIDs that existed in previous release
-	create view v_existingid as
+	create table if not exists v_existingid as
 	select a.* from v_allid a, prev_textdefinition_s b
 	where a.id = b.id;
 
 	-- map all ids to latest committime
-	create view v_maxidtime as
+	create table if not exists v_maxidtime as
 	select id, max(committime) as committime 
 	from cs_description
 	where type_uuid in ('700546a3-09c7-3fc2-9eb9-53d318659a09')
 	group by id; 
 
 	-- all attributes of all previously existing textdef 
-	create view v_existingdescription as
+	create table if not exists v_existingdescription as
 	select a.* 
 	from cs_description a, v_existingid b
 	where a.id = b.id;

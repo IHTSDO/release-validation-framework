@@ -20,8 +20,8 @@
 /* 	limit to a list of active concepts of which descriptions have been edited 
 	this release 
 */
-	drop temporary table if exists tmp_edited_con;
-	create temporary table if not exists tmp_edited_con as
+	drop table if exists tmp_edited_con;
+	create table if not exists tmp_edited_con as
 	select distinct a.*
 	from curr_concept_s a
 		join curr_description_d b
@@ -30,8 +30,8 @@
 	commit;
 
 /* list of active description of active concepts edited for this release */
-	drop temporary table if exists tmp_active_desc;
-	create temporary table if not exists tmp_active_desc as	
+	drop table if exists tmp_active_desc;
+	create table if not exists tmp_active_desc as
 	select a.*
 	from curr_description_s a
 		join tmp_edited_con b
@@ -40,8 +40,8 @@
 	commit;
 
 /* list of inactive description of active concepts edited for this release */
-	drop temporary table if exists tmp_inactive_desc;
-	create temporary table if not exists tmp_inactive_desc as	
+	drop table if exists tmp_inactive_desc;
+	create table if not exists tmp_inactive_desc as
 	select a.*
 	from curr_description_s a
 		join tmp_edited_con b
@@ -66,6 +66,6 @@
 	and a.effectivetime = '<CURRENT-RELEASE-DATE>' or b.effectivetime = '<PREVIOUS-RELEASE-DATE>';
 	commit;
 
-	drop temporary table if exists tmp_edited_con;
-	drop temporary table if exists tmp_active_desc;
-	drop temporary table if exists tmp_inactive_desc;
+	drop table if exists tmp_edited_con;
+	drop table if exists tmp_active_desc;
+	drop table if exists tmp_inactive_desc;

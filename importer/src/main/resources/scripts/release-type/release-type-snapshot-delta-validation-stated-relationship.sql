@@ -17,9 +17,10 @@
 
 
 ********************************************************************************/
-	
-	
-	create or replace view snapshot as
+
+  drop table if exists snapshot;
+  create table if not exists snapshot like curr_stated_relationship_s;
+  insert into snapshot
 	select * 
 	from curr_stated_relationship_s
 	where cast(effectivetime as datetime)= 
@@ -85,7 +86,7 @@
 	or a.modifierid is null;
 
 
-	drop view snapshot;
+	drop table if exists snapshot;
 	 
 	 
 	 

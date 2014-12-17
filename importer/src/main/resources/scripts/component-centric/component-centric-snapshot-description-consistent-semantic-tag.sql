@@ -8,14 +8,16 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding active FSN's and semantic tags */
-	create or replace view v_curr_snapshot_1 as
+	drop table if exists v_curr_snapshot_1;
+	create table if not exists v_curr_snapshot_1 (INDEX(conceptid)) as
 	select  a.conceptid , a.id , SUBSTRING(term,LOCATE('(',term)) as tag , a.term 
 	from curr_description_s a 
 	where a.typeid ='900000000000003001'
 	and a.active = 1
 	and a.term like '% (%)';
 
-	create or replace view v_curr_snapshot_2 as
+	drop table if exists v_curr_snapshot_2;
+	create table if not exists v_curr_snapshot_2 (INDEX(conceptid)) as
 	SELECT a.conceptid
 	from curr_description_s a , v_curr_snapshot_1 b
 	where a.typeid in ('900000000000003001')
@@ -35,6 +37,6 @@
 	from v_curr_snapshot_2 a;
 
 
-	drop view v_curr_snapshot_1;
-	drop view v_curr_snapshot_2;
+	drop table if exists v_curr_snapshot_1;
+	drop table if exists v_curr_snapshot_2;
 

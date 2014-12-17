@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding terms containing double spaces */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.id 
 	from curr_textdefinition_s a , curr_concept_s b
 	where a.active = 1
@@ -27,6 +28,6 @@
 	from v_curr_snapshot a;
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;
 
 	

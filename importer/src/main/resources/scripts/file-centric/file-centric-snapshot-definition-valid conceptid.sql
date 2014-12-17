@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding invalid conceptid values  */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.conceptid
 	from curr_textdefinition_s a
 	left join curr_concept_s b
@@ -27,4 +28,4 @@
 	from v_curr_snapshot a;
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;

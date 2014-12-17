@@ -7,43 +7,43 @@
 
 ********************************************************************************/
 	
-	drop view if exists v_allid;
-	drop view if exists v_newid;
-	drop view if exists v_existingid;
-	drop view if exists v_totalcount;
-	drop view if exists v_maxidtime;
-	drop view if exists v_maxidtimecount;
+	drop table if exists v_allid;
+	drop table if exists v_newid;
+	drop table if exists v_existingid;
+	drop table if exists v_totalcount;
+	drop table if exists v_maxidtime;
+	drop table if exists v_maxidtimecount;
 
 	
 	-- All distinct Ids in CS
-	create view v_allid as
+	create table if not exists v_allid as
 	select count(distinct(a.id)) as allidcount from cs_description a;
 	
 	
 	-- Count of Ids that existed in previous release
-	create view v_existingid as
+	create table if not exists v_existingid as
 	select count(*) as existingidcount 
 	from v_allid a, prev_description_s b
 	where a.allidcount = b.id;
 		
 	-- Count of Ids that are new in current release
-	create view v_newid as
+	create table if not exists v_newid as
 	select count(*) as newidcount from v_allid a
 	left join prev_description_s b on a.allidcount = b.id
 	where b.id is null;
 	
 	-- Sum of new and existing Ids 
-	create view v_totalcount as
+	create table if not exists v_totalcount as
 	select (a.newidcount + b.existingidcount) as totalcount 
 	from v_newid a, v_existingid b;
 	 
 	-- Map all ids to latest committime
-	create view v_maxidtime as
+	create table if not exists v_maxidtime as
 	select id, max(commitTime) as commitTime from cs_description 
 	group by id; 
 	
 	-- Count of latest committime Ids 
-	create view v_maxidtimecount as
+	create table if not exists v_maxidtimecount as
 	select count(*) as maxidtimecount from v_maxidtime;
 
 

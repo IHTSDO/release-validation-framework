@@ -5,8 +5,11 @@
 	The current data in the Definition snapshot file are the same as the data in 
 	the current delta file. 
 ********************************************************************************/
-	create or replace view td as
-	select * 
+
+  drop table if exists td;
+  create table if not exists td like curr_textdefinition_s;
+  insert into td
+	select *
 	from curr_textdefinition_s
 	where cast(effectivetime as datetime)= 
 	(select max(cast(effectivetime as datetime))
@@ -67,7 +70,7 @@
 	or b.casesignificanceid is null;
 
 
-	drop view td;
+	drop table if exists td;
 	 
 	 
 	 

@@ -21,8 +21,9 @@
 	having count(a.referencedcomponentid) > 1;
 
 
-	/* Create view of all active SNOMED RT refset members */
-	create or replace view v_act_srt as
+	/* create table if not exists of all active SNOMED RT refset members */
+	drop table if exists v_act_srt;
+	create table if not exists v_act_srt (INDEX(referencedcomponentid)) as
 		select referencedcomponentid 
 		from curr_simplemaprefset_s 
 		where refsetid = '900000000000498005';
@@ -39,5 +40,5 @@
 		on a.id = b.referencedcomponentid 
 	where b.referencedcomponentid is null;
 
-	drop view if exists v_act_srt;
+	drop table if exists v_act_srt;
 

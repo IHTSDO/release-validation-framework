@@ -6,38 +6,38 @@
 	time cs and the count of rf2 .
 
 ********************************************************************************/
-	drop view if exists v_maxidtime;
+	drop table if exists v_maxidtime;
 	drop table if exists maxattribute_tmp;
 	drop table if exists matching_tmp;
-	drop view if exists v_cscount;
-	drop view if exists v_rf2count;
-	drop view if exists v_matchingcount;
-	drop view if exists v_allid;
-	drop view if exists v_newid;
-	drop view if exists v_newdescription;
+	drop table if exists v_cscount;
+	drop table if exists v_rf2count;
+	drop table if exists v_matchingcount;
+	drop table if exists v_allid;
+	drop table if exists v_newid;
+	drop table if exists v_newdescription;
 	drop table if exists newmaxattribute_tmp;
 	drop table if exists newinactive_tmp;
-	drop view if exists v_newinactive;
+	drop table if exists v_newinactive;
 	drop table if exists textdefintion_tmp;
-	drop view if exists v_textdefintion;
-	drop view if exists v_existingid;
-	drop view if exists v_existingdescription;
+	drop table if exists v_textdefintion;
+	drop table if exists v_existingid;
+	drop table if exists v_existingdescription;
 	drop table if exists existingmaxattribute_tmp;
 	drop table if exists exactexistingmatchcsrf2_tmp;
-	drop view if exists v_existingmatch;
-	drop view if exists v_allconceptid;
-	drop view if exists v_newconceptid;
-	drop view if exists v_maxidconcepttime;
-	drop view if exists v_newconcept;
+	drop table if exists v_existingmatch;
+	drop table if exists v_allconceptid;
+	drop table if exists v_newconceptid;
+	drop table if exists v_maxidconcepttime;
+	drop table if exists v_newconcept;
 	drop table if exists newmaxconceptattribute_tmp;
 	drop table if exists newinactiveconcept_tmp;
 	drop table if exists newdescriptioninactiveconcept_tmp;
-	drop view if exists v_newdescriptioninactiveconcept;
+	drop table if exists v_newdescriptioninactiveconcept;
 
 
 	/* Prep */
 	-- map all ids to latest committime
-	create view v_maxidtime as
+	create table if not exists v_maxidtime as
 	select id, max(committime) as committime from cs_description 
 	group by id; 
 
@@ -62,13 +62,13 @@
 
 
 	/* Counts */
-	create view v_cscount as
+	create table if not exists v_cscount as
 	select count(*) as cscount from maxattribute_tmp;
 
-	create view v_rf2count as
+	create table if not exists v_rf2count as
 	select count(*) as rf2count from curr_description_d;
 
-	create view v_matchingcount as
+	create table if not exists v_matchingcount as
 	select count(*) as matchingcount from matching_tmp;
 
 
@@ -77,18 +77,18 @@
 	
 	/* Subtract from cscount for those Descriptions that were created and inactivated in current release */
 	-- All distinct Descriptions Ids in CS
-	create view v_allid as
+	create table if not exists v_allid as
 	select distinct(a.id) from cs_description a;
 
 
 	-- SCTIDs that new to current release
-	create view v_newid as
+	create table if not exists v_newid as
 	select a.* from v_allid a
 	left join prev_description_s b on a.id = b.id
 	where b.id is null;
 
 	-- All attributes of Descriptions that are new in current release 
-	create view v_newdescription as 
+	create table if not exists v_newdescription as
 	select a.* from cs_description a, v_newid b 
 	where a.id = b.id;  
 
@@ -103,7 +103,7 @@
 	select * from newmaxattribute_tmp where active = 0;
 
 	-- Generate count of Descriptions created and inactivated in current release
-	create view v_newinactive as
+	create table if not exists v_newinactive as
 	select count(*) as newinactive from newinactive_tmp;
 
 
@@ -118,7 +118,7 @@
 	and active = '1';
 
 	-- Generate count of TextDefinitions created in current release
-	create view v_textdefintion as
+	create table if not exists v_textdefintion as
 	select count(*) as textdefintion from textdefintion_tmp;
 
 
@@ -126,12 +126,12 @@
 
 	/* Subtract from cscount for those existing Descriptions whose end version is the same as the previously released version */
 	-- SCTIDs that existed in previous release
-	create view v_existingid as
+	create table if not exists v_existingid as
 	select a.* from v_allid a, prev_description_s b
 	where a.id = b.id;
 
 	-- All attributes of all previously existing Descriptions 
-	create view v_existingdescription as
+	create table if not exists v_existingdescription as
 	select a.* from cs_description a, v_existingid b
 	where a.id = b.id;
 
@@ -153,7 +153,7 @@
 	and a.casesignificanceid = b.casesignificanceid;
 
 	-- Generate count of existing CS file's Descriptions whose final versions are the same as the previously released versions
-	create view v_existingmatch as
+	create table if not exists v_existingmatch as
 	select count(*) as existingmatch from exactexistingmatchcsrf2_tmp;
 
 
@@ -162,23 +162,23 @@
 
 	/* Subtract from cscount for those new Descriptions inactivated Concepts */
 	-- All distinct Ids in CS
-	create view v_allconceptid as
+	create table if not exists v_allconceptid as
 	select distinct(a.id) from cs_concept a;
 
 
 	-- SCTIDs that new to current release
-	create view v_newconceptid as
+	create table if not exists v_newconceptid as
 	select a.* from v_allconceptid a
 	left join prev_concept_s b on a.id = b.id
 	where b.id is null;
 
 	-- Map all ids to latest committime
-	create view v_maxidconcepttime as
+	create table if not exists v_maxidconcepttime as
 	select id, max(committime) as committime from cs_concept 
 	group by id; 
 
 	-- All attributes of concepts that are new in current release 
-	create view v_newconcept as 
+	create table if not exists v_newconcept as
 	select a.* from cs_concept a, v_newconceptid b 
 	where a.id = b.id;  
 
@@ -200,7 +200,7 @@
 	and typeid != '900000000000550004';
 
 	-- Generate count of new CS file's Descriptions that belong to new concepts that have been inactivated
-	create view v_newdescriptioninactiveconcept as
+	create table if not exists v_newdescriptioninactiveconcept as
 	select count(*) as newdescriptioninactiveconcept from newdescriptioninactiveconcept_tmp;
 	
 

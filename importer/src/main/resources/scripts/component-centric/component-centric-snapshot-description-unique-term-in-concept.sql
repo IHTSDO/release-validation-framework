@@ -11,8 +11,8 @@
 /*	list of active descriptions of active concepts edited in the current 
 	prospective release 
 */	
-	drop temporary table if exists tmp_active_desc;
-	create temporary table if not exists tmp_active_desc as
+	drop table if exists tmp_active_desc;
+	create table if not exists tmp_active_desc as
 	select c.conceptid, c.term
 	from res_concepts_edited a
 		join curr_concept_s b
@@ -36,6 +36,6 @@
 	and binary count(term) > 1;
 	commit;
 	
-	drop temporary table if exists tmp_active_desc;
+	drop table if exists tmp_active_desc;
 	
 			

@@ -20,8 +20,10 @@
 	
 	
 	/* selecting the latest components (i.e. the delta) from the snapshot */
-	create or replace view ss as
-	select * 
+  drop table if exists ss;
+  create table if not exists ss like curr_concept_s;
+  insert into ss
+	select *
 	from curr_concept_s
 	where cast(effectivetime as datetime)= 
 		(select max(cast(effectivetime as datetime))
@@ -66,7 +68,7 @@
 	or b.definitionstatusid is null;
 
 
-	drop view ss;
+	drop table if exists ss;
 	 
 	 
 	 

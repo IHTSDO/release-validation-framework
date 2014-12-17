@@ -4,8 +4,8 @@
 */
 
 /* view of current delta, derived from current full */
-	drop temporary table if exists temp_table;
-	create temporary table if not exists temp_table like prev_stated_relationship_f;
+	drop table if exists temp_table;
+	create table if not exists temp_table like prev_stated_relationship_f;
 	
 	insert into temp_table 
 	select * from curr_stated_relationship_d;
@@ -74,4 +74,4 @@
 	or b.characteristictypeid is null
 	or b.modifierid is null;
 
-drop temporary table temp_table;
+drop table temp_table;

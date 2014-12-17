@@ -7,44 +7,44 @@
 
 ********************************************************************************/
 	
-	drop view if exists v_allid;
-	drop view if exists v_newid;
-	drop view if exists v_maxidtime;
-	drop view if exists v_newdescription;
+	drop table if exists v_allid;
+	drop table if exists v_newid;
+	drop table if exists v_maxidtime;
+	drop table if exists v_newdescription;
 	drop table if exists newmaxattribute_tmp;
 	drop table if exists newinactive_tmp;
 	drop table if exists missingrf2new_tmp;
 	drop table if exists textdefintion_tmp;
-	drop view if exists v_allconceptid;
-	drop view if exists v_newconceptid;
-	drop view if exists v_maxconceptidtime;
-	drop view if exists v_newconcept;
+	drop table if exists v_allconceptid;
+	drop table if exists v_newconceptid;
+	drop table if exists v_maxconceptidtime;
+	drop table if exists v_newconcept;
 	drop table if exists newmaxconceptattribute_tmp;
 	drop table if exists newinactiveconcept_tmp;
 
 	-- All distinct Ids in CS
-	create view v_allid as
+	create table if not exists v_allid as
 	select distinct(a.id) 
 	from cs_description a
 	where a.type_uuid ='00791270-77c9-32b6-b34f-d932569bd2bf';
 
 
 	-- SCTIDs that new to current release
-	create view v_newid as
+	create table if not exists v_newid as
 	select a.* from v_allid a
 	left join prev_textdefinition_s b 
 	on a.id = b.id
 	where b.id is null;
 
 	-- Map all ids to latest committime
-	create view v_maxidtime as
+	create table if not exists v_maxidtime as
 	select id, max(committime) as committime 
 	from cs_description 
 	where type_uuid ='00791270-77c9-32b6-b34f-d932569bd2bf'
 	group by id; 
 
 	-- All attributes of descriptions that are new in current release 
-	create view v_newdescription as 
+	create table if not exists v_newdescription as
 	select a.* 
 	from cs_description a, v_newid b 
 	where a.id = b.id;  
@@ -89,25 +89,25 @@
 
 	/* Textdef of new concepts in this release that were inactivated by release time */
 	-- All distinct Ids in CS
-	create view v_allconceptid as
+	create table if not exists v_allconceptid as
 	select distinct(a.id) 
 	from cs_concept a;
 
 	-- SCTIDs that new to current release
-	create view v_newconceptid as
+	create table if not exists v_newconceptid as
 	select a.* from v_allconceptid a
 	left join prev_concept_s b 
 	on a.id = b.id
 	where b.id is null;
 
 	-- Map all ids to latest committime
-	create view v_maxconceptidtime as
+	create table if not exists v_maxconceptidtime as
 	select id, max(committime) as committime 
 	from cs_concept 
 	group by id; 
 
 	-- All attributes of concepts that are new in current release 
-	create view v_newconcept as 
+	create table if not exists v_newconcept as
 	select a.* from cs_concept a, v_newconceptid b 
 	where a.id = b.id;  
 

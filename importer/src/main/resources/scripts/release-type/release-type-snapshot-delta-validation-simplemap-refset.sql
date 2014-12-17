@@ -6,8 +6,11 @@
 
 ********************************************************************************/
 	/* selecting the latest components (i.e. the delta) from the snapshot */
-	create or replace view vw as
-	select * 
+
+  drop table if exists vw;
+  create table if not exists vw like curr_simplemaprefset_s;
+  insert into vw
+	select *
 	from curr_simplemaprefset_s
 	where cast(effectivetime as datetime)= 
 		(select max(cast(effectivetime as datetime))
@@ -55,4 +58,4 @@
 	or b.referencedcomponentid is null
 	or b.maptarget is null;
 
-	drop view vw;
+	drop table if exists vw;

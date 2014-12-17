@@ -7,8 +7,11 @@
 
 ********************************************************************************/
 	/* selecting the latest components (i.e. the delta) from the snapshot */
-	create or replace view vw as
-	select * 
+
+  drop table if exists vw;
+  create table if not exists vw like curr_simplerefset_s;
+  insert into vw
+	select *
 	from curr_simplerefset_s
 	where effectivetime = '<CURRENT-RELEASE-DATE>';
 
@@ -50,7 +53,7 @@
 	or b.moduleid is null
 	or b.referencedcomponentid is null;
 
-	drop view vw;
+	drop table if exists vw;
 	 
 	 
 	 

@@ -3,7 +3,9 @@
 */
 
 /* 	view of current snapshot, derived from current full */
-	create or replace view temp_view as
+	drop table if exists temp_view;
+  	create table if not exists temp_view like curr_relationship_f;
+  	insert into temp_view
 	select a.*
 	from curr_relationship_f a
 	where cast(a.effectivetime as datetime) = 
@@ -74,6 +76,6 @@
 	or b.modifierid is null;
 
 commit;
-drop view temp_view;
+drop table if exists temp_view;
 
 

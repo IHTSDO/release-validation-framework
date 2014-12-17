@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding invalid TargetComponentId */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.targetcomponentid
 	from curr_associationrefset_s a
 	left join curr_concept_s b
@@ -24,4 +25,4 @@
 		concat('ASSOC RS: Targetcomponentid=',a.targetcomponentid, ':Invalid TargetComponentId.') 	
 	from v_curr_snapshot a;
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;

@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding FSN's without balanced parantheses */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	SELECT a.id , a.conceptid , a.term
 	from curr_description_s  a , curr_concept_s b
 	where (LENGTH(term) - LENGTH(REPLACE(term, '(', ''))) - (LENGTH(term) - LENGTH(REPLACE(term, ')', ''))) !=0 
@@ -28,6 +29,6 @@
 	from v_curr_snapshot a;
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;
 
 	

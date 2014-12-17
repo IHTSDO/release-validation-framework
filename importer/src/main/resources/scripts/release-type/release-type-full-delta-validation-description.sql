@@ -4,17 +4,17 @@
 */
 
 /*	The current full based on the current delta and the prior full */
-	drop temporary table if exists temp_table;
-    create temporary table if not exists temp_table(
-       id VARCHAR(18),
+	drop table if exists temp_table;
+    create table if not exists temp_table(
+       id bigint(20),
        effectivetime CHAR(8),
        active CHAR(1),
-       moduleid VARCHAR(18),
-       conceptid VARCHAR(18),
+       moduleid bigint(20),
+       conceptid bigint(20),
        languagecode VARCHAR(2),
-       typeid VARCHAR(18),
+       typeid bigint(20),
        term VARCHAR(255),
-       casesignificanceid VARCHAR(18),
+       casesignificanceid bigint(20),
 		index idx_id (id),
 	    index idx_effectivetime (effectivetime),
 	    index idx_active (active),
@@ -88,4 +88,4 @@
 	or b.casesignificanceid is null;
 
 	commit;
-	drop temporary table temp_table;
+	drop table temp_table;

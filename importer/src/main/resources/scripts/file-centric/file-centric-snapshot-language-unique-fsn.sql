@@ -35,7 +35,7 @@
 	*/
 	
 /* for active concepts edited for the prospective release, active descriptions appear not more than once as active members of each language refset */ 
-	create temporary table if not exists tmp_descsedited as
+	create table if not exists tmp_descsedited as
 	select a.id 
 	from curr_description_d a
 	join curr_concept_s b
@@ -56,7 +56,7 @@
 	having count(refsetid) > 1 
 	and count(referencedcomponentid) > 1;
 
-	drop temporary table if exists  tmp_descsedited;
+	drop table if exists  tmp_descsedited;
 	
 	
 	
@@ -65,7 +65,8 @@
 	/* TEST: Concept does not have an FSN defined */
 
 	/* Get all active FSNs */
-	create or replace view v_curr_fsn as
+	drop table if exists v_curr_fsn;
+	create table if not exists v_curr_fsn (INDEX(conceptid)) as
 	select conceptid
 		from curr_description_s  
 		where active = '1'
@@ -86,7 +87,7 @@
 	and b.conceptid is null;
 		
 	
-	drop view v_curr_fsn;
+	drop table if exists v_curr_fsn;
 	
 	
 	

@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding FSN's with leading and training spaces */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.term from curr_textdefinition_s a 
 	where a.active = 1
 	and a.term != LTRIM(term)
@@ -27,5 +28,5 @@
 	from v_curr_snapshot a;
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;
 	

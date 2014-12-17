@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding invalid inactive states*/
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.id 
 	from curr_attributevaluerefset_s a , prev_attributevaluerefset_s b
 	where cast(a.effectivetime as datetime) =
@@ -30,4 +31,4 @@
 	from v_curr_snapshot a;
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;

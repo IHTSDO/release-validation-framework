@@ -13,7 +13,9 @@
 ********************************************************************************/
 	
 
-	create or replace view curr as
+	drop table if exists curr;
+  create table if not exists curr like curr_relationship_f;
+  insert into curr
 		select *
 		from curr_relationship_f
 		where cast(effectivetime as datetime) <
@@ -78,7 +80,7 @@
 	or b.characteristictypeid is null
 	or b.modifierid is null;
 
-	drop view curr;
+	drop table if exists curr;
 
 	commit;	
 	

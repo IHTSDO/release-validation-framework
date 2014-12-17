@@ -8,10 +8,10 @@
 ********************************************************************************/
 	
 	
-	drop view if exists v_allid;
-	drop view if exists v_newid;
-	drop view if exists v_maxidtime;
-	drop view if exists v_newrelationship;
+	drop table if exists v_allid;
+	drop table if exists v_newid;
+	drop table if exists v_maxidtime;
+	drop table if exists v_newrelationship;
 	drop table if exists newmaxattribute_tmp;
 	drop table if exists newinactive_tmp;
 	drop table if exists missingrf2new_tmp;
@@ -20,22 +20,22 @@
 
 	/* Prep */
 	-- All distinct Ids in CS
-	create view v_allid as
+	create table if not exists v_allid as
 	select distinct(a.id) from cs_relationship a;
 
 	-- SCTIDs that new to current release
-	create view v_newid as
+	create table if not exists v_newid as
 	select a.* from v_allid a
 	left join prev_stated_relationship_s b on a.id = b.id
 	where b.id is null;
 
 	-- Map all ids to latest committime
-	create view v_maxidtime as
+	create table if not exists v_maxidtime as
 	select id, max(committime) as committime from cs_relationship 
 	group by id; 
 
 	-- All attributes of relationships that are new in current release 
-	create view v_newrelationship as 
+	create table if not exists v_newrelationship as
 	select a.* from cs_relationship a, v_newid b 
 	where a.id = b.id;  
 

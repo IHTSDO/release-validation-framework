@@ -19,7 +19,9 @@
 ********************************************************************************/
 	
 
-	create or replace view curr as
+  drop table if exists curr;
+  create table if not exists curr like curr_simplemaprefset_f;
+  insert into curr
 		select *
 		from curr_simplemaprefset_f
 		where cast(effectivetime as datetime) <
@@ -73,4 +75,4 @@
 	or b.maptarget is null;
 
 
-	drop view curr;
+	drop table if exists curr;

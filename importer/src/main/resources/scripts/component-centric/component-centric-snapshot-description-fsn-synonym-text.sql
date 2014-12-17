@@ -8,7 +8,7 @@
 ********************************************************************************/
 	
 /* 	active concepts having descriptions edited in the current release cycle */
-	create temporary table if not exists tmp_consedited as
+	create table if not exists tmp_consedited as
 	select distinct conceptid 
 	from curr_concept_s a
 	join curr_description_d b
@@ -16,7 +16,7 @@
 	and a.active = 1;
 
 /* 	for edited concepts, list all FSNs, with and without semantic tags */
-	create temporary table if not exists tmp_fsn as
+	create table if not exists tmp_fsn as
 	select replace(a.term, concat('(',substring_index(a.term, '(', -1)), '') as termwithouttag,
 	a.id , a.conceptid , a.term 
 	from curr_description_s a
@@ -26,7 +26,7 @@
 	where a.typeid ='900000000000003001';
 
 /* all terms for edited concepts */
-	create temporary table if not exists tmp_allterms as
+	create table if not exists tmp_allterms as
 	select a.id , a.conceptid , a.term
 	from curr_description_s a 
 	join tmp_consedited b
@@ -35,7 +35,7 @@
 	where a.typeid !='900000000000003001';
 
 /* select the concepts that have synonyms that match the FSNs without semantic tags */
-	create temporary table if not exists tmp_termsmatch as
+	create table if not exists tmp_termsmatch as
 	select a.* 
 	from tmp_fsn a
 	join tmp_allterms b
@@ -66,8 +66,8 @@
 
 
 /* 	clean up */
-	drop temporary table if exists tmp_consedited;
-	drop temporary table if exists tmp_allterms;
-	drop temporary table if exists tmp_fsn;
-	drop temporary table if exists tmp_termsmatch;
+	drop table if exists tmp_consedited;
+	drop table if exists tmp_allterms;
+	drop table if exists tmp_fsn;
+	drop table if exists tmp_termsmatch;
 	

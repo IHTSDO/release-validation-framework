@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding invalid valueid identifiers */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.valueid
 	from curr_attributevaluerefset_s a
 	left join curr_concept_s b
@@ -28,4 +29,4 @@
 
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;

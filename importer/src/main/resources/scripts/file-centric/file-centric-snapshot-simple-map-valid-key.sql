@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by key values in SIMPLE MAP REFSET */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.id , a.refsetid , a.referencedcomponentid 
 	from curr_simplemaprefset_s a 
 	group by a.id , a.refsetid , a.referencedcomponentid 
@@ -23,5 +24,5 @@
 		concat('SM RS: id=',a.id, ':Invalid keys in SIMPLE MAP REFSET snapshot file.') 	
 	from v_curr_snapshot a;
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;
 	

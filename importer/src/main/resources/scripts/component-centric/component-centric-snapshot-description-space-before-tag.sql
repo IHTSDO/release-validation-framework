@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding FSN's semantic tag */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	SELECT a.term
 	from curr_description_s a , curr_concept_s b
 	where typeid ='900000000000003001'
@@ -30,6 +31,6 @@
 	where a.term not like ' (%';
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;
 
 	

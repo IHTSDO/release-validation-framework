@@ -3,20 +3,20 @@
 	The current full inferred relationship file consists of the previously published full file and the changes for the current release
 */
 
-drop temporary table if exists temp_table;
+drop table if exists temp_table;
 
 /* view of current delta, derived from current full */
 	create table if not exists temp_table (
-    id varchar(18),
+    id bigint(20),
     effectivetime char(8),
     active char(1),
-    moduleid varchar(18),
-    sourceid varchar(18),
-    destinationid varchar(18),
-    relationshipgroup varchar(18),
-    typeid varchar(18),
-    characteristictypeid varchar(18),
-    modifierid varchar(18)
+    moduleid bigint(20),
+    sourceid bigint(20),
+    destinationid bigint(20),
+    relationshipgroup bigint(20),
+    typeid bigint(20),
+    characteristictypeid bigint(20),
+    modifierid bigint(20)
     );
 
 	create  index id_id on temp_table(id);

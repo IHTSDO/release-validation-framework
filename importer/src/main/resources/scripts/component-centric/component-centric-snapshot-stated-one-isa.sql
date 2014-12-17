@@ -6,8 +6,9 @@
 	All concepts have at least one stated is-a relationship.
 
 ********************************************************************************/
-	/* Create view of all concepts containing an active stated is_a relationship */
-	create or replace view v_act_stated_isa as
+	/* create table if not exists of all concepts containing an active stated is_a relationship */
+	drop table if exists v_act_stated_isa;
+	create table if not exists v_act_stated_isa as
 	select sourceid
 		from curr_stated_relationship_s
 		where active = '1'
@@ -28,4 +29,4 @@
 	and b.sourceid is null
 	and a.id != 138875005;
 
-	drop view v_act_stated_isa;
+	drop table if exists v_act_stated_isa;

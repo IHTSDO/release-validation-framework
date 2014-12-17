@@ -10,8 +10,8 @@
 
 ********************************************************************************/
 /*	list of active concepts edited for the current prospective release */
-	drop temporary table if exists tmp_active_con;
-	create temporary table if not exists tmp_active_con as
+	drop table if exists tmp_active_con;
+	create table if not exists tmp_active_con as
 	select b.*
 	from res_concepts_edited a 
 		join curr_concept_s b
@@ -20,8 +20,8 @@
 	commit;
 
 /* 	list of refset members per concept, per refset */
-	drop temporary table if exists tmp_member;
-	create temporary table if not exists tmp_member as
+	drop table if exists tmp_member;
+	create table if not exists tmp_member as
 	select a.id as conceptid, c.refsetid, c.referencedcomponentid
 	from tmp_active_con a
 		join curr_description_s b
@@ -46,7 +46,7 @@
 		and count(referencedcomponentid) > 1;
 	commit;
 	
-	drop temporary table if exists tmp_active_con;
-	drop temporary table if exists tmp_member;
+	drop table if exists tmp_active_con;
+	drop table if exists tmp_member;
 
 	

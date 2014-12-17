@@ -19,7 +19,9 @@
 ********************************************************************************/
 	
 
-	create or replace view curr as
+	drop table if exists curr;
+  create table if not exists curr like curr_langrefset_f;
+  insert into curr
 	select *
 	from curr_langrefset_f
 	where cast(effectivetime as datetime) <
@@ -74,4 +76,4 @@
 	
 	commit;
 
-	drop view curr;
+	drop table if exists curr;

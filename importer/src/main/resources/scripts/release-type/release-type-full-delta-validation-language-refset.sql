@@ -4,8 +4,8 @@
 */
 
 /* view of current delta, derived from current full */
-	drop temporary table if exists temp_table;
-	create temporary table if not exists temp_table like prev_langrefset_f;
+	drop table if exists temp_table;
+	create table if not exists temp_table like prev_langrefset_f;
 	
 	insert into temp_table select * from curr_langrefset_d;
 	commit;
@@ -62,4 +62,4 @@
   	or b.acceptabilityid is null;
 
 	commit;
-	drop temporary table if exists temp_table;
+	drop table if exists temp_table;

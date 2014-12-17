@@ -8,8 +8,9 @@
 
 ********************************************************************************/
 	
-	/* create view of limited status concepts */
-	create or replace view v_limcons as
+	/* create table if not exists of limited status concepts */
+	drop table if exists v_limcons;
+	create table if not exists v_limcons (INDEX(referencedcomponentid)) as
 	   select referencedcomponentid from curr_attributevaluerefset_s 
 	   where active = '1'
 	   and valueid = '900000000000486000';
@@ -29,5 +30,5 @@
 	and b.active = '0' 
 	and c.referencedcomponentid is null;
 	
-	drop view v_limcons;
+	drop table if exists v_limcons;
 		

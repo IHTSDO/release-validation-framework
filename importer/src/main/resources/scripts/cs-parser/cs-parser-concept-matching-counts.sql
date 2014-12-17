@@ -7,32 +7,32 @@
 .
 
 ********************************************************************************/
-	drop view if exists v_allid;
-	drop view if exists v_maxidtime;
+	drop table if exists v_allid;
+	drop table if exists v_maxidtime;
 	drop table if exists maxattribute_tmp;
-	drop view if exists v_matching;
-	drop view if exists v_cscount;
-	drop view if exists v_rf2count;
-	drop view if exists v_newid;
-	drop view if exists v_matchingcount;
-	drop view if exists v_newconcept;
+	drop table if exists v_matching;
+	drop table if exists v_cscount;
+	drop table if exists v_rf2count;
+	drop table if exists v_newid;
+	drop table if exists v_matchingcount;
+	drop table if exists v_newconcept;
 	drop table if exists newmaxattribute_tmp;
 	drop table if exists newinactive_tmp;
-	drop view if exists v_newinactive;
-	drop view if exists v_existingid;
-	drop view if exists v_existingconcept;
+	drop table if exists v_newinactive;
+	drop table if exists v_existingid;
+	drop table if exists v_existingconcept;
 	drop table if exists existingmaxattribute_tmp;
 	drop table if exists exactexistingmatchcsrf2_tmp;
-	drop view if exists v_existingmatch;
+	drop table if exists v_existingmatch;
 
 
 	/* Prep */
 	-- All distinct Concept Ids in CS
-	create view v_allid as
+	create table if not exists v_allid as
 	select distinct(a.id) from cs_concept a;
 
 	-- map all ids to latest committime
-	create view v_maxidtime as
+	create table if not exists v_maxidtime as
 	select id, max(committime) as committime from cs_concept 
 	group by id; 
 
@@ -43,7 +43,7 @@
 	and a.committime = b.committime;
 
 	-- Concepts whose RF2 Files attributes are exactly the same as the final versions of the CS file
-	create view v_matching as 
+	create table if not exists v_matching as
 	select a.id
 	from maxattribute_tmp a 
 	inner join curr_concept_d b on a.id = b.id 
@@ -53,13 +53,13 @@
 
 
 	/* Counts */
-	create view v_cscount as
+	create table if not exists v_cscount as
 	select count(*) as cscount from maxattribute_tmp;
 
-	create view v_rf2count as
+	create table if not exists v_rf2count as
 	select count(*) as rf2count from curr_concept_d;
 
-	create view v_matchingcount as
+	create table if not exists v_matchingcount as
 	select count(*) as matchingcount from v_matching;
 
 
@@ -67,13 +67,13 @@
 
 	/* Subtract from cscount for those Concepts that were created and inactivated in current release */
 	-- SCTIDs that new to current release
-	create view v_newid as
+	create table if not exists v_newid as
 	select a.* from v_allid a
 	left join prev_concept_s b on a.id = b.id
 	where b.id is null;
 
 	-- All attributes of Concepts that are new in current release 
-	create view v_newconcept as 
+	create table if not exists v_newconcept as
 	select a.* from cs_concept a, v_newid b 
 	where a.id = b.id;  
 
@@ -88,19 +88,19 @@
 	select * from newmaxattribute_tmp where active = 0;
 
 	-- Generate count of Concepts created and inactivated in current release
-	create view v_newinactive as
+	create table if not exists v_newinactive as
 	select count(*) as newinactive from newinactive_tmp;
 
 
 
 	/* Subtract from cscount for those existing Concepts whose end version is the same as the previously released version */
 	-- SCTIDs that existed in previous release
-	create view v_existingid as
+	create table if not exists v_existingid as
 	select a.* from v_allid a, prev_concept_s b
 	where a.id = b.id;
 
 	-- All attributes of all previously existing Concepts 
-	create view v_existingconcept as
+	create table if not exists v_existingconcept as
 	select a.* from cs_concept a, v_existingid b
 	where a.id = b.id;
 
@@ -118,7 +118,7 @@
 	and a.definitionstatusid = b.definitionstatusid;
 
 	-- Generate count of existing CS file's Concepts whose final versions are the same as the previously released versions
-	create view v_existingmatch as
+	create table if not exists v_existingmatch as
 	select count(*) as existingmatch from exactexistingmatchcsrf2_tmp;
 
 

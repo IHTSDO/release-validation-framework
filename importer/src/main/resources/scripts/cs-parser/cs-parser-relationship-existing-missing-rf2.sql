@@ -6,32 +6,32 @@
 	Find existing Relationship Ids found is in CS_ but missing in RF2.
 
 ********************************************************************************/
-	drop view if exists v_allid;
-	drop view if exists v_existingid;
-	drop view if exists v_maxidtime;
-	drop view if exists v_existingrelationship;
+	drop table if exists v_allid;
+	drop table if exists v_existingid;
+	drop table if exists v_maxidtime;
+	drop table if exists v_existingrelationship;
 	drop table if exists existingmaxattribute_tmp;
 	drop table if exists missingrf2existing_tmp;
 	drop table if exists exactexistingmatchcsrf2_tmp;
 
 	/* Prep */
 	-- All distinct Ids in CS
-	create view v_allid as
+	create table if not exists v_allid as
 	select distinct(a.id) from cs_relationship a;
 
 
 	-- SCTIDs that existed in previous release
-	create view v_existingid as
+	create table if not exists v_existingid as
 	select a.* from v_allid a, prev_stated_relationship_s b
 	where a.id = b.id;
 
 	-- Map all ids to latest committime
-	create view v_maxidtime as
+	create table if not exists v_maxidtime as
 	select id, max(committime) as committime from cs_relationship 
 	group by id; 
 
 	-- All attributes of all previously existing relationships 
-	create view v_existingrelationship as
+	create table if not exists v_existingrelationship as
 	select a.* from cs_relationship a, v_existingid b
 	where a.id = b.id;
 

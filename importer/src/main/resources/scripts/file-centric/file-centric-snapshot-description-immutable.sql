@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by immutable values in DESCRIPTION */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.id , a.typeid , a.languagecode , a.conceptid 
 	from curr_description_s a 
 	group by a.id , a.typeid , a.languagecode , a.conceptid
@@ -24,6 +25,6 @@
 	from v_curr_snapshot a;
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;
 
 	

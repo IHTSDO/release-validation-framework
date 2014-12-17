@@ -5,8 +5,11 @@
 	The current data in the Definition snapshot file are the same as the data in 
 	the current delta file. 
 ********************************************************************************/
-	create or replace view des as
-	select * 
+
+  drop table if exists des;
+  create table if not exists des like curr_description_s;
+  insert into des
+	select *
 	from curr_description_s
 	where cast(effectivetime as datetime)= 
 	(select max(cast(effectivetime as datetime))
@@ -67,7 +70,7 @@
 	or b.casesignificanceid is null;
 
 
-	drop view des;
+	drop table if exists des;
 	 
 	 
 	 

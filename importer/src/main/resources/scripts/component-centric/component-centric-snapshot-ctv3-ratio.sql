@@ -22,8 +22,9 @@
 	commit;
 	
 	
-/* Create view of CTV3 refset members */
-	create or replace view v_ctv3 as
+/* create table if not exists of CTV3 refset members */
+	drop table if exists v_ctv3;
+	create table if not exists v_ctv3 as
 		select referencedcomponentid 
 		from curr_simplemaprefset_s 
 		where refsetid = '900000000000497000';
@@ -40,7 +41,7 @@
 		on a.id = b.referencedcomponentid 
 	where b.referencedcomponentid is null;
 
-	drop view if exists v_act_ctv3;
+	drop table if exists v_act_ctv3;
 
 
 

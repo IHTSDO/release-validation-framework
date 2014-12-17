@@ -7,8 +7,8 @@
 ********************************************************************************/
 
 /* 	a list of concepts and their semantic tags, for active concepts edited this release */
-	drop temporary table if exists tmp_hierarchy;
-	create temporary table if not exists tmp_hierarchy as
+	drop table if exists tmp_hierarchy;
+	create table if not exists tmp_hierarchy as
 	select distinct a.conceptid, concat('(',substring_index(a.term, '(', -1)) as semantictag
 	from curr_description_s a
 		join curr_description_d  b
@@ -21,8 +21,8 @@
 	commit;	 
 
 /* 	a list of descriptions and their hierarchies */
-	drop temporary table if exists tmp_description; 
-	create temporary table if not exists tmp_description 
+	drop table if exists tmp_description;
+	create table if not exists tmp_description
 	select a.id, a.conceptid, a.term, b.semantictag as semantictag
 	from curr_description_s a
 	join tmp_hierarchy b
@@ -46,6 +46,6 @@
 	and count(a.semantictag) > 1;
 	commit;
 	
-	drop temporary table if exists tmp_hierarchy;
-	drop temporary table if exists tmp_description;
+	drop table if exists tmp_hierarchy;
+	drop table if exists tmp_description;
 	

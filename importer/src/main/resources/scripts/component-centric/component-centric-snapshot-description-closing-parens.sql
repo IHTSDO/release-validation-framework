@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding FSN's not ending with closing parantheses */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.term 
 	from curr_description_s a , curr_concept_s b
 	where a.typeid in ('900000000000003001')	
@@ -29,6 +30,6 @@
 	from v_curr_snapshot a;
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;
 
 	

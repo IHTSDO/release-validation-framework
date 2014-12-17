@@ -19,7 +19,9 @@
 ********************************************************************************/
 	
 
-	create or replace view curr as
+	drop table if exists curr;
+  create table if not exists curr like curr_attributevaluerefset_f;
+  insert into curr
 		select *
 		from curr_attributevaluerefset_f
 		where cast(effectivetime as datetime) <
@@ -72,4 +74,4 @@
 	or b.referencedcomponentid is null
 	or b.valueid is null;
 	
-	drop view curr;
+	drop table if exists curr;

@@ -4,42 +4,42 @@
 	Textdef that has different results in change set compared to Rf2.
 
 ********************************************************************************/
-	drop view if exists v_allid;
-	drop view if exists v_newid;
-	drop view if exists v_maxidtime;
-	drop view if exists v_maxcs_description;
-	drop view if exists v_mismatching;
+	drop table if exists v_allid;
+	drop table if exists v_newid;
+	drop table if exists v_maxidtime;
+	drop table if exists v_maxcs_description;
+	drop table if exists v_mismatching;
 
 
 	-- All distinct ids in CS
-	create view v_allid as
+	create table if not exists v_allid as
 	select distinct(id) 
 	from cs_description
 	where type_uuid ='00791270-77c9-32b6-b34f-d932569bd2bf';
 
 
 	-- SCTids that new to current release
-	create view v_newid as
+	create table if not exists v_newid as
 	select a.* from v_allid a
 	left join prev_textdefinition_s b 
 	on a.id = b.id
 	where b.id is null;
 
 	-- Map all ids to latest committime
-	create view v_maxidtime as
+	create table if not exists v_maxidtime as
 	select id, max(committime) as committime 
 	from cs_description
 	where type_uuid = '00791270-77c9-32b6-b34f-d932569bd2bf'
 	group by id; 
 
 	-- Descriptions that were created in current release but were then inactivated
-	create view v_maxcs_description as
+	create table if not exists v_maxcs_description as
 	select a.* 
 	from cs_description a, v_maxidtime b
 	where a.id = b.id 
 	and a.committime = b.committime;
 
-	create view v_mismatching as 
+	create table if not exists v_mismatching as
 	select a.id, a.description_uuid,
 			a.active as cs_active, 
 			a.conceptid as cs_conceptid,

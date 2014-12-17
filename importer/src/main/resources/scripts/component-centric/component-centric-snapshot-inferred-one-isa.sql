@@ -6,8 +6,9 @@
 	All concepts have at least one inferred is-a relationship.
 
 ********************************************************************************/
-	/* Create view of all concepts containing an active inferred is_a relationship */
-	create or replace view v_act_inferred_isa as
+	/* create table if not exists of all concepts containing an active inferred is_a relationship */
+	drop table if exists v_act_inferred_isa;
+	create table if not exists v_act_inferred_isa (INDEX(sourceid)) as
 	select sourceid
 		from curr_relationship_s
 		where active = '1'
@@ -26,4 +27,4 @@
 	and b.sourceid is null
 	and a.id != 138875005;
 
-	drop view v_act_inferred_isa;
+	drop table if exists v_act_inferred_isa;

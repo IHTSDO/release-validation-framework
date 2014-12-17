@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by key values in ASSOCIATION REFSET */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select a.id , a.refsetid , a.referencedcomponentid , a.targetcomponentid
 	from curr_associationrefset_s a 
 	group by a.id , a.refsetid , a.referencedcomponentid , a.targetcomponentid
@@ -23,5 +24,5 @@
 		concat('ASSOC RF: id=',a.id, ':Invalid keys in ASSOCIATION REFSET snapshot file.') 	
 	from v_curr_snapshot a;
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;
 	

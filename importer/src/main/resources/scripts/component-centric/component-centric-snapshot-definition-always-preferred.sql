@@ -8,7 +8,8 @@
 ********************************************************************************/
 	
 /* 	view of current snapshot made by finding Non preferred definition */
-	create or replace view v_curr_snapshot as
+	drop table if exists v_curr_snapshot;
+	create table if not exists  v_curr_snapshot as
 	select distinct a.term, a.conceptid
 	from curr_textdefinition_s a , curr_langrefset_s b 
 	where a.id = b.referencedcomponentid
@@ -27,5 +28,5 @@
 	from v_curr_snapshot a;
 
 
-	drop view v_curr_snapshot;
+	drop table if exists v_curr_snapshot;
 	

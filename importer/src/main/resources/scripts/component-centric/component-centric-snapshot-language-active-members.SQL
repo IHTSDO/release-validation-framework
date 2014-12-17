@@ -9,7 +9,8 @@
 	
 /* 	view of current snapshot of language refset referencedcomponentids of active members */
 	
-	create or replace view v_act_langrs as
+	drop table if exists v_act_langrs;
+	create table if not exists v_act_langrs (INDEX(referencedcomponentid)) as
 	 select referencedcomponentid
 		from curr_langrefset_s 
 		where active = '1';
@@ -20,7 +21,8 @@
 
 /* 	view of current snapshot of language refset referencedcomponentids of inactive only members */
 
-	create or replace view v_inact_only_langrs as
+	drop table if exists v_inact_only_langrs;
+	create table if not exists v_inact_only_langrs (INDEX(referencedcomponentid)) as
 	 select a.referencedcomponentid
 		from curr_langrefset_s a
 		left join v_act_langrs b on a.referencedcomponentid = b.referencedcomponentid
@@ -42,7 +44,7 @@
 	where a.active = '1' 
 	and c.active = '1';
 
-	drop view v_act_langrs;
-	drop view v_inact_only_langrs;
+	drop table if exists v_act_langrs;
+	drop table if exists v_inact_only_langrs;
 
 	

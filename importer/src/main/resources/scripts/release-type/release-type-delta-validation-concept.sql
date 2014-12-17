@@ -4,7 +4,9 @@
 */
 
 	/* view of current delta, derived from current full */
-	create or replace view temp_view as
+	drop table if exists temp_view;
+  create table if not exists temp_view like curr_concept_f;
+  insert into temp_view
 	select a.*
 	from curr_concept_f a
 	where a.effectivetime = '<CURRENT-RELEASE-DATE>';
@@ -51,4 +53,4 @@
 	or b.definitionstatusid is null;
 
 	commit;
-	drop view temp_view;
+	drop table if exists temp_view;
