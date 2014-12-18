@@ -11,9 +11,9 @@ fileToTest="rel2_Refset_SimpleDelta_INT_20140131.txt"
 
 # Target API Deployment
 #TODO - allow the user to change the API at runtime
-api="http://localhost:8080/api/v1"
+#api="http://localhost:8080/api/v1"
 #api="http://localhost:8081/api/v1"
-#api="https://dev-rvf.ihtsdotools.org/api/v1"
+api="https://dev-rvf.ihtsdotools.org/api/v1"
 #api="https://uat-rvf.ihtsdotools.org/api/v1"
 
 #TODO make this function miss out the data if jsonFile is not specified.
@@ -101,12 +101,14 @@ function doTest() {
 		curl -i -X POST "$api/test-post" -F manifest=@${manifestFile} -F file=@${releaseFile}
 	elif  [ ${testType} == "full" ] 
 	then
-		read -p "What assertion group name should be used?: " assertionGroup
+		read -p "What assertion group id should be used?: " assertionGroup
+		read -p "Do you want to purge existing database for prospective release (true/false)?: " purgeExistingDatabase
 		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
 		datestamp=`date +%Y%m%d%H%M%S`
 		curl -i -X POST "$api/run-post" -F manifest=@${manifestFile} -F file=@${releaseFile} \
 		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
 		-F "previousReleaseVersion=${currentReleaseVersion}" \
+		-F "purgeExistingDatabase=${purgeExistingDatabase}" \
 		-F "groups=${assertionGroup}" \
 		-F "runId=${datestamp}" 
 	else

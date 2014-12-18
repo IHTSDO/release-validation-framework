@@ -123,6 +123,7 @@ public class TestUploadFileController {
 	public ResponseEntity runPostTestPackage(
 			@RequestParam(value = "file") MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
+			@RequestParam(value = "purgeExistingDatabase", required = false) boolean purgeExistingDatabase,
 			@RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
 			@RequestParam(value = "groups") List<String> groupsList,
 			@RequestParam(value = "prospectiveReleaseVersion") String prospectiveReleaseVersion,
@@ -184,9 +185,12 @@ public class TestUploadFileController {
             // pass file name without extension - we add this back when we retrieve using controller
             responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
 
-            System.out.println("report.getNumErrors()/report.getNumTestRuns() = " + report.getNumErrors() / report.getNumTestRuns());
+            LOGGER.info("report.getNumErrors() = " + report.getNumErrors());
+            LOGGER.info("report.getNumTestRuns() = " + report.getNumTestRuns());
+            double threshold = report.getNumErrors() / report.getNumTestRuns();
+            LOGGER.info("threshold = " + threshold);
             // bail out only if number of test failures exceeds threshold
-            if(report.getNumErrors()/report.getNumTestRuns() > validationRunner.getFailureThreshold()){
+            if(threshold > validationRunner.getFailureThreshold()){
                 return new ResponseEntity<>(responseMap, HttpStatus.OK);
             }
         }
@@ -194,7 +198,7 @@ public class TestUploadFileController {
 		/*
 			If we are here, assume manifest is valid, so load data from file.
 		  */
-		if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion)){
+		if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion) || purgeExistingDatabase){
 			releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile);
 		}
 
