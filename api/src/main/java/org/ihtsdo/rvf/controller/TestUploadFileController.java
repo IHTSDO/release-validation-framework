@@ -121,7 +121,7 @@ public class TestUploadFileController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity runPostTestPackage(
-			@RequestParam(value = "file") MultipartFile file,
+			@RequestParam(value = "file", required = false) MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
 			@RequestParam(value = "purgeExistingDatabase", required = false) boolean purgeExistingDatabase,
 			@RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
@@ -138,74 +138,89 @@ public class TestUploadFileController {
         Map<String , Object> responseMap = new HashMap<>();
 		// convert groups which is passed as string to assertion groups
 		List<AssertionGroup> groups = getAssertionGroups(groupsList);
+        final File tempFile;
+        // set up the response in order to strean directly to the response
+        File reportFile = new File(validationRunner.getReportDataFolder(), "manifest_validation_"+runId+".txt");
+        PrintWriter writer = new PrintWriter(reportFile);
 
-		// load the filename
-		String filename = file.getOriginalFilename();
-		System.out.println("filename = " + filename);
+        if (file != null)
+        {
+            // load the filename
+            String filename = file.getOriginalFilename();
+            System.out.println("filename = " + filename);
 
-		final File tempFile = File.createTempFile(filename, ".zip");
-		tempFile.deleteOnExit();
-		if (!filename.endsWith(".zip")) {
-			responseMap.put("type", "pre");
-			responseMap.put("assertionsFailed", 0);
-			responseMap.put("report", "Post condition test package has to be zipped up");
-			return new ResponseEntity<>(responseMap, HttpStatus.OK);
-		}
-
-		// set up the response in order to strean directly to the response
-		File reportFile = new File(validationRunner.getReportDataFolder(), "manifest_validation_"+runId+".txt");
-		PrintWriter writer = new PrintWriter(reportFile);
-
-		// must be a zip
-		copyUploadToDisk(file, tempFile);
-		ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
-
-		TestReportable report;
-
-		if (manifestFile == null) {
-			report = validationRunner.execute(resourceManager, writer, writeSucceses);
-		} else {
-			String originalFilename = manifestFile.getOriginalFilename();
-			final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
-			tempManifestFile.deleteOnExit();
-			copyUploadToDisk(manifestFile, tempManifestFile);
-
-			ManifestFile mf = new ManifestFile(tempManifestFile);
-			report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
-		}
-
-		// verify if manifest is valid
-		if(report.getNumErrors() > 0){
-
-			LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
-			responseMap.put("type", "pre");
-			responseMap.put("assertionsRun", report.getNumTestRuns());
-			responseMap.put("assertionsFailed", report.getNumErrors());
-			LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
-            // pass file name without extension - we add this back when we retrieve using controller
-            responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
-
-            LOGGER.info("report.getNumErrors() = " + report.getNumErrors());
-            LOGGER.info("report.getNumTestRuns() = " + report.getNumTestRuns());
-            double threshold = report.getNumErrors() / report.getNumTestRuns();
-            LOGGER.info("threshold = " + threshold);
-            // bail out only if number of test failures exceeds threshold
-            if(threshold > validationRunner.getFailureThreshold()){
+            tempFile = File.createTempFile(filename, ".zip");
+            tempFile.deleteOnExit();
+            if (!filename.endsWith(".zip")) {
+                responseMap.put("type", "pre");
+                responseMap.put("assertionsFailed", 0);
+                responseMap.put("report", "Post condition test package has to be zipped up");
                 return new ResponseEntity<>(responseMap, HttpStatus.OK);
             }
-        }
 
-		/*
-			If we are here, assume manifest is valid, so load data from file.
-		  */
-		if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion) || purgeExistingDatabase){
-			releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile);
-		}
+            // must be a zip
+            copyUploadToDisk(file, tempFile);
+            ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+
+            TestReportable report;
+
+            if (manifestFile == null) {
+                report = validationRunner.execute(resourceManager, writer, writeSucceses);
+            } else {
+                String originalFilename = manifestFile.getOriginalFilename();
+                final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
+                tempManifestFile.deleteOnExit();
+                copyUploadToDisk(manifestFile, tempManifestFile);
+
+                ManifestFile mf = new ManifestFile(tempManifestFile);
+                report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+            }
+
+            // verify if manifest is valid
+            if(report.getNumErrors() > 0){
+
+                LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+                responseMap.put("type", "pre");
+                responseMap.put("assertionsRun", report.getNumTestRuns());
+                responseMap.put("assertionsFailed", report.getNumErrors());
+                LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
+                // pass file name without extension - we add this back when we retrieve using controller
+                responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
+
+                LOGGER.info("report.getNumErrors() = " + report.getNumErrors());
+                LOGGER.info("report.getNumTestRuns() = " + report.getNumTestRuns());
+                double threshold = report.getNumErrors() / report.getNumTestRuns();
+                LOGGER.info("threshold = " + threshold);
+                // bail out only if number of test failures exceeds threshold
+                if(threshold > validationRunner.getFailureThreshold()){
+                    return new ResponseEntity<>(responseMap, HttpStatus.OK);
+                }
+            }
+
+            /*
+			 If we are here, assume manifest is valid, so load data from file.
+		    */
+            if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion) || purgeExistingDatabase){
+                releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile);
+            }
+        }
 
 		if(!releaseDataManager.isKnownRelease(previousReleaseVersion)){
 			// the previous published release must already be present in database, otherwise we throw an error!
             responseMap.put("type", "post");
             responseMap.put("failureMessage", "Please load release data first for version : " + previousReleaseVersion);
+            LOGGER.info("Please load release data first for version : " + previousReleaseVersion);
+            LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
+            // pass file name without extension - we add this back when we retrieve using controller
+            responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
+            return new ResponseEntity<>(responseMap, HttpStatus.OK);
+        }
+
+		if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion)){
+			// the previous published release must already be present in database, otherwise we throw an error!
+            responseMap.put("type", "post");
+            responseMap.put("failureMessage", "Please load prospective data first for version : " + prospectiveReleaseVersion);
+            LOGGER.info("Please load prospective data first for version : " + prospectiveReleaseVersion);
             LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
             // pass file name without extension - we add this back when we retrieve using controller
             responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));

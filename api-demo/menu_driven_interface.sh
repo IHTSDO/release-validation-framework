@@ -84,12 +84,14 @@ function doTest() {
 	testType=$1
 	echo
 	read -p "What archive should be uploaded?: " releaseFile
-	if [ ! -e ${releaseFile} ] 
+	if [ ! -e ${releaseFile} ]
 	then
-		echo "${releaseFile} not found."
-		return
+		echo "${releaseFile} not found. You might have skipped setting the release file."
+#		return
 	fi
-	prospectiveReleaseVersion=`getReleaseDate ${releaseFile}`
+
+#	prospectiveReleaseVersion=`getReleaseDate ${releaseFile}`
+
 	read -p "What manifest should be uploaded?: " manifestFile
 	if [ ! -e ${manifestFile} ] 
 	then
@@ -105,6 +107,7 @@ function doTest() {
 		read -p "What assertion group id should be used?: " assertionGroup
 		read -p "Do you want to purge existing database for prospective release (true/false)?: " purgeExistingDatabase
 		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
+		read -p "What is the prospective (ie the one being tested) release version (YYYYMMDD): " prospectiveReleaseVersion
 		datestamp=`date +%Y%m%d%H%M%S`
 		curl -i -X POST "$api/run-post" \
 		--progress-bar \
