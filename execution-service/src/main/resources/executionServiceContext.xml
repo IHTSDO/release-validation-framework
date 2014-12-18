@@ -26,6 +26,7 @@
         <property name="password" value="${rvf.snomed.jdbc.password}"/>
         <property name="minEvictableIdleTimeMillis" value="1800000"/>
         <property name="timeBetweenEvictionRunsMillis" value="1800000"/>
+        <property name="maxActive" value="-1"/>
         <property name="testOnBorrow" value="true"/>
         <property name="testOnReturn" value="true"/>
         <property name="testWhileIdle" value="true"/>

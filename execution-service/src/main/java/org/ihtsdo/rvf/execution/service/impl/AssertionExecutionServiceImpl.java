@@ -14,14 +14,13 @@ import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -31,7 +30,7 @@ import java.util.regex.Pattern;
  * An implementation of the {@link org.ihtsdo.rvf.execution.service.AssertionExecutionService}
  */
 @Service
-public class AssertionExecutionServiceImpl implements AssertionExecutionService {
+public class AssertionExecutionServiceImpl implements AssertionExecutionService, InitializingBean {
 
     @Autowired
     AssertionService assertionService;
@@ -52,14 +51,18 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
 
     private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceImpl.class);
     private PreparedStatement insertStatement;
+    private PreparedStatement resultStatement;
 
-    public void initialiseResultTable(Long executionId) {
+    @Override
+    public void afterPropertiesSet() throws Exception {
         String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(RUN_ID BIGINT, ASSERTION_ID BIGINT, " +
                 " ASSERTION_TEXT VARCHAR(255), DETAILS VARCHAR(255))";
         String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, assertion_text, details) values (?, ?, ?, ?)";
+        String resultSQL = "select assertion_id, assertion_text, details from " + qaResulTableName + " where assertion_id = ?";
         try {
             dataSource.getConnection().createStatement().execute(createSQLString);
             insertStatement = dataSource.getConnection().prepareStatement(insertSQL);
+            resultStatement = dataSource.getConnection().prepareStatement(resultSQL);
         }
         catch (SQLException e) {
             logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
@@ -113,11 +116,9 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
     @Override
     public TestRunItem executeTest(Test test, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion) {
 
-        String initSQL = "USE " + releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion) + ";";
         logger.info("Started execution id = " + executionId);
         Calendar startTime = Calendar.getInstance();
-        // initialise result table that stores results
-        initialiseResultTable(executionId);
+
         // set prospective version as default schema to use since SQL has calls that do not specify schema name
         String prospectiveSchemaName = releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion);
         logger.info("Setting default catalog as : " + releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
@@ -161,6 +162,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
                         part = part.replaceAll("<ASSERTIONTEXT>", test.getName());
                         part = part.replaceAll("qa_result_table", dataSource.getDefaultCatalog()+"."+qaResulTableName);
                         part = part.replaceAll("<PROSPECTIVE>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
+                        part = part.replaceAll("<TEMP>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
                         part = part.replaceAll("<PREVIOUS>", releaseDataManager.getSchemaForRelease(previousReleaseVersion));
                         part = part.replaceAll("<DELTA>", deltaTableSuffix);
                         part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
@@ -194,28 +196,40 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
                         }
                         else if(part.startsWith("insert")){
                             logger.info("Executing insert statement : " + part);
-                            PreparedStatement pt = rvfDynamicDataSource.getConnection(prospectiveSchemaName).prepareStatement(part);
-                            logger.info("pt = " + pt);
-                            int result = pt.executeUpdate();
+                            Statement insertStatement = rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement();
+                            int result = insertStatement.executeUpdate(part);
+//                            PreparedStatement pt = rvfDynamicDataSource.getConnection(prospectiveSchemaName).prepareStatement(part);
+//                            logger.info("pt = " + pt);
+//                            int result = pt.executeUpdate();
+
                             logger.info("result = " + result);
+                            // close statement
+                            insertStatement.close();
                         }
                         else {
-                            if(part.startsWith("create table") || part.startsWith("drop table")){
-                                part = part + " ENGINE = MyISAM";
+                            if(part.startsWith("create table")){
+                                // only add engine if we do not create using a like statement
+                                if (!part.contains("like")) {
+                                    part = part + " ENGINE = MyISAM";
+                                }
                             }
-                            rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement().execute(initSQL);
+//                            boolean r = rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement().execute(initSQL);
+//                            logger.info("r = " + r);
                             logger.info("Executing statement :" + part);
 //                            boolean result = qaDataSource.getConnection().prepareStatement(part).execute();
-                            boolean result = rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement().execute(part);
-                            if(!result){
+                            Statement createStatement = rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement();
+                            int result = createStatement.executeUpdate(part);
+                            if(result > 0){
                                 logger.error("Error executing sql : " + part);
                             }
+                            // close statement
+                            createStatement.close();
+                            logger.info("Rows affected = " + result);
                         }
                     }
 
+                    logger.info("Adding results to query results table");
                     // select results that match execution
-                    String resultSQL = "select assertion_id, assertion_text, details from " + qaResulTableName + " where assertion_id = ?";
-                    PreparedStatement resultStatement = dataSource.getConnection().prepareStatement(resultSQL);
                     resultStatement.setLong(1, test.getId());
                     resultStatement.executeQuery();
                     ResultSet resultSet = resultStatement.executeQuery();
@@ -227,7 +241,8 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService 
                         counter++;
                     }
                     resultSet.close();
-                    resultStatement.close();
+//                    resultStatement.close();
+                    logger.info("counter = " + counter);
 
                     // if counter is > 0, then we know there are failures
                     if(counter > 0)

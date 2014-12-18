@@ -39,6 +39,15 @@ public class RvfDynamicDataSource {
             dataSource.setPassword(basicDataSource.getPassword());
             dataSource.setDriverClassName(basicDataSource.getDriverClassName());
             dataSource.setDefaultCatalog(schema);
+            dataSource.setMaxActive(basicDataSource.getMaxActive());
+            dataSource.setMaxIdle(basicDataSource.getMaxIdle());
+            dataSource.setTestOnBorrow(basicDataSource.getTestOnBorrow());
+            dataSource.setTestOnReturn(basicDataSource.getTestOnReturn());
+            dataSource.setTestWhileIdle(basicDataSource.getTestWhileIdle());
+            dataSource.setValidationQuery(basicDataSource.getValidationQuery());
+            dataSource.setValidationQueryTimeout(basicDataSource.getValidationQueryTimeout());
+            dataSource.setMinEvictableIdleTimeMillis(basicDataSource.getMinEvictableIdleTimeMillis());
+            dataSource.setTimeBetweenEvictionRunsMillis(basicDataSource.getTimeBetweenEvictionRunsMillis());
             // add to map
             schemaDatasourceMap.put(schema, dataSource);
 
