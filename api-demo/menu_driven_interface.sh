@@ -76,7 +76,8 @@ function uploadRelease() {
 	releaseDate=`getReleaseDate ${releaseFile}`
 	url=" ${api}/releases/${releaseDate}"
 	echo "Uploading release file to ${url}"
-	curl -X POST -F file=@${releaseFile} ${url} 
+#	curl -X POST ${url} --progress-bar -F file=@${releaseFile} > /dev/null
+	curl -X POST ${url} --progress-bar -F file=@${releaseFile} -o tmp/uploadprogress.txt
 }
 
 function doTest() {
@@ -105,12 +106,15 @@ function doTest() {
 		read -p "Do you want to purge existing database for prospective release (true/false)?: " purgeExistingDatabase
 		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
 		datestamp=`date +%Y%m%d%H%M%S`
-		curl -i -X POST "$api/run-post" -F manifest=@${manifestFile} -F file=@${releaseFile} \
+		curl -i -X POST "$api/run-post" \
+		--progress-bar \
+		-F manifest=@${manifestFile} -F file=@${releaseFile} \
 		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
 		-F "previousReleaseVersion=${currentReleaseVersion}" \
 		-F "purgeExistingDatabase=${purgeExistingDatabase}" \
 		-F "groups=${assertionGroup}" \
-		-F "runId=${datestamp}" 
+		-F "runId=${datestamp}" \
+		-o tmp/uploadprogress.txt
 	else
 		echo "Test type ${testType} not recognised"
 	fi
