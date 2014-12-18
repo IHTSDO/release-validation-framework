@@ -18,9 +18,9 @@
 ********************************************************************************/
 	
 
-	drop table if exists curr;
-  create table if not exists curr like curr_concept_f;
-  insert into curr
+	drop table if exists v_curr_view;
+  create table if not exists v_curr_view like curr_concept_f;
+  insert into v_curr_view
 		select *
 		from curr_concept_f
 		where cast(effectivetime as datetime) <
@@ -33,7 +33,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('CONCEPT: id=',a.id, ': Concept in current release file, but not in prior release file.') 	
-	from curr a
+	from v_curr_view a
 	left join prev_concept_f b
 		on a.id = b.id
 	where b.id is null
@@ -46,10 +46,11 @@
 		'<ASSERTIONTEXT>',
 		concat('CONCEPT: id=',a.id, ': Concept in prior release file but not in current release file.') 	
 	from prev_concept_f a
-	left join curr b
+	left join v_curr_view b
 			on a.id = b.id
 	where b.id is null
 	or b.definitionstatusid is null;
 
 
-	drop table if exists curr;
+  truncate table v_curr_view;
+	drop table if exists v_curr_view;

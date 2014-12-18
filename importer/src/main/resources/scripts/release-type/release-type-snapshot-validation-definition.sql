@@ -4,9 +4,9 @@
 */
 
 /* 	view of current snapshot, derived from current full */
-	drop table if exists temp_view;
-  	create table if not exists temp_view like curr_textdefinition_f;
-  	insert into temp_view
+	drop table if exists v_temp_view;
+  	create table if not exists v_temp_view like curr_textdefinition_f;
+  	insert into v_temp_view
 	select a.*
 	from curr_textdefinition_f a
 	where cast(a.effectivetime as datetime) = 
@@ -22,7 +22,7 @@
 		'<ASSERTIONTEXT>',
 		concat('Definition: id=',a.id, ': Definition is in SNAPSHOT file, but not in FULL file.') 	
 	from curr_textdefinition_s a
-	left join temp_view b 
+	left join v_temp_view b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -49,7 +49,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('Definition: id=',a.id, ': Definition is in FULL file, but not in SNAPSHOT file.') 
-	from temp_view a
+	from v_temp_view a
 	left join curr_textdefinition_s b 
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
@@ -71,4 +71,4 @@
 	or b.casesignificanceid is null;
 
 commit;
-drop table if exists temp_view;
+drop table if exists v_temp_view;

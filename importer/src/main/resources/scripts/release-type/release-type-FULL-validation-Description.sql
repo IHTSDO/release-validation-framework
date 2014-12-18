@@ -18,9 +18,9 @@
 ********************************************************************************/
 	
 
-	drop table if exists curr;
-  create table if not exists curr like curr_description_f;
-  insert into curr
+	drop table if exists v_curr_view;
+  create table if not exists v_curr_view like curr_description_f;
+  insert into v_curr_view
 		select *
 		from curr_description_f
 		where cast(effectivetime as datetime) <
@@ -33,7 +33,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('DESCRITPION: id=',a.id, '; description in current release file, but not in prior release file.') 	
-	from curr a
+	from v_curr_view a
 	left join prev_description_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
@@ -61,7 +61,7 @@
 		'<ASSERTIONTEXT>',
 		concat('DESCRIPTION: id=',a.id, '; description in prior release file but not in current release file.') 	
 	from prev_description_f a
-	left join curr b
+	left join v_curr_view b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -81,5 +81,5 @@
 	or b.term is null
 	or b.casesignificanceid is null;
 
-
-	drop table if exists curr;
+  truncate table v_curr_view;
+  drop table if exists v_curr_view;

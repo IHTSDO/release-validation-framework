@@ -4,7 +4,7 @@
 */
 
 /*	The current full based on the current delta and the prior full */
-	drop table if exists temp_table;
+	drop table if exists v_temp_table;
     create table if not exists temp_table(
        id bigint(20),
        effectivetime CHAR(8),
@@ -26,9 +26,9 @@
 	    index idx_casesignificanceid (casesignificanceid)
     );
     
-	insert into temp_table select * from curr_description_d;
+	insert into v_temp_table select * from curr_description_d;
 	commit;
-	insert into temp_table select * from prev_description_f;
+	insert into v_temp_table select * from prev_description_f;
 	commit;
 	
 /* in the delta; not in the full */
@@ -39,7 +39,7 @@
 	'<ASSERTIONTEXT>',
 	concat('Description: id=',a.id, ': Description is in current full file, but not in prior full file.') 	
 	from curr_description_f a
-	left join temp_table b 
+	left join v_temp_table b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
 	and a.active = b.active
@@ -66,7 +66,7 @@
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
 	concat('Description: id=',a.id, ': Description is in prior full file, but not in current full file.')
-	from temp_table a
+	from v_temp_table a
 	left join curr_description_f b 
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
@@ -88,4 +88,4 @@
 	or b.casesignificanceid is null;
 
 	commit;
-	drop table temp_table;
+	 drop table if exists v_temp_table;

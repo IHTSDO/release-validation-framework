@@ -4,9 +4,9 @@
 */
 
 /* view of current delta, derived from current full */
-	drop table if exists temp_view;
-  create table if not exists temp_view like curr_description_f;
-  insert into temp_view
+	drop table if exists v_temp_view;
+  create table if not exists v_temp_view like curr_description_f;
+  insert into v_temp_view
 	select a.*
 	from curr_description_f a
 	where a.effectivetime = '<CURRENT-RELEASE-DATE>';
@@ -19,7 +19,7 @@
 	'<ASSERTIONTEXT>',
 	concat('DESCRIPTION: id=',a.id, ': Description is in DELTA file, but not in FULL file.') 	
 	from curr_description_d a
-	left join temp_view b
+	left join v_temp_view b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
 	and a.active = b.active
@@ -46,7 +46,7 @@
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
 	concat('DESCRIPTION: id=',a.id, ': description is in FULL file, but not in DELTA file.') 
-	from temp_view a
+	from v_temp_view a
 	left join curr_description_d b 
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
@@ -68,4 +68,4 @@
 	or b.casesignificanceid is null;
 
 commit;
-drop table if exists temp_view;
+drop table if exists v_temp_view;

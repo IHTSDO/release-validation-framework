@@ -1,4 +1,4 @@
-drop table if exists curr_concept_f;
+drop table if exists v_curr_view_concept_f;
 create table curr_concept_f(
 id bigint not null,
 effectivetime char(8) not null,
@@ -13,7 +13,7 @@ key idx_definitionstatusid(definitionstatusid)
 ) engine=myisam default charset=utf8;
 
 
-drop table if exists curr_description_f;
+drop table if exists v_curr_view_description_f;
 create table curr_description_f(
 id bigint not null,
 effectivetime char(8) not null,
@@ -35,7 +35,7 @@ key idx_term(term),
 key idx_casesignificanceid(casesignificanceid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_textdefinition_f;
+drop table if exists v_curr_view_textdefinition_f;
 create table curr_textdefinition_f(
 id bigint not null,
 effectivetime char(8) not null,
@@ -56,7 +56,7 @@ key idx_typeid(typeid),
 key idx_casesignificanceid(casesignificanceid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_relationship_f;
+drop table if exists v_curr_view_relationship_f;
 create table curr_relationship_f(
 id bigint not null,
 effectivetime char(8) not null,
@@ -80,7 +80,7 @@ key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_stated_relationship_f;
+drop table if exists v_curr_view_stated_relationship_f;
 create table curr_stated_relationship_f(
 id bigint not null,
 effectivetime char(8) not null,
@@ -104,7 +104,7 @@ key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_langrefset_f;
+drop table if exists v_curr_view_langrefset_f;
 create table curr_langrefset_f(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -122,7 +122,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_acceptabilityid(acceptabilityid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_associationrefset_f;
+drop table if exists v_curr_view_associationrefset_f;
 create table curr_associationrefset_f(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -140,7 +140,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_targetcomponentid(targetcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_attributevaluerefset_f;
+drop table if exists v_curr_view_attributevaluerefset_f;
 create table curr_attributevaluerefset_f(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -158,7 +158,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_valueid(valueid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_simplemaprefset_f;
+drop table if exists v_curr_view_simplemaprefset_f;
 create table curr_simplemaprefset_f(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -176,7 +176,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_maptarget(maptarget)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_simplerefset_f;
+drop table if exists v_curr_view_simplerefset_f;
 create table curr_simplerefset_f(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
@@ -192,7 +192,7 @@ create table curr_simplerefset_f(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_complexmaprefset_f;
+drop table if exists v_curr_view_complexmaprefset_f;
 create table curr_complexmaprefset_f(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
@@ -220,7 +220,7 @@ create table curr_complexmaprefset_f(
 
 
 
-drop table if exists curr_concept_s;
+drop table if exists v_curr_view_concept_s;
 create table curr_concept_s(
 id bigint not null,
 effectivetime char(8) not null,
@@ -235,7 +235,7 @@ key idx_definitionstatusid(definitionstatusid)
 ) engine=myisam default charset=utf8;
 
 
-drop table if exists curr_description_s;
+drop table if exists v_curr_view_description_s;
 create table curr_description_s(
 id bigint not null,
 effectivetime char(8) not null,
@@ -257,7 +257,7 @@ key idx_term(term),
 key idx_casesignificanceid(casesignificanceid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_textdefinition_s;
+drop table if exists v_curr_view_textdefinition_s;
 create table curr_textdefinition_s(
 id bigint not null,
 effectivetime char(8) not null,
@@ -278,7 +278,7 @@ key idx_typeid(typeid),
 key idx_casesignificanceid(casesignificanceid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_relationship_s;
+drop table if exists v_curr_view_relationship_s;
 create table curr_relationship_s(
 id bigint not null,
 effectivetime char(8) not null,
@@ -302,7 +302,7 @@ key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_stated_relationship_s;
+drop table if exists v_curr_view_stated_relationship_s;
 create table curr_stated_relationship_s(
 id bigint not null,
 effectivetime char(8) not null,
@@ -326,7 +326,7 @@ key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_langrefset_s;
+drop table if exists v_curr_view_langrefset_s;
 create table curr_langrefset_s(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -344,7 +344,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_acceptabilityid(acceptabilityid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_associationrefset_s;
+drop table if exists v_curr_view_associationrefset_s;
 create table curr_associationrefset_s(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -362,7 +362,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_targetcomponentid(targetcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_attributevaluerefset_s;
+drop table if exists v_curr_view_attributevaluerefset_s;
 create table curr_attributevaluerefset_s(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -380,7 +380,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_valueid(valueid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_simplemaprefset_s;
+drop table if exists v_curr_view_simplemaprefset_s;
 create table curr_simplemaprefset_s(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -398,7 +398,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_maptarget(maptarget)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_simplerefset_s;
+drop table if exists v_curr_view_simplerefset_s;
 create table curr_simplerefset_s(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
@@ -414,7 +414,7 @@ create table curr_simplerefset_s(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_complexmaprefset_s;
+drop table if exists v_curr_view_complexmaprefset_s;
 create table curr_complexmaprefset_s(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
@@ -440,7 +440,7 @@ create table curr_complexmaprefset_s(
 
 
 
-drop table if exists curr_concept_d;
+drop table if exists v_curr_view_concept_d;
 create table curr_concept_d(
 id bigint not null,
 effectivetime char(8) not null,
@@ -455,7 +455,7 @@ key idx_definitionstatusid(definitionstatusid)
 ) engine=myisam default charset=utf8;
 
 
-drop table if exists curr_description_d;
+drop table if exists v_curr_view_description_d;
 create table curr_description_d(
 id bigint not null,
 effectivetime char(8) not null,
@@ -477,7 +477,7 @@ key idx_term(term),
 key idx_casesignificanceid(casesignificanceid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_textdefinition_d;
+drop table if exists v_curr_view_textdefinition_d;
 create table curr_textdefinition_d(
 id bigint not null,
 effectivetime char(8) not null,
@@ -498,7 +498,7 @@ key idx_typeid(typeid),
 key idx_casesignificanceid(casesignificanceid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_relationship_d;
+drop table if exists v_curr_view_relationship_d;
 create table curr_relationship_d(
 id bigint not null,
 effectivetime char(8) not null,
@@ -522,7 +522,7 @@ key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_stated_relationship_d;
+drop table if exists v_curr_view_stated_relationship_d;
 create table curr_stated_relationship_d(
 id bigint not null,
 effectivetime char(8) not null,
@@ -546,7 +546,7 @@ key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_langrefset_d;
+drop table if exists v_curr_view_langrefset_d;
 create table curr_langrefset_d(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -564,7 +564,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_acceptabilityid(acceptabilityid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_associationrefset_d;
+drop table if exists v_curr_view_associationrefset_d;
 create table curr_associationrefset_d(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -582,7 +582,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_targetcomponentid(targetcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_attributevaluerefset_d;
+drop table if exists v_curr_view_attributevaluerefset_d;
 create table curr_attributevaluerefset_d(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -600,7 +600,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_valueid(valueid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_simplemaprefset_d;
+drop table if exists v_curr_view_simplemaprefset_d;
 create table curr_simplemaprefset_d(
 id varchar(36) not null,
 effectivetime char(8) not null,
@@ -618,7 +618,7 @@ key idx_referencedcomponentid(referencedcomponentid),
 key idx_maptarget(maptarget)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_simplerefset_d;
+drop table if exists v_curr_view_simplerefset_d;
 create table curr_simplerefset_d(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
@@ -634,7 +634,7 @@ create table curr_simplerefset_d(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists curr_complexmaprefset_d;
+drop table if exists v_curr_view_complexmaprefset_d;
 create table curr_complexmaprefset_d(
 	id varchar(36) not null,
 	effectivetime char(8) not null,

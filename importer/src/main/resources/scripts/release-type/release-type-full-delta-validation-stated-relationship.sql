@@ -4,14 +4,14 @@
 */
 
 /* view of current delta, derived from current full */
-	drop table if exists temp_table;
-	create table if not exists temp_table like prev_stated_relationship_f;
+	drop table if exists v_temp_table;
+	create table if not exists v_temp_table like prev_stated_relationship_f;
 	
-	insert into temp_table 
+	insert into v_temp_table
 	select * from curr_stated_relationship_d;
 	commit;
 	
-	insert into temp_table 
+	insert into v_temp_table
 	select * from prev_stated_relationship_f;
 	commit;
 /* in the delta; not in the full */
@@ -22,7 +22,7 @@
 	'<ASSERTIONTEXT>',
 	concat('Stated relationship: id=',a.id, ': Stated relationship is in current full file, but not in prior full file.') 	
 	from curr_stated_relationship_f a
-	left join temp_table b 
+	left join v_temp_table b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
 	and a.active = b.active
@@ -51,7 +51,7 @@
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
 	concat('Stated relationship: id=',a.id, ': Stated relationship is in prior full file, but not in current full file.')
-	from temp_table a
+	from v_temp_table a
 	left join curr_stated_relationship_f b 
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
@@ -74,4 +74,4 @@
 	or b.characteristictypeid is null
 	or b.modifierid is null;
 
-drop table temp_table;
+ drop table if exists v_temp_table;

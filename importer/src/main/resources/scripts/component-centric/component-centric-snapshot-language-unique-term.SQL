@@ -10,8 +10,8 @@
 
 ********************************************************************************/
 /*	list of active concepts edited for the current prospective release */
-	drop table if exists tmp_active_con;
-	create table if not exists tmp_active_con as
+	drop table if exists v_tmp_active_con;
+	create table if not exists v_tmp_active_con as
 	select b.*
 	from res_concepts_edited a 
 		join curr_concept_s b
@@ -23,7 +23,7 @@
 	drop table if exists tmp_member;
 	create table if not exists tmp_member as
 	select a.id as conceptid, c.refsetid, c.referencedcomponentid
-	from tmp_active_con a
+	from v_tmp_active_con a
 		join curr_description_s b
 			on a.id = b.conceptid
 			and a.active = b.active
@@ -46,7 +46,7 @@
 		and count(referencedcomponentid) > 1;
 	commit;
 	
-	drop table if exists tmp_active_con;
+	drop table if exists v_tmp_active_con;
 	drop table if exists tmp_member;
 
 	

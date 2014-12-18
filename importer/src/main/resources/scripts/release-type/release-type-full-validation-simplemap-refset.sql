@@ -19,9 +19,9 @@
 ********************************************************************************/
 	
 
-  drop table if exists curr;
-  create table if not exists curr like curr_simplemaprefset_f;
-  insert into curr
+  drop table if exists v_curr_view;
+  create table if not exists v_curr_view like curr_simplemaprefset_f;
+  insert into v_curr_view
 		select *
 		from curr_simplemaprefset_f
 		where cast(effectivetime as datetime) <
@@ -34,7 +34,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
     concat('SIMPLE-MAP: id=',a.id, ': refset member is in current release file, but not in prior release file.') 	        
-	from curr a
+	from v_curr_view a
 	left join prev_simplemaprefset_f b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
@@ -58,7 +58,7 @@
 		'<ASSERTIONTEXT>',
     concat('SIMPLE-MAP: id=',a.id, ': refset member is in prior release file, but not in current release file.') 	        
 	from prev_simplemaprefset_f a
-	left join curr b
+	left join v_curr_view b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
 	and a.active = b.active
@@ -75,4 +75,5 @@
 	or b.maptarget is null;
 
 
-	drop table if exists curr;
+  truncate table v_curr_view;
+  drop table if exists v_curr_view;

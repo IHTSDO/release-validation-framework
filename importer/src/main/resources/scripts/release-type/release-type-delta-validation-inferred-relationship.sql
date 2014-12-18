@@ -3,9 +3,9 @@
 */
 
 /* 	view of current delta, derived from current full */
-	drop table if exists temp_view;
-  create table if not exists temp_view like curr_relationship_f;
-  insert into temp_view
+	drop table if exists v_temp_view;
+  create table if not exists v_temp_view like curr_relationship_f;
+  insert into v_temp_view
 	select a.*
 	from curr_relationship_f a
 	where a.effectivetime = '<CURRENT-RELEASE-DATE>'; 
@@ -18,7 +18,7 @@
 		'<ASSERTIONTEXT>',
 		concat('Inferred relationship: id=',a.id, ': Relationship is in delta file, but not in FULL file.') 	
 	from curr_relationship_d a
-	left join temp_view b 
+	left join v_temp_view b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -47,7 +47,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('Inferred relationship: id=',a.id, ': Relationship is in FULL file, but not in delta file.') 
-	from temp_view a
+	from v_temp_view a
 	left join curr_relationship_d b 
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
@@ -71,6 +71,6 @@
 	or b.modifierid is null;
 
 commit;
-drop table if exists temp_view;
+drop table if exists v_temp_view;
 
 
