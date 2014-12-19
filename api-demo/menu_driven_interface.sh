@@ -111,6 +111,7 @@ function doTest() {
 		datestamp=`date +%Y%m%d%H%M%S`
 		curl -i -X POST "$api/run-post" \
 		--progress-bar \
+	    --max-time 36000 \
 		--retry 0 \
 		-F manifest=@${manifestFile} -F file=@${releaseFile} \
 		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
