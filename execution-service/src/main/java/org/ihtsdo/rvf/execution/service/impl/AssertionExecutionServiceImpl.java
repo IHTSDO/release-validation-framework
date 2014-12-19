@@ -55,7 +55,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
     @Override
     public void afterPropertiesSet() throws Exception {
         String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(RUN_ID BIGINT, ASSERTION_ID BIGINT, " +
-                " ASSERTION_TEXT VARCHAR(255), DETAILS VARCHAR(255))";
+                " ASSERTION_TEXT VARCHAR(255), DETAILS VARCHAR(255), INDEX (RUN_ID), INDEX (ASSERTION_ID))";
         String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, assertion_text, details) values (?, ?, ?, ?)";
         try {
             dataSource.getConnection().createStatement().execute(createSQLString);
@@ -143,7 +143,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                      Moving this outside to the after properties method throws resource closed exception because the
                      connection does not stay open for the entire duration - needs MySQL server tweaks
                     */
-                    String resultSQL = "select assertion_id, assertion_text, details from " + qaResulTableName + " where assertion_id = ?";
+                    String resultSQL = "select assertion_id, assertion_text, details from " + qaResulTableName + " where assertion_id = ? and run_id = ?";
                     PreparedStatement resultStatement = dataSource.getConnection().prepareStatement(resultSQL);
 
                     String[] parts = {""};
@@ -232,6 +232,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                     logger.info("Adding results to query results table");
                     // select results that match execution
                     resultStatement.setLong(1, test.getId());
+                    resultStatement.setLong(2, executionId);
                     ResultSet resultSet = resultStatement.executeQuery();
                     String detail = null;
                     int counter = 0;
