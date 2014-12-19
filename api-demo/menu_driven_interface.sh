@@ -54,7 +54,7 @@ function listAssertions() {
 
 function listGroups() {
 	echo
-	echo "Listing Assertions"
+	echo "Listing Groups"
 	callURL GET ${api}/groups/
 } 
 
