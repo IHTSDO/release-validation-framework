@@ -166,7 +166,8 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                         // replace all substitutions for exec
                         part = part.replaceAll("<RUNID>", String.valueOf(executionId));
                         part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(test.getId()));
-                        part = part.replaceAll("<ASSERTIONTEXT>", test.getName());
+                        // watch out for any 's that users might have introduced
+                        part = part.replaceAll("<ASSERTIONTEXT>", test.getName().replaceAll("'", ""));
                         part = part.replaceAll("qa_result_table", dataSource.getDefaultCatalog()+"."+qaResulTableName);
                         part = part.replaceAll("<PROSPECTIVE>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
                         part = part.replaceAll("<TEMP>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
@@ -174,6 +175,8 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                         part = part.replaceAll("<DELTA>", deltaTableSuffix);
                         part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
                         part = part.replaceAll("<FULL>", fullTableSuffix);
+                        part = part.replaceAll("<PREVIOUS-RELEASE-DATE>", previousReleaseVersion);
+                        part = part.replaceAll("<CURRENT-RELEASE-DATE>", prospectiveReleaseVersion);
 
                         for(String key : testConfiguration.getKeys())
                         {
@@ -181,6 +184,8 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                             part = part.replaceAll(key, testConfiguration.getValue(key));
                         }
 
+                        // remove any leading and train white space
+                        part = part.trim();
                         if(part.startsWith("select")){
                             logger.info("Set select query :" + part);
                             selectSQL = part;
