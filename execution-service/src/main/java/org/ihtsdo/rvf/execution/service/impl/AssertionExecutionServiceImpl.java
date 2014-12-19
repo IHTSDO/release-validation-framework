@@ -51,18 +51,15 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
     private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceImpl.class);
     private PreparedStatement insertStatement;
-    private PreparedStatement resultStatement;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(RUN_ID BIGINT, ASSERTION_ID BIGINT, " +
                 " ASSERTION_TEXT VARCHAR(255), DETAILS VARCHAR(255))";
         String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, assertion_text, details) values (?, ?, ?, ?)";
-        String resultSQL = "select assertion_id, assertion_text, details from " + qaResulTableName + " where assertion_id = ?";
         try {
             dataSource.getConnection().createStatement().execute(createSQLString);
             insertStatement = dataSource.getConnection().prepareStatement(insertSQL);
-            resultStatement = dataSource.getConnection().prepareStatement(resultSQL);
         }
         catch (SQLException e) {
             logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
@@ -139,6 +136,16 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                 // execute sql and get result
                 try
                 {
+                    // create a single connection for entire test and close it after running test - avoid creating too many connections
+                    Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName);
+                    /*
+                     create a prepared statement for retrieving matching results.
+                     Moving this outside to the after properties method throws resource closed exception because the
+                     connection does not stay open for the entire duration - needs MySQL server tweaks
+                    */
+                    String resultSQL = "select assertion_id, assertion_text, details from " + qaResulTableName + " where assertion_id = ?";
+                    PreparedStatement resultStatement = dataSource.getConnection().prepareStatement(resultSQL);
+
                     String[] parts = {""};
                     if(command.getStatements().size() == 0)
                     {
@@ -178,7 +185,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                             logger.info("Set select query :" + part);
                             selectSQL = part;
 
-                            PreparedStatement preparedStatement = rvfDynamicDataSource.getConnection(prospectiveSchemaName).prepareStatement(selectSQL);
+                            PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
                             logger.info("Created statement");
                             ResultSet execResult = preparedStatement.executeQuery();
                             logger.info("execResult = " + execResult);
@@ -196,11 +203,8 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                         }
                         else if(part.startsWith("insert")){
                             logger.info("Executing insert statement : " + part);
-                            Statement insertStatement = rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement();
+                            Statement insertStatement = connection.createStatement();
                             int result = insertStatement.executeUpdate(part);
-//                            PreparedStatement pt = rvfDynamicDataSource.getConnection(prospectiveSchemaName).prepareStatement(part);
-//                            logger.info("pt = " + pt);
-//                            int result = pt.executeUpdate();
 
                             logger.info("result = " + result);
                             // close statement
@@ -209,15 +213,12 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                         else {
                             if(part.startsWith("create table")){
                                 // only add engine if we do not create using a like statement
-                                if (!part.contains("like")) {
+                                if (!part.contains("like") || !part.contains("as")) {
                                     part = part + " ENGINE = MyISAM";
                                 }
                             }
-//                            boolean r = rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement().execute(initSQL);
-//                            logger.info("r = " + r);
                             logger.info("Executing statement :" + part);
-//                            boolean result = qaDataSource.getConnection().prepareStatement(part).execute();
-                            Statement createStatement = rvfDynamicDataSource.getConnection(prospectiveSchemaName).createStatement();
+                            Statement createStatement = connection.createStatement();
                             int result = createStatement.executeUpdate(part);
                             if(result > 0){
                                 logger.error("Error executing sql : " + part);
@@ -231,7 +232,6 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                     logger.info("Adding results to query results table");
                     // select results that match execution
                     resultStatement.setLong(1, test.getId());
-                    resultStatement.executeQuery();
                     ResultSet resultSet = resultStatement.executeQuery();
                     String detail = null;
                     int counter = 0;
@@ -241,8 +241,10 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                         counter++;
                     }
                     resultSet.close();
-//                    resultStatement.close();
+                    resultStatement.close();
                     logger.info("counter = " + counter);
+                    // close connection
+                    connection.close();
 
                     // if counter is > 0, then we know there are failures
                     if(counter > 0)
