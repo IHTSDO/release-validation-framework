@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
-public class RvfDynamicDataSourceTest {
+public class RvfDynamicDataSourceIntegrationTest {
 
     @Autowired
     private RvfDynamicDataSource rvfDynamicDataSource;
