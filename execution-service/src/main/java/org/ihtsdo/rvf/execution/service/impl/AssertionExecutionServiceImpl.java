@@ -143,7 +143,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                      Moving this outside to the after properties method throws resource closed exception because the
                      connection does not stay open for the entire duration - needs MySQL server tweaks
                     */
-                    String resultSQL = "select assertion_id, assertion_text, details from " + qaResulTableName + " where assertion_id = ? and run_id = ?";
+                    String resultSQL = "select assertion_id, assertion_text, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
                     PreparedStatement resultStatement = dataSource.getConnection().prepareStatement(resultSQL);
 
                     String[] parts = {""};
@@ -229,16 +229,20 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                         }
                     }
 
-                    logger.info("Adding results to query results table");
                     // select results that match execution
                     resultStatement.setLong(1, test.getId());
                     resultStatement.setLong(2, executionId);
                     ResultSet resultSet = resultStatement.executeQuery();
-                    String detail = null;
-                    int counter = 0;
+                    String sqlQueryString = resultStatement.toString();
+                    sqlQueryString = sqlQueryString.substring(sqlQueryString.indexOf(":"));
+                    logger.info("Getting failure count using SQL : " + resultStatement);
+                    long counter = 0;
                     while (resultSet.next())
                     {
-                        detail = detail + resultSet.getString(3);
+                        // only get first 10 failed results
+                        if (counter<10) {
+                            runItem.addFirstNInstance(resultSet.getString(3));
+                        }
                         counter++;
                     }
                     resultSet.close();
@@ -248,9 +252,10 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                     connection.close();
 
                     // if counter is > 0, then we know there are failures
+                    runItem.setFailureCount(counter);
                     if(counter > 0)
                     {
-                        runItem.setFailureMessage("Failed Item count : " + counter);
+                        runItem.setFailureMessage("SQL lookup for failures : " + sqlQueryString);
                         runItem.setFailure(true);
                     }
                     else{

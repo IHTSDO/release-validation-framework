@@ -3,7 +3,9 @@ package org.ihtsdo.rvf.execution.service.util;
 import org.ihtsdo.rvf.helper.Configuration;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A class that records metrics about execution of an {@link org.ihtsdo.rvf.entity.Test}.
@@ -18,6 +20,8 @@ public class TestRunItem {
     private boolean failure = true;
     private long runTime;
     private String failureMessage;
+    private List<String> firstNInstances = new ArrayList<>();
+    private Long failureCount;
 
     /**
      * Empty constructor for IOC
@@ -120,5 +124,25 @@ public class TestRunItem {
 
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
+    }
+
+    public List<String> getFirstNInstances() {
+        return firstNInstances;
+    }
+
+    public void setFirstNInstances(List<String> firstNInstances) {
+        this.firstNInstances = firstNInstances;
+    }
+
+    public void addFirstNInstance(String string){
+        getFirstNInstances().add(string);
+    }
+
+    public Long getFailureCount() {
+        return failureCount;
+    }
+
+    public void setFailureCount(Long failureCount) {
+        this.failureCount = failureCount;
     }
 }
