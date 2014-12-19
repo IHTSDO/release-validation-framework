@@ -213,7 +213,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
                         else {
                             if(part.startsWith("create table")){
                                 // only add engine if we do not create using a like statement
-                                if (!part.contains("like") || !part.contains("as")) {
+                                if (!(part.contains("like") || part.contains("as"))) {
                                     part = part + " ENGINE = MyISAM";
                                 }
                             }
