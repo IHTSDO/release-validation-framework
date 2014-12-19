@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
@@ -7,11 +8,14 @@ import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.*;
 
 @Controller
@@ -24,8 +28,10 @@ public class AssertionGroupController {
 	private EntityService entityService;
     @Autowired
 	private AssertionExecutionService assertionExecutionService;
+    private ObjectMapper objectMapper = new ObjectMapper();
+    private final Logger logger = LoggerFactory.getLogger(AssertionGroupController.class);
 
-	@RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public List<AssertionGroup> getGroups() {
@@ -44,9 +50,10 @@ public class AssertionGroupController {
     @RequestMapping(value = "{id}/assertions", method = RequestMethod.POST)
 	@ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<Assertion> assertions) {
+    public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<String> assertionsList) {
 
         AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+        List<Assertion> assertions = getAssertions(assertionsList);
         for(Assertion assertion : assertions){
             assertionService.addAssertionToGroup(assertion, group);
         }
@@ -160,5 +167,30 @@ public class AssertionGroupController {
         responseMap.put("assertionsFailed", failedAssertionCount);
 
         return responseMap;
+    }
+
+    private List<Assertion> getAssertions(List<String> items){
+
+        List<Assertion> assertions = new ArrayList<>();
+        for(String item: items){
+            try
+            {
+                if(item.matches("\\d+")){
+                    // treat as assertion id and retrieve associated assertion
+                    Assertion assertion = assertionService.find(Long.valueOf(item));
+                    if(assertion != null){
+                        assertions.add(assertion);
+                    }
+                }
+                else{
+                    assertions.add(objectMapper.readValue(item, Assertion.class));
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return assertions;
     }
 }
