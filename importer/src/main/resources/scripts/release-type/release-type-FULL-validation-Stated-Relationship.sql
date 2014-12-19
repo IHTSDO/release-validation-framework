@@ -19,7 +19,8 @@
 	
 
 	drop table if exists v_curr_view;
-	create table if not exists v_curr_view as
+  create table if not exists v_curr_view like curr_stated_relationship_f;
+  insert into v_curr_view
 		select *
 		from curr_stated_relationship_f
 		where cast(effectivetime as datetime) <
