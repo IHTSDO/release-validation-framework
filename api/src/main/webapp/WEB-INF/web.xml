@@ -23,9 +23,24 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
-	<servlet-mapping>
-		<servlet-name>DispatcherServlet</servlet-name>
-		<url-pattern>/v1/*</url-pattern>
-	</servlet-mapping>
+    <servlet>
+        <servlet-name>ApiRootRedirectServlet</servlet-name>
+        <servlet-class>org.ihtsdo.rvf.servlet.ApiRootRedirectServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ApiRootRedirectServlet</servlet-name>
+        <url-pattern>/v1</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <url-pattern>/v1/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ApiRootRedirectServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
 
 </web-app>
