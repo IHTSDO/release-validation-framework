@@ -131,6 +131,8 @@ public class TestUploadFileController {
 			@RequestParam(value = "runId") Long runId,
             HttpServletRequest request) throws IOException {
 
+        Calendar startTime = Calendar.getInstance();
+        LOGGER.info(String.format("Started execution with runId [%1s] : ", runId));
         // generate url from request so we can display in response
         String requestUrl = String.valueOf(request.getRequestURL());
         String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
@@ -236,11 +238,14 @@ public class TestUploadFileController {
 				assertionIds.add(assertion.getId());
 			}
 		}
+
+        int counter = 0;
 		for (Long id: assertionIds) {
 			try
 			{
-				Assertion assertion = assertionService.find(id);
-				List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
+                Assertion assertion = assertionService.find(id);
+                LOGGER.info(String.format("Started executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertionIds.size(), assertion.getUuid()));
+                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
 						prospectiveReleaseVersion, previousReleaseVersion));
 				// get only first since we have 1:1 correspondence between Assertion and Test
 				if(items.size() == 1){
@@ -250,7 +255,9 @@ public class TestUploadFileController {
 					}
 				}
 				map.put(assertion, items);
-			}
+                LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertionIds.size(), assertion.getUuid()));
+                counter++;
+            }
 			catch (MissingEntityException e) {
 				failedAssertionCount++;
 			}
@@ -263,6 +270,7 @@ public class TestUploadFileController {
         LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
         // pass file name without extension - we add this back when we retrieve using controller
         responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
+        LOGGER.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", runId, ((Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000)));
 
         return new ResponseEntity<>(responseMap, HttpStatus.OK);
 	}
