@@ -34,6 +34,7 @@
 		<property name="defaultCatalog" value="${rvf.master.schema.name}"/>
 		<property name="username" value="${rvf.jdbc.username}"/>
 		<property name="password" value="${rvf.jdbc.password}"/>
+        <property name="maxActive" value="-1"/>
 		<property name="minEvictableIdleTimeMillis" value="1800000"/>
 		<property name="timeBetweenEvictionRunsMillis" value="1800000"/>
 		<property name="testOnBorrow" value="true"/>
