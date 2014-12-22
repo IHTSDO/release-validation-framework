@@ -120,6 +120,9 @@ function doTest() {
 		-F "groups=${assertionGroup}" \
 		-F "runId=${datestamp}" \
 		-o tmp/uploadprogress.txt
+		
+		echo "Server call complete.  Server returned:  "
+		cat tmp/uploadprogress.txt
 	else
 		echo "Test type ${testType} not recognised"
 	fi
