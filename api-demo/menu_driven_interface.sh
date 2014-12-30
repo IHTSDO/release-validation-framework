@@ -76,8 +76,9 @@ function uploadRelease() {
 	releaseDate=`getReleaseDate ${releaseFile}`
 	url=" ${api}/releases/${releaseDate}"
 	echo "Uploading release file to ${url}"
-#	curl -X POST ${url} --progress-bar -F file=@${releaseFile} > /dev/null
-	curl -X POST ${url} --progress-bar -F file=@${releaseFile} -o tmp/uploadprogress.txt
+	curl -X POST ${url} --progress-bar -F file=@${releaseFile} \
+		 -F "overWriteExisting=true" -F "purgeExistingDatabase=true" \
+		 -o tmp/uploadprogress.txt
 }
 
 function doTest() {
