@@ -15,3 +15,5 @@ release.properties
 
 
 api-demo/report.csv
+api-demo/tmp
+
