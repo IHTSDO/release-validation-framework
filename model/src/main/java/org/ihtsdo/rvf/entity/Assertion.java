@@ -122,4 +122,12 @@ public class Assertion {
         this.groups = groups;
     }
 
+	@Override
+	public String toString() {
+		return "Assertion{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				'}';
+	}
+
 }
