@@ -88,7 +88,13 @@ function doTest() {
 	if [ ! -e ${releaseFile} ]
 	then
 		echo "${releaseFile} not found. You might have skipped setting the release file."
-#		return
+		return
+	elif [ -z $releaseFile ] 
+	then
+		echo "Passing empty file parameter - set purge to false!"
+		fileParam=""
+	else
+		fileParam="-F file=@${releaseFile}" 
 	fi
 
 #	prospectiveReleaseVersion=`getReleaseDate ${releaseFile}`
@@ -102,7 +108,7 @@ function doTest() {
 	
 	if [ ${testType} == "structural" ] 
 	then
-		curl -i -X POST "$api/test-post" -F manifest=@${manifestFile} -F file=@${releaseFile}
+	curl -i -X POST "$api/test-post" -F manifest=@${manifestFile} ${fileParam}
 	elif  [ ${testType} == "full" ] 
 	then
 		read -p "What assertion group id should be used?: " assertionGroup
@@ -112,9 +118,9 @@ function doTest() {
 		datestamp=`date +%Y%m%d%H%M%S`
 		curl -i -X POST "$api/run-post" \
 		--progress-bar \
-	    --max-time 36000 \
 		--retry 0 \
-		-F manifest=@${manifestFile} -F file=@${releaseFile} \
+		${fileParam} \
+		-F manifest=@${manifestFile} \
 		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
 		-F "previousReleaseVersion=${currentReleaseVersion}" \
 		-F "purgeExistingDatabase=${purgeExistingDatabase}" \
