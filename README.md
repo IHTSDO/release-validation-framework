@@ -68,3 +68,12 @@ used by the api-module tries to connect to a MySQL server, which will be missing
 failure on Jenkins, all these tests have been marked as IntegrationTests. This should be skipped by setting a separate 
 Spring context file for tests that do not require MySQL access.
 
+Importing Assertions
+--------------------
+Assertions can currently be imported from copies of the legacy implementation (RAT) configuration files included in this project.
+To import these assertions, start the API listening locally on port 8080 and type:
+```
+cd importer
+mvn clean integration-test -Dskip.integration.tests=false
+```
+
