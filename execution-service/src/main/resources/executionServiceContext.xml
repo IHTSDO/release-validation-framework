@@ -15,7 +15,7 @@
 
     <context:property-placeholder location="file://${rvfConfigLocation}/execution-service.properties" order="-1"
                                   ignore-unresolvable="true" ignore-resource-not-found="true" />
-    <context:property-placeholder location="classpath:execution-service.properties" />
+    <context:property-placeholder location="classpath*:execution-service.properties" />
 
 
     <!-- Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing-->
