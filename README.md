@@ -10,6 +10,17 @@ git clone https://github.com/IHTSDO/release-validation-framework.git
 mvn clean install -DrvfConfigLocation=/tmp
 ```
 
+Database Setup
+------------------
+The RVF currently requires a local database to be available as per the settings defined in execution-service.properties below.
+Setting up this database and user can be done using the following mysql code:
+```
+CREATE USER 'rvf_user'@'localhost' 
+// alternatively more secure: CREATE USER 'rvf_user'@'localhost' IDENTIFIED BY 'password_here';
+
+GRANT ALL PRIVILEGES ON *.* TO 'rvf_user'@'localhost';
+```
+The rvf_user should not be restricted to the rvf_master database schema, as it will be required to generate new databases for each release (both existing and prospective) that it receives.
 ### Configuration Folder
 The services in the RVF can be configured using property files. Default values for the services are included in the jar 
 files. However, it is possible to override the default values by providing property files for each of the services. 
