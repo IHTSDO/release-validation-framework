@@ -134,7 +134,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		logger.info("Setting default catalog as : " + releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
 
 		TestRunItem runItem = new TestRunItem();
-		runItem.setTestTime(Calendar.getInstance().getTime());
+		runItem.setTestTime(startTime.getTime());
 		runItem.setExecutionId(String.valueOf(executionId));
 		runItem.setTestType(test.getType().name());
 
