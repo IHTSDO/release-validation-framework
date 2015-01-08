@@ -2,6 +2,7 @@
 set -e
 
 #example useage ./start-api-local.sh -d -p 8081
+apiPort=8080
 
 while getopts ":dp:" opt
 do
