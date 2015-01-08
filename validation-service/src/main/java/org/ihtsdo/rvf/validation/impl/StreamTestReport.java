@@ -1,8 +1,9 @@
 package org.ihtsdo.rvf.validation.impl;
 
+import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.validation.ResultFormatter;
 import org.ihtsdo.rvf.validation.TestReportable;
-import org.ihtsdo.rvf.validation.TestRunItem;
+import org.ihtsdo.rvf.validation.StructuralTestRunItem;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -60,8 +61,8 @@ public class StreamTestReport implements TestReportable {
 		writer.write("/n/n");
 	}
 
-	public void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue) {
-		TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, actualValue, expectedValue);
+	public void addError( String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue) {
+		StructuralTestRunItem item = new StructuralTestRunItem (executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, actualValue, expectedValue);
 		String row = formatter.formatRow(item, 0);
 		writer.write(row);
 		if (errorMap.containsKey(columnName)) {
@@ -74,9 +75,9 @@ public class StreamTestReport implements TestReportable {
 		numTestRuns++;
 	}
 
-	public void addSuccess(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern) {
+	public void addSuccess( String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern) {
 		if (writeSuccesses) {
-			TestRunItem item = new TestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, false, null, null);
+			StructuralTestRunItem item = new StructuralTestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, false, null, null);
 			String row = formatter.formatRow(item, 0);
 			writer.write(row);
 		}

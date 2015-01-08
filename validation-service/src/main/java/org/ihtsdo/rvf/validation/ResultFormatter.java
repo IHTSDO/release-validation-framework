@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface ResultFormatter {
 
-	String formatResults(List<TestRunItem> results);
+	String formatResults(List<StructuralTestRunItem> results);
 
-	String formatRow(TestRunItem testRunItem, Integer itemErrorCount);
+	String formatRow(StructuralTestRunItem testRunItem, Integer itemErrorCount);
 
 	String getHeaders();
 

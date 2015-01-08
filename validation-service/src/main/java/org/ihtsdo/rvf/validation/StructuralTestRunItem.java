@@ -3,7 +3,7 @@ package org.ihtsdo.rvf.validation;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class TestRunItem {
+public class StructuralTestRunItem {
 
 	private final String executionId;
 	private final Date testTime;
@@ -16,7 +16,7 @@ public class TestRunItem {
 	private String actualValue;
 	private String expectedValue;
 
-	public TestRunItem(String executionId, Date testTime, String fileName, String filePath, String columnName,
+	public StructuralTestRunItem(String executionId, Date testTime, String fileName, String filePath, String columnName,
 			String testType, String testPattern, boolean failure, String actualValue, String expectedValue) {
 		this.executionId = executionId;
 		this.testTime = testTime;
