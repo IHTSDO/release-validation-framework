@@ -1,8 +1,8 @@
 package org.ihtsdo.rvf.controller;
 
 import org.ihtsdo.rvf.entity.Test;
+import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.service.EntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,7 +67,9 @@ public class TestController {
         return entityService.count(Test.class);
     }
 
-
+/*
+ *  PGW: I don't think it's valid to execute a test without it being linked to an assertion.   Tests need to know what 
+ *  assertion they belong to in order to report what rule is being broken.  
     @RequestMapping(value = "/{id}/run", method = RequestMethod.GET)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
@@ -76,5 +78,5 @@ public class TestController {
                                    @RequestParam String previousReleaseVersion) {
         Test test1 = (Test) entityService.find(Test.class, id);
         return assertionExecutionService.executeTest(test1, runId, prospectiveReleaseVersion, previousReleaseVersion);
-    }
+    } */
 }

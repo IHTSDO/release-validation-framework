@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,14 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
         else{
             throw new MissingEntityException(id);
         }
+	}
+	
+	public Collection <Assertion> find(List<Long> ids) {
+		Collection <Assertion>assertionsFound = new ArrayList<Assertion>();
+        for (Long id : ids) {
+        	assertionsFound.add(find(id));
+        }
+        return assertionsFound;
 	}
 
 	@Override

@@ -16,62 +16,48 @@ public interface AssertionService extends EntityService<Assertion> {
 
 	Assertion update(Long id, Map<String, String> newValues);
 
-    @Override
-    void delete(Assertion assertion);
+	@Override
+	void delete(Assertion assertion);
 
-    List<Assertion> findAll();
+	List<Assertion> findAll();
 
 	Assertion find(Long id);
+	
+	Collection<Assertion> find (List<Long> ids);
 
-//    List<AssertionTest> getAssertionTests(Assertion assertion, ReleaseCenter releaseCenter);
+	Assertion find(UUID uuid);
 
-//    List<AssertionTest> getAssertionTests(Long assertionId, Long releaseCenterId);
+	List<AssertionTest> getAssertionTests(Assertion assertion);
 
-//    List<Test> getTests(Assertion assertion, ReleaseCenter releaseCenter);
+	List<AssertionTest> getAssertionTests(Long assertionId);
 
-//    List<Test> getTests(Long assertionId, Long releaseCenterId);
+	List<AssertionTest> getAssertionTests(UUID uuid);
 
-    Assertion find(UUID uuid);
+	List<Test> getTests(Assertion assertion);
 
-    List<AssertionTest> getAssertionTests(Assertion assertion);
+	List<Test> getTests(Long assertionId);
 
-    List<AssertionTest> getAssertionTests(Long assertionId);
+	List<Test> getTests(UUID uuid);
 
-    List<AssertionTest> getAssertionTests(UUID uuid);
+	Assertion addTest(Assertion assertion, Test test);
 
-    List<Test> getTests(Assertion assertion);
+	Assertion addTests(Assertion assertion, Collection<Test> tests);
 
-    List<Test> getTests(Long assertionId);
+	Assertion deleteTest(Assertion assertion, Test test);
 
-//    Assertion addTest(Assertion assertion, ReleaseCenter releaseCenter, Test test);
+	Assertion deleteTests(Assertion assertion, Collection<Test> tests);
 
-    List<Test> getTests(UUID uuid);
+	Long count();
 
-    Assertion addTest(Assertion assertion, Test test);
+	List<AssertionGroup> getGroupsForAssertion(Assertion assertion);
 
-//    Assertion addTests(Assertion assertion, ReleaseCenter releaseCenter, Collection<Test> tests);
+	List<AssertionGroup> getGroupsForAssertion(Long assertionId);
 
-    Assertion addTests(Assertion assertion, Collection<Test> tests);
+	List<Assertion> getAssertionsForGroup(AssertionGroup group);
 
-//    Assertion deleteTest(Assertion assertion, ReleaseCenter releaseCenter, Test test);
+	List<Assertion> getAssertionsForGroup(Long groupId);
 
-    Assertion deleteTest(Assertion assertion, Test test);
+	AssertionGroup addAssertionToGroup(Assertion assertion, AssertionGroup group);
 
-//    Assertion deleteTests(Assertion assertion, ReleaseCenter releaseCenter, Collection<Test> tests);
-
-    Assertion deleteTests(Assertion assertion, Collection<Test> tests);
-
-    Long count();
-
-    List<AssertionGroup> getGroupsForAssertion(Assertion assertion);
-
-    List<AssertionGroup> getGroupsForAssertion(Long assertionId);
-
-    List<Assertion> getAssertionsForGroup(AssertionGroup group);
-
-    List<Assertion> getAssertionsForGroup(Long groupId);
-
-    AssertionGroup addAssertionToGroup(Assertion assertion, AssertionGroup group);
-
-    AssertionGroup removeAssertionFromGroup(Assertion assertion, AssertionGroup group);
+	AssertionGroup removeAssertionFromGroup(Assertion assertion, AssertionGroup group);
 }

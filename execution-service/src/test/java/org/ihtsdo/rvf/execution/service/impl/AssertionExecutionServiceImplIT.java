@@ -3,7 +3,6 @@ package org.ihtsdo.rvf.execution.service.impl;
 import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
@@ -17,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+
 import java.util.HashMap;
 
 import static org.junit.Assert.assertNotNull;

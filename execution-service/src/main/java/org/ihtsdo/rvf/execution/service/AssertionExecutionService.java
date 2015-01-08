@@ -3,7 +3,7 @@ package org.ihtsdo.rvf.execution.service;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.execution.service.util.TestRunItem;
+import org.ihtsdo.rvf.entity.TestRunItem;
 
 import java.util.Collection;
 
@@ -21,8 +21,9 @@ public interface AssertionExecutionService {
 
     Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    TestRunItem executeTest(Test test, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+    //Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+	TestRunItem executeTest(Assertion assertion, Test test, Long executionId,
+			String prospectiveReleaseVersion, String previousReleaseVersion);
 
 }

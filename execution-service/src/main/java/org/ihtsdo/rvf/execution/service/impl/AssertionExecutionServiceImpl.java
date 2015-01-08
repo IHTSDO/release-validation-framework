@@ -1,15 +1,16 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.Test;
+import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
-import org.ihtsdo.rvf.execution.service.util.TestRunItem;
 import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -70,7 +72,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	public TestRunItem executeAssertionTest(AssertionTest assertionTest, Long executionId,
 											String prospectiveReleaseVersion, String previousReleaseVersion) {
 
-		return executeTest(assertionTest.getTest(), executionId, prospectiveReleaseVersion, previousReleaseVersion);
+		return executeTest(assertionTest.getAssertion(), assertionTest.getTest(), executionId, prospectiveReleaseVersion, previousReleaseVersion);
 	}
 
 	@Override
@@ -93,7 +95,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		//get tests for given assertion
 		for(Test test: assertionService.getTests(assertion))
 		{
-			runItems.add(executeTest(test, executionId, prospectiveReleaseVersion, previousReleaseVersion));
+			runItems.add(executeTest(assertion, test, executionId, prospectiveReleaseVersion, previousReleaseVersion));
 		}
 
 		return runItems;
@@ -124,7 +126,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	}
 
 	@Override
-	public TestRunItem executeTest(Test test, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion) {
+	public TestRunItem executeTest(Assertion assertion, Test test, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion) {
 
 		logger.info("Started execution id = " + executionId);
 		Calendar startTime = Calendar.getInstance();
@@ -137,6 +139,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		runItem.setTestTime(startTime.getTime());
 		runItem.setExecutionId(String.valueOf(executionId));
 		runItem.setTestType(test.getType().name());
+		runItem.setAssertionText(assertion.toString());
 
 		// get command from test and validate the included command object
 		ExecutionCommand command = test.getCommand();
@@ -292,7 +295,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		}
 		return runItem;
 	}
-
+/*
 	@Override
 	public Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId,
 												String prospectiveReleaseVersion, String previousReleaseVersion) {
@@ -302,7 +305,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		}
 
 		return items;
-	}
+	}*/
 
 	public void setQaResulTableName(String qaResulTableName) {
 		this.qaResulTableName = qaResulTableName;

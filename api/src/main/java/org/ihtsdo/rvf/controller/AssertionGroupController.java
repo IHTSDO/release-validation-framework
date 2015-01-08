@@ -1,10 +1,12 @@
 package org.ihtsdo.rvf.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
+import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.util.TestRunItem;
+import org.ihtsdo.rvf.helper.AssertionHelper;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
@@ -26,41 +28,43 @@ public class AssertionGroupController {
 	private AssertionService assertionService;
 	@Autowired
 	private EntityService entityService;
-    @Autowired
+	@Autowired
 	private AssertionExecutionService assertionExecutionService;
-    private ObjectMapper objectMapper = new ObjectMapper();
-    private final Logger logger = LoggerFactory.getLogger(AssertionGroupController.class);
+	@Autowired
+	private AssertionHelper assertionHelper;
+	private ObjectMapper objectMapper = new ObjectMapper();
+	private final Logger logger = LoggerFactory.getLogger(AssertionGroupController.class);
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public List<AssertionGroup> getGroups() {
+	@ResponseStatus(HttpStatus.OK)
+	public List<AssertionGroup> getGroups() {
 		return entityService.findAll(AssertionGroup.class);
 	}
 
-    @RequestMapping(value = "{id}/assertions", method = RequestMethod.GET)
+	@RequestMapping(value = "{id}/assertions", method = RequestMethod.GET)
 	@ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public List<Assertion> getAssertionsForGroup(@PathVariable Long id) {
+	@ResponseStatus(HttpStatus.OK)
+	public List<Assertion> getAssertionsForGroup(@PathVariable Long id) {
 
-        AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-        return assertionService.getAssertionsForGroup(group);
+		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		return assertionService.getAssertionsForGroup(group);
 	}
 
-    @RequestMapping(value = "{id}/assertions", method = RequestMethod.POST)
+	@RequestMapping(value = "{id}/assertions", method = RequestMethod.POST)
 	@ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<String> assertionsList) {
+	@ResponseStatus(HttpStatus.OK)
+	public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<String> assertionsList) {
 
-        AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-        List<Assertion> assertions = getAssertions(assertionsList);
-        for(Assertion assertion : assertions){
-            assertionService.addAssertionToGroup(assertion, group);
-        }
+		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		List<Assertion> assertions = getAssertions(assertionsList);
+		for(Assertion assertion : assertions){
+			assertionService.addAssertionToGroup(assertion, group);
+		}
 
-        return group;
+		return group;
 	}
-    
+	
 	@RequestMapping(value = "{id}/addAllAssertions", method = RequestMethod.PUT)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
@@ -72,125 +76,99 @@ public class AssertionGroupController {
 		return (AssertionGroup) entityService.update(group);
 	}
 
-    @RequestMapping(value = "{id}/assertions", method = RequestMethod.DELETE)
+	@RequestMapping(value = "{id}/assertions", method = RequestMethod.DELETE)
 	@ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup removeAssertionsFromGroup(@PathVariable Long id, @RequestBody(required = false) List<Assertion> assertions) {
+	@ResponseStatus(HttpStatus.OK)
+	public AssertionGroup removeAssertionsFromGroup(@PathVariable Long id, @RequestBody(required = false) List<Assertion> assertions) {
 
-        AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-        for(Assertion assertion : assertions){
-            assertionService.removeAssertionFromGroup(assertion, group);
-        }
+		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		for(Assertion assertion : assertions){
+			assertionService.removeAssertionFromGroup(assertion, group);
+		}
 
-        return group;
+		return group;
 	}
 
-    @RequestMapping(value = "{id}/assertions", method = RequestMethod.PUT)
+	@RequestMapping(value = "{id}/assertions", method = RequestMethod.PUT)
 	@ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup setAsAssertionsInGroup(@PathVariable Long id, @RequestBody(required = false) Set<Assertion> assertions) {
+	@ResponseStatus(HttpStatus.OK)
+	public AssertionGroup setAsAssertionsInGroup(@PathVariable Long id, @RequestBody(required = false) Set<Assertion> assertions) {
 
-        AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-        // replace all existing assertions with current list
-        group.setAssertions(assertions);
+		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		// replace all existing assertions with current list
+		group.setAssertions(assertions);
 
-        return (AssertionGroup) entityService.update(group);
+		return (AssertionGroup) entityService.update(group);
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.GET)
 	@ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup getAssertionGroup(@PathVariable Long id) {
-        return (AssertionGroup) entityService.find(AssertionGroup.class, id);
+	@ResponseStatus(HttpStatus.OK)
+	public AssertionGroup getAssertionGroup(@PathVariable Long id) {
+		return (AssertionGroup) entityService.find(AssertionGroup.class, id);
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
 	@ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup deleteAssertionGroup(@PathVariable Long id) {
-        AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-        entityService.delete(group);
-        return group;
+	@ResponseStatus(HttpStatus.OK)
+	public AssertionGroup deleteAssertionGroup(@PathVariable Long id) {
+		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		entityService.delete(group);
+		return group;
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CREATED)
 	public AssertionGroup createAssertionGroupWithName(@RequestParam String name) {
-        AssertionGroup group = new AssertionGroup();
-        group.setName(name);
+		AssertionGroup group = new AssertionGroup();
+		group.setName(name);
 		return (AssertionGroup) entityService.create(group);
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public AssertionGroup updateAssertionGroup(@PathVariable Long id,
+	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
+	public AssertionGroup updateAssertionGroup(@PathVariable Long id,
 			@RequestParam String name) {
-        AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-        group.setName(name);
-        return (AssertionGroup) entityService.update(group);
+		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		group.setName(name);
+		return (AssertionGroup) entityService.update(group);
 	}
 
-    @RequestMapping(value = "/{id}/run", method = RequestMethod.GET)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public Map<String, Object> executeAssertions(@PathVariable Long id,
-                                           @RequestParam Long runId, @RequestParam String prospectiveReleaseVersion,
-                                           @RequestParam String previousReleaseVersion) {
-        Map<String , Object> responseMap = new HashMap<>();
-        Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
-        AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+	@RequestMapping(value = "/{id}/run", method = RequestMethod.GET)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
+	public Map<String, Object> executeAssertions(@PathVariable Long id,
+										   @RequestParam Long runId, @RequestParam String prospectiveReleaseVersion,
+										   @RequestParam String previousReleaseVersion) {
 
-        int failedAssertionCount = 0;
-        for (Assertion assertion: assertionService.getAssertionsForGroup(group)) {
-            try
-            {
-                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
-                        prospectiveReleaseVersion, previousReleaseVersion));
-                // get only first since we have 1:1 correspondence between Assertion and Test
-                if(items.size() == 1){
-                    TestRunItem runItem = items.get(0);
-                    if(runItem.isFailure()){
-                        failedAssertionCount++;
-                    }
-                }
-                map.put(assertion, items);
-            }
-            catch (MissingEntityException e) {
-                failedAssertionCount++;
-            }
-        }
+		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		return assertionHelper.assertAssertions(assertionService.getAssertionsForGroup(group), runId, prospectiveReleaseVersion, previousReleaseVersion);
+	}
 
-        responseMap.put("assertions", map);
-        responseMap.put("assertionsRun", map.keySet().size());
-        responseMap.put("assertionsFailed", failedAssertionCount);
+	private List<Assertion> getAssertions(List<String> items){
 
-        return responseMap;
-    }
+		List<Assertion> assertions = new ArrayList<>();
+		for(String item: items){
+			try
+			{
+				if(item.matches("\\d+")){
+					// treat as assertion id and retrieve associated assertion
+					Assertion assertion = assertionService.find(Long.valueOf(item));
+					if(assertion != null){
+						assertions.add(assertion);
+					}
+				}
+				else{
+					assertions.add(objectMapper.readValue(item, Assertion.class));
+				}
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
-    private List<Assertion> getAssertions(List<String> items){
-
-        List<Assertion> assertions = new ArrayList<>();
-        for(String item: items){
-            try
-            {
-                if(item.matches("\\d+")){
-                    // treat as assertion id and retrieve associated assertion
-                    Assertion assertion = assertionService.find(Long.valueOf(item));
-                    if(assertion != null){
-                        assertions.add(assertion);
-                    }
-                }
-                else{
-                    assertions.add(objectMapper.readValue(item, Assertion.class));
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return assertions;
-    }
+		return assertions;
+	}
 }
