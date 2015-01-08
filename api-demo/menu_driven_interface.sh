@@ -11,9 +11,9 @@ fileToTest="rel2_Refset_SimpleDelta_INT_20140131.txt"
 
 # Target API Deployment
 #TODO - allow the user to change the API at runtime
-#api="http://localhost:8080/api/v1"
+api="http://localhost:8080/api/v1"
 #api="http://localhost:8081/api/v1"
-api="https://dev-rvf.ihtsdotools.org/api/v1"
+#api="https://dev-rvf.ihtsdotools.org/api/v1"
 #api="https://uat-rvf.ihtsdotools.org/api/v1"
 
 #TODO make this function miss out the data if jsonFile is not specified.
@@ -84,38 +84,53 @@ function uploadRelease() {
 function doTest() {
 	testType=$1
 	echo
-	read -p "What archive should be uploaded?: " releaseFile
-	if [ ! -e ${releaseFile} ]
+	if [ ${testType} != "single" ]
 	then
-		echo "${releaseFile} not found. You might have skipped setting the release file."
-		return
-	elif [ -z $releaseFile ] 
-	then
-		echo "Passing empty file parameter - set purge to false!"
-		fileParam=""
-	else
-		fileParam="-F file=@${releaseFile}" 
+		read -p "What archive should be uploaded?: " releaseFile
+		if [ ! -e ${releaseFile} ]
+		then
+			echo "${releaseFile} not found. You might have skipped setting the release file."
+			return
+		elif [ -z $releaseFile ] 
+		then
+			echo "Passing empty file parameter - set purge to false!"
+			fileParam=""
+		else
+			fileParam="-F file=@${releaseFile}" 
+		fi
+		
+		read -p "What manifest should be uploaded?: " manifestFile
+		if [ ! -e ${manifestFile} ] 
+		then
+			echo "${manifestFile} not found."
+			return
+		fi
 	fi
 
 #	prospectiveReleaseVersion=`getReleaseDate ${releaseFile}`
+	datestamp=`date +%Y%m%d%H%M%S`
 
-	read -p "What manifest should be uploaded?: " manifestFile
-	if [ ! -e ${manifestFile} ] 
-	then
-		echo "${manifestFile} not found."
-		return
-	fi
 	
 	if [ ${testType} == "structural" ] 
 	then
-	curl -i -X POST "$api/test-post" -F manifest=@${manifestFile} ${fileParam}
-	elif  [ ${testType} == "full" ] 
+		curl -i -X POST "$api/test-post" -F manifest=@${manifestFile} ${fileParam}
+	elif [ ${testType} == "single" ]
+	then 
+		read -p "What assertion id should be used?: " assertionId
+		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
+		read -p "What is the prospective (ie the one being tested) release version (YYYYMMDD): " prospectiveReleaseVersion
+		curl -i -X POST "${api}/assertions/${assertionId}/run" \
+		--progress-bar \
+		--retry 0 \
+		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
+		-F "previousReleaseVersion=${currentReleaseVersion}" \
+		-F "runId=${datestamp}" 			 
+	elif [ ${testType} == "full" ] 
 	then
 		read -p "What assertion group id should be used?: " assertionGroup
 		read -p "Do you want to purge existing database for prospective release (true/false)?: " purgeExistingDatabase
 		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
 		read -p "What is the prospective (ie the one being tested) release version (YYYYMMDD): " prospectiveReleaseVersion
-		datestamp=`date +%Y%m%d%H%M%S`
 		curl -i -X POST "$api/run-post" \
 		--progress-bar \
 		--retry 0 \
@@ -171,6 +186,7 @@ function pressAnyKey() {
 function mainMenu() {
 	echo 
 	echo "*****   RVF Menu    ******"
+	echo "1 - test a package against a single assertion"
 	echo "a - list known assertions"
 	echo "b - list known groups"
 	echo "g - group all known assertions"
@@ -185,6 +201,7 @@ function mainMenu() {
 	do
 		read -s -n 1 user_choice
 		case "$user_choice" in
+			1)   doTest "single"; break;;
 			a|A) listAssertions ; break ;;
 			b|B) listGroups ; break ;;
 			l|L) listKnownReleases ; break;;
