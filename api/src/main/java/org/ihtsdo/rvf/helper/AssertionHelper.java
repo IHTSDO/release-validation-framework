@@ -13,6 +13,7 @@ import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 @Component
 public class AssertionHelper {
 	@Autowired
@@ -22,6 +23,7 @@ public class AssertionHelper {
 	
 	public Map<String, Object> assertAssertions (Collection<Assertion> assertions, Long runId,  String prospectiveReleaseVersion,
 			String previousReleaseVersion) {
+		//TODO throw an exception that results in a malformed request response and remove runtime dependency on JUnit
 		Assert.assertNotNull(runId);
 		Collection<TestRunItem> allTestRunItems = new ArrayList<>();
 		Map<String , Object> responseMap = new HashMap<>();
