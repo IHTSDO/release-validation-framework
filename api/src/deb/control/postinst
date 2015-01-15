@@ -6,6 +6,9 @@ echo $*
 
 APP_NAME=[[packageName]]
 
+# Record package version number
+echo [[version]] > /opt/rvf-api/data/version.txt
+
 supervisorctl update $APP_NAME || true
 supervisorctl start $APP_NAME || true
 

@@ -1,6 +1,18 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
-import org.ihtsdo.rvf.entity.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashMap;
+
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
+import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionTest;
+import org.ihtsdo.rvf.entity.ExecutionCommand;
+import org.ihtsdo.rvf.entity.TestRunItem;
+import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.helper.Configuration;
@@ -13,14 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import javax.sql.DataSource;
-
-import java.util.HashMap;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
@@ -80,7 +84,7 @@ public class AssertionExecutionServiceImplIT {
         assert snomedDataSource != null;
 
         // set configuration
-        String template = "" +
+        final String template = "" +
                 "select  " +
                 "concat('CONCEPT: id=',a.id, ':Concept has only one defining relationship but is not primitive.')  " +
                 "from <PROSPECTIVE>.concept_<SNAPSHOT> a  " +
@@ -90,8 +94,8 @@ public class AssertionExecutionServiceImplIT {
                 "and a.definitionstatusid != '900000000000074008' " +
                 "group by b.sourceid " +
                 "having count(*) = 1;";
-        Configuration configuration = new Configuration();
-        ExecutionCommand command = new ExecutionCommand();
+        final Configuration configuration = new Configuration();
+        final ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(template);
         command.setCode("Execute me".getBytes());
         command.setConfiguration(configuration);
@@ -101,7 +105,7 @@ public class AssertionExecutionServiceImplIT {
         assertionTest.setTest(test);
 
         // set both prospective and previous release
-        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1L, "20140731", "20140131");
+        final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1L, "20150131", "20140731");
         assertNotNull(runItem);
         System.out.println("runItem = " + runItem);
         System.out.println("runItem.isFailure() = " + runItem.isFailure());
@@ -115,7 +119,7 @@ public class AssertionExecutionServiceImplIT {
         assert snomedDataSource != null;
 
         // set configuration
-        String template = "" +
+        final String template = "" +
                 "create or replace view v_act_langrs as " +
                 "select referencedcomponentid " +
                 "from <PROSPECTIVE>.langrefset_<SNAPSHOT> " +
@@ -129,8 +133,8 @@ public class AssertionExecutionServiceImplIT {
                 "and a.definitionstatusid != '900000000000074008' " +
                 "group by b.sourceid " +
                 "having count(*) = 8;";
-        Configuration configuration = new Configuration();
-        ExecutionCommand command = new ExecutionCommand();
+        final Configuration configuration = new Configuration();
+        final ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(template);
         command.setCode("Execute me".getBytes());
         command.setConfiguration(configuration);
@@ -140,7 +144,7 @@ public class AssertionExecutionServiceImplIT {
         assertionTest.setTest(test);
 
         // set both prospective and previous release
-        TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "20140731", "20140131");
+        final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "20140731", "20140131");
         assertNotNull(runItem);
         assertTrue("Test must have passed", runItem.isFailure());
     }

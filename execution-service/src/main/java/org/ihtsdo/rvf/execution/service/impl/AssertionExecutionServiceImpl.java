@@ -1,6 +1,17 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.entity.Assertion;
@@ -19,14 +30,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-
-import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.regex.Pattern;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * An implementation of the {@link org.ihtsdo.rvf.execution.service.AssertionExecutionService}
@@ -56,30 +60,30 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(RUN_ID BIGINT, ASSERTION_ID BIGINT, " +
+		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(RUN_ID BIGINT, ASSERTION_ID BIGINT, " +
 				" ASSERTION_TEXT VARCHAR(255), DETAILS VARCHAR(255), INDEX (RUN_ID), INDEX (ASSERTION_ID))";
-		String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, assertion_text, details) values (?, ?, ?, ?)";
+		final String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, assertion_text, details) values (?, ?, ?, ?)";
 		try {
 			dataSource.getConnection().createStatement().execute(createSQLString);
 			insertStatement = dataSource.getConnection().prepareStatement(insertSQL);
 		}
-		catch (SQLException e) {
+		catch (final SQLException e) {
 			logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
 		}
 	}
 
 	@Override
-	public TestRunItem executeAssertionTest(AssertionTest assertionTest, Long executionId,
-											String prospectiveReleaseVersion, String previousReleaseVersion) {
+	public TestRunItem executeAssertionTest(final AssertionTest assertionTest, final Long executionId,
+											final String prospectiveReleaseVersion, final String previousReleaseVersion) {
 
 		return executeTest(assertionTest.getAssertion(), assertionTest.getTest(), executionId, prospectiveReleaseVersion, previousReleaseVersion);
 	}
 
 	@Override
-	public Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertionTests, Long executionId,
-														 String prospectiveReleaseVersion, String previousReleaseVersion) {
-		Collection<TestRunItem> items = new ArrayList<>();
-		for(AssertionTest at: assertionTests){
+	public Collection<TestRunItem> executeAssertionTests(final Collection<AssertionTest> assertionTests, final Long executionId,
+														 final String prospectiveReleaseVersion, final String previousReleaseVersion) {
+		final Collection<TestRunItem> items = new ArrayList<>();
+		for(final AssertionTest at: assertionTests){
 			items.add(executeAssertionTest(at, executionId, prospectiveReleaseVersion, previousReleaseVersion));
 		}
 
@@ -87,13 +91,13 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	}
 
 	@Override
-	public Collection<TestRunItem> executeAssertion(Assertion assertion, Long executionId,
-													String prospectiveReleaseVersion, String previousReleaseVersion) {
+	public Collection<TestRunItem> executeAssertion(final Assertion assertion, final Long executionId,
+													final String prospectiveReleaseVersion, final String previousReleaseVersion) {
 
-		Collection<TestRunItem> runItems = new ArrayList<>();
+		final Collection<TestRunItem> runItems = new ArrayList<>();
 
 		//get tests for given assertion
-		for(Test test: assertionService.getTests(assertion))
+		for(final Test test: assertionService.getTests(assertion))
 		{
 			runItems.add(executeTest(assertion, test, executionId, prospectiveReleaseVersion, previousReleaseVersion));
 		}
@@ -102,10 +106,10 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	}
 
 	@Override
-	public Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, Long executionId,
-													 String prospectiveReleaseVersion, String previousReleaseVersion) {
-		Collection<TestRunItem> items = new ArrayList<>();
-		for(Assertion assertion : assertions){
+	public Collection<TestRunItem> executeAssertions(final Collection<Assertion> assertions, final Long executionId,
+													 final String prospectiveReleaseVersion, final String previousReleaseVersion) {
+		final Collection<TestRunItem> items = new ArrayList<>();
+		for(final Assertion assertion : assertions){
 			items.addAll(executeAssertion(assertion, executionId, prospectiveReleaseVersion, previousReleaseVersion));
 		}
 
@@ -113,59 +117,51 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	}
 	
 	/** Executes an update using statement sql and logs the time taken **/
-	private int executeUpdateStatement (Connection connection, String sql, String typeMsg) throws SQLException{
-		long startTime = System.currentTimeMillis();
+	private int executeUpdateStatement (final Connection connection, final String sql, final String typeMsg) throws SQLException{
+		final long startTime = System.currentTimeMillis();
 		logger.info("Executing {} statement: {}", typeMsg, sql);
 		try (Statement statement = connection.createStatement()) {
 			//try block will close statement in all circumstances
-			int result = statement.executeUpdate(sql);
-			long timeTaken = System.currentTimeMillis() - startTime;
+			final int result = statement.executeUpdate(sql);
+			final long timeTaken = System.currentTimeMillis() - startTime;
 			logger.info("Completed {} in {}ms, result = {}",typeMsg, timeTaken, result);
 			return result;
 		}
 	}
 
 	@Override
-	public TestRunItem executeTest(Assertion assertion, Test test, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion) {
+	public TestRunItem executeTest(final Assertion assertion, final Test test, final Long executionId, final String prospectiveReleaseVersion, final String previousReleaseVersion) {
 
 		logger.info("Started execution id = " + executionId);
-		Calendar startTime = Calendar.getInstance();
+		final Calendar startTime = Calendar.getInstance();
 
 		// set prospective version as default schema to use since SQL has calls that do not specify schema name
-		String prospectiveSchemaName = releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion);
+		final String prospectiveSchemaName = releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion);
 		logger.info("Setting default catalog as : " + releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
 
-		TestRunItem runItem = new TestRunItem();
+		final TestRunItem runItem = new TestRunItem();
 		runItem.setTestTime(startTime.getTime());
 		runItem.setExecutionId(String.valueOf(executionId));
 		runItem.setTestType(test.getType().name());
 		runItem.setAssertionText(assertion.toString());
 
 		// get command from test and validate the included command object
-		ExecutionCommand command = test.getCommand();
+		final ExecutionCommand command = test.getCommand();
 		if(command != null)
 		{
 			// get test configuration
-			Configuration testConfiguration = test.getCommand().getConfiguration();
+			final Configuration testConfiguration = test.getCommand().getConfiguration();
 			if(command.validate(test.getType(), testConfiguration))
 			{
 				// execute sql and get result
 				try
 				{
 					// create a single connection for entire test and close it after running test - avoid creating too many connections
-					Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName);
-					/*
-					 create a prepared statement for retrieving matching results.
-					 Moving this outside to the after properties method throws resource closed exception because the
-					 connection does not stay open for the entire duration - needs MySQL server tweaks
-					*/
-					String resultSQL = "select assertion_id, assertion_text, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
-					PreparedStatement resultStatement = dataSource.getConnection().prepareStatement(resultSQL);
-
+					final Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName);
 					String[] parts = {""};
 					if(command.getStatements().size() == 0)
 					{
-						String sql = command.getTemplate();
+						final String sql = command.getTemplate();
 						parts = sql.split(";");
 					}
 					else{
@@ -176,7 +172,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 					for(String part: parts)
 					{
 						// remove all SQL comments - //TODO might throw errors for -- style comments
-						Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
+						final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
 						part = commentPattern.matcher(part).replaceAll("");
 
 						// replace all substitutions for exec
@@ -194,7 +190,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 						part = part.replaceAll("<PREVIOUS-RELEASE-DATE>", previousReleaseVersion);
 						part = part.replaceAll("<CURRENT-RELEASE-DATE>", prospectiveReleaseVersion);
 
-						for(String key : testConfiguration.getKeys())
+						for(final String key : testConfiguration.getKeys())
 						{
 							logger.info("key : value " + key + " : " + testConfiguration.getValue(key));
 							part = part.replaceAll(key, testConfiguration.getValue(key));
@@ -206,9 +202,9 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 							logger.info("Set select query :" + part);
 							selectSQL = part;
 
-							PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
+							final PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
 							logger.info("Created statement");
-							ResultSet execResult = preparedStatement.executeQuery();
+							final ResultSet execResult = preparedStatement.executeQuery();
 							logger.info("execResult = " + execResult);
 							while(execResult.next())
 							{
@@ -232,17 +228,24 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 									part = part + " ENGINE = MyISAM";
 								}
 							}
-							int result = executeUpdateStatement(connection, part,"create table");
+							final int result = executeUpdateStatement(connection, part,"create table");
 							if(result > 0){
 								logger.error("Error executing sql : " + part);
 							}
 						}
 					}
-
+					
+					/*
+					 create a prepared statement for retrieving matching results.
+					 Moving this outside to the after properties method throws resource closed exception because the
+					 connection does not stay open for the entire duration - needs MySQL server tweaks
+					*/
+					final String resultSQL = "select assertion_id, assertion_text, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
+					final PreparedStatement resultStatement = dataSource.getConnection().prepareStatement(resultSQL);
 					// select results that match execution
 					resultStatement.setLong(1, test.getId());
 					resultStatement.setLong(2, executionId);
-					ResultSet resultSet = resultStatement.executeQuery();
+					final ResultSet resultSet = resultStatement.executeQuery();
 					String sqlQueryString = resultStatement.toString();
 					sqlQueryString = sqlQueryString.substring(sqlQueryString.indexOf(":"));
 					logger.info("Getting failure count using SQL : " + resultStatement);
@@ -272,7 +275,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 						runItem.setFailure(false);
 					}
 				}
-				catch (SQLException e) {
+				catch (final SQLException e) {
 					logger.warn("Nested exception is : " + e.fillInStackTrace());
 					runItem.setFailureMessage("Error executing SQL passed as command object. Nested exception : " + e.fillInStackTrace());
 				}
@@ -288,9 +291,11 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
 		runItem.setRunTime(Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis());
 		try {
+			logger.info(runItem.toString());
+			//need to log json different to a json file rather than in the log
 			logger.info("runItem as json = " + mapper.writerWithDefaultPrettyPrinter().writeValueAsString(runItem));
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return runItem;
@@ -307,31 +312,31 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		return items;
 	}*/
 
-	public void setQaResulTableName(String qaResulTableName) {
+	public void setQaResulTableName(final String qaResulTableName) {
 		this.qaResulTableName = qaResulTableName;
 	}
 
-	public void setAssertionIdColumnName(String assertionIdColumnName) {
+	public void setAssertionIdColumnName(final String assertionIdColumnName) {
 		this.assertionIdColumnName = assertionIdColumnName;
 	}
 
-	public void setAssertionNameColumnName(String assertionNameColumnName) {
+	public void setAssertionNameColumnName(final String assertionNameColumnName) {
 		this.assertionNameColumnName = assertionNameColumnName;
 	}
 
-	public void setAssertionDetailsColumnName(String assertionDetailsColumnName) {
+	public void setAssertionDetailsColumnName(final String assertionDetailsColumnName) {
 		this.assertionDetailsColumnName = assertionDetailsColumnName;
 	}
 
-	public void setDeltaTableSuffix(String deltaTableSuffix) {
+	public void setDeltaTableSuffix(final String deltaTableSuffix) {
 		this.deltaTableSuffix = deltaTableSuffix;
 	}
 
-	public void setSnapshotTableSuffix(String snapshotTableSuffix) {
+	public void setSnapshotTableSuffix(final String snapshotTableSuffix) {
 		this.snapshotTableSuffix = snapshotTableSuffix;
 	}
 
-	public void setFullTableSuffix(String fullTableSuffix) {
+	public void setFullTableSuffix(final String fullTableSuffix) {
 		this.fullTableSuffix = fullTableSuffix;
 	}
 }

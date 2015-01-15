@@ -60,7 +60,7 @@ mvn clean test
 ### Integration Testing
 Integration tests expect an actual MySQL SNOMED CT database that contains SNOMED CT data. To run integration tests use: 
 ```
-mvn clean integration-test -Dskip.integration.tests=false - DrvfConfigLocation=/tmp
+mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation=/tmp
 ```
 
 Note that all tests in the API that deal with controllers are currently marked as Integration tests. The spring context
