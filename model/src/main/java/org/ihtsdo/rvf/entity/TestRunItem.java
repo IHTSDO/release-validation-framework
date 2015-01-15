@@ -1,11 +1,11 @@
 package org.ihtsdo.rvf.entity;
 
-import org.ihtsdo.rvf.helper.Configuration;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.ihtsdo.rvf.helper.Configuration;
 
 /**
  * A class that records metrics about execution of an {@link org.ihtsdo.rvf.entity.Test}.
@@ -31,8 +31,8 @@ public class TestRunItem {
 
 	}
 
-	public TestRunItem(Assertion assertion, String executionId, Date testTime, Configuration configuration,
-					   String testType, String testPattern, boolean failure, long runTime, String failureMessage) {
+	public TestRunItem(final Assertion assertion, final String executionId, final Date testTime, final Configuration configuration,
+					   final String testType, final String testPattern, final boolean failure, final long runTime, final String failureMessage) {
 		this.assertionText = assertion.toString();
 		this.executionId = executionId;
 		this.testTime = testTime;
@@ -48,7 +48,7 @@ public class TestRunItem {
 		return failure;
 	}
 
-	private String check(String separator, String filePath) {
+	private String check(final String separator, final String filePath) {
 		return filePath != null ? (separator + filePath) : "";
 	}
 
@@ -79,6 +79,7 @@ public class TestRunItem {
 	@Override
 	public String toString() {
 		return "TestRunItem{" +
+				"assertionText=" + assertionText +  '\'' +	
 				"executionId='" + executionId + '\'' +
 				", testType='" + testType + '\'' +
 				", testPattern='" + testPattern + '\'' +
@@ -88,23 +89,23 @@ public class TestRunItem {
 				'}';
 	}
 
-	public void setExecutionId(String executionId) {
+	public void setExecutionId(final String executionId) {
 		this.executionId = executionId;
 	}
 
-	public void setTestTime(Date testTime) {
+	public void setTestTime(final Date testTime) {
 		this.testTime = testTime;
 	}
 
-	public void setTestType(String testType) {
+	public void setTestType(final String testType) {
 		this.testType = testType;
 	}
 
-	public void setTestPattern(String testPattern) {
+	public void setTestPattern(final String testPattern) {
 		this.testPattern = testPattern;
 	}
 
-	public void setFailure(boolean failure) {
+	public void setFailure(final boolean failure) {
 		this.failure = failure;
 	}
 
@@ -112,11 +113,11 @@ public class TestRunItem {
 		return runTime;
 	}
 
-	public void setRunTime(long runTime) {
+	public void setRunTime(final long runTime) {
 		this.runTime = runTime;
 	}
 
-	public void setFailureMessage(String failureMessage) {
+	public void setFailureMessage(final String failureMessage) {
 		this.failureMessage = failureMessage;
 	}
 
@@ -124,7 +125,7 @@ public class TestRunItem {
 		return configuration;
 	}
 
-	public void setConfiguration(Configuration configuration) {
+	public void setConfiguration(final Configuration configuration) {
 		this.configuration = configuration;
 	}
 
@@ -132,11 +133,11 @@ public class TestRunItem {
 		return firstNInstances;
 	}
 
-	public void setFirstNInstances(List<String> firstNInstances) {
+	public void setFirstNInstances(final List<String> firstNInstances) {
 		this.firstNInstances = firstNInstances;
 	}
 
-	public void addFirstNInstance(String string){
+	public void addFirstNInstance(final String string){
 		getFirstNInstances().add(string);
 	}
 
@@ -144,7 +145,7 @@ public class TestRunItem {
 		return failureCount;
 	}
 
-	public void setFailureCount(Long failureCount) {
+	public void setFailureCount(final Long failureCount) {
 		this.failureCount = failureCount;
 	}
 
@@ -152,7 +153,7 @@ public class TestRunItem {
 		return assertionText;
 	}
 
-	public void setAssertionText(String assertionText) {
+	public void setAssertionText(final String assertionText) {
 		this.assertionText = assertionText;
 	}
 }
