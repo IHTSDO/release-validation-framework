@@ -46,14 +46,14 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	RvfDynamicDataSource rvfDynamicDataSource;
 	@Autowired
 	ReleaseDataManager releaseDataManager;
-	String qaResulTableName;
-	String assertionIdColumnName;
-	String assertionNameColumnName;
-	String assertionDetailsColumnName;
-	ObjectMapper mapper = new ObjectMapper();
-	String deltaTableSuffix = "d";
-	String snapshotTableSuffix = "s";
-	String fullTableSuffix = "f";
+	private String qaResulTableName;
+	private String assertionIdColumnName;
+	private String assertionNameColumnName;
+	private String assertionDetailsColumnName;
+	private final ObjectMapper mapper = new ObjectMapper();
+	private String deltaTableSuffix = "d";
+	private String snapshotTableSuffix = "s";
+	private String fullTableSuffix = "f";
 
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceImpl.class);
 	private PreparedStatement insertStatement;
@@ -62,10 +62,10 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	public void afterPropertiesSet() throws Exception {
 		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(RUN_ID BIGINT, ASSERTION_ID BIGINT, " +
 				" ASSERTION_TEXT VARCHAR(255), DETAILS VARCHAR(255), INDEX (RUN_ID), INDEX (ASSERTION_ID))";
-		final String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, assertion_text, details) values (?, ?, ?, ?)";
-		try {
-			dataSource.getConnection().createStatement().execute(createSQLString);
-			insertStatement = dataSource.getConnection().prepareStatement(insertSQL);
+		try (Connection connection = dataSource.getConnection()) {
+			try (Statement statement = connection.createStatement()) {
+				statement.execute(createSQLString);
+			}
 		}
 		catch (final SQLException e) {
 			logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
@@ -132,7 +132,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	@Override
 	public TestRunItem executeTest(final Assertion assertion, final Test test, final Long executionId, final String prospectiveReleaseVersion, final String previousReleaseVersion) {
 
-		logger.info("Started execution id = " + executionId);
+		logger.info("Starting execution id = " + executionId);
 		final Calendar startTime = Calendar.getInstance();
 
 		// set prospective version as default schema to use since SQL has calls that do not specify schema name
@@ -147,133 +147,17 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
 		// get command from test and validate the included command object
 		final ExecutionCommand command = test.getCommand();
-		if(command != null)
+		if (command != null)
 		{
 			// get test configuration
 			final Configuration testConfiguration = test.getCommand().getConfiguration();
-			if(command.validate(test.getType(), testConfiguration))
+			if (command.validate(test.getType(), testConfiguration))
 			{
 				// execute sql and get result
-				try
-				{
-					// create a single connection for entire test and close it after running test - avoid creating too many connections
-					final Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName);
-					String[] parts = {""};
-					if(command.getStatements().size() == 0)
-					{
-						final String sql = command.getTemplate();
-						parts = sql.split(";");
-					}
-					else{
-						parts = command.getStatements().toArray(new String[command.getStatements().size()]);
-					}
-					// parse sql to get select statement
-					String selectSQL = null;
-					for(String part: parts)
-					{
-						// remove all SQL comments - //TODO might throw errors for -- style comments
-						final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
-						part = commentPattern.matcher(part).replaceAll("");
-
-						// replace all substitutions for exec
-						part = part.replaceAll("<RUNID>", String.valueOf(executionId));
-						part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(test.getId()));
-						// watch out for any 's that users might have introduced
-						part = part.replaceAll("<ASSERTIONTEXT>", test.getName().replaceAll("'", ""));
-						part = part.replaceAll("qa_result_table", dataSource.getDefaultCatalog()+"."+qaResulTableName);
-						part = part.replaceAll("<PROSPECTIVE>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
-						part = part.replaceAll("<TEMP>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
-						part = part.replaceAll("<PREVIOUS>", releaseDataManager.getSchemaForRelease(previousReleaseVersion));
-						part = part.replaceAll("<DELTA>", deltaTableSuffix);
-						part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
-						part = part.replaceAll("<FULL>", fullTableSuffix);
-						part = part.replaceAll("<PREVIOUS-RELEASE-DATE>", previousReleaseVersion);
-						part = part.replaceAll("<CURRENT-RELEASE-DATE>", prospectiveReleaseVersion);
-
-						for(final String key : testConfiguration.getKeys())
-						{
-							logger.info("key : value " + key + " : " + testConfiguration.getValue(key));
-							part = part.replaceAll(key, testConfiguration.getValue(key));
-						}
-
-						// remove any leading and train white space
-						part = part.trim();
-						if(part.startsWith("select")){
-							logger.info("Set select query :" + part);
-							selectSQL = part;
-
-							final PreparedStatement preparedStatement = connection.prepareStatement(selectSQL);
-							logger.info("Created statement");
-							final ResultSet execResult = preparedStatement.executeQuery();
-							logger.info("execResult = " + execResult);
-							while(execResult.next())
-							{
-								insertStatement.setLong(1, executionId);
-								insertStatement.setLong(2, test.getId());
-								insertStatement.setString(3, test.getName());
-								insertStatement.setString(4, execResult.getString(1));
-								// execute insert statement
-								insertStatement.executeUpdate();
-							}
-							execResult.close();
-							preparedStatement.close();
-						}
-						else if(part.startsWith("insert")){
-							executeUpdateStatement(connection, part, "insert");
-						}
-						else {
-							if(part.startsWith("create table")){
-								// only add engine if we do not create using a like statement
-								if (!(part.contains("like") || part.contains("as"))) {
-									part = part + " ENGINE = MyISAM";
-								}
-							}
-							final int result = executeUpdateStatement(connection, part,"create table");
-							if(result > 0){
-								logger.error("Error executing sql : " + part);
-							}
-						}
-					}
-					
-					/*
-					 create a prepared statement for retrieving matching results.
-					 Moving this outside to the after properties method throws resource closed exception because the
-					 connection does not stay open for the entire duration - needs MySQL server tweaks
-					*/
-					final String resultSQL = "select assertion_id, assertion_text, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
-					final PreparedStatement resultStatement = dataSource.getConnection().prepareStatement(resultSQL);
-					// select results that match execution
-					resultStatement.setLong(1, test.getId());
-					resultStatement.setLong(2, executionId);
-					final ResultSet resultSet = resultStatement.executeQuery();
-					String sqlQueryString = resultStatement.toString();
-					sqlQueryString = sqlQueryString.substring(sqlQueryString.indexOf(":"));
-					logger.info("Getting failure count using SQL : " + resultStatement);
-					long counter = 0;
-					while (resultSet.next())
-					{
-						// only get first 10 failed results
-						if (counter<10) {
-							runItem.addFirstNInstance(resultSet.getString(3));
-						}
-						counter++;
-					}
-					resultSet.close();
-					resultStatement.close();
-					logger.info("counter = " + counter);
-					// close connection
-					connection.close();
-
-					// if counter is > 0, then we know there are failures
-					runItem.setFailureCount(counter);
-					if(counter > 0)
-					{
-						runItem.setFailureMessage("SQL lookup for failures : " + sqlQueryString);
-						runItem.setFailure(true);
-					}
-					else{
-						runItem.setFailure(false);
-					}
+				// create a single connection for entire test and close it after running test - avoid creating too many connections
+				try (Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName)) {
+					executeCommand(test, executionId, prospectiveReleaseVersion, previousReleaseVersion, command, testConfiguration, connection);
+					extractTestResult(test, executionId, runItem, connection);
 				}
 				catch (final SQLException e) {
 					logger.warn("Nested exception is : " + e.fillInStackTrace());
@@ -294,9 +178,8 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			logger.info(runItem.toString());
 			//need to log json different to a json file rather than in the log
 			logger.info("runItem as json = " + mapper.writerWithDefaultPrettyPrinter().writeValueAsString(runItem));
-		}
-		catch (final IOException e) {
-			e.printStackTrace();
+		} catch (final IOException e) {
+			logger.warn("Failed to write runItem in json to log.", e);
 		}
 		return runItem;
 	}
@@ -311,6 +194,130 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
 		return items;
 	}*/
+
+	private void executeCommand(final Test test, final Long executionId,
+			final String prospectiveReleaseVersion,
+			final String previousReleaseVersion,
+			final ExecutionCommand command,
+			final Configuration testConfiguration, final Connection connection)
+			throws SQLException {
+		String[] parts = {""};
+		if (command.getStatements().size() == 0)
+		{
+			final String sql = command.getTemplate();
+			parts = sql.split(";");
+		}
+		else {
+			parts = command.getStatements().toArray(new String[command.getStatements().size()]);
+		}
+		// parse sql to get select statement
+		String selectSQL = null;
+		for (String part: parts)
+		{
+			// remove all SQL comments - //TODO might throw errors for -- style comments
+			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
+			part = commentPattern.matcher(part).replaceAll("");
+
+			// replace all substitutions for exec
+			part = part.replaceAll("<RUNID>", String.valueOf(executionId));
+			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(test.getId()));
+			// watch out for any 's that users might have introduced
+			part = part.replaceAll("<ASSERTIONTEXT>", test.getName().replaceAll("'", ""));
+			part = part.replaceAll("qa_result_table", dataSource.getDefaultCatalog()+"."+qaResulTableName);
+			part = part.replaceAll("<PROSPECTIVE>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
+			part = part.replaceAll("<TEMP>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
+			part = part.replaceAll("<PREVIOUS>", releaseDataManager.getSchemaForRelease(previousReleaseVersion));
+			part = part.replaceAll("<DELTA>", deltaTableSuffix);
+			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
+			part = part.replaceAll("<FULL>", fullTableSuffix);
+			part = part.replaceAll("<PREVIOUS-RELEASE-DATE>", previousReleaseVersion);
+			part = part.replaceAll("<CURRENT-RELEASE-DATE>", prospectiveReleaseVersion);
+
+			for (final String key : testConfiguration.getKeys())
+			{
+				logger.info("key : value " + key + " : " + testConfiguration.getValue(key));
+				part = part.replaceAll(key, testConfiguration.getValue(key));
+			}
+
+			// remove any leading and train white space
+			part = part.trim();
+			if (part.startsWith("select")){
+				logger.info("Set select query :" + part);
+				selectSQL = part;
+				try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+					try (ResultSet execResult = preparedStatement.executeQuery()) {
+						final String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, assertion_text, details) values (?, ?, ?, ?)";
+						try (PreparedStatement insertStatement = dataSource.getConnection().prepareStatement(insertSQL)) {
+							while(execResult.next())
+							{
+								insertStatement.setLong(1, executionId);
+								insertStatement.setLong(2, test.getId());
+								insertStatement.setString(3, test.getName());
+								insertStatement.setString(4, execResult.getString(1));
+								insertStatement.addBatch();
+							}
+							// execute insert statement
+							insertStatement.executeBatch();
+						}
+					}
+				}
+			}
+			else if(part.startsWith("insert")){
+				executeUpdateStatement(connection, part, "insert");
+			}
+			else {
+				if(part.startsWith("create table")){
+					// only add engine if we do not create using a like statement
+					if (!(part.contains("like") || part.contains("as"))) {
+						part = part + " ENGINE = MyISAM";
+					}
+				}
+				final int result = executeUpdateStatement(connection, part,"create table");
+				if(result > 0){
+					logger.error("Error executing sql : " + part);
+				}
+			}
+		}
+	}
+
+	private void extractTestResult(final Test test, final Long executionId,
+			final TestRunItem runItem, final Connection connection)
+			throws SQLException {
+		/*
+		 create a prepared statement for retrieving matching results.
+		*/
+		final String resultSQL = "select assertion_id, assertion_text, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
+		try (PreparedStatement resultStatement = dataSource.getConnection().prepareStatement(resultSQL)) {
+			// select results that match execution
+			resultStatement.setLong(1, test.getId());
+			resultStatement.setLong(2, executionId);
+			try (ResultSet resultSet = resultStatement.executeQuery()) {
+				String sqlQueryString = resultStatement.toString();
+				sqlQueryString = sqlQueryString.substring(sqlQueryString.indexOf(":"));
+				logger.info("Getting failure count using SQL : " + resultStatement);
+				long counter = 0;
+				while (resultSet.next())
+				{
+					// only get first 10 failed results
+					if (counter < 10) {
+						runItem.addFirstNInstance(resultSet.getString(3));
+					}
+					counter++;
+				}
+				logger.info("counter = " + counter);
+				// if counter is > 0, then we know there are failures
+				runItem.setFailureCount(counter);
+				if(counter > 0)
+				{
+					runItem.setFailureMessage("SQL lookup for failures : " + sqlQueryString);
+					runItem.setFailure(true);
+				}
+				else{
+					runItem.setFailure(false);
+				}
+			}
+		}
+	}
 
 	public void setQaResulTableName(final String qaResulTableName) {
 		this.qaResulTableName = qaResulTableName;

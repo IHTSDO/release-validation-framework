@@ -1,10 +1,18 @@
 package org.ihtsdo.rvf.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 import org.ihtsdo.rvf.helper.Configuration;
 
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "test")
@@ -24,7 +32,7 @@ public class Test {
 	public Test() {
 	}
 
-	public Test(Long id, String name) {
+	public Test(final Long id, final String name) {
 		this.id = id;
 		this.name = name;
 	}
@@ -33,7 +41,7 @@ public class Test {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -41,7 +49,7 @@ public class Test {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -49,7 +57,7 @@ public class Test {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -57,7 +65,7 @@ public class Test {
         return type;
     }
 
-    public void setType(TestType type) {
+    public void setType(final TestType type) {
         this.type = type;
     }
 
@@ -65,7 +73,7 @@ public class Test {
         return command;
     }
 
-    public void setCommand(ExecutionCommand command) {
+    public void setCommand(final ExecutionCommand command) {
         this.command = command;
         this.command.setTest(this);
     }
@@ -87,7 +95,7 @@ public class Test {
         }
     }
 
-    public void setConfiguration(Configuration configuration) {
+    public void setConfiguration(final Configuration configuration) {
         if(command == null){
             setCommand(new ExecutionCommand(configuration));
         }
@@ -95,4 +103,10 @@ public class Test {
             command.setConfiguration(configuration);
         }
     }
+
+	@Override
+	public String toString() {
+		return "Test [id=" + id + ", name=" + name + ", description="
+				+ description + ", type=" + type + "]";
+	}
 }

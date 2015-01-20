@@ -1,12 +1,26 @@
 package org.ihtsdo.rvf.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.ihtsdo.rvf.helper.Configuration;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.ihtsdo.rvf.helper.Configuration;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 /**
  * A class that encapsulate the logic/code that is used to run a {@link org.ihtsdo.rvf.entity.Test}.
@@ -36,7 +50,7 @@ public class ExecutionCommand {
     @OrderColumn(name="statement_index")
     List<String> statements = new ArrayList<>();
 
-    public ExecutionCommand(Configuration configuration) {
+    public ExecutionCommand(final Configuration configuration) {
         this.configuration = configuration;
     }
 
@@ -46,14 +60,14 @@ public class ExecutionCommand {
     public ExecutionCommand() {
     }
 
-    public boolean validate(TestType type, Configuration testConfiguration){
+    public boolean validate(final TestType type, final Configuration testConfiguration){
 
         boolean valid = true;
         if(type == null){
             return false;
         }
         // get all instances of keys in configuration and see if they have all been set
-        for(String key : configuration.getKeys())
+        for(final String key : configuration.getKeys())
         {
             if(testConfiguration.getValue(key) == null)
             {
@@ -69,7 +83,7 @@ public class ExecutionCommand {
         return configuration;
     }
 
-    public void setConfiguration(Configuration configuration) {
+    public void setConfiguration(final Configuration configuration) {
         this.configuration = configuration;
         this.configuration.setCommand(this);
     }
@@ -78,7 +92,7 @@ public class ExecutionCommand {
         return template;
     }
 
-    public void setTemplate(String template) {
+    public void setTemplate(final String template) {
         this.template = template;
     }
 
@@ -86,7 +100,7 @@ public class ExecutionCommand {
         return code;
     }
 
-    public void setCode(byte[] code) {
+    public void setCode(final byte[] code) {
         this.code = code;
     }
 
@@ -94,7 +108,7 @@ public class ExecutionCommand {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -102,7 +116,7 @@ public class ExecutionCommand {
         return test;
     }
 
-    public void setTest(Test test) {
+    public void setTest(final Test test) {
         this.test = test;
     }
 
@@ -110,7 +124,12 @@ public class ExecutionCommand {
         return statements;
     }
 
-    public void setStatements(List<String> statements) {
+    public void setStatements(final List<String> statements) {
         this.statements = statements;
     }
+
+	@Override
+	public String toString() {
+		return "ExecutionCommand [id=" + id + "]";
+	}
 }

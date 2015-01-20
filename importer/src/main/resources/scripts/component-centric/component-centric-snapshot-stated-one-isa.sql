@@ -8,14 +8,12 @@
 ********************************************************************************/
 	/* create table if not exists of all concepts containing an active stated is_a relationship */
 	drop table if exists v_act_stated_isa;
-	create table if not exists v_act_stated_isa as
+	create table if not exists v_act_stated_isa (index(sourceid)) as
 	select sourceid
 		from curr_stated_relationship_s
 		where active = '1'
 		and typeid = 116680003;
-		
-
-
+			
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
 		<RUNID>,

@@ -144,8 +144,8 @@ public class AssertionExecutionServiceImplIT {
         assertionTest.setTest(test);
 
         // set both prospective and previous release
-        final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "20140731", "20140131");
+        final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "20150131", "20140131");
         assertNotNull(runItem);
-        assertTrue("Test must have passed", runItem.isFailure());
+        assertTrue("Test must have passed", !runItem.isFailure());
     }
 }

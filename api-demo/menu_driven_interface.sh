@@ -27,7 +27,7 @@ function callURL() {
 		jsonData=`cat ${jsonFile}`   #Parsing the json to objects in spring seems very forgiving of white space and unescaped characters.
 		dataArg="${jsonData}"
 	fi
-	curl -i \
+	curl -i --retry 0 \
 	--header "Content-type: application/json" \
 	--header "Accept: application/json" \
 	-X ${httpMethod} \
@@ -76,7 +76,7 @@ function uploadRelease() {
 	releaseDate=`getReleaseDate ${releaseFile}`
 	url=" ${api}/releases/${releaseDate}"
 	echo "Uploading release file to ${url}"
-	curl -X POST ${url} --progress-bar -F file=@${releaseFile} \
+	curl --retry 0 -X POST ${url} --progress-bar -F file=@${releaseFile} \
 		 -F "overWriteExisting=true" -F "purgeExistingDatabase=true" \
 		 -o tmp/uploadprogress.txt
 }
@@ -119,9 +119,8 @@ function doTest() {
 		read -p "What assertion id should be used?: " assertionId
 		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
 		read -p "What is the prospective (ie the one being tested) release version (YYYYMMDD): " prospectiveReleaseVersion
-		curl -i -X POST "${api}/assertions/${assertionId}/run" \
+		curl --retry 0 -i -X POST "${api}/assertions/${assertionId}/run" \
 		--progress-bar \
-		--retry 0 \
 		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
 		-F "previousReleaseVersion=${currentReleaseVersion}" \
 		-F "runId=${datestamp}" 			 
@@ -131,9 +130,8 @@ function doTest() {
 		read -p "Do you want to purge existing database for prospective release (true/false)?: " purgeExistingDatabase
 		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
 		read -p "What is the prospective (ie the one being tested) release version (YYYYMMDD): " prospectiveReleaseVersion
-		curl -i -X POST "$api/run-post" \
+		curl --retry 0 -i -X POST "$api/run-post" \
 		--progress-bar \
-		--retry 0 \
 		${fileParam} \
 		-F manifest=@${manifestFile} \
 		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \

@@ -1,6 +1,10 @@
 package org.ihtsdo.rvf.entity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Class represents the association between an assertion and a test, here we determine whether the test is active
@@ -31,14 +35,14 @@ public class AssertionTest {
 	public AssertionTest() {
 	}
 
-	public AssertionTest(Long id, String name) {
+	public AssertionTest(final Long id, final String name) {
 	}
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -46,7 +50,7 @@ public class AssertionTest {
 		return test;
 	}
 
-	public void setTest(Test test) {
+	public void setTest(final Test test) {
 		this.test = test;
 	}
 
@@ -54,7 +58,7 @@ public class AssertionTest {
 		return assertion;
 	}
 
-	public void setAssertion(Assertion assertion) {
+	public void setAssertion(final Assertion assertion) {
 		this.assertion = assertion;
 	}
 
@@ -70,7 +74,13 @@ public class AssertionTest {
 		return inactive;
 	}
 
-	public void setInactive(boolean inactive) {
+	@Override
+	public String toString() {
+		return "AssertionTest [id=" + id + ", test=" + test + ", assertion="
+				+ assertion + ", inactive=" + inactive + "]";
+	}
+
+	public void setInactive(final boolean inactive) {
 		this.inactive = inactive;
 	}
 

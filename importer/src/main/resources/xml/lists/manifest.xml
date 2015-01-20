@@ -335,7 +335,8 @@
 		<script uuid="f14d521f-2472-4871-9c4e-356f0f075a3a" category="component-centric-validation" sqlFile="component-centric-snapshot-ctv3-code-unique.sql" text="CTV3 codes are unique in the CTV3 simple map refset"  />
 		<script uuid="3b2c1824-8445-410e-8ae2-d943be01c33f" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-unique-terms.sql" text="There are no duplicate Definition terms in the DEFINITION snapshot file." />
 	  	<script uuid="5e80ea3e-c4dd-4ae3-8b75-f0567e42b962" category="component-centric-validation" sqlFile="component-centric-snapshot-snomed-rt-code-unique.sql" text="SNOMED RT codes are unique in the SNOMED RT simple map refset"  />
-
+		<!-- needs to remove this -->
+		<!--  
 		<script uuid="f3c799e0-9add-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-basic-counts.sql" text="Before more complex operations, ensure proper counts exist"  />
 		<script uuid="31b605f0-9ae0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-existing-missing-rf2.sql" text="Find existing Ids found is in CS_ but missing in RF2"  />
 		<script uuid="faa18a90-9ae3-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-new-missing-rf2.sql" text="Find new Ids found is in CS_ but missing in RF2"  />
@@ -369,6 +370,8 @@
 		<script uuid="b9e9d0a1-0512-4c99-a93b-7e8ec8d7f1fc" category="cs-parser" sqlFile="cs-parser-text-def-existing-missing-rf2.sql" text="TextDef Ids found in CS_ but missing in RF2."  />
 		<script uuid="0f974b12-eb5b-4b54-8119-6ee82572702d" category="cs-parser" sqlFile="cs-parser-text-def-new-missing-cs.sql" text="New TextDef Ids found in RF2 but missing in CS."  />
 		<script uuid="b84d4406-18d8-4aa4-a5b3-963baaa6face" category="cs-parser" sqlFile="cs-parser-text-def-new-missing-rf2.sql" text="New Textdef Ids found in CS_ but missing in RF2."  />
+		
+		-->
 
 	<!-- rt added this as a template... 
 		<script uuid="" category="" sqlFile="" text=""  />

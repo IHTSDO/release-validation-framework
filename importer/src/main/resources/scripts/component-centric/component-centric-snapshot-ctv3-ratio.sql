@@ -24,11 +24,11 @@
 	
 /* create table if not exists of CTV3 refset members */
 	drop table if exists v_ctv3;
-	create table if not exists v_ctv3 as
+	create table if not exists v_ctv3 (index (referencedcomponentid)) as
 		select referencedcomponentid 
 		from curr_simplemaprefset_s 
 		where refsetid = '900000000000497000';
-			
+		
 /* Concept is without a CTV3 Refset Member mapping */
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 

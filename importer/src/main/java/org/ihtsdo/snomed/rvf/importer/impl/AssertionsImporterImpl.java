@@ -1,10 +1,19 @@
 package org.ihtsdo.snomed.rvf.importer.impl;
 
-import com.facebook.presto.sql.parser.SqlParser;
-import com.facebook.presto.sql.parser.StatementSplitter;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.UUID;
+
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.Test;
@@ -25,8 +34,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.util.*;
+import com.facebook.presto.sql.parser.SqlParser;
+import com.facebook.presto.sql.parser.StatementSplitter;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * An implementation of a {@link org.ihtsdo.snomed.rvf.importer.AssertionsImporter} that imports older
@@ -50,53 +62,53 @@ public class AssertionsImporterImpl implements AssertionsImporter {
     }
 
     @Override
-    public void importAssertionsFromFile(String xmlFilePath, String sqlResourcesFolderLocation){
+    public void importAssertionsFromFile(final String xmlFilePath, final String sqlResourcesFolderLocation){
         // get JDOM document from given manifest file
-        Document xmlDocument = getJDomDocumentFromFile(xmlFilePath);
+        final Document xmlDocument = getJDomDocumentFromFile(xmlFilePath);
         if(xmlDocument != null)
         {
-            XPathFactory factory = XPathFactory.instance();
-            XPathExpression expression = factory.compile("//script");
-            List<Element> scriptElements = expression.evaluate(xmlDocument);
+            final XPathFactory factory = XPathFactory.instance();
+            final XPathExpression expression = factory.compile("//script");
+            final List<Element> scriptElements = expression.evaluate(xmlDocument);
             if(scriptElements.size() > 0)
             {
                 // get various values from script element
-                for(Element element : scriptElements)
+                for(final Element element : scriptElements)
                 {
-                    ResponseEntity responseEntity = createAssertionFromElement(element);
+                    final ResponseEntity responseEntity = createAssertionFromElement(element);
                     if(HttpStatus.CREATED == responseEntity.getStatusCode()){
                         try
                         {
-                            Assertion assertion = objectMapper.readValue(responseEntity.getBody().toString(), Assertion.class);
+                            final Assertion assertion = objectMapper.readValue(responseEntity.getBody().toString(), Assertion.class);
                             logger.info("Created assertion id : " + assertion.getId());
                             assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
                             // get Sql file name from element and use it to add SQL test
-                            String sqlFileName = element.getAttributeValue("sqlFile");
+                            final String sqlFileName = element.getAttributeValue("sqlFile");
                             logger.info("sqlFileName = " + sqlFileName);
                             String category = element.getAttributeValue("category");
                             /*
                                 We know category is written as file-centric-validation, component-centric-validation, etc
                                 We use this to generate the corresponding using folder name = category - validation
                               */
-                            int index = category.indexOf("validation");
+                            final int index = category.indexOf("validation");
                             if(index > -1)
                             {
                                 category = category.substring(0, index-1);
                             }
                             logger.info("category = " + category);
 
-                            File sqlFile = new File(sqlResourcesFolderLocation+System.getProperty("file.separator")+category, sqlFileName);
-                            String sqlString = readStream(new FileInputStream(sqlFile));
+                            final File sqlFile = new File(sqlResourcesFolderLocation+System.getProperty("file.separator")+category, sqlFileName);
+                            final String sqlString = readStream(new FileInputStream(sqlFile));
                             // add test to assertion
                             addSqlTestToAssertion(assertion, sqlString);
                         }
-                        catch (FileNotFoundException e) {
+                        catch (final FileNotFoundException e) {
                             logger.error("Nested exception is : " + e.getMessage());
                         }
                         catch (JsonMappingException | JsonParseException e) {
                             logger.warn("Error reading or parsing json. Nested exception is : " + e.getMessage());
                         }
-                        catch (Exception e) {
+                        catch (final Exception e) {
                             logger.warn("Error reading sql from input stream. Nested exception is : " + e.getMessage());
                         }
                     }
@@ -119,19 +131,19 @@ public class AssertionsImporterImpl implements AssertionsImporter {
         }
     }
 
-    protected ResponseEntity createAssertionFromElement(Element element){
+    protected ResponseEntity createAssertionFromElement(final Element element){
 
-        String category = element.getAttributeValue("category");
+        final String category = element.getAttributeValue("category");
         logger.info("category = " + category);
-        String uuid = element.getAttributeValue("uuid");
+        final String uuid = element.getAttributeValue("uuid");
         logger.info("uuid = " + uuid);
-        String text = element.getAttributeValue("text");
+        final String text = element.getAttributeValue("text");
         logger.info("text = " + text);
-        String sqlFileName = element.getAttributeValue("sqlFile");
+        final String sqlFileName = element.getAttributeValue("sqlFile");
         logger.info("sqlFileName = " + sqlFileName);
 
         // add entities using rest client
-        Assertion assertion = new Assertion();
+        final Assertion assertion = new Assertion();
         assertion.setUuid(UUID.fromString(uuid));
         assertion.setStatement(text);
         assertion.setName(text);
@@ -143,17 +155,17 @@ public class AssertionsImporterImpl implements AssertionsImporter {
             paramsString = paramsString.replaceAll("\"id\":null,", "");
             return restClient.post("assertions", paramsString);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             logger.warn("Nested exception is : " + e.fillInStackTrace());
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 
-    protected ResponseEntity addSqlTestToAssertion(Assertion assertion, String sql){
+    protected ResponseEntity addSqlTestToAssertion(final Assertion assertion, final String sql){
 
-        List<String> statements = new ArrayList<>();
-        StatementSplitter splitter = new StatementSplitter(sql);
-        for(StatementSplitter.Statement statement : splitter.getCompleteStatements())
+        final List<String> statements = new ArrayList<>();
+        final StatementSplitter splitter = new StatementSplitter(sql);
+        for(final StatementSplitter.Statement statement : splitter.getCompleteStatements())
         {
             String cleanedSql = statement.statement();
 //            cleanedSql = cleanedSql.replaceAll("<RUNID>", "{{run_id}}");
@@ -161,11 +173,11 @@ public class AssertionsImporterImpl implements AssertionsImporter {
 //            cleanedSql = cleanedSql.replaceAll("<ASSERTIONTEXT>", "{{assertion_text}}");
 
             // tokenise and process statement
-            StringTokenizer tokenizer = new StringTokenizer(cleanedSql);
+            final StringTokenizer tokenizer = new StringTokenizer(cleanedSql);
             while(tokenizer.hasMoreTokens())
             {
                 String token = tokenizer.nextToken();
-                Map<String, String> schemaMapping = getRvfSchemaMapping(token);
+                final Map<String, String> schemaMapping = getRvfSchemaMapping(token);
                 if(schemaMapping.keySet().size() > 0){
                     // we know sometimes tokenizer messed up and leaves a trailing ), so we clena this up
                     if(token.endsWith(")")){
@@ -186,34 +198,34 @@ public class AssertionsImporterImpl implements AssertionsImporter {
         }
 
         // set configuration;
-        Configuration configuration = new Configuration();
-        ExecutionCommand command = new ExecutionCommand();
+        final Configuration configuration = new Configuration();
+        final ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(sql);
         command.setCode("Execute me".getBytes());
         command.setConfiguration(configuration);
         command.setStatements(statements);
-        Test test = new Test();
+        final Test test = new Test();
         test.setType(TestType.SQL);
         test.setName(assertion.getName());
         test.setCommand(command);
         // we have to add as a list of tests, since api spec expects list of tests
-        List<Test> tests = new ArrayList<>();
+        final List<Test> tests = new ArrayList<>();
         tests.add(test);
 
         try
         {
             return restClient.post("assertions/"+assertion.getId()+"/tests", objectMapper.writeValueAsString(tests));
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             logger.warn("Nested exception is : " + e.fillInStackTrace());
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 
-    protected static Document getJDomDocumentFromFile(String fileName){
+    protected static Document getJDomDocumentFromFile(final String fileName){
 
         try {
-            SAXBuilder sax = new SAXBuilder();
+            final SAXBuilder sax = new SAXBuilder();
             return sax.build(fileName);
         }
         catch (JDOMException | IOException e) {
@@ -222,10 +234,10 @@ public class AssertionsImporterImpl implements AssertionsImporter {
         }
     }
 
-    protected static String readStream(InputStream is) throws Exception {
-        InputStreamReader reader = new InputStreamReader(is);
-        StringBuilder builder = new StringBuilder();
-        char buffer[] = new char[1024];
+    protected static String readStream(final InputStream is) throws Exception {
+        final InputStreamReader reader = new InputStreamReader(is);
+        final StringBuilder builder = new StringBuilder();
+        final char buffer[] = new char[1024];
         // Wait for at least 1 byte (e.g. stdin)
         int n = reader.read(buffer);
         builder.append(buffer, 0, n);
@@ -239,7 +251,7 @@ public class AssertionsImporterImpl implements AssertionsImporter {
     protected Map<String, String> getRvfSchemaMapping(String ratSchema){
         String rvfSchema = "";
         ratSchema = ratSchema.trim();
-        String originalRatSchema = ratSchema;
+        final String originalRatSchema = ratSchema;
         boolean currOrPrevFound = false;
         if(ratSchema.startsWith("curr_")){
             rvfSchema = "<PROSPECTIVE>";
@@ -282,7 +294,7 @@ public class AssertionsImporterImpl implements AssertionsImporter {
         }
 
         if (rvfSchema.length() > 0) {
-            Map<String, String> map = new HashMap<>();
+            final Map<String, String> map = new HashMap<>();
             map.put(originalRatSchema, rvfSchema);
 
             return map;
