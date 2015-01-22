@@ -119,7 +119,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	/** Executes an update using statement sql and logs the time taken **/
 	private int executeUpdateStatement (final Connection connection, final String sql, final String typeMsg) throws SQLException{
 		final long startTime = System.currentTimeMillis();
-		logger.info("Executing {} statement: {}", typeMsg, sql);
+		logger.info("Executing {} statement: {}", typeMsg, sql.replaceAll("\n", " " ).replaceAll("\t", ""));
 		try (Statement statement = connection.createStatement()) {
 			//try block will close statement in all circumstances
 			final int result = statement.executeUpdate(sql);
@@ -272,10 +272,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 						part = part + " ENGINE = MyISAM";
 					}
 				}
-				final int result = executeUpdateStatement(connection, part,"create table");
-				if(result > 0){
-					logger.error("Error executing sql : " + part);
-				}
+				executeUpdateStatement(connection, part,"create table");
 			}
 		}
 	}

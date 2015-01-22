@@ -1,6 +1,22 @@
 package org.ihtsdo.rvf.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -25,14 +41,15 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.*;
-import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The controller that handles uploaded files for the validation to run
@@ -56,12 +73,12 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity uploadTestPackage(@RequestParam(value = "file") MultipartFile file,
-			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
-			@RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
-			HttpServletResponse response) throws IOException {
+	public ResponseEntity uploadTestPackage(@RequestParam(value = "file") final MultipartFile file,
+			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
+			final HttpServletResponse response) throws IOException {
 		// load the filename
-		String filename = file.getOriginalFilename();
+		final String filename = file.getOriginalFilename();
 		// must be a zip
 		if (filename.endsWith(".zip")) {
 			return uploadPostTestPackage(file, writeSucceses, manifestFile, response);
@@ -75,12 +92,12 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-post", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity uploadPostTestPackage(@RequestParam(value = "file") MultipartFile file,
-			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
-			@RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
-			HttpServletResponse response) throws IOException {
+	public ResponseEntity uploadPostTestPackage(@RequestParam(value = "file") final MultipartFile file,
+			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
+			final HttpServletResponse response) throws IOException {
 		// load the filename
-		String filename = file.getOriginalFilename();
+		final String filename = file.getOriginalFilename();
 
 		final File tempFile = File.createTempFile(filename, ".zip");
 		tempFile.deleteOnExit();
@@ -91,23 +108,23 @@ public class TestUploadFileController {
 		// set up the response in order to strean directly to the response
 		response.setContentType("text/csv;charset=utf-8");
 		response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
-		PrintWriter writer = response.getWriter();
+		final PrintWriter writer = response.getWriter();
 
 		// must be a zip
 		copyUploadToDisk(file, tempFile);
-		ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+		final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
 
 		TestReportable report;
 
 		if (manifestFile == null) {
 			report = validationRunner.execute(resourceManager, writer, writeSucceses);
 		} else {
-			String originalFilename = manifestFile.getOriginalFilename();
+			final String originalFilename = manifestFile.getOriginalFilename();
 			final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
 			tempManifestFile.deleteOnExit();
 			copyUploadToDisk(manifestFile, tempManifestFile);
 
-			ManifestFile mf = new ManifestFile(tempManifestFile);
+			final ManifestFile mf = new ManifestFile(tempManifestFile);
 			report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
 		}
 
@@ -123,34 +140,34 @@ public class TestUploadFileController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity runPostTestPackage(
-			@RequestParam(value = "file", required = false) MultipartFile file,
-			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
-			@RequestParam(value = "purgeExistingDatabase", required = false) boolean purgeExistingDatabase,
-			@RequestParam(value = "manifest", required = false) MultipartFile manifestFile,
-			@RequestParam(value = "groups") List<String> groupsList,
-			@RequestParam(value = "prospectiveReleaseVersion") String prospectiveReleaseVersion,
-			@RequestParam(value = "previousReleaseVersion") String previousReleaseVersion,
-			@RequestParam(value = "runId") Long runId,
-            HttpServletRequest request) throws IOException {
+			@RequestParam(value = "file", required = false) final MultipartFile file,
+			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			@RequestParam(value = "purgeExistingDatabase", required = false) final boolean purgeExistingDatabase,
+			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
+			@RequestParam(value = "groups") final List<String> groupsList,
+			@RequestParam(value = "prospectiveReleaseVersion") final String prospectiveReleaseVersion,
+			@RequestParam(value = "previousReleaseVersion") final String previousReleaseVersion,
+			@RequestParam(value = "runId") final Long runId,
+            final HttpServletRequest request) throws IOException {
 
-        Calendar startTime = Calendar.getInstance();
+        final Calendar startTime = Calendar.getInstance();
         LOGGER.info(String.format("Started execution with runId [%1s] : ", runId));
         // generate url from request so we can display in response
-        String requestUrl = String.valueOf(request.getRequestURL());
-        String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
+        final String requestUrl = String.valueOf(request.getRequestURL());
+        final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
 
-        Map<String , Object> responseMap = new HashMap<>();
+        final Map<String , Object> responseMap = new HashMap<>();
 		// convert groups which is passed as string to assertion groups
-		List<AssertionGroup> groups = getAssertionGroups(groupsList);
+		final List<AssertionGroup> groups = getAssertionGroups(groupsList);
         final File tempFile;
         // set up the response in order to strean directly to the response
-        File reportFile = new File(validationRunner.getReportDataFolder(), "manifest_validation_"+runId+".txt");
-        PrintWriter writer = new PrintWriter(reportFile);
+        final File reportFile = new File(validationRunner.getReportDataFolder(), "manifest_validation_"+runId+".txt");
+        final PrintWriter writer = new PrintWriter(reportFile);
 
         if (file != null)
         {
             // load the filename
-            String filename = file.getOriginalFilename();
+            final String filename = file.getOriginalFilename();
             System.out.println("filename = " + filename);
 
             tempFile = File.createTempFile(filename, ".zip");
@@ -164,19 +181,19 @@ public class TestUploadFileController {
 
             // must be a zip
             copyUploadToDisk(file, tempFile);
-            ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+            final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
 
             TestReportable report;
 
             if (manifestFile == null) {
                 report = validationRunner.execute(resourceManager, writer, writeSucceses);
             } else {
-                String originalFilename = manifestFile.getOriginalFilename();
+                final String originalFilename = manifestFile.getOriginalFilename();
                 final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
                 tempManifestFile.deleteOnExit();
                 copyUploadToDisk(manifestFile, tempManifestFile);
 
-                ManifestFile mf = new ManifestFile(tempManifestFile);
+                final ManifestFile mf = new ManifestFile(tempManifestFile);
                 report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
             }
 
@@ -193,7 +210,7 @@ public class TestUploadFileController {
 
                 LOGGER.info("report.getNumErrors() = " + report.getNumErrors());
                 LOGGER.info("report.getNumTestRuns() = " + report.getNumTestRuns());
-                double threshold = report.getNumErrors() / report.getNumTestRuns();
+                final double threshold = report.getNumErrors() / report.getNumTestRuns();
                 LOGGER.info("threshold = " + threshold);
                 // bail out only if number of test failures exceeds threshold
                 if(threshold > validationRunner.getFailureThreshold()){
@@ -231,27 +248,27 @@ public class TestUploadFileController {
             return new ResponseEntity<>(responseMap, HttpStatus.OK);
         }
 
-		Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
+		final Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
 		int failedAssertionCount = 0;
-		Set<Long> assertionIds = new HashSet<>();
-		for(AssertionGroup group : groups)
+		final Set<Long> assertionIds = new HashSet<>();
+		for(final AssertionGroup group : groups)
 		{
-			for(Assertion assertion : assertionService.getAssertionsForGroup(group)){
+			for(final Assertion assertion : assertionService.getAssertionsForGroup(group)){
 				assertionIds.add(assertion.getId());
 			}
 		}
 
         int counter = 0;
-		for (Long id: assertionIds) {
+		for (final Long id: assertionIds) {
 			try
 			{
-                Assertion assertion = assertionService.find(id);
+                final Assertion assertion = assertionService.find(id);
                 LOGGER.info(String.format("Started executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertionIds.size(), assertion.getUuid()));
-                List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
+                final List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
 						prospectiveReleaseVersion, previousReleaseVersion));
 				// get only first since we have 1:1 correspondence between Assertion and Test
 				if(items.size() == 1){
-					TestRunItem runItem = items.get(0);
+					final TestRunItem runItem = items.get(0);
 					if(runItem.isFailure()){
 						failedAssertionCount++;
 					}
@@ -260,7 +277,7 @@ public class TestUploadFileController {
                 LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertionIds.size(), assertion.getUuid()));
                 counter++;
             }
-			catch (MissingEntityException e) {
+			catch (final MissingEntityException e) {
 				failedAssertionCount++;
 			}
 		}
@@ -279,11 +296,11 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity uploadPreTestPackage(@RequestParam(value = "file") MultipartFile file,
-			@RequestParam(value = "writeSuccesses", required = false) boolean writeSucceses,
-			HttpServletResponse response) throws IOException {
+	public ResponseEntity uploadPreTestPackage(@RequestParam(value = "file") final MultipartFile file,
+			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			final HttpServletResponse response) throws IOException {
 		// load the filename
-		String filename = file.getOriginalFilename();
+		final String filename = file.getOriginalFilename();
 
 		if (!filename.startsWith("rel")) {
 			LOGGER.error("Not a valid pre condition file " + filename);
@@ -298,12 +315,12 @@ public class TestUploadFileController {
 
 		response.setContentType("text/csv;charset=utf-8");
 		response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
-		PrintWriter writer = response.getWriter();
+		final PrintWriter writer = response.getWriter();
 
 		copyUploadToDisk(file, tempFile);
 
-		ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
-		TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
+		final ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
+		final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
 
 		// store the report to disk for now with a timestamp
 		if (report.getNumErrors() > 0) {
@@ -316,26 +333,27 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public FileSystemResource getFile(@PathVariable String id) {
+	public FileSystemResource getFile(@PathVariable final String id) {
 		return new FileSystemResource(new File(validationRunner.getReportDataFolder(), id+".txt"));
 	}
 
-	private void copyUploadToDisk(MultipartFile file, File tempFile) throws IOException {
+	private void copyUploadToDisk(final MultipartFile file, final File tempFile) throws IOException {
 		try (FileOutputStream out = new FileOutputStream(tempFile)) {
-			InputStream inputStream = file.getInputStream();
-			IOUtils.copy(inputStream, out);
+			try (InputStream inputStream = file.getInputStream()){
+				IOUtils.copy(inputStream, out);
+			}
 		}
 	}
 
-	private List<AssertionGroup> getAssertionGroups(List<String> items){
+	private List<AssertionGroup> getAssertionGroups(final List<String> items){
 
-		List<AssertionGroup> groups = new ArrayList<>();
-		for(String item: items){
+		final List<AssertionGroup> groups = new ArrayList<>();
+		for(final String item: items){
             try
             {
                 if(item.matches("\\d+")){
                     // treat as group id and retrieve associated group
-                    AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, Long.valueOf(item));
+                    final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, Long.valueOf(item));
                     if(group != null){
                         groups.add(group);
                     }
@@ -344,7 +362,7 @@ public class TestUploadFileController {
                     groups.add(objectMapper.readValue(item, AssertionGroup.class));
                 }
 			}
-			catch (IOException e) {
+			catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
