@@ -47,7 +47,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		b.conceptid
+		b.id
 	from curr_langrefset_s a
 	join tmp_descsedited b
 	on a.referencedcomponentid = b.id

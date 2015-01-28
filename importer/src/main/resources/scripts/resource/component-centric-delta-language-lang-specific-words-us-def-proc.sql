@@ -9,7 +9,7 @@
 ********************************************************************************/
 
 	drop procedure if exists usTerm_procedure;
-	CREATE PROCEDURE usTerm_procedure(runid int, assertionuuid char(36), assertiontext varchar(255))  
+	CREATE PROCEDURE usTerm_procedure(runid BIGINT, assertionuuid char(36), assertiontext varchar(255))  
 	begin 
 		declare no_more_rows boolean default false; 
 		declare usTerm VARCHAR(255); 
@@ -44,7 +44,7 @@
 
 
 		end loop LOOP1; 
-	end
+	end;
 
 	
 	

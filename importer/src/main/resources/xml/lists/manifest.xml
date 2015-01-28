@@ -5,6 +5,9 @@
 		
 		<!-- build resource table -->
 		<script uuid="87dca0d6-4080-4b28-bcfa-e58c08e8170f" category="resource" sqlFile="res-table-edited-concept.sql" text="Build a table of all concepts edited in the current release cycle."/>
+		<script uuid="f03f8a9f-912c-4fce-88a0-3e9576d1c5c2" category="resource" sqlFile="create-resource-tables.sql" text="Create shared resource tables and indexes."/>
+		<script uuid="c81ee170-84f0-11e1-b0c4-0800200c9a66" category="resource" sqlFile="component-centric-delta-language-lang-specific-words-gb-def-proc.sql" text="Defines procedure that tests that terms that contain EN-GB language-specific words are in the same GB language refset." />
+		<script uuid="ba8918f0-84f0-11e1-b0c4-0800200c9a66" category="resource" sqlFile="component-centric-delta-language-lang-specific-words-us-def-proc.sql" text="Defines procedure that tests that terms that contain EN-US language-specific words are in the same US language refset." />
 
 		<!-- release-type-full-validation -->
 		<script uuid="84f5edda-1249-4d79-87da-e248e61f06a6" category="release-type-validation" sqlFile="release-type-full-validation-concept.sql" text="The current Concept full file contains all previously published data unchanged." >
@@ -324,10 +327,7 @@
 		<script uuid="f5092a2b-8874-4290-ae96-a04bf568b1ab" category="component-centric-validation" sqlFile="component-centric-snapshot-vmp-active.sql" text="Active VMP simple refset members refer to active components." />
 		<script uuid="38b88ff6-7ee3-40a5-b362-98a87e80526e" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-inactive.sql" text="Inactive Non-human refset members refer to inactive components." />
 		<script uuid="8479317e-8459-4362-bee8-628b8220f1e4" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-active.sql" text="Active Non-human refset members refer to active components." />
-		
-		<script uuid="ba8918f0-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-us-def-proc.sql" text="Defines procedure that tests that terms that contain EN-US language-specific words are in the same US language refset." />
 		<script uuid="c3249e80-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-us-call-proc.sql" text="Calling procedure testing that terms that contain EN-US language-specific words are in the same US language refset." />
-		<script uuid="c81ee170-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-gb-def-proc.sql" text="Defines procedure that tests that terms that contain EN-GB language-specific words are in the same GB language refset." />
 		<script uuid="cc9c5340-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-gb-call-proc.sql" text="Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset." />
 		<script uuid="0a4bba70-85b7-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-navigation.sql" text="targetComponentId' does not refer to navigation concepts." />
 		<script uuid="c82246b1-a137-40c5-8653-554c9ce82c6b" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-terms.sql" text="Terms are unique in Description hierarchy." />
@@ -335,114 +335,9 @@
 		<script uuid="f14d521f-2472-4871-9c4e-356f0f075a3a" category="component-centric-validation" sqlFile="component-centric-snapshot-ctv3-code-unique.sql" text="CTV3 codes are unique in the CTV3 simple map refset"  />
 		<script uuid="3b2c1824-8445-410e-8ae2-d943be01c33f" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-unique-terms.sql" text="There are no duplicate Definition terms in the DEFINITION snapshot file." />
 	  	<script uuid="5e80ea3e-c4dd-4ae3-8b75-f0567e42b962" category="component-centric-validation" sqlFile="component-centric-snapshot-snomed-rt-code-unique.sql" text="SNOMED RT codes are unique in the SNOMED RT simple map refset"  />
-		<!-- needs to remove this -->
-		<!--  
-		<script uuid="f3c799e0-9add-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-basic-counts.sql" text="Before more complex operations, ensure proper counts exist"  />
-		<script uuid="31b605f0-9ae0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-existing-missing-rf2.sql" text="Find existing Ids found is in CS_ but missing in RF2"  />
-		<script uuid="faa18a90-9ae3-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-new-missing-rf2.sql" text="Find new Ids found is in CS_ but missing in RF2"  />
-		<script uuid="cf048100-9ae6-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-existing-missing-cs.sql" text="Find existing Concept Ids found is in RF2 but missing in CS_"  />
-		<script uuid="e86d0540-9ae6-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-new-missing-cs.sql" text="Find new Concept Ids found is in RF2 but missing in CS_"  />
-		<script uuid="dfd887c0-9aea-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-cs-rf2-mismatch.sql" text="Concept that has different results in change set compared to Rf2"  />
-		<script uuid="8f0024d0-9bb6-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-concept-matching-counts.sql" text="Ensure count of cs-to-rf2 matches equals the count of max time cs and the count of rf2"  />
-
-		<script uuid="83d1d8c0-9aed-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-description-basic-counts.sql" text="Before more complex operations, ensure proper counts exist"  />
-		<script uuid="88e10340-9aed-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-description-existing-missing-rf2.sql" text="Find existing Ids found is in CS_ but missing in RF2"  />
-		<script uuid="8cddac50-9aed-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-description-new-missing-rf2.sql" text="Find new Ids found is in CS_ but missing in RF2"  />
-		<script uuid="90e578f0-9aed-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-description-existing-missing-cs.sql" text="Find existing Description Ids found is in RF2 but missing in CS_"  />
-		<script uuid="94fb4f50-9aed-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-description-new-missing-cs.sql" text="Find new Description Ids found is in RF2 but missing in CS_"  />
-		<script uuid="99a3a1b0-9aed-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-description-cs-rf2-mismatch.sql" text="Description that has different results in change set compared to Rf2"  />
-		<script uuid="b2b0cd30-9bb6-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-description-matching-counts.sql" text="Ensure count of cs-to-rf2 matches equals the count of max time cs and the count of rf2"  />
-
-		<script uuid="c1b44170-9af0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-basic-counts.sql" text="Before more complex operations, ensure proper counts exist"  />
-		<script uuid="c5712260-9af0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-existing-missing-rf2.sql" text="Find existing Ids found is in CS_ but missing in RF2"  />
-		<script uuid="c89bd570-9af0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-new-missing-rf2.sql" text="Find new Ids found is in CS_ but missing in RF2"  />
-		<script uuid="cdbd9d90-9af0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-existing-missing-cs.sql" text="Find existing Relationship Ids found is in RF2 but missing in CS_"  />
-		<script uuid="d17b41d0-9af0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-new-missing-cs.sql" text="Find new Relationship Ids found is in RF2 but missing in CS_"  />
-		<script uuid="d583d1c0-9af0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-cs-rf2-mismatch.sql" text="Relationship that has different results in change set compared to Rf2"  />
-		<script uuid="f6aef5c0-9bb6-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-matching-counts.sql" text="Ensure count of cs-to-rf2 matches equals the count of max time cs and the count of rf2"  />
-		
-		<script uuid="d17b41d0-9af0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-new-missing-cs.sql" text="Find new Relationship Ids found is in RF2 but missing in CS."  />
-		<script uuid="d583d1c0-9af0-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-cs-rf2-mismatch.sql" text="Relationship that has different results in change set compared to Rf2"  />
-		<script uuid="f6aef5c0-9bb6-11e1-a8b0-0800200c9a66" category="cs-parser" sqlFile="cs-parser-relationship-matching-counts.sql" text="Ensure count of cs-to-rf2 matches equals the count of max time cs and the count of rf2"  />
-		<script uuid="ebe39cc7-0de2-4421-95ef-0de3c3dfd819" category="cs-parser" sqlFile="cs-parser-text-def-basic-counts.sql" text="Before more complex operations, ensure proper counts exist."  />
-		<script uuid="fc4ce8a0-1e3e-4e14-aee1-cc88ef34c1d1" category="cs-parser" sqlFile="cs-parser-text-def-cs-rf2-mismatch.sql" text="Textdef that has different results in change set compared to Rf2."  />
-		<script uuid="eca1a0a5-ce96-4277-bb81-58e57331c382" category="cs-parser" sqlFile="cs-parser-text-def-existing-missing-cs.sql" text="TextDef Ids found in RF2 but missing in CS."  />
-		<script uuid="b9e9d0a1-0512-4c99-a93b-7e8ec8d7f1fc" category="cs-parser" sqlFile="cs-parser-text-def-existing-missing-rf2.sql" text="TextDef Ids found in CS_ but missing in RF2."  />
-		<script uuid="0f974b12-eb5b-4b54-8119-6ee82572702d" category="cs-parser" sqlFile="cs-parser-text-def-new-missing-cs.sql" text="New TextDef Ids found in RF2 but missing in CS."  />
-		<script uuid="b84d4406-18d8-4aa4-a5b3-963baaa6face" category="cs-parser" sqlFile="cs-parser-text-def-new-missing-rf2.sql" text="New Textdef Ids found in CS_ but missing in RF2."  />
-		
-		-->
 
 	<!-- rt added this as a template... 
 		<script uuid="" category="" sqlFile="" text=""  />
 	-->
-
-
-
-
-
-
-
-		<!-- file-centric-->
-		<script uuid="814f93f9-f28d-4344-95cd-035c67d39038" category="file-centric" sqlFile="file-centric-concept-valid-IsPrimitive.sql" text="There is no Null IsPrimitive and Invalid IsPrimitive value should be { 0,1}." />		
-		<script uuid="9f68a25b-00ab-479c-ad15-9e78bb5cd8b9" category="file-centric" sqlFile="concept-valid-Ctv3Id.sql" text="There is no Null Ctv3Id and No special character in Ctv3id.}" />
-		<script uuid="4739250a-2cda-494b-9f76-33d16d563095" category="file-centric" sqlFile="concept-valid-SnomedId.sql" text="There is no Null  SnomedId and Non-alpha numeric character in SnomedId" />
-		<script uuid="4e171b18-3012-49df-9386-1094f6703f5e" category="file-centric" sqlFile="concept-valid-ConceptId.sql" text="There is no Null ConceptId and valid characters are {*0123456789} and ConceptId partition is 00" />
-		<script uuid="2d226e39-1c29-4f42-ac87-0129159d560c" category="file-centric" sqlFile="concept-valid-FullySpecifiedName.sql" text="There is no Null FullySpecifiedName and FullySpecifiedName is unique" />		
-		<script uuid="20570f25-73fd-46ff-bc38-17fa37912e78" category="file-centric" sqlFile="concept-valid-ConceptStatus.sql" text="There should be no Null ConceptStatus and ConceptStatus value should be between {0,1, 2, 3, 4,5,6,10}" />
-		<script uuid="22040c2c-848f-4614-b668-a0fa9f29df03" category="file-centric" sqlFile="concept-unique-SnomedId.sql" text="SnomedId is unique" />
-		<script uuid="a35fa7ea-d327-4c3b-84b3-cd598b57c7ee" category="file-centric" sqlFile="concept-unique-Ctv3Id.sql" text="CTV3id is unique" />
-		<script uuid="65933de1-c0ff-4980-a696-621c1a90f1a2" category="file-centric" sqlFile="concept-unique-ConceptId.sql" text="ConceptId is unique" />
-		<script uuid="fda80098-0491-4e73-9d2a-448220e470ec" category="file-centric" sqlFile="concept-valid-ConceptStatus-length.sql" text="ConceptStatus length is not more than 2 digit" />
-		<script uuid="5ee7730b-df25-4b89-bf0f-eba6be2edd42" category="file-centric" sqlFile="concept-valid-Ctv3Id-length.sql" text="Ctv3id string length is not more than 5 character" />
-		<script uuid="2e9fe17f-ede6-4854-a37e-a9e7627b859d" category="file-centric" sqlFile="concept-valid-ConceptId-length.sql" text="ConceptId string length should be between 6 and 32 digit" />
-		<script uuid="5c6dfdfd-957b-455d-a00d-521e880d5fe9" category="file-centric" sqlFile="concept-valid-SnomedId-length.sql" text="SnomedId string length should be between 6 and 8 character" />
-		<script uuid="e11afc7c-05a5-4166-ab7a-49f89de3879c" category="file-centric" sqlFile="concept-valid-FullySpecifiedName-length.sql" text="FullySpecifiedName string length should be between 1 and 255 character" />
-		<script uuid="9720ff35-db7a-4648-b26a-f63ddaba582c" category="file-centric" sqlFile="concept-valid-SnomedId-assigned.sql" text="Newly published concept should have SNOMEDID assigned with M-8 or M-9." />
-
-
-
-
-
-
-
-
-
-		
-
-
-
-
-
-
-
-
-		
-		</useCase>
+	</useCase>
 </manifest>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

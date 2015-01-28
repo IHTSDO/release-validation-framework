@@ -29,7 +29,8 @@ public class AssertionsImporterImplIntegrationTest {
 
     @Test
     public void testImportAssertionsFromFile() throws Exception {
-
+    	//"/xml/lists/manifest.xml"
+    	//"/testManifest.xml"
         final URL manifestUrl = AssertionsImporterImplIntegrationTest.class.getResource("/xml/lists/manifest.xml");
         assertNotNull("manifestUrl must not be null", manifestUrl);
         final URL scriptsFolderUrl = AssertionsImporterImplIntegrationTest.class.getResource("/scripts");

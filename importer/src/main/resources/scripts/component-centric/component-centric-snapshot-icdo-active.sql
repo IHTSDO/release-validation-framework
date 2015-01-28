@@ -19,4 +19,4 @@
 	inner join curr_concept_s b on a.referencedcomponentid = b.id
 	where a.refsetid = '446608001'
 	and a.active = '1'
-	and b.active = '0'
+	and b.active = '0';

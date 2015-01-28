@@ -17,4 +17,4 @@
 	
 	from curr_simplemaprefset_s a
 	where a.refsetid = '900000000000497000'
-	and a.active != '1'
+	and a.active != '1';

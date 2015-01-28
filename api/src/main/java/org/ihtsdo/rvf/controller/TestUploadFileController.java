@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -168,8 +167,7 @@ public class TestUploadFileController {
         {
             // load the filename
             final String filename = file.getOriginalFilename();
-            System.out.println("filename = " + filename);
-
+            
             tempFile = File.createTempFile(filename, ".zip");
             tempFile.deleteOnExit();
             if (!filename.endsWith(".zip")) {
@@ -222,7 +220,9 @@ public class TestUploadFileController {
 			 If we are here, assume manifest is valid, so load data from file.
 		    */
             if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion) || purgeExistingDatabase){
+            	LOGGER.info("Start loading release version:" + prospectiveReleaseVersion);
                 releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile);
+                LOGGER.info("Completed loading release version:" + prospectiveReleaseVersion);
             }
         }
 
@@ -247,23 +247,45 @@ public class TestUploadFileController {
             responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
             return new ResponseEntity<>(responseMap, HttpStatus.OK);
         }
-
-		final Map<Assertion, Collection<TestRunItem>> map = new HashMap<>();
+		//execute common resources for assertions before executing group in the future we should run tests concurrently
+		final List<Assertion> resourceAssertions = assertionService.getResourceAssertions();
+		LOGGER.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
+		final Map<Assertion, Collection<TestRunItem>> assertionResultMap = new HashMap<>();
 		int failedAssertionCount = 0;
-		final Set<Long> assertionIds = new HashSet<>();
+		failedAssertionCount += executeAssertions(prospectiveReleaseVersion, previousReleaseVersion, runId, resourceAssertions, assertionResultMap);
+		final HashSet<Assertion> assertions = new HashSet<>();
 		for(final AssertionGroup group : groups)
 		{
 			for(final Assertion assertion : assertionService.getAssertionsForGroup(group)){
-				assertionIds.add(assertion.getId());
+				assertions.add(assertion);
 			}
 		}
+		failedAssertionCount += executeAssertions(prospectiveReleaseVersion,
+				previousReleaseVersion, runId, assertions, assertionResultMap);
 
-        int counter = 0;
-		for (final Long id: assertionIds) {
+        responseMap.put("type", "post");
+        responseMap.put("assertions", assertionResultMap);
+		responseMap.put("assertionsRun", assertionResultMap.keySet().size());
+		responseMap.put("assertionsFailed", failedAssertionCount);
+        LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
+        // pass file name without extension - we add this back when we retrieve using controller
+        responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
+        LOGGER.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", runId, ((Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000)));
+
+        return new ResponseEntity<>(responseMap, HttpStatus.OK);
+	}
+
+	private int executeAssertions(final String prospectiveReleaseVersion,
+			final String previousReleaseVersion, final Long runId,
+			final Collection<Assertion> assertions,
+			final Map<Assertion, Collection<TestRunItem>> map) {
+		int failedAssertionCount = 0;
+		
+        int counter = 1;
+		for (final Assertion assertion: assertions) {
 			try
 			{
-                final Assertion assertion = assertionService.find(id);
-                LOGGER.info(String.format("Started executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertionIds.size(), assertion.getUuid()));
+                LOGGER.info(String.format("Started executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertions.size(), assertion.getUuid()));
                 final List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
 						prospectiveReleaseVersion, previousReleaseVersion));
 				// get only first since we have 1:1 correspondence between Assertion and Test
@@ -274,24 +296,14 @@ public class TestUploadFileController {
 					}
 				}
 				map.put(assertion, items);
-                LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertionIds.size(), assertion.getUuid()));
+                LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertions.size(), assertion.getUuid()));
                 counter++;
             }
 			catch (final MissingEntityException e) {
 				failedAssertionCount++;
 			}
 		}
-
-        responseMap.put("type", "post");
-        responseMap.put("assertions", map);
-		responseMap.put("assertionsRun", map.keySet().size());
-		responseMap.put("assertionsFailed", failedAssertionCount);
-        LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
-        // pass file name without extension - we add this back when we retrieve using controller
-        responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
-        LOGGER.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", runId, ((Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000)));
-
-        return new ResponseEntity<>(responseMap, HttpStatus.OK);
+		return failedAssertionCount;
 	}
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)

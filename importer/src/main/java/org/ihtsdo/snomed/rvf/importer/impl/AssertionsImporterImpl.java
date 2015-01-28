@@ -48,7 +48,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class AssertionsImporterImpl implements AssertionsImporter {
 
-    private static final SqlParser SQL_PARSER = new SqlParser();
+    private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
+	private static final SqlParser SQL_PARSER = new SqlParser();
     private static final Logger logger = LoggerFactory.getLogger(AssertionsImporterImpl.class);
     @Autowired
     protected RvfRestClient restClient;
@@ -165,13 +166,17 @@ public class AssertionsImporterImpl implements AssertionsImporter {
 
         final List<String> statements = new ArrayList<>();
         final StatementSplitter splitter = new StatementSplitter(sql);
+        if (splitter.getCompleteStatements() == null || splitter.getCompleteStatements().isEmpty()) {
+        	logger.warn("SQL statements not ending with ;" + sql );
+        }
+        final StringBuilder storedProcedureSql = new StringBuilder();
+        boolean storedProcedureFound = false;
         for(final StatementSplitter.Statement statement : splitter.getCompleteStatements())
         {
             String cleanedSql = statement.statement();
-//            cleanedSql = cleanedSql.replaceAll("<RUNID>", "{{run_id}}");
-//            cleanedSql = cleanedSql.replaceAll("<ASSERTIONUUID>", "{{assertion_id}}");
-//            cleanedSql = cleanedSql.replaceAll("<ASSERTIONTEXT>", "{{assertion_text}}");
-
+            if ( cleanedSql.startsWith(CREATE_PROCEDURE) || cleanedSql.startsWith(CREATE_PROCEDURE.toLowerCase())) {
+            	storedProcedureFound = true;
+            }
             // tokenise and process statement
             final StringTokenizer tokenizer = new StringTokenizer(cleanedSql);
             while(tokenizer.hasMoreTokens())
@@ -188,13 +193,19 @@ public class AssertionsImporterImpl implements AssertionsImporter {
                     cleanedSql = cleanedSql.replaceAll(token, schemaMapping.get(token));
                 }
             }
-
             cleanedSql = cleanedSql.replaceAll("runid", "run_id");
             cleanedSql = cleanedSql.replaceAll("assertionuuid", "assertion_id");
             cleanedSql = cleanedSql.replaceAll("assertiontext", "assertion_text");
-            cleanedSql = cleanedSql.replaceAll("qa_result", "qa_result_table");
-
-            statements.add(cleanedSql);
+            logger.info("cleaned sql:" + cleanedSql);
+            if (!storedProcedureFound) {
+               statements.add(cleanedSql);
+            } else {
+            	storedProcedureSql.append(cleanedSql + ";\n");
+            }
+        }
+        if (storedProcedureFound && storedProcedureSql.length() > 0) {
+        	statements.add(storedProcedureSql.toString());
+        	logger.debug("Stored proecure found:" + storedProcedureSql.toString());
         }
 
         // set configuration;

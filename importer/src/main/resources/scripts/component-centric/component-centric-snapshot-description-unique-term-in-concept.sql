@@ -21,7 +21,6 @@
 		join curr_description_s c
 			on c.conceptid = a.conceptid
 			and c.active = 1;
-	commit;
 
 /*  violators have the same term twice within a concept */
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
@@ -34,7 +33,6 @@
 	group by conceptid,  binary term
 	having count(conceptid) > 1
 	and binary count(term) > 1;
-	commit;
 	
 	drop table if exists tmp_active_desc;
 	

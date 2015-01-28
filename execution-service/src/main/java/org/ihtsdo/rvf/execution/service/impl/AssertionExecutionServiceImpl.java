@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
 import java.io.IOException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
@@ -117,14 +119,14 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	}
 	
 	/** Executes an update using statement sql and logs the time taken **/
-	private int executeUpdateStatement (final Connection connection, final String sql, final String typeMsg) throws SQLException{
+	private int executeUpdateStatement (final Connection connection, final String sql) throws SQLException{
 		final long startTime = System.currentTimeMillis();
-		logger.info("Executing {} statement: {}", typeMsg, sql.replaceAll("\n", " " ).replaceAll("\t", ""));
+		logger.info("Executing {} statement:", sql.replaceAll("\n", " " ).replaceAll("\t", ""));
 		try (Statement statement = connection.createStatement()) {
 			//try block will close statement in all circumstances
 			final int result = statement.executeUpdate(sql);
 			final long timeTaken = System.currentTimeMillis() - startTime;
-			logger.info("Completed {} in {}ms, result = {}",typeMsg, timeTaken, result);
+			logger.info("Completed in {}ms, result = {}", timeTaken, result);
 			return result;
 		}
 	}
@@ -212,38 +214,28 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		}
 		// parse sql to get select statement
 		String selectSQL = null;
-		for (String part: parts)
+		final List<String> sqlStatements = transformSql(parts,executionId,test,prospectiveReleaseVersion,previousReleaseVersion);
+		for (String sqlStatement: sqlStatements)
 		{
-			// remove all SQL comments - //TODO might throw errors for -- style comments
-			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
-			part = commentPattern.matcher(part).replaceAll("");
-
-			// replace all substitutions for exec
-			part = part.replaceAll("<RUNID>", String.valueOf(executionId));
-			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(test.getId()));
-			// watch out for any 's that users might have introduced
-			part = part.replaceAll("<ASSERTIONTEXT>", test.getName().replaceAll("'", ""));
-			part = part.replaceAll("qa_result_table", dataSource.getDefaultCatalog()+"."+qaResulTableName);
-			part = part.replaceAll("<PROSPECTIVE>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
-			part = part.replaceAll("<TEMP>", releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
-			part = part.replaceAll("<PREVIOUS>", releaseDataManager.getSchemaForRelease(previousReleaseVersion));
-			part = part.replaceAll("<DELTA>", deltaTableSuffix);
-			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
-			part = part.replaceAll("<FULL>", fullTableSuffix);
-			part = part.replaceAll("<PREVIOUS-RELEASE-DATE>", previousReleaseVersion);
-			part = part.replaceAll("<CURRENT-RELEASE-DATE>", prospectiveReleaseVersion);
-
+			//TODO nothing is configured yet
 			for (final String key : testConfiguration.getKeys())
 			{
 				logger.info("key : value " + key + " : " + testConfiguration.getValue(key));
-				part = part.replaceAll(key, testConfiguration.getValue(key));
+				sqlStatement = sqlStatement.replaceAll(key, testConfiguration.getValue(key));
 			}
-
 			// remove any leading and train white space
-			part = part.trim();
-			if (part.startsWith("select")){
-				logger.info("Set select query :" + part);
-				selectSQL = part;
+			sqlStatement = sqlStatement.trim();
+			if (sqlStatement.startsWith("call")) {
+				logger.info("Start calling stored proecure {}", sqlStatement);
+				try ( CallableStatement cs = connection.prepareCall(sqlStatement)) {
+					cs.execute();
+				}
+				logger.info("End of calling stored proecure {}", sqlStatement);
+			}
+			else if (sqlStatement.startsWith("select")){
+				//TODO need to verify this is required.
+				logger.info("Select query found:" + sqlStatement);
+				selectSQL = sqlStatement;
 				try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 					try (ResultSet execResult = preparedStatement.executeQuery()) {
 						final String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, assertion_text, details) values (?, ?, ?, ?)";
@@ -258,23 +250,49 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 							}
 							// execute insert statement
 							insertStatement.executeBatch();
+							logger.debug("batch insert completed for test:" + test.getName());
 						}
 					}
 				}
 			}
-			else if(part.startsWith("insert")){
-				executeUpdateStatement(connection, part, "insert");
-			}
 			else {
-				if(part.startsWith("create table")){
+				if (sqlStatement.startsWith("create table")){
 					// only add engine if we do not create using a like statement
-					if (!(part.contains("like") || part.contains("as"))) {
-						part = part + " ENGINE = MyISAM";
+					if (!(sqlStatement.contains("like") || sqlStatement.contains("as"))) {
+						sqlStatement = sqlStatement + " ENGINE = MyISAM";
 					}
 				}
-				executeUpdateStatement(connection, part,"create table");
+				executeUpdateStatement(connection, sqlStatement);
 			}
 		}
+	}
+
+	private List<String> transformSql(final String[] parts, final Long executionId, final Test test, final String prospectiveRelease, final String previousRelease) {
+		final List<String> result = new ArrayList<>();
+		for( String part : parts) {
+			logger.debug("Original sql statement: {}", part);
+			// remove all SQL comments - //TODO might throw errors for -- style comments
+			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
+			part = commentPattern.matcher(part).replaceAll("");
+			// replace all substitutions for exec
+			part = part.replaceAll("<RUNID>", String.valueOf(executionId));
+			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(test.getId()));
+			// watch out for any 's that users might have introduced
+			part = part.replaceAll("<ASSERTIONTEXT>", test.getName().replaceAll("'", ""));
+			part = part.replaceAll("qa_result", dataSource.getDefaultCatalog()+ "."+qaResulTableName);
+			part = part.replaceAll("<PROSPECTIVE>", releaseDataManager.getSchemaForRelease(prospectiveRelease));
+			part = part.replaceAll("<TEMP>", releaseDataManager.getSchemaForRelease(prospectiveRelease));
+			part = part.replaceAll("<PREVIOUS>", releaseDataManager.getSchemaForRelease(previousRelease));
+			part = part.replaceAll("<DELTA>", deltaTableSuffix);
+			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
+			part = part.replaceAll("<FULL>", fullTableSuffix);
+			part = part.replaceAll("<PREVIOUS-RELEASE-DATE>", previousRelease);
+			part = part.replaceAll("<CURRENT-RELEASE-DATE>", prospectiveRelease);
+			part.trim();
+			logger.debug("Transformed sql statement: {}", part);
+			result.add(part);
+		}
+		return result;
 	}
 
 	private void extractTestResult(final Test test, final Long executionId,
@@ -291,7 +309,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			try (ResultSet resultSet = resultStatement.executeQuery()) {
 				String sqlQueryString = resultStatement.toString();
 				sqlQueryString = sqlQueryString.substring(sqlQueryString.indexOf(":"));
-				logger.info("Getting failure count using SQL : " + resultStatement);
+				logger.info("Getting test result using SQL : " + resultStatement);
 				long counter = 0;
 				while (resultSet.next())
 				{

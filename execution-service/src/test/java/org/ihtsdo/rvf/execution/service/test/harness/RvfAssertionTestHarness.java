@@ -56,7 +56,9 @@ public class RvfAssertionTestHarness {
 	    @Test
 	    public void testAssertion() {
 	    	//Assertion 111 and assertion test 107
-	    	final Collection<AssertionTest> tests = assertionDao.getAssertionTests(36L);
+	    	//36L
+	    	//150L
+	    	final Collection<AssertionTest> tests = assertionDao.getAssertionTests(3L);
 	    	
 	    	for(final AssertionTest test : tests) {
 	    		System.out.println(test);

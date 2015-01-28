@@ -1,12 +1,12 @@
 package org.ihtsdo.rvf.dao;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
-
-import java.util.List;
-import java.util.UUID;
 
 public interface AssertionDao extends EntityDao<Assertion> {
 
@@ -37,4 +37,6 @@ public interface AssertionDao extends EntityDao<Assertion> {
     List<Assertion> getAssertionsForGroup(AssertionGroup group);
 
     List<Assertion> getAssertionsForGroup(Long groupId);
+
+	List<Assertion> getAssertionsByKeywords(String keyName);
 }

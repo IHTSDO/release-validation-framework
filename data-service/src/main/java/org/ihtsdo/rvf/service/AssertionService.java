@@ -1,14 +1,14 @@
 package org.ihtsdo.rvf.service;
 
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.entity.AssertionTest;
-import org.ihtsdo.rvf.entity.Test;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
+import org.ihtsdo.rvf.entity.AssertionTest;
+import org.ihtsdo.rvf.entity.Test;
 
 public interface AssertionService extends EntityService<Assertion> {
 
@@ -60,4 +60,6 @@ public interface AssertionService extends EntityService<Assertion> {
 	AssertionGroup addAssertionToGroup(Assertion assertion, AssertionGroup group);
 
 	AssertionGroup removeAssertionFromGroup(Assertion assertion, AssertionGroup group);
+
+	List<Assertion> getResourceAssertions();
 }
