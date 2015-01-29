@@ -58,7 +58,6 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	private String fullTableSuffix = "f";
 
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceImpl.class);
-	private PreparedStatement insertStatement;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -159,7 +158,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 				// create a single connection for entire test and close it after running test - avoid creating too many connections
 				try (Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName)) {
 					executeCommand(test, executionId, prospectiveReleaseVersion, previousReleaseVersion, command, testConfiguration, connection);
-					extractTestResult(test, executionId, runItem, connection);
+					extractTestResult(test, executionId, runItem);
 				}
 				catch (final SQLException e) {
 					logger.warn("Nested exception is : " + e.fillInStackTrace());
@@ -239,18 +238,20 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 				try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
 					try (ResultSet execResult = preparedStatement.executeQuery()) {
 						final String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, assertion_text, details) values (?, ?, ?, ?)";
-						try (PreparedStatement insertStatement = dataSource.getConnection().prepareStatement(insertSQL)) {
-							while(execResult.next())
-							{
-								insertStatement.setLong(1, executionId);
-								insertStatement.setLong(2, test.getId());
-								insertStatement.setString(3, test.getName());
-								insertStatement.setString(4, execResult.getString(1));
-								insertStatement.addBatch();
+						try (Connection qaDbConnecion = dataSource.getConnection()) {
+							try (PreparedStatement insertStatement = qaDbConnecion.prepareStatement(insertSQL)) {
+								while(execResult.next())
+								{
+									insertStatement.setLong(1, executionId);
+									insertStatement.setLong(2, test.getId());
+									insertStatement.setString(3, test.getName());
+									insertStatement.setString(4, execResult.getString(4));
+									insertStatement.addBatch();
+								}
+								// execute insert statement
+								insertStatement.executeBatch();
+								logger.debug("batch insert completed for test:" + test.getName());
 							}
-							// execute insert statement
-							insertStatement.executeBatch();
-							logger.debug("batch insert completed for test:" + test.getName());
 						}
 					}
 				}
@@ -269,6 +270,9 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
 	private List<String> transformSql(final String[] parts, final Long executionId, final Test test, final String prospectiveRelease, final String previousRelease) {
 		final List<String> result = new ArrayList<>();
+		final String defaultCatalog = dataSource.getDefaultCatalog();
+		final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveRelease);
+		final String previousReleaseSchema = releaseDataManager.getSchemaForRelease(previousRelease);
 		for( String part : parts) {
 			logger.debug("Original sql statement: {}", part);
 			// remove all SQL comments - //TODO might throw errors for -- style comments
@@ -279,10 +283,10 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(test.getId()));
 			// watch out for any 's that users might have introduced
 			part = part.replaceAll("<ASSERTIONTEXT>", test.getName().replaceAll("'", ""));
-			part = part.replaceAll("qa_result", dataSource.getDefaultCatalog()+ "."+qaResulTableName);
-			part = part.replaceAll("<PROSPECTIVE>", releaseDataManager.getSchemaForRelease(prospectiveRelease));
-			part = part.replaceAll("<TEMP>", releaseDataManager.getSchemaForRelease(prospectiveRelease));
-			part = part.replaceAll("<PREVIOUS>", releaseDataManager.getSchemaForRelease(previousRelease));
+			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
+			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
+			part = part.replaceAll("<TEMP>", prospectiveSchema);
+			part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
 			part = part.replaceAll("<DELTA>", deltaTableSuffix);
 			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
 			part = part.replaceAll("<FULL>", fullTableSuffix);
@@ -295,40 +299,41 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		return result;
 	}
 
-	private void extractTestResult(final Test test, final Long executionId,
-			final TestRunItem runItem, final Connection connection)
+	private void extractTestResult(final Test test, final Long executionId, final TestRunItem runItem)
 			throws SQLException {
 		/*
 		 create a prepared statement for retrieving matching results.
 		*/
 		final String resultSQL = "select assertion_id, assertion_text, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
-		try (PreparedStatement resultStatement = dataSource.getConnection().prepareStatement(resultSQL)) {
-			// select results that match execution
-			resultStatement.setLong(1, test.getId());
-			resultStatement.setLong(2, executionId);
-			try (ResultSet resultSet = resultStatement.executeQuery()) {
-				String sqlQueryString = resultStatement.toString();
-				sqlQueryString = sqlQueryString.substring(sqlQueryString.indexOf(":"));
-				logger.info("Getting test result using SQL : " + resultStatement);
-				long counter = 0;
-				while (resultSet.next())
-				{
-					// only get first 10 failed results
-					if (counter < 10) {
-						runItem.addFirstNInstance(resultSet.getString(3));
+		try (Connection connection = dataSource.getConnection()) {
+			try (PreparedStatement resultStatement = connection.prepareStatement(resultSQL)) {
+				// select results that match execution
+				resultStatement.setLong(1, test.getId());
+				resultStatement.setLong(2, executionId);
+				try (ResultSet resultSet = resultStatement.executeQuery()) {
+					String sqlQueryString = resultStatement.toString();
+					sqlQueryString = sqlQueryString.substring(sqlQueryString.indexOf(":"));
+					logger.info("Getting test result using SQL : " + resultStatement);
+					long counter = 0;
+					while (resultSet.next())
+					{
+						// only get first 10 failed results
+						if (counter < 10) {
+							runItem.addFirstNInstance(resultSet.getString(3));
+						}
+						counter++;
 					}
-					counter++;
-				}
-				logger.info("counter = " + counter);
-				// if counter is > 0, then we know there are failures
-				runItem.setFailureCount(counter);
-				if(counter > 0)
-				{
-					runItem.setFailureMessage("SQL lookup for failures : " + sqlQueryString);
-					runItem.setFailure(true);
-				}
-				else{
-					runItem.setFailure(false);
+					logger.info("counter = " + counter);
+					// if counter is > 0, then we know there are failures
+					runItem.setFailureCount(counter);
+					if(counter > 0)
+					{
+						runItem.setFailureMessage("SQL lookup for failures : " + sqlQueryString);
+						runItem.setFailure(true);
+					}
+					else{
+						runItem.setFailure(false);
+					}
 				}
 			}
 		}

@@ -18,4 +18,4 @@
 	on a.referencedcomponentid = b.id
 	where a.active = '0'
 	and a.refsetid = '447566000'
-	and b.active = '1'			
+	and b.active = '1';		

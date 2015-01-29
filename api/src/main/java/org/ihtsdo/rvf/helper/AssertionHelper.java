@@ -17,23 +17,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class AssertionHelper {
 	@Autowired
-	static AssertionService assertionService;
+	private AssertionService assertionService;
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	
-	public Map<String, Object> assertAssertions (Collection<Assertion> assertions, Long runId,  String prospectiveReleaseVersion,
-			String previousReleaseVersion) {
+	public Map<String, Object> assertAssertions (final Collection<Assertion> assertions, final Long runId,  final String prospectiveReleaseVersion,
+			final String previousReleaseVersion) {
 		//TODO throw an exception that results in a malformed request response and remove runtime dependency on JUnit
 		Assert.assertNotNull(runId);
-		Collection<TestRunItem> allTestRunItems = new ArrayList<>();
-		Map<String , Object> responseMap = new HashMap<>();
+		final Collection<TestRunItem> allTestRunItems = new ArrayList<>();
+		final Map<String , Object> responseMap = new HashMap<>();
 		int failedAssertionCount = 0;
-		for (Assertion assertion: assertions) {
+		for (final Assertion assertion: assertions) {
 			try
 			{
-				List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
+				final List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
 						prospectiveReleaseVersion, previousReleaseVersion));
-				for (TestRunItem item : items) {
+				for (final TestRunItem item : items) {
 					if(item.isFailure()){
 						failedAssertionCount++;
 					}
@@ -41,7 +41,7 @@ public class AssertionHelper {
 				}
 
 			}
-			catch (MissingEntityException e) {
+			catch (final MissingEntityException e) {
 				failedAssertionCount++;
 			}
 		}

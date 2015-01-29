@@ -18,7 +18,7 @@
 	where a.active = '1'
 	and b.active = '1'
 	and b.refsetid = '447570008'
-	group by a.referencedcomponentid, a.targetcomponentid
+	group by a.referencedcomponentid, a.targetcomponentid;
 	
 	
 	

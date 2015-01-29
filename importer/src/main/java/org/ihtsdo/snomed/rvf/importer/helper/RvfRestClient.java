@@ -22,9 +22,9 @@ import org.springframework.web.client.RestTemplate;
 public class RvfRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(RvfRestClient.class);
-    //"https://dev-release.ihtsdotools.org:8080/api/v1/"
+    //"https://dev-rvf.ihtsdotools.org/api/v1/"
     //"http://localhost:8080/api/v1/"
-    private String serverUrl = "http://dev-release.ihtsdotools.org/api/v1/";
+    private String serverUrl = "http://localhost:8080/api/v1/";
     @Autowired
     private final RestTemplate restTemplate;
     private final HttpHeaders headers;
@@ -69,7 +69,7 @@ public class RvfRestClient {
             connection.setRequestMethod("HEAD");
             final int responseCode = connection.getResponseCode();
             if (responseCode != 200) {
-                logger.error("Error connecting to serverUrl specified :" + serverUrl);
+                logger.error("Error connecting to serverUrl specified :" + serverUrl + "Response code=" + responseCode);
             }
         }
         catch (final IOException e) {
