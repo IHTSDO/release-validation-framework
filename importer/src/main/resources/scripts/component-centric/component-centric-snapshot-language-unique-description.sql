@@ -22,7 +22,7 @@
 	and b.active = '1'
 	and b.typeid = '900000000000550004'
 	GROUP BY b.conceptid, b.languagecode
-	having count(*) > 1
+	having count(*) > 1;
 	
 
 			
