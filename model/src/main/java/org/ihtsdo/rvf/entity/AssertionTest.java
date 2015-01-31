@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Class represents the association between an assertion and a test, here we determine whether the test is active
@@ -13,6 +14,7 @@ import javax.persistence.ManyToOne;
  */
 
 @Entity
+@Table(name = "assertion_test")
 public class AssertionTest {
 
 	@Id
@@ -25,22 +27,22 @@ public class AssertionTest {
 	@ManyToOne
 	private Assertion assertion;
 
-	@ManyToOne
-	private ReleaseCenter center;
+//	@ManyToOne
+//	private ReleaseCenter center;
 
 	private boolean inactive;
 
 	public AssertionTest() {
 	}
 
-	public AssertionTest(Long id, String name) {
+	public AssertionTest(final Long id, final String name) {
 	}
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -48,7 +50,7 @@ public class AssertionTest {
 		return test;
 	}
 
-	public void setTest(Test test) {
+	public void setTest(final Test test) {
 		this.test = test;
 	}
 
@@ -56,23 +58,29 @@ public class AssertionTest {
 		return assertion;
 	}
 
-	public void setAssertion(Assertion assertion) {
+	public void setAssertion(final Assertion assertion) {
 		this.assertion = assertion;
 	}
 
-	public ReleaseCenter getCenter() {
-		return center;
-	}
-
-	public void setCenter(ReleaseCenter center) {
-		this.center = center;
-	}
+//	public ReleaseCenter getCenter() {
+//		return center;
+//	}
+//
+//	public void setCenter(ReleaseCenter center) {
+//		this.center = center;
+//	}
 
 	public boolean isInactive() {
 		return inactive;
 	}
 
-	public void setInactive(boolean inactive) {
+	@Override
+	public String toString() {
+		return "AssertionTest [id=" + id + ", test=" + test + ", assertion="
+				+ assertion + ", inactive=" + inactive + "]";
+	}
+
+	public void setInactive(final boolean inactive) {
 		this.inactive = inactive;
 	}
 

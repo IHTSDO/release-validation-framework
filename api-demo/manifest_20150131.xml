@@ -1,5 +1,5 @@
 <listing xmlns="http://release.ihtsdo.org/manifest/1.0.0">
-	<folder Name="SRS_Daily_Build_20150131">
+	<folder Name="SnomedCT_Release_INT_20150131">
 		<file Name="Readme_en_20150131.txt"/>
 
 		<folder Name="RF2Release">

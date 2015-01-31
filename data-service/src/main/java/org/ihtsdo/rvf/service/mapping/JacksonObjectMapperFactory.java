@@ -1,7 +1,8 @@
 package org.ihtsdo.rvf.service.mapping;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class JacksonObjectMapperFactory {
 
@@ -12,7 +13,7 @@ public class JacksonObjectMapperFactory {
 	 */
 	public ObjectMapper createObjectMapper() {
 		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 		return objectMapper;
 	}
 

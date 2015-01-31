@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.ihtsdo.snomed.rvf</groupId>
         <artifactId>release-validation-framework</artifactId>
-        <version>0.1.8</version>
+        <version>0.1.9</version>
     </parent>
 
     <artifactId>validation-service</artifactId>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.ihtsdo.snomed.util</groupId>
             <artifactId>snomed-utilities</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.7</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
@@ -43,7 +43,11 @@
             <version>3.2</version>
             <classifier>with-deps</classifier>
         </dependency>
-
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
     </dependencies>
 
     <build>

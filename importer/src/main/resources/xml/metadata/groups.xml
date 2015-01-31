@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<groupList>
+	<group name="build-resources" purpose="Scripts used to build temporary tables used when executing assertions that must be executed prior to the execution of assertion scripts"/>
+	<group name="rf2-assertions" purpose="Scripts that contain assertions regarding the validity of rf2 files"/>
+	<group name="rf1-assertions" purpose="Scripts that contain assertions regarding the validity of rf1 files"/>
+	<group name="clean-up" purpose="Scripts that remove the temporary tables used for executing assertions"/>
+</groupList>

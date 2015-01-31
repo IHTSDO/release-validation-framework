@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<runList uuid="f3c4ef50-6249-11e1-b86c-0800200c9a66">
+	<script uuid="87dca0d6-4080-4b28-bcfa-e58c08e8170f" category="resource" sqlFile="res-table-edited-concept.sql" text="Build a table of all concepts edited in the current release cycle."/>
+	
+		<!-- file-centric-rf1-->
+		<script uuid="814f93f9-f28d-4344-95cd-035c67d39038" category="file-centric" sqlFile="file-centric-concept-valid-IsPrimitive.sql" text="There is no Null IsPrimitive and Invalid IsPrimitive value should be {0,1}." />		
+		<script uuid="9f68a25b-00ab-479c-ad15-9e78bb5cd8b9" category="file-centric" sqlFile="file-centric-concept-valid-Ctv3Id.sql" text="There is no Null Ctv3Id and No special character in Ctv3id." />
+		<script uuid="4739250a-2cda-494b-9f76-33d16d563095" category="file-centric" sqlFile="file-centric-concept-valid-SnomedId.sql" text="There is no Null  SnomedId and Non-alpha numeric character in SnomedId." />
+		<script uuid="4e171b18-3012-49df-9386-1094f6703f5e" category="file-centric" sqlFile="file-centric-concept-valid-ConceptId.sql" text="There is no Null ConceptId and valid characters are {*0123456789} and ConceptId partition is 00." />
+		<script uuid="2d226e39-1c29-4f42-ac87-0129159d560c" category="file-centric" sqlFile="file-centric-concept-valid-FullySpecifiedName.sql" text="There is no Null FullySpecifiedName and FullySpecifiedName is unique." />		
+		<script uuid="20570f25-73fd-46ff-bc38-17fa37912e78" category="file-centric" sqlFile="file-centric-concept-valid-ConceptStatus.sql" text="There should be no Null ConceptStatus and ConceptStatus value should be between {0,1, 2, 3, 4,5,6,10}." />
+		<script uuid="22040c2c-848f-4614-b668-a0fa9f29df03" category="file-centric" sqlFile="file-centric-concept-unique-SnomedId.sql" text="SnomedId is unique." />
+		<script uuid="a35fa7ea-d327-4c3b-84b3-cd598b57c7ee" category="file-centric" sqlFile="file-centric-concept-unique-Ctv3Id.sql" text="CTV3id is unique." />
+		<script uuid="65933de1-c0ff-4980-a696-621c1a90f1a2" category="file-centric" sqlFile="file-centric-concept-unique-ConceptId.sql" text="ConceptId is unique." />
+		<script uuid="fda80098-0491-4e73-9d2a-448220e470ec" category="file-centric" sqlFile="file-centric-concept-valid-ConceptStatus-length.sql" text="ConceptStatus length is not more than 2 digit." />
+		<script uuid="5ee7730b-df25-4b89-bf0f-eba6be2edd42" category="file-centric" sqlFile="file-centric-concept-valid-Ctv3Id-length.sql" text="Ctv3id string length is not more than 5 character." />
+		<script uuid="2e9fe17f-ede6-4854-a37e-a9e7627b859d" category="file-centric" sqlFile="file-centric-concept-valid-ConceptId-length.sql" text="ConceptId string length should be between 6 and 32 digit." />
+		<script uuid="5c6dfdfd-957b-455d-a00d-521e880d5fe9" category="file-centric" sqlFile="file-centric-concept-valid-SnomedId-length.sql" text="SnomedId string length should be between 6 and 8 character." />
+		<script uuid="e11afc7c-05a5-4166-ab7a-49f89de3879c" category="file-centric" sqlFile="file-centric-concept-valid-FullySpecifiedName-length.sql" text="FullySpecifiedName string length should be between 1 and 255 character." />
+		<script uuid="9720ff35-db7a-4648-b26a-f63ddaba582c" category="file-centric" sqlFile="file-centric-concept-valid-SnomedId-assigned.sql" text="Newly published concept should have SNOMEDID assigned with M-8 or M-9." />
+			
+</runList>

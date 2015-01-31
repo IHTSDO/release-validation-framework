@@ -1,10 +1,5 @@
 package org.ihtsdo.rvf.validation;
 
-import org.apache.commons.lang3.StringUtils;
-import org.ihtsdo.rvf.validation.log.ValidationLog;
-import org.ihtsdo.rvf.validation.resource.ResourceManager;
-import org.ihtsdo.snomed.util.rf2.schema.*;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,6 +8,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.ihtsdo.rvf.validation.log.ValidationLog;
+import org.ihtsdo.rvf.validation.model.ColumnType;
+import org.ihtsdo.rvf.validation.resource.ResourceManager;
+import org.ihtsdo.snomed.util.rf2.schema.DataType;
+import org.ihtsdo.snomed.util.rf2.schema.Field;
+import org.ihtsdo.snomed.util.rf2.schema.FileRecognitionException;
+import org.ihtsdo.snomed.util.rf2.schema.SchemaFactory;
+import org.ihtsdo.snomed.util.rf2.schema.TableSchema;
 
 public class ColumnPatternTester {
 
@@ -39,7 +44,7 @@ public class ColumnPatternTester {
 	private final TestReportable testReport;
 	private Map<ColumnType, PatternTest> columnTests;
 
-	public ColumnPatternTester(ValidationLog validationLog, ResourceManager resourceManager, TestReportable testReport) {
+	public ColumnPatternTester(final ValidationLog validationLog, final ResourceManager resourceManager, final TestReportable testReport) {
 		this.validationLog = validationLog;
 		this.resourceManager = resourceManager;
 		this.testReport = testReport;
@@ -49,13 +54,13 @@ public class ColumnPatternTester {
 	public void runTests() {
 
 		// Stats
-		Date startTime = new Date();
+		final Date startTime = new Date();
 		int filesTested = 0;
 		long linesTested = 0;
 
 		// for each config file (should only the one)
-		List<String> fileNames = resourceManager.getFileNames();
-		for (String fileName : fileNames) {
+		final List<String> fileNames = resourceManager.getFileNames();
+		for (final String fileName : fileNames) {
 			if (fileName == null) {
 				validationLog.executionError("Null file");
 				continue;
@@ -65,11 +70,11 @@ public class ColumnPatternTester {
 				continue;
 			}
 
-			SchemaFactory schemaFactory = new SchemaFactory();
+			final SchemaFactory schemaFactory = new SchemaFactory();
 			TableSchema tableSchema;
 			try {
 				tableSchema = schemaFactory.createSchemaBean(fileName);
-			} catch (FileRecognitionException e) {
+			} catch (final FileRecognitionException e) {
 				// log the problem and continue to the next file
 				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, e.getMessage());
 				continue;
@@ -80,18 +85,17 @@ public class ColumnPatternTester {
 				continue;
 			}
 
-			boolean releaseInputFile = fileName.startsWith("rel2");
+			final boolean releaseInputFile = fileName.startsWith("rel2");
 			List<Field> fields = tableSchema.getFields();
 
 			if (fields != null) {
-				try {
-					BufferedReader reader = resourceManager.getReader(fileName, Charset.forName(UTF_8));
+				try (BufferedReader reader = resourceManager.getReader(fileName, Charset.forName(UTF_8))) {
 					filesTested++;
 					String line;
 					long lineNumber = 0;
 
 					String[] columnData;
-					int configColumnCount = fields.size();
+					final int configColumnCount = fields.size();
 
 					while ((line = reader.readLine()) != null) {
 						int columnIndex = 0;
@@ -99,24 +103,28 @@ public class ColumnPatternTester {
 						lineNumber++;
 						columnData = line.split("\t");
 
-						int dataColumnCount = columnData.length;
+						final int dataColumnCount = columnData.length;
 
 						if (!(validateRow(startTime, fileName, line, lineNumber, configColumnCount, dataColumnCount))) {
 							continue;
 						}
-
-						for (Field column : fields) {
-							String value = columnData[columnIndex];
+						//check whether header fields not containing null values due to specific additional fields
+						if ( (lineNumber == 1) && havingAdditionalFields(tableSchema)) {
+							schemaFactory.populateExtendedRefsetAdditionalFieldNames(tableSchema, line);
+							fields = tableSchema.getFields();
+						}
+						for (final Field column : fields) {
+							final String value = columnData[columnIndex];
 							if (lineNumber == 1) {
 								// Test header value
-								testHeaderValue(value, column, startTime, fileName, columnIndex + "");
+								testHeaderValue(value, column, startTime, fileName, columnIndex);
 							} else {
 								testDataValue(lineNumber + "-" + columnIndex, lineNumber, value, column, startTime, fileName, releaseInputFile);
 							}
 							columnIndex++;
 						}
 					}
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					validationLog.executionError("Problem reading file {}", fileName, e);
 					testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", fileName, "Unable to read the file");
 				}
@@ -130,7 +138,16 @@ public class ColumnPatternTester {
 		validationLog.info("{} files and {} lines tested in {} milliseconds.", filesTested, linesTested, (new Date().getTime() - startTime.getTime()));
 	}
 
-	public boolean validateRow(Date startTime, String fileName, String line, long lineNumber, int configColumnCount, int dataColumnCount) {
+	private boolean havingAdditionalFields(final TableSchema tableSchema) {
+		for (final Field field : tableSchema.getFields()) {
+			if (field.getName() == null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean validateRow(final Date startTime, final String fileName, final String line, final long lineNumber, final int configColumnCount, final int dataColumnCount) {
 		if (StringUtils.isEmpty(line)) {
 			validationLog.assertionError("Empty line at line {}", lineNumber);
 			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Empty Row", EMPTY_ROW_TEST, "", line, "expected data");
@@ -155,18 +172,18 @@ public class ColumnPatternTester {
 		return true;
 	}
 
-	private void testDataValue(String id, long lineNumber, String value, Field column, Date startTime, String fileName, boolean isReleaseInputFile) {
+	private void testDataValue(final String id, final long lineNumber, final String value, final Field column, final Date startTime, final String fileName, final boolean isReleaseInputFile) {
 
-		ColumnType columnType = getColumnType(column);
+		final ColumnType columnType = getColumnType(column);
 
-		PatternTest columnTest = columnTests.get(columnType);
+		final PatternTest columnTest = columnTests.get(columnType);
 
 		if (columnTest != null) {
 			if (canBeBlank(value, column) || columnTest.validate(column, lineNumber, value)) {
 				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(), columnTest.getPatternString());
 			} else {
-				String testedValue = StringUtils.isNoneEmpty(value) ? value : "No Value";
+				final String testedValue = StringUtils.isNoneEmpty(value) ? value : "No Value";
 				validationLog.assertionError(columnTest.getMessage(), columnTest.getErrorArgs());
 				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue());
@@ -174,11 +191,11 @@ public class ColumnPatternTester {
 		}
 	}
 
-	private boolean canBeBlank(String value, Field column) {
+	private boolean canBeBlank(final String value, final Field column) {
 		return !column.isMandatory() && isBlank(value);
 	}
 
-	private ColumnType getColumnType(Field field) {
+	private ColumnType getColumnType(final Field field) {
 		switch (field.getType()) {
 			case SCTID:
 				return ColumnType.SCTID;
@@ -198,10 +215,10 @@ public class ColumnPatternTester {
 		return null;
 	}
 
-	private void testHeaderValue(String value, Field column, Date startTime, String fileName, String colIndex) {
-		String expectedColumnName = column.getName();
+	private void testHeaderValue(final String value, final Field column, final Date startTime, final String fileName, final int colIndex) {
+		final String expectedColumnName = column.getName();
 		if (expectedColumnName == null) {
-			validationLog.info("Column name is null actual '{}'", value);
+			validationLog.info("Column name in the {} file is expected to be null actual '{}' at column {}", fileName, value, colIndex+1);
 			column.setName(value);
 		} else if (!expectedColumnName.equalsIgnoreCase(value)) {
 			validationLog.assertionError("Column name does not match expected value: expected '{}', actual '{}'", expectedColumnName, value);
@@ -238,7 +255,7 @@ public class ColumnPatternTester {
 		return columnTests;
 	}
 
-	public boolean isBlank(String value) {
+	public boolean isBlank(final String value) {
 		return BLANK.matcher(value).matches();
 	}
 
@@ -250,20 +267,20 @@ public class ColumnPatternTester {
 		protected Object[] errorArgs;
 		private String expectedValue;
 
-		public PatternTest(String methodName, String errorMessage, Pattern... patterns) {
+		public PatternTest(final String methodName, final String errorMessage, final Pattern... patterns) {
 			this.methodName = methodName;
 			this.patterns = patterns;
 			this.errorMessage = errorMessage;
 			this.expectedValue = getPatternString();
 		}
 
-		public boolean validate(Field column, long lineNumber, String value) {
+		public boolean validate(final Field column, final long lineNumber, final String value) {
 			errorArgs = new String[]{lineNumber + "", column.getName(), value};
 
 			// ignore a null value if this is the case
 			if ((column.getType() == DataType.SCTID_OR_UUID) && isBlank(value)) return true;
 
-			for (Pattern pattern : patterns) {
+			for (final Pattern pattern : patterns) {
 				if (pattern.matcher(value).matches()) {
 					return true;
 				}
@@ -288,16 +305,16 @@ public class ColumnPatternTester {
 			return expectedValue;
 		}
 
-		public void setExpectedValue(String expectedValue) {
+		public void setExpectedValue(final String expectedValue) {
 			this.expectedValue = expectedValue;
 		}
 
 		public String getPatternString() {
-			StringBuilder builder = new StringBuilder();
+			final StringBuilder builder = new StringBuilder();
 			builder.append(patterns[0].toString());
 			if (patterns.length > 1) {
 				for (int i = 1; i < patterns.length; i++) {
-					Pattern pattern = patterns[i];
+					final Pattern pattern = patterns[i];
 					builder.append(" or ");
 					builder.append(pattern.toString());
 				}
@@ -308,16 +325,16 @@ public class ColumnPatternTester {
 
 	private class BooleanPatternTest extends PatternTest {
 
-		public BooleanPatternTest(String methodName, String errorMessage, String expectedValue, Pattern pattern) {
+		public BooleanPatternTest(final String methodName, final String errorMessage, final String expectedValue, final Pattern pattern) {
 			super(methodName, errorMessage, pattern);
 			setExpectedValue(expectedValue);
 		}
 
 		@Override
-		public boolean validate(Field column, long lineNumber, String value) {
+		public boolean validate(final Field column, final long lineNumber, final String value) {
 			errorArgs = new String[]{lineNumber + "", "1 or 2", value};
 
-			for (Pattern pattern : patterns) {
+			for (final Pattern pattern : patterns) {
 				if (pattern.matcher(value).matches()) {
 					return true;
 				}
@@ -334,12 +351,12 @@ public class ColumnPatternTester {
 
 	private class DateTimeTest extends PatternTest {
 
-		public DateTimeTest(String methodName, String errorMessage) {
+		public DateTimeTest(final String methodName, final String errorMessage) {
 			super(methodName, errorMessage, DATE_PATTERN);
 		}
 
 		@Override
-		public boolean validate(Field column, long lineNumber, String value) {
+		public boolean validate(final Field column, final long lineNumber, final String value) {
 			// Date Stamp
 			if (!DATE_PATTERN.matcher(value).matches()) {
 				errorArgs = new String[]{lineNumber + "", column.getName(), value};
@@ -356,12 +373,12 @@ public class ColumnPatternTester {
 
 	private class RelDateTimeTest extends DateTimeTest {
 
-		private RelDateTimeTest(String methodName, String errorMessage) {
+		private RelDateTimeTest(final String methodName, final String errorMessage) {
 			super(methodName, errorMessage);
 		}
 
 		@Override
-		public boolean validate(Field column, long lineNumber, String value) {
+		public boolean validate(final Field column, final long lineNumber, final String value) {
 			return value.isEmpty() || super.validate(column, lineNumber, value);
 		}
 

@@ -18,6 +18,8 @@
                     </bean>
                 </property>
             </bean>
+            <bean class="org.springframework.http.converter.ResourceHttpMessageConverter"/>
+            <bean class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter"/>
         </mvc:message-converters>
     </mvc:annotation-driven>
 
@@ -30,8 +32,9 @@
     <bean id="objectMapperFactory" class="org.ihtsdo.rvf.service.mapping.JacksonObjectMapperFactory"/>
 
     <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>
-    <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.ValidationLogFactoryImpl"/>
+    <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.impl.ValidationLogFactoryImpl"/>
 
 	<import resource="validationContext.xml"/>
+	<import resource="executionServiceContext.xml"/>
 
 </beans>

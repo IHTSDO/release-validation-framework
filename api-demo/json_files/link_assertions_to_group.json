@@ -1,0 +1,13 @@
+[
+    {
+        "id" : 1,
+        "name" : "Concept has 1 defining relationship but is not primitive",
+        "statement" : null,
+        "description" : "Concept has 1 defining relationship but is not primitive",
+        "docLink" : null,
+        "effectiveFrom" : null,
+        "keywords" : null,
+        "uuid" : "d281b2c1-0864-42ca-8eca-524c287965e2",
+        "groups" : [ ]
+    }
+]

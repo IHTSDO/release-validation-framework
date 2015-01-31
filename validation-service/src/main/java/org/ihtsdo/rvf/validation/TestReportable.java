@@ -23,10 +23,10 @@ public interface TestReportable {
 	void addNewLine();
 
 	class TestRunItemCount {
-		private TestRunItem item;
+		private StructuralTestRunItem item;
 		private Integer count = 0;
 
-		public TestRunItemCount(TestRunItem item) {
+		public TestRunItemCount(StructuralTestRunItem item) {
 			this.item = item;
 			count = 1;
 		}
@@ -39,7 +39,7 @@ public interface TestReportable {
 			return count;
 		}
 
-		public TestRunItem getItem() {
+		public StructuralTestRunItem getItem() {
 			return item;
 		}
 

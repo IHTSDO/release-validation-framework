@@ -1,0 +1,13 @@
+[
+   {
+       "id":null,
+       "name":"Real - Concept has 1 defining relationship but is not primitive",
+       "description":null,
+       "type":"SQL",
+       "command":{"id":null,
+           "configuration":{"id":null,"items":[],"keys":[]},
+           "template":"select  concat('CONCEPT: id=',a.id, ':Concept has only one defining relationship but is not primitive.')  from <PROSPECTIVE>.concept_<SNAPSHOT> a  inner join <PROSPECTIVE>.stated_relationship_<SNAPSHOT> b on a.id = b.id where a.active = '1' and b.active = '1' and a.definitionstatusid != '900000000000074008' group by b.sourceid having count(*) = 1;",
+           "code":"RXhlY3V0ZSBtZQ==",
+           "statements":[]}
+   }
+]

@@ -6,5 +6,13 @@ echo $*
 
 APP_NAME=[[packageName]]
 
+# Record package version number
+echo [[version]] > /opt/rvf-api/data/version.txt
+
 supervisorctl update $APP_NAME || true
 supervisorctl start $APP_NAME || true
+
+# Database command safe to run both on install and upgrade
+echo "Creating RVF mysql database and user"
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS rvf_master; GRANT ALL PRIVILEGES  ON rvf_master.* TO 'rvf_user'@'localhost' ;"
+

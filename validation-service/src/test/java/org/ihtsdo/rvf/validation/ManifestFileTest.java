@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.validation;
 
 import org.ihtsdo.rvf.validation.model.Listing;
+import org.ihtsdo.rvf.validation.model.ManifestFile;
 import org.junit.Test;
 
 import java.io.File;
