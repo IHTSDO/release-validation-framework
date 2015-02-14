@@ -3,23 +3,31 @@ package org.ihtsdo.rvf.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+
 import javax.servlet.http.HttpServletRequest;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/version")
+@Api(value = "Release Versions")
 public class VersionController {
 
 	public static final String VERSION_FILE_PATH = "/opt/rvf-api/data/version.txt";
 
 	private String versionString;
 
-	@RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
+	@ApiOperation( value = "Get version of deployed RVF service",
+		notes = "Get version of deployed RVF service" )
 	public Map<String, String> getVersion(HttpServletRequest request) throws IOException {
 		Map<String, String> entity = new HashMap<>();
 		entity.put("package_version", getVersionString());

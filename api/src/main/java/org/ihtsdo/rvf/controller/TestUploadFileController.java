@@ -49,11 +49,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 
 /**
  * The controller that handles uploaded files for the validation to run
  */
 @Controller
+@Api(value = "Test Files")
 public class TestUploadFileController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestUploadFileController.class);
@@ -72,6 +75,8 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
+	@ApiOperation( value = "Upload test files",
+		notes = "Uploaded files should be in RF2 format files. Service can accept zip file or txt file. " )
 	public ResponseEntity uploadTestPackage(@RequestParam(value = "file") final MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
@@ -91,6 +96,8 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-post", method = RequestMethod.POST)
 	@ResponseBody
+	@ApiOperation( value = "Upload test files",
+			notes = "? - TBD" )
 	public ResponseEntity uploadPostTestPackage(@RequestParam(value = "file") final MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
@@ -138,6 +145,8 @@ public class TestUploadFileController {
 	@RequestMapping(value = "/run-post", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Upload test files",
+			notes = "? - TBD" )
 	public ResponseEntity runPostTestPackage(
 			@RequestParam(value = "file", required = false) final MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
@@ -308,6 +317,8 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
 	@ResponseBody
+	@ApiOperation( value = "Upload test files",
+		notes = "? - TBD" )
 	public ResponseEntity uploadPreTestPackage(@RequestParam(value = "file") final MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			final HttpServletResponse response) throws IOException {
@@ -345,6 +356,8 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
 	@ResponseBody
+	@ApiOperation( value = "Returns a report",
+		notes = "Returns a report as txt file for a valid report id " )
 	public FileSystemResource getFile(@PathVariable final String id) {
 		return new FileSystemResource(new File(validationRunner.getReportDataFolder(), id+".txt"));
 	}
