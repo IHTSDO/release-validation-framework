@@ -40,8 +40,8 @@ public class SwaggerConfig {
 		
 		return new ApiInfo(
 				"RVF API Docs",
-				"This is a listing of available apis of SNOMED release verification framework service. For more technical details visit "
-				+ "<a href='https://github.com/IHTSDO/release-validation-framework' > SNOMED Release Service </a> page @ github.com ",
+				"This is a listing of available apis of SNOMED release validation framework service. For more technical details visit "
+				+ "<a href='https://github.com/IHTSDO/release-validation-framework' > SNOMED release validation framework Service </a> page @ github.com ",
 				"https://github.com/IHTSDO/release-validation-framework",
 				"info@ihtsdotools.org",
 				"Apache License, Version 2.0",
