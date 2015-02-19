@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.helper.AssertionHelper;
-import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
 import org.slf4j.Logger;
@@ -19,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/groups")
@@ -53,13 +53,19 @@ public class AssertionGroupController {
 
 	@RequestMapping(value = "{id}/assertions", method = RequestMethod.POST)
 	@ResponseBody
-	@ResponseStatus(HttpStatus.OK)
-	public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<String> assertionsList) {
+	public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<String> assertionsList, HttpServletResponse response) {
 
 		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-		List<Assertion> assertions = getAssertions(assertionsList);
-		for(Assertion assertion : assertions){
-			assertionService.addAssertionToGroup(assertion, group);
+		
+		//Do we have anything to add?
+		if (assertionsList == null || assertionsList.size() == 0) {
+			response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+		} else {
+			List<Assertion> assertions = getAssertions(assertionsList);
+			for(Assertion assertion : assertions){
+				assertionService.addAssertionToGroup(assertion, group);
+			}
+			response.setStatus(HttpServletResponse.SC_OK);
 		}
 
 		return group;
