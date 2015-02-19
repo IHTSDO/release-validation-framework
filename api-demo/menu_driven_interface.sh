@@ -18,8 +18,6 @@ api="http://localhost:8080/api/v1"
 
 #TODO make this function miss out the data if jsonFile is not specified.
 function callURL() {
-	httpMethod=$1
-	url=$2
 	jsonFile=$3
 	dataArg=""
 	if [ -n "${jsonFile}" ] 
@@ -27,6 +25,13 @@ function callURL() {
 		jsonData=`cat ${jsonFile}`   #Parsing the json to objects in spring seems very forgiving of white space and unescaped characters.
 		dataArg="${jsonData}"
 	fi
+	callURL_JSON $1 $2 ${dataArg}
+}
+
+function callURL_JSON() {
+	httpMethod=$1
+	url=$2
+	dataArg=$3
 	curl -i --retry 0 \
 	--header "Content-type: application/json" \
 	--header "Accept: application/json" \
@@ -149,14 +154,8 @@ function doTest() {
 }
 
 function groupAllAssertions() {
-	echo
-	read -p "What group name should be used?: " groupName
-	mkdir -p tmp
-	#create the group and recover the ID
-	echo "First creating an empty group using name ${groupName}"
-	curl -X POST --data "name=${groupName}" ${api}/groups  | tee tmp/group-create-response.txt 
-	newGroupId=`cat tmp/group-create-response.txt | grep "\"id\"" | sed 's/[^0-9]//g'`
-	
+
+	_createGroup
 	if [ -n "${newGroupId}" ]
 	then
 		echo "Grouping assertions under id ${newGroupId}"
@@ -166,6 +165,36 @@ function groupAllAssertions() {
 		exit -1
 	fi
 	
+}
+
+function groupSpecifiedAssertions() {
+	_createGroup	
+	listAssertions | grep "\"id\"\|name" | sed "s/\"id\" ://" | sed "s/\"name\" ://" | sed "s/ \{8\}//" | paste - - | sort -k1,1n
+	
+	read -p "What assertion ids should be added to this group (comma separate): " assertionList
+	
+	IFS=","  #Set the internal field separator
+	requestBody=""
+	for assertion in ${assertionList} ; do
+		if [ -n "${requestBody}" ] 
+		then
+			requestBody="${requestBody},"
+		fi
+		requestBody="${requestBody} \"${assertion}\""
+	done
+	requestBody="[${requestBody}]"
+	callURL_JSON POST ${api}/groups/${newGroupId}/assertions "${requestBody}"
+}
+
+function _createGroup() {
+	
+	echo
+	read -p "What group name should be used?: " groupName
+	mkdir -p tmp
+	#create the group and recover the ID
+	echo "First creating an empty group using name ${groupName}"
+	curl -X POST --data "name=${groupName}" ${api}/groups  | tee tmp/group-create-response.txt 
+	newGroupId=`cat tmp/group-create-response.txt | grep "\"id\"" | sed 's/[^0-9]//g'`	
 }
 
 function pressAnyKey() {
@@ -188,6 +217,7 @@ function mainMenu() {
 	echo "a - list known assertions"
 	echo "b - list known groups"
 	echo "g - group all known assertions"
+	echo "h - group specified assertions"
 	echo "l - List known previous releases"
 	echo "s - structural test a package with a manifest"
 	echo "t - full test a package with a manifest"
@@ -204,6 +234,7 @@ function mainMenu() {
 			b|B) listGroups ; break ;;
 			l|L) listKnownReleases ; break;;
 			g|G) groupAllAssertions; break;; 
+			h|H) groupSpecifiedAssertions; break;; 
 			s|S) doTest "structural"; break;;
 			t|T) doTest "full"; break;;
 			u|U) uploadRelease ; break;;
@@ -214,7 +245,6 @@ function mainMenu() {
 
 echo
 echo "Target Release Validation Framework API URL is '${api}'"
-echo
 
 while true
 do
