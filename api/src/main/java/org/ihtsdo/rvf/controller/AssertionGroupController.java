@@ -31,6 +31,8 @@ import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Controller
 @RequestMapping("/groups")
 @Api(value = "Assertions Groups")
@@ -70,15 +72,21 @@ public class AssertionGroupController {
 
 	@RequestMapping(value = "{id}/assertions", method = RequestMethod.POST)
 	@ResponseBody
-	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Add assertions to a group",
 		notes = "Add assertions to an assertion group identified by given id" )
-	public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<String> assertionsList) {
+	public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<String> assertionsList, HttpServletResponse response) {
 
 		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-		List<Assertion> assertions = getAssertions(assertionsList);
-		for(Assertion assertion : assertions){
-			assertionService.addAssertionToGroup(assertion, group);
+		
+		//Do we have anything to add?
+		if (assertionsList == null || assertionsList.size() == 0) {
+			response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+		} else {
+			List<Assertion> assertions = getAssertions(assertionsList);
+			for(Assertion assertion : assertions){
+				assertionService.addAssertionToGroup(assertion, group);
+			}
+			response.setStatus(HttpServletResponse.SC_OK);
 		}
 
 		return group;
