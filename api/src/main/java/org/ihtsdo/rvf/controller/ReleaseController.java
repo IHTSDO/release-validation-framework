@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.controller;
 
+import java.io.IOException;
+
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,14 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-
-import java.io.IOException;
 
 /**
  * A controller that handles API calls for uploading and checking status of previously published releases.
@@ -34,15 +39,14 @@ public class ReleaseController {
     @RequestMapping(value = "{version}", method = RequestMethod.POST)
     @ResponseBody
 	@ApiOperation( value = "TBD", notes = "?" )
-    public ResponseEntity uploadRelease(@RequestParam(value = "file") MultipartFile file,
-                                 @PathVariable String version,
-                                 @RequestParam(value = "overWriteExisting", required = false) boolean overWriteExisting,
-                                 @RequestParam(value = "purgeExistingDatabase", required = false) boolean purgeExistingDatabase) {
+    public ResponseEntity uploadRelease(@RequestParam(value = "file") final MultipartFile file,
+                                 @PathVariable final String version,
+                                 @RequestParam(value = "append", required = false) final boolean isAppend) {
         try {
-            boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), overWriteExisting, purgeExistingDatabase);
+            final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), version, isAppend);
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             logger.warn("Error getting input stream from upload. Nested exception is : \n" + e.fillInStackTrace());
             return new ResponseEntity<>("Error getting input stream from upload. Nested exception is : " + e.fillInStackTrace(), HttpStatus.BAD_REQUEST);
         }
@@ -51,7 +55,7 @@ public class ReleaseController {
     @RequestMapping(value = "{version}", method = RequestMethod.GET)
     @ResponseBody
 	@ApiOperation( value = "TBD", notes = "?" )
-    public ResponseEntity getRelease(@PathVariable String version) {
+    public ResponseEntity getRelease(@PathVariable final String version) {
 
         if(releaseDataManager.isKnownRelease(version)){
             return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);

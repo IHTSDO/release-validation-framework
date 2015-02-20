@@ -133,4 +133,14 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 				.createQuery("from Assertion assertion where assertion.keywords = :keyWord order by assertion.id")
 				.setParameter("keyWord", keyName).list();
 	}
+
+	@Override
+	public AssertionGroup getAssertionGroupsByName(final String groupName) {
+		final List<AssertionGroup> result  =  getCurrentSession().createQuery("from AssertionGroup g  where g.name= :groupName")
+                .setParameter("groupName", groupName).list();
+		if(result != null && !result.isEmpty()) {
+			return result.get(0);
+		}
+		return null;
+	}
 }

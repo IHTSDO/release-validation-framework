@@ -11,12 +11,11 @@ import java.util.Set;
  */
 public interface ReleaseDataManager {
 
-    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName,
-                                       boolean overWriteExisting, boolean purgeExistingDatabase);
+    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName, String version, boolean isAppend);
 
-    boolean uploadPublishedReleaseData(File releasePackZip, boolean overWriteExisting, boolean purgeExistingDatabase);
+    boolean uploadPublishedReleaseData(File releasePackZip, String version, boolean isAppend);
 
-    String loadSnomedData(String versionName, boolean purgeExisting, File zipDataFile);
+    String loadSnomedData(String versionName, boolean isAppend, File ... zipDataFile);
 
     boolean isKnownRelease(String releaseVersion);
 
@@ -25,4 +24,6 @@ public interface ReleaseDataManager {
     String getSchemaForRelease(String releaseVersion);
 
     void setSchemaForRelease(String releaseVersion, String schemaName);
+
+	File getZipFileForKnownRelease(String knownVersion);
 }

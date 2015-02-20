@@ -275,4 +275,9 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 				
 	}
 
+	@Override
+	public AssertionGroup getAssertionGroupByName(final String groupName) {
+		return assertionDao.getAssertionGroupsByName(groupName);
+	}
+
 }
