@@ -12,6 +12,7 @@ import org.ihtsdo.rvf.helper.Configuration;
  */
 public class TestRunItem {
 
+	private Long assertionId;
 	private String assertionText;
 	private String executionId;
 	private Date testTime;
@@ -33,7 +34,8 @@ public class TestRunItem {
 
 	public TestRunItem(final Assertion assertion, final String executionId, final Date testTime, final Configuration configuration,
 					   final String testType, final String testPattern, final boolean failure, final long runTime, final String failureMessage) {
-		this.assertionText = assertion.toString();
+		assertionId = assertion.getId();
+		this.assertionText = assertion.getName();
 		this.executionId = executionId;
 		this.testTime = testTime;
 		this.configuration = configuration;
@@ -79,6 +81,7 @@ public class TestRunItem {
 	@Override
 	public String toString() {
 		return "TestRunItem{" +
+				"assertionId=" + assertionId + +  '\'' +
 				"assertionText=" + assertionText +  '\'' +	
 				"executionId='" + executionId + '\'' +
 				", testType='" + testType + '\'' +

@@ -49,12 +49,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.Files;
 
 /**
  * The controller that handles uploaded files for the validation to run
  */
 @Controller
 public class TestUploadFileController {
+
+	private static final String FAILURE_MESSAGE = "failureMessage";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestUploadFileController.class);
 
@@ -139,114 +142,125 @@ public class TestUploadFileController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity runPostTestPackage(
-			@RequestParam(value = "file", required = false) final MultipartFile file,
+			@RequestParam(value = "file") final MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
-			@RequestParam(value = "purgeExistingDatabase", required = false) final boolean purgeExistingDatabase,
 			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
 			@RequestParam(value = "groups") final List<String> groupsList,
-			@RequestParam(value = "prospectiveReleaseVersion") final String prospectiveReleaseVersion,
-			@RequestParam(value = "previousReleaseVersion") final String previousReleaseVersion,
+			@RequestParam(value = "previousIntReleaseVersion") final String prevIntReleaseVersion,
+			@RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
+			@RequestParam(value = "extensionBaseLineReleaseVersion", required = false) final String extensionBaseLine,
 			@RequestParam(value = "runId") final Long runId,
             final HttpServletRequest request) throws IOException {
-
+		//TODO needs to refactor this method further
         final Calendar startTime = Calendar.getInstance();
         LOGGER.info(String.format("Started execution with runId [%1s] : ", runId));
         // generate url from request so we can display in response
         final String requestUrl = String.valueOf(request.getRequestURL());
         final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
-
         final Map<String , Object> responseMap = new HashMap<>();
-		// convert groups which is passed as string to assertion groups
-		final List<AssertionGroup> groups = getAssertionGroups(groupsList);
-        final File tempFile;
-        // set up the response in order to strean directly to the response
-        final File reportFile = new File(validationRunner.getReportDataFolder(), "manifest_validation_"+runId+".txt");
-        final PrintWriter writer = new PrintWriter(reportFile);
-
-        if (file != null)
-        {
-            // load the filename
-            final String filename = file.getOriginalFilename();
-            
-            tempFile = File.createTempFile(filename, ".zip");
-            tempFile.deleteOnExit();
-            if (!filename.endsWith(".zip")) {
-                responseMap.put("type", "pre");
-                responseMap.put("assertionsFailed", 0);
-                responseMap.put("report", "Post condition test package has to be zipped up");
-                return new ResponseEntity<>(responseMap, HttpStatus.OK);
-            }
-
-            // must be a zip
-            copyUploadToDisk(file, tempFile);
-            final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
-
-            TestReportable report;
-
-            if (manifestFile == null) {
-                report = validationRunner.execute(resourceManager, writer, writeSucceses);
-            } else {
-                final String originalFilename = manifestFile.getOriginalFilename();
-                final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
-                tempManifestFile.deleteOnExit();
-                copyUploadToDisk(manifestFile, tempManifestFile);
-
-                final ManifestFile mf = new ManifestFile(tempManifestFile);
-                report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
-            }
-
-            // verify if manifest is valid
-            if(report.getNumErrors() > 0){
-
-                LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
-                responseMap.put("type", "pre");
-                responseMap.put("assertionsRun", report.getNumTestRuns());
-                responseMap.put("assertionsFailed", report.getNumErrors());
-                LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
-                // pass file name without extension - we add this back when we retrieve using controller
-                responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
-
-                LOGGER.info("report.getNumErrors() = " + report.getNumErrors());
-                LOGGER.info("report.getNumTestRuns() = " + report.getNumTestRuns());
-                final double threshold = report.getNumErrors() / report.getNumTestRuns();
-                LOGGER.info("threshold = " + threshold);
-                // bail out only if number of test failures exceeds threshold
-                if(threshold > validationRunner.getFailureThreshold()){
-                    return new ResponseEntity<>(responseMap, HttpStatus.OK);
-                }
-            }
-
-            /*
-			 If we are here, assume manifest is valid, so load data from file.
-		    */
-            if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion) || purgeExistingDatabase){
-            	LOGGER.info("Start loading release version:" + prospectiveReleaseVersion);
-                releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile);
-                LOGGER.info("Completed loading release version:" + prospectiveReleaseVersion);
-            }
+        // load the filename
+        final String filename = file.getOriginalFilename();
+        final File   tempFile = File.createTempFile(filename, ".zip");
+        tempFile.deleteOnExit();
+        if (!filename.endsWith(".zip")) {
+        	responseMap.put("type", "pre");
+        	responseMap.put("assertionsFailed", -1L);
+        	responseMap.put(FAILURE_MESSAGE, "Post condition test package has to be zipped up");
+        	return new ResponseEntity<>(responseMap, HttpStatus.OK);
         }
+        // must be a zip
+        copyUploadToDisk(file, tempFile);
+        boolean isFailed = verifyZipFileStructure(responseMap, tempFile, runId, manifestFile, writeSucceses, urlPrefix);
+        if (isFailed) {
+        	  return new ResponseEntity<>(responseMap, HttpStatus.OK);
+        } else {
+        	isFailed = checkKnownVersion(prevIntReleaseVersion,previousExtVersion,extensionBaseLine,responseMap);
+        	if (isFailed) {
+        		return new ResponseEntity<>(responseMap, HttpStatus.OK);
+        	}
+        	final String[] tokens = Files.getNameWithoutExtension(file.getOriginalFilename()).split("_");
+        	final String prospectiveReleaseVersion = tokens[tokens.length-1];
+			uploadProspectiveVersion(prospectiveReleaseVersion, extensionBaseLine, tempFile);
+        	final String prevReleaseVersion = previousExtVersion != null ? previousExtVersion : prevIntReleaseVersion;
+        	runAssertionTests(prospectiveReleaseVersion, prevReleaseVersion,runId,groupsList,responseMap);
+        	final long timeTaken = (Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000;
+        	LOGGER.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", runId, timeTaken));
+        	return new ResponseEntity<>(responseMap, HttpStatus.OK);
+        }
+	}
 
-		if(!releaseDataManager.isKnownRelease(previousReleaseVersion)){
+
+
+	private boolean checkKnownVersion(final String prevIntReleaseVersion, final String previousExtVersion, 
+			final String extensionBaseLine, final Map<String, Object> responseMap) {
+		
+		if (previousExtVersion != null ) {
+    		if(extensionBaseLine == null ) {
+    			responseMap.put(FAILURE_MESSAGE, "PreviousExtensionVersion is :" 
+    					+ prevIntReleaseVersion +" but extension release base line has not been specified.");
+    			return true;
+    		}
+    	}
+		if (prevIntReleaseVersion == null && previousExtVersion == null && extensionBaseLine == null) {
+			responseMap.put(FAILURE_MESSAGE, "None of the known release version is specified");
+			return true;
+		}
+		boolean isFailed = false;
+		if (prevIntReleaseVersion != null) {
+			if (!isKnownVersion(prevIntReleaseVersion, responseMap))
+			{
+				isFailed = true;
+			}
+		}
+		if(previousExtVersion != null) {
+			if(!isKnownVersion(previousExtVersion, responseMap))
+			{
+				isFailed = true;
+			}
+		}
+		if( extensionBaseLine != null) {
+			if(!isKnownVersion(extensionBaseLine, responseMap)) {
+				isFailed = true;
+			}
+		}
+		return isFailed;
+	}
+
+	private void uploadProspectiveVersion(final String prospectiveReleaseVersion, final String extensionBaseLine, final File tempFile) {
+		
+		if (extensionBaseLine != null) {
+			//load them together here as opposed to clone the existing DB so that to make sure it is clean.
+			String versionDate = extensionBaseLine;
+			if (extensionBaseLine.length() > 8) {
+				versionDate = extensionBaseLine.substring(extensionBaseLine.length() -8);
+			}
+			final File preLoadedZipFile = releaseDataManager.getZipFileForKnownRelease(versionDate);
+			LOGGER.info("Start loading release version{} with release file {} and baseline {}", 
+					prospectiveReleaseVersion, tempFile.getName(),preLoadedZipFile.getName());
+			releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile, preLoadedZipFile);
+		}
+		else {
+			LOGGER.info("Start loading release version{} with release file {}", prospectiveReleaseVersion, tempFile.getName());
+			releaseDataManager.loadSnomedData(prospectiveReleaseVersion, false, tempFile);
+		}
+		LOGGER.info("Completed loading release version{}", prospectiveReleaseVersion);
+	}
+
+	private boolean isKnownVersion(final String vertionToCheck, final Map<String, Object> responseMap) {
+		if(!releaseDataManager.isKnownRelease(vertionToCheck)){
 			// the previous published release must already be present in database, otherwise we throw an error!
-            responseMap.put("type", "post");
-            responseMap.put("failureMessage", "Please load release data first for version : " + previousReleaseVersion);
-            LOGGER.info("Please load release data first for version : " + previousReleaseVersion);
-            LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
-            // pass file name without extension - we add this back when we retrieve using controller
-            responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
-            return new ResponseEntity<>(responseMap, HttpStatus.OK);
-        }
+			responseMap.put("type", "post");
+			final String errorMsg = "Please load published release data in RVF first for version: " + vertionToCheck;
+			responseMap.put(FAILURE_MESSAGE, errorMsg);
+			LOGGER.info(errorMsg);
+			return false;
+		}
+		return true;
+	}
 
-		if(!releaseDataManager.isKnownRelease(prospectiveReleaseVersion)){
-			// the previous published release must already be present in database, otherwise we throw an error!
-            responseMap.put("type", "post");
-            responseMap.put("failureMessage", "Please load prospective data first for version : " + prospectiveReleaseVersion);
-            LOGGER.info("Please load prospective data first for version : " + prospectiveReleaseVersion);
-            LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
-            // pass file name without extension - we add this back when we retrieve using controller
-            responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
-            return new ResponseEntity<>(responseMap, HttpStatus.OK);
-        }
+	private void runAssertionTests(final String prospectiveReleaseVersion, final String previousReleaseVersion, final long runId, final List<String> groupNames,
+			final Map<String, Object> responseMap) throws IOException {
+	      final List<AssertionGroup> groups = getAssertionGroupsByNames(groupNames);
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
 		final List<Assertion> resourceAssertions = assertionService.getResourceAssertions();
 		LOGGER.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
@@ -263,16 +277,63 @@ public class TestUploadFileController {
 		failedAssertionCount += executeAssertions(prospectiveReleaseVersion,
 				previousReleaseVersion, runId, assertions, assertionResultMap);
 
-        responseMap.put("type", "post");
-        responseMap.put("assertions", assertionResultMap);
+		responseMap.put("type", "post");
+
+		final List<TestRunItem> items = new ArrayList<>();
+		for( final Collection<TestRunItem> testItesms : assertionResultMap.values()) {
+			items.addAll(testItesms);
+		}
+		responseMap.put("assertions", items);
 		responseMap.put("assertionsRun", assertionResultMap.keySet().size());
 		responseMap.put("assertionsFailed", failedAssertionCount);
-        LOGGER.info("reportPhysicalUrl : " + reportFile.getAbsolutePath());
-        // pass file name without extension - we add this back when we retrieve using controller
-        responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(reportFile.getName()));
-        LOGGER.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", runId, ((Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000)));
+	}
 
-        return new ResponseEntity<>(responseMap, HttpStatus.OK);
+	
+	
+	private boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final MultipartFile manifestFile, 
+			final boolean writeSucceses, final String urlPrefix ) throws IOException {
+		 boolean isFailed = false;
+		// convert groups which is passed as string to assertion groups
+        // set up the response in order to stream directly to the response
+        final File manifestTestReport = new File(validationRunner.getReportDataFolder(), "manifest_validation_"+runId+".txt");
+        final PrintWriter writer = new PrintWriter(manifestTestReport);
+        final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+
+        TestReportable report;
+
+        if (manifestFile == null) {
+        	report = validationRunner.execute(resourceManager, writer, writeSucceses);
+        } else {
+        	final String originalFilename = manifestFile.getOriginalFilename();
+        	final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
+        	tempManifestFile.deleteOnExit();
+        	copyUploadToDisk(manifestFile, tempManifestFile);
+
+        	final ManifestFile mf = new ManifestFile(tempManifestFile);
+        	report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+        }
+
+        // verify if manifest is valid
+        if(report.getNumErrors() > 0){
+
+        	LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+        	responseMap.put("type", "pre");
+        	responseMap.put("assertionsRun", report.getNumTestRuns());
+        	responseMap.put("assertionsFailed", report.getNumErrors());
+        	LOGGER.info("reportPhysicalUrl : " + manifestTestReport.getAbsolutePath());
+        	// pass file name without extension - we add this back when we retrieve using controller
+        	responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(manifestTestReport.getName()));
+
+        	LOGGER.info("report.getNumErrors() = " + report.getNumErrors());
+        	LOGGER.info("report.getNumTestRuns() = " + report.getNumTestRuns());
+        	final double threshold = report.getNumErrors() / report.getNumTestRuns();
+        	LOGGER.info("threshold = " + threshold);
+        	// bail out only if number of test failures exceeds threshold
+        	if(threshold > validationRunner.getFailureThreshold()){
+        		isFailed = true;
+        	}
+        }
+        return isFailed;
 	}
 
 	private int executeAssertions(final String prospectiveReleaseVersion,
@@ -356,29 +417,34 @@ public class TestUploadFileController {
 			}
 		}
 	}
-
-	private List<AssertionGroup> getAssertionGroups(final List<String> items){
+	
+	
+	private List<AssertionGroup> getAssertionGroupsByNames( final List<String> groupNames) {
+		final List<AssertionGroup> result = new ArrayList<>();
+		for (final String groupName : groupNames) {
+			final AssertionGroup group = assertionService.getAssertionGroupByName(groupName);
+			if (group != null) {
+				result.add(group);
+			}
+		}
+		return result;
+	}
+	
+	private List<AssertionGroup> getAssertionGroups(final List<String> items) throws IOException{
 
 		final List<AssertionGroup> groups = new ArrayList<>();
 		for(final String item: items){
-            try
-            {
-                if(item.matches("\\d+")){
-                    // treat as group id and retrieve associated group
-                    final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, Long.valueOf(item));
-                    if(group != null){
-                        groups.add(group);
-                    }
-                }
-                else{
-                    groups.add(objectMapper.readValue(item, AssertionGroup.class));
-                }
-			}
-			catch (final IOException e) {
-				e.printStackTrace();
-			}
+			 if(item.matches("\\d+")){
+                 // treat as group id and retrieve associated group
+                 final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, Long.valueOf(item));
+                 if(group != null){
+                     groups.add(group);
+                 }
+             }
+             else{
+                 groups.add(objectMapper.readValue(item, AssertionGroup.class));
+             }
 		}
-
 		return groups;
 	}
 }

@@ -1,6 +1,20 @@
 package org.ihtsdo.rvf.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.List;
+
+import javax.servlet.ServletException;
+
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
@@ -20,17 +34,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.ServletException;
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testDispatcherServletContext.xml"})
@@ -53,20 +57,20 @@ public class TestUploadFileControllerIntegrationTest {
 
     @Test
     public void testUploadTestPackage() throws Exception {
-        MvcResult result = mockMvc.perform(
+        final MvcResult result = mockMvc.perform(
                 fileUpload("/test-file")
                         .file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140831.zip", "application/zip",
                                 getClass().getResourceAsStream("/SnomedCT_Release_INT_20140831.zip")))
                 .requestAttr("writeSuccess", Boolean.FALSE))
                 .andDo(print())
                 .andExpect(status().isOk()).andReturn();
-        String content = result.getResponse().getContentAsString();
+        final String content = result.getResponse().getContentAsString();
         assertTrue(content.length() > 0);
     }
 
     @Test
     public void testPostUploadTestPackage() throws Exception {
-        MvcResult result = mockMvc.perform(
+        final MvcResult result = mockMvc.perform(
                 fileUpload("/test-post")
                         .file(new MockMultipartFile("file", "ValidPostconditionAll.zip", "application/zip",
                                 getClass().getResourceAsStream("/ValidPostconditionAll.zip")))
@@ -78,7 +82,7 @@ public class TestUploadFileControllerIntegrationTest {
 
     @Test
     public void testUploadTestPackageExtendedMap() throws Exception {
-        MvcResult result = mockMvc.perform(
+        final MvcResult result = mockMvc.perform(
                 fileUpload("/test-file")
                         .file(new MockMultipartFile("file", "SnomedCT_test2_INT_20140131.zip", "application/zip",
                                 getClass().getResourceAsStream("/SnomedCT_test2_INT_20140131.zip")))
@@ -90,7 +94,7 @@ public class TestUploadFileControllerIntegrationTest {
 
     @Test
     public void testUploadTestDescription() throws Exception {
-        MvcResult result = mockMvc.perform(
+        final MvcResult result = mockMvc.perform(
                 fileUpload("/test-pre")
                         .file(new MockMultipartFile("file", "rel2_Description_Delta-en_INT_20240731.txt", "application/zip",
                                 getClass().getResourceAsStream("/rel2_Description_Delta-en_INT_20240731.txt")))
@@ -102,7 +106,7 @@ public class TestUploadFileControllerIntegrationTest {
 
     @Test
     public void testUploadPre() throws Exception {
-        MvcResult result = mockMvc.perform(
+        final MvcResult result = mockMvc.perform(
                 fileUpload("/test-file")
                         .file(new MockMultipartFile("file", "rel2_sRefset_SimpleMapDelta_INT_20140731.txt", "application/zip",
                                 getClass().getResourceAsStream("/rel2_sRefset_SimpleMapDelta_INT_20140731.txt")))
@@ -115,7 +119,7 @@ public class TestUploadFileControllerIntegrationTest {
     @Test
     public void testRunPostTestPackage() throws Exception {
 
-        Assertion assertion = new Assertion();
+        final Assertion assertion = new Assertion();
         assertion.setName("Concept has 1 defining relationship but is not primitive");
         assertion.setDescription("Concept has 1 defining relationship but is not primitive");
         // save assertion
@@ -126,13 +130,13 @@ public class TestUploadFileControllerIntegrationTest {
         System.out.println("paramsString after = " + paramsString);
         MvcResult returnedResponse = mockMvc.perform(post("/assertions").content(paramsString).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-        Assertion assertion2 = objectMapper.readValue(returnedResponse.getResponse().getContentAsString(), Assertion.class);
+        final Assertion assertion2 = objectMapper.readValue(returnedResponse.getResponse().getContentAsString(), Assertion.class);
         assertNotNull("Returned assertion must not be null", assertion2);
         assertNotNull("Returned assertion must have an id", assertion2.getId());
-        Long assertionId = assertion2.getId();
+        final Long assertionId = assertion2.getId();
 
         // set configuration
-        String template = "" +
+        final String template = "" +
                 "select  " +
                 "concat('CONCEPT: id=',a.id, ':Concept has only one defining relationship but is not primitive.')  " +
                 "from <PROSPECTIVE>.concept_<SNAPSHOT> a  " +
@@ -142,15 +146,15 @@ public class TestUploadFileControllerIntegrationTest {
                 "and a.definitionstatusid != '900000000000074008' " +
                 "group by b.sourceid " +
                 "having count(*) = 1;";
-        Configuration configuration = new Configuration();
-        ExecutionCommand command = new ExecutionCommand();
+        final Configuration configuration = new Configuration();
+        final ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(template);
         command.setCode("Execute me".getBytes());
         command.setConfiguration(configuration);
         command.setStatements(Collections.<String>emptyList());
 
-        String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
-        org.ihtsdo.rvf.entity.Test executableTest = new org.ihtsdo.rvf.entity.Test();
+        final String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
+        final org.ihtsdo.rvf.entity.Test executableTest = new org.ihtsdo.rvf.entity.Test();
         executableTest.setName(execTestName);
         executableTest.setCommand(command);
         executableTest.setType(TestType.SQL);
@@ -164,18 +168,18 @@ public class TestUploadFileControllerIntegrationTest {
                 .andDo(print());
 
         // create assertion group
-        String name = "Test Assertion Group";
+        final String name = "Test Assertion Group";
         returnedResponse = mockMvc.perform(post("/groups").param("name", name).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("id").exists()).andReturn();
-        AssertionGroup group = objectMapper.readValue(returnedResponse.getResponse().getContentAsString(), AssertionGroup.class);
+        final AssertionGroup group = objectMapper.readValue(returnedResponse.getResponse().getContentAsString(), AssertionGroup.class);
         assertNotNull("Returned group must not be null", group);
         assertNotNull("Returned group must have an id", group.getId());
 
         // add assertions to group
-        List<Assertion> assertions = Collections.singletonList(assertion2);
-        paramsString = objectMapper.writeValueAsString(assertions);
+        final List<String> assertionIds= Collections.singletonList(assertionId.toString());
+        paramsString = objectMapper.writeValueAsString(assertionIds);
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(post("/groups/{id}/assertions", group.getId())
                 .content(paramsString)
@@ -185,13 +189,14 @@ public class TestUploadFileControllerIntegrationTest {
                 .andDo(print());
 
 
-        List<AssertionGroup> groups = Collections.singletonList(group);
+        final String[] groups = new String[1];
+        Collections.singletonList(group.getId().toString()).toArray(groups);
         mockMvc.perform(fileUpload("/run-post")
                 .file(new MockMultipartFile("file", "SnomedCT_test2_INT_20140131.zip", "application/zip",
                         getClass().getResourceAsStream("/SnomedCT_test2_INT_20140131.zip")))
                 .file(new MockMultipartFile("manifest", "manifest_20250731.xml", "application/xml",
                         getClass().getResourceAsStream("/manifest_20250731.xml")))
-                .param("groups", objectMapper.writeValueAsString(groups))
+                .param("groups", groups)
                 .param("prospectiveReleaseVersion", "20140731")
                 .param("previousReleaseVersion", "20140731")
                 .param("writeSuccesses", "false")

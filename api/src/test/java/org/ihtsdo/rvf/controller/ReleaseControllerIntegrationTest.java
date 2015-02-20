@@ -1,6 +1,14 @@
 package org.ihtsdo.rvf.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.nio.charset.Charset;
+
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,14 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.Charset;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A test case for {@link AssertionController}.
@@ -47,7 +48,7 @@ public class ReleaseControllerIntegrationTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
         assertNotNull(releaseDataManager);
         releaseDataManager.uploadPublishedReleaseData(getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip") ,
-                "SnomedCT_Release_INT_20140131.zip", true, false);
+                "SnomedCT_Release_INT_20140131.zip", "INT_20140131", false);
         assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));
         assertTrue("Release 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("20140131"));
     }
