@@ -11,11 +11,11 @@ import java.util.Set;
  */
 public interface ReleaseDataManager {
 
-    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName, String version, boolean isAppend);
+    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName, String version);
 
-    boolean uploadPublishedReleaseData(File releasePackZip, String version, boolean isAppend);
+    boolean uploadPublishedReleaseData(File releasePackZip, String version);
 
-    String loadSnomedData(String versionName, boolean isAppend, File ... zipDataFile);
+    String loadSnomedData(String versionName, File ... zipDataFile);
 
     boolean isKnownRelease(String releaseVersion);
 

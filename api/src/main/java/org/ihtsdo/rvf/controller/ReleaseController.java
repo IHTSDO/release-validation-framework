@@ -40,10 +40,9 @@ public class ReleaseController {
     @ResponseBody
 	@ApiOperation( value = "TBD", notes = "?" )
     public ResponseEntity uploadRelease(@RequestParam(value = "file") final MultipartFile file,
-                                 @PathVariable final String version,
-                                 @RequestParam(value = "append", required = false) final boolean isAppend) {
+                                 @PathVariable final String version) {
         try {
-            final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), version, isAppend);
+            final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), version);
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
         catch (final IOException e) {

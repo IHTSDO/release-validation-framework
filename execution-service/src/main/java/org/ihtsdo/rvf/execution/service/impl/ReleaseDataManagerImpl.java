@@ -12,11 +12,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
-
-import com.google.common.io.Files;
 
 /**
  * An implementation of a {@link org.ihtsdo.rvf.execution.service.ReleaseDataManager}. The method afterPropertiesSet must always be called
@@ -89,30 +84,14 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 */
 	protected void populateLookupMap() {
 		// now get list of existing RVF_INT like databases
-		final Set<String> rvfDatabases = new HashSet<>();
-		try {
-			final ResultSet catalogs = snomedDataSource.getConnection().getMetaData().getCatalogs();
+		try ( ResultSet catalogs = snomedDataSource.getConnection().getMetaData().getCatalogs()) {
 			while (catalogs.next()) {
 				final String schemaName = catalogs.getString(1);
 				if (schemaName.startsWith(RVF_DB_PREFIX)) {
-					// get the last yyymmdd fragment which indicates release data
-					final String releaseDate = schemaName.substring(RVF_DB_PREFIX.length());
-					try {
-						// we convert to data to verify we have a pattern matching yyyyMMdd
-						final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-						sdf.setLenient(false);
-						sdf.parse(releaseDate);
-						// if we are here then release date is a valid date format
-						logger.info("Registering existing schema as known release: " + schemaName);
-						releaseSchemaNameLookup.put(releaseDate, schemaName);
-					} catch (final ParseException e) {
-						logger.warn("Error processing file. Not a valid release date : " + schemaName);
-					}
-					// also store for later processing
-					rvfDatabases.add(schemaName);
+					final String version = schemaName.substring(RVF_DB_PREFIX.length());
+					releaseSchemaNameLookup.put(version, schemaName);
 				}
 			}
-			catalogs.close();
 		} catch (final SQLException e) {
 			logger.error("Error getting list of existing schemas. Nested exception is : \n" + e.fillInStackTrace());
 		}
@@ -130,8 +109,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 * @return result of the copy operation - false if there are errors.
 	 */
 	@Override
-	public boolean uploadPublishedReleaseData(final InputStream inputStream, final String fileName, final String version, final boolean isAppend) {
-		boolean result = false;
+	public boolean uploadPublishedReleaseData(final InputStream inputStream, final String fileName, final String version) {
 		// copy release pack zip to data location
 		logger.info("Receiving release data - " + fileName);
 		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
@@ -139,28 +117,26 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		try {
 			output = new FileOutputStream(fileDestination);
 			IOUtils.copy(inputStream, output);
-			result = true;
 			logger.info("Release file copied to : " + fileDestination.getAbsolutePath());
 		} catch (final IOException e) {
 			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
+			return false;
+			
 		} finally {
 			IOUtils.closeQuietly(inputStream);
 			IOUtils.closeQuietly(output);
 		}
-		// get the last yyymmdd fragment which indicates release data
-		final String[] tokens = Files.getNameWithoutExtension(fileName).split("_");
-		final String releaseDate = tokens[tokens.length-1];
 		// if we are here then release date is a valid date format
 		// now call loadSnomedData method passing release zip, if there is no matching database
-		if (!releaseSchemaNameLookup.keySet().contains(releaseDate) ) {
-			logger.info("Loading data into schema " + RVF_DB_PREFIX + releaseDate);
-			final String schemaName = loadSnomedData(releaseDate, true, fileDestination);
-			logger.info("schemaName = " + schemaName);
-			// now add to releaseSchemaNameLookup
-			releaseSchemaNameLookup.put(releaseDate, schemaName);
-			result = true;
+		if (releaseSchemaNameLookup.keySet().contains(version) ) {
+			logger.info("Version is already known in RVF and the existing one will be deleted and reloaded: " + version);
 		}
-		return result;
+		logger.info("Loading data into schema " + RVF_DB_PREFIX + version);
+		final String schemaName = loadSnomedData(version, fileDestination);
+		logger.info("schemaName = " + schemaName);
+		// now add to releaseSchemaNameLookup
+		releaseSchemaNameLookup.put(version, schemaName);
+		return true;
 	}
 
 	/**
@@ -176,10 +152,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 */
 	@Override
 	//TODO seems that this is only used in test
-	public boolean uploadPublishedReleaseData(final File releasePackZip, final String version, final boolean isApppend) {
+	public boolean uploadPublishedReleaseData(final File releasePackZip, final String version) {
 		boolean result = false;
 		try(InputStream inputStream = new FileInputStream(releasePackZip)) {
-			 result = uploadPublishedReleaseData(inputStream, releasePackZip.getName(), version, isApppend);
+			 result = uploadPublishedReleaseData(inputStream, releasePackZip.getName(), version);
 		} catch (final IOException e) {
 			logger.error("Error during upload release:" + releasePackZip.getName(), e);
 		}
@@ -192,72 +168,53 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 * this method directly if prospective build data is to be loaded.
 	 *
 	 * @param versionName the version of the data as a yyyymmdd string (e.g. 20140731)
-	 * @param purgeExisting boolean that controls if existing database needs to be purged
+	 * @param isAppend boolean that controls if existing database needs to be appended
 	 * @param zipDataFile the zip file that contains the release data
 	 * @return the name of the schema to which the data has been loaded.
 	 */
 	@Override
-	public String loadSnomedData(final String versionName, final boolean purgeExisting, final File... zipDataFile) {
-
-		final long startTime = Calendar.getInstance().getTimeInMillis();
-		final File outputFolder = new File(FileUtils.getTempDirectoryPath(), "rvf_loader_data_" + versionName);
-		logger.info("Setting output folder location = " + outputFolder.getAbsolutePath());
-		if (outputFolder.exists()) {
-			logger.info("Output folder already exists and will be deleted before recreating.");
-			outputFolder.delete();
-		} 
-		outputFolder.mkdir();
+	public String loadSnomedData(final String versionName, final File... zipDataFile) {
+		File outputFolder = null;
 		final String createdSchemaName = RVF_DB_PREFIX + versionName;
+		final long startTime = Calendar.getInstance().getTimeInMillis();
 		try {
-			boolean alreadyExists = false;
-			// first verify if database with name already exists, if it does then we skip
-			final ResultSet catalogs = snomedDataSource.getConnection().getMetaData().getCatalogs();
-			while (catalogs.next()) {
-				final String schemaName = catalogs.getString(1);
-				if ((createdSchemaName).equals(schemaName)) {
-					alreadyExists = true;
-					break;
-				}
-			}
-			catalogs.close();
-
-			if (alreadyExists && !purgeExisting) {
-				return createdSchemaName;
-			}
-			
+			outputFolder = new File(FileUtils.getTempDirectoryPath(), "rvf_loader_data_" + versionName);
+			logger.info("Setting output folder location = " + outputFolder.getAbsolutePath());
+			if (outputFolder.exists()) {
+				logger.info("Output folder already exists and will be deleted before recreating.");
+				outputFolder.delete();
+			} 
+			outputFolder.mkdir();
 			// extract SNOMED CT content from zip file
-			final Connection connection = snomedDataSource.getConnection();
-			connection.setAutoCommit(true);
-			createDBAndTables(versionName, connection);
+			
 			for (final File zipFile : zipDataFile) {
 				ZipFileUtils.extractFilesFromZipToOneFolder(zipFile, outputFolder.getAbsolutePath());
 			}
-			loadReleaseFilesToDB(versionName, outputFolder, connection);
-
+			try (Connection connection = snomedDataSource.getConnection()) {
+				connection.setAutoCommit(true);
+				createDBAndTables(createdSchemaName, connection);
+				loadReleaseFilesToDB(outputFolder, connection);
+				connection.commit();
+			}
 //			loadDataViaScript(versionName, outputFolder);
-
-			
 			// add schema name to look up map
 			releaseSchemaNameLookup.put(versionName, createdSchemaName);
-		} catch (final SQLException e) {
-			logger.error("Error creating connection to database. Nested exception is : " + e.fillInStackTrace());
-		} catch (final IOException e) {
-			e.printStackTrace();
-			logger.error("Unable to read sql file. Nested exception is : " + e.fillInStackTrace());
-		} finally {
+		} catch (final SQLException | IOException e) {
+			logger.error("Error while loading file {} into version {} due to {}", zipDataFile, versionName, e.fillInStackTrace());
+			return null;
+		}  finally {
 			// remove output directory so it does not occupy space
 			FileUtils.deleteQuietly(outputFolder);
 		}
-
 		logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime) / 60000) + " minutes.");
 		return createdSchemaName;
 	}
 
-	private void createDBAndTables(final String versionName, final Connection connection) throws SQLException, IOException {
+	private void createDBAndTables(final String schemaName, final Connection connection) throws SQLException, IOException {
 		//clean and create database
-		final String dropStr = "drop database if exists " + RVF_DB_PREFIX + versionName + ";";
-		final String createDbStr = "create database if not exists " + RVF_DB_PREFIX + versionName + ";";
-		final String  useStr = "use " + RVF_DB_PREFIX + versionName + ";";
+		final String dropStr = "drop database if exists " + schemaName + ";";
+		final String createDbStr = "create database if not exists "+ schemaName + ";";
+		final String  useStr = "use " + schemaName + ";";
 		try(Statement statement = connection.createStatement()) {
 			statement.execute(dropStr);
 			statement.execute(createDbStr);
@@ -269,7 +226,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 	}
 
-	private void loadReleaseFilesToDB(final String versionName, final File rf2TextFilesDir, final Connection connection) throws SQLException, FileNotFoundException {
+	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final Connection connection) throws SQLException, FileNotFoundException {
 		
 		if (rf2TextFilesDir != null) {
 			final String[] rf2Files = rf2TextFilesDir.list( new FilenameFilter() {

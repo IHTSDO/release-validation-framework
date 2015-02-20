@@ -27,7 +27,7 @@ public class ReleaseFilesDataLoaderTestHarness {
 	    private DataSource snomedDataSource;
 	    @Autowired
 	    private ReleaseDataManager releaseDataManager;
-	    private final String intFilePath = "/Users/mchu/SNOMED_Releases/SnomedCT_Release_INT_20140731.zip";
+	    private final String intFilePath = "/Users/mchu/SNOMED_Releases/SnomedCT_RF2Release_INT_20150131.zip";
 		private final String extentionFilePath = "/Users/mchu/SNOMED_Releases/SnomedCT_SpanishRelease_INT_20141031.zip";
 		
 		
@@ -41,20 +41,20 @@ public class ReleaseFilesDataLoaderTestHarness {
 	        final File extentionFile = new File(extentionFilePath);
 	       
 	        assertNotNull(extentionFile);
-	        final String versionName = "SpanishRelease_INT_20141031";
-	        final String schemaName = releaseDataManager.loadSnomedData(versionName, true, extentionFile);
+	        final String versionName = "test_20150131";
+	        releaseDataManager.loadSnomedData(versionName, intFile);
 	        try (
 	        		Connection connection = snomedDataSource.getConnection();
 	        		ResultSet catalogs = connection.getMetaData().getCatalogs(); ) {
 	        	boolean exists = false;
 	            while (catalogs.next()) {
 	                final String catalogName = catalogs.getString(1);
-	                if(catalogName.equals(schemaName)){
+	                if(catalogName.equals(versionName)){
 	                    exists = true;
 	                    break;
 	                }
 	            }
-	            assertTrue("Schema name must exist : " + schemaName, exists);
+	            assertTrue("Schema name must exist : " + versionName, exists);
 	        }
 	    }
 
