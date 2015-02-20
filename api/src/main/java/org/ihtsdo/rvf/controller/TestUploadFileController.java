@@ -178,18 +178,35 @@ public class TestUploadFileController {
         	if (isFailed) {
         		return new ResponseEntity<>(responseMap, HttpStatus.OK);
         	}
+        	
         	final String[] tokens = Files.getNameWithoutExtension(file.getOriginalFilename()).split("_");
-        	final String prospectiveReleaseVersion = tokens[tokens.length-1];
-			uploadProspectiveVersion(prospectiveReleaseVersion, extensionBaseLine, tempFile);
-        	final String prevReleaseVersion = previousExtVersion != null ? previousExtVersion : prevIntReleaseVersion;
-        	runAssertionTests(prospectiveReleaseVersion, prevReleaseVersion,runId,groupsList,responseMap);
+        	final String releaseDate = tokens[tokens.length-1];
+    		String prospectiveVersion = releaseDate ;
+    		String prevReleaseVersion = prevIntReleaseVersion;
+    		final boolean isExtension = previousExtVersion != null ? true : false;
+        	if (isExtension) {
+        		//SnomedCT_Release-es_INT_20140430.zip
+        		//SnomedCT_SpanishRelease_INT_20141031.zip
+        		final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("combined_");
+        		prospectiveVersion = extensionName.toLowerCase() + releaseDate;
+        		prevReleaseVersion = extensionName.toLowerCase() + previousExtVersion;
+        	} 
+        	uploadProspectiveVersion(prospectiveVersion, extensionBaseLine, tempFile);
+        	combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
+        	runAssertionTests(prospectiveVersion, prevReleaseVersion,runId,groupsList,responseMap);
         	final long timeTaken = (Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000;
         	LOGGER.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", runId, timeTaken));
         	return new ResponseEntity<>(responseMap, HttpStatus.OK);
         }
 	}
 
-
+	private void combineKnownVersions(final String combinedVersion, final String firstKnown, final String secondKnown) {
+		LOGGER.info("Start combining two known versions {}, {} into {}", firstKnown, secondKnown, combinedVersion);
+		final File firstZipFile = releaseDataManager.getZipFileForKnownRelease(firstKnown);
+		final File secondZipFile = releaseDataManager.getZipFileForKnownRelease(secondKnown);
+		releaseDataManager.loadSnomedData(combinedVersion, firstZipFile , secondZipFile);
+		LOGGER.info("Complete combining two known versions {}, {} into {}", firstKnown, secondKnown, combinedVersion);
+	}
 
 	private boolean checkKnownVersion(final String prevIntReleaseVersion, final String previousExtVersion, 
 			final String extensionBaseLine, final Map<String, Object> responseMap) {
@@ -226,24 +243,27 @@ public class TestUploadFileController {
 		return isFailed;
 	}
 
-	private void uploadProspectiveVersion(final String prospectiveReleaseVersion, final String extensionBaseLine, final File tempFile) {
+	private void uploadProspectiveVersion(final String prospectiveVersion, final String knownVersion, final File tempFile) {
 		
-		if (extensionBaseLine != null) {
+		if (knownVersion != null) {
 			//load them together here as opposed to clone the existing DB so that to make sure it is clean.
-			String versionDate = extensionBaseLine;
-			if (extensionBaseLine.length() > 8) {
-				versionDate = extensionBaseLine.substring(extensionBaseLine.length() -8);
+			String versionDate = knownVersion;
+			if (knownVersion.length() > 8) {
+				versionDate = knownVersion.substring(knownVersion.length() -8);
 			}
 			final File preLoadedZipFile = releaseDataManager.getZipFileForKnownRelease(versionDate);
-			LOGGER.info("Start loading release version{} with release file {} and baseline {}", 
-					prospectiveReleaseVersion, tempFile.getName(),preLoadedZipFile.getName());
-			releaseDataManager.loadSnomedData(prospectiveReleaseVersion, true, tempFile, preLoadedZipFile);
+			if (preLoadedZipFile != null) {
+				LOGGER.info("Start loading release version {} with release file {} and baseline {}", 
+						prospectiveVersion, tempFile.getName(), preLoadedZipFile.getName());
+				releaseDataManager.loadSnomedData(prospectiveVersion, tempFile, preLoadedZipFile);
+			}
+			LOGGER.error("Can't find the cached release zip file for known version:" + versionDate);
 		}
 		else {
-			LOGGER.info("Start loading release version{} with release file {}", prospectiveReleaseVersion, tempFile.getName());
-			releaseDataManager.loadSnomedData(prospectiveReleaseVersion, false, tempFile);
+			LOGGER.info("Start loading release version{} with release file {}", prospectiveVersion, tempFile.getName());
+			releaseDataManager.loadSnomedData(prospectiveVersion, tempFile);
 		}
-		LOGGER.info("Completed loading release version{}", prospectiveReleaseVersion);
+		LOGGER.info("Completed loading release version{}", prospectiveVersion);
 	}
 
 	private boolean isKnownVersion(final String vertionToCheck, final Map<String, Object> responseMap) {

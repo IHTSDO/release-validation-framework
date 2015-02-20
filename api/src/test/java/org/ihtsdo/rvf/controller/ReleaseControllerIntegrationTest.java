@@ -48,7 +48,7 @@ public class ReleaseControllerIntegrationTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
         assertNotNull(releaseDataManager);
         releaseDataManager.uploadPublishedReleaseData(getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip") ,
-                "SnomedCT_Release_INT_20140131.zip", "INT_20140131", false);
+                "SnomedCT_Release_INT_20140131.zip", "INT_20140131");
         assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));
         assertTrue("Release 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("20140131"));
     }
