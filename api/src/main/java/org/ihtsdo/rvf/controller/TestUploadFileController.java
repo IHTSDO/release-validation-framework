@@ -117,31 +117,30 @@ public class TestUploadFileController {
 		// set up the response in order to strean directly to the response
 		response.setContentType("text/csv;charset=utf-8");
 		response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
-		final PrintWriter writer = response.getWriter();
+		try (PrintWriter writer = response.getWriter()) {
+			// must be a zip
+			copyUploadToDisk(file, tempFile);
+			final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
 
-		// must be a zip
-		copyUploadToDisk(file, tempFile);
-		final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+			TestReportable report;
 
-		TestReportable report;
+			if (manifestFile == null) {
+				report = validationRunner.execute(resourceManager, writer, writeSucceses);
+			} else {
+				final String originalFilename = manifestFile.getOriginalFilename();
+				final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
+				tempManifestFile.deleteOnExit();
+				copyUploadToDisk(manifestFile, tempManifestFile);
 
-		if (manifestFile == null) {
-			report = validationRunner.execute(resourceManager, writer, writeSucceses);
-		} else {
-			final String originalFilename = manifestFile.getOriginalFilename();
-			final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
-			tempManifestFile.deleteOnExit();
-			copyUploadToDisk(manifestFile, tempManifestFile);
+				final ManifestFile mf = new ManifestFile(tempManifestFile);
+				report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+			}
 
-			final ManifestFile mf = new ManifestFile(tempManifestFile);
-			report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+			// store the report to disk for now with a timestamp
+			if (report.getNumErrors() > 0) {
+				LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+			}
 		}
-
-		// store the report to disk for now with a timestamp
-		if (report.getNumErrors() > 0) {
-			LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
-		}
-
 		return null;
 	}
 
@@ -325,43 +324,45 @@ public class TestUploadFileController {
 		// convert groups which is passed as string to assertion groups
         // set up the response in order to stream directly to the response
         final File manifestTestReport = new File(validationRunner.getReportDataFolder(), "manifest_validation_"+runId+".txt");
-        final PrintWriter writer = new PrintWriter(manifestTestReport);
-        final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+        try (PrintWriter writer = new PrintWriter(manifestTestReport)) {
+        	final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
 
-        TestReportable report;
+            TestReportable report;
 
-        if (manifestFile == null) {
-        	report = validationRunner.execute(resourceManager, writer, writeSucceses);
-        } else {
-        	final String originalFilename = manifestFile.getOriginalFilename();
-        	final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
-        	tempManifestFile.deleteOnExit();
-        	copyUploadToDisk(manifestFile, tempManifestFile);
+            if (manifestFile == null) {
+            	report = validationRunner.execute(resourceManager, writer, writeSucceses);
+            } else {
+            	final String originalFilename = manifestFile.getOriginalFilename();
+            	final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
+            	tempManifestFile.deleteOnExit();
+            	copyUploadToDisk(manifestFile, tempManifestFile);
 
-        	final ManifestFile mf = new ManifestFile(tempManifestFile);
-        	report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+            	final ManifestFile mf = new ManifestFile(tempManifestFile);
+            	report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+            }
+
+            // verify if manifest is valid
+            if(report.getNumErrors() > 0){
+
+            	LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+            	responseMap.put("type", "pre");
+            	responseMap.put("assertionsRun", report.getNumTestRuns());
+            	responseMap.put("assertionsFailed", report.getNumErrors());
+            	LOGGER.info("reportPhysicalUrl : " + manifestTestReport.getAbsolutePath());
+            	// pass file name without extension - we add this back when we retrieve using controller
+            	responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(manifestTestReport.getName()));
+
+            	LOGGER.info("report.getNumErrors() = " + report.getNumErrors());
+            	LOGGER.info("report.getNumTestRuns() = " + report.getNumTestRuns());
+            	final double threshold = report.getNumErrors() / report.getNumTestRuns();
+            	LOGGER.info("threshold = " + threshold);
+            	// bail out only if number of test failures exceeds threshold
+            	if(threshold > validationRunner.getFailureThreshold()){
+            		isFailed = true;
+            	}
+            }
         }
-
-        // verify if manifest is valid
-        if(report.getNumErrors() > 0){
-
-        	LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
-        	responseMap.put("type", "pre");
-        	responseMap.put("assertionsRun", report.getNumTestRuns());
-        	responseMap.put("assertionsFailed", report.getNumErrors());
-        	LOGGER.info("reportPhysicalUrl : " + manifestTestReport.getAbsolutePath());
-        	// pass file name without extension - we add this back when we retrieve using controller
-        	responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(manifestTestReport.getName()));
-
-        	LOGGER.info("report.getNumErrors() = " + report.getNumErrors());
-        	LOGGER.info("report.getNumTestRuns() = " + report.getNumTestRuns());
-        	final double threshold = report.getNumErrors() / report.getNumTestRuns();
-        	LOGGER.info("threshold = " + threshold);
-        	// bail out only if number of test failures exceeds threshold
-        	if(threshold > validationRunner.getFailureThreshold()){
-        		isFailed = true;
-        	}
-        }
+        
         return isFailed;
 	}
 
@@ -416,22 +417,18 @@ public class TestUploadFileController {
 		if (!filename.endsWith(".txt")) {
 			throw new IllegalArgumentException("Pre condition file should always be a .txt file");
 		}
-
 		response.setContentType("text/csv;charset=utf-8");
 		response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
-		final PrintWriter writer = response.getWriter();
-
-		copyUploadToDisk(file, tempFile);
-
-		final ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
-		final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
-
-		// store the report to disk for now with a timestamp
-		if (report.getNumErrors() > 0) {
-			LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+		
+		try (PrintWriter writer = response.getWriter()) {
+			copyUploadToDisk(file, tempFile);
+			final ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
+			final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
+			// store the report to disk for now with a timestamp
+			if (report.getNumErrors() > 0) {
+				LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+			}
 		}
-
-
 		return null;
 	}
 
