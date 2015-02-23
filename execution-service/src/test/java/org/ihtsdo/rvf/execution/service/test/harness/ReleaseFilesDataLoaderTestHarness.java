@@ -42,7 +42,7 @@ public class ReleaseFilesDataLoaderTestHarness {
 	       
 	        assertNotNull(extentionFile);
 	        final String versionName = "test_20150131";
-	        releaseDataManager.loadSnomedData(versionName, intFile);
+	        releaseDataManager.loadSnomedData(versionName, intFile, extentionFile);
 	        try (
 	        		Connection connection = snomedDataSource.getConnection();
 	        		ResultSet catalogs = connection.getMetaData().getCatalogs(); ) {
