@@ -189,7 +189,13 @@ public class TestUploadFileController {
         		final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("edition_");
         		prospectiveVersion = extensionName.toLowerCase() + releaseDate;
         		prevReleaseVersion = extensionName.toLowerCase() + previousExtVersion;
-        		combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
+//        		combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
+        		final boolean isSuccess = releaseDataManager.combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
+        		if (!isSuccess) {
+        			responseMap.put(FAILURE_MESSAGE, "Failed to combine knwon versions:" 
+        					+ prevIntReleaseVersion + " and"+ previousExtVersion + "into" + prevReleaseVersion);
+        			return new ResponseEntity<>(responseMap, HttpStatus.OK);
+        		}
         	} 
         	uploadProspectiveVersion(prospectiveVersion, extensionBaseLine, tempFile);
         	runAssertionTests(prospectiveVersion, prevReleaseVersion,runId,groupsList,responseMap);

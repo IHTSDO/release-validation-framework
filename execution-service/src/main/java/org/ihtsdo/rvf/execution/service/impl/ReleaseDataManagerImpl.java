@@ -194,7 +194,6 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 				connection.setAutoCommit(true);
 				createDBAndTables(createdSchemaName, connection);
 				loadReleaseFilesToDB(outputFolder, connection);
-				connection.commit();
 			}
 //			loadDataViaScript(versionName, outputFolder);
 			// add schema name to look up map
@@ -354,5 +353,43 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			}
 		}
 		return null;
+	}
+	
+	
+	@Override
+	public boolean combineKnownVersions(final String combinedVersionName, final String ... knownVersions){
+		final long startTime = System.currentTimeMillis();
+		boolean isFailed = false;
+		//create db schema for the combined version
+		final String schemaName = RVF_DB_PREFIX + combinedVersionName;
+		try (Connection connection = snomedDataSource.getConnection()) {
+			createDBAndTables(schemaName, connection);
+		} catch (SQLException | IOException e) {
+			isFailed = true;
+			logger.error("Failed to create db schema and tables for version:" + combinedVersionName +" due to " + e.fillInStackTrace());
+		}
+		//select data from known version schema and insert into the new schema
+		for (final String known : knownVersions) {
+			final String knownSchema = releaseSchemaNameLookup.get(known);
+			
+			for (final String tableName : RF2FileTableMapper.getAllTableNames()) {
+				final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
+				final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
+				final String sql = "insert into " + schemaName + "." + tableName  + " select * from " + knownSchema + "." + tableName;
+				try (Connection connection = snomedDataSource.getConnection();
+						Statement statement = connection.createStatement() ) {
+					statement.execute(disableIndex);
+					statement.execute(sql);
+					statement.execute(enableIndex);
+				} catch (final SQLException e) {
+					isFailed = true;
+					logger.error("Failed to insert data to table:" + tableName +" due to " + e.fillInStackTrace());
+				}
+			}
+		}
+		final long endTime = System.currentTimeMillis();
+		logger.info("Time taken to combine both known versions into one schema in seconds:" + (endTime-startTime)/1000);
+		return !isFailed;
+		
 	}
 }
