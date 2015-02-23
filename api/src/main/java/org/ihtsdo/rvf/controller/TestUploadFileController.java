@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -73,8 +74,10 @@ public class TestUploadFileController {
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	@Autowired
-	ReleaseDataManager releaseDataManager;
-	ObjectMapper objectMapper = new ObjectMapper();
+	private ReleaseDataManager releaseDataManager;
+	private final ObjectMapper objectMapper = new ObjectMapper();
+	@Autowired
+	private TaskExecutor taskExecutor;
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
@@ -186,7 +189,10 @@ public class TestUploadFileController {
         	if (isFailed) {
         		return new ResponseEntity<>(responseMap, HttpStatus.OK);
         	}
-        	
+        	// TODO We could move all the following code to another thread using TaskExecutor and return the URL for 
+        	//assertion results something like: https://rvf.ihtsdotools.org/api/v1/assertionresults/{run_id}
+        	//We need to create AssertionResultService which queries the qa_result table for a given run_id
+
         	final String[] tokens = Files.getNameWithoutExtension(file.getOriginalFilename()).split("_");
         	final String releaseDate = tokens[tokens.length-1];
     		String prospectiveVersion = releaseDate ;
@@ -197,13 +203,17 @@ public class TestUploadFileController {
         		//SnomedCT_SpanishRelease_INT_20141031.zip
         		final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("edition_");
         		prospectiveVersion = extensionName.toLowerCase() + releaseDate;
-        		prevReleaseVersion = extensionName.toLowerCase() + previousExtVersion;
-//        		combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
-        		final boolean isSuccess = releaseDataManager.combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
-        		if (!isSuccess) {
-        			responseMap.put(FAILURE_MESSAGE, "Failed to combine knwon versions:" 
-        					+ prevIntReleaseVersion + " and"+ previousExtVersion + "into" + prevReleaseVersion);
-        			return new ResponseEntity<>(responseMap, HttpStatus.OK);
+        		prevReleaseVersion = previousExtVersion;
+        		if (prevIntReleaseVersion != null) {
+        			//previous extension release is not merged
+            		prevReleaseVersion = extensionName.toLowerCase() + previousExtVersion;
+//            		combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
+            		final boolean isSuccess = releaseDataManager.combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
+            		if (!isSuccess) {
+            			responseMap.put(FAILURE_MESSAGE, "Failed to combine knwon versions:" 
+            					+ prevIntReleaseVersion + " and"+ previousExtVersion + "into" + prevReleaseVersion);
+            			return new ResponseEntity<>(responseMap, HttpStatus.OK);
+            		}
         		}
         	} 
         	uploadProspectiveVersion(prospectiveVersion, extensionBaseLine, tempFile);

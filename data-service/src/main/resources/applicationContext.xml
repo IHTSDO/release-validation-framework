@@ -65,4 +65,9 @@
 		<property name="dataSource" ref="dataSource"/>
 		<property name="sessionFactory" ref="sessionFactory"/>
 	</bean>
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+    	<property name="corePoolSize" value="5" />
+   	 	<property name="maxPoolSize" value="10" />
+    	<property name="queueCapacity" value="25" />
+	</bean>
 </beans>
