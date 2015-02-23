@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -69,5 +70,9 @@ public class RF2FileTableMapper {
 			}
 		}
 		return null;
+	}
+	
+	public static Collection<String> getAllTableNames() {
+		return tableNameMap.values();
 	}
 }

@@ -49,16 +49,13 @@ public class ReleaseFileDataLoader {
 	 * @throws SQLException
 	 */
 	public void loadFilesIntoDB(final String rf2TextFileRootPath, final String[] rf2Files) throws SQLException {
-		final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
-		try (Statement statement = connection.createStatement()) {
-			statement.execute(configStr);
-		}
 		for (final String rf2FileName : rf2Files) {
 			final String rvfTableName = RF2FileTableMapper.getLegacyTableName(rf2FileName);
 			if( rvfTableName == null) {
 				LOGGER.warn("No matching table name found for RF2 file:" + rf2FileName);
 				continue;
 			}
+			final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
 			final String disableIndex = "ALTER TABLE " + rvfTableName + " DISABLE KEYS;";
 			final String enableIndex = "ALTER TABLE " + rvfTableName + " ENABLE KEYS;";
 			final String loadFile = "load data local infile '" + rf2TextFileRootPath + "/" + rf2FileName + "' into table " + rvfTableName
@@ -68,6 +65,7 @@ public class ReleaseFileDataLoader {
 			LOGGER.info(loadFile);
 			final long start = System.currentTimeMillis();
 			try (Statement statement = connection.createStatement()) {
+				statement.execute(configStr);
 				statement.execute(disableIndex);
 				statement.execute(loadFile);
 				statement.execute(enableIndex);

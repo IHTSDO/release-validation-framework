@@ -43,13 +43,15 @@ public class ReleaseFilesDataLoaderTestHarness {
 	        assertNotNull(extentionFile);
 	        final String versionName = "test_20150131";
 	        releaseDataManager.loadSnomedData(versionName, intFile, extentionFile);
+//	        releaseDataManager.combineKnownVersions(versionName, "20150131", "20141031");
 	        try (
 	        		Connection connection = snomedDataSource.getConnection();
 	        		ResultSet catalogs = connection.getMetaData().getCatalogs(); ) {
 	        	boolean exists = false;
 	            while (catalogs.next()) {
 	                final String catalogName = catalogs.getString(1);
-	                if(catalogName.equals(versionName)){
+	                System.out.println("catalog name:" + catalogName);
+	                if(catalogName.contains(versionName)){
 	                    exists = true;
 	                    break;
 	                }

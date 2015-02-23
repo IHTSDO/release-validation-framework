@@ -26,4 +26,6 @@ public interface ReleaseDataManager {
     void setSchemaForRelease(String releaseVersion, String schemaName);
 
 	File getZipFileForKnownRelease(String knownVersion);
+	
+	boolean combineKnownVersions(final String combinedVersionName, final String ... knownVersions);
 }
