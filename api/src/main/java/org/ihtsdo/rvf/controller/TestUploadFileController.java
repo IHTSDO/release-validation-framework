@@ -186,12 +186,12 @@ public class TestUploadFileController {
         	if (isExtension) {
         		//SnomedCT_Release-es_INT_20140430.zip
         		//SnomedCT_SpanishRelease_INT_20141031.zip
-        		final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("combined_");
+        		final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("edition_");
         		prospectiveVersion = extensionName.toLowerCase() + releaseDate;
         		prevReleaseVersion = extensionName.toLowerCase() + previousExtVersion;
+        		combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
         	} 
         	uploadProspectiveVersion(prospectiveVersion, extensionBaseLine, tempFile);
-        	combineKnownVersions(prevReleaseVersion, prevIntReleaseVersion, previousExtVersion);
         	runAssertionTests(prospectiveVersion, prevReleaseVersion,runId,groupsList,responseMap);
         	final long timeTaken = (Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000;
         	LOGGER.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", runId, timeTaken));
