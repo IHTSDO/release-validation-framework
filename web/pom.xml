@@ -5,7 +5,11 @@
     <parent>
         <groupId>org.ihtsdo.snomed.rvf</groupId>
         <artifactId>release-validation-framework</artifactId>
+<<<<<<< HEAD
         <version>0.1.11-SNAPSHOT</version>
+=======
+        <version>0.1.10</version>
+>>>>>>> updating poms for branch'release/0.1.10' with non-snapshot versions
     </parent>
 
     <artifactId>web</artifactId>
