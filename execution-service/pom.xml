@@ -98,5 +98,10 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo.snomed.util</groupId>
+			<artifactId>snomed-utilities</artifactId>
+			<version>1.0.7</version>
+		</dependency>
 	</dependencies>
 </project>

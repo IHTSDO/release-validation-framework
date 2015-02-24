@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 /**
@@ -41,6 +42,7 @@ public class Assertion {
     @Column(columnDefinition = "BINARY(16)")
     private UUID uuid = UUID.randomUUID();
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "assertions")
+    @JsonIgnore
     private Set<AssertionGroup> groups = new HashSet<>();
 
 	public Assertion() {

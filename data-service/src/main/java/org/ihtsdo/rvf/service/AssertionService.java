@@ -62,4 +62,5 @@ public interface AssertionService extends EntityService<Assertion> {
 	AssertionGroup removeAssertionFromGroup(Assertion assertion, AssertionGroup group);
 
 	List<Assertion> getResourceAssertions();
+	AssertionGroup getAssertionGroupByName(String groupName);
 }

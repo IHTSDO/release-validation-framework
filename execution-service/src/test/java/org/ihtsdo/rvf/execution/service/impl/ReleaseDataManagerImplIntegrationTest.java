@@ -32,7 +32,7 @@ public class ReleaseDataManagerImplIntegrationTest {
         final File inputFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
         assertNotNull(inputFile);
         final String versionName = "20140131";
-        final String schemaName = releaseDataManager.loadSnomedData(versionName, true, inputFile);
+        final String schemaName = releaseDataManager.loadSnomedData(versionName, inputFile);
         try (
         		Connection connection = snomedDataSource.getConnection();
         		ResultSet catalogs = connection.getMetaData().getCatalogs(); ) {
@@ -45,6 +45,7 @@ public class ReleaseDataManagerImplIntegrationTest {
                 }
             }
             assertTrue("Schema name must exist : " + schemaName, exists);
+            assertNotNull(releaseDataManager.getZipFileForKnownRelease(versionName));
         }
     }
 
@@ -54,7 +55,7 @@ public class ReleaseDataManagerImplIntegrationTest {
 
         final File inputFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
         assertNotNull(inputFile);
-        final boolean writeSucess =releaseDataManager.uploadPublishedReleaseData(inputFile, true, true);
+        final boolean writeSucess =releaseDataManager.uploadPublishedReleaseData(inputFile, "INT-20140131");
         assertTrue("Upload must have been successful", writeSucess);
 
         assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));
