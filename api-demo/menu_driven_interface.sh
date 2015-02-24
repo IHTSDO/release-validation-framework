@@ -11,9 +11,9 @@ fileToTest="rel2_Refset_SimpleDelta_INT_20140131.txt"
 
 # Target API Deployment
 #TODO - allow the user to change the API at runtime
-api="http://localhost:8080/api/v1"
+#api="http://localhost:8080/api/v1"
 #api="http://localhost:8081/api/v1"
-#api="https://dev-rvf.ihtsdotools.org/api/v1"
+api="https://dev-rvf.ihtsdotools.org/api/v1"
 #api="https://uat-rvf.ihtsdotools.org/api/v1"
 
 #TODO make this function miss out the data if jsonFile is not specified.
@@ -78,11 +78,19 @@ function uploadRelease() {
 		echo "${releaseFile} not found."
 		return
 	fi
-	releaseDate=`getReleaseDate ${releaseFile}`
-	url=" ${api}/releases/${releaseDate}"
-	echo "Uploading release file to ${url}"
+	read -p "What version (schema) are we storing this under?: " version
+	
+	read -p "Do you wish to append an extension to an international release? (Y/N): " append
+	appendStr="false"
+	if [ ${append} == "y" ] ||  [ ${append} == "Y" ] 
+	then
+		appendStr="true"
+	fi
+	
+	url=" ${api}/releases/${version}"
+	echo "Uploading release file to ${url} with append = "
 	curl --retry 0 -X POST ${url} --progress-bar -F file=@${releaseFile} \
-		 -F "overWriteExisting=true" -F "purgeExistingDatabase=true" \
+		 -F "append=${appendStr}" \
 		 -o tmp/uploadprogress.txt
 }
 
@@ -91,10 +99,10 @@ function doTest() {
 	echo
 	if [ ${testType} != "single" ]
 	then
-		read -p "What archive should be uploaded?: " releaseFile
+		read -p "What archive should be uploaded (prospective release)?: " releaseFile
 		if [ ! -e ${releaseFile} ]
 		then
-			echo "${releaseFile} not found. You might have skipped setting the release file."
+			echo "${releaseFile} not found. "
 			return
 		elif [ -z $releaseFile ] 
 		then
@@ -129,19 +137,22 @@ function doTest() {
 		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
 		-F "previousReleaseVersion=${currentReleaseVersion}" \
 		-F "runId=${datestamp}" 			 
-	elif [ ${testType} == "full" ] 
+	elif [ ${testType} == "full" ] ||	[ ${testType} == "extension" ]
 	then
-		read -p "What assertion group id should be used?: " assertionGroup
-		read -p "Do you want to purge existing database for prospective release (true/false)?: " purgeExistingDatabase
-		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
-		read -p "What is the prospective (ie the one being tested) release version (YYYYMMDD): " prospectiveReleaseVersion
+		read -p "What assertion group id(s) / name(s) should be used? (comma separate): " assertionGroups
+		if [ ${testType} == "extension" ]
+		then
+			read -p "What is the baseline (ie the International Release that is being extended) release version (YYYYMMDD): " baselineReleaseVersion
+			read -p "What is the previous Extension release version (YYYYMMDD): " previousExtensionVersion
+		fi
+		read -p "What is the previous International release version (YYYYMMDD): " prevReleaseVersion
 		curl --retry 0 -i -X POST "$api/run-post" \
 		--progress-bar \
 		${fileParam} \
 		-F manifest=@${manifestFile} \
-		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
-		-F "previousReleaseVersion=${currentReleaseVersion}" \
-		-F "purgeExistingDatabase=${purgeExistingDatabase}" \
+		-F "previousIntReleaseVersion=${prevReleaseVersion}" \
+		-F "extensionBaseLineReleaseVersion=${baselineReleaseVersion}" \
+		-F "previousExtensionReleaseVersion=${previousExtensionVersion}" \
 		-F "groups=${assertionGroup}" \
 		-F "runId=${datestamp}" \
 		-o tmp/uploadprogress.txt
@@ -216,6 +227,7 @@ function mainMenu() {
 	echo "1 - test a package against a single assertion"
 	echo "a - list known assertions"
 	echo "b - list known groups"
+	echo "e - test an extension specifying baseline and previous"
 	echo "g - group all known assertions"
 	echo "h - group specified assertions"
 	echo "l - List known previous releases"
@@ -232,6 +244,7 @@ function mainMenu() {
 			1)   doTest "single"; break;;
 			a|A) listAssertions ; break ;;
 			b|B) listGroups ; break ;;
+			e|E) doTest "extension"; break;;
 			l|L) listKnownReleases ; break;;
 			g|G) groupAllAssertions; break;; 
 			h|H) groupSpecifiedAssertions; break;; 
