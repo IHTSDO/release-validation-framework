@@ -16,6 +16,8 @@ api="http://localhost:8080/api/v1"
 #api="https://dev-rvf.ihtsdotools.org/api/v1"
 #api="https://uat-rvf.ihtsdotools.org/api/v1"
 
+mkdir -p tmp
+
 #TODO make this function miss out the data if jsonFile is not specified.
 function callURL() {
 	jsonFile=$3
@@ -162,6 +164,7 @@ function doTest() {
 
 		echo "Server call complete.  Server returned:  "
 		cat tmp/uploadprogress.txt
+		echo
 	else
 		echo "Test type ${testType} not recognised"
 	fi
