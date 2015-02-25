@@ -13,15 +13,13 @@ import java.util.Collection;
  */
 public interface AssertionExecutionService {
 
-    TestRunItem executeAssertionTest(AssertionTest assertionTest, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+	TestRunItem executeAssertionTest(AssertionTest assertionTest, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertions, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+	Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertions, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    Collection<TestRunItem> executeAssertion(Assertion assertion, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+	Collection<TestRunItem> executeAssertion(Assertion assertion, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
-    Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
-
-    //Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+	Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
 
 	TestRunItem executeTest(Assertion assertion, Test test, Long executionId,
 			String prospectiveReleaseVersion, String previousReleaseVersion);

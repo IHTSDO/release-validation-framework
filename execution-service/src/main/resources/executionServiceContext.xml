@@ -13,31 +13,55 @@
 	<context:annotation-config/>
 	<tx:annotation-driven/>
 
-    <context:property-placeholder location="file://${rvfConfigLocation}/execution-service.properties" order="-1"
-                                  ignore-unresolvable="true" ignore-resource-not-found="true" />
-    <context:property-placeholder location="classpath*:execution-service.properties" />
+	<context:property-placeholder location="file://${rvfConfigLocation}/execution-service.properties" order="-1"
+								  ignore-unresolvable="true" ignore-resource-not-found="true" />
+	<context:property-placeholder location="classpath*:execution-service-defaults.properties" />
 
 
-    <!-- Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing-->
-    <bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="${rvf.snomed.jdbc.driverClassName}"/>
-        <property name="url" value="${rvf.snomed.jdbc.url}"/>
-        <property name="username" value="${rvf.snomed.jdbc.username}"/>
-        <property name="password" value="${rvf.snomed.jdbc.password}"/>
-        <property name="minEvictableIdleTimeMillis" value="1800000"/>
-        <property name="timeBetweenEvictionRunsMillis" value="1800000"/>
-        <property name="maxActive" value="-1"/>
-        <property name="testOnBorrow" value="true"/>
-        <property name="testOnReturn" value="true"/>
-        <property name="testWhileIdle" value="true"/>
-        <property name="validationQuery" value="SELECT 1"/>
-        <property name="numTestsPerEvictionRun" value="3"/>
-    </bean>
+	<!-- Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing-->
+	<bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${rvf.snomed.jdbc.driverClassName}"/>
+		<property name="url" value="${rvf.snomed.jdbc.url}"/>
+		<property name="username" value="${rvf.snomed.jdbc.username}"/>
+		<property name="password" value="${rvf.snomed.jdbc.password}"/>
+		<property name="minEvictableIdleTimeMillis" value="1800000"/>
+		<property name="timeBetweenEvictionRunsMillis" value="1800000"/>
+		<property name="maxActive" value="-1"/>
+		<property name="testOnBorrow" value="true"/>
+		<property name="testOnReturn" value="true"/>
+		<property name="testWhileIdle" value="true"/>
+		<property name="validationQuery" value="SELECT 1"/>
+		<property name="numTestsPerEvictionRun" value="3"/>
+	</bean>
+	
+	<bean factory-bean="s3ClientFactory" factory-method="getClient">
+		<constructor-arg value="${offlineMode}" />
+	</bean>
+
+	<bean class="org.ihtsdo.otf.dao.s3.S3ClientFactory" name="s3ClientFactory">
+		<property name="onlineImplementation">
+			<bean class="org.ihtsdo.otf.dao.s3.S3ClientImpl">
+				<constructor-arg>
+					<bean class="com.amazonaws.auth.BasicAWSCredentials">
+						<constructor-arg value="${aws.key}" />
+						<constructor-arg value="${aws.privateKey}" />
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property>
+		<property name="offlineImplementation">
+			<bean class="org.ihtsdo.otf.dao.s3.OfflineS3ClientImpl">
+				<constructor-arg value="${s3.offline.directory}"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean class="org.ihtsdo.otf.dao.s3.helper.S3ClientHelper"/>
 
 	<!-- service beans will go here -->
-    <bean id="rvfDynamicDataSource" class="org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource">
-        <property name="url" value="${rvf.snomed.jdbc.url}"/>
-    </bean>
+	<bean id="rvfDynamicDataSource" class="org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource">
+		<property name="url" value="${rvf.snomed.jdbc.url}"/>
+	</bean>
 	<bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl">
 		<property name="qaResulTableName" value="${rvf.qa.result.table.name}"/>
 		<property name="assertionDetailsColumnName" value="${rvf.assertion.details.column.name}"/>
@@ -52,7 +76,15 @@
 		<property name="snomedDataSource" ref="snomedDataSource"/>
 		<property name="sctDataLocation" value="${rvf.data.folder.location}"/>
 	</bean>
+	
+	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner" scope="prototype">
+		<constructor-arg name="bucketName" ref="bucketName"/>
+	</bean>
+	
+	<bean class="java.lang.String" id="bucketName">
+		<constructor-arg value="${bucketName}" />
+	</bean>
 
-    <import resource="applicationContext.xml"/>
+	<import resource="applicationContext.xml"/>
 
 </beans>

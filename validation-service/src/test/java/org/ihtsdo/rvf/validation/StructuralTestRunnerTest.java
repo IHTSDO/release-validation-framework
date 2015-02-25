@@ -20,10 +20,10 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/validationContext.xml"})
-public class ValidationTestRunnerTest {
+public class StructuralTestRunnerTest {
 
 	@Autowired
-	private ValidationTestRunner validationRunner;
+	private StructuralTestRunner validationRunner;
 
 	@Test
 	public void testExecute_DataInResponse() throws Exception {
@@ -100,7 +100,7 @@ public class ValidationTestRunnerTest {
 	}
 
 	private File getFile(String testFileName) throws URISyntaxException {
-		URL zipUrl = ValidationTestRunner.class.getResource(testFileName);
+		URL zipUrl = StructuralTestRunner.class.getResource(testFileName);
 		return new File(zipUrl.toURI());
 	}
 

@@ -24,7 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.util.ZipFileUtils;
+import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -347,9 +347,11 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			
 			if( zipFiles != null && zipFiles.length > 0) {
 				if (zipFiles.length > 1) {
-					logger.warn("More than one zip files having version:" + knownVersion);
+					logger.warn("Found more than one zip files having version:" + knownVersion);
 				}
 				return zipFiles[0];
+			} else {
+				logger.warn("Failed to find zip file for {} in directory {}", knownVersion, sctDataFolder);
 			}
 		}
 		return null;
@@ -359,6 +361,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	@Override
 	public boolean combineKnownVersions(final String combinedVersionName, final String ... knownVersions){
 		final long startTime = System.currentTimeMillis();
+		logger.info("Combining known versions into {}", combinedVersionName);
 		boolean isFailed = false;
 		//create db schema for the combined version
 		final String schemaName = RVF_DB_PREFIX + combinedVersionName;
@@ -371,11 +374,12 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		//select data from known version schema and insert into the new schema
 		for (final String known : knownVersions) {
 			final String knownSchema = releaseSchemaNameLookup.get(known);
-			
+			logger.info("Adding known version {} in schema {}", known, knownSchema);
 			for (final String tableName : RF2FileTableMapper.getAllTableNames()) {
 				final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
 				final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
 				final String sql = "insert into " + schemaName + "." + tableName  + " select * from " + knownSchema + "." + tableName;
+				logger.debug("Copying table {}", tableName);
 				try (Connection connection = snomedDataSource.getConnection();
 						Statement statement = connection.createStatement() ) {
 					statement.execute(disableIndex);
@@ -383,12 +387,12 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 					statement.execute(enableIndex);
 				} catch (final SQLException e) {
 					isFailed = true;
-					logger.error("Failed to insert data to table:" + tableName +" due to " + e.fillInStackTrace());
+					logger.error("Failed to insert data to table: " + tableName +" due to " + e.fillInStackTrace());
 				}
 			}
 		}
 		final long endTime = System.currentTimeMillis();
-		logger.info("Time taken to combine both known versions into one schema in seconds:" + (endTime-startTime)/1000);
+		logger.info("Time taken to combine both known versions into one schema in seconds: " + (endTime-startTime)/1000);
 		return !isFailed;
 		
 	}

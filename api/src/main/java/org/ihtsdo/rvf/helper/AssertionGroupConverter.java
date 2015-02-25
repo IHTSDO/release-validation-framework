@@ -16,19 +16,18 @@ import java.io.IOException;
 @Component
 public class AssertionGroupConverter implements Converter<String, AssertionGroup>{
 
-    @Autowired
-    EntityService entityService;
-    ObjectMapper mapper = new ObjectMapper();
+	@Autowired
+	EntityService entityService;
+	ObjectMapper mapper = new ObjectMapper();
 
-    @Override
-    public AssertionGroup convert(String s) {
-        System.out.println("s = " + s);
-        try {
-            return mapper.readValue(s, AssertionGroup.class);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("String version passed can not be null.");
-        }
-    }
+	@Override
+	public AssertionGroup convert(String s) {
+		try {
+			return mapper.readValue(s, AssertionGroup.class);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException("String version passed can not be null.");
+		}
+	}
 }

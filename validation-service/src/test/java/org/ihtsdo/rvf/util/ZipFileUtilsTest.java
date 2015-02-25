@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.util;
+package org.ihtsdo.rvf.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.Test;
 
 public class ZipFileUtilsTest {
