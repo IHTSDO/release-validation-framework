@@ -32,15 +32,15 @@ done
 
 if [ -z "${skipMode}" ]
 then
-	echo 'Building RVF API webapp (skipping tests)..'
+	echo 'Building RVF API webapp..'
 	sleep 1
-	mvn clean install -Dapple.awt.UIElement='true' -DskipTests=true
+	mvn clean install -Dapple.awt.UIElement='true' -DrvfConfigLocation=/tmp
 	echo
 fi
 
-echo "Starting RVF API webapp on port ${apiPort}."
-echo
 configLocation="$(pwd)/config"
+echo "Starting RVF API webapp on port ${apiPort} with config directory ${configLocation}"
+echo
 java -Xmx4g ${debugFlags} -DENV_NAME=$(whoami) -jar api/target/validation-api.jar -DrvfConfigLocation=${configLocation} -httpPort=${apiPort}
 
 

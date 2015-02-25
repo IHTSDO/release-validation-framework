@@ -17,9 +17,9 @@
 		<hibernate.version>3.6.10.Final</hibernate.version>
 		<hsql.version>5.3.0</hsql.version>
 		<skip.integration.tests>true</skip.integration.tests>
-        <mysql.connector.java.version>5.1.20</mysql.connector.java.version>
-        <dbcp.version>1.4</dbcp.version>
-    </properties>
+		<mysql.connector.java.version>5.1.20</mysql.connector.java.version>
+		<dbcp.version>1.4</dbcp.version>
+	</properties>
 
 	<modules>
 		<module>model</module>
@@ -28,8 +28,8 @@
 		<module>api</module>
 		<module>web</module>
 		<module>execution-service</module>
-        <module>importer</module>
-    </modules>
+		<module>importer</module>
+	</modules>
 
 
 	<scm>
@@ -73,6 +73,32 @@
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo.otf.common</groupId>
+			<artifactId>otf-common</artifactId>
+			<version>0.0.5</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-beans</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
 		</dependency>
 	</dependencies>
 
@@ -172,12 +198,12 @@
 			<name>IHTSDO Public Nexus Releases</name>
 			<url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
 		</repository>
-        <repository>
-            <id>ihtsdo-public-nexus-snapshot</id>
-            <name>IHTSDO Public Nexus Snapshots</name>
-            <url>https://maven.ihtsdotools.org/content/repositories/snapshots/</url>
-        </repository>
-    </repositories>
+		<repository>
+			<id>ihtsdo-public-nexus-snapshot</id>
+			<name>IHTSDO Public Nexus Snapshots</name>
+			<url>https://maven.ihtsdotools.org/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
 
 	<distributionManagement>
 		<repository>
