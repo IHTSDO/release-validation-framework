@@ -94,11 +94,12 @@ public class ZipFileUtils {
 	public static void copyUploadToDisk(final MultipartFile file, final File tempFile) throws IOException {
 		LOGGER.debug ("Start copy of {} to {}", file.getOriginalFilename(), tempFile.getName());
 		//Would it be quicker to do this as a move ie using TransferTo ?
-		try (FileOutputStream out = new FileOutputStream(tempFile)) {
+		/*try (FileOutputStream out = new FileOutputStream(tempFile)) {
 			try (InputStream inputStream = file.getInputStream()){
 				IOUtils.copy(inputStream, out);
 			}
-		}
+		}*/
+		file.transferTo(tempFile);
 		LOGGER.debug ("Finished copy of {} to {}", file.getOriginalFilename(), tempFile.getName());	
 	}
 

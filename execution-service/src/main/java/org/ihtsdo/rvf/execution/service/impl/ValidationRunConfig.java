@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
+import java.io.File;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -7,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ValidationRunConfig {
 	
 	private MultipartFile file;
+	
+	private File prospectiveFile;
 	
 	private boolean writeSucceses;
 	
@@ -95,5 +98,11 @@ public class ValidationRunConfig {
 	public ValidationRunConfig addUrl(String url) {
 		this.url = url;
 		return this;
+	}
+	public File getProspectiveFile() {
+		return prospectiveFile;
+	}
+	public void setProspectiveFile(File prospectiveFile) {
+		this.prospectiveFile = prospectiveFile;
 	}
 }

@@ -93,6 +93,7 @@ public class ValidationRunner implements Runnable{
 			e.printStackTrace(new PrintWriter(errors));
 			String failureMsg = "System Failure: " + e.getMessage() + " : " + errors.toString();
 			responseMap.put(FAILURE_MESSAGE, failureMsg);
+			logger.error("Exception thrown, writing as result",e);
 			try {
 				writeResults(responseMap, State.FAILED);
 			} catch (Exception e2) {
@@ -110,19 +111,7 @@ public class ValidationRunner implements Runnable{
 		// load the filename
 		logger.info("Loading file: {}", config.getFile().getOriginalFilename());
 
-		final String filename = config.getFile().getOriginalFilename();
-		final File tempFile = File.createTempFile(filename, ".zip");
-		tempFile.deleteOnExit();
-		if (!filename.endsWith(".zip")) {
-			responseMap.put("type", "pre");
-			responseMap.put("assertionsFailed", -1L);
-			responseMap.put(FAILURE_MESSAGE, "Post condition test package has to be zipped up");
-			writeResults(responseMap, State.FAILED);
-			return;
-		}
-		// must be a zip
-		ZipFileUtils.copyUploadToDisk(config.getFile(), tempFile);
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, tempFile, config.getRunId(), config.getManifestFile(), config.isWriteSucceses(), config.getUrl());
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, config.getProspectiveFile(), config.getRunId(), config.getManifestFile(), config.isWriteSucceses(), config.getUrl());
 		if (isFailed) {
 			writeResults(responseMap, State.FAILED);
 			return;
@@ -166,7 +155,7 @@ public class ValidationRunner implements Runnable{
 					}
 				}
 			} 
-			uploadProspectiveVersion(prospectiveVersion, config.getExtensionBaseLine(), tempFile);
+			uploadProspectiveVersion(prospectiveVersion, config.getExtensionBaseLine(), config.getProspectiveFile());
 			runAssertionTests(prospectiveVersion, prevReleaseVersion,config.getRunId(),config.getGroupsList(),responseMap);
 			final long timeTaken = (Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000;
 			logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", config.getRunId(), timeTaken));
@@ -180,12 +169,32 @@ public class ValidationRunner implements Runnable{
 		setConfig(config);
 		//Setting this before we actually start running to ensure we have access to storageLocation
 		try {
-			writeState(State.READY);
-			initialized = true;
+			if (saveUploadedFiles(config, responseMap)) {
+				writeState(State.READY);
+				initialized = true;
+			}
 		} catch (Exception e) {
 			responseMap.put(FAILURE_MESSAGE, "Failed to write Ready State to Storage Location due to " + e.getMessage());
 		}
 		return initialized;
+	}
+	
+	/*
+	 * The issue here is that spring cleans up Multipart files when Dispatcher is complete, so 
+	 * we need to save off the file before we allow the parent thread to finish.
+	 */
+	private boolean saveUploadedFiles(ValidationRunConfig config, Map<String, String> responseMap) throws IOException {
+		final String filename = config.getFile().getOriginalFilename();
+		final File tempFile = File.createTempFile(filename, ".zip");
+		tempFile.deleteOnExit();
+		if (!filename.endsWith(".zip")) {
+			responseMap.put(FAILURE_MESSAGE, "Post condition test package has to be zipped up");
+			return false;
+		}
+		// must be a zip, save it off
+		ZipFileUtils.copyUploadToDisk(config.getFile(), tempFile);	
+		config.setProspectiveFile(tempFile);
+		return true;
 	}
 	
 	private void writeResults (Map<String , Object> responseMap, State state) throws IOException, NoSuchAlgorithmException, JSONException, DecoderException {
@@ -301,7 +310,7 @@ public class ValidationRunner implements Runnable{
 						prospectiveVersion, tempFile.getName(), preLoadedZipFile.getName());
 				releaseDataManager.loadSnomedData(prospectiveVersion, tempFile, preLoadedZipFile);
 			} else {
-				throw new ConfigurationException ("Can't find the cached release zip file for known version:" + versionDate);
+				throw new ConfigurationException ("Can't find the cached release zip file for known version: " + versionDate);
 			}
 		} else {
 			logger.info("Start loading release version {} with release file {}", prospectiveVersion, tempFile.getName());
