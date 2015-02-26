@@ -21,6 +21,7 @@ import javax.naming.ConfigurationException;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.ihtsdo.otf.dao.s3.S3Client;
 import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.rvf.entity.Assertion;
@@ -390,9 +391,10 @@ public class ValidationRunner implements Runnable{
 		InputStream is = s3Helper.getFileStream(resultsFilePath);
 		String jsonResults = "Failed to recover results in " + resultsFilePath;
 		if (is == null) {
-			logger.warn("Failed to find state file {}, in bucket {}", stateFilePath, bucketName);
+			logger.warn("Failed to find results file {}, in bucket {}", stateFilePath, bucketName);
 		} else {
-			jsonResults = IOUtils.toString(is, "UTF-8");
+			String jsonResultsEscaped = IOUtils.toString(is, "UTF-8");
+			jsonResults = StringEscapeUtils.unescapeJava(jsonResultsEscaped);
 		}
 		responseMap.put("RVFResult", jsonResults);
 	}
