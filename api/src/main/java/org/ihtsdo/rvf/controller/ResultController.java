@@ -23,7 +23,7 @@ public class ResultController {
 
 	@RequestMapping(value = "{runId}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Map<String, String>> getResult(@PathVariable Long runId, 
+	public ResponseEntity<Map<String, Object>> getResult(@PathVariable Long runId, 
 			@RequestParam(value = "storageLocation") String storageLocation) throws IOException {
 		ValidationRunner validationRunner = validationRunnerProvider.get();
 		ValidationRunConfig config = new ValidationRunConfig();
@@ -31,7 +31,8 @@ public class ResultController {
 		validationRunner.setConfig(config);
 		//Can we find an rvf status file at that location?  Return 404 if not.
 		ValidationRunner.State state = validationRunner.getCurrentState();
-		Map <String, String> responseMap = new HashMap<String, String>();
+		Map <String, Object> responseMap = new HashMap<String, Object>();
+		responseMap.put("Status", state.toString());
 		HttpStatus returnStatus = HttpStatus.NON_AUTHORITATIVE_INFORMATION; 
 		if (state == null) {
 			returnStatus = HttpStatus.NOT_FOUND;
