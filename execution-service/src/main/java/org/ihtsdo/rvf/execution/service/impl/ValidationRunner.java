@@ -387,14 +387,15 @@ public class ValidationRunner implements Runnable{
 		return currentState;
 	}
 
-	public void recoverResult(Map<String, String> responseMap) throws IOException {
+	public void recoverResult(Map<String, Object> responseMap) throws IOException {
 		InputStream is = s3Helper.getFileStream(resultsFilePath);
-		String jsonResults = "Failed to recover results in " + resultsFilePath;
+		Object jsonResults = new String ("Failed to recover results in " + resultsFilePath);
 		if (is == null) {
 			logger.warn("Failed to find results file {}, in bucket {}", stateFilePath, bucketName);
 		} else {
 			String jsonResultsEscaped = IOUtils.toString(is, "UTF-8");
 			jsonResults = StringEscapeUtils.unescapeJava(jsonResultsEscaped);
+			// jsonResults = new JSONObject(jsonResultsEscaped);
 		}
 		responseMap.put("RVFResult", jsonResults);
 	}
