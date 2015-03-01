@@ -29,6 +29,7 @@ import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.helper.JSONMap;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
@@ -394,8 +395,9 @@ public class ValidationRunner implements Runnable{
 			logger.warn("Failed to find results file {}, in bucket {}", stateFilePath, bucketName);
 		} else {
 			String jsonResultsEscaped = IOUtils.toString(is, "UTF-8");
-			jsonResults = StringEscapeUtils.unescapeJava(jsonResultsEscaped);
-			// jsonResults = new JSONObject(jsonResultsEscaped);
+			// jsonResults = StringEscapeUtils.unescapeJava(jsonResultsEscaped);
+			 JSONObject json = new JSONObject(jsonResultsEscaped);
+			 jsonResults = new JSONMap(json);
 		}
 		responseMap.put("RVFResult", jsonResults);
 	}
