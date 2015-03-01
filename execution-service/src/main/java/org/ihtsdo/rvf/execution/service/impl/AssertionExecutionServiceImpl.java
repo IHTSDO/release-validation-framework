@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
+import javax.naming.ConfigurationException;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.entity.Assertion;
@@ -161,8 +162,13 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 					extractTestResult(test, executionId, runItem);
 				}
 				catch (final SQLException e) {
-					logger.warn("Nested exception is : " + e.fillInStackTrace());
-					runItem.setFailureMessage("Error executing SQL passed as command object. Nested exception : " + e.fillInStackTrace());
+					logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command);
+					runItem.setFailureMessage("Error executing SQL command object. Nested exception : " + e.fillInStackTrace());
+				}
+				catch (ConfigurationException e) {
+					logger.warn("Failed to configure command {}, Nested exception is : " + e.fillInStackTrace(), command);
+					runItem.setFailureMessage("Error configuring SQL command object. Nested exception : " + e.fillInStackTrace());
+					
 				}
 			}
 			else {
@@ -201,7 +207,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			final String previousReleaseVersion,
 			final ExecutionCommand command,
 			final Configuration testConfiguration, final Connection connection)
-			throws SQLException {
+			throws SQLException, ConfigurationException {
 		String[] parts = {""};
 		if (command.getStatements().size() == 0)
 		{
@@ -268,11 +274,20 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		}
 	}
 
-	private List<String> transformSql(final String[] parts, final Long executionId, final Test test, final String prospectiveRelease, final String previousRelease) {
+	private List<String> transformSql(final String[] parts, final Long executionId, final Test test, final String prospectiveRelease, final String previousRelease) throws ConfigurationException {
 		final List<String> result = new ArrayList<>();
 		final String defaultCatalog = dataSource.getDefaultCatalog();
 		final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveRelease);
 		final String previousReleaseSchema = releaseDataManager.getSchemaForRelease(previousRelease);
+		
+		//We need both these schemas to exist
+		if (prospectiveSchema == null) {
+			throw new ConfigurationException ("Failed to determine a prospective schema for release " + prospectiveRelease);
+		}
+		
+		if (previousReleaseSchema == null) {
+			throw new ConfigurationException ("Failed to determine a schema for previous release " + previousRelease);
+		}
 		for( String part : parts) {
 			logger.debug("Original sql statement: {}", part);
 			// remove all SQL comments - //TODO might throw errors for -- style comments

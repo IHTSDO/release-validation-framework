@@ -18,3 +18,5 @@ api-demo/report.csv
 api-demo/tmp
 
 /bin
+
+config_local

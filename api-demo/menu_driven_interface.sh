@@ -11,10 +11,12 @@ fileToTest="rel2_Refset_SimpleDelta_INT_20140131.txt"
 
 # Target API Deployment
 #TODO - allow the user to change the API at runtime
-#api="http://localhost:8080/api/v1"
+api="http://localhost:8080/api/v1"
 #api="http://localhost:8081/api/v1"
-api="https://dev-rvf.ihtsdotools.org/api/v1"
+#api="https://dev-rvf.ihtsdotools.org/api/v1"
 #api="https://uat-rvf.ihtsdotools.org/api/v1"
+
+mkdir -p tmp
 
 #TODO make this function miss out the data if jsonFile is not specified.
 function callURL() {
@@ -104,6 +106,10 @@ function doTest() {
 		then
 			echo "${releaseFile} not found. "
 			return
+		elif [ -d $releaseFile ] 
+		then
+			echo "Can't pass a whole directory!"
+			return
 		elif [ -z $releaseFile ] 
 		then
 			echo "Passing empty file parameter - set purge to false!"
@@ -120,10 +126,8 @@ function doTest() {
 		fi
 	fi
 
-#	prospectiveReleaseVersion=`getReleaseDate ${releaseFile}`
 	datestamp=`date +%Y%m%d%H%M%S`
 
-	
 	if [ ${testType} == "structural" ] 
 	then
 		curl -i -X POST "$api/test-post" -F manifest=@${manifestFile} ${fileParam}
@@ -153,12 +157,14 @@ function doTest() {
 		-F "previousIntReleaseVersion=${prevReleaseVersion}" \
 		-F "extensionBaseLineReleaseVersion=${baselineReleaseVersion}" \
 		-F "previousExtensionReleaseVersion=${previousExtensionVersion}" \
-		-F "groups=${assertionGroup}" \
+		-F "groups=${assertionGroups}" \
 		-F "runId=${datestamp}" \
+		-F "storageLocation=RVFMisc/${datestamp}" \
 		-o tmp/uploadprogress.txt
-		
+
 		echo "Server call complete.  Server returned:  "
 		cat tmp/uploadprogress.txt
+		echo
 	else
 		echo "Test type ${testType} not recognised"
 	fi
