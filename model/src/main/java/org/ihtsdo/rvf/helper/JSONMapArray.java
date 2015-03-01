@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class JSONMapArray implements Set<Object> {
 	
@@ -107,6 +108,15 @@ public class JSONMapArray implements Set<Object> {
 		public Object next() {
 			Object retVal = jsonArray.get(currentPointer);
 			currentPointer++;
+			
+			if (retVal instanceof JSONObject) {
+				retVal = new JSONMap((JSONObject)retVal);
+			} else if (retVal instanceof JSONArray) {
+				retVal = new JSONMapArray((JSONArray)retVal);
+			}	else {
+				// return object as is.
+			}
+			
 			return retVal;
 		}
 
