@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,7 +51,9 @@ public class JSONMap implements Map<String, Object> {
 		Object obj = jsonObject.get(key.toString());
 		if (obj instanceof JSONObject) {
 			return new JSONMap((JSONObject)obj);
-		} else {
+		} else if (obj instanceof JSONArray) {
+			return new JSONMapArray((JSONArray)obj);
+		}	else {
 			return obj;
 		}
 	}
@@ -86,7 +90,6 @@ public class JSONMap implements Map<String, Object> {
 	@Override
 	public Set<String> keySet() {
 		return jsonObject.keySet();
-
 	}
 
 	@Override
@@ -97,10 +100,10 @@ public class JSONMap implements Map<String, Object> {
 
 	@Override
 	public Set<java.util.Map.Entry<String, Object>> entrySet() {
-		Set<java.util.Map.Entry<String, Object>> entrySet = new HashSet();
+		Set<java.util.Map.Entry<String, Object>> entrySet = new HashSet<Entry<String, Object>>();
 		for (String key : keySet()) {
 			java.util.Map.Entry<String, Object> thisEntry =
-			new AbstractMap.SimpleEntry<String, Object>(key, jsonObject.get(key));
+			new AbstractMap.SimpleEntry<String, Object>(key, get(key));
 			entrySet.add(thisEntry);
 		}
 		return entrySet;
