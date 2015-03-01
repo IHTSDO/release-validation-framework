@@ -21,6 +21,9 @@ public class JSONMapTest {
 		testArray.put ("first");
 		testArray.put("second");
 		testArray.put("third");
+		JSONObject subElement = new JSONObject();
+		subElement.put("SubHello", "SubWorld");
+		testArray.put(subElement);
 		testJSONObject.put("myArray", testArray);
 	}
 
