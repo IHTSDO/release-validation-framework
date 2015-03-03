@@ -393,7 +393,9 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		final long endTime = System.currentTimeMillis();
 		logger.info("Time taken to combine both known versions into one schema in seconds: " + (endTime-startTime)/1000);
+		if (!isFailed) {
+			releaseSchemaNameLookup.put(combinedVersionName, schemaName);
+		}
 		return !isFailed;
-		
 	}
 }
