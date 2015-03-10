@@ -130,6 +130,6 @@
 	and b.active = '1'
 	and c.active = '1'
 	and b.typeid = '900000000000003001'
-	GROUP BY a.referencedcomponentid
+	GROUP BY c.id
 	having count(distinct(a.refsetid)) < (select count(distinct(refsetid)) from curr_langrefset_s);
 	

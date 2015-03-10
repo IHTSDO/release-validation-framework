@@ -18,9 +18,9 @@
   insert into v_curr_view
 		select *
 		from curr_relationship_f
-		where cast(effectivetime as datetime) <
+		where cast(effectivetime as datetime) <=
 			(select max(cast(effectivetime as datetime)) 
-			 from curr_stated_relationship_f);
+			 from prev_stated_relationship_f);
 
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select

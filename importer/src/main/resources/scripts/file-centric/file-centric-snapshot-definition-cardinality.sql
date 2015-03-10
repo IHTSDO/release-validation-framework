@@ -3,7 +3,7 @@
 	file-centric-snapshot-concept-unique-id
 
 	Assertion:
-	There are zero active definitions or there is one active definition per concept in the DEFINITION snapshot.
+	There is at most one active definition per concept per dialect per language in the DEFINITION snapshot.
 
 ********************************************************************************/
 	
@@ -13,7 +13,7 @@
 	select a.conceptid
 	from curr_textdefinition_s a	
 	where a.active = 1
-	group by a.conceptid
+	group by a.conceptid,a.languagecode
 	having  count(a.conceptid) > 1;
 	
 
@@ -24,7 +24,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',a.conceptid, ':More than one active definition per concept in the DEFINITION snapshot.') 	
+		concat('CONCEPT: id=',a.conceptid, ':More than one active definition per concept per language in the DEFINITION snapshot.') 	
 	from v_curr_snapshot a;
 
 
