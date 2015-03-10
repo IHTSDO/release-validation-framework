@@ -10,7 +10,7 @@
 /* 	view of current snapshot made by finding active FSN's and semantic tags */
 	drop table if exists v_curr_snapshot_1;
 	create table if not exists v_curr_snapshot_1 (INDEX(conceptid)) as
-	select  a.conceptid , a.id , SUBSTRING(term,LOCATE('(',term)) as tag , a.term 
+	select  a.conceptid , a.id , SUBSTRING(term,LOCATE('(',term)) as tag , a.term, a.languagecode 
 	from curr_description_s a 
 	where a.typeid ='900000000000003001'
 	and a.active = 1
@@ -22,6 +22,7 @@
 	from curr_description_s a , v_curr_snapshot_1 b
 	where a.typeid in ('900000000000003001')
 	and a.conceptid = b.conceptid
+	and a.languagecode = b.languagecode 
 	and b.tag !=  SUBSTRING(a.term, LOCATE('(', a.term))
 	and a.active = 1;
 

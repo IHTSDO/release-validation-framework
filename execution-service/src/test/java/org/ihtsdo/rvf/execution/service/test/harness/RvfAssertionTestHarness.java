@@ -2,12 +2,15 @@ package org.ihtsdo.rvf.execution.service.test.harness;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.ihtsdo.rvf.dao.AssertionDao;
+import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
@@ -48,25 +51,27 @@ public class RvfAssertionTestHarness {
 	        assertNotNull(entityService);
 	        assertNotNull(releaseDataManager);
 	        // register releases with release manager, since they will be used during SQL replacement
-	        releaseDataManager.setSchemaForRelease("20140731", "rvf_int_20140731");
-	        releaseDataManager.setSchemaForRelease("20150131", "rvf_int_20150131");
+	        releaseDataManager.setSchemaForRelease("spanishedition_20140430", "rvf_int_spanishedition_20140430");
+	        releaseDataManager.setSchemaForRelease("spanishedition_20141031", "rvf_int_spanishedition_20141031");
 
 	    }
 	    
 	    @Test
-	    public void testAssertion() {
+	    public void testAssertions() {
 	    	//Assertion 111 and assertion test 107
 	    	//36L
 	    	//150L
-	    	final Collection<AssertionTest> tests = assertionDao.getAssertionTests(3L);
-	    	
-	    	for(final AssertionTest test : tests) {
-	    		System.out.println(test);
+	    	final Collection<Assertion> assertions = assertionDao.getAssertionsForGroup(3L);
+	    	final List<AssertionTest> tests = new ArrayList<>();
+	    	for(final Assertion assertion : assertions) {
+	    		tests.addAll(assertionDao.getAssertionTests(assertion));
 	    	}
-
-	        final Long runId =15012015112L;
+	    	//15012015112L;
+	    	//1425919799121L
+	        final Long runId =201503101114L;
+	        System.out.println("RunID:" + runId);
 			// set both prospective and previous release
-	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, "20150131", "20140731");
+	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, "spanishedition_20141031", "spanishedition_20140430");
 	        for (final TestRunItem item : runItems) {
 	        	 System.out.println("runItem = " + item);
 	 	        System.out.println("runItem.isFailure() = " + item.isFailure());

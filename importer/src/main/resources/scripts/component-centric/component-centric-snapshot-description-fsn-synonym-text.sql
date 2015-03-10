@@ -42,14 +42,6 @@
 	on a.conceptid = b.conceptid
 	and a.termwithouttag = b.term;
 
-	select a.* 
-	from tmp_fsn a
-	left join tmp_termsmatch b
-	on a.conceptid = b.conceptid
-	and a.termwithouttag = b.termwithouttag
-	where b.conceptid is null
-	and b.termwithouttag is null;
-
 /* 	inserting exceptions in the result table */
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 

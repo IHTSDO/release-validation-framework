@@ -39,7 +39,8 @@
 	from curr_concept_s a
 	left join v_ctv3 b 
 		on a.id = b.referencedcomponentid 
-	where b.referencedcomponentid is null;
+	where b.referencedcomponentid is null
+	and a.definitionstatusid != '900000000000074008';
 
 	drop table if exists v_act_ctv3;
 

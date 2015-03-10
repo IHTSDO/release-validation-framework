@@ -30,7 +30,7 @@
 */
 	drop table if exists v_curr_snapshot_1;
 	create table if not exists v_curr_snapshot_1 as
-	select SUBSTRING_INDEX(term, ' ', 1) as firstword , a.conceptid , a.id , a.term , a.casesignificanceid
+	select SUBSTRING_INDEX(term, ' ', 1) as firstword , a.conceptid , a.id , a.term , a.casesignificanceid, a.effectivetime
 	from  curr_description_s a , v_tmp_active_con b
 	where a.casesignificanceid = 900000000000017005
 	and a.active = 1
@@ -39,13 +39,14 @@
 	
 	drop table if exists v_curr_snapshot_2;
 	create table if not exists v_curr_snapshot_2 (INDEX(conceptid)) as
-	select a.conceptid , a.term ,  a.casesignificanceid 
+	select distinct (a.conceptid)
 	from v_curr_snapshot_1 a , curr_description_s b , v_tmp_active_con c
 	where b.casesignificanceid = 900000000000020002
 	and b.active = 1
 	and c.active = 1
 	and b.conceptid = c.id
 	and a.conceptid = b.conceptid
+	and cast(b.effectivetime as datetime) >= cast(a.effectivetime as datetime) 
 	and BINARY SUBSTRING_INDEX(b.term, ' ', 1) = firstword;	
 	
 /* 	inserting exceptions in the result table */
@@ -54,7 +55,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESC: conceptid=',a.conceptid, ':Terms not sharing case-sensitivity.') 	
+		concat('DESC: conceptid=',a.conceptid, ':has terms not sharing case-sensitivity.') 	
 	from v_curr_snapshot_2 a;
 
 

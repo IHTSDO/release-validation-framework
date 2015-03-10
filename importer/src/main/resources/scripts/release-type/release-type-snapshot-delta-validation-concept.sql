@@ -25,9 +25,9 @@
   insert into ss
 	select *
 	from curr_concept_s
-	where cast(effectivetime as datetime)= 
-		(select max(cast(effectivetime as datetime))
-		 from curr_concept_s);
+	where cast(effectivetime as datetime) >= 
+		(select min(cast(effectivetime as datetime))
+		 from curr_concept_d);
 
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
