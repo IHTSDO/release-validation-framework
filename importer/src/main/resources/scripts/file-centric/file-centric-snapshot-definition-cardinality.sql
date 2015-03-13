@@ -1,9 +1,8 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-concept-unique-id
-
+	file-centric-snapshot-definition-cardinality.sql
 	Assertion:
-	There is at most one active definition per concept per dialect per language in the DEFINITION snapshot.
+	There is at most one active definition per concept per language per dialect in the DEFINITION snapshot.
 
 ********************************************************************************/
 	
@@ -13,7 +12,7 @@
 	select a.conceptid
 	from curr_textdefinition_s a	
 	where a.active = 1
-	group by a.conceptid,a.languagecode
+	group by a.conceptid,a.languagecode,binary a.term
 	having  count(a.conceptid) > 1;
 	
 
@@ -24,7 +23,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',a.conceptid, ':More than one active definition per concept per language in the DEFINITION snapshot.') 	
+		concat('CONCEPT: id=',a.conceptid, ':More than one active definition per concept per dialect in the DEFINITION snapshot.') 	
 	from v_curr_snapshot a;
 
 
