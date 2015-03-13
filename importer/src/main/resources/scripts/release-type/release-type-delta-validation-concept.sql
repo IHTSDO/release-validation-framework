@@ -9,7 +9,9 @@
   insert into v_temp_view
 	select a.*
 	from curr_concept_f a
-	where a.effectivetime = '<CURRENT-RELEASE-DATE>';
+	where cast(effectivetime as datetime) >=
+			(select min(cast(effectivetime as datetime)) 
+			 from curr_concept_d);
 	
 	
 /* in the delta; not in the full */

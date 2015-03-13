@@ -19,9 +19,9 @@
   insert into snapshot
 	select *
 	from curr_relationship_s
-	where cast(effectivetime as datetime)= 
-	(select max(cast(effectivetime as datetime))
-	 from curr_relationship_s);
+	where cast(effectivetime as datetime) >= 
+	(select min(cast(effectivetime as datetime))
+	 from curr_relationship_d);
 
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 

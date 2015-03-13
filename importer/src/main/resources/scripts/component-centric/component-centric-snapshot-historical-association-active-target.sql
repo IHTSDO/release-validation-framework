@@ -21,7 +21,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('MEMBER: id=',a.id, ': Active Historical refset member is active, but maps to Target Component that is inactive concept.') 	
+		concat('id=',a.id, ': is an active association refset member but the target component is an inactive concept: ', b.id) 	
 	
 	from curr_associationrefset_s a
 	inner join curr_concept_s b on a.targetcomponentid = b.id

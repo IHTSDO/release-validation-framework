@@ -123,6 +123,12 @@ function doTest() {
 		then
 			echo "${manifestFile} not found."
 			return
+		elif [ -z $manifestFile ] 
+		then
+			echo "Passing empty manifestFile file parameter!"
+			manifestFileParam=""
+		else
+			manifestFileParam="-F file=@${manifestFile}" 
 		fi
 	fi
 
@@ -153,7 +159,7 @@ function doTest() {
 		curl --retry 0 -i -X POST "$api/run-post" \
 		--progress-bar \
 		${fileParam} \
-		-F manifest=@${manifestFile} \
+		${manifestFileParam} \
 		-F "previousIntReleaseVersion=${prevReleaseVersion}" \
 		-F "extensionBaseLineReleaseVersion=${baselineReleaseVersion}" \
 		-F "previousExtensionReleaseVersion=${previousExtensionVersion}" \

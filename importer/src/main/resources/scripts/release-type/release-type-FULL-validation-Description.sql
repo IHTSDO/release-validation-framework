@@ -23,9 +23,9 @@
   insert into v_curr_view
 		select *
 		from curr_description_f
-		where cast(effectivetime as datetime) <
+		where cast(effectivetime as datetime) <=
 			(select max(cast(effectivetime as datetime)) 
-			 from curr_description_f);
+			 from prev_description_f);
 
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select

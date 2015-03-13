@@ -14,7 +14,7 @@
 ********************************************************************************/
 	
 	
-	/* TEST: Concept has FSN that is defined 2+ times for a given refset 
+	/* TEST: Recently edited Concept has FSN that is defined 2+ times for a given refset*/
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
 		<RUNID>,
@@ -22,7 +22,7 @@
 		'<ASSERTIONTEXT>',
 		concat('CONCEPT: id=',c.id, ': Concept has FSN that is defined more than one time within a given refset.') 
 		
-	from curr_description_s a 
+	from curr_description_d a 
 	inner join curr_langrefset_s b on a.id = b.referencedcomponentid 
 	inner join curr_concept_s c on a.conceptid = c.id
 	where c.active = '1'
@@ -30,9 +30,8 @@
 	and a.active = '1'
 	and a.typeid = '900000000000003001'
 	GROUP BY b.referencedcomponentid, b.refsetid
-	having count(b.referencedcomponentid) > 1
-	and count(refsetid) > 1;
-	*/
+	having count(b.referencedcomponentid) > (select count(distinct(refsetid)) from curr_langrefset_s);
+	
 	
 /* for active concepts edited for the prospective release, active descriptions appear not more than once as active members of each language refset */ 
 	create table if not exists tmp_descsedited as
@@ -47,14 +46,14 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		b.id
+		concat('DESC: id=',b.id,': active description appears more than once within a given refset.')
 	from curr_langrefset_s a
 	join tmp_descsedited b
 	on a.referencedcomponentid = b.id
 	and a.active = 1
 	group by refsetid, referencedcomponentid
-	having count(refsetid) > 1 
-	and count(referencedcomponentid) > 1;
+	having count(referencedcomponentid) > (select count(distinct(refsetid)) from curr_langrefset_s);
+	
 
 	drop table if exists  tmp_descsedited;
 	
@@ -130,6 +129,6 @@
 	and b.active = '1'
 	and c.active = '1'
 	and b.typeid = '900000000000003001'
-	GROUP BY a.referencedcomponentid
+	GROUP BY c.id
 	having count(distinct(a.refsetid)) < (select count(distinct(refsetid)) from curr_langrefset_s);
 	

@@ -8,7 +8,9 @@
   insert into v_temp_view
 	select a.*
 	from curr_relationship_f a
-	where a.effectivetime = '<CURRENT-RELEASE-DATE>'; 
+	where cast(effectivetime as datetime) >=
+			(select min(cast(effectivetime as datetime)) 
+			 from curr_relationship_d);
 
 /* in the delta; not in the full */
 	insert into qa_result (runid, assertionuuid, assertiontext, details)

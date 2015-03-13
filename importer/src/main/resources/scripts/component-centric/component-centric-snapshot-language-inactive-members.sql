@@ -17,9 +17,10 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('MEMBER: id=',b.id, ': Refset member is active for an inactive description.') 
-	from curr_description_d a
-	inner join curr_langrefset_d b 
+	from curr_description_s a
+	inner join curr_langrefset_s b 
 		on a.id = b.referencedcomponentid
-	where a.active != b.active;
+	where b.active = '1'
+	and a.active ='0';
 
 	
