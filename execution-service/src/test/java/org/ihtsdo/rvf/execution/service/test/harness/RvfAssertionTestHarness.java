@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.execution.service.test.harness;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import javax.sql.DataSource;
 
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
@@ -30,7 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RvfAssertionTestHarness {
 	
-	 @Autowired
+	 private static final String PROSPECTIVE_RELEASE = "20141031";
+	private static final String PREVIOUS_RELEASE = "20140430";
+	@Autowired
 	    private AssertionExecutionService assertionExecutionService;
 	    @Resource(name = "dataSource")
 	    private DataSource dataSource;
@@ -51,8 +55,8 @@ public class RvfAssertionTestHarness {
 	        assertNotNull(entityService);
 	        assertNotNull(releaseDataManager);
 	        // register releases with release manager, since they will be used during SQL replacement
-	        releaseDataManager.setSchemaForRelease("spanishedition_20140430", "rvf_int_spanishedition_20140430");
-	        releaseDataManager.setSchemaForRelease("spanishedition_20141031", "rvf_int_spanishedition_20141031");
+	        releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_int_spanishedition_20140430");
+	        releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_int_spanishedition_20141031");
 
 	    }
 	    
@@ -61,17 +65,31 @@ public class RvfAssertionTestHarness {
 	    	//Assertion 111 and assertion test 107
 	    	//36L
 	    	//150L
-	    	final Collection<Assertion> assertions = assertionDao.getAssertionsForGroup(3L);
+	    	final List<String> groupNames = Arrays.asList("file-centric-validation", "release-type-validation", "component-centric-validation");
+	    	final List<AssertionGroup> groups = new ArrayList<>();
+	    	for (final String name : groupNames) {
+	    		groups.add(assertionDao.getAssertionGroupsByName(name));
+	    	}
+	    	final Collection<Assertion> assertions = new ArrayList<>();
+	    	for (final AssertionGroup group: groups) {
+	    		assertions.addAll(assertionDao.getAssertionsForGroup(group.getId()));
+	    	}
+	    	
 	    	final List<AssertionTest> tests = new ArrayList<>();
 	    	for(final Assertion assertion : assertions) {
 	    		tests.addAll(assertionDao.getAssertionTests(assertion));
 	    	}
 	    	//15012015112L;
 	    	//1425919799121L
-	        final Long runId =201503101114L;
+	    	//201503101114L;
+	    	//201503120846L
+	    	//201503120939L;
+	    	//201503121422L;
+	    	//201503122311L;
+	        final Long runId =201503130923L;
 	        System.out.println("RunID:" + runId);
 			// set both prospective and previous release
-	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, "spanishedition_20141031", "spanishedition_20140430");
+	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
 	        for (final TestRunItem item : runItems) {
 	        	 System.out.println("runItem = " + item);
 	 	        System.out.println("runItem.isFailure() = " + item.isFailure());

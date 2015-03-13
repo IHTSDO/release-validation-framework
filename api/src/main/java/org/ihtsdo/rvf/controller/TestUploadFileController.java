@@ -1,38 +1,28 @@
 package org.ihtsdo.rvf.controller;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.inject.Provider;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
-import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
-import org.ihtsdo.rvf.validation.TestReportable;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
+import org.ihtsdo.rvf.validation.TestReportable;
 import org.ihtsdo.rvf.validation.model.ManifestFile;
 import org.ihtsdo.rvf.validation.resource.ResourceManager;
 import org.ihtsdo.rvf.validation.resource.TextFileResourceProvider;
@@ -171,8 +161,8 @@ public class TestUploadFileController {
 		final String requestUrl = String.valueOf(request.getRequestURL());
 		final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
 
-		ValidationRunner validationRunner = validationRunnerProvider.get();
-		ValidationRunConfig vrConfig = new ValidationRunConfig();
+		final ValidationRunner validationRunner = validationRunnerProvider.get();
+		final ValidationRunConfig vrConfig = new ValidationRunConfig();
 		vrConfig.addFile(file)
 				.addWriteSucceses(writeSucceses)
 				.addGroupsList(groupsList)
@@ -185,14 +175,14 @@ public class TestUploadFileController {
 		
 		//Before we start running, ensure that we've made our mark in the storage location
 		//Init will fail if we can't write the "running" state to storage
-		Map <String, String> responseMap = new HashMap();
-		boolean initialisedOK = validationRunner.init(vrConfig, responseMap);
+		final Map <String, String> responseMap = new HashMap<>();
+		final boolean initialisedOK = validationRunner.init(vrConfig, responseMap);
 		
-		HttpStatus returnStatus = initialisedOK ? HttpStatus.OK : HttpStatus.PRECONDITION_FAILED;
+		final HttpStatus returnStatus = initialisedOK ? HttpStatus.OK : HttpStatus.PRECONDITION_FAILED;
 		if (initialisedOK) {
-			Thread asyncValidationProcess = new Thread(validationRunner);
+			final Thread asyncValidationProcess = new Thread(validationRunner);
 			asyncValidationProcess.start();
-			String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
+			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
 			responseMap.put("resultURL", urlToPoll);
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);

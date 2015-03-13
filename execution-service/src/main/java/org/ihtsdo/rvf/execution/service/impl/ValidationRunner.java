@@ -21,7 +21,6 @@ import javax.naming.ConfigurationException;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.ihtsdo.otf.dao.s3.S3Client;
 import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.rvf.entity.Assertion;
@@ -38,8 +37,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.google.common.io.Files;
@@ -81,7 +80,7 @@ public class ValidationRunner implements Runnable{
 	private String stateFilePath;
 	private String resultsFilePath;
 	
-	public ValidationRunner (String bucketName) {
+	public ValidationRunner (final String bucketName) {
 		this.bucketName = bucketName;
 	}
 
@@ -90,22 +89,22 @@ public class ValidationRunner implements Runnable{
 		final Map<String , Object> responseMap = new HashMap<>();
 		try {
 			runValidation(responseMap);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
+		} catch (final Exception e) {
+			final StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			String failureMsg = "System Failure: " + e.getMessage() + " : " + errors.toString();
+			final String failureMsg = "System Failure: " + e.getMessage() + " : " + errors.toString();
 			responseMap.put(FAILURE_MESSAGE, failureMsg);
 			logger.error("Exception thrown, writing as result",e);
 			try {
 				writeResults(responseMap, State.FAILED);
-			} catch (Exception e2) {
+			} catch (final Exception e2) {
 				//Can't even record the error to disk!  Lets hope Telemetry is working
 				logger.error("Failed to record failure (which was: " + failureMsg + ") due to " + e2.getMessage() );
 			}
 		}
 	}
 
-	private void runValidation (Map<String , Object> responseMap) throws Exception {
+	private void runValidation (final Map<String , Object> responseMap) throws Exception {
 		
 		final Calendar startTime = Calendar.getInstance();
 		logger.info(String.format("Started execution with runId [%1s] : ", config.getRunId()));
@@ -167,15 +166,28 @@ public class ValidationRunner implements Runnable{
 	}
 
 
-	public boolean init(ValidationRunConfig config, Map<String, String> responseMap) {
+	public boolean init(final ValidationRunConfig config, final Map<String, String> responseMap) {
 		setConfig(config);
+		//check assertion groups
+		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(config.getGroupsList());
+		if (groups.size() != config.getGroupsList().size()) {
+			final List<String> found = new ArrayList<>();
+			for (final AssertionGroup group : groups) {
+				found.add(group.getName());
+			}
+			final String groupNotFoundMsg = String.format("Assertion groups requested: %s but found in RVF: %s", config.getGroupsList(), found);
+			responseMap.put(FAILURE_MESSAGE, groupNotFoundMsg);
+			logger.warn("Invalid assertion groups requested." + groupNotFoundMsg);
+			return false;
+			
+		}
 		//Setting this before we actually start running to ensure we have access to storageLocation
 		try {
 			if (saveUploadedFiles(config, responseMap)) {
 				writeState(State.READY);
 				initialized = true;
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			responseMap.put(FAILURE_MESSAGE, "Failed to write Ready State to Storage Location due to " + e.getMessage());
 		}
 		return initialized;
@@ -185,7 +197,7 @@ public class ValidationRunner implements Runnable{
 	 * The issue here is that spring cleans up Multipart files when Dispatcher is complete, so 
 	 * we need to save off the file before we allow the parent thread to finish.
 	 */
-	private boolean saveUploadedFiles(ValidationRunConfig config, Map<String, String> responseMap) throws IOException {
+	private boolean saveUploadedFiles(final ValidationRunConfig config, final Map<String, String> responseMap) throws IOException {
 		final String filename = config.getFile().getOriginalFilename();
 		final File tempFile = File.createTempFile(filename, ".zip");
 		tempFile.deleteOnExit();
@@ -199,22 +211,22 @@ public class ValidationRunner implements Runnable{
 		return true;
 	}
 	
-	private void writeResults (Map<String , Object> responseMap, State state) throws IOException, NoSuchAlgorithmException, JSONException, DecoderException {
+	private void writeResults (final Map<String , Object> responseMap, final State state) throws IOException, NoSuchAlgorithmException, JSONException, DecoderException {
 
-		JSONObject json = new JSONObject(responseMap);
+		final JSONObject json = new JSONObject(responseMap);
 		writeToS3(json.toString(1),resultsFilePath);
 		writeState(state);
 	}
 	
-	private void writeState (State state) throws IOException, NoSuchAlgorithmException, DecoderException {
+	private void writeState (final State state) throws IOException, NoSuchAlgorithmException, DecoderException {
 		logger.info("RVF run {} setting state as {}", config.getRunId(), state.toString() );
 		writeToS3(state.name(), stateFilePath);
 	}
 	
-	private void writeToS3(String writeMe, String targetPath) throws IOException, NoSuchAlgorithmException, DecoderException{
+	private void writeToS3(final String writeMe, final String targetPath) throws IOException, NoSuchAlgorithmException, DecoderException{
 		//First write the data to a local temp file
-		File temp = File.createTempFile("tempfile", ".tmp"); 
-		BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+		final File temp = File.createTempFile("tempfile", ".tmp"); 
+		final BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
 		bw.write(writeMe);
 		bw.close();
 		
@@ -366,7 +378,7 @@ public class ValidationRunner implements Runnable{
 		return failedAssertionCount;
 	}
 
-	public void setConfig(ValidationRunConfig config) {
+	public void setConfig(final ValidationRunConfig config) {
 		this.config = config;
 		s3Helper = new FileHelper(bucketName, s3Client);
 		stateFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "state.txt";
@@ -376,27 +388,27 @@ public class ValidationRunner implements Runnable{
 	public State getCurrentState() {
 		State currentState = null;
 		try {
-			InputStream is = s3Helper.getFileStream(stateFilePath);
+			final InputStream is = s3Helper.getFileStream(stateFilePath);
 			if (is == null) {
 				logger.warn("Failed to find state file {}, in bucket {}", stateFilePath, bucketName);
 			}
-			String stateStr = IOUtils.toString(is, "UTF-8");
+			final String stateStr = IOUtils.toString(is, "UTF-8");
 			currentState = State.valueOf(stateStr);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			logger.warn("Failed to determine validation run state in file {} due to {}", stateFilePath, e.toString());
 		}
 		return currentState;
 	}
 
-	public void recoverResult(Map<String, Object> responseMap) throws IOException {
-		InputStream is = s3Helper.getFileStream(resultsFilePath);
+	public void recoverResult(final Map<String, Object> responseMap) throws IOException {
+		final InputStream is = s3Helper.getFileStream(resultsFilePath);
 		Object jsonResults = new String ("Failed to recover results in " + resultsFilePath);
 		if (is == null) {
 			logger.warn("Failed to find results file {}, in bucket {}", stateFilePath, bucketName);
 		} else {
-			String jsonResultsEscaped = IOUtils.toString(is, "UTF-8");
+			final String jsonResultsEscaped = IOUtils.toString(is, "UTF-8");
 			// jsonResults = StringEscapeUtils.unescapeJava(jsonResultsEscaped);
-			 JSONObject json = new JSONObject(jsonResultsEscaped);
+			 final JSONObject json = new JSONObject(jsonResultsEscaped);
 			 jsonResults = new JSONMap(json);
 		}
 		responseMap.put("RVFResult", jsonResults);
