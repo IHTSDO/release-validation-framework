@@ -134,7 +134,7 @@
 			<keywords></keywords>
 		</script>	
 <!-- release-type-snapshot-validation -->
-		<script uuid="645e3292-18d6-41df-b42a-58ba4d7240d5" category="release-type-validation" sqlFile="release-type-snapshot-validation-concept.sql" text="The current snapshot file is an accurate derivative of the current full file"  >
+		<script uuid="645e3292-18d6-41df-b42a-58ba4d7240d5" category="release-type-validation" sqlFile="release-type-snapshot-validation-concept.sql" text="The current concept snapshot file is an accurate derivative of the current full file"  >
 			<keywords></keywords>
 		</script>
 		<script uuid="13985234-923e-4d91-911b-b3262e353cfa" category="release-type-validation" sqlFile="release-type-snapshot-validation-definition.sql" text="The current text definition snapshot file is an accurate derivative of the current full file"  >
@@ -332,8 +332,9 @@
 		<script uuid="0a4bba70-85b7-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-navigation.sql" text="targetComponentId' does not refer to navigation concepts." />
 		<!-- Exclude this assertion for the time being 
 		<script uuid="38b88ff6-7ee3-40a5-b362-98a87e80526e" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-inactive.sql" text="Inactive Non-human refset members refer to inactive components." />
-		<script uuid="c82246b1-a137-40c5-8653-554c9ce82c6b" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-terms.sql" text="Terms are unique in Description hierarchy." />
 		-->
+		<script uuid="c82246b1-a137-40c5-8653-554c9ce82c6b" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-terms.sql" text="Terms are unique in Description hierarchy." />
+		
 		<script uuid="5c0186f3-0b72-4685-8aad-eff15a7f8880" category="component-centric-validation" sqlFile="component-centric-snapshot-description-consistent-semantic-tag.sql" text="All active FSNs for a given concept have the same semantic tag." />
 		<script uuid="f14d521f-2472-4871-9c4e-356f0f075a3a" category="component-centric-validation" sqlFile="component-centric-snapshot-ctv3-code-unique.sql" text="CTV3 codes are unique in the CTV3 simple map refset"  />
 	  	<script uuid="5e80ea3e-c4dd-4ae3-8b75-f0567e42b962" category="component-centric-validation" sqlFile="component-centric-snapshot-snomed-rt-code-unique.sql" text="SNOMED RT codes are unique in the SNOMED RT simple map refset"  />

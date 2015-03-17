@@ -1,0 +1,230 @@
+{
+  "assertionType" : "component-centric-validation",
+  "totalAssertionsRun" : 56,
+  "totalAssertionsFailed" : 3,
+  "results" : [ {
+    "assertionName" : "Active historical association refset members have active concepts as targets.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "No active Historical Association member associates an inactive concept with its parent.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Active historical association refset members refer to inactive concepts.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All Concepts having only one defining relationship have definitionstatus PRIMITIVE.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All inactive concepts have definition status of PRIMITIVE.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All inferred relationships in which the source concept is inactive, are inactive relationships.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Inferred relationship modifier is always SOME.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All inferred is-a relationships have relationship group of 0.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All concepts have at least one inferred is-a relationship.",
+    "firstNInstances" : [ "CONCEPT: id=700241009: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702769005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703860006: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703155005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702386002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703649004: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703672002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702850009: Concept does not have an inferred is-a relationship.", "CONCEPT: id=700132008: Concept does not have an inferred is-a relationship." ],
+    "totalFailed" : 9
+  }, {
+    "assertionName" : "Relationship groups contain at least 2 relationships.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All stated relationships in which the source concept is inactive, are inactive relationships.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Stated relationship modifier is always SOME.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All stated is-a relationships have relationship group of 0.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All concepts have at least one stated is-a relationship.",
+    "firstNInstances" : [ "CONCEPT: id=700241009: Concept does not have a stated is-a relationship.", "CONCEPT: id=702769005: Concept does not have a stated is-a relationship.", "CONCEPT: id=703860006: Concept does not have a stated is-a relationship.", "CONCEPT: id=703155005: Concept does not have a stated is-a relationship.", "CONCEPT: id=702386002: Concept does not have a stated is-a relationship.", "CONCEPT: id=703649004: Concept does not have a stated is-a relationship.", "CONCEPT: id=703672002: Concept does not have a stated is-a relationship.", "CONCEPT: id=702850009: Concept does not have a stated is-a relationship.", "CONCEPT: id=700132008: Concept does not have a stated is-a relationship." ],
+    "totalFailed" : 9
+  }, {
+    "assertionName" : "Relationship groups contain at least 2 relationships.",
+    "firstNInstances" : [ "RELATIONSHIP: id=4994338024: Relationship is in \u001Ca relationship group with a single active inferred member.", "RELATIONSHIP: id=4998022027: Relationship is in \u001Ca relationship group with a single active inferred member.", "RELATIONSHIP: id=5025315021: Relationship is in \u001Ca relationship group with a single active inferred member.", "RELATIONSHIP: id=4969200029: Relationship is in \u001Ca relationship group with a single active inferred member." ],
+    "totalFailed" : 4
+  }, {
+    "assertionName" : "No Concept has 2 stated relationships with the same type, destination and group.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "For each active FSN there is a synonym that has the same text.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "No active Terms contain leading or trailing spaces.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "No synonyms have semantic tags.",
+    "firstNInstances" : [ ],
+    "totalFailed" : -1
+  }, {
+    "assertionName" : "All FSNs have a space before the semantic tag.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All active FSNs have a semantic tag.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "No active Terms contain double spaces.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All FSNs end in closing parentheses.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "The first letter of the FSN should be capitalized.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "For a given concept, all description terms are unique.",
+    "firstNInstances" : [ ],
+    "totalFailed" : -1
+  }, {
+    "assertionName" : "No active term matches that of an inactive Description.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Terms contains balanced parentheses.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Case-sensitive terms have appropriate caseSignificanceId.",
+    "firstNInstances" : [ ],
+    "totalFailed" : -1
+  }, {
+    "assertionName" : "Active Terms of active concept consist of valid characters.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All definitions are case sensitive.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All definitions are preferred.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "No active Terms contain leading or trailing spaces.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "No active Terms contain double spaces.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "The first letter of the Term should be capitalized.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Members are inactive for inactive descriptions in the snapshot file.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Descriptions in a language refset are unique for a given concept.",
+    "firstNInstances" : [ ],
+    "totalFailed" : -1
+  }, {
+    "assertionName" : "Members are active for active descriptions in the snapshot file.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "There is only zero or one active Definition per concept per dialect in the snapshot file.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "SNOMED RT identifier simple map refset refers to active components.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "There is one and only one SNOMED RT simple map refset member per concept.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "SNOMED RT identifier simple map refset members are unique.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "CTV3 simple map refset members are unique.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "There is one and only one CTV3 simple map refset member per concept.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "CTV3 simple map refset members are always active.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Active VTM simple refset members refer to active components.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Active VMP simple refset members refer to active components.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Active Non-human refset members refer to active components.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Calling procedure testing that terms that contain EN-US language-specific words are in the same US language refset.",
+    "firstNInstances" : [ ],
+    "totalFailed" : -1
+  }, {
+    "assertionName" : "Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset.",
+    "firstNInstances" : [ ],
+    "totalFailed" : -1
+  }, {
+    "assertionName" : "targetComponentId' does not refer to navigation concepts.",
+    "firstNInstances" : [ ],
+    "totalFailed" : -1
+  }, {
+    "assertionName" : "All active FSNs for a given concept have the same semantic tag.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  },{
+    "assertionName" : "Terms are unique in Description hierarchy.",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  },{
+    "assertionName" : "CTV3 codes are unique in the CTV3 simple map refset",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "SNOMED RT codes are unique in the SNOMED RT simple map refset",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
+  } ]
+}

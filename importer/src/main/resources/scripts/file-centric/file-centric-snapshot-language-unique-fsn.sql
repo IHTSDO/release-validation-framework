@@ -116,6 +116,7 @@
 	
 	
 	/* TEST: Concept does not have an FSN in each possible refset */
+	/*Only for core module concepts*/
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
@@ -129,6 +130,7 @@
 	and b.active = '1'
 	and c.active = '1'
 	and b.typeid = '900000000000003001'
+	and c.moduleid in ('900000000000207008','900000000000012004')
 	GROUP BY c.id
 	having count(distinct(a.refsetid)) < (select count(distinct(refsetid)) from curr_langrefset_s);
 	
