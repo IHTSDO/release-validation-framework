@@ -1,6 +1,6 @@
 
 /*  
-	The current snapshot file is an accurate derivative of the current full file
+	The current concept snapshot file is an accurate derivative of the current full file
 */
 
 /* view of current snapshot, derived from current full */

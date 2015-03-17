@@ -16,7 +16,7 @@
 	a.active = '0'
 	and a.id = b.id
 	and a.effectivetime != b.effectivetime
-   	and b.active != '1'
+   	and b.active != '1';
 	
 	
 /* 	inserting exceptions in the result table */
