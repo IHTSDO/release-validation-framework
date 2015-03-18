@@ -4,7 +4,7 @@
 
 	<groupId>org.ihtsdo.snomed.rvf</groupId>
 	<artifactId>release-validation-framework</artifactId>
-	<version>0.1.14-SNAPSHOT</version>
+	<version>0.1.14</version>
 
 	<packaging>pom</packaging>
 	<name>SNOMED Release Validation Framework</name>
