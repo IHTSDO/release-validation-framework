@@ -2,7 +2,7 @@ package org.ihtsdo.rvf.helper;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,20 +21,19 @@ public class AssertionHelper {
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	
-	public Map<String, Object> assertAssertions (final Collection<Assertion> assertions, final Long runId,  final String prospectiveReleaseVersion,
+	public Map<String, Object> assertAssertions(final Collection<Assertion> assertions, final Long runId,  final String prospectiveReleaseVersion,
 			final String previousReleaseVersion) {
 		//TODO throw an exception that results in a malformed request response and remove runtime dependency on JUnit
 		Assert.assertNotNull(runId);
 		final Collection<TestRunItem> allTestRunItems = new ArrayList<>();
-		final Map<String , Object> responseMap = new HashMap<>();
+		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		int failedAssertionCount = 0;
 		for (final Assertion assertion: assertions) {
-			try
-			{
+			try {
 				final List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
 						prospectiveReleaseVersion, previousReleaseVersion));
 				for (final TestRunItem item : items) {
-					if(item.isFailure()){
+					if (item.getFailureCount() != 0) {
 						failedAssertionCount++;
 					}
 					allTestRunItems.add(item);
@@ -45,10 +44,9 @@ public class AssertionHelper {
 				failedAssertionCount++;
 			}
 		}
-
-		responseMap.put("assertions", allTestRunItems);
 		responseMap.put("assertionsRun", allTestRunItems.size());
 		responseMap.put("assertionsFailed", failedAssertionCount);
+		responseMap.put("assertions", allTestRunItems);
 
 		return responseMap;
 	}

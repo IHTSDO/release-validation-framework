@@ -11,8 +11,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,8 +86,9 @@ public class ValidationRunner implements Runnable{
 
 	@Override
 	public void run() {
-		final Map<String , Object> responseMap = new HashMap<>();
+		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		try {
+			responseMap.put("Validation config", config);
 			runValidation(responseMap);
 		} catch (final Exception e) {
 			final StringWriter errors = new StringWriter();
@@ -251,7 +252,7 @@ public class ValidationRunner implements Runnable{
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
 		final List<Assertion> resourceAssertions = assertionService.getResourceAssertions();
 		logger.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
-		final Map<Assertion, Collection<TestRunItem>> assertionResultMap = new HashMap<>();
+		final Map<Assertion, Collection<TestRunItem>> assertionResultMap = new LinkedHashMap<>();
 		int failedAssertionCount = 0;
 		failedAssertionCount += executeAssertions(prospectiveReleaseVersion, previousReleaseVersion, runId, resourceAssertions, assertionResultMap);
 		final HashSet<Assertion> assertions = new HashSet<>();
@@ -263,16 +264,15 @@ public class ValidationRunner implements Runnable{
 		}
 		failedAssertionCount += executeAssertions(prospectiveReleaseVersion,
 				previousReleaseVersion, runId, assertions, assertionResultMap);
-
-		responseMap.put("type", "post");
-
 		final List<TestRunItem> items = new ArrayList<>();
 		for( final Collection<TestRunItem> testItesms : assertionResultMap.values()) {
 			items.addAll(testItesms);
 		}
-		responseMap.put("assertions", items);
+		responseMap.put("type", "post");
 		responseMap.put("assertionsRun", assertionResultMap.keySet().size());
 		responseMap.put("assertionsFailed", failedAssertionCount);
+		responseMap.put("assertions", items);
+		
 	}
 
 	private boolean checkKnownVersion(final String prevIntReleaseVersion, final String previousExtVersion, 
@@ -363,7 +363,7 @@ public class ValidationRunner implements Runnable{
 				// get only first since we have 1:1 correspondence between Assertion and Test
 				if(items.size() == 1){
 					final TestRunItem runItem = items.get(0);
-					if(runItem.isFailure()){
+					if(runItem.getFailureCount() != 0){
 						failedAssertionCount++;
 					}
 				}

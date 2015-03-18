@@ -64,9 +64,6 @@
 	</bean>
 	<bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl">
 		<property name="qaResulTableName" value="${rvf.qa.result.table.name}"/>
-		<property name="assertionDetailsColumnName" value="${rvf.assertion.details.column.name}"/>
-		<property name="assertionIdColumnName" value="${rvf.assertion.id.column.name}"/>
-		<property name="assertionNameColumnName" value="${rvf.assertion.name.column.name}"/>
 		<property name="deltaTableSuffix" value="${rvf.delta.table.suffix}"/>
 		<property name="snapshotTableSuffix" value="${rvf.snapshot.table.suffix}"/>
 		<property name="fullTableSuffix" value="${rvf.full.table.suffix}"/>

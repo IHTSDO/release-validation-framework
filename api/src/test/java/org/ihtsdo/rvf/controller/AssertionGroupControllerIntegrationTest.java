@@ -1,10 +1,26 @@
 package org.ihtsdo.rvf.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
-import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
 import org.junit.After;
@@ -21,16 +37,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A test case for {@link org.ihtsdo.rvf.controller.AssertionGroupController}.
@@ -79,7 +86,7 @@ public class AssertionGroupControllerIntegrationTest {
     @Test
     public void testGetGroup() throws Exception {
 
-        Long id = group.getId();
+        final Long id = group.getId();
         mockMvc.perform(get("/groups/{id}",id).accept(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(get("/groups/{id}",id).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -89,14 +96,14 @@ public class AssertionGroupControllerIntegrationTest {
 
     @Test
     public void testDeleteGroup() throws Exception {
-        Long id = group.getId();
+        final Long id = group.getId();
         mockMvc.perform(delete("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andDo(print());
     }
 
     @Test
     public void testDeleteMissingGroup() throws Exception {
-        Long id = 29367234L;
+        final Long id = 29367234L;
         mockMvc.perform(delete("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("No entity found with given id " + id))).andDo(print());
@@ -104,7 +111,7 @@ public class AssertionGroupControllerIntegrationTest {
 
     @Test
     public void testGetMissingGroup() throws Exception {
-        Long id = 29367234L;
+        final Long id = 29367234L;
         mockMvc.perform(get("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("No entity found with given id " + id))).andDo(print());
@@ -113,7 +120,7 @@ public class AssertionGroupControllerIntegrationTest {
     @Test
     public void testCreateGroup() throws Exception {
 
-        String name = "New Test Assertion Group";
+        final String name = "New Test Assertion Group";
         mockMvc.perform(post("/groups").param("name", name).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
@@ -122,10 +129,10 @@ public class AssertionGroupControllerIntegrationTest {
 
     @Test
     public void testUpdateGroup() throws Exception {
-        Long id = group.getId();
-        String updatedName = "Updated Assertion Group Name";
+        final Long id = group.getId();
+        final String updatedName = "Updated Assertion Group Name";
         group.setName(updatedName);
-        String paramsString = objectMapper.writeValueAsString(group);
+        final String paramsString = objectMapper.writeValueAsString(group);
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(put("/groups/{id}", id).param("name", updatedName).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -135,7 +142,7 @@ public class AssertionGroupControllerIntegrationTest {
 
     @Test
     public void testGetAssertionsForGroup() throws Exception {
-        Long id = group.getId();
+        final Long id = group.getId();
         // create and add some assertions
         assertionService.addAssertionToGroup(getRandomAssertion(), group);
         assertionService.addAssertionToGroup(getRandomAssertion(), group);
@@ -149,13 +156,13 @@ public class AssertionGroupControllerIntegrationTest {
 
     @Test
     public void testAddAssertionsToGroup() throws Exception {
-        Long id = group.getId();
+        final Long id = group.getId();
         // create and add some assertions
-        List<Long> assertions = new ArrayList<>();
+        final List<Long> assertions = new ArrayList<>();
         assertions.add(getRandomAssertion().getId());
         assertions.add(getRandomAssertion().getId());
 
-        String paramsString = objectMapper.writeValueAsString(assertions);
+        final String paramsString = objectMapper.writeValueAsString(assertions);
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(post("/groups/{id}/assertions", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -171,13 +178,13 @@ public class AssertionGroupControllerIntegrationTest {
 
     @Test
     public void testDeleteTestsForAssertion() throws Exception {
-        Long id = group.getId();
+        final Long id = group.getId();
         // create and add some assertions
-        List<Assertion> assertions = new ArrayList<>();
+        final List<Assertion> assertions = new ArrayList<>();
         assertions.add(getRandomAssertion());
         assertions.add(getRandomAssertion());
 
-        String paramsString = objectMapper.writeValueAsString(assertions);
+        final String paramsString = objectMapper.writeValueAsString(assertions);
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(delete("/groups/{id}/assertions", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -194,9 +201,9 @@ public class AssertionGroupControllerIntegrationTest {
     }
 
     private Assertion getRandomAssertion(){
-        org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
+        final org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
         test.setName("Random Test " + UUID.randomUUID());
-        test.setCommand(new ExecutionCommand(new Configuration()));
+        test.setCommand(new ExecutionCommand());
 
         Assertion assertion = new Assertion();
         assertion.setName("Test assertion");

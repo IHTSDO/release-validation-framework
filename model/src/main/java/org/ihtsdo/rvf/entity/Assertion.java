@@ -1,22 +1,17 @@
 package org.ihtsdo.rvf.entity;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 /**
@@ -39,13 +34,9 @@ public class Assertion {
 	private String docLink;
 	private Date effectiveFrom;
 	private String keywords;
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID uuid = UUID.randomUUID();
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "assertions")
-    @JsonIgnore
-    private Set<AssertionGroup> groups = new HashSet<>();
+    private String uuid = UUID.randomUUID().toString();
 
-	public Assertion() {
+    public Assertion() {
 	}
 
 	public Assertion(final Long id, final String name) {
@@ -116,19 +107,11 @@ public class Assertion {
 
     @XmlElement
     public UUID getUuid() {
-        return uuid;
+        return UUID.fromString(uuid);
     }
 
     public void setUuid(final UUID uuid) {
-        this.uuid = uuid;
-    }
-
-    public Set<AssertionGroup> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(final Set<AssertionGroup> groups) {
-        this.groups = groups;
+        this.uuid = uuid.toString();
     }
 
 	@Override

@@ -18,7 +18,6 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.snomed.rvf.importer.AssertionsImporter;
 import org.ihtsdo.snomed.rvf.importer.helper.RvfRestClient;
 import org.jdom2.Document;
@@ -195,7 +194,8 @@ public class AssertionsImporterImpl implements AssertionsImporter {
             }
             cleanedSql = cleanedSql.replaceAll("runid", "run_id");
             cleanedSql = cleanedSql.replaceAll("assertionuuid", "assertion_id");
-            cleanedSql = cleanedSql.replaceAll("assertiontext", "assertion_text");
+            cleanedSql = cleanedSql.replaceAll("assertiontext,", "");
+            cleanedSql = cleanedSql.replaceAll("'<ASSERTIONTEXT>',", "");
             logger.info("cleaned sql:" + cleanedSql);
             if (!storedProcedureFound) {
                statements.add(cleanedSql);
@@ -208,12 +208,8 @@ public class AssertionsImporterImpl implements AssertionsImporter {
         	logger.debug("Stored proecure found:" + storedProcedureSql.toString());
         }
 
-        // set configuration;
-        final Configuration configuration = new Configuration();
         final ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(sql);
-        command.setCode("Execute me".getBytes());
-        command.setConfiguration(configuration);
         command.setStatements(statements);
         final Test test = new Test();
         test.setType(TestType.SQL);
