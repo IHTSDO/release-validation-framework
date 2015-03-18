@@ -1,5 +1,9 @@
 package org.ihtsdo.rvf.dao;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.UUID;
+
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -7,10 +11,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 public class EntityDaoImpl<T> implements EntityDao<T> {
@@ -23,51 +23,51 @@ public class EntityDaoImpl<T> implements EntityDao<T> {
     protected EntityDaoImpl() {
     }
 
-    protected EntityDaoImpl(Class<T> type) {
+    protected EntityDaoImpl(final Class<T> type) {
 		this.type = type;
 	}
 
 	@Override
-	public T save(T entity) {
+	public T save(final T entity) {
 		return (T) getCurrentSession().save(entity);
 	}
 
 	@Override
-	public T update(T entity) {
+	public T update(final T entity) {
         try {
-            Object merged = getCurrentSession().merge(entity);
+            final Object merged = getCurrentSession().merge(entity);
             getCurrentSession().update(merged);
             return (T) merged;
         }
-        catch (ObjectNotFoundException e) {
+        catch (final ObjectNotFoundException e) {
             // disappeared already due to cascade
             return entity;
         }
 	}
 
 	@Override
-	public T load(Class clazz, Serializable id) {
+	public T load(final Class clazz, final Serializable id) {
 		return (T) getCurrentSession().get(clazz, id);
 	}
 
 	@Override
-	public T findByUuid(Class clazz, UUID uuid) {
+	public T findByUuid(final Class clazz, final UUID uuid) {
 
-        return (T) getCurrentSession().createCriteria(clazz).add(Restrictions.eq("uuid", uuid)).uniqueResult();
+        return (T) getCurrentSession().createCriteria(clazz).add(Restrictions.eq("uuid", uuid.toString())).uniqueResult();
 	}
 
 	@Override
-	public void delete(T entity) {
+	public void delete(final T entity) {
         getCurrentSession().delete(entity);
 	}
 
     @Override
-    public List<T> findAll(Class clazz){
+    public List<T> findAll(final Class clazz){
         return getCurrentSession().createCriteria(clazz).list();
     }
 
     @Override
-    public Long count(Class clazz){
+    public Long count(final Class clazz){
         return (Long) getCurrentSession().createCriteria(clazz).setProjection(Projections.rowCount()).uniqueResult();
     }
 

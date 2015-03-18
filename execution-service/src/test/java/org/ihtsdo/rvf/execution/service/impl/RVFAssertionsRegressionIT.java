@@ -63,6 +63,7 @@ public class RVFAssertionsRegressionIT {
 	private URL componentCentrilExpected;
 	private URL fileCentricExpected;
 	private Long runId;
+	private final ObjectMapper mapper = new ObjectMapper();
 	@Before
 	public void setUp() {
 		//load previous and prospective versions if not loaded already
@@ -123,7 +124,6 @@ public class RVFAssertionsRegressionIT {
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
-		final ObjectMapper mapper = new ObjectMapper();
 		System.out.println("Test result");
 		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
 		final Gson gson = new Gson();

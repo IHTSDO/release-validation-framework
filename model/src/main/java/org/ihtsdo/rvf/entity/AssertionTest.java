@@ -27,9 +27,6 @@ public class AssertionTest {
 	@ManyToOne
 	private Assertion assertion;
 
-//	@ManyToOne
-//	private ReleaseCenter center;
-
 	private boolean inactive;
 
 	public AssertionTest() {
@@ -62,13 +59,6 @@ public class AssertionTest {
 		this.assertion = assertion;
 	}
 
-//	public ReleaseCenter getCenter() {
-//		return center;
-//	}
-//
-//	public void setCenter(ReleaseCenter center) {
-//		this.center = center;
-//	}
 
 	public boolean isInactive() {
 		return inactive;

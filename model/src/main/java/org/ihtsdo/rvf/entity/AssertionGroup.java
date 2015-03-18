@@ -1,13 +1,23 @@
 package org.ihtsdo.rvf.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
-import javax.persistence.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * An entity that reprsents a collection of {@link org.ihtsdo.rvf.entity.Assertion}s. Note that this is deliberately not
@@ -37,7 +47,7 @@ public class AssertionGroup {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -45,18 +55,15 @@ public class AssertionGroup {
 		return assertions;
 	}
 
-	public void setAssertions(Set<Assertion> assertions) {
+	public void setAssertions(final Set<Assertion> assertions) {
 		this.assertions = assertions;
-		for(Assertion assertion : this.assertions){
-			assertion.getGroups().add(this);
-		}
 	}
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -66,9 +73,8 @@ public class AssertionGroup {
 	 * @param assertion the assertion to be added
 	 */
 	@Transient
-	public void addAssertion(Assertion assertion){
+	public void addAssertion(final Assertion assertion){
 		this.getAssertions().add(assertion);
-		assertion.getGroups().add(this);
 	}
 
 	/**
@@ -77,8 +83,7 @@ public class AssertionGroup {
 	 * @param assertion the assertion to be removed
 	 */
 	@Transient
-	public void removeAssertion(Assertion assertion){
+	public void removeAssertion(final Assertion assertion){
 		this.getAssertions().remove(assertion);
-		assertion.getGroups().remove(this);
 	}
 }

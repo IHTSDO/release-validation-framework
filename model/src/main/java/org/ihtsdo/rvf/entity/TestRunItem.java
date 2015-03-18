@@ -4,22 +4,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.ihtsdo.rvf.helper.Configuration;
+import java.util.UUID;
 
 /**
  * A class that records metrics about execution of an {@link org.ihtsdo.rvf.entity.Test}.
  */
 public class TestRunItem {
 
-	private Long assertionId;
+	private UUID assertionUuid;
 	private String assertionText;
 	private String executionId;
 	private Date testTime;
-	private Configuration configuration;
 	private String testType;
 	private String testPattern;
-	private boolean failure = true;
 	private long runTime;
 	private String failureMessage;
 	private List<String> firstNInstances = new ArrayList<>();
@@ -29,25 +26,7 @@ public class TestRunItem {
 	 * Empty constructor for IOC
 	 */
 	public TestRunItem() {
-
-	}
-
-	public TestRunItem(final Assertion assertion, final String executionId, final Date testTime, final Configuration configuration,
-					   final String testType, final String testPattern, final boolean failure, final long runTime, final String failureMessage) {
-		assertionId = assertion.getId();
-		this.assertionText = assertion.getName();
-		this.executionId = executionId;
-		this.testTime = testTime;
-		this.configuration = configuration;
-		this.testType = testType;
-		this.testPattern = testPattern;
-		this.failure = failure;
-		this.runTime = runTime;
-		this.failureMessage = failureMessage;
-	}
-
-	public boolean isFailure() {
-		return failure;
+		failureCount = -1L;
 	}
 
 	private String check(final String separator, final String filePath) {
@@ -81,12 +60,11 @@ public class TestRunItem {
 	@Override
 	public String toString() {
 		return "TestRunItem{" +
-				"assertionId=" + assertionId + +  '\'' +
+				"assertionUuid=" + assertionUuid + +  '\'' +
 				"assertionText=" + assertionText +  '\'' +	
 				"executionId='" + executionId + '\'' +
 				", testType='" + testType + '\'' +
 				", testPattern='" + testPattern + '\'' +
-				", failure=" + (failure ? "Fail" : "Pass") +
 				", testTime='" + testTime + '\'' +
 				", runTime='" + runTime + '\'' +
 				'}';
@@ -108,10 +86,6 @@ public class TestRunItem {
 		this.testPattern = testPattern;
 	}
 
-	public void setFailure(final boolean failure) {
-		this.failure = failure;
-	}
-
 	public long getRunTime() {
 		return runTime;
 	}
@@ -122,14 +96,6 @@ public class TestRunItem {
 
 	public void setFailureMessage(final String failureMessage) {
 		this.failureMessage = failureMessage;
-	}
-
-	public Configuration getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(final Configuration configuration) {
-		this.configuration = configuration;
 	}
 
 	public List<String> getFirstNInstances() {
@@ -158,5 +124,13 @@ public class TestRunItem {
 
 	public void setAssertionText(final String assertionText) {
 		this.assertionText = assertionText;
+	}
+
+	public UUID getAssertionUuid() {
+		return assertionUuid;
+	}
+
+	public void setAssertionUuid(final UUID assertionUuid) {
+		this.assertionUuid = assertionUuid;
 	}
 }
