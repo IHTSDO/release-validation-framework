@@ -145,7 +145,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		runItem.setTestTime(startTime.getTime());
 		runItem.setExecutionId(String.valueOf(executionId));
 		runItem.setTestType(test.getType().name());
-		runItem.setAssertionText(assertion.toString());
+		runItem.setAssertionText(assertion.getName());
 
 		// get command from test and validate the included command object
 		final ExecutionCommand command = test.getCommand();
@@ -165,7 +165,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 					logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command);
 					runItem.setFailureMessage("Error executing SQL command object. Nested exception : " + e.fillInStackTrace());
 				}
-				catch (ConfigurationException e) {
+				catch (final ConfigurationException e) {
 					logger.warn("Failed to configure command {}, Nested exception is : " + e.fillInStackTrace(), command);
 					runItem.setFailureMessage("Error configuring SQL command object. Nested exception : " + e.fillInStackTrace());
 					

@@ -71,11 +71,15 @@ public class RvfAssertionTestHarness {
 	    		groups.add(assertionDao.getAssertionGroupsByName(name));
 	    	}
 	    	final Collection<Assertion> assertions = new ArrayList<>();
+//	    	final Assertion assert79 = new Assertion();
+//	    	assert79.setId(79L);
+//	    	assertions.add(assert79);
 	    	for (final AssertionGroup group: groups) {
 	    		assertions.addAll(assertionDao.getAssertionsForGroup(group.getId()));
 	    	}
 	    	
 	    	final List<AssertionTest> tests = new ArrayList<>();
+	    	final AssertionTest test = new AssertionTest();
 	    	for(final Assertion assertion : assertions) {
 	    		tests.addAll(assertionDao.getAssertionTests(assertion));
 	    	}
@@ -86,7 +90,8 @@ public class RvfAssertionTestHarness {
 	    	//201503120939L;
 	    	//201503121422L;
 	    	//201503122311L;
-	        final Long runId =201503130923L;
+	    	//201503130923L;
+	        final Long runId =201503130924L;
 	        System.out.println("RunID:" + runId);
 			// set both prospective and previous release
 	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
