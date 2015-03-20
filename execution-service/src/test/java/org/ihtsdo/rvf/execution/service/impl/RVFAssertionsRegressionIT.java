@@ -2,11 +2,14 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,17 +17,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.service.AssertionService;
+import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,27 +61,30 @@ public class RVFAssertionsRegressionIT {
     @Autowired
     private ReleaseDataManager releaseDataManager;
     @Autowired
-    private AssertionDao assertionDao;
-    
+    private  AssertionDao assertionDao;
     private  URL releaseTypeExpectedResults;
 	private URL componentCentrilExpected;
 	private URL fileCentricExpected;
 	private Long runId;
 	private final ObjectMapper mapper = new ObjectMapper();
+	
 	@Before
-	public void setUp() {
+	public void setUp() throws FileNotFoundException, IOException {
 		//load previous and prospective versions if not loaded already
         assertNotNull(releaseDataManager);
         if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
-        	final URL previousReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130131.zip");
+        	final URL previousReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130131");
             assertNotNull("Must not be null", previousReleaseUrl);
-			final File previousFIle = new File(previousReleaseUrl.getFile());
-			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFIle);
+			final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
+			ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
+			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFile);
         }
         if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
-        	final URL prspectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731.zip");
+        	final URL prspectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
             assertNotNull("Must not be null", prspectiveReleaseUrl);
-        	releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, new File(prspectiveReleaseUrl.getFile()));
+            final File prospectiveFile = new File(prspectiveReleaseUrl.getFile() + "_test.zip");
+			ZipFileUtils.zip(prspectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
+        	releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, prospectiveFile);
         }
         
         releaseTypeExpectedResults = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
@@ -87,25 +94,34 @@ public class RVFAssertionsRegressionIT {
         fileCentricExpected = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
         assertNotNull("Must not be null", fileCentricExpected);
         runId = System.currentTimeMillis();
+        releaseDataManager.setSchemaForRelease("20130131", "rvf_int_" + PREVIOUS_RELEASE);
+        releaseDataManager.setSchemaForRelease("20130731", "rvf_int_"+ PROSPECTIVE_RELEASE);
+        
+        final List<Assertion> assertions = assertionDao.getAssertionsByKeywords("resource");
+		 assertionExecutionService.executeAssertions(assertions, runId,"20130731", "20130131");
         
 	}
 	
 	@Test
 	public void testReleaseTypeAssertions() throws Exception {
-		final List<AssertionTest> tests = getAssertionTestsByKeyword(RELEASE_TYPE_VALIDATION);
-		final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
-		assertTestResult(RELEASE_TYPE_VALIDATION, releaseTypeExpectedResults.getFile(), runItems);
-		
+		runAssertionsTest(RELEASE_TYPE_VALIDATION, releaseTypeExpectedResults.getFile());
 	}
-
-	private List<AssertionTest> getAssertionTestsByKeyword(final String keyword) {
-		final List<AssertionTest> tests = new ArrayList<>();
-    	final List<Assertion> assertions = assertionDao.getAssertionsByKeywords(keyword);
-		for(final Assertion assertion : assertions ) {
-    		tests.addAll(assertionDao.getAssertionTests(assertion));
-    	}
-		return tests;
+	
+	@Test
+	public void testComponentCentricAssertions() throws Exception {
+		runAssertionsTest(COMPONENT_CENTRIC_VALIDATION, componentCentrilExpected.getFile());
 	}
+	@Test
+	public void testFileCentricAssertions() throws Exception {
+		runAssertionsTest(FILE_CENTRIC_VALIDATION, fileCentricExpected.getFile());
+	}
+	 
+	private void runAssertionsTest(final String groupName, final String expectedJsonFile) throws Exception {
+		 final List<Assertion> assertions= assertionDao.getAssertionsByKeywords(groupName);
+		 System.out.println("found total assertions:" + assertions.size());
+			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, runId,"20130731", "20130131");
+			assertTestResult(groupName, expectedJsonFile, runItems);
+	 }
 	private void assertTestResult(final String type, final String expectedJsonFileName,final Collection<TestRunItem> runItems) throws Exception {
 		final List<RVFTestResult> results = new ArrayList<>();
 		int failureCounter = 0;
@@ -113,6 +129,8 @@ public class RVFAssertionsRegressionIT {
 			final RVFTestResult result = new RVFTestResult();
 			result.setAssertonName(item.getAssertionText());
 			result.setFirstNInstances(item.getFirstNInstances());
+			result.setAssertionUuid(item.getAssertionUuid());
+			assertNull("No failure should have occured.", item.getFailureMessage());
 			result.setTotalFailed(item.getFailureCount() != null ? item.getFailureCount() : -1L);
 			results.add(result);
 			if(result.getTotalFailed() > 0) {
@@ -135,17 +153,22 @@ public class RVFAssertionsRegressionIT {
 		assertEquals(expectedReport.getResults().size(), actualReport.getResults().size());
 		final List<RVFTestResult> expected = expectedReport.getResults();
 		final List<RVFTestResult> actual = actualReport.getResults();
-		final Map<String,RVFTestResult> expectedResultByNameMap = new HashMap<>();
+		final Map<UUID,RVFTestResult> expectedResultByNameMap = new HashMap<>();
 		for (final RVFTestResult result : expectedReport.getResults()) {
-			expectedResultByNameMap.put(result.getAssertionName(), result);
+			expectedResultByNameMap.put(result.getAssertionUuid(), result);
 		}
-		final Map<String,RVFTestResult> actualResultByNameMap = new HashMap<>();
+		final Map<UUID,RVFTestResult> actualResultByNameMap = new HashMap<>();
 		for (final RVFTestResult result : actualReport.getResults()) {
-			actualResultByNameMap.put(result.getAssertionName(), result);
+			actualResultByNameMap.put(result.getAssertionUuid(), result);
 		}
-		for (final String name : expectedResultByNameMap.keySet()) {
-			assertTrue("Acutal test result should have assertion name but doesn't.", actualResultByNameMap.containsKey(name));
-			assertEquals("Acutal result is different from the expected for assertion name:" + name, expectedResultByNameMap.get(name),actualResultByNameMap.get(name));
+		for (final UUID uuid : expectedResultByNameMap.keySet()) {
+			assertTrue("Acutal test result should have assertion uuid but doesn't.", actualResultByNameMap.containsKey(uuid));
+			final RVFTestResult expectedResult = expectedResultByNameMap.get(uuid);
+			final RVFTestResult actualResult = actualResultByNameMap.get(uuid);
+			
+			assertEquals("Assertion name is not the same" + " for assertion uuid:" + uuid, expectedResult.getAssertionName(),actualResult.getAssertionName());
+			assertEquals("Total failures count doesn't match"  + " for assertion uuid:" + uuid, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
+			assertEquals("First N instances not matching" + " for assertion uuid:" + uuid, expectedResult.getFirstNInstances(), actualResult.getFirstNInstances());
 		}
 		
 		Collections.sort(expected);
@@ -153,19 +176,6 @@ public class RVFAssertionsRegressionIT {
 		for(int i=0;i < expected.size();i++) {
 			assertEquals(expected.get(i), actual.get(i));
 		}
-	}
-
-	@Test
-	public void testComponentCentricAssertions() throws Exception {
-		final List<AssertionTest> tests = getAssertionTestsByKeyword(COMPONENT_CENTRIC_VALIDATION);
-		final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
-		assertTestResult(COMPONENT_CENTRIC_VALIDATION, componentCentrilExpected.getFile(), runItems);
-	}
-	@Test
-	public void testFileCentricAssertions() throws Exception {
-		final List<AssertionTest> tests = getAssertionTestsByKeyword(FILE_CENTRIC_VALIDATION);
-		final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
-		assertTestResult(FILE_CENTRIC_VALIDATION, fileCentricExpected.getFile(), runItems);
 	}
 	
 	private static class TestReport {
@@ -255,6 +265,7 @@ public class RVFAssertionsRegressionIT {
 	}
 	private static class RVFTestResult implements Comparable<RVFTestResult> {
 		private String assertionName;
+		private UUID assertionUuid;
 		private List<String> firstNInstances;
 		private long totalFailed;
 		public void setAssertonName(final String assertionText) {
@@ -279,12 +290,24 @@ public class RVFAssertionsRegressionIT {
 			return totalFailed;
 		}
 		
+		public UUID getAssertionUuid() {
+			return assertionUuid;
+		}
+
+		public void setAssertionUuid(final UUID assertionUuid) {
+			this.assertionUuid = assertionUuid;
+		}
+
+		public void setAssertionName(final String assertionName) {
+			this.assertionName = assertionName;
+		}
 		
+
 		@Override
 		public String toString() {
 			return "RVFTestResult [assertionName=" + assertionName
-					+ ", firstNInstances=" + firstNInstances + ", totalFailed="
-					+ totalFailed + "]";
+					+ ", assertionUuid=" + assertionUuid + ", firstNInstances="
+					+ firstNInstances + ", totalFailed=" + totalFailed + "]";
 		}
 
 		@Override
@@ -293,11 +316,10 @@ public class RVFAssertionsRegressionIT {
 			int result = 1;
 			result = prime * result
 					+ ((assertionName == null) ? 0 : assertionName.hashCode());
-			result = prime
-					* result
-					+ ((firstNInstances == null) ? 0 : firstNInstances
-							.hashCode());
-			result = prime * result + (int) (totalFailed ^ (totalFailed >>> 32));
+			result = prime * result
+					+ ((assertionUuid == null) ? 0 : assertionUuid.hashCode());
+			result = prime * result
+					+ (int) (totalFailed ^ (totalFailed >>> 32));
 			return result;
 		}
 
@@ -315,6 +337,11 @@ public class RVFAssertionsRegressionIT {
 					return false;
 			} else if (!assertionName.equals(other.assertionName))
 				return false;
+			if (assertionUuid == null) {
+				if (other.assertionUuid != null)
+					return false;
+			} else if (!assertionUuid.equals(other.assertionUuid))
+				return false;
 			if (firstNInstances == null) {
 				if (other.firstNInstances != null)
 					return false;
@@ -327,7 +354,7 @@ public class RVFAssertionsRegressionIT {
 
 		@Override
 		public int compareTo(final RVFTestResult o) {
-			return this.assertionName.compareTo(o.getAssertionName());
+			return this.assertionUuid.compareTo(o.getAssertionUuid());
 		}
 	}
 }

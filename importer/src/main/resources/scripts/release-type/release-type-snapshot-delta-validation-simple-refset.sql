@@ -13,14 +13,16 @@
   insert into vw
 	select *
 	from curr_simplerefset_s
-	where effectivetime = '<CURRENT-RELEASE-DATE>';
+	where cast(effectivetime as datetime) >
+		(select max(cast(effectivetime as datetime)) 
+		 from prev_simplerefset_f);
 
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		a.id
+		concat('Simple refset: id=',a.id, ': in snapshot file, but not in delta file.') 	
 	from vw a
 	left join curr_simplerefset_d b
 		on a.id = b.id
@@ -39,7 +41,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		a.id
+		concat('Simple refset: id=',a.id, ': in delta file, but not snapshot file.') 	
 	from curr_simplerefset_d a
 	left join vw b
 		on a.id = b.id

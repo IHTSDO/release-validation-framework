@@ -65,16 +65,16 @@ public class RvfAssertionTestHarness {
 	    	//Assertion 111 and assertion test 107
 	    	//36L
 	    	//150L
-	    	//"release-type-validation", "component-centric-validation"
-	    	final List<String> groupNames = Arrays.asList("file-centric-validation");
+	    	//"release-type-validation", "component-centric-validation""release-type-validation","file-centric-validation"
+	    	final List<String> groupNames = Arrays.asList("release-type-validation","file-centric-validation");
 	    	final List<AssertionGroup> groups = new ArrayList<>();
 	    	for (final String name : groupNames) {
 	    		groups.add(assertionDao.getAssertionGroupsByName(name));
 	    	}
 	    	final Collection<Assertion> assertions = new ArrayList<>();
-//	    	final Assertion assert79 = new Assertion();
-//	    	assert79.setId(79L);
-//	    	assertions.add(assert79);
+//	    	final Assertion single = new Assertion();
+//	    	single.setId(28L);
+//	    	assertions.add(single);
 	    	for (final AssertionGroup group: groups) {
 	    		assertions.addAll(assertionDao.getAssertionsForGroup(group.getId()));
 	    	}
@@ -96,8 +96,9 @@ public class RvfAssertionTestHarness {
 	        System.out.println("RunID:" + runId);
 			// set both prospective and previous release
 	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
-	        for (final TestRunItem item : runItems) {
-	        	 System.out.println("runItem = " + item);
-	        }
+	        System.out.println("TOTAL of assertions run:" + runItems.size());
+//	        for (final TestRunItem item : runItems) {
+//	        	 System.out.println("runItem = " + item);
+//	        }
 	    }
 }
