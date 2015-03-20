@@ -12,9 +12,9 @@
 	create table if not exists  v_curr_snapshot as
 	select a.id 
 	from curr_associationrefset_s a , prev_associationrefset_s b
-	where cast(a.effectivetime as datetime) =
+	where cast(a.effectivetime as datetime) >
 				(select max(cast(effectivetime as datetime)) 
-				 from curr_associationrefset_s)
+				 from prev_associationrefset_s)
 	and a.active = 0
 	and a.id = b.id
 	and a.active = b.active;

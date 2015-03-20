@@ -31,7 +31,6 @@ import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.helper.JSONMap;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
-import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -207,7 +206,7 @@ public class ValidationRunner implements Runnable{
 			return false;
 		}
 		// must be a zip, save it off
-		ZipFileUtils.copyUploadToDisk(config.getFile(), tempFile);	
+		config.getFile().transferTo(tempFile);	
 		config.setProspectiveFile(tempFile);
 		return true;
 	}

@@ -4,226 +4,282 @@
   "totalAssertionsFailed" : 3,
   "results" : [ {
     "assertionName" : "Active historical association refset members have active concepts as targets.",
+    "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "No active Historical Association member associates an inactive concept with its parent.",
+    "assertionUuid" : "90bcb7f0-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Active historical association refset members refer to inactive concepts.",
+    "assertionUuid" : "f7117eb0-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All Concepts having only one defining relationship have definitionstatus PRIMITIVE.",
+    "assertionUuid" : "f2293d20-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All inactive concepts have definition status of PRIMITIVE.",
+    "assertionUuid" : "fdf6a1b0-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All inferred relationships in which the source concept is inactive, are inactive relationships.",
+    "assertionUuid" : "2e4fd620-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Inferred relationship modifier is always SOME.",
+    "assertionUuid" : "32b41aa0-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All inferred is-a relationships have relationship group of 0.",
+    "assertionUuid" : "36f43550-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All concepts have at least one inferred is-a relationship.",
-    "firstNInstances" : [ "CONCEPT: id=700241009: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702769005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703860006: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703155005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702386002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703649004: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703672002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702850009: Concept does not have an inferred is-a relationship.", "CONCEPT: id=700132008: Concept does not have an inferred is-a relationship." ],
+    "assertionUuid" : "3ab84230-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ "CONCEPT: id=700241009: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702769005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703860006: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703155005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702386002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703649004: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703672002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702850005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship." ],
     "totalFailed" : 9
   }, {
     "assertionName" : "Relationship groups contain at least 2 relationships.",
+    "assertionUuid" : "411e9840-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
+    "assertionUuid" : "4572d730-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All stated relationships in which the source concept is inactive, are inactive relationships.",
+    "assertionUuid" : "49487040-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Stated relationship modifier is always SOME.",
+    "assertionUuid" : "4d32c9d0-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All stated is-a relationships have relationship group of 0.",
+    "assertionUuid" : "50e809a0-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All concepts have at least one stated is-a relationship.",
-    "firstNInstances" : [ "CONCEPT: id=700241009: Concept does not have a stated is-a relationship.", "CONCEPT: id=702769005: Concept does not have a stated is-a relationship.", "CONCEPT: id=703860006: Concept does not have a stated is-a relationship.", "CONCEPT: id=703155005: Concept does not have a stated is-a relationship.", "CONCEPT: id=702386002: Concept does not have a stated is-a relationship.", "CONCEPT: id=703649004: Concept does not have a stated is-a relationship.", "CONCEPT: id=703672002: Concept does not have a stated is-a relationship.", "CONCEPT: id=702850009: Concept does not have a stated is-a relationship.", "CONCEPT: id=700132008: Concept does not have a stated is-a relationship." ],
+    "assertionUuid" : "5555c400-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ "CONCEPT: id=700241009: Concept does not have a stated is-a relationship.", "CONCEPT: id=702769005: Concept does not have a stated is-a relationship.", "CONCEPT: id=703860006: Concept does not have a stated is-a relationship.", "CONCEPT: id=703155005: Concept does not have a stated is-a relationship.", "CONCEPT: id=702386002: Concept does not have a stated is-a relationship.", "CONCEPT: id=703649004: Concept does not have a stated is-a relationship.", "CONCEPT: id=703672002: Concept does not have a stated is-a relationship.", "CONCEPT: id=702850005: Concept does not have a stated is-a relationship.", "CONCEPT: id=700132006: Concept does not have a stated is-a relationship." ],
     "totalFailed" : 9
   }, {
     "assertionName" : "Relationship groups contain at least 2 relationships.",
+    "assertionUuid" : "59b574a0-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "RELATIONSHIP: id=4994338024: Relationship is in \u001Ca relationship group with a single active inferred member.", "RELATIONSHIP: id=4998022027: Relationship is in \u001Ca relationship group with a single active inferred member.", "RELATIONSHIP: id=5025315021: Relationship is in \u001Ca relationship group with a single active inferred member.", "RELATIONSHIP: id=4969200029: Relationship is in \u001Ca relationship group with a single active inferred member." ],
     "totalFailed" : 4
   }, {
     "assertionName" : "No Concept has 2 stated relationships with the same type, destination and group.",
+    "assertionUuid" : "5d27df10-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "For each active FSN there is a synonym that has the same text.",
+    "assertionUuid" : "19423070-7118-45bd-98ba-6d0dc18bc619",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "No active Terms contain leading or trailing spaces.",
+    "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "No synonyms have semantic tags.",
+    "assertionUuid" : "e95acdbd-0a20-4010-9e78-00e70491e800",
     "firstNInstances" : [ ],
-    "totalFailed" : -1
+    "totalFailed" : 0
   }, {
     "assertionName" : "All FSNs have a space before the semantic tag.",
+    "assertionUuid" : "32369add-8d9f-48de-a129-29b32c79a9d7",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All active FSNs have a semantic tag.",
+    "assertionUuid" : "a4ed3a89-170e-4d9c-995a-716447c4fe64",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "No active Terms contain double spaces.",
+    "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All FSNs end in closing parentheses.",
+    "assertionUuid" : "5a605c09-db1e-453f-aa4a-064faab2d310",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "The first letter of the FSN should be capitalized.",
+    "assertionUuid" : "dd0d0406-7481-444a-9f04-b6fc7db49039",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "For a given concept, all description terms are unique.",
+    "assertionUuid" : "2e0eb135-fd7d-4f24-83c1-0cba797ee766",
     "firstNInstances" : [ ],
-    "totalFailed" : -1
+    "totalFailed" : 0
   }, {
     "assertionName" : "No active term matches that of an inactive Description.",
+    "assertionUuid" : "c2975dd5-3869-4bf7-ac75-53fd53b90144",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Terms contains balanced parentheses.",
+    "assertionUuid" : "50907ee7-ddf6-4cb5-ba8b-be150644430b",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
+    "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Case-sensitive terms have appropriate caseSignificanceId.",
+    "assertionUuid" : "22a95293-3acb-4671-95f8-1ff13ba3202c",
     "firstNInstances" : [ ],
-    "totalFailed" : -1
+    "totalFailed" : 0
   }, {
     "assertionName" : "Active Terms of active concept consist of valid characters.",
+    "assertionUuid" : "6614ff12-fca2-42b7-a5da-ea26353979fe",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All definitions are case sensitive.",
+    "assertionUuid" : "b4930ea7-4078-4599-979c-2dde18164f01",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "All definitions are preferred.",
+    "assertionUuid" : "73e46e72-6fdb-407b-9d50-d86a36a3a862",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "No active Terms contain leading or trailing spaces.",
+    "assertionUuid" : "da3ae7c4-6144-4cd5-9530-2a7780c53c9a",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "No active Terms contain double spaces.",
+    "assertionUuid" : "f7b7cefe-858d-4749-ab98-7106700feaee",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "The first letter of the Term should be capitalized.",
+    "assertionUuid" : "6138248d-8cc8-4bc2-8043-cd609fdd640c",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Members are inactive for inactive descriptions in the snapshot file.",
+    "assertionUuid" : "d76f1430-7e9a-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Descriptions in a language refset are unique for a given concept.",
+    "assertionUuid" : "e658fb00-7e9a-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
-    "totalFailed" : -1
+    "totalFailed" : 0
   }, {
     "assertionName" : "Members are active for active descriptions in the snapshot file.",
+    "assertionUuid" : "f636b7b0-7e9a-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "There is only zero or one active Definition per concept per dialect in the snapshot file.",
+    "assertionUuid" : "00e87310-7e9b-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "SNOMED RT identifier simple map refset refers to active components.",
+    "assertionUuid" : "695cea40-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "There is one and only one SNOMED RT simple map refset member per concept.",
+    "assertionUuid" : "730720b0-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "SNOMED RT identifier simple map refset members are unique.",
+    "assertionUuid" : "83638340-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "CTV3 simple map refset members are unique.",
+    "assertionUuid" : "a2e01ee0-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "There is one and only one CTV3 simple map refset member per concept.",
+    "assertionUuid" : "bab42070-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "CTV3 simple map refset members are always active.",
+    "assertionUuid" : "c0869af0-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Active VTM simple refset members refer to active components.",
+    "assertionUuid" : "9715b1dd-7de5-4f80-ad28-f97ab52b9359",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Active VMP simple refset members refer to active components.",
+    "assertionUuid" : "f5092a2b-8874-4290-ae96-a04bf568b1ab",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Active Non-human refset members refer to active components.",
+    "assertionUuid" : "8479317e-8459-4362-bee8-628b8220f1e4",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Calling procedure testing that terms that contain EN-US language-specific words are in the same US language refset.",
+    "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
-    "totalFailed" : -1
+    "totalFailed" : 0
   }, {
     "assertionName" : "Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset.",
+    "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
-    "totalFailed" : -1
+    "totalFailed" : 0
   }, {
     "assertionName" : "targetComponentId' does not refer to navigation concepts.",
+    "assertionUuid" : "0a4bba70-85b7-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ ],
-    "totalFailed" : -1
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Terms are unique in Description hierarchy.",
+    "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
+    "firstNInstances" : [ ],
+    "totalFailed" : 0
   }, {
     "assertionName" : "All active FSNs for a given concept have the same semantic tag.",
+    "assertionUuid" : "5c0186f3-0b72-4685-8aad-eff15a7f8880",
     "firstNInstances" : [ ],
     "totalFailed" : 0
-  },{
-    "assertionName" : "Terms are unique in Description hierarchy.",
-    "firstNInstances" : [ ],
-    "totalFailed" : 0
-  },{
+  }, {
     "assertionName" : "CTV3 codes are unique in the CTV3 simple map refset",
+    "assertionUuid" : "f14d521f-2472-4871-9c4e-356f0f075a3a",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   }, {
     "assertionName" : "SNOMED RT codes are unique in the SNOMED RT simple map refset",
+    "assertionUuid" : "5e80ea3e-c4dd-4ae3-8b75-f0567e42b962",
     "firstNInstances" : [ ],
     "totalFailed" : 0
   } ]

@@ -18,7 +18,7 @@
 ********************************************************************************/
 	
 
-	drop table if exists v_curr_view;
+drop table if exists v_curr_view;
   create table if not exists v_curr_view like curr_concept_f;
   insert into v_curr_view
 		select *

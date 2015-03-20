@@ -2,8 +2,11 @@ package org.ihtsdo.snomed.rvf.importer.impl;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
 import java.net.URL;
 
+import org.apache.commons.io.IOUtils;
+import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.snomed.rvf.importer.AssertionsImporter;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,5 +41,11 @@ public class AssertionsImporterImplIntegrationTest {
 
         // import content
         assertionsImporter.importAssertionsFromFile(manifestUrl.getPath(), scriptsFolderUrl.getPath());
+    }
+    
+   
+    public void testAddSqlScript() throws IOException {
+    	final AssertionsImporterImpl importer = new AssertionsImporterImpl();
+    	importer.addSqlTestToAssertion(new Assertion(), IOUtils.toString(AssertionsImporterImplIntegrationTest.class.getResource("/scripts/release-type/release-type-full-validation-concept.sql")));
     }
 }
