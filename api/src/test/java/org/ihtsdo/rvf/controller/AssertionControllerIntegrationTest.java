@@ -1,10 +1,26 @@
 package org.ihtsdo.rvf.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.ReleaseCenter;
-import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
 import org.junit.After;
@@ -21,14 +37,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.Charset;
-import java.util.*;
-
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A test case for {@link org.ihtsdo.rvf.controller.AssertionController}.
@@ -83,7 +92,7 @@ public class AssertionControllerIntegrationTest {
     @Test
     public void testGetAssertion() throws Exception {
 
-        Long id = assertion.getId();
+        final Long id = assertion.getId();
         mockMvc.perform(get("/assertions/{id}",id).accept(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(get("/assertions/{id}",id).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -93,7 +102,7 @@ public class AssertionControllerIntegrationTest {
 
     @Test
     public void testDeleteAssertion() throws Exception {
-        Long id = assertion.getId();
+        final Long id = assertion.getId();
 //        mockMvc.perform(delete("/assertions/delete/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(delete("/assertions/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -101,7 +110,7 @@ public class AssertionControllerIntegrationTest {
 
     @Test
     public void testDeleteMissingAssertion() throws Exception {
-        Long id = 29367234L;
+        final Long id = 29367234L;
         mockMvc.perform(delete("/assertions/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(delete("/assertions/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -110,7 +119,7 @@ public class AssertionControllerIntegrationTest {
 
     @Test
     public void testGetMissingAssertion() throws Exception {
-        Long id = 29367234L;
+        final Long id = 29367234L;
         mockMvc.perform(get("/assertions/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(get("/assertions/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -120,7 +129,7 @@ public class AssertionControllerIntegrationTest {
     @Test
     public void testCreateAssertion() throws Exception {
 
-        Assertion assertion1 = new Assertion();
+        final Assertion assertion1 = new Assertion();
         assertion1.setName("Testing assertion");
         assertion1.setDescription("Test description");
         String paramsString = objectMapper.writeValueAsString(assertion1);
@@ -137,10 +146,10 @@ public class AssertionControllerIntegrationTest {
 
     @Test
     public void testUpdateAssertion() throws Exception {
-        Long id = assertion.getId();
-        String updatedName = "Updated Assertion Name";
+        final Long id = assertion.getId();
+        final String updatedName = "Updated Assertion Name";
         params.put("name", updatedName);
-        String paramsString = objectMapper.writeValueAsString(params);
+        final String paramsString = objectMapper.writeValueAsString(params);
         mockMvc.perform(put("/assertions/{id}", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(put("/assertions/{id}", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -150,7 +159,7 @@ public class AssertionControllerIntegrationTest {
 
     @Test
     public void testGetTestsForAssertion() throws Exception {
-        Long id = assertion.getId();
+        final Long id = assertion.getId();
         // create and add some tests to assertion
         assertionService.addTest(assertion, getRandomTest());
         assertionService.addTest(assertion, getRandomTest());
@@ -164,17 +173,17 @@ public class AssertionControllerIntegrationTest {
 
     @Test
     public void testAddTestsForAssertion() throws Exception {
-        Long id = assertion.getId();
+        final Long id = assertion.getId();
         // create and add some tests to assertion
-        List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
-        org.ihtsdo.rvf.entity.Test test1 = getRandomTest();
+        final List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
+        final org.ihtsdo.rvf.entity.Test test1 = getRandomTest();
         assertNotNull(test1.getId());
         tests.add(test1);
-        org.ihtsdo.rvf.entity.Test test2 = getRandomTest();
+        final org.ihtsdo.rvf.entity.Test test2 = getRandomTest();
         assertNotNull(test2.getId());
         tests.add(test2);
 
-        String paramsString = objectMapper.writeValueAsString(tests);
+        final String paramsString = objectMapper.writeValueAsString(tests);
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
@@ -190,17 +199,17 @@ public class AssertionControllerIntegrationTest {
 
     @Test
     public void testDeleteTestsForAssertion() throws Exception {
-        Long id = assertion.getId();
+        final Long id = assertion.getId();
         // create and add some tests to assertion
-        List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
-        org.ihtsdo.rvf.entity.Test test1 = getRandomTest();
+        final List<org.ihtsdo.rvf.entity.Test> tests = new ArrayList<>();
+        final org.ihtsdo.rvf.entity.Test test1 = getRandomTest();
         assertNotNull(test1.getId());
         tests.add(test1);
-        org.ihtsdo.rvf.entity.Test test2 = getRandomTest();
+        final org.ihtsdo.rvf.entity.Test test2 = getRandomTest();
         assertNotNull(test2.getId());
         tests.add(test2);
 
-        String paramsString = objectMapper.writeValueAsString(tests);
+        final String paramsString = objectMapper.writeValueAsString(tests);
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(delete("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
@@ -217,9 +226,9 @@ public class AssertionControllerIntegrationTest {
     }
 
     private org.ihtsdo.rvf.entity.Test getRandomTest(){
-        org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
+        final org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
         test.setName("Random Test " + UUID.randomUUID());
-        test.setCommand(new ExecutionCommand(new Configuration()));
+        test.setCommand(new ExecutionCommand());
         return (org.ihtsdo.rvf.entity.Test) entityService.create(test);
     }
 }

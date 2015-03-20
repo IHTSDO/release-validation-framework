@@ -20,7 +20,6 @@ import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
-import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.ihtsdo.rvf.validation.TestReportable;
 import org.ihtsdo.rvf.validation.model.ManifestFile;
@@ -108,7 +107,7 @@ public class TestUploadFileController {
 		response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
 		try (PrintWriter writer = response.getWriter()) {
 			// must be a zip
-			ZipFileUtils.copyUploadToDisk(file, tempFile);
+			file.transferTo(tempFile);
 			final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
 
 			TestReportable report;
@@ -119,12 +118,10 @@ public class TestUploadFileController {
 				final String originalFilename = manifestFile.getOriginalFilename();
 				final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
 				tempManifestFile.deleteOnExit();
-				ZipFileUtils.copyUploadToDisk(manifestFile, tempManifestFile);
-
+				file.transferTo(tempManifestFile);
 				final ManifestFile mf = new ManifestFile(tempManifestFile);
 				report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
 			}
-
 			// store the report to disk for now with a timestamp
 			if (report.getNumErrors() > 0) {
 				LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
@@ -201,7 +198,7 @@ public class TestUploadFileController {
 		response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
 		
 		try (PrintWriter writer = response.getWriter()) {
-			ZipFileUtils.copyUploadToDisk(file, tempFile);
+			file.transferTo(tempFile);
 			final ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
 			final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
 			// store the report to disk for now with a timestamp

@@ -1,10 +1,20 @@
 package org.ihtsdo.rvf.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.nio.charset.Charset;
+
 import org.hamcrest.Matchers;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.EntityService;
 import org.junit.After;
 import org.junit.Before;
@@ -20,12 +30,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.Charset;
-
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A test case for {@link org.ihtsdo.rvf.controller.TestController}.
@@ -53,10 +58,7 @@ public class TestControllerIntegrationTest {
         test = new org.ihtsdo.rvf.entity.Test();
         test.setName("Test Name");
         test.setDescription("Example Test Description");
-        Configuration configuration = new Configuration();
-        configuration.setValue("key1", "value 1");
-        test.setCommand(new ExecutionCommand(configuration));
-
+        test.setCommand(new ExecutionCommand());
         assert entityService != null;
         assert entityService.count(org.ihtsdo.rvf.entity.Test.class) == 0;
         test = (org.ihtsdo.rvf.entity.Test) entityService.create(test);
@@ -77,7 +79,7 @@ public class TestControllerIntegrationTest {
     @Test
     public void testGetTest() throws Exception {
 
-        Long id = test.getId();
+        final Long id = test.getId();
         mockMvc.perform(get("/tests/{id}",id).accept(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(get("/tests/{id}",id).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -87,7 +89,7 @@ public class TestControllerIntegrationTest {
 
     @Test
     public void testDeleteTest() throws Exception {
-        Long id = test.getId();
+        final Long id = test.getId();
 //        mockMvc.perform(delete("/tests/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(delete("/tests/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -95,7 +97,7 @@ public class TestControllerIntegrationTest {
 
     @Test
     public void testDeleteMissingTest() throws Exception {
-        Long id = 29367234L;
+        final Long id = 29367234L;
         mockMvc.perform(delete("/tests/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(delete("/tests/{id}", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
@@ -105,13 +107,11 @@ public class TestControllerIntegrationTest {
     @Test
     public void testCreateTest() throws Exception {
 
-        org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
+        final org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
         test.setName("Test Name");
         test.setDescription("Example Test Description");
-        Configuration configuration = new Configuration();
-        configuration.setValue("key1", "value 1");
-        test.setCommand(new ExecutionCommand(configuration));
-        String paramsString = objectMapper.writeValueAsString(test);
+        test.setCommand(new ExecutionCommand());
+        final String paramsString = objectMapper.writeValueAsString(test);
 
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(post("/tests").content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
@@ -123,10 +123,10 @@ public class TestControllerIntegrationTest {
 
     @Test
     public void testUpdateTest() throws Exception {
-        Long id = test.getId();
-        String updatedName = "Updated Test Name";
+        final Long id = test.getId();
+        final String updatedName = "Updated Test Name";
         test.setName(updatedName);
-        String paramsString = objectMapper.writeValueAsString(test);
+        final String paramsString = objectMapper.writeValueAsString(test);
         mockMvc.perform(put("/tests/{id}", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
         mockMvc.perform(put("/tests/{id}", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -137,7 +137,7 @@ public class TestControllerIntegrationTest {
     @Test
     public void executeTest() throws Exception{
         // set configuration
-        String template = "" +
+        final String template = "" +
                 "select  " +
                 "concat('CONCEPT: id=',a.id, ':Concept has only one defining relationship but is not primitive.')  " +
                 "from <PROSPECTIVE>.concept_<SNAPSHOT> a  " +
@@ -147,25 +147,22 @@ public class TestControllerIntegrationTest {
                 "and a.definitionstatusid != '900000000000074008' " +
                 "group by b.sourceid " +
                 "having count(*) = 1;";
-        Configuration configuration = new Configuration();
-        ExecutionCommand command = new ExecutionCommand();
+        final ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(template);
-        command.setCode("Execute me".getBytes());
-        command.setConfiguration(configuration);
 
-        String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
-        org.ihtsdo.rvf.entity.Test executableTest = new org.ihtsdo.rvf.entity.Test();
+        final String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
+        final org.ihtsdo.rvf.entity.Test executableTest = new org.ihtsdo.rvf.entity.Test();
         executableTest.setName(execTestName);
         executableTest.setCommand(command);
         executableTest.setType(TestType.SQL);
-        org.ihtsdo.rvf.entity.Test returnedTest = objectMapper.readValue(mockMvc.perform(post("/tests").content(objectMapper.writeValueAsString(executableTest)).contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse().getContentAsString(), org.ihtsdo.rvf.entity.Test.class);
-        Long executableTestId = returnedTest.getId();
+        final org.ihtsdo.rvf.entity.Test returnedTest = objectMapper.readValue(mockMvc.perform(post("/tests").content(objectMapper.writeValueAsString(executableTest)).contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse().getContentAsString(), org.ihtsdo.rvf.entity.Test.class);
+        final Long executableTestId = returnedTest.getId();
         assert executableTestId != null;
 
         mockMvc.perform(get("/tests", executableTestId).contentType(MediaType.APPLICATION_JSON)).andDo(print());
 
         // execute test
-        String paramsString = objectMapper.writeValueAsString(returnedTest);
+        final String paramsString = objectMapper.writeValueAsString(returnedTest);
         System.out.println("paramsString = " + paramsString);
         mockMvc.perform(get("/tests/{id}/run", executableTestId).content(paramsString).param("runId", "1")
                 .param("prospectiveReleaseVersion", "rvf_int_20140731")

@@ -9,9 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.ihtsdo.rvf.helper.Configuration;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -77,33 +74,7 @@ public class Test {
         this.command = command;
         this.command.setTest(this);
     }
-
-    @JsonIgnore
-    public Configuration getConfiguration() {
-        if(command == null){
-            setCommand(new ExecutionCommand(new Configuration()));
-            return command.getConfiguration();
-        }
-        else{
-            if(command.getConfiguration() == null){
-                command.setConfiguration(new Configuration());
-                return command.getConfiguration();
-            }
-            else{
-                return command.getConfiguration();
-            }
-        }
-    }
-
-    public void setConfiguration(final Configuration configuration) {
-        if(command == null){
-            setCommand(new ExecutionCommand(configuration));
-        }
-        else{
-            command.setConfiguration(configuration);
-        }
-    }
-
+    
 	@Override
 	public String toString() {
 		return "Test [id=" + id + ", name=" + name + ", description="

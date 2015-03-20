@@ -19,7 +19,6 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.helper.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -146,11 +145,8 @@ public class TestUploadFileControllerIntegrationTest {
                 "and a.definitionstatusid != '900000000000074008' " +
                 "group by b.sourceid " +
                 "having count(*) = 1;";
-        final Configuration configuration = new Configuration();
         final ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(template);
-        command.setCode("Execute me".getBytes());
-        command.setConfiguration(configuration);
         command.setStatements(Collections.<String>emptyList());
 
         final String execTestName = "Real - Concept has 1 defining relationship but is not primitive";

@@ -15,7 +15,6 @@ import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
 import org.junit.Before;
@@ -98,11 +97,8 @@ public class AssertionExecutionServiceImplIT {
 				"and a.definitionstatusid != '900000000000074008' " +
 				"group by b.sourceid " +
 				"having count(*) = 1;";
-		final Configuration configuration = new Configuration();
 		final ExecutionCommand command = new ExecutionCommand();
 		command.setTemplate(template);
-		command.setCode("Execute me".getBytes());
-		command.setConfiguration(configuration);
 		test.setName("Real - Concept has 1 defining relationship but is not primitive");
 		test.setCommand(command);
 
@@ -112,8 +108,7 @@ public class AssertionExecutionServiceImplIT {
 		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1L, "20150131", "20140731");
 		assertNotNull(runItem);
 		logger.debug("runItem = " + runItem);
-		logger.debug("runItem.isFailure() = " + runItem.isFailure());
-		assertTrue("Test must have passed", !runItem.isFailure());
+		assertTrue("Test must have passed", runItem.getFailureCount() == 0);
 	}
 
 	@Test
@@ -137,11 +132,8 @@ public class AssertionExecutionServiceImplIT {
 				"and a.definitionstatusid != '900000000000074008' " +
 				"group by b.sourceid " +
 				"having count(*) = 8;";
-		final Configuration configuration = new Configuration();
 		final ExecutionCommand command = new ExecutionCommand();
 		command.setTemplate(template);
-		command.setCode("Execute me".getBytes());
-		command.setConfiguration(configuration);
 		test.setName("Fake - Concept has 8 defining relationship but is not primitive");
 		test.setCommand(command);
 
@@ -150,6 +142,6 @@ public class AssertionExecutionServiceImplIT {
 		// set both prospective and previous release
 		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "20150131", "20140131");
 		assertNotNull(runItem);
-		assertTrue("Test must have passed", !runItem.isFailure());
+		assertTrue("Test must have passed", runItem.getFailureCount() == 0);
 	}
 }

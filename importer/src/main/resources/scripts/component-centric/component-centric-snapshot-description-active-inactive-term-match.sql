@@ -54,10 +54,10 @@
 */ 
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
-		100,
-		'c2975dd5-3869-4bf7-ac75-53fd53b90144',
-		'No active term associated with active concept matches that of an inactive description',
-		a.conceptid
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		'<ASSERTIONTEXT>',
+		concat('CONCEPT: Concept=',a.conceptid) 
 	from tmp_active_desc a
 	join tmp_inactive_desc b
 	on a.conceptid = b.conceptid

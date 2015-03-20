@@ -2,7 +2,6 @@ package org.ihtsdo.snomed.rvf.importer.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,7 +17,6 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.helper.Configuration;
 import org.ihtsdo.snomed.rvf.importer.AssertionsImporter;
 import org.ihtsdo.snomed.rvf.importer.helper.RvfRestClient;
 import org.jdom2.Document;
@@ -36,8 +34,6 @@ import org.springframework.stereotype.Service;
 
 import com.facebook.presto.sql.parser.SqlParser;
 import com.facebook.presto.sql.parser.StatementSplitter;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -78,10 +74,11 @@ public class AssertionsImporterImpl implements AssertionsImporter {
                 {
                     final ResponseEntity responseEntity = createAssertionFromElement(element);
                     if(HttpStatus.CREATED == responseEntity.getStatusCode()){
+                    	 Assertion assertion = null;
                         try
                         {
-                            final Assertion assertion = objectMapper.readValue(responseEntity.getBody().toString(), Assertion.class);
-                            logger.info("Created assertion id : " + assertion.getId());
+                        	assertion = objectMapper.readValue(responseEntity.getBody().toString(), Assertion.class);
+                        	 logger.info("Created assertion id : " + assertion.getId());
                             assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
                             // get Sql file name from element and use it to add SQL test
                             final String sqlFileName = element.getAttributeValue("sqlFile");
@@ -103,14 +100,9 @@ public class AssertionsImporterImpl implements AssertionsImporter {
                             // add test to assertion
                             addSqlTestToAssertion(assertion, sqlString);
                         }
-                        catch (final FileNotFoundException e) {
-                            logger.error("Nested exception is : " + e.getMessage());
-                        }
-                        catch (JsonMappingException | JsonParseException e) {
-                            logger.warn("Error reading or parsing json. Nested exception is : " + e.getMessage());
-                        }
                         catch (final Exception e) {
                             logger.warn("Error reading sql from input stream. Nested exception is : " + e.getMessage());
+                            throw new IllegalStateException("Failed to add sql script test to assertion with uuid:" + assertion.getUuid(), e);
                         }
                     }
                     else{
@@ -174,6 +166,7 @@ public class AssertionsImporterImpl implements AssertionsImporter {
         for(final StatementSplitter.Statement statement : splitter.getCompleteStatements())
         {
             String cleanedSql = statement.statement();
+            logger.debug("sql to be cleaned:" + cleanedSql);
             if ( cleanedSql.startsWith(CREATE_PROCEDURE) || cleanedSql.startsWith(CREATE_PROCEDURE.toLowerCase())) {
             	storedProcedureFound = true;
             }
@@ -182,21 +175,27 @@ public class AssertionsImporterImpl implements AssertionsImporter {
             while(tokenizer.hasMoreTokens())
             {
                 String token = tokenizer.nextToken();
+                // we know sometimes tokenizer messed up and leaves a trailing ), so we clena this up
+                if(token.endsWith(")")){
+                    token = token.substring(0, token.length() - 1);
+                }
                 final Map<String, String> schemaMapping = getRvfSchemaMapping(token);
                 if(schemaMapping.keySet().size() > 0){
-                    // we know sometimes tokenizer messed up and leaves a trailing ), so we clena this up
-                    if(token.endsWith(")")){
-                        token = token.substring(0, token.length() - 1);
-                    }
+                   
                     lookupMap.put(token, schemaMapping.get(token));
                     // now replace all instances with rvf mapping
-                    cleanedSql = cleanedSql.replaceAll(token, schemaMapping.get(token));
+                    if (schemaMapping.get(token) != null)
+                    {
+                    	cleanedSql = cleanedSql.replaceAll(token, schemaMapping.get(token));
+                    }
+                   
                 }
             }
             cleanedSql = cleanedSql.replaceAll("runid", "run_id");
             cleanedSql = cleanedSql.replaceAll("assertionuuid", "assertion_id");
-            cleanedSql = cleanedSql.replaceAll("assertiontext", "assertion_text");
-            logger.info("cleaned sql:" + cleanedSql);
+            cleanedSql = cleanedSql.replaceAll("assertiontext,", "");
+            cleanedSql = cleanedSql.replaceAll("'<ASSERTIONTEXT>',", "");
+            logger.debug("cleaned sql:" + cleanedSql);
             if (!storedProcedureFound) {
                statements.add(cleanedSql);
             } else {
@@ -208,12 +207,8 @@ public class AssertionsImporterImpl implements AssertionsImporter {
         	logger.debug("Stored proecure found:" + storedProcedureSql.toString());
         }
 
-        // set configuration;
-        final Configuration configuration = new Configuration();
         final ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(sql);
-        command.setCode("Execute me".getBytes());
-        command.setConfiguration(configuration);
         command.setStatements(statements);
         final Test test = new Test();
         test.setType(TestType.SQL);

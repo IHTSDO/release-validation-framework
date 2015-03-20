@@ -12,9 +12,9 @@
 	create table if not exists  v_curr_snapshot as
 	select a.id 
 	from curr_textdefinition_s a , prev_textdefinition_s b
-	where cast(a.effectivetime as datetime) =
+	where cast(a.effectivetime as datetime) >
 				(select max(cast(effectivetime as datetime)) 
-				 from curr_textdefinition_s)
+				 from prev_textdefinition_s)
 	and a.active = 0
 	and a.id = b.id
 	and a.active = b.active;

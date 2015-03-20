@@ -21,8 +21,10 @@
 
 	create table if not exists tmp_priorfullfromcurrent as
 	select *
-	from prev_simplerefset_f
-	where effectivetime != '<CURRENT-RELEASE-DATE>';
+	from curr_simplerefset_f
+	where cast(effectivetime as datetime) <=
+		(select max(cast(effectivetime as datetime)) 
+		 from prev_simplerefset_f);
 
 /*  rows that are among the prior rows of the current simplerefset full file, that are not in the published prior refset*/
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
@@ -30,7 +32,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-    a.id
+    concat('Refset: id=',a.id, ': simple refset member is in current release file, but not in prior release file.') 	  
 	from tmp_priorfullfromcurrent a
 	left join prev_simplerefset_f b
 	on a.id = b.id
@@ -52,7 +54,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-    a.id
+      	concat('Refset: id=',a.id, ': simple refset member is in prior release file, but not in current release file.') 	 
 	from prev_simplerefset_f a
 	left join tmp_priorfullfromcurrent b
 		on a.id = b.id

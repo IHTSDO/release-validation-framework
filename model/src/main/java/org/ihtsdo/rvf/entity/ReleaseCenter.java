@@ -1,8 +1,9 @@
 package org.ihtsdo.rvf.entity;
 
-import org.ihtsdo.rvf.helper.Configuration;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "release_center")
@@ -14,14 +15,12 @@ public class ReleaseCenter {
 	private String name;
 	private String shortName;
 	private boolean inactivated;
-    @OneToOne(targetEntity = Configuration.class)
-    Configuration configuration;
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -29,7 +28,7 @@ public class ReleaseCenter {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -37,7 +36,7 @@ public class ReleaseCenter {
 		return shortName;
 	}
 
-	public void setShortName(String shortName) {
+	public void setShortName(final String shortName) {
 		this.shortName = shortName;
 	}
 
@@ -45,15 +44,7 @@ public class ReleaseCenter {
 		return inactivated;
 	}
 
-	public void setInactivated(boolean inactivated) {
+	public void setInactivated(final boolean inactivated) {
 		this.inactivated = inactivated;
 	}
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-    }
 }

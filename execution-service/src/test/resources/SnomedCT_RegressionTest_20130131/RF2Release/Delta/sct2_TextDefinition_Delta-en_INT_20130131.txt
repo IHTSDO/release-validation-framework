@@ -1,0 +1,10 @@
+id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignificanceId
+2988807015	20140131	1	900000000000207008	609406000	en	900000000000550004	A non-immune hypersensitivity reaction directed towards a foreign substance, which results in tissue injury, which is usually transient. It is the manifestation of the pseudoallergic state.	900000000000017005
+2988808013	20140131	1	900000000000207008	699528002	en	900000000000550004	Rapidly developing osteoporosis characterized primarily by bone marrow edema of a self-limiting nature.	900000000000017005
+2987155015	20140131	1	900000000000207008	36813001	en	900000000000550004	A condition in which the placenta is located over or near the internal os of the cervix, increasing the risk of hemorrhage.	900000000000017005
+2988809017	20140131	1	900000000000207008	699536006	en	900000000000550004	Injury to a joint due to an extension beyond the normal range of motion	900000000000017005
+2985919011	20140131	1	900000000000207008	699666008	en	900000000000550004	Flattest corneal meridian defined as the axis in degrees wherein power is least and radius of curvature is longest.	900000000000017005
+2987064010	20140131	1	900000000000207008	698055008	en	900000000000550004	An inflammatory necrotizing lesion occurring in minor salivary glands.	900000000000017005
+2973601010	20140131	1	900000000000207008	62950007	en	900000000000550004	A disorder characterized by inflammation of both the brain and the spinal cord.	900000000000017005
+2988954017	20140131	1	900000000000207008	699683004	en	900000000000550004	Caries in which the lesion has removed so much of the crown that its original site of initiation cannot be determined with any certainty.	900000000000017005
+2983208019	20140131	1	900000000000207008	699220008	en	900000000000550004	A common taste disorder where there is a lingering, often unpleasant taste despite the absence of any stimulus to initiate the distorted taste.	900000000000017005

@@ -53,8 +53,8 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 
 	@Override
 	public List<AssertionTest> getAssertionTests(final UUID uuid) {
-		return getCurrentSession().createQuery("from AssertionTest as at where at.assertion.uuid = :assertionId")
-				.setParameter("assertionId", uuid).list();
+		return getCurrentSession().createQuery("from AssertionTest as at where at.assertion.uuid = :assertionUuid")
+				.setParameter("assertionUuid", uuid.toString()).list();
 	}
 
 	@Override
@@ -86,8 +86,8 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 
 	@Override
 	public List<Test> getTests(final UUID uuid) {
-		return getCurrentSession().createQuery("select at.test from AssertionTest as at where at.assertion.uuid = :assertionId")
-				.setParameter("assertionId", uuid).list();
+		return getCurrentSession().createQuery("select at.test from AssertionTest as at where at.assertion.uuid = :assertionUuid")
+				.setParameter("assertionUuid", uuid.toString()).list();
 	}
 
 	@Override

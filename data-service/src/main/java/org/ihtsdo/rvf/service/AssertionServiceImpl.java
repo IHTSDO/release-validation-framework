@@ -243,7 +243,6 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
         if(! assertionGroups.contains(group))
         {
             group.getAssertions().add(assertion);
-            assertion.getGroups().add(group);
             assertionDao.update(assertion);
         }
 
@@ -262,10 +261,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
         if(assertionGroups.contains(group))
         {
             group.getAssertions().remove(assertion);
-            assertion.getGroups().remove(group);
-            assertionDao.update(assertion);
         }
-
         return (AssertionGroup) entityService.update(group);
     }
 

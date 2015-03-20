@@ -1,8 +1,12 @@
 package org.ihtsdo.rvf.validation;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Map;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.ihtsdo.rvf.validation.impl.CsvMetadataResultFormatter;
 import org.ihtsdo.rvf.validation.impl.CsvResultFormatter;
 import org.ihtsdo.rvf.validation.impl.StreamTestReport;
@@ -18,11 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
-
 @Component
 public class StructuralTestRunner implements InitializingBean{
 
@@ -34,11 +33,11 @@ public class StructuralTestRunner implements InitializingBean{
 	@Autowired
 	private ValidationLogFactory validationLogFactory;
 
-	public TestReportable execute(ResourceManager resourceManager, PrintWriter writer, boolean writeSuccesses,
-			ManifestFile manifest) {
+	public TestReportable execute(final ResourceManager resourceManager, final PrintWriter writer, final boolean writeSuccesses,
+			final ManifestFile manifest) {
 
 		// the information for the manifest testing
-		StreamTestReport testReport = new StreamTestReport(new CsvMetadataResultFormatter(), writer, true);
+		final StreamTestReport testReport = new StreamTestReport(new CsvMetadataResultFormatter(), writer, true);
 		// run manifest tests
 		runManifestTests(resourceManager, testReport, manifest, validationLogFactory.getValidationLog(ManifestPatternTester.class));
 		testReport.addNewLine();
@@ -46,34 +45,34 @@ public class StructuralTestRunner implements InitializingBean{
 		// run column tests
 		testReport.setFormatter(new CsvResultFormatter());
 		testReport.setWriteSuccesses(writeSuccesses);
-		ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
+		final ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
 		runColumnTests(resourceManager, testReport, validationLog);
 
-		String summary = testReport.writeSummary();
+		final String summary = testReport.writeSummary();
 		validationLog.info(summary);
 
 		return testReport;
 	}
 
-	public TestReportable execute(ResourceManager resourceManager, PrintWriter writer, boolean writeSuccesses) {
+	public TestReportable execute(final ResourceManager resourceManager, final PrintWriter writer, final boolean writeSuccesses) {
 
-		StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), writer, writeSuccesses);
-		ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
+		final StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), writer, writeSuccesses);
+		final ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
 		runColumnTests(resourceManager, testReport, validationLog);
-		String summary = testReport.writeSummary();
+		final String summary = testReport.writeSummary();
 		validationLog.info(summary);
 		return testReport;
 	}
 
-	private void runManifestTests(ResourceManager resourceManager, TestReportable report,
-			ManifestFile manifest, ValidationLog validationLog) {
-		ManifestPatternTester manifestPatternTester = new ManifestPatternTester(validationLog, resourceManager, manifest, report);
+	private void runManifestTests(final ResourceManager resourceManager, final TestReportable report,
+			final ManifestFile manifest, final ValidationLog validationLog) {
+		final ManifestPatternTester manifestPatternTester = new ManifestPatternTester(validationLog, resourceManager, manifest, report);
 		manifestPatternTester.runTests();
 	}
 
-	private void runColumnTests(ResourceManager resourceManager, TestReportable report, ValidationLog validationLog) {
+	private void runColumnTests(final ResourceManager resourceManager, final TestReportable report, final ValidationLog validationLog) {
 
-		ColumnPatternTester columnPatternTest = new ColumnPatternTester(validationLog, resourceManager, report);
+		final ColumnPatternTester columnPatternTest = new ColumnPatternTester(validationLog, resourceManager, report);
 		columnPatternTest.runTests();
 	}
 	
@@ -95,7 +94,7 @@ public class StructuralTestRunner implements InitializingBean{
 				final String originalFilename = manifestFile.getOriginalFilename();
 				final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
 				tempManifestFile.deleteOnExit();
-				ZipFileUtils.copyUploadToDisk(manifestFile, tempManifestFile);
+				manifestFile.transferTo(tempManifestFile);
 
 				final ManifestFile mf = new ManifestFile(tempManifestFile);
 				report = execute(resourceManager, writer, writeSucceses, mf);
@@ -152,7 +151,7 @@ public class StructuralTestRunner implements InitializingBean{
 		logger.info("Using report folder location as :" + reportDataFolder.getAbsolutePath());
 	}
 
-	public void setReportFolderLocation(String reportFolderLocation) {
+	public void setReportFolderLocation(final String reportFolderLocation) {
 		this.reportFolderLocation = reportFolderLocation;
 	}
 
@@ -164,7 +163,7 @@ public class StructuralTestRunner implements InitializingBean{
 		return failureThreshold;
 	}
 
-	public void setFailureThreshold(int failureThreshold) {
+	public void setFailureThreshold(final int failureThreshold) {
 		this.failureThreshold = failureThreshold;
 	}
 }

@@ -48,7 +48,7 @@ public class TestDataBootStrap {
 
     public void setupExecutableTest(){
         // set configuration
-        String template = "" +
+        final String template = "" +
                 "select  " +
                 "concat('CONCEPT: id=',a.id, ':Concept has only one defining relationship but is not primitive.')  " +
                 "from curr_concept_table_name a  " +
@@ -58,27 +58,22 @@ public class TestDataBootStrap {
                 "and a.definition_status_id != '900000000000074008' " +
                 "group by b.source_id_column_name " +
                 "having count(*) = 1;";
-        Configuration configuration = new Configuration();
-        configuration.setValue("curr_concept_table_name", "curr_concept_s");
-        configuration.setValue("curr_stated_relationship_table_name", "curr_stated_relationship_s");
-        configuration.setValue("id_column_name", "id");
-        configuration.setValue("active_column_name", "active");
-        configuration.setValue("definition_status_id", "definitionstatusid");
-        configuration.setValue("source_id_column_name", "sourceid");
-        entityService.create(configuration);
-        ExecutionCommand command = new ExecutionCommand();
+        template.replace("curr_concept_table_name", "curr_concept_s");
+        template.replace("curr_stated_relationship_table_name", "curr_stated_relationship_s");
+        template.replace("id_column_name", "id");
+        template.replace("active_column_name", "active");
+        template.replace("definition_status_id", "definitionstatusid");
+        template.replace("source_id_column_name", "sourceid");
+        final ExecutionCommand command = new ExecutionCommand();
         command.setTemplate(template);
-        command.setCode("Execute me".getBytes());
-        command.setConfiguration(configuration);
 
-        String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
+        final String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
         org.ihtsdo.rvf.entity.Test executableTest = new org.ihtsdo.rvf.entity.Test();
         executableTest.setName(execTestName);
-//        executableTest.setConfiguration(configuration);
         executableTest.setCommand(command);
         executableTest.setType(TestType.SQL);
         executableTest = (org.ihtsdo.rvf.entity.Test) entityService.create(executableTest);
-        Long executableTestId = executableTest.getId();
+        final Long executableTestId = executableTest.getId();
         assert executableTestId != null;
 
         // associate test with assertion
