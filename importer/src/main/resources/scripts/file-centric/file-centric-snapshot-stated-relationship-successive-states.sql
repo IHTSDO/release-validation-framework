@@ -16,11 +16,13 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		a.id
-	from curr_stated_relationship_d a
+	from curr_stated_relationship_s a
 	inner join prev_stated_relationship_s b on a.id = b.id 
 	where a.active = '0' 
 	and b.active = '0' 
-	and a.effectivetime = '<CURRENT-RELEASE-DATE>'
+	and cast(a.effectivetime as datetime) >
+				(select max(cast(effectivetime as datetime))
+				 from prev_stated_relationship_s)
 	and a.moduleid = b.moduleid
 	and a.sourceid = b.sourceid
 	and a.relationshipgroup = b.relationshipgroup

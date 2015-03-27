@@ -10,13 +10,14 @@
 /* 	view of current snapshot made by finding duplicate active FSN associated with active concepts */
 	drop table if exists v_curr_snapshot;
 	create table if not exists  v_curr_snapshot as
-	select  a.term ,a.typeid 
+	select  a.term
 	from curr_description_s a , curr_concept_s b	
 	where a.conceptid = b.id
 	and b.active = 1
 	and a.active = 1
+	and a.typeid = '900000000000003001'
 	group by BINARY  a.term
-	having count(a.term) > 1 and a.typeid = '900000000000003001' ;
+	having count(a.term) > 1 ;
 
 	
 /* 	inserting exceptions in the result table */
@@ -25,7 +26,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESC: id=',a.term, ':Active FSN is unique in DESCRIPTION snapshot.') 	
+		concat('DESC: Active FSN =',a.term, ': is not unique in DESCRIPTION snapshot.') 	
 	from v_curr_snapshot a;
 
 

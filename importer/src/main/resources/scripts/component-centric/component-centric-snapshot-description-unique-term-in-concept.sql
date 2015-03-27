@@ -1,4 +1,3 @@
-
 /******************************************************************************** 
 	component-centric-snapshot-description-unique-term-in-concept
 

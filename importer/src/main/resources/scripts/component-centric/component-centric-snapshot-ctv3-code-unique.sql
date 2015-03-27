@@ -12,11 +12,11 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		a.maptarget
+		concat('CTV3 Code = ', a.maptarget, 'is not unique')
 	from curr_simplemaprefset_s a
 	inner join curr_concept_s b 
 		on a.referencedcomponentid = b.id
-	where 1=1
+	where a.maptarget is not null
 	and a.refsetid = '900000000000497000'
 	group by binary a.maptarget
 	having count(*) > 1

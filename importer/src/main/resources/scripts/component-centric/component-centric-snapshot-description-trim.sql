@@ -12,8 +12,7 @@
 	create table if not exists  v_curr_snapshot as
 	select a.term from curr_description_s a 
 	where a.active = 1
-	and a.term != LTRIM(term)
-	and a.term != RTRIM(term); 
+	and ( a.term != LTRIM(term) or a.term != RTRIM(term)); 
 	
 
 
@@ -24,7 +23,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',a.term, ':Active Terms with leading and trailing spaces.') 	
+		concat('Description: term=',a.term, ':Active Terms with leading and trailing spaces.') 	
 	from v_curr_snapshot a;
 
 

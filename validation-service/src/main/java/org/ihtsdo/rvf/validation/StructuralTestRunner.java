@@ -13,7 +13,7 @@ import org.ihtsdo.rvf.validation.impl.StreamTestReport;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.log.ValidationLogFactory;
 import org.ihtsdo.rvf.validation.model.ManifestFile;
-import org.ihtsdo.rvf.validation.resource.ResourceManager;
+import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class StructuralTestRunner implements InitializingBean{
 	@Autowired
 	private ValidationLogFactory validationLogFactory;
 
-	public TestReportable execute(final ResourceManager resourceManager, final PrintWriter writer, final boolean writeSuccesses,
+	public TestReportable execute(final ResourceProvider resourceManager, final PrintWriter writer, final boolean writeSuccesses,
 			final ManifestFile manifest) {
 
 		// the information for the manifest testing
@@ -54,7 +54,7 @@ public class StructuralTestRunner implements InitializingBean{
 		return testReport;
 	}
 
-	public TestReportable execute(final ResourceManager resourceManager, final PrintWriter writer, final boolean writeSuccesses) {
+	public TestReportable execute(final ResourceProvider resourceManager, final PrintWriter writer, final boolean writeSuccesses) {
 
 		final StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), writer, writeSuccesses);
 		final ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
@@ -64,13 +64,13 @@ public class StructuralTestRunner implements InitializingBean{
 		return testReport;
 	}
 
-	private void runManifestTests(final ResourceManager resourceManager, final TestReportable report,
+	private void runManifestTests(final ResourceProvider resourceManager, final TestReportable report,
 			final ManifestFile manifest, final ValidationLog validationLog) {
 		final ManifestPatternTester manifestPatternTester = new ManifestPatternTester(validationLog, resourceManager, manifest, report);
 		manifestPatternTester.runTests();
 	}
 
-	private void runColumnTests(final ResourceManager resourceManager, final TestReportable report, final ValidationLog validationLog) {
+	private void runColumnTests(final ResourceProvider resourceManager, final TestReportable report, final ValidationLog validationLog) {
 
 		final ColumnPatternTester columnPatternTest = new ColumnPatternTester(validationLog, resourceManager, report);
 		columnPatternTest.runTests();
@@ -84,7 +84,7 @@ public class StructuralTestRunner implements InitializingBean{
 		// set up the response in order to stream directly to the response
 		final File manifestTestReport = new File(getReportDataFolder(), "manifest_validation_"+runId+".txt");
 		try (PrintWriter writer = new PrintWriter(manifestTestReport)) {
-			final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+			final ResourceProvider resourceManager = new ZipFileResourceProvider(tempFile);
 
 			TestReportable report;
 

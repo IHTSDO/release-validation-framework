@@ -28,6 +28,7 @@ import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.helper.JSONMap;
 import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -59,22 +60,25 @@ public class ValidationRunner implements Runnable{
 	boolean initialized = false;
 	
 	@Resource
-	S3Client s3Client;
+	private S3Client s3Client;
 	
 	@Autowired
-	StructuralTestRunner structuralTestRunner;
+	private StructuralTestRunner structuralTestRunner;
 	
 	@Autowired
-	ReleaseDataManager releaseDataManager;
+	private ReleaseDataManager releaseDataManager;
 	
 	@Autowired
-	AssertionService assertionService;
+	private AssertionService assertionService;
 	
 	@Autowired
-	AssertionExecutionService assertionExecutionService;
+	private AssertionExecutionService assertionExecutionService;
 	
 	@Autowired
-	String bucketName;
+	private final String bucketName;
+	
+	@Autowired
+	private ResourceDataLoader resourceLoader;
 	
 	private String stateFilePath;
 	private String resultsFilePath;
@@ -157,6 +161,7 @@ public class ValidationRunner implements Runnable{
 				}
 			} 
 			uploadProspectiveVersion(prospectiveVersion, config.getExtensionBaseLine(), config.getProspectiveFile());
+			resourceLoader.loadResourceData(releaseDataManager.getSchemaForRelease(prospectiveVersion));
 			runAssertionTests(prospectiveVersion, prevReleaseVersion,config.getRunId(),config.getGroupsList(),responseMap);
 			final long timeTaken = (Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000;
 			logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", config.getRunId(), timeTaken));
@@ -164,7 +169,6 @@ public class ValidationRunner implements Runnable{
 		}
 		
 	}
-
 
 	public boolean init(final ValidationRunConfig config, final Map<String, String> responseMap) {
 		setConfig(config);
@@ -271,6 +275,11 @@ public class ValidationRunner implements Runnable{
 		responseMap.put("assertionsRun", assertionResultMap.keySet().size());
 		responseMap.put("assertionsFailed", failedAssertionCount);
 		responseMap.put("assertions", items);
+		
+	}
+
+	private void loadResourceData() {
+		
 		
 	}
 

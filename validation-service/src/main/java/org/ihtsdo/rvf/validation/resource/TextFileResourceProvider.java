@@ -5,7 +5,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextFileResourceProvider implements ResourceManager {
+public class TextFileResourceProvider implements ResourceProvider {
 
 	private final String fileName;
 	private File file;

@@ -2,6 +2,8 @@ package org.ihtsdo.rvf.execution.service.test.harness;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +19,7 @@ import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
 import org.junit.Before;
@@ -48,6 +51,8 @@ public class RvfAssertionTestHarness {
 	    private ReleaseDataManager releaseDataManager;
 	    @Autowired
 	    AssertionDao assertionDao;
+	    @Autowired
+	    private ResourceDataLoader resourceDataLoader;
 
 	    @Before
 	    public void setUp() {
@@ -61,12 +66,16 @@ public class RvfAssertionTestHarness {
 	    }
 	    
 	    @Test
-	    public void testAssertions() {
+	    public void testAssertions() throws SQLException, IOException {
+	    	
+	    	 resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
+	        final List<Assertion> resources = assertionDao.getAssertionsByKeywords("resource");
+			 assertionExecutionService.executeAssertions(resources, 201503130924L,PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
 	    	//Assertion 111 and assertion test 107
 	    	//36L
 	    	//150L
 	    	//"release-type-validation", "component-centric-validation""release-type-validation","file-centric-validation"
-	    	final List<String> groupNames = Arrays.asList("release-type-validation","file-centric-validation");
+	    	final List<String> groupNames = Arrays.asList("component-centric-validation","release-type-validation","file-centric-validation");
 	    	final List<AssertionGroup> groups = new ArrayList<>();
 	    	for (final String name : groupNames) {
 	    		groups.add(assertionDao.getAssertionGroupsByName(name));
@@ -97,8 +106,5 @@ public class RvfAssertionTestHarness {
 			// set both prospective and previous release
 	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
 	        System.out.println("TOTAL of assertions run:" + runItems.size());
-//	        for (final TestRunItem item : runItems) {
-//	        	 System.out.println("runItem = " + item);
-//	        }
 	    }
 }
