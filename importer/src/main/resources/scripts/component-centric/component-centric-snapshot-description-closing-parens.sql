@@ -12,7 +12,7 @@
 	create table if not exists  v_curr_snapshot as
 	select a.term 
 	from curr_description_s a , curr_concept_s b
-	where a.typeid in ('900000000000003001')	
+	where a.typeid = '900000000000003001'
 	and a.conceptid = b.id
 	and b.active =1 
 	and a.active = 1

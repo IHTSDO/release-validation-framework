@@ -36,7 +36,8 @@
 	from curr_description_s a
 		join tmp_edited_con b
 			on a.conceptid = b.id
-			and a.active = 1;
+			and a.active = 1
+			and cast(a.effectivetime as datetime) >= (select min(cast(effectivetime as datetime)) from curr_description_d);
 	commit;
 
 /* list of inactive description of active concepts edited for this release */
@@ -57,13 +58,13 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: Concept=',a.conceptid) 
+		concat('Active description id = ',a.id,' and inactive description id = ', b.id, ' share the same term') 
 	from tmp_active_desc a
 	join tmp_inactive_desc b
 	on a.conceptid = b.conceptid
 	and cast(a.term as binary)= cast(b.term as binary)
 	where a.active != b.active
-	and a.effectivetime = '<CURRENT-RELEASE-DATE>' or b.effectivetime = '<PREVIOUS-RELEASE-DATE>';
+	and cast(a.effectivetime as datetime) >= cast(b.effectivetime as datetime);
 	commit;
 
 	drop table if exists tmp_edited_con;

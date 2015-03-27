@@ -244,43 +244,6 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 	}
 
-	private void loadDataViaScript(final String versionName,
-			final File outputFolder) throws IOException, SQLException,
-			FileNotFoundException {
-		// get file from jar and write to tmp directory, so we can prepend sql statements and set default schema
-		final InputStream is = getClass().getResourceAsStream("/sql/create-tables-mysql.sql");
-
-		final File outputFile = new File(outputFolder.getAbsolutePath(), "create-tables-mysql.sql");
-		// add scheme information
-		FileUtils.writeStringToFile(outputFile, "drop database if exists " + RVF_DB_PREFIX + versionName + ";\n", true);
-		FileUtils.writeStringToFile(outputFile, "create database if not exists " + RVF_DB_PREFIX + versionName + ";\n", true);
-		FileUtils.writeStringToFile(outputFile, "use " + RVF_DB_PREFIX + versionName + ";\n", true);
-		FileUtils.writeLines(outputFile, IOUtils.readLines(is), true);
-
-		final InputStream is2 = getClass().getResourceAsStream("/sql/load-data-mysql.sql");
-		final File outputFile2 = new File(outputFolder.getAbsolutePath(), "load-data-mysql.sql");
-		FileUtils.writeStringToFile(outputFile2, "use " + RVF_DB_PREFIX + versionName + ";\n", true);
-		for (String line : IOUtils.readLines(is2)) {
-			// process line and add to output file
-			line = line.replaceAll("<release_version>", versionName);
-			line = line.replaceAll("<data_location>", outputFolder.getAbsolutePath());
-			FileUtils.writeStringToFile(outputFile2, line + "\n", true);
-		}
-
-		logger.info("Executing script located at : " + outputFile.getAbsolutePath());
-		final Connection connection = snomedDataSource.getConnection();
-		final ScriptRunner runner = new ScriptRunner(connection);
-		final InputStreamReader reader = new InputStreamReader(new FileInputStream(outputFile));
-		runner.runScript(reader);
-		reader.close();
-
-		logger.info("Executing script located at : " + outputFile2.getAbsolutePath());
-		final InputStreamReader reader2 = new InputStreamReader(new FileInputStream(outputFile2));
-		runner.runScript(reader2);
-		reader2.close();
-		connection.close();
-	}
-
 
 	/**
 	 * Verifies if the given releaseVersion has already been loaded into a database.

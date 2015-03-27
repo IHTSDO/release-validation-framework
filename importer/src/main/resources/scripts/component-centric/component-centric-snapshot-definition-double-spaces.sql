@@ -3,7 +3,7 @@
 	file-centric-snapshot-definition-double-spaces
 
 	Assertion:
-	No active Terms associated with active concept contain double spaces.
+	No active definiitons associated with active concept contain double spaces.
 
 ********************************************************************************/
 	

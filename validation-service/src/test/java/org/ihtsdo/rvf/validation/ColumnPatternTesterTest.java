@@ -16,7 +16,7 @@ import java.util.List;
 import org.ihtsdo.rvf.validation.impl.CsvResultFormatter;
 import org.ihtsdo.rvf.validation.impl.StreamTestReport;
 import org.ihtsdo.rvf.validation.log.impl.TestValidationLogImpl;
-import org.ihtsdo.rvf.validation.resource.ResourceManager;
+import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 import org.junit.Test;
 
 public class ColumnPatternTesterTest {
@@ -26,7 +26,7 @@ public class ColumnPatternTesterTest {
 
 	@Test
 	public void testFileNotFound() throws Exception {
-		final ResourceManager resourceManager = new TestFileResourceProvider(new File(""));
+		final ResourceProvider resourceManager = new TestFileResourceProvider(new File(""));
 		testReport = new StreamTestReport(new CsvResultFormatter(), new TestWriterDelegate(new StringWriter()), false);
 		tester = new ColumnPatternTester(new TestValidationLogImpl(ColumnPatternTester.class), resourceManager, testReport);
 
@@ -162,7 +162,7 @@ public class ColumnPatternTesterTest {
 	public void executeRun(final String filename, final boolean writeSucceses) throws URISyntaxException {
 		final File f = new File(getClass().getResource(filename).toURI());
 
-		final ResourceManager resourceManager = new TestFileResourceProvider(f);
+		final ResourceProvider resourceManager = new TestFileResourceProvider(f);
 		//testReport = new TestReport(new CsvResultFormatter());
 
 		testReport = new StreamTestReport(new CsvResultFormatter(), new TestWriterDelegate(new StringWriter()), writeSucceses);
@@ -171,7 +171,7 @@ public class ColumnPatternTesterTest {
 		tester.runTests();
 	}
 
-	class TestFileResourceProvider implements ResourceManager {
+	class TestFileResourceProvider implements ResourceProvider {
 
 		private final List<String> fileNames = new ArrayList<>();
 		private final File file;

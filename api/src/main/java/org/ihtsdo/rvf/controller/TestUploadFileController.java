@@ -23,7 +23,7 @@ import org.ihtsdo.rvf.service.EntityService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.ihtsdo.rvf.validation.TestReportable;
 import org.ihtsdo.rvf.validation.model.ManifestFile;
-import org.ihtsdo.rvf.validation.resource.ResourceManager;
+import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 import org.ihtsdo.rvf.validation.resource.TextFileResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;
@@ -116,7 +116,7 @@ public class TestUploadFileController {
 		try (PrintWriter writer = response.getWriter()) {
 			// must be a zip
 			file.transferTo(tempFile);
-			final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+			final ResourceProvider resourceManager = new ZipFileResourceProvider(tempFile);
 
 			TestReportable report;
 
@@ -211,7 +211,7 @@ public class TestUploadFileController {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			file.transferTo(tempFile);
-			final ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
+			final ResourceProvider resourceManager = new TextFileResourceProvider(tempFile, filename);
 			final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
 			// store the report to disk for now with a timestamp
 			if (report.getNumErrors() > 0) {

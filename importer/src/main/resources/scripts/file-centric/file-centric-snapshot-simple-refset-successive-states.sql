@@ -14,9 +14,10 @@
 	from curr_simplerefset_s a , prev_simplerefset_s b
 	where 
 	a.active = '0'
+	and b.active = '0'
 	and a.id = b.id
-	and a.effectivetime != b.effectivetime
-   	and b.active != '1';
+	and a.effectivetime != b.effectivetime;
+   	
 	
 	
 /* 	inserting exceptions in the result table */

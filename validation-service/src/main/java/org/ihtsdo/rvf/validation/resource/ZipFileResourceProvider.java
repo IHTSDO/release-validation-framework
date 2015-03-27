@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class ZipFileResourceProvider implements ResourceManager {
+public class ZipFileResourceProvider implements ResourceProvider {
 
 	private ZipFile zipFile;
 	private String filePath;

@@ -16,7 +16,6 @@
 	and a.active = 1
 	and b.active = 1
 	and a.conceptid = b.id
-	and a.term not like '%)' 
 	and a.term not like '% (%';
 	
 	
@@ -27,10 +26,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('DESC: term=',a.term, ':Fully Specified Name has no space before the semantic tag.')	
-	from v_curr_snapshot a
-	where a.term not like ' (%';
-
-
+	from v_curr_snapshot a;
 	drop table if exists v_curr_snapshot;
 
 	

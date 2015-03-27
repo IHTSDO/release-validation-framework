@@ -8,17 +8,17 @@ import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.model.FileElement;
 import org.ihtsdo.rvf.validation.model.Folder;
 import org.ihtsdo.rvf.validation.model.ManifestFile;
-import org.ihtsdo.rvf.validation.resource.ResourceManager;
+import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 
 public class ManifestPatternTester {
 
 	private static final String MANIFEST_STRUCTURE_TEST = "ManifestPackageStructureTest";
 	private final ValidationLog validationLog;
-	private final ResourceManager resourceManager;
+	private final ResourceProvider resourceManager;
 	private final ManifestFile manifestFile;
 	private final TestReportable report;
 
-	public ManifestPatternTester(final ValidationLog validationLog, final ResourceManager resourceManager, final ManifestFile manifestFile,
+	public ManifestPatternTester(final ValidationLog validationLog, final ResourceProvider resourceManager, final ManifestFile manifestFile,
 			final TestReportable report) {
 		this.validationLog = validationLog;
 		this.resourceManager = resourceManager;

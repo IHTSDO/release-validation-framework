@@ -58,8 +58,8 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(RUN_ID BIGINT, ASSERTION_ID BIGINT, " + 
-				"DETAILS VARCHAR(500), INDEX (RUN_ID), INDEX (ASSERTION_ID))";
+		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(run_id BIGINT, assertion_id BIGINT, " + 
+				"details VARCHAR(500), INDEX (run_id), INDEX (assertion_id))";
 		try (Connection connection = dataSource.getConnection()) {
 			try (Statement statement = connection.createStatement()) {
 				statement.execute(createSQLString);

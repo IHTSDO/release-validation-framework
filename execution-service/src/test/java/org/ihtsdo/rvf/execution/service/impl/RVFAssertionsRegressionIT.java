@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.Before;
@@ -61,6 +63,8 @@ public class RVFAssertionsRegressionIT {
     @Autowired
     private ReleaseDataManager releaseDataManager;
     @Autowired
+    private ResourceDataLoader resourceDataLoader;
+    @Autowired
     private  AssertionDao assertionDao;
     private  URL releaseTypeExpectedResults;
 	private URL componentCentrilExpected;
@@ -69,7 +73,7 @@ public class RVFAssertionsRegressionIT {
 	private final ObjectMapper mapper = new ObjectMapper();
 	
 	@Before
-	public void setUp() throws FileNotFoundException, IOException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException {
 		//load previous and prospective versions if not loaded already
         assertNotNull(releaseDataManager);
         if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
@@ -97,6 +101,7 @@ public class RVFAssertionsRegressionIT {
         releaseDataManager.setSchemaForRelease("20130131", "rvf_int_" + PREVIOUS_RELEASE);
         releaseDataManager.setSchemaForRelease("20130731", "rvf_int_"+ PROSPECTIVE_RELEASE);
         
+        resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease("20130731"));
         final List<Assertion> assertions = assertionDao.getAssertionsByKeywords("resource");
 		 assertionExecutionService.executeAssertions(assertions, runId,"20130731", "20130131");
         
@@ -130,20 +135,21 @@ public class RVFAssertionsRegressionIT {
 			result.setAssertonName(item.getAssertionText());
 			result.setFirstNInstances(item.getFirstNInstances());
 			result.setAssertionUuid(item.getAssertionUuid());
-			assertNull("No failure should have occured.", item.getFailureMessage());
+			assertNull("No failure should have occured for assertion uuid." + item.getAssertionUuid(), item.getFailureMessage());
 			result.setTotalFailed(item.getFailureCount() != null ? item.getFailureCount() : -1L);
 			results.add(result);
 			if(result.getTotalFailed() > 0) {
 				failureCounter ++;
 			}
 		}
+		Collections.sort(results);
 		final TestReport actualReport = new TestReport();
 		actualReport.setAssertionType(type);;
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
-		System.out.println("Test result");
-		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
+//		System.out.println("Test result");
+//		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
 		final Gson gson = new Gson();
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));
 		final TestReport expectedReport = gson.fromJson(br, TestReport.class);
@@ -354,7 +360,10 @@ public class RVFAssertionsRegressionIT {
 
 		@Override
 		public int compareTo(final RVFTestResult o) {
-			return this.assertionUuid.compareTo(o.getAssertionUuid());
+//			return this.assertionUuid.compareTo(o.getAssertionUuid());
+			
+			return new Long(this.getTotalFailed()).compareTo(o.getTotalFailed());
+			
 		}
 	}
 }
