@@ -35,31 +35,27 @@ public class ResultController {
 		final ValidationRunConfig config = new ValidationRunConfig();
 		config.addRunId(runId).addStorageLocation(storageLocation);
 		validationRunner.setConfig(config);
+		
 		//Can we find an rvf status file at that location?  Return 404 if not.
 		final Map <String, Object> responseMap = new LinkedHashMap<>();
 		final State state = validationRunner.getCurrentState();
-		HttpStatus returnStatus = HttpStatus.NON_AUTHORITATIVE_INFORMATION; 
+		HttpStatus returnStatus = HttpStatus.OK;
+		
 		if (state == null) {
-			returnStatus = HttpStatus.NOT_FOUND;
-			responseMap.put(ValidationRunner.FAILURE_MESSAGE, "No validation state found at " + storageLocation);
+			responseMap.put(MESSAGE, "No validation state found at " + storageLocation);
 		} else {
 			responseMap.put("Status", state.toString());
 			switch (state) {
-				case READY : 	returnStatus = HttpStatus.LOCKED;
-								responseMap.put(MESSAGE, "Validation hasn't started running yet!");
+				case READY : 	responseMap.put(MESSAGE, "Validation hasn't started running yet!");
 								break;
-				case RUNNING :  returnStatus = HttpStatus.LOCKED;
-								responseMap.put(MESSAGE, "Validation is still running.");
+				case RUNNING :  responseMap.put(MESSAGE, "Validation is still running.");
 								break;
-				case FAILED :   returnStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-								validationRunner.recoverResult(responseMap);
+				case FAILED :   validationRunner.recoverResult(responseMap);
 								break;
-				case COMPLETE : returnStatus = HttpStatus.OK;
-								validationRunner.recoverResult(responseMap);
+				case COMPLETE : validationRunner.recoverResult(responseMap);
 								break;
 			}
 		}
-
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}
 
