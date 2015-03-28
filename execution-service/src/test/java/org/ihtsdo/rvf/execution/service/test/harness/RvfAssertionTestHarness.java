@@ -12,6 +12,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -66,7 +67,7 @@ public class RvfAssertionTestHarness {
 	    }
 	    
 	    @Test
-	    public void testAssertions() throws SQLException, IOException {
+	    public void testAssertions() throws BusinessServiceException, SQLException, IOException {
 	    	
 	    	 resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
 	        final List<Assertion> resources = assertionDao.getAssertionsByKeywords("resource");
