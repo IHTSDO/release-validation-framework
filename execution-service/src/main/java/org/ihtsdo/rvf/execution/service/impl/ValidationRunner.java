@@ -23,6 +23,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.dao.s3.S3Client;
 import org.ihtsdo.otf.dao.s3.helper.FileHelper;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.TestRunItem;
@@ -161,7 +162,11 @@ public class ValidationRunner implements Runnable{
 				}
 			} 
 			uploadProspectiveVersion(prospectiveVersion, config.getExtensionBaseLine(), config.getProspectiveFile());
-			resourceLoader.loadResourceData(releaseDataManager.getSchemaForRelease(prospectiveVersion));
+			final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
+			if ( prospectiveSchema != null) {
+				resourceLoader.loadResourceData(prospectiveSchema);
+				logger.info("completed loading resource data for schema:" + prospectiveSchema);
+			}
 			runAssertionTests(prospectiveVersion, prevReleaseVersion,config.getRunId(),config.getGroupsList(),responseMap);
 			final long timeTaken = (Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000;
 			logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", config.getRunId(), timeTaken));
@@ -318,7 +323,7 @@ public class ValidationRunner implements Runnable{
 		return isFailed;
 	}
 
-	private void uploadProspectiveVersion(final String prospectiveVersion, final String knownVersion, final File tempFile) throws ConfigurationException {
+	private void uploadProspectiveVersion(final String prospectiveVersion, final String knownVersion, final File tempFile) throws ConfigurationException, BusinessServiceException {
 		
 		if (knownVersion != null) {
 			//load them together here as opposed to clone the existing DB so that to make sure it is clean.

@@ -23,6 +23,7 @@ import java.util.UUID;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.TestRunItem;
@@ -73,7 +74,7 @@ public class RVFAssertionsRegressionIT {
 	private final ObjectMapper mapper = new ObjectMapper();
 	
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, BusinessServiceException {
 		//load previous and prospective versions if not loaded already
         assertNotNull(releaseDataManager);
         if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {

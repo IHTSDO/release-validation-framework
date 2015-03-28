@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.controller;
 
 import java.io.IOException;
 
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,7 @@ public class ReleaseController {
             final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), version);
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
-        catch (final IOException e) {
+        catch (final IOException |BusinessServiceException e) {
             logger.warn("Error getting input stream from upload. Nested exception is : \n" + e.fillInStackTrace());
             return new ResponseEntity<>("Error getting input stream from upload. Nested exception is : " + e.fillInStackTrace(), HttpStatus.BAD_REQUEST);
         }
