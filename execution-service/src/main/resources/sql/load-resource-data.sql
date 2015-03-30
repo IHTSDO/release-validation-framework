@@ -23,5 +23,5 @@ load data local
 	infile '<data_location>/semanticTags.txt'
 	into table res_semantictag
 	columns terminated by '\t' 
-	lines terminated by '\r\n' 
+	lines terminated by '\r\n'
 	ignore 1 lines;
