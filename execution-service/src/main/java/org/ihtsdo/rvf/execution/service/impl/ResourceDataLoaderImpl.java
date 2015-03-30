@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,13 +48,8 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 				final File temp = File.createTempFile("load-resource-data.txt", null);
 				final File tempDataFolder = Files.createTempDirectory("dataFiles").toFile();
 				try {
-					final File dataFiles = new File(getClass().getResource("/datafiles").getFile());
-					for (final File file : dataFiles.listFiles()) {
-						try (final InputStream txtInput = new FileInputStream(file);
-								final OutputStream output = new FileOutputStream(new File(tempDataFolder,file.getName()));) {
-							IOUtils.copy(txtInput,output);
-						}
-					}
+					final String[] dataFiles = {"cs_words.txt","usTerms.txt","gbTerms.txt","semanticTags.txt"};
+					copyDataFiles(dataFiles,tempDataFolder);
 					try (final InputStream input = getClass().getResourceAsStream("/sql/load-resource-data.sql")) {
 						for (String line : IOUtils.readLines(input)) {
 							// process line and add to output file
@@ -74,6 +70,16 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 				throw new BusinessServiceException(errorMsg, e);
 			}
 		}
+	}
+
+	private void copyDataFiles(final String[] resourceFileNames, final File tempDataFolder ) throws IOException, FileNotFoundException {
+		for( final String fileName : resourceFileNames) {
+			try (final InputStream txtInput = getClass().getResourceAsStream("/datafiles/" + fileName);
+					final OutputStream output = new FileOutputStream(new File(tempDataFolder, fileName));) {
+					IOUtils.copy(txtInput,output);
+			}
+		}
+			
 	}
 
 	public void setSnomedDataSource(final BasicDataSource snomedDataSourceX) {
