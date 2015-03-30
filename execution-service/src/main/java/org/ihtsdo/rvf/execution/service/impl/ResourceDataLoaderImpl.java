@@ -2,9 +2,12 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -31,7 +34,7 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 	public void loadResourceData(final String schemaName) throws BusinessServiceException {
 		if (schemaName != null) {
 			final String  useStr = "use " + schemaName + ";";
-			try (Connection connection = snomedDataSource.getConnection()) {
+			try (final Connection connection = snomedDataSource.getConnection()) {
 				final ScriptRunner runner = new ScriptRunner(connection);
 				try (Statement statement = connection.createStatement()) {
 					statement.execute(useStr);
@@ -40,21 +43,30 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 
 					runner.runScript(new InputStreamReader(input));
 				} 
-				try (InputStream input = getClass().getResourceAsStream("/sql/load-resource-data.sql")) {
-
-					final File temp = File.createTempFile("load-resource-data.txt", null);
-					final String dataFileFullPath = getClass().getResource("/datafiles").getFile();
-					for (String line : IOUtils.readLines(input)) {
-						// process line and add to output file
-						line = line.replaceAll("<data_location>", dataFileFullPath);
-						FileUtils.writeStringToFile(temp, line + "\n", true);
+				
+				final File temp = File.createTempFile("load-resource-data.txt", null);
+				final File tempDataFolder = Files.createTempDirectory("dataFiles").toFile();
+				try {
+					final File dataFiles = new File(getClass().getResource("/datafiles").getFile());
+					for (final File file : dataFiles.listFiles()) {
+						try (final InputStream txtInput = new FileInputStream(file);
+								final OutputStream output = new FileOutputStream(new File(tempDataFolder,file.getName()));) {
+							IOUtils.copy(txtInput,output);
+						}
+					}
+					try (final InputStream input = getClass().getResourceAsStream("/sql/load-resource-data.sql")) {
+						for (String line : IOUtils.readLines(input)) {
+							// process line and add to output file
+							line = line.replaceAll("<data_location>", tempDataFolder.getPath());
+							FileUtils.writeStringToFile(temp, line + "\n", true);
+						}
 					}
 					try (final InputStreamReader reader = new InputStreamReader(new FileInputStream(temp))) {
 						runner.runScript(reader);
 					}
-					finally {
-						temp.delete();
-					}
+				} finally {
+					temp.delete();
+					tempDataFolder.delete();
 				}
 			} catch (final SQLException | IOException e) {
 				final String errorMsg = "Error when loadding resource data to schema:" + schemaName;
