@@ -10,7 +10,7 @@
 /* 	view of current snapshot made by finding FSN's with leading and training spaces */
 	drop table if exists v_curr_snapshot;
 	create table if not exists  v_curr_snapshot as
-	select SUBSTRING(a.term , 1, 1) as originalcase ,  UCASE(SUBSTRING(a.term , 1, 1)) as uppercase , a.term  
+	select SUBSTRING(a.term , 1, 1) as originalcase ,  UCASE(SUBSTRING(a.term , 1, 1)) as uppercase , a.id 
 	from curr_textdefinition_s a ;
 	 
 
@@ -20,7 +20,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('TEXTDEF: term=',a.term, ':First letter of the Term not capitalized.') 	
+		concat('TEXTDEFINITION: id=',a.id, ' contains a term that the first letter is not capitalized.') 	
 	from v_curr_snapshot a
 	where BINARY originalcase != uppercase;
 

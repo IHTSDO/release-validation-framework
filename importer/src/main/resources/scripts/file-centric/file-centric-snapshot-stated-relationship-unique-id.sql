@@ -14,7 +14,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('RELATIONSHIP: id=',id, ': Stated Relationship Id is repeated in the Stated Relationship snapshot file.') 
+		concat('RELATIONSHIP: id=',id, ' is repeated in the Stated Relationship snapshot file.') 
 	
 	from curr_stated_relationship_s
 	group by id

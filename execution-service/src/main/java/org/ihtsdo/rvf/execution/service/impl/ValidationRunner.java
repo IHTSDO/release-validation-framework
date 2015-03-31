@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
@@ -15,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
@@ -27,15 +29,14 @@ import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.TestRunItem;
+import org.ihtsdo.rvf.entity.TestType;
+import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
-import org.ihtsdo.rvf.helper.JSONMap;
-import org.ihtsdo.rvf.helper.MissingEntityException;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 @Service
 @Scope(value = "prototype")
@@ -130,15 +133,12 @@ public class ValidationRunner implements Runnable{
 				writeResults(responseMap, State.FAILED);
 				return;
 			}
-			// TODO We could move all the following code to another thread using TaskExecutor and return the URL for 
-			//assertion results something like: https://rvf.ihtsdotools.org/api/v1/assertionresults/{run_id}
-			//We need to create AssertionResultService which queries the qa_result table for a given run_id
-
+			
 			final String[] tokens = Files.getNameWithoutExtension(config.getFile().getOriginalFilename()).split("_");
 			final String releaseDate = tokens[tokens.length-1];
 			String prospectiveVersion = releaseDate ;
 			String prevReleaseVersion = config.getPrevIntReleaseVersion();
-			final boolean isExtension = config.getPreviousExtVersion() != null ? true : false;
+			final boolean isExtension = config.getPreviousExtVersion() != null && !config.getPreviousExtVersion().isEmpty() ? true : false;
 			if (isExtension) {
 				//SnomedCT_Release-es_INT_20140430.zip
 				//SnomedCT_SpanishRelease_INT_20141031.zip
@@ -152,7 +152,7 @@ public class ValidationRunner implements Runnable{
 						final boolean isSuccess = releaseDataManager.combineKnownVersions(prevReleaseVersion, config.getPrevIntReleaseVersion(), config.getPreviousExtVersion());
 						if (!isSuccess) {
 							responseMap.put(FAILURE_MESSAGE, "Failed to combine known versions:" 
-									+ config.getPrevIntReleaseVersion() + " and"+ config.getPreviousExtVersion() + "into" + prevReleaseVersion);
+									+ config.getPrevIntReleaseVersion() + " and "+ config.getPreviousExtVersion() + "into" + prevReleaseVersion);
 							writeResults(responseMap, State.FAILED);
 							return;
 						}
@@ -168,15 +168,20 @@ public class ValidationRunner implements Runnable{
 				logger.info("completed loading resource data for schema:" + prospectiveSchema);
 			}
 			runAssertionTests(prospectiveVersion, prevReleaseVersion,config.getRunId(),config.getGroupsList(),responseMap);
-			final long timeTaken = (Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis())/60000;
+			final Calendar endTime = Calendar.getInstance();
+			final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis())/60000;
 			logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", config.getRunId(), timeTaken));
+			responseMap.put("Start time", startTime.getTime());
+			responseMap.put("End time", endTime.getTime());
 			writeResults(responseMap, State.COMPLETE);
+			
 		}
 		
 	}
 
 	public boolean init(final ValidationRunConfig config, final Map<String, String> responseMap) {
 		setConfig(config);
+		logger.info("Run config:" + config);
 		//check assertion groups
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(config.getGroupsList());
 		if (groups.size() != config.getGroupsList().size()) {
@@ -217,13 +222,13 @@ public class ValidationRunner implements Runnable{
 		// must be a zip, save it off
 		config.getFile().transferTo(tempFile);	
 		config.setProspectiveFile(tempFile);
+		config.setTestFileName(filename);
 		return true;
 	}
 	
 	private void writeResults (final Map<String , Object> responseMap, final State state) throws IOException, NoSuchAlgorithmException, JSONException, DecoderException {
-
-		final JSONObject json = new JSONObject(responseMap);
-		writeToS3(json.toString(1),resultsFilePath);
+		final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+		writeToS3(prettyGson.toJson(responseMap), resultsFilePath);
 		writeState(state);
 	}
 	
@@ -256,35 +261,38 @@ public class ValidationRunner implements Runnable{
 
 	private void runAssertionTests(final String prospectiveReleaseVersion, final String previousReleaseVersion, final long runId, final List<String> groupNames,
 			final Map<String, Object> responseMap) throws IOException {
+		final long timeStart = System.currentTimeMillis();
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(groupNames);
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
 		final List<Assertion> resourceAssertions = assertionService.getResourceAssertions();
 		logger.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
-		final Map<Assertion, Collection<TestRunItem>> assertionResultMap = new LinkedHashMap<>();
-		int failedAssertionCount = 0;
-		failedAssertionCount += executeAssertions(prospectiveReleaseVersion, previousReleaseVersion, runId, resourceAssertions, assertionResultMap);
-		final HashSet<Assertion> assertions = new HashSet<>();
+		 final List<TestRunItem> items = executeAssertions(prospectiveReleaseVersion, previousReleaseVersion, runId, resourceAssertions);
+		final Set<Assertion> assertions = new HashSet<>();
 		for(final AssertionGroup group : groups)
 		{
 			for(final Assertion assertion : assertionService.getAssertionsForGroup(group)){
 				assertions.add(assertion);
 			}
 		}
-		failedAssertionCount += executeAssertions(prospectiveReleaseVersion,
-				previousReleaseVersion, runId, assertions, assertionResultMap);
-		final List<TestRunItem> items = new ArrayList<>();
-		for( final Collection<TestRunItem> testItesms : assertionResultMap.values()) {
-			items.addAll(testItesms);
+		logger.info("Total assertions to run: " + assertions.size());
+		items.addAll(executeAssertions(prospectiveReleaseVersion,previousReleaseVersion, runId, assertions));
+		//failed tests
+		final List<TestRunItem> failedItems = new ArrayList<>();
+		for (final TestRunItem item : items) {
+			if( item.getFailureCount() != 0) {
+				failedItems.add(item);
+			}
 		}
-		responseMap.put("type", "post");
-		responseMap.put("assertionsRun", assertionResultMap.keySet().size());
-		responseMap.put("assertionsFailed", failedAssertionCount);
-		responseMap.put("assertions", items);
-		
-	}
-
-	private void loadResourceData() {
-		
+		final long timeEnd = System.currentTimeMillis();
+		final ValidationReport report = new ValidationReport(TestType.SQL);
+		report.setExecutionId(runId);
+		report.setTotalTestsRun(items.size());
+		report.setTimeTakenInSeconds((timeEnd-timeStart)/1000);
+		report.setTotalFailures(failedItems.size());
+		report.setFailedAssertions(failedItems);
+		items.removeAll(failedItems);
+		report.setPassedAssertions(items);
+		responseMap.put(report.getTestType().name() + " test result", report);
 		
 	}
 
@@ -303,19 +311,19 @@ public class ValidationRunner implements Runnable{
 			return true;
 		}
 		boolean isFailed = false;
-		if (prevIntReleaseVersion != null) {
+		if (prevIntReleaseVersion != null && !prevIntReleaseVersion.isEmpty()) {
 			if (!isKnownVersion(prevIntReleaseVersion, responseMap))
 			{
 				isFailed = true;
 			}
 		}
-		if(previousExtVersion != null) {
+		if(previousExtVersion != null && !previousExtVersion.isEmpty()) {
 			if(!isKnownVersion(previousExtVersion, responseMap))
 			{
 				isFailed = true;
 			}
 		}
-		if( extensionBaseLine != null) {
+		if( extensionBaseLine != null && !extensionBaseLine.isEmpty()) {
 			if(!isKnownVersion(extensionBaseLine, responseMap)) {
 				isFailed = true;
 			}
@@ -360,35 +368,19 @@ public class ValidationRunner implements Runnable{
 	
 
 
-	private int executeAssertions(final String prospectiveReleaseVersion,
-			final String previousReleaseVersion, final Long runId,
-			final Collection<Assertion> assertions,
-			final Map<Assertion, Collection<TestRunItem>> map) {
-		int failedAssertionCount = 0;
+	private List<TestRunItem> executeAssertions(final String prospectiveReleaseVersion,
+			final String previousReleaseVersion, final Long runId, final Collection<Assertion> assertions) {
 		
+		final List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
 		for (final Assertion assertion: assertions) {
-			try
-			{
-				logger.info(String.format("Started executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertions.size(), assertion.getUuid()));
-				final List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
-						prospectiveReleaseVersion, previousReleaseVersion));
-				// get only first since we have 1:1 correspondence between Assertion and Test
-				if(items.size() == 1){
-					final TestRunItem runItem = items.get(0);
-					if(runItem.getFailureCount() != 0){
-						failedAssertionCount++;
-					}
-				}
-				map.put(assertion, items);
-				logger.info(String.format("Finished executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertions.size(), assertion.getUuid()));
-				counter++;
-			}
-			catch (final MissingEntityException e) {
-				failedAssertionCount++;
-			}
+			logger.info(String.format("Started executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertions.size(), assertion.getUuid()));
+			results.addAll(assertionExecutionService.executeAssertion(assertion, runId,
+					prospectiveReleaseVersion, previousReleaseVersion));
+			logger.info(String.format("Finished executing assertion [%1s] of [%2s] with uuid : [%3s]", counter, assertions.size(), assertion.getUuid()));
+			counter++;
 		}
-		return failedAssertionCount;
+		return results;
 	}
 
 	public void setConfig(final ValidationRunConfig config) {
@@ -419,12 +411,10 @@ public class ValidationRunner implements Runnable{
 		if (is == null) {
 			logger.warn("Failed to find results file {}, in bucket {}", stateFilePath, bucketName);
 		} else {
-			final String jsonResultsEscaped = IOUtils.toString(is, "UTF-8");
-			// jsonResults = StringEscapeUtils.unescapeJava(jsonResultsEscaped);
-			 final JSONObject json = new JSONObject(jsonResultsEscaped);
-			 jsonResults = new JSONMap(json);
+			final Gson gson = new Gson();
+			jsonResults = gson.fromJson(new InputStreamReader(is), Map.class);
 		}
-		responseMap.put("RVFResult", jsonResults);
+		responseMap.put("RVF Validation Result", jsonResults);
 	}
 
 }

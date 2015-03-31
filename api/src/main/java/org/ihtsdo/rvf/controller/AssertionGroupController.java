@@ -6,6 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+<<<<<<< HEAD
+=======
+
+import javax.servlet.http.HttpServletResponse;
+>>>>>>> Tidy up the RVF validation result and assertion text
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -27,11 +32,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+<<<<<<< HEAD
 import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 import javax.servlet.http.HttpServletResponse;
+=======
+>>>>>>> Tidy up the RVF validation result and assertion text
 
 @Controller
 @RequestMapping("/groups")
@@ -46,7 +54,7 @@ public class AssertionGroupController {
 	private AssertionExecutionService assertionExecutionService;
 	@Autowired
 	private AssertionHelper assertionHelper;
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final Logger logger = LoggerFactory.getLogger(AssertionGroupController.class);
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
@@ -56,7 +64,11 @@ public class AssertionGroupController {
 		notes = "Retrieves all assertion groups defined in the system. "
 				+ "Assertion group is used to define group of similar type of assertions" )
 	public List<AssertionGroup> getGroups() {
-		return entityService.findAll(AssertionGroup.class);
+		List<AssertionGroup> result = assertionService.getAllAssertionGroups();
+		if (result == null ) {
+			result = new ArrayList<>();
+		}
+		return result;
 	}
 
 	@RequestMapping(value = "{id}/assertions", method = RequestMethod.GET)
@@ -64,9 +76,9 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Get all assertions of a group",
 		notes = "Retrieves all assertions from a specific assertion group" )
-	public List<Assertion> getAssertionsForGroup(@PathVariable Long id) {
+	public List<Assertion> getAssertionsForGroup(@PathVariable final Long id) {
 
-		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
 		return assertionService.getAssertionsForGroup(group);
 	}
 
@@ -74,16 +86,16 @@ public class AssertionGroupController {
 	@ResponseBody
 	@ApiOperation( value = "Add assertions to a group",
 		notes = "Add assertions to an assertion group identified by given id" )
-	public AssertionGroup addAssertionsToGroup(@PathVariable Long id, @RequestBody(required = false) List<String> assertionsList, HttpServletResponse response) {
+	public AssertionGroup addAssertionsToGroup(@PathVariable final Long id, @RequestBody(required = false) final List<String> assertionsList, final HttpServletResponse response) {
 
-		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
 		
 		//Do we have anything to add?
 		if (assertionsList == null || assertionsList.size() == 0) {
 			response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 		} else {
-			List<Assertion> assertions = getAssertions(assertionsList);
-			for(Assertion assertion : assertions){
+			final List<Assertion> assertions = getAssertions(assertionsList);
+			for(final Assertion assertion : assertions){
 				assertionService.addAssertionToGroup(assertion, group);
 			}
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -99,10 +111,10 @@ public class AssertionGroupController {
 		notes = "Add all assertions available in the system to a group."
 				+ " This api may only be used when user desires to add all assertion found in the system to an assertion group"
 				+ " otherwise use {id}/assertions api as post call." )
-	public AssertionGroup addAllAssertions(@PathVariable Long id) {
-		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-		List<Assertion> assertionList = (List<Assertion>)entityService.findAll(Assertion.class);
-		Set<Assertion> assertionSet = new HashSet<>(assertionList);
+	public AssertionGroup addAllAssertions(@PathVariable final Long id) {
+		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		final List<Assertion> assertionList = entityService.findAll(Assertion.class);
+		final Set<Assertion> assertionSet = new HashSet<>(assertionList);
 		group.setAssertions(assertionSet);
 		return (AssertionGroup) entityService.update(group);
 	}
@@ -112,10 +124,10 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Delete assertion from a group",
 		notes = "Removes supplied assertions from a given assertion group" )
-	public AssertionGroup removeAssertionsFromGroup(@PathVariable Long id, @RequestBody(required = false) List<Assertion> assertions) {
+	public AssertionGroup removeAssertionsFromGroup(@PathVariable final Long id, @RequestBody(required = false) final List<Assertion> assertions) {
 
-		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-		for(Assertion assertion : assertions){
+		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		for(final Assertion assertion : assertions){
 			assertionService.removeAssertionFromGroup(assertion, group);
 		}
 
@@ -127,9 +139,9 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Add supplied assertions to an assertion group",
 		notes = "Replaces existing assertions of an assertion group with supplied assertions" )
-	public AssertionGroup setAsAssertionsInGroup(@PathVariable Long id, @RequestBody(required = false) Set<Assertion> assertions) {
+	public AssertionGroup setAsAssertionsInGroup(@PathVariable final Long id, @RequestBody(required = false) final Set<Assertion> assertions) {
 
-		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
 		// replace all existing assertions with current list
 		group.setAssertions(assertions);
 
@@ -141,7 +153,7 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Get an assertion group",
 		notes = "Retrieves an assertion group for a given id" )
-	public AssertionGroup getAssertionGroup(@PathVariable Long id) {
+	public AssertionGroup getAssertionGroup(@PathVariable final Long id) {
 		return (AssertionGroup) entityService.find(AssertionGroup.class, id);
 	}
 
@@ -150,8 +162,8 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Delete an assertion group",
 		notes = "Delete an assertion group from the system" )
-	public AssertionGroup deleteAssertionGroup(@PathVariable Long id) {
-		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+	public AssertionGroup deleteAssertionGroup(@PathVariable final Long id) {
+		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
 		entityService.delete(group);
 		return group;
 	}
@@ -161,8 +173,8 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation( value = "Create an assertion group with specified name",
 		notes = "Create an assertion group with specified name" )
-	public AssertionGroup createAssertionGroupWithName(@RequestParam String name) {
-		AssertionGroup group = new AssertionGroup();
+	public AssertionGroup createAssertionGroupWithName(@RequestParam final String name) {
+		final AssertionGroup group = new AssertionGroup();
 		group.setName(name);
 		return (AssertionGroup) entityService.create(group);
 	}
@@ -172,9 +184,9 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Update an assertion group",
 		notes = "Update an assertion group identified with an id and name" )
-	public AssertionGroup updateAssertionGroup(@PathVariable Long id,
-			@RequestParam String name) {
-		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+	public AssertionGroup updateAssertionGroup(@PathVariable final Long id,
+			@RequestParam final String name) {
+		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
 		group.setName(name);
 		return (AssertionGroup) entityService.update(group);
 	}
@@ -186,23 +198,23 @@ public class AssertionGroupController {
 		notes = "Execute all tests available in an assertion group identified by assertion group id. "
 				+ "User is required to supply a run id,"
 				+ " previous release version and prospective release version" )
-	public Map<String, Object> executeAssertions(@PathVariable Long id,
-										   @RequestParam Long runId, @RequestParam String prospectiveReleaseVersion,
-										   @RequestParam String previousReleaseVersion) {
+	public Map<String, Object> executeAssertions(@PathVariable final Long id,
+										   @RequestParam final Long runId, @RequestParam final String prospectiveReleaseVersion,
+										   @RequestParam final String previousReleaseVersion) {
 
-		AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
 		return assertionHelper.assertAssertions(assertionService.getAssertionsForGroup(group), runId, prospectiveReleaseVersion, previousReleaseVersion);
 	}
 
-	private List<Assertion> getAssertions(List<String> items){
+	private List<Assertion> getAssertions(final List<String> items){
 
-		List<Assertion> assertions = new ArrayList<>();
-		for(String item: items){
+		final List<Assertion> assertions = new ArrayList<>();
+		for(final String item: items){
 			try
 			{
 				if(item.matches("\\d+")){
 					// treat as assertion id and retrieve associated assertion
-					Assertion assertion = assertionService.find(Long.valueOf(item));
+					final Assertion assertion = assertionService.find(Long.valueOf(item));
 					if(assertion != null){
 						assertions.add(assertion);
 					}
@@ -211,7 +223,7 @@ public class AssertionGroupController {
 					assertions.add(objectMapper.readValue(item, Assertion.class));
 				}
 			}
-			catch (IOException e) {
+			catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}

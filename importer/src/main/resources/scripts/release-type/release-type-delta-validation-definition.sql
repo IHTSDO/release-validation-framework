@@ -19,7 +19,7 @@
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Definition: id=',a.id, ': Definition is in DELTA file, but not in FULL file.') 	
+	concat('Definition: id=',a.id, ' is in DELTA file, but not in FULL file.') 	
 	from curr_textdefinition_d a
 	left join v_temp_view b
 	on a.id = b.id
@@ -47,7 +47,7 @@
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Definition: id=',a.id, ': Definition is in FULL file, but not in DELTA file.') 
+	concat('Definition: id=',a.id, ' is in FULL file, but not in DELTA file.') 
 	from v_temp_view a
 	left join curr_textdefinition_d b 
 	on a.id = b.id

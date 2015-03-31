@@ -26,6 +26,7 @@
 	<bean class="org.ihtsdo.rvf.dao.helper.TestDatabasePrimerDao"/>
 	<bean id="assertionDao" class="org.ihtsdo.rvf.dao.AssertionDaoImpl"/>
 	<bean id="entityDao" class="org.ihtsdo.rvf.dao.EntityDaoImpl"/>
+	<bean id="assertionGroupDao" class="org.ihtsdo.rvf.dao.AssertionGroupDaoImpl"/>
 
 	<!--data source-->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">

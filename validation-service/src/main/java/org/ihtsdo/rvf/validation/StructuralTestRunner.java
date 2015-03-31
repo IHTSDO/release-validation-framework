@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.ihtsdo.rvf.entity.TestType;
+import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.validation.impl.CsvMetadataResultFormatter;
 import org.ihtsdo.rvf.validation.impl.CsvResultFormatter;
 import org.ihtsdo.rvf.validation.impl.StreamTestReport;
@@ -79,7 +81,10 @@ public class StructuralTestRunner implements InitializingBean{
 	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final MultipartFile manifestFile, 
 			final boolean writeSucceses, final String urlPrefix ) throws IOException {
 		 boolean isFailed = false;
+		 final long timeStart = System.currentTimeMillis();
 		 logger.debug("Start verifying zip file structure of {} against manifest", tempFile.getName());
+		 final ValidationReport validationReport = new ValidationReport(TestType.ARCHIVE_STRUCTURAL);
+		 validationReport.setExecutionId(runId);
 		// convert groups which is passed as string to assertion groups
 		// set up the response in order to stream directly to the response
 		final File manifestTestReport = new File(getReportDataFolder(), "manifest_validation_"+runId+".txt");
@@ -99,18 +104,14 @@ public class StructuralTestRunner implements InitializingBean{
 				final ManifestFile mf = new ManifestFile(tempManifestFile);
 				report = execute(resourceManager, writer, writeSucceses, mf);
 			}
-
+			validationReport.setTotalTestsRun(report.getNumTestRuns());
 			// verify if manifest is valid
-			if(report.getNumErrors() > 0){
-
+			if(report.getNumErrors() > 0) {
+				validationReport.setTotalFailures(report.getNumErrors());
+				validationReport.setReportUrl(urlPrefix+"/reports/"+ FilenameUtils.removeExtension(manifestTestReport.getName()));
 				logger.error("No Errors expected but got " + report.getNumErrors() + " errors");
-				responseMap.put("type", "pre");
-				responseMap.put("assertionsRun", report.getNumTestRuns());
-				responseMap.put("assertionsFailed", report.getNumErrors());
 				logger.info("reportPhysicalUrl : " + manifestTestReport.getAbsolutePath());
 				// pass file name without extension - we add this back when we retrieve using controller
-				responseMap.put("reportUrl", urlPrefix+"/reports/"+ FilenameUtils.removeExtension(manifestTestReport.getName()));
-
 				logger.info("report.getNumErrors() = " + report.getNumErrors());
 				logger.info("report.getNumTestRuns() = " + report.getNumTestRuns());
 				final double threshold = report.getNumErrors() / report.getNumTestRuns();
@@ -121,6 +122,9 @@ public class StructuralTestRunner implements InitializingBean{
 				}
 			}
 		}
+		final long timeEnd = System.currentTimeMillis();
+		validationReport.setTimeTakenInSeconds((timeEnd-timeStart)/1000);
+		responseMap.put(TestType.ARCHIVE_STRUCTURAL.toString() + " test result", validationReport);
 		logger.debug("Finished verifying zip file structure of {} against manifest", tempFile.getName());		
 		return isFailed;
 	}

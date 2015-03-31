@@ -80,7 +80,7 @@ public class AssertionGroupControllerIntegrationTest {
         mockMvc.perform(get("/groups").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(containsString(group.getName())));
+                .andExpect(content().string(containsString(group.getName()))).andDo(print());
     }
 
     @Test
@@ -207,7 +207,6 @@ public class AssertionGroupControllerIntegrationTest {
 
         Assertion assertion = new Assertion();
         assertion.setName("Test assertion");
-        assertion.setDescription("Test assertion description");
         // save assertion
         assertion = assertionService.addTest(assertion, test);
         assertNotNull(assertion.getId());

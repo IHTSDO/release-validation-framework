@@ -17,7 +17,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESC: FSN=',a.term, ':contains invalid character.') 	
+		concat('DESCRIPTION: FSN=',a.term, ' which contains invalid character.') 	
 	from  curr_description_d a , curr_concept_s b 
 	where a.active = 1
 	and b.active = 1
@@ -32,7 +32,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESC: Synonym=',a.term, ':contains invalid character.') 	
+		concat('DESCRIPTION: Synonym=',a.term, ' which contains invalid character.') 	
 	from  curr_description_d a , curr_concept_s b 
 	where a.active = 1
 	and b.active = 1

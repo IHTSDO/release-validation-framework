@@ -20,7 +20,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESCRIPTION: id=',a.id, ': Concept in snapshot file, but not in delta file.')
+		concat('DESCRIPTION: id=',a.id, ' is in the DESCRIPTION snapshot file, but not in delta file.')
 	from  des a
 	left join curr_description_d b
 		on a.id = b.id
@@ -47,7 +47,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESCRIPTION: id=',a.id, ': Concept in delta but not in snapshot file.') 	
+		concat('DESCRIPTION: id=',a.id, ' is in the DESCRIPTION delta file but not in snapshot file.') 	
 	from curr_description_d a
 	left join des b
 		on a.id = b.id

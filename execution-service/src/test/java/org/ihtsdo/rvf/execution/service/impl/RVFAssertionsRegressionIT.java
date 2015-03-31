@@ -149,8 +149,8 @@ public class RVFAssertionsRegressionIT {
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
-//		System.out.println("Test result");
-//		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
+		System.out.println("Test result");
+		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
 		final Gson gson = new Gson();
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));
 		final TestReport expectedReport = gson.fromJson(br, TestReport.class);

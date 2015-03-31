@@ -20,22 +20,22 @@
   }, {
     "assertionName" : "New inactive states follow active states in the DESCRIPTION snapshot.",
     "assertionUuid" : "2b193a88-8dab-4d19-b995-b556ed59398d",
-    "firstNInstances" : [ "DESC: id=2984057019: is inactive in current release but not active in previous DESCRIPTION snapshot." ],
+    "firstNInstances" : [ "DESCRIPTION: id=2984057019 should not have a new inactive state in the current release as it was already inactive in previous snapshot." ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot.",
+    "assertionName" : "There is a 1:1 relationship between the id and the immutable values in  the DESCRIPTION snapshot.",
     "assertionUuid" : "48118153-d32a-4d1c-bfbc-23ed953e9991",
     "firstNInstances" : [ "DESC: id=2989790014:There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "ID is unique in the DEFINITION snapshot.",
     "assertionUuid" : "4ba823ce-8ae4-4b2e-beb5-e119b822cfe2",
-    "firstNInstances" : [ "TEXTDEF: id=3005197021:Non unique id in textdefinition release file." ],
+    "firstNInstances" : [ "TextDefinition: id=3005197021 is not unique in the TextDefinition Snapshot file." ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "There is a 1:1 relationship between the id and the immutable values in DEFINITION snapshot.",
+    "assertionName" : "There is a 1:1 relationship between the id and the immutable values in the DEFINITION snapshot.",
     "assertionUuid" : "718cc822-73b5-42c2-9c01-f8df09a9bf8d",
-    "firstNInstances" : [ "CONCEPT: id=3005197021:There is a 1:1 relationship between the id and the immutable values in definition snapshot." ],
+    "firstNInstances" : [ "DEFINITION: id=3005197021 is referneced with more than one set of immutable values in the definition snapshot." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "New inactive states follow active states in the DEFINITION snapshot file.",
@@ -55,7 +55,7 @@
   }, {
     "assertionName" : "New inactive states follow active states in the ATTRIBUTEVALUE snapshot.",
     "assertionUuid" : "2aa0bea1-b1fa-4543-b277-b4392a6f864d",
-    "firstNInstances" : [ "ATT RS: id=0001d24b-d872-5077-8955-b9c7e055b015:Invalid inactive states in the ATTRIBUTEVALUE REFSET snapshot file." ],
+    "firstNInstances" : [ "AttributeRefsetId=0001d24b-d872-5077-8955-b9c7e055b015 should not have a new inactive state in the snapshot file as was inactive previously." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "New inactive states follow active states in the SIMPLE MAP REFSET snapshot.",
@@ -65,17 +65,17 @@
   }, {
     "assertionName" : "New inactive states for existing components must have active states in the previous SIMPLE REFSET snapshot.",
     "assertionUuid" : "9190473a-29f7-40fc-b879-9ae0d038b681",
-    "firstNInstances" : [ "Simple RS: id=74d0e838-34eb-5a9a-8f02-5584487d55db:Invalid inactive states in the SIMPLE REFSET snapshot." ],
+    "firstNInstances" : [ "Simple Refset: id=74d0e838-34eb-5a9a-8f02-5584487d55db should not have a new invalid inactive state in the SIMPLE REFSET snapshot." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "c779d282-3c4d-4c16-a8a6-8d1a621b247d",
-    "firstNInstances" : [ "Simple RS: id=65f4359b-bf19-5d99-abc1-7139bbff5d47:Invalid keys in SIMPLE REFSET snapshot file." ],
+    "firstNInstances" : [ "Simple Refset: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 has more than one set of immutable keys in the snapshot file." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "All language refset members inactivated in current snapshot must have been active in the previous release.",
     "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c6: Member inactived in current release was inactive in previous release." ],
+    "firstNInstances" : [ "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 should not have a new inactive state in the current release as it was inactive already in the previvous SNAPSHOT." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "Preferred Term exists exactly once in each language refset for each concept.",
@@ -85,7 +85,7 @@
   }, {
     "assertionName" : "There is a 1-to-1 relationship between the id and the immutable values in Inferred Relationship snapshot.",
     "assertionUuid" : "4dbfed80-79b9-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=702386002: Concept contains two or more version of the immutable values in Inferred Relationships." ],
+    "firstNInstances" : [ "CONCEPT: id=702386002 contains two or more version of the immutable values in Inferred Relationship Snapshot." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "All relationships inactivated in current release must have been active in the previous release.",
@@ -110,7 +110,7 @@
   }, {
     "assertionName" : "There is at most one active definition per concept per language per dialect in the DEFINITION snapshot.",
     "assertionUuid" : "de0c4d6c-6297-41be-9979-fb1c93717baa",
-    "firstNInstances" : [ "CONCEPT: id=278512001:More than one active definition per concept per dialect in the DEFINITION snapshot.", "CONCEPT: id=703672002:More than one active definition per concept per dialect in the DEFINITION snapshot." ],
+    "firstNInstances" : [ "CONCEPT: id=278512001 has more than one active definition per concept per dialect in the DEFINITION snapshot.", "CONCEPT: id=703672002 has more than one active definition per concept per dialect in the DEFINITION snapshot." ],
     "totalFailed" : 2
   }, {
     "assertionName" : "ID is unique in the ASSOCIATION REFSET snapshot.",
@@ -145,7 +145,7 @@
   }, {
     "assertionName" : "The current Stated Relationship snapshot file does not contain duplicate Relationship Ids.",
     "assertionUuid" : "9074a620-79b9-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=4768117024: Stated Relationship Id is repeated in the Stated Relationship snapshot file.", "RELATIONSHIP: id=4994338024: Stated Relationship Id is repeated in the Stated Relationship snapshot file." ],
+    "firstNInstances" : [ "RELATIONSHIP: id=4768117024 is repeated in the Stated Relationship snapshot file.", "RELATIONSHIP: id=4994338024 is repeated in the Stated Relationship snapshot file." ],
     "totalFailed" : 2
   }, {
     "assertionName" : "There are no duplicate Definition terms in the DEFINITION snapshot file.",
@@ -158,14 +158,14 @@
     "firstNInstances" : [ "RELATIONSHIP : id=1000002029: Relationship Id is repeated in the Inferred Relationship snapshot file.", "RELATIONSHIP : id=1000005028: Relationship Id is repeated in the Inferred Relationship snapshot file.", "RELATIONSHIP : id=1000006026: Relationship Id is repeated in the Inferred Relationship snapshot file." ],
     "totalFailed" : 3
   }, {
-    "assertionName" : "ConceptId value refers to valid concept identifier in DESCRIPTION snapshot.",
+    "assertionName" : "ConceptId value refers to valid concept identifier in the DESCRIPTION snapshot.",
     "assertionUuid" : "1491f72c-cb00-42db-a97b-9c685f4e4cb0",
-    "firstNInstances" : [ "TEXTDEF: id=45477008:ConceptId value refers to valid concept identifier in DESCRIPTION snapshot.", "TEXTDEF: id=699400005:ConceptId value refers to valid concept identifier in DESCRIPTION snapshot.", "TEXTDEF: id=700244001:ConceptId value refers to valid concept identifier in DESCRIPTION snapshot.", "TEXTDEF: id=703215002:ConceptId value refers to valid concept identifier in DESCRIPTION snapshot." ],
+    "firstNInstances" : [ "DESCRIPTION: id=3006191013 refers to an invalid concept identifier in the DESCRIPTION snapshot.", "DESCRIPTION: id=3007330011 refers to an invalid concept identifier in the DESCRIPTION snapshot.", "DESCRIPTION: id=2989790017 refers to an invalid concept identifier in the DESCRIPTION snapshot.", "DESCRIPTION: id=2984057019 refers to an invalid concept identifier in the DESCRIPTION snapshot." ],
     "totalFailed" : 4
   }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DEFINITION snapshot.",
     "assertionUuid" : "5a83783e-3366-48bd-a50d-8f3a53812174",
-    "firstNInstances" : [ "TEXTDEF: id=278512001:ConceptId value refers to valid concept identifier in DEFINITION snapshot.", "TEXTDEF: id=278512001:ConceptId value refers to valid concept identifier in DEFINITION snapshot.", "TEXTDEF: id=699220008:ConceptId value refers to valid concept identifier in DEFINITION snapshot.", "TEXTDEF: id=700237005:ConceptId value refers to valid concept identifier in DEFINITION snapshot.", "TEXTDEF: id=702316007:ConceptId value refers to valid concept identifier in DEFINITION snapshot.", "TEXTDEF: id=703218000:ConceptId value refers to valid concept identifier in DEFINITION snapshot.", "TEXTDEF: id=3961000119101:ConceptId value refers to valid concept identifier in DEFINITION snapshot." ],
+    "firstNInstances" : [ "DEFINITION: id=3008054012 refers to an invalid concept id in the Text Definition snapshot.", "DEFINITION: id=2989691019 refers to an invalid concept id in the Text Definition snapshot.", "DEFINITION: id=2989562013 refers to an invalid concept id in the Text Definition snapshot.", "DEFINITION: id=3010125011 refers to an invalid concept id in the Text Definition snapshot.", "DEFINITION: id=2995945017 refers to an invalid concept id in the Text Definition snapshot.", "DEFINITION: id=2995945020 refers to an invalid concept id in the Text Definition snapshot.", "DEFINITION: id=2983208019 refers to an invalid concept id in the Text Definition snapshot." ],
     "totalFailed" : 7
   }, {
     "assertionName" : "All source ids found in the Stated Relationship snapshot file exist in the Concept snapshot file.",
@@ -190,7 +190,7 @@
   }, {
     "assertionName" : "All members refer to a description that is referenced in either the description table or the text definition table.",
     "assertionUuid" : "f5d9ae70-7856-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "MEMBER: id=00000692-31c5-5aac-81a8-2e54b488c824: Referenced description Id is in neither the description nor the definition file.", "MEMBER: id=0000097d-42b2-500d-88bb-46066baa9bad: Referenced description Id is in neither the description nor the definition file.", "MEMBER: id=00000b14-886f-5d9f-bba5-64e03752cbbc: Referenced description Id is in neither the description nor the definition file.", "MEMBER: id=00000fa8-54c4-5611-a39b-946ae76fd2f6: Referenced description Id is in neither the description nor the definition file.", "MEMBER: id=00001558-7a36-5f18-94f3-6c2d9d22a428: Referenced description Id is in neither the description nor the definition file.", "MEMBER: id=00001828-bc61-59f0-811d-56732d1a8507: Referenced description Id is in neither the description nor the definition file.", "MEMBER: id=00001f12-ad7d-54d9-9bef-89f5d2ef6b2b: Referenced description Id is in neither the description nor the definition file.", "MEMBER: id=000026dd-7c22-5d1f-870f-30a64f5bef55: Referenced description Id is in neither the description nor the definition file.", "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c6: Referenced description Id is in neither the description nor the definition file.", "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c7: Referenced description Id is in neither the description nor the definition file." ],
+    "firstNInstances" : [ "Language Refset: id=00000692-31c5-5aac-81a8-2e54b488c824 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=0000097d-42b2-500d-88bb-46066baa9bad references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00000b14-886f-5d9f-bba5-64e03752cbbc references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00000fa8-54c4-5611-a39b-946ae76fd2f6 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00001558-7a36-5f18-94f3-6c2d9d22a428 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00001828-bc61-59f0-811d-56732d1a8507 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00001f12-ad7d-54d9-9bef-89f5d2ef6b2b references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=000026dd-7c22-5d1f-870f-30a64f5bef55 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7 references a description which is in neither the description nor the definition snapshot file." ],
     "totalFailed" : 10
   }, {
     "assertionName" : "Every concept's FSN exists exactly once in each language refset.",
@@ -200,7 +200,7 @@
   }, {
     "assertionName" : "All destination ids found in the Stated Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "994b5ff0-79b9-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=4969198024: Stated Relationship contains a destination id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=4998022027: Stated Relationship contains a destination id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=4969199027: Stated Relationship contains a destination id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=5042420023: Stated Relationship contains a destination id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=4994338024: Stated Relationship contains a destination id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=4994338024: Stated Relationship contains a destination id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=5022653026: Stated Relationship contains a destination id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=4969200029: Stated Relationship contains a destination id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=4768117023: Stated Relationship contains a destination id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=4768117024: Stated Relationship contains a destination id that does not exist in the Concept snapshot file." ],
+    "firstNInstances" : [ "Stated Relationship: id=4969198024 contains a destination id that does not exist in the Concept snapshot file.", "Stated Relationship: id=4998022027 contains a destination id that does not exist in the Concept snapshot file.", "Stated Relationship: id=4969199027 contains a destination id that does not exist in the Concept snapshot file.", "Stated Relationship: id=5042420023 contains a destination id that does not exist in the Concept snapshot file.", "Stated Relationship: id=4994338024 contains a destination id that does not exist in the Concept snapshot file.", "Stated Relationship: id=4994338024 contains a destination id that does not exist in the Concept snapshot file.", "Stated Relationship: id=5022653026 contains a destination id that does not exist in the Concept snapshot file.", "Stated Relationship: id=4969200029 contains a destination id that does not exist in the Concept snapshot file.", "Stated Relationship: id=4768117023 contains a destination id that does not exist in the Concept snapshot file.", "Stated Relationship: id=4768117024 contains a destination id that does not exist in the Concept snapshot file." ],
     "totalFailed" : 11
   }, {
     "assertionName" : "All type ids found in the Stated Relationship snapshot file exist in the Concept snapshot file.",

@@ -14,7 +14,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('MEMBER: id=',a.id, ': Referenced description Id is in neither the description nor the definition file.') 
+		concat('Language Refset: id=',a.id, ' references a description which is in neither the description nor the definition snapshot file.') 
 	from curr_langrefset_s a
 	where not exists
 		(select b.id

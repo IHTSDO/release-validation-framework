@@ -12,7 +12,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('MEMBER: id=',a.id, ': Active VTM simple refset members refer to inactive components.') 	
+		concat('Simple refset: id=',a.id, ' is an active VTM but refers to an inactive component.') 	
 	from curr_simplerefset_s a
 	inner join curr_concept_s b 
 	on a.referencedcomponentid = b.id
