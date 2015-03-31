@@ -21,7 +21,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('Simple RS: id=',a.id, ':Invalid keys in SIMPLE REFSET snapshot file.') 	
+		concat('Simple Refset: id=',a.id, ' has more than one set of immutable keys in the snapshot file.') 	
 	from v_curr_snapshot a;
 
 	drop table if exists v_curr_snapshot;

@@ -20,7 +20,7 @@ drop table if exists v_temp_table;
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Simple map refset: id=',a.id, ': simple map refset is in current full file, but not in prior full file.') 	
+	concat('SimpleMapRefset: id=',a.id, ' is in current full file, but not in prior full file.') 	
 	from curr_simplemaprefset_f a
 	left join v_temp_table b
 	on a.id = b.id
@@ -44,7 +44,7 @@ drop table if exists v_temp_table;
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Simple map refset: id=',a.id, ': simple map refset is in prior full file, but not in current full file.')
+	concat('SimpleMapRefset: id=',a.id, ' is in prior full file, but not in current full file.')
 	from v_temp_table a
 	left join curr_simplemaprefset_f b 
 	on a.id = b.id

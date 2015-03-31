@@ -29,7 +29,7 @@ public class ResultController {
 
 	@RequestMapping(value = "{runId}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> getResult(@PathVariable final Long runId, 
+	public ResponseEntity<Map<String,Object>> getResult(@PathVariable final Long runId, 
 			@RequestParam(value = "storageLocation") final String storageLocation) throws IOException {
 		final ValidationRunner validationRunner = validationRunnerProvider.get();
 		final ValidationRunConfig config = new ValidationRunConfig();
@@ -37,10 +37,9 @@ public class ResultController {
 		validationRunner.setConfig(config);
 		
 		//Can we find an rvf status file at that location?  Return 404 if not.
-		final Map <String, Object> responseMap = new LinkedHashMap<>();
+		final Map<String, Object> responseMap = new LinkedHashMap<>();
 		final State state = validationRunner.getCurrentState();
-		HttpStatus returnStatus = HttpStatus.OK;
-		
+		final HttpStatus returnStatus = HttpStatus.OK;
 		if (state == null) {
 			responseMap.put(MESSAGE, "No validation state found at " + storageLocation);
 		} else {

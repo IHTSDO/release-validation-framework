@@ -23,7 +23,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',a.conceptid, ':More than one active definition per concept per dialect in the DEFINITION snapshot.') 	
+		concat('CONCEPT: id=',a.conceptid, ' has more than one active definition per concept per dialect in the DEFINITION snapshot.') 	
 	from v_curr_snapshot a;
 
 

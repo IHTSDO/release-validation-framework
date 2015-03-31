@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.entity;
 
-import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -29,10 +28,6 @@ public class Assertion {
     @Column(name = "assertion_id")
     private Long id;
 	private String name;
-	private String statement;
-	private String description;
-	private String docLink;
-	private Date effectiveFrom;
 	private String keywords;
     private String uuid = UUID.randomUUID().toString();
 
@@ -62,47 +57,12 @@ public class Assertion {
 		this.name = name;
 	}
 
-	public String getStatement() {
-		return statement;
-	}
-
-	public void setStatement(final String statement) {
-		this.statement = statement;
-	}
-
-    @XmlElement
-    public String getDocLink() {
-		return docLink;
-	}
-
-	public void setDocLink(final String docLink) {
-		this.docLink = docLink;
-	}
-
-    @XmlElement
-    public Date getEffectiveFrom() {
-		return effectiveFrom;
-	}
-
-	public void setEffectiveFrom(final Date effectiveFrom) {
-		this.effectiveFrom = effectiveFrom;
-	}
-
 	public String getKeywords() {
 		return keywords;
 	}
 
 	public void setKeywords(final String keywords) {
 		this.keywords = keywords;
-	}
-
-    @XmlElement
-    public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
 	}
 
     @XmlElement

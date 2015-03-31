@@ -12,7 +12,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',b.id, ': Concept contains two or more version of the immutable values in Inferred Relationships.') 	
+		concat('CONCEPT: id=',b.id, ' contains two or more version of the immutable values in Inferred Relationship Snapshot.') 	
 
 	from curr_relationship_s a 
 	inner join curr_concept_s b on a.sourceid = b.id

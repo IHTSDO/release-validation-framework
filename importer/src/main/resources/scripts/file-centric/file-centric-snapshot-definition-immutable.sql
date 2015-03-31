@@ -21,7 +21,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',a.id, ':There is a 1:1 relationship between the id and the immutable values in definition snapshot.') 	
+		concat('DEFINITION: id=',a.id, ' is referneced with more than one set of immutable values in the definition snapshot.') 	
 	from v_curr_snapshot a;
 
 	drop table if exists v_curr_snapshot;

@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
-import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -131,16 +129,14 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	public TestRunItem executeTest(final Assertion assertion, final Test test, final Long executionId, final String prospectiveReleaseVersion, final String previousReleaseVersion) {
 
 		logger.info("Starting execution id = " + executionId);
-		final Calendar startTime = Calendar.getInstance();
+		final long timeStart = System.currentTimeMillis();
 
 		// set prospective version as default schema to use since SQL has calls that do not specify schema name
 		final String prospectiveSchemaName = releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion);
 		logger.info("Setting default catalog as : " + releaseDataManager.getSchemaForRelease(prospectiveReleaseVersion));
 
 		final TestRunItem runItem = new TestRunItem();
-		runItem.setTestTime(startTime.getTime());
-		runItem.setExecutionId(String.valueOf(executionId));
-		runItem.setTestType(test.getType().name());
+		runItem.setTestCategory(assertion.getKeywords());
 		runItem.setAssertionText(assertion.getName());
 		runItem.setAssertionUuid(assertion.getUuid());
 
@@ -165,18 +161,12 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			}
 			
 		}
-		else{
-			throw new IllegalArgumentException("Test passed does not have associated execution command. Test: \n" + test);
+		else {
+			runItem.setFailureMessage("Test does not have any associated execution command:" + test);
 		}
-
-		runItem.setRunTime(Calendar.getInstance().getTimeInMillis() - startTime.getTimeInMillis());
-		try {
-			logger.info(runItem.toString());
-			//need to log json different to a json file rather than in the log
-			logger.info("runItem as json = " + mapper.writerWithDefaultPrettyPrinter().writeValueAsString(runItem));
-		} catch (final IOException e) {
-			logger.warn("Failed to write runItem in json to log.", e);
-		}
+		final long timeEnd = System.currentTimeMillis();
+		runItem.setRunTime((timeEnd - timeStart));
+		logger.info(runItem.toString());
 		return runItem;
 	}
 /*

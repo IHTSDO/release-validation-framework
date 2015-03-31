@@ -40,8 +40,6 @@ public class TestDataBootStrap {
         assertion = new Assertion();
         assertion.setName("Assertion Name");
         assertion.setName("Assertion Description");
-        assertion.setDocLink("http://snomed.org/tig/1.pdf");
-        assertion.setStatement("Human readable statement");
         assertion = assertionService.create(assertion);
         assert assertion != null;
     }

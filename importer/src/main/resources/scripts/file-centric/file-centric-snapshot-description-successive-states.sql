@@ -31,8 +31,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESC: id=',a.id, ': is inactive in current release but not active in previous DESCRIPTION snapshot.') 	
+		concat('DESCRIPTION: id=',a.id, ' should not have a new inactive state in the current release as it was already inactive in previous snapshot.') 	
 	from v_curr_snapshot a;
-
 
 	drop table if exists v_curr_snapshot;

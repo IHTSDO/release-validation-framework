@@ -37,7 +37,7 @@
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Description: id=',a.id, ': Description is in current full file, but not in prior full file.') 	
+	concat('Description: id=',a.id, ' is in current full file, but not in prior full file.') 	
 	from curr_description_f a
 	left join v_temp_table b
 	on a.id = b.id
@@ -65,7 +65,7 @@
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Description: id=',a.id, ': Description is in prior full file, but not in current full file.')
+	concat('Description: id=',a.id, ' is in prior full file, but not in current full file.')
 	from v_temp_table a
 	left join curr_description_f b 
 	on a.id = b.id

@@ -12,7 +12,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('RELATIONSHIP: id=',a.id, ': Stated Relationship contains a destination id that does not exist in the Concept snapshot file.') 	
+		concat('Stated Relationship: id=',a.id, ' contains a destination id that does not exist in the Concept snapshot file.') 	
 	from curr_stated_relationship_s a
 	left join curr_concept_s b on a.destinationid = b.id
 	where b.id is null;

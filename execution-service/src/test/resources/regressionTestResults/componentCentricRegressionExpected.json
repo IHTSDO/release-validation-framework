@@ -5,7 +5,7 @@
   "results" : [ {
     "assertionName" : "Active historical association refset members have active concepts as targets.",
     "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba: is an active association refset member but the target component is an inactive concept: 609452007" ],
+    "firstNInstances" : [ "AssociationRefset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is active  but the target component is an inactive concept: 609452007" ],
     "totalFailed" : 1
   }, {
     "assertionName" : "No active Historical Association member associates an inactive concept with its parent.",
@@ -55,7 +55,7 @@
   }, {
     "assertionName" : "No active Terms contain leading or trailing spaces.",
     "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",
-    "firstNInstances" : [ "Description: term=  Fracture clinic:Active Terms with leading and trailing spaces." ],
+    "firstNInstances" : [ "Description: id=3006276018 has active term with leading or trailing spaces." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "No synonyms have semantic tags.",
@@ -90,7 +90,7 @@
   }, {
     "assertionName" : "Active description of active concept consists of valid characters.",
     "assertionUuid" : "6614ff12-fca2-42b7-a5da-ea26353979fe",
-    "firstNInstances" : [ "DESC: Synonym=Fracture \\clinic :contains invalid character." ],
+    "firstNInstances" : [ "DESCRIPTION: Synonym=Fracture \\clinic  which contains invalid character." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "All definitions are case sensitive.",
@@ -100,7 +100,7 @@
   }, {
     "assertionName" : "The first letter of the Definition should be capitalized.",
     "assertionUuid" : "6138248d-8cc8-4bc2-8043-cd609fdd640c",
-    "firstNInstances" : [ "TEXTDEF: term=formed by an abnormal connection between arteries within the   dura mater and veins that normally drain the brain. :First letter of the Term not capitalized." ],
+    "firstNInstances" : [ "TEXTDEFINITION: id=3008053018 contains a term that the first letter is not capitalized." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "Descriptions in a language refset are unique for a given concept.",
@@ -115,7 +115,7 @@
   }, {
     "assertionName" : "SNOMED RT identifier simple map refset refers to active components.",
     "assertionUuid" : "695cea40-7f25-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "MEMBER: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249623: SNOMED RT simple map refset member is not active." ],
+    "firstNInstances" : [ "SimpleMapRefset: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249623 is not an active SNOMED RT member." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "SNOMED RT identifier simple map refset members are unique.",
@@ -135,7 +135,7 @@
   }, {
     "assertionName" : "Active VTM simple refset members refer to active components.",
     "assertionUuid" : "9715b1dd-7de5-4f80-ad28-f97ab52b9359",
-    "firstNInstances" : [ "MEMBER: id=74d0e838-34eb-5a9a-8f02-5584487d55db: Active VTM simple refset members refer to inactive components." ],
+    "firstNInstances" : [ "Simple refset: id=74d0e838-34eb-5a9a-8f02-5584487d55db is an active VTM but refers to an inactive component." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "Active VMP simple refset members refer to active components.",
@@ -170,7 +170,7 @@
   }, {
     "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
     "assertionUuid" : "4572d730-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=1000005028: Concept have two inferred relationships with same typeid and same destinationid within a single relationship-group.", "CONCEPT: id=1000006026: Concept have two inferred relationships with same typeid and same destinationid within a single relationship-group." ],
+    "firstNInstances" : [ "CONCEPT: id=1000005028 has two inferred relationships with same typeid and same destinationid within a single relationship-group.", "CONCEPT: id=1000006026 has two inferred relationships with same typeid and same destinationid within a single relationship-group." ],
     "totalFailed" : 2
   }, {
     "assertionName" : "For each active FSN there is a synonym that has the same text.",
@@ -180,7 +180,7 @@
   }, {
     "assertionName" : "All FSNs have a space before the semantic tag.",
     "assertionUuid" : "32369add-8d9f-48de-a129-29b32c79a9d7",
-    "firstNInstances" : [ "DESC: term=Epilepsy in mother complicating childbirth(disorder:Fully Specified Name has no space before the semantic tag.", "DESC: term=DoloTest profile(observable entity):Fully Specified Name has no space before the semantic tag." ],
+    "firstNInstances" : [ "DESCRIPTION: id=3004397016 : The FSN has no space before the semantic tag.", "DESCRIPTION: id=2990804014 : The FSN has no space before the semantic tag." ],
     "totalFailed" : 2
   }, {
     "assertionName" : "All active FSNs have a semantic tag.",

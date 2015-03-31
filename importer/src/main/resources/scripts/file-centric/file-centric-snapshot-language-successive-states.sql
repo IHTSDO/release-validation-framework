@@ -13,7 +13,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('MEMBER: id=',a.id, ': Member inactived in current release was inactive in previous release.') 
+		concat('Language Refset: id=',a.id, ' should not have a new inactive state in the current release as it was inactive already in the previvous SNAPSHOT.') 
 	from curr_langrefset_s a
 	join prev_langrefset_s b
 	where cast(a.effectivetime as datetime) >

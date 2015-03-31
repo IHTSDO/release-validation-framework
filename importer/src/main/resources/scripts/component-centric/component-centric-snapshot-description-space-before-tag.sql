@@ -10,7 +10,7 @@
 /* 	view of current snapshot made by finding FSN's semantic tag */
 	drop table if exists v_curr_snapshot;
 	create table if not exists  v_curr_snapshot as
-	SELECT a.term
+	SELECT a.id
 	from curr_description_s a , curr_concept_s b
 	where typeid ='900000000000003001'
 	and a.active = 1
@@ -25,7 +25,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESC: term=',a.term, ':Fully Specified Name has no space before the semantic tag.')	
+		concat('DESCRIPTION: id=',a.id, ' : The FSN has no space before the semantic tag.')	
 	from v_curr_snapshot a;
 	drop table if exists v_curr_snapshot;
 
