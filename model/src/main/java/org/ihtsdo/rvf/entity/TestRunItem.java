@@ -13,7 +13,7 @@ public class TestRunItem {
 	private UUID assertionUuid;
 	private String assertionText;
 	private String executionId;
-	private long runTimeInMilliSeconds;
+	private Long runTimeInMilliSeconds;
 	private Long failureCount;
 	private String failureMessage;
 	private List<String> firstNInstances;
@@ -59,7 +59,7 @@ public class TestRunItem {
 		this.testCategory = testType;
 	}
 
-	public long getRunTime() {
+	public Long getRunTime() {
 		return runTimeInMilliSeconds;
 	}
 

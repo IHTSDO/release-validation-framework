@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
 import org.ihtsdo.rvf.helper.AssertionHelper;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
@@ -203,7 +204,10 @@ public class AssertionGroupController {
 										   @RequestParam final String previousReleaseVersion) {
 
 		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-		return assertionHelper.assertAssertions(assertionService.getAssertionsForGroup(group), runId, prospectiveReleaseVersion, previousReleaseVersion);
+		final ExecutionConfig config = new ExecutionConfig(runId);
+		config.setPreviousVersion(previousReleaseVersion);
+		config.setProspectiveVersion(prospectiveReleaseVersion);
+		return assertionHelper.assertAssertions(assertionService.getAssertionsForGroup(group), config);
 	}
 
 	private List<Assertion> getAssertions(final List<String> items){

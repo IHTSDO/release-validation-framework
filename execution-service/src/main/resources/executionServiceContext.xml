@@ -81,6 +81,9 @@
 		<constructor-arg name="bucketName" ref="bucketName"/>
 	</bean>
 	
+	<bean id ="resultExtractor" class="org.ihtsdo.rvf.execution.service.impl.ResultExtractorServiceImpl">
+	</bean>
+	
 	<bean class="java.lang.String" id="bucketName">
 		<constructor-arg value="${bucketName}" />
 	</bean>

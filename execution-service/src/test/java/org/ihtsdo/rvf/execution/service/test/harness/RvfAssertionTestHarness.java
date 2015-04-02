@@ -71,7 +71,7 @@ public class RvfAssertionTestHarness {
 	    	
 	    	 resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
 	        final List<Assertion> resources = assertionDao.getAssertionsByKeywords("resource");
-			 assertionExecutionService.executeAssertions(resources, 201503130924L,PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
+			 assertionExecutionService.executeAssertions(resources, null);
 	    	//Assertion 111 and assertion test 107
 	    	//36L
 	    	//150L
@@ -105,7 +105,7 @@ public class RvfAssertionTestHarness {
 	        final Long runId =201503130924L;
 	        System.out.println("RunID:" + runId);
 			// set both prospective and previous release
-	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, runId, PROSPECTIVE_RELEASE, PREVIOUS_RELEASE);
+	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, null);
 	        System.out.println("TOTAL of assertions run:" + runItems.size());
 	    }
 }

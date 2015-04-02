@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.rvf.execution.service.ResultExtractorService;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner.State;
@@ -25,7 +27,9 @@ public class ResultController {
 	
 	private static final String MESSAGE = "Message";
 	@Autowired
-	Provider<ValidationRunner> validationRunnerProvider;
+	private Provider<ValidationRunner> validationRunnerProvider;
+	@Autowired
+	private ResultExtractorService resultExtractor;
 
 	@RequestMapping(value = "{runId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -47,7 +51,9 @@ public class ResultController {
 			switch (state) {
 				case READY : 	responseMap.put(MESSAGE, "Validation hasn't started running yet!");
 								break;
-				case RUNNING :  responseMap.put(MESSAGE, "Validation is still running.");
+				case RUNNING :  final String progress = validationRunner.recoverProgress();
+								responseMap.put(MESSAGE, "Validation is still running.");
+								responseMap.put("Progress", progress);
 								break;
 				case FAILED :   validationRunner.recoverResult(responseMap);
 								break;
@@ -56,6 +62,23 @@ public class ResultController {
 			}
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
+	}
+	
+	@RequestMapping(value = "{runId}/{assertionUUID}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> extractResults(@PathVariable final Long runId,
+			@PathVariable(value="assertionUUID") final String assertionUUID) {
+		 final HttpStatus returnStatus = HttpStatus.OK;
+		String result = String.format("No results found for runId [%s] and assertion UUID [%s].",runId, assertionUUID);
+		try {
+			final String jsonResult = resultExtractor.extractResultToJson( runId, assertionUUID);
+			if (jsonResult != null) {
+				result = jsonResult;
+			} 
+		} catch (final BusinessServiceException e) {
+			result = "Error message:" + e.getMessage();
+		}
+		return new ResponseEntity<>(result, returnStatus);
 	}
 
 }

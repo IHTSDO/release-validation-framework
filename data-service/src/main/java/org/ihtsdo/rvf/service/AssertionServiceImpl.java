@@ -292,4 +292,9 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 	public List<AssertionGroup> getAllAssertionGroups() {
 		return assertionGroupDao.findAll();
 	}
+
+	@Override
+	public Assertion getAssertionByUUID(final String assertionUUID) {
+		return assertionDao.getAssertionByUUID( assertionUUID);
+	}
 }

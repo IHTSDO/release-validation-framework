@@ -90,7 +90,7 @@
   }, {
     "assertionName" : "Active description of active concept consists of valid characters.",
     "assertionUuid" : "6614ff12-fca2-42b7-a5da-ea26353979fe",
-    "firstNInstances" : [ "DESCRIPTION: Synonym=Fracture \\clinic  which contains invalid character." ],
+    "firstNInstances" : [ "DESCRIPTION ID=3006276018: Synonym=Fracture \\clinic  contains invalid character." ],
     "totalFailed" : 1
   }, {
     "assertionName" : "All definitions are case sensitive.",
