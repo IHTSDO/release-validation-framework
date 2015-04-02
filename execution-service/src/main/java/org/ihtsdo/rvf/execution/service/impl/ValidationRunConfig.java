@@ -18,6 +18,7 @@ public class ValidationRunConfig {
 	private String extensionBaseLine;
 	private String storageLocation;
 	private String url;
+	private Integer failureExportMax;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -67,6 +68,16 @@ public class ValidationRunConfig {
 	public ValidationRunConfig addExtensionBaseLine(final String extensionBaseLine) {
 		this.extensionBaseLine = extensionBaseLine;
 		return this;
+	}
+	public ValidationRunConfig addFailureExportMax(final Integer exportMax) {
+		this.failureExportMax = exportMax;
+		return this;
+	}
+	public Integer getFailureExportMax() {
+		return failureExportMax;
+	}
+	public void setFailureExportMax(final Integer failureExportMax) {
+		this.failureExportMax = failureExportMax;
 	}
 	public Long getRunId() {
 		return runId;

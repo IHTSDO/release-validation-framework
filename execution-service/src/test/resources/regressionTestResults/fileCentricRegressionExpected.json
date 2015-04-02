@@ -150,7 +150,7 @@
   }, {
     "assertionName" : "There are no duplicate Definition terms in the DEFINITION snapshot file.",
     "assertionUuid" : "3b2c1824-8445-410e-8ae2-d943be01c33f",
-    "firstNInstances" : [ "TEXTDEF: Term=A subtype of non-spastic cerebral palsy with loss of muscular coordination with abnormal force and rhythm, and impairment of accuracy; commonly presents with gait and trunk ataxia, poor balance, past pointing, terminal intention tremor, scanning speech, nystagmus and other abnormal eye movements, and hypotonia. Low tone is a prominent feature.:There are no duplicate Definition terms in the DEFINITION snapshot file.", "TEXTDEF: Term=Arthralgia of knee less than three months.:There are no duplicate Definition terms in the DEFINITION snapshot file." ],
+    "firstNInstances" : [ "Definition id =2995945017: Term=[A subtype of non-spastic cerebral palsy with loss of muscular coordination with abnormal force and rhythm, and impairment of accuracy; commonly presents with gait and trunk ataxia, poor balance, past pointing, terminal intention tremor, scanning speech, nystagmus and other abnormal eye movements, and hypotonia. Low tone is a prominent feature.] is duplicate in the DEFINITION snapshot file.", "Definition id =3005197017: Term=[Arthralgia of knee less than three months.] is duplicate in the DEFINITION snapshot file." ],
     "totalFailed" : 2
   }, {
     "assertionName" : "The current Inferred Relationship snapshot file does not contain duplicate Relationship Ids.",

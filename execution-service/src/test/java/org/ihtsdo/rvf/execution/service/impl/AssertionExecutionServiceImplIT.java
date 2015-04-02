@@ -50,6 +50,8 @@ public class AssertionExecutionServiceImplIT {
 	private AssertionTest assertionTest;
 	private org.ihtsdo.rvf.entity.Test test;
 
+	private ExecutionConfig config;
+
 	@Before
 	public void setUp() {
 
@@ -59,6 +61,10 @@ public class AssertionExecutionServiceImplIT {
 		// register releases with release manager, since they will be used during SQL replacement
 		releaseDataManager.setSchemaForRelease("20140731", "rvf_int_20140731");
 		releaseDataManager.setSchemaForRelease("20140131", "rvf_int_20140131");
+		
+		config.setPreviousVersion("20140131");
+		config.setProspectiveVersion("20140731");
+		config.setExecutionId(1L);
 
 		assertion = assertionService.create(new HashMap<String, String>());
 		// create test
@@ -105,7 +111,7 @@ public class AssertionExecutionServiceImplIT {
 		assertionTest.setTest(test);
 
 		// set both prospective and previous release
-		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 1L, "20150131", "20140731");
+		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config);
 		assertNotNull(runItem);
 		logger.debug("runItem = " + runItem);
 		assertTrue("Test must have passed", runItem.getFailureCount() == 0);
@@ -140,7 +146,7 @@ public class AssertionExecutionServiceImplIT {
 		assertionTest.setTest(test);
 
 		// set both prospective and previous release
-		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, 2L, "20150131", "20140131");
+		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config);
 		assertNotNull(runItem);
 		assertTrue("Test must have passed", runItem.getFailureCount() == 0);
 	}

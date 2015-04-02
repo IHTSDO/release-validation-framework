@@ -142,6 +142,7 @@ public class TestUploadFileController {
 			@RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
 			@RequestParam(value = "extensionBaseLineReleaseVersion", required = false) final String extensionBaseLine,
 			@RequestParam(value = "runId") final Long runId,
+			@RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@RequestParam(value = "storageLocation") final String storageLocation,
             final HttpServletRequest request) throws IOException {
 		
@@ -158,7 +159,8 @@ public class TestUploadFileController {
 				.addPreviousExtVersion(previousExtVersion)
 				.addExtensionBaseLine(extensionBaseLine)
 				.addRunId(runId)
-				.addStorageLocation(storageLocation);
+				.addStorageLocation(storageLocation)
+				.addFailureExportMax(exportMax);
 		
 		//Before we start running, ensure that we've made our mark in the storage location
 		//Init will fail if we can't write the "running" state to storage
@@ -174,7 +176,6 @@ public class TestUploadFileController {
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}
-
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
 	@ResponseBody

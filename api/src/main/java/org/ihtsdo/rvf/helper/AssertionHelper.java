@@ -9,6 +9,7 @@ import java.util.Map;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,15 @@ public class AssertionHelper {
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	
-	public Map<String, Object> assertAssertions(final Collection<Assertion> assertions, final Long runId,  final String prospectiveReleaseVersion,
-			final String previousReleaseVersion) {
+	public Map<String, Object> assertAssertions(final Collection<Assertion> assertions, final ExecutionConfig config) {
 		//TODO throw an exception that results in a malformed request response and remove runtime dependency on JUnit
-		Assert.assertNotNull(runId);
+		Assert.assertNotNull(config);
 		final Collection<TestRunItem> allTestRunItems = new ArrayList<>();
 		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		int failedAssertionCount = 0;
 		for (final Assertion assertion: assertions) {
 			try {
-				final List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, runId,
-						prospectiveReleaseVersion, previousReleaseVersion));
+				final List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, config));
 				for (final TestRunItem item : items) {
 					if (item.getFailureCount() != 0) {
 						failedAssertionCount++;

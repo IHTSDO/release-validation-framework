@@ -1,6 +1,6 @@
 
 /******************************************************************************** 
-	component-centric-snapshot-description-valid characters
+	component-centric-snapshot-description-valid-characters
 
 	Assertion:
 	Active Terms of active concept consist of valid characters.
@@ -17,7 +17,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESCRIPTION: FSN=',a.term, ' which contains invalid character.') 	
+		concat('DESCRIPTION ID=',a.id, ': FSN=',a.term, ' contains invalid character.') 	
 	from  curr_description_d a , curr_concept_s b 
 	where a.active = 1
 	and b.active = 1
@@ -32,7 +32,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('DESCRIPTION: Synonym=',a.term, ' which contains invalid character.') 	
+		concat('DESCRIPTION ID=',a.id, ': Synonym=',a.term, ' contains invalid character.') 	
 	from  curr_description_d a , curr_concept_s b 
 	where a.active = 1
 	and b.active = 1
