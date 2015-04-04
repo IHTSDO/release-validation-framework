@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.hibernate.ObjectNotFoundException;
 import org.ihtsdo.rvf.dao.AssertionDao;
+import org.ihtsdo.rvf.dao.AssertionGroupDao;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
@@ -23,6 +24,8 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 
 	@Autowired
 	private AssertionDao assertionDao;
+	@Autowired
+	private AssertionGroupDao assertionGroupDao;
     @Autowired
     private EntityService entityService;
 
@@ -105,12 +108,9 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 	// todo use beanUtils/propertyUtils reflection for each of the properties
 	private void setProperties(final Assertion assertion, final Map<String, String> properties) {
 		assertion.setName(properties.get("name"));
-		assertion.setDescription(properties.get("description"));
-		assertion.setDocLink(properties.get("docLink"));
 		assertion.setKeywords(properties.get("keywords"));
-		assertion.setStatement(properties.get("statement"));
         if(properties.get("uuid") != null ){
-            assertion.setUuid(UUID.fromString(properties.get("statement")));
+            assertion.setUuid(UUID.fromString(properties.get("uuid")));
         }
 	}
 
@@ -288,4 +288,13 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 		return result;
 	}
 
+	@Override
+	public List<AssertionGroup> getAllAssertionGroups() {
+		return assertionGroupDao.findAll();
+	}
+
+	@Override
+	public Assertion getAssertionByUUID(final String assertionUUID) {
+		return assertionDao.getAssertionByUUID( assertionUUID);
+	}
 }

@@ -5,7 +5,6 @@
 		
 		<!-- build resource table -->
 		<script uuid="87dca0d6-4080-4b28-bcfa-e58c08e8170f" category="resource" sqlFile="res-table-edited-concept.sql" text="Build a table of all concepts edited in the current release cycle."/>
-		<script uuid="f03f8a9f-912c-4fce-88a0-3e9576d1c5c2" category="resource" sqlFile="create-resource-tables.sql" text="Create shared resource tables and indexes."/>
 		<script uuid="c81ee170-84f0-11e1-b0c4-0800200c9a66" category="resource" sqlFile="component-centric-delta-language-lang-specific-words-gb-def-proc.sql" text="Defines procedure that tests that terms that contain EN-GB language-specific words are in the same GB language refset." />
 		<script uuid="ba8918f0-84f0-11e1-b0c4-0800200c9a66" category="resource" sqlFile="component-centric-delta-language-lang-specific-words-us-def-proc.sql" text="Defines procedure that tests that terms that contain EN-US language-specific words are in the same US language refset." />
 
@@ -176,23 +175,23 @@
 		<script uuid="3be8c763-a5bc-404b-af9f-a2cb681f6f3d" category="file-centric-validation" sqlFile="file-centric-snapshot-description-unique-id.sql" text="ID is unique in DESCRIPTION snapshot."  >
 			<keywords>ID is unique in DESCRIPTION snapshot.</keywords>
 		</script>
-		<script uuid="8ea2e5d9-5c35-4436-b67d-c5268b5da06c" category="file-centric-validation" sqlFile="file-centric-snapshot-description-unique-FSN.sql" text="Active Fully Specified Name is unique in DESCRIPTION snapshot."  >
+		<script uuid="8ea2e5d9-5c35-4436-b67d-c5268b5da06c" category="file-centric-validation" sqlFile="file-centric-snapshot-description-unique-FSN.sql" text="Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot."  >
 			<keywords>Active Fully Specified Name is unique in DESCRIPTION snapshot.</keywords>
 		</script>
 		<script uuid="2b193a88-8dab-4d19-b995-b556ed59398d" category="file-centric-validation" sqlFile="file-centric-snapshot-description-successive-states.sql" text="New inactive states follow active states in the DESCRIPTION snapshot."  >
 			<keywords>New inactive states follow active states in the DESCRIPTION snapshot.</keywords>
 		</script>
-		<script uuid="1491f72c-cb00-42db-a97b-9c685f4e4cb0" category="file-centric-validation" sqlFile="file-centric-snapshot-description-valid-conceptid.sql" text="ConceptId value refers to valid concept identifier in DESCRIPTION snapshot."  >
+		<script uuid="1491f72c-cb00-42db-a97b-9c685f4e4cb0" category="file-centric-validation" sqlFile="file-centric-snapshot-description-valid-conceptid.sql" text="ConceptId value refers to valid concept identifier in the DESCRIPTION snapshot."  >
 			<keywords>ConceptId value refers to valid concept identifier in DESCRIPTION snapshot.</keywords>
 		</script>
-		<script uuid="48118153-d32a-4d1c-bfbc-23ed953e9991" category="file-centric-validation" sqlFile="file-centric-snapshot-description-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot."  >
+		<script uuid="48118153-d32a-4d1c-bfbc-23ed953e9991" category="file-centric-validation" sqlFile="file-centric-snapshot-description-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in  the DESCRIPTION snapshot."  >
 			<keywords>There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot.</keywords>
 		</script>
 		
 		<script uuid="4ba823ce-8ae4-4b2e-beb5-e119b822cfe2" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-unique-id.sql" text="ID is unique in the DEFINITION snapshot."  >
 			<keywords>ID is unique in the DEFINITION snapshot.</keywords>
 		</script>
-		<script uuid="718cc822-73b5-42c2-9c01-f8df09a9bf8d" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in DEFINITION snapshot."  >
+		<script uuid="718cc822-73b5-42c2-9c01-f8df09a9bf8d" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in the DEFINITION snapshot."  >
 			<keywords>There is a 1:1 relationship between the id and the immutable values in DEFINITION snapshot.</keywords>
 		</script>
 		<script uuid="e6082dc4-c6f4-48c6-afa3-233182336a5c" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-successive-states.sql" text="New inactive states follow active states in the DEFINITION snapshot file."  >
@@ -255,7 +254,7 @@
 			<keywords>Referencedcomponentid refers to valid concepts in the SIMPLE REFSET snapshot.</keywords>
 		</script>
 		
-		<script uuid="eff30fb0-7856-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-language-successive-states.sql" text="All members inactivated in current release must have been active in the previous release." />
+		<script uuid="eff30fb0-7856-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-language-successive-states.sql" text="All language refset members inactivated in current snapshot must have been active in the previous release." />
 		<script uuid="f5d9ae70-7856-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-language-valid-descriptionid.sql" text="All members refer to a description that is referenced in either the description table or the text definition table." />
 		<script uuid="fc24db60-7856-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-language-unique-id.sql" text="The current Language Refset snapshot file does not contain duplicate Member Ids." />
 		<script uuid="ffe6c560-7856-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-language-unique-fsn.sql" text="Every concept's FSN exists exactly once in each language refset." />
@@ -267,7 +266,7 @@
 		<script uuid="72184790-79b9-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-inferred-relationship-valid-sourceid.sql" text="All source ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file." />
 		<script uuid="77fc7550-79b9-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-inferred-relationship-valid-typeid.sql" text="All type ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file." />
 		<script uuid="7e453140-79b9-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-stated-relationship-immutable.sql" text="There is a 1-to-1 relationship between the id and the immutable values in STATED RELATIONSHIP snapshot." />
-		<script uuid="89ceaf00-79b9-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-stated-relationship-successive-states.sql" text="All relationships inactivated in current release must have been active in the previous release." />
+		<script uuid="89ceaf00-79b9-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-stated-relationship-successive-states.sql" text="All stated relationships inactivated in current release must have been active in the previous release." />
 		<script uuid="9074a620-79b9-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-stated-relationship-unique-id.sql" text="The current Stated Relationship snapshot file does not contain duplicate Relationship Ids." />
 		<script uuid="994b5ff0-79b9-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-stated-relationship-valid-destinationid.sql" text="All destination ids found in the Stated Relationship snapshot file exist in the Concept snapshot file." />
 		<script uuid="9f84d9a0-79b9-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-stated-relationship-valid-sourceid.sql" text="All source ids found in the Stated Relationship snapshot file exist in the Concept snapshot file." />
@@ -275,10 +274,10 @@
 		<script uuid="3b2c1824-8445-410e-8ae2-d943be01c33f" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-unique-terms.sql" text="There are no duplicate Definition terms in the DEFINITION snapshot file." />
 		<script uuid="eb940ee0-7cd6-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-active-target.sql" text="Active historical association refset members have active concepts as targets." />
 		<script uuid="90bcb7f0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-refers-to-parent.sql" text="No active Historical Association member associates an inactive concept with its parent." />
-		<script uuid="f7117eb0-7cd6-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-active-source-concept.sql" text="Active historical association refset members refer to inactive concepts." />
-		<script uuid="f2293d20-7cd6-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-concept-primitive.sql" text="All Concepts having only one defining relationship have definitionstatus PRIMITIVE." />
+		<script uuid="f7117eb0-7cd6-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-active-source-concept.sql" text="Active historical association refset members have inactive concepts as reference components." />
+		<script uuid="f2293d20-7cd6-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-concept-primitive.sql" text="The definition status is PRIMITIVE for concepts having only one defining relationship." />
 		<script uuid="fdf6a1b0-7cd6-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-concept-inactive-definitionstatusid.sql" text="All inactive concepts have definition status of PRIMITIVE." />
-		<script uuid="2e4fd620-7d08-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-inferred-inactive-concepts.sql" text="All inferred relationships in which the source concept is inactive, are inactive relationships." />
+		<script uuid="2e4fd620-7d08-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-inferred-inactive-concepts.sql" text="All inferred relationships in which the concept associated is inactive, are inactive relationships." />
 		<script uuid="32b41aa0-7d08-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-inferred-inactive-modifier.sql" text="Inferred relationship modifier is always SOME." />
 		<script uuid="36f43550-7d08-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-inferred-isa-relgroup.sql" text="All inferred is-a relationships have relationship group of 0." />
 		<script uuid="3ab84230-7d08-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-inferred-one-isa.sql" text="All concepts have at least one inferred is-a relationship." />
@@ -303,17 +302,17 @@
 		<script uuid="50907ee7-ddf6-4cb5-ba8b-be150644430b" category="component-centric-validation" sqlFile="component-centric-snapshot-description-balanced parentheses.sql" text="Terms contains balanced parentheses." />
 		<script uuid="805ab37c-33fa-45aa-876b-f86365a828c8" category="component-centric-validation" sqlFile="component-centric-snapshot-description-case-word-match.sql" text="Case-sensitive terms that share initial words also share caseSignificanceId value." />
 		<script uuid="22a95293-3acb-4671-95f8-1ff13ba3202c" category="component-centric-validation" sqlFile="component-centric-snapshot-description-casesignificanceid.sql" text="Case-sensitive terms have appropriate caseSignificanceId." />		
-		<script uuid="6614ff12-fca2-42b7-a5da-ea26353979fe" category="component-centric-validation" sqlFile="component-centric-snapshot-description-valid characters.sql" text="Active Terms of active concept consist of valid characters." />		
+		<script uuid="6614ff12-fca2-42b7-a5da-ea26353979fe" category="component-centric-validation" sqlFile="component-centric-snapshot-description-valid-characters.sql" text="Active description of active concept consists of valid characters." />		
 		
 		<script uuid="b4930ea7-4078-4599-979c-2dde18164f01" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-case-sensitive.sql" text="All definitions are case sensitive." />
 		<script uuid="73e46e72-6fdb-407b-9d50-d86a36a3a862" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-preferred.sql" text="All definitions are preferred." />
-		<script uuid="da3ae7c4-6144-4cd5-9530-2a7780c53c9a" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-trim.sql" text="No active Terms contain leading or trailing spaces." />
-		<script uuid="f7b7cefe-858d-4749-ab98-7106700feaee" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-double-spaces.sql" text="No active Terms contain double spaces." />
-		<script uuid="6138248d-8cc8-4bc2-8043-cd609fdd640c" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-uppercase.sql" text="The first letter of the Term should be capitalized." />
+		<script uuid="da3ae7c4-6144-4cd5-9530-2a7780c53c9a" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-trim.sql" text="No active definitions contain leading or trailing spaces." />
+		<script uuid="f7b7cefe-858d-4749-ab98-7106700feaee" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-double-spaces.sql" text="No active definitions contain double spaces." />
+		<script uuid="6138248d-8cc8-4bc2-8043-cd609fdd640c" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-uppercase.sql" text="The first letter of the Definition should be capitalized." />
 		
-		<script uuid="d76f1430-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-inactive-members.sql" text="Members are inactive for inactive descriptions in the snapshot file." />
+		<script uuid="d76f1430-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-inactive-members.sql" text="Members are inactive for inactive descriptions in the language refset snapshot file." />
 		<script uuid="e658fb00-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-unique-term.sql" text="Descriptions in a language refset are unique for a given concept." />
-		<script uuid="f636b7b0-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-active-members.sql" text="Members are active for active descriptions in the snapshot file." />
+		<script uuid="f636b7b0-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-active-members.sql" text="Members are active for active descriptions in the language refset snapshot file." />
 		<script uuid="00e87310-7e9b-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-unique-description.sql" text="There is only zero or one active Definition per concept per dialect in the snapshot file." />
 		<script uuid="695cea40-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-snomed-rt-active.sql" text="SNOMED RT identifier simple map refset refers to active components." />
 		<script uuid="730720b0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-snomed-rt-ratio.sql" text="There is one and only one SNOMED RT simple map refset member per concept." />
@@ -329,8 +328,8 @@
 		<script uuid="8479317e-8459-4362-bee8-628b8220f1e4" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-active.sql" text="Active Non-human refset members refer to active components." />
 		<script uuid="c3249e80-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-us-call-proc.sql" text="Calling procedure testing that terms that contain EN-US language-specific words are in the same US language refset." />
 		<script uuid="cc9c5340-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-gb-call-proc.sql" text="Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset." />
-		<script uuid="0a4bba70-85b7-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-navigation.sql" text="targetComponentId' does not refer to navigation concepts." />
-		<!-- Exclude this assertion for the time being 
+		<!-- Exclude these assertion for the time being 
+		<script uuid="0a4bba70-85b7-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-navigation.sql" text="targetComponentId in association refset file does not refer to navigation concepts." />
 		<script uuid="38b88ff6-7ee3-40a5-b362-98a87e80526e" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-inactive.sql" text="Inactive Non-human refset members refer to inactive components." />
 		-->
 		<script uuid="c82246b1-a137-40c5-8653-554c9ce82c6b" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-terms.sql" text="Terms are unique in Description hierarchy." />

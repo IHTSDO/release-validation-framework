@@ -73,9 +73,15 @@
 		<property name="snomedDataSource" ref="snomedDataSource"/>
 		<property name="sctDataLocation" value="${rvf.data.folder.location}"/>
 	</bean>
+	<bean id="resourceDataLoader" class="org.ihtsdo.rvf.execution.service.impl.ResourceDataLoaderImpl">
+		<property name="snomedDataSource" ref="snomedDataSource"/>
+	</bean>
 	
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner" scope="prototype">
 		<constructor-arg name="bucketName" ref="bucketName"/>
+	</bean>
+	
+	<bean id ="resultExtractor" class="org.ihtsdo.rvf.execution.service.impl.ResultExtractorServiceImpl">
 	</bean>
 	
 	<bean class="java.lang.String" id="bucketName">

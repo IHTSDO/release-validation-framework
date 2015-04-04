@@ -4,6 +4,7 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestRunItem;
+import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
 
 import java.util.Collection;
 
@@ -13,15 +14,14 @@ import java.util.Collection;
  */
 public interface AssertionExecutionService {
 
-	TestRunItem executeAssertionTest(AssertionTest assertionTest, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+	TestRunItem executeAssertionTest(AssertionTest assertionTest, ExecutionConfig config);
 
-	Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertions, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+	Collection<TestRunItem> executeAssertionTests(Collection<AssertionTest> assertions, ExecutionConfig config);
 
-	Collection<TestRunItem> executeAssertion(Assertion assertion, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+	Collection<TestRunItem> executeAssertion(Assertion assertion, ExecutionConfig config);
 
-	Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, Long executionId, String prospectiveReleaseVersion, String previousReleaseVersion);
+	Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, ExecutionConfig config);
 
-	TestRunItem executeTest(Assertion assertion, Test test, Long executionId,
-			String prospectiveReleaseVersion, String previousReleaseVersion);
+	TestRunItem executeTest(Assertion assertion, Test test, ExecutionConfig config);
 
 }

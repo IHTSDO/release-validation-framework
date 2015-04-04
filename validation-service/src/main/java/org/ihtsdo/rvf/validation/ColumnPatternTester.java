@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.model.ColumnType;
-import org.ihtsdo.rvf.validation.resource.ResourceManager;
+import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 import org.ihtsdo.snomed.util.rf2.schema.DataType;
 import org.ihtsdo.snomed.util.rf2.schema.Field;
 import org.ihtsdo.snomed.util.rf2.schema.FileRecognitionException;
@@ -40,11 +40,11 @@ public class ColumnPatternTester {
 	private static final String COLUMN_BOOLEAN_TEST_TYPE = "ColumnBooleanTest";
 
 	private final ValidationLog validationLog;
-	private final ResourceManager resourceManager;
+	private final ResourceProvider resourceManager;
 	private final TestReportable testReport;
 	private Map<ColumnType, PatternTest> columnTests;
 
-	public ColumnPatternTester(final ValidationLog validationLog, final ResourceManager resourceManager, final TestReportable testReport) {
+	public ColumnPatternTester(final ValidationLog validationLog, final ResourceProvider resourceManager, final TestReportable testReport) {
 		this.validationLog = validationLog;
 		this.resourceManager = resourceManager;
 		this.testReport = testReport;

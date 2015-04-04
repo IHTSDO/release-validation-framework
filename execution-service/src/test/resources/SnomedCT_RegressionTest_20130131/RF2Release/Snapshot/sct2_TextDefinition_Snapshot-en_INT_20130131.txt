@@ -7,4 +7,4 @@ id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignific
 2987064010	20140131	1	900000000000207008	698055008	en	900000000000550004	An inflammatory necrotizing lesion occurring in minor salivary glands.	900000000000017005
 2973601010	20140131	1	900000000000207008	62950007	en	900000000000550004	A disorder characterized by inflammation of both the brain and the spinal cord.	900000000000017005
 2988954017	20140131	1	900000000000207008	699683004	en	900000000000550004	Caries in which the lesion has removed so much of the crown that its original site of initiation cannot be determined with any certainty.	900000000000017005
-2983208019	20140131	1	900000000000207008	699220008	en	900000000000550004	A common taste disorder where there is a lingering, often unpleasant taste despite the absence of any stimulus to initiate the distorted taste.	900000000000017005
+2983208019	20140131	0	900000000000207008	699220008	en	900000000000550004	A common taste disorder where there is a lingering, often unpleasant taste despite the absence of any stimulus to initiate the distorted taste.	900000000000017005

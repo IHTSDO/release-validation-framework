@@ -27,7 +27,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('ATT RS: id=',a.id, ':Invalid inactive states in the ATTRIBUTEVALUE REFSET snapshot file.') 	
+		concat('AttributeRefsetId=',a.id, ' should not have a new inactive state in the snapshot file as was inactive previously.') 	
 	from v_curr_snapshot a;
 
 

@@ -13,11 +13,14 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('MEMBER: id=',a.id, ': Member inactived in current release was inactive in previous release.') 
-	from curr_langrefset_d a
+		concat('Language Refset: id=',a.id, ' should not have a new inactive state in the current release as it was inactive already in the previvous SNAPSHOT.') 
+	from curr_langrefset_s a
 	join prev_langrefset_s b
-	on a.id = b.id
-	where a.active = b.active
-	and a.active = 0;
+	where cast(a.effectivetime as datetime) >
+				(select max(cast(effectivetime as datetime)) 
+				 from prev_langrefset_s)
+	and a.active = 0
+	and a.id = b.id
+	and a.active = b.active;
 
 

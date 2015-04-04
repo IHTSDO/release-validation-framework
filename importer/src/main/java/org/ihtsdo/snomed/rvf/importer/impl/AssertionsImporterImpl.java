@@ -138,7 +138,6 @@ public class AssertionsImporterImpl implements AssertionsImporter {
         // add entities using rest client
         final Assertion assertion = new Assertion();
         assertion.setUuid(UUID.fromString(uuid));
-        assertion.setStatement(text);
         assertion.setName(text);
         assertion.setKeywords(category);
 

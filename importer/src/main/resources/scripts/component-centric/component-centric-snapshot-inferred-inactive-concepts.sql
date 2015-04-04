@@ -2,9 +2,8 @@
 /******************************************************************************** 
 	component-centric-snapshot-inferred-inactive-concepts
 	
-	Assertion:
-	All inferred relationships in which any of the three relationship concepts
-	are inactive, are inactive relationships.
+	Assertion:	
+	All inferred relationships in which the concept associated is inactive, are inactive relationships.
 
 ********************************************************************************/
 	

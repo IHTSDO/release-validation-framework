@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
-public interface ResourceManager {
+public interface ResourceProvider {
 
 	BufferedReader getReader(String name, Charset charset) throws IOException;
 

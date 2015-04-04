@@ -67,7 +67,6 @@ public class AssertionServiceImplTest {
 
         assertion = new Assertion();
         assertion.setName("Test assertion");
-        assertion.setDescription("Test Description");
         assertion = assertionService.create(assertion);
         assertNotNull(assertion.getId());
         assertNotNull(assertion.getUuid());
@@ -302,7 +301,6 @@ public class AssertionServiceImplTest {
 
         Assertion assertion2 = new Assertion();
         assertion2.setName("Second assertion in group");
-        assertion2.setDescription("Description of second assertion in group");
         // save assertion2
         assertion2 = assertionService.create(assertion2);
         assertNotNull(assertion2.getId());
@@ -310,7 +308,6 @@ public class AssertionServiceImplTest {
 
         Assertion assertion3 = new Assertion();
         assertion3.setName("Third assertion in group");
-        assertion3.setDescription("Description of third assertion in group");
         // save assertion3
         assertion3 = assertionService.create(assertion3);
         assertNotNull(assertion3.getId());

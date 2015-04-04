@@ -42,4 +42,5 @@ public interface AssertionDao extends EntityDao<Assertion> {
 	
 	AssertionGroup getAssertionGroupsByName(String groupName);
 
+	Assertion getAssertionByUUID(String assertionUUID);
 }

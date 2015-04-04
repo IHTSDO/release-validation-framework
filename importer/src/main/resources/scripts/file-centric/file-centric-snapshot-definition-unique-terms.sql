@@ -10,7 +10,7 @@
 /* 	view of current snapshot made by finding duplicate terms in textdefinition file*/
 	drop table if exists v_curr_snapshot;
 	create table if not exists  v_curr_snapshot as
-	select  a.term 
+	select a.id, a.term 
 	from curr_textdefinition_s a
 	where active = 1
 	group by BINARY  a.term
@@ -23,7 +23,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('TEXTDEF: Term=',a.term, ':There are no duplicate Definition terms in the DEFINITION snapshot file.') 	
+		concat('Definition id =', a.id,': Term=[',a.term, '] is duplicate in the DEFINITION snapshot file.') 	
 	from v_curr_snapshot a;
 
 

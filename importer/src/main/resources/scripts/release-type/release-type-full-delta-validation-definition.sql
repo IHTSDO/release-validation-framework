@@ -16,7 +16,7 @@ drop table if exists v_temp_table;
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Definition: id=',a.id, ': definition is in current full file, but not in prior full file.') 	
+	concat('Definition: id=',a.id, ' is in current full file, but not in prior full file.') 	
 	from curr_textdefinition_f a
 	left join v_temp_table b
 	on a.id = b.id
@@ -44,7 +44,7 @@ drop table if exists v_temp_table;
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Definition: id=',a.id, ': definition is in prior full file, but not in current full file.')
+	concat('Definition: id=',a.id, ' is in prior full file, but not in current full file.')
 	from v_temp_table a
 	left join curr_textdefinition_f b 
 	on a.id = b.id

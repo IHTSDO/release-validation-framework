@@ -5,33 +5,20 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class ValidationRunConfig {
-	
-	@JsonIgnore
-	private MultipartFile file;
-	
-	private File prospectiveFile;
-	
-	private boolean writeSucceses;
-	
-	@JsonIgnore
-	private MultipartFile manifestFile;
-	
-	private List<String> groupsList;
-	
-	private String prevIntReleaseVersion;
-	
-	private String previousExtVersion;
-	
-	private String extensionBaseLine;
-	
+	private String testFileName;
 	private Long runId;
-	
+	private transient MultipartFile file;
+	private transient File prospectiveFile;
+	private boolean writeSucceses;
+	private transient MultipartFile manifestFile;
+	private List<String> groupsList;
+	private String prevIntReleaseVersion;
+	private String previousExtVersion;
+	private String extensionBaseLine;
 	private String storageLocation;
-	
 	private String url;
+	private Integer failureExportMax;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -82,6 +69,16 @@ public class ValidationRunConfig {
 		this.extensionBaseLine = extensionBaseLine;
 		return this;
 	}
+	public ValidationRunConfig addFailureExportMax(final Integer exportMax) {
+		this.failureExportMax = exportMax;
+		return this;
+	}
+	public Integer getFailureExportMax() {
+		return failureExportMax;
+	}
+	public void setFailureExportMax(final Integer failureExportMax) {
+		this.failureExportMax = failureExportMax;
+	}
 	public Long getRunId() {
 		return runId;
 	}
@@ -108,5 +105,24 @@ public class ValidationRunConfig {
 	}
 	public void setProspectiveFile(final File prospectiveFile) {
 		this.prospectiveFile = prospectiveFile;
+	}
+
+	public void setTestFileName(final String filename) {
+		testFileName = filename;
+		
+	}
+	
+	public String getTestFileName() {
+		return testFileName;
+	}
+	
+	@Override
+	public String toString() {
+		return "ValidationRunConfig [testFileName=" + testFileName
+				+ ", writeSucceses=" + writeSucceses + ", groupsList="
+				+ groupsList + ", prevIntReleaseVersion="
+				+ prevIntReleaseVersion + ", previousExtVersion="
+				+ previousExtVersion + ", extensionBaseLine="
+				+ extensionBaseLine + ", runId=" + runId + ", url=" + url + "]";
 	}
 }

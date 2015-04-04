@@ -3,7 +3,7 @@
 	component-centric-snapshot-language-inactive-members
 
 	Assertion:
-	Members are inactive for inactive descriptions in the snapshot file.
+	Members are inactive for inactive descriptions in the language refset snapshot file.
 
 ********************************************************************************/
 	

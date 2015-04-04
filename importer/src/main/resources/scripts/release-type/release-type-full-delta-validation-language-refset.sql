@@ -19,7 +19,7 @@
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Language refset: id=',a.id, ': Language refset is in current full file, but not in prior full file.') 	
+	concat('Language refset: id=',a.id, ' is in current full file, but not in prior full file.') 	
 	from curr_langrefset_f a
 	left join v_temp_table b
 	on a.id = b.id
@@ -43,7 +43,7 @@
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Language refset: id=',a.id, ': Language refset is in prior full file, but not in current full file.')
+	concat('Language refset: id=',a.id, ' is in prior full file, but not in current full file.')
 	from v_temp_table a
 	left join curr_langrefset_f b 
 	on a.id = b.id

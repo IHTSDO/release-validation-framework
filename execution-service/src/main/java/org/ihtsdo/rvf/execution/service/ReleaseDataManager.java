@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Set;
 
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+
 /**
  * Utility service that manages a repository of published SNOMED CT releases. Note that we have deliberately not
  * included a delete/update functionality in this service. This get functionality should never be exposed to the external world
@@ -11,11 +13,11 @@ import java.util.Set;
  */
 public interface ReleaseDataManager {
 
-    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName, String version);
+    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName, String version) throws BusinessServiceException;
 
-    boolean uploadPublishedReleaseData(File releasePackZip, String version);
+    boolean uploadPublishedReleaseData(File releasePackZip, String version) throws BusinessServiceException;
 
-    String loadSnomedData(String versionName, File ... zipDataFile);
+    String loadSnomedData(String versionName, File ... zipDataFile) throws BusinessServiceException;
 
     boolean isKnownRelease(String releaseVersion);
 

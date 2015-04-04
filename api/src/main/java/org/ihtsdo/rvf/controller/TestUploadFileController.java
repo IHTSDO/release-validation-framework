@@ -23,7 +23,7 @@ import org.ihtsdo.rvf.service.EntityService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.ihtsdo.rvf.validation.TestReportable;
 import org.ihtsdo.rvf.validation.model.ManifestFile;
-import org.ihtsdo.rvf.validation.resource.ResourceManager;
+import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 import org.ihtsdo.rvf.validation.resource.TextFileResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;
@@ -108,7 +108,7 @@ public class TestUploadFileController {
 		try (PrintWriter writer = response.getWriter()) {
 			// must be a zip
 			file.transferTo(tempFile);
-			final ResourceManager resourceManager = new ZipFileResourceProvider(tempFile);
+			final ResourceProvider resourceManager = new ZipFileResourceProvider(tempFile);
 
 			TestReportable report;
 
@@ -142,6 +142,7 @@ public class TestUploadFileController {
 			@RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
 			@RequestParam(value = "extensionBaseLineReleaseVersion", required = false) final String extensionBaseLine,
 			@RequestParam(value = "runId") final Long runId,
+			@RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@RequestParam(value = "storageLocation") final String storageLocation,
             final HttpServletRequest request) throws IOException {
 		
@@ -158,7 +159,8 @@ public class TestUploadFileController {
 				.addPreviousExtVersion(previousExtVersion)
 				.addExtensionBaseLine(extensionBaseLine)
 				.addRunId(runId)
-				.addStorageLocation(storageLocation);
+				.addStorageLocation(storageLocation)
+				.addFailureExportMax(exportMax);
 		
 		//Before we start running, ensure that we've made our mark in the storage location
 		//Init will fail if we can't write the "running" state to storage
@@ -174,7 +176,6 @@ public class TestUploadFileController {
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}
-
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
 	@ResponseBody
@@ -199,7 +200,7 @@ public class TestUploadFileController {
 		
 		try (PrintWriter writer = response.getWriter()) {
 			file.transferTo(tempFile);
-			final ResourceManager resourceManager = new TextFileResourceProvider(tempFile, filename);
+			final ResourceProvider resourceManager = new TextFileResourceProvider(tempFile, filename);
 			final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
 			// store the report to disk for now with a timestamp
 			if (report.getNumErrors() > 0) {

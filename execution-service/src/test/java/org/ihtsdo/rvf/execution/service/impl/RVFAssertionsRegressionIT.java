@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,11 +23,13 @@ import java.util.UUID;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.Before;
@@ -61,15 +64,17 @@ public class RVFAssertionsRegressionIT {
     @Autowired
     private ReleaseDataManager releaseDataManager;
     @Autowired
+    private ResourceDataLoader resourceDataLoader;
+    @Autowired
     private  AssertionDao assertionDao;
     private  URL releaseTypeExpectedResults;
 	private URL componentCentrilExpected;
 	private URL fileCentricExpected;
-	private Long runId;
+	private ExecutionConfig config;
 	private final ObjectMapper mapper = new ObjectMapper();
 	
 	@Before
-	public void setUp() throws FileNotFoundException, IOException {
+	public void setUp() throws FileNotFoundException, IOException, SQLException, BusinessServiceException {
 		//load previous and prospective versions if not loaded already
         assertNotNull(releaseDataManager);
         if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
@@ -80,10 +85,10 @@ public class RVFAssertionsRegressionIT {
 			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFile);
         }
         if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
-        	final URL prspectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
-            assertNotNull("Must not be null", prspectiveReleaseUrl);
-            final File prospectiveFile = new File(prspectiveReleaseUrl.getFile() + "_test.zip");
-			ZipFileUtils.zip(prspectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
+        	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
+            assertNotNull("Must not be null", prospectiveReleaseUrl);
+            final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
+			ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
         	releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, prospectiveFile);
         }
         
@@ -93,12 +98,16 @@ public class RVFAssertionsRegressionIT {
         assertNotNull("Must not be null", componentCentrilExpected);
         fileCentricExpected = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
         assertNotNull("Must not be null", fileCentricExpected);
-        runId = System.currentTimeMillis();
         releaseDataManager.setSchemaForRelease("20130131", "rvf_int_" + PREVIOUS_RELEASE);
         releaseDataManager.setSchemaForRelease("20130731", "rvf_int_"+ PROSPECTIVE_RELEASE);
         
+        resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease("20130731"));
         final List<Assertion> assertions = assertionDao.getAssertionsByKeywords("resource");
-		 assertionExecutionService.executeAssertions(assertions, runId,"20130731", "20130131");
+		config = new ExecutionConfig(System.currentTimeMillis());
+		config.setPreviousVersion("20130131");
+		config.setProspectiveVersion("20130731");
+		config.setFailureExportMax(10);
+		assertionExecutionService.executeAssertions(assertions, config);
         
 	}
 	
@@ -119,7 +128,7 @@ public class RVFAssertionsRegressionIT {
 	private void runAssertionsTest(final String groupName, final String expectedJsonFile) throws Exception {
 		 final List<Assertion> assertions= assertionDao.getAssertionsByKeywords(groupName);
 		 System.out.println("found total assertions:" + assertions.size());
-			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, runId,"20130731", "20130131");
+			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
 			assertTestResult(groupName, expectedJsonFile, runItems);
 	 }
 	private void assertTestResult(final String type, final String expectedJsonFileName,final Collection<TestRunItem> runItems) throws Exception {
@@ -130,13 +139,14 @@ public class RVFAssertionsRegressionIT {
 			result.setAssertonName(item.getAssertionText());
 			result.setFirstNInstances(item.getFirstNInstances());
 			result.setAssertionUuid(item.getAssertionUuid());
-			assertNull("No failure should have occured.", item.getFailureMessage());
+			assertNull("No failure should have occured for assertion uuid." + item.getAssertionUuid(), item.getFailureMessage());
 			result.setTotalFailed(item.getFailureCount() != null ? item.getFailureCount() : -1L);
 			results.add(result);
 			if(result.getTotalFailed() > 0) {
 				failureCounter ++;
 			}
 		}
+		Collections.sort(results);
 		final TestReport actualReport = new TestReport();
 		actualReport.setAssertionType(type);;
 		actualReport.setTotalAssertionsRun(runItems.size());
@@ -354,7 +364,10 @@ public class RVFAssertionsRegressionIT {
 
 		@Override
 		public int compareTo(final RVFTestResult o) {
-			return this.assertionUuid.compareTo(o.getAssertionUuid());
+//			return this.assertionUuid.compareTo(o.getAssertionUuid());
+			
+			return new Long(this.getTotalFailed()).compareTo(o.getTotalFailed());
+			
 		}
 	}
 }

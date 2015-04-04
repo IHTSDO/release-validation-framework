@@ -118,7 +118,7 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 				.setParameter("groupId", groupId).list();
 	}
 
-	AssertionTest validateAndGetFirstEntry(final List<AssertionTest> list){
+	private AssertionTest validateAndGetFirstEntry(final List<AssertionTest> list){
 		if(list.size() == 1){
 			return list.get(0);
 		}
@@ -146,5 +146,21 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 			return result.get(0);
 		}
 		return null;
+	}
+
+	@Override
+	public Assertion getAssertionByUUID(final String assertionUUID) {
+		Assertion assertion = null;
+		@SuppressWarnings("unchecked")
+		final List<Assertion> result = getCurrentSession()
+				.createQuery("from Assertion assertion where assertion.uuid = :uuid")
+				.setParameter("uuid", assertionUUID).list();
+		if( result != null && !result.isEmpty()) {
+			if (result.size() > 1) {
+				logger.warn("Find more than one assertion for uuid:" + assertionUUID);
+			}
+			assertion = result.get(0);
+		}
+		return assertion;
 	}
 }

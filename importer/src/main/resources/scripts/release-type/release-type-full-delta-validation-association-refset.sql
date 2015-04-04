@@ -19,7 +19,7 @@ drop table if exists v_temp_table;
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Association refset: id=',a.id, ': Association refset is in current full file, but not in prior full file.') 	
+	concat('Association refset: id=',a.id, ' is in the current full file, but not in the prior full file.') 	
 	from curr_associationrefset_f a
 	left join v_temp_table b
 	on a.id = b.id
@@ -43,7 +43,7 @@ drop table if exists v_temp_table;
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('Association refset: id=',a.id, ': Association refset is in prior full file, but not in current full file.')
+	concat('Association refset: id=',a.id, ' is in the prior full file, but not in the current full file.')
 	from v_temp_table a
 	left join curr_associationrefset_f b 
 	on a.id = b.id

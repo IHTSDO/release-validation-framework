@@ -4,7 +4,7 @@
 
 	<groupId>org.ihtsdo.snomed.rvf</groupId>
 	<artifactId>release-validation-framework</artifactId>
-	<version>0.1.15</version>
+	<version>0.1.16</version>
 
 	<packaging>pom</packaging>
 	<name>SNOMED Release Validation Framework</name>
@@ -87,7 +87,7 @@
 		<dependency>
 			<groupId>org.ihtsdo.otf.common</groupId>
 			<artifactId>otf-common</artifactId>
-			<version>0.0.5</version>
+			<version>0.0.8</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>spring-beans</artifactId>

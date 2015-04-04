@@ -31,18 +31,20 @@ public class AssertionGroup {
 	@Id
 	@GeneratedValue
 	@Column(name = "group_id")
-	Long id;
+	private Long id;
 	
-	@JsonIgnore
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private String name;
+	
+	@ManyToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(
 			name="group_assertion_link",
 			joinColumns = @JoinColumn( name="group_id"),
 			inverseJoinColumns = @JoinColumn( name="assertion_id")
 	)
-	Set<Assertion> assertions = new HashSet<>();
-	String name;
-
+	
+	@JsonIgnore
+	private Set<Assertion> assertions = new HashSet<>();
+	
 	public String getName() {
 		return name;
 	}
@@ -85,5 +87,10 @@ public class AssertionGroup {
 	@Transient
 	public void removeAssertion(final Assertion assertion){
 		this.getAssertions().remove(assertion);
+	}
+
+	@Override
+	public String toString() {
+		return "AssertionGroup [id=" + id + ", name=" + name + ", total assertions =" + assertions.size() + "]";
 	}
 }

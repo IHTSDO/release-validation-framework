@@ -131,7 +131,6 @@ public class AssertionControllerIntegrationTest {
 
         final Assertion assertion1 = new Assertion();
         assertion1.setName("Testing assertion");
-        assertion1.setDescription("Test description");
         String paramsString = objectMapper.writeValueAsString(assertion1);
         System.out.println("paramsString = " + paramsString);
         // we have to strip the id property added by Jackson since this causes conflicts when Spring tries to convert content into Assertion

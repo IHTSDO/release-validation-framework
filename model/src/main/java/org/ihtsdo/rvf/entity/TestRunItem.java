@@ -1,8 +1,6 @@
 package org.ihtsdo.rvf.entity;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,16 +9,15 @@ import java.util.UUID;
  */
 public class TestRunItem {
 
+	private String testCategory;
 	private UUID assertionUuid;
 	private String assertionText;
 	private String executionId;
-	private Date testTime;
-	private String testType;
-	private String testPattern;
-	private long runTime;
-	private String failureMessage;
-	private List<String> firstNInstances = new ArrayList<>();
+	private Long runTimeInMilliSeconds;
 	private Long failureCount;
+	private String failureMessage;
+	private List<String> firstNInstances;
+
 
 	/**
 	 * Empty constructor for IOC
@@ -29,29 +26,14 @@ public class TestRunItem {
 		failureCount = -1L;
 	}
 
-	private String check(final String separator, final String filePath) {
-		return filePath != null ? (separator + filePath) : "";
-	}
-
 	public String getExecutionId() {
 		return executionId;
 	}
 
-	public Date getTestTime() {
-		return testTime;
+	public String getTestCategory() {
+		return testCategory;
 	}
 
-	public String getTestType() {
-		return testType;
-	}
-
-	public String getTestPattern() {
-		return testPattern;
-	}
-
-	public String getStartDate() {
-		return new SimpleDateFormat().format(testTime);
-	}
 
 	public String getFailureMessage() {
 		return failureMessage;
@@ -62,11 +44,10 @@ public class TestRunItem {
 		return "TestRunItem{" +
 				"assertionUuid=" + assertionUuid + +  '\'' +
 				"assertionText=" + assertionText +  '\'' +	
-				"executionId='" + executionId + '\'' +
-				", testType='" + testType + '\'' +
-				", testPattern='" + testPattern + '\'' +
-				", testTime='" + testTime + '\'' +
-				", runTime='" + runTime + '\'' +
+				"executionId=" + executionId + '\'' +
+				"testCategory=" + testCategory + '\'' +
+				"runTime=" + runTimeInMilliSeconds + '\'' +
+				"failureCount=" + failureCount +
 				'}';
 	}
 
@@ -74,24 +55,16 @@ public class TestRunItem {
 		this.executionId = executionId;
 	}
 
-	public void setTestTime(final Date testTime) {
-		this.testTime = testTime;
+	public void setTestCategory(final String testType) {
+		this.testCategory = testType;
 	}
 
-	public void setTestType(final String testType) {
-		this.testType = testType;
-	}
-
-	public void setTestPattern(final String testPattern) {
-		this.testPattern = testPattern;
-	}
-
-	public long getRunTime() {
-		return runTime;
+	public Long getRunTime() {
+		return runTimeInMilliSeconds;
 	}
 
 	public void setRunTime(final long runTime) {
-		this.runTime = runTime;
+		this.runTimeInMilliSeconds = runTime;
 	}
 
 	public void setFailureMessage(final String failureMessage) {
@@ -106,8 +79,11 @@ public class TestRunItem {
 		this.firstNInstances = firstNInstances;
 	}
 
-	public void addFirstNInstance(final String string){
-		getFirstNInstances().add(string);
+	public void addFirstNInstance(final String failureInstance){
+		if (firstNInstances == null) {
+			firstNInstances = new ArrayList<>();
+		}
+		firstNInstances.add(failureInstance);
 	}
 
 	public Long getFailureCount() {

@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.rvf.execution.service.ResultExtractorService;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner.State;
@@ -25,42 +27,58 @@ public class ResultController {
 	
 	private static final String MESSAGE = "Message";
 	@Autowired
-	Provider<ValidationRunner> validationRunnerProvider;
+	private Provider<ValidationRunner> validationRunnerProvider;
+	@Autowired
+	private ResultExtractorService resultExtractor;
 
 	@RequestMapping(value = "{runId}", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> getResult(@PathVariable final Long runId, 
+	public ResponseEntity<Map<String,Object>> getResult(@PathVariable final Long runId, 
 			@RequestParam(value = "storageLocation") final String storageLocation) throws IOException {
 		final ValidationRunner validationRunner = validationRunnerProvider.get();
 		final ValidationRunConfig config = new ValidationRunConfig();
 		config.addRunId(runId).addStorageLocation(storageLocation);
 		validationRunner.setConfig(config);
+		
 		//Can we find an rvf status file at that location?  Return 404 if not.
-		final Map <String, Object> responseMap = new LinkedHashMap<>();
+		final Map<String, Object> responseMap = new LinkedHashMap<>();
 		final State state = validationRunner.getCurrentState();
-		HttpStatus returnStatus = HttpStatus.NON_AUTHORITATIVE_INFORMATION; 
+		final HttpStatus returnStatus = HttpStatus.OK;
 		if (state == null) {
-			returnStatus = HttpStatus.NOT_FOUND;
-			responseMap.put(ValidationRunner.FAILURE_MESSAGE, "No validation state found at " + storageLocation);
+			responseMap.put(MESSAGE, "No validation state found at " + storageLocation);
 		} else {
 			responseMap.put("Status", state.toString());
 			switch (state) {
-				case READY : 	returnStatus = HttpStatus.LOCKED;
-								responseMap.put(MESSAGE, "Validation hasn't started running yet!");
+				case READY : 	responseMap.put(MESSAGE, "Validation hasn't started running yet!");
 								break;
-				case RUNNING :  returnStatus = HttpStatus.LOCKED;
+				case RUNNING :  final String progress = validationRunner.recoverProgress();
 								responseMap.put(MESSAGE, "Validation is still running.");
+								responseMap.put("Progress", progress);
 								break;
-				case FAILED :   returnStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-								validationRunner.recoverResult(responseMap);
+				case FAILED :   validationRunner.recoverResult(responseMap);
 								break;
-				case COMPLETE : returnStatus = HttpStatus.OK;
-								validationRunner.recoverResult(responseMap);
+				case COMPLETE : validationRunner.recoverResult(responseMap);
 								break;
 			}
 		}
-
 		return new ResponseEntity<>(responseMap, returnStatus);
+	}
+	
+	@RequestMapping(value = "{runId}/{assertionUUID}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<String> extractResults(@PathVariable final Long runId,
+			@PathVariable(value="assertionUUID") final String assertionUUID) {
+		 final HttpStatus returnStatus = HttpStatus.OK;
+		String result = String.format("No results found for runId [%s] and assertion UUID [%s].",runId, assertionUUID);
+		try {
+			final String jsonResult = resultExtractor.extractResultToJson( runId, assertionUUID);
+			if (jsonResult != null) {
+				result = jsonResult;
+			} 
+		} catch (final BusinessServiceException e) {
+			result = "Error message:" + e.getMessage();
+		}
+		return new ResponseEntity<>(result, returnStatus);
 	}
 
 }

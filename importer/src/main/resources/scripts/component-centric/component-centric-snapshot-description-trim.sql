@@ -10,10 +10,9 @@
 /* 	view of current snapshot made by finding FSN's with leading and training spaces */
 	drop table if exists v_curr_snapshot;
 	create table if not exists  v_curr_snapshot as
-	select a.term from curr_description_s a 
+	select a.id from curr_description_s a 
 	where a.active = 1
-	and a.term != LTRIM(term)
-	and a.term != RTRIM(term); 
+	and ( a.term != LTRIM(term) or a.term != RTRIM(term)); 
 	
 
 
@@ -24,9 +23,8 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',a.term, ':Active Terms with leading and trailing spaces.') 	
+		concat('Description: id=',a.id, ' has active term with leading or trailing spaces.') 	
 	from v_curr_snapshot a;
-
-
+	
 	drop table if exists v_curr_snapshot;
 	
