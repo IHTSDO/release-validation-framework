@@ -45,6 +45,14 @@ public class AssertionGroup {
 	@JsonIgnore
 	private Set<Assertion> assertions = new HashSet<>();
 	
+	@Transient
+	private final int total = 0;
+	
+	
+	public int getTotal() {
+		return assertions.size();
+	}
+
 	public String getName() {
 		return name;
 	}

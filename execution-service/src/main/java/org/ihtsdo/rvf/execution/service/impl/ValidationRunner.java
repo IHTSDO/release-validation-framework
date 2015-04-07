@@ -2,12 +2,14 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,7 +38,6 @@ import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +52,15 @@ import com.google.gson.GsonBuilder;
 @Scope(value = "prototype")
 public class ValidationRunner implements Runnable {
 	
+	private static final String UTF_8 = "UTF-8";
+
 	public enum State { READY, RUNNING, FAILED, COMPLETE } 
 	
 	public static final String FAILURE_MESSAGE = "failureMessage";
 
 	private final Logger logger = LoggerFactory.getLogger(ValidationRunner.class);
 	
-	private ValidationRunConfig config;
+	private ValidationRunConfig validationConfig;
 	
 	private FileHelper s3Helper;
 	
@@ -96,7 +99,7 @@ public class ValidationRunner implements Runnable {
 	public void run() {
 		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		try {
-			responseMap.put("Validation config", config);
+			responseMap.put("Validation config", validationConfig);
 			runValidation(responseMap);
 		} catch (final Exception e) {
 			final StringWriter errors = new StringWriter();
@@ -116,62 +119,62 @@ public class ValidationRunner implements Runnable {
 	private void runValidation(final Map<String , Object> responseMap) throws Exception {
 		
 		final Calendar startTime = Calendar.getInstance();
-		logger.info(String.format("Started execution with runId [%1s] : ", config.getRunId()));
+		logger.info(String.format("Started execution with runId [%1s] : ", validationConfig.getRunId()));
 		writeState(State.RUNNING);
 		
 		// load the filename
-		final String structureTestStartMsg = "Start structure testing for release file:" + config.getFile().getOriginalFilename();
+		final String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getFile().getOriginalFilename();
 		logger.info(structureTestStartMsg);
 		writeProgress(structureTestStartMsg);
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, config.getProspectiveFile(), config.getRunId(), config.getManifestFile(), config.isWriteSucceses(), config.getUrl());
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getProspectiveFile(), validationConfig.getRunId(), validationConfig.getManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl());
 		if (isFailed) {
 			writeResults(responseMap, State.FAILED);
 			return;
 		} else {
-			isFailed = checkKnownVersion(config.getPrevIntReleaseVersion(),
-										 config.getPreviousExtVersion(),
-										 config.getExtensionBaseLine(),
+			isFailed = checkKnownVersion(validationConfig.getPrevIntReleaseVersion(),
+										 validationConfig.getPreviousExtVersion(),
+										 validationConfig.getExtensionBaseLine(),
 										 responseMap);
 			if (isFailed) {
 				writeResults(responseMap, State.FAILED);
 				return;
 			}
 			
-			final String[] tokens = Files.getNameWithoutExtension(config.getFile().getOriginalFilename()).split("_");
+			final String[] tokens = Files.getNameWithoutExtension(validationConfig.getFile().getOriginalFilename()).split("_");
 			final String releaseDate = tokens[tokens.length - 1];
 			String prospectiveVersion = releaseDate;
-			String prevReleaseVersion = config.getPrevIntReleaseVersion();
-			final boolean isExtension = config.getPreviousExtVersion() != null && !config.getPreviousExtVersion().trim().isEmpty() ? true : false;
+			String prevReleaseVersion = validationConfig.getPrevIntReleaseVersion();
+			final boolean isExtension = validationConfig.getPreviousExtVersion() != null && !validationConfig.getPreviousExtVersion().trim().isEmpty() ? true : false;
 			if (isExtension) {
 				//SnomedCT_Release-es_INT_20140430.zip
 				//SnomedCT_SpanishRelease_INT_20141031.zip
 				final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("edition_");
 				prospectiveVersion = extensionName.toLowerCase() + releaseDate;
-				prevReleaseVersion = config.getPreviousExtVersion();
-				if (config.getPrevIntReleaseVersion() != null) {
+				prevReleaseVersion = validationConfig.getPreviousExtVersion();
+				if (validationConfig.getPrevIntReleaseVersion() != null) {
 					//previous extension release is being specified as already being merged, but we might have already done it anyway
-					prevReleaseVersion = extensionName.toLowerCase() + config.getPreviousExtVersion();
+					prevReleaseVersion = extensionName.toLowerCase() + validationConfig.getPreviousExtVersion();
 					if (!releaseDataManager.isKnownRelease(prevReleaseVersion)) {
-						final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", config.getPrevIntReleaseVersion() , config.getPreviousExtVersion(), prevReleaseVersion);
+						final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), prevReleaseVersion);
 						logger.info(startCombiningMsg);
 						writeProgress(startCombiningMsg);
-						final boolean isSuccess = releaseDataManager.combineKnownVersions(prevReleaseVersion, config.getPrevIntReleaseVersion(), config.getPreviousExtVersion());
+						final boolean isSuccess = releaseDataManager.combineKnownVersions(prevReleaseVersion, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
 						if (!isSuccess) {
 							responseMap.put(FAILURE_MESSAGE, "Failed to combine known versions:" 
-									+ config.getPrevIntReleaseVersion() + " and " + config.getPreviousExtVersion() + "into" + prevReleaseVersion);
+									+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + "into" + prevReleaseVersion);
 							writeResults(responseMap, State.FAILED);
 							return;
 						}
 					} else {
-						logger.info("Skipping merge of {} with {} as already detected in database as {}",config.getPrevIntReleaseVersion(), config.getPreviousExtVersion(), prevReleaseVersion);
+						logger.info("Skipping merge of {} with {} as already detected in database as {}",validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion(), prevReleaseVersion);
 					}
 				}
 			} 
 			writeProgress("Loading prospective file into DB.");
 			if (isExtension) {
-				uploadProspectiveVersion(prospectiveVersion, config.getExtensionBaseLine(), config.getProspectiveFile());
+				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionBaseLine(), validationConfig.getProspectiveFile());
 			} else {
-				uploadProspectiveVersion(prospectiveVersion, null, config.getProspectiveFile());
+				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getProspectiveFile());
 			}
 			final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
 			if (prospectiveSchema != null) {
@@ -179,19 +182,19 @@ public class ValidationRunner implements Runnable {
 				resourceLoader.loadResourceData(prospectiveSchema);
 				logger.info("completed loading resource data for schema:" + prospectiveSchema);
 			}
-			final ExecutionConfig executionConfig = new ExecutionConfig(config.getRunId());
+			final ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId());
 			executionConfig.setProspectiveVersion(prospectiveVersion);
 			executionConfig.setPreviousVersion(prevReleaseVersion);
-			executionConfig.setGroupNames(config.getGroupsList());
+			executionConfig.setGroupNames(validationConfig.getGroupsList());
 			//default to 10
 			executionConfig.setFailureExportMax(10);
-			if (config.getFailureExportMax() != null) {
-				executionConfig.setFailureExportMax(config.getFailureExportMax());
+			if (validationConfig.getFailureExportMax() != null) {
+				executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
 			}
 			runAssertionTests(executionConfig,responseMap);
 			final Calendar endTime = Calendar.getInstance();
 			final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
-			logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", config.getRunId(), timeTaken));
+			logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
 			responseMap.put("Start time", startTime.getTime());
 			responseMap.put("End time", endTime.getTime());
 			writeResults(responseMap, State.COMPLETE);
@@ -247,14 +250,24 @@ public class ValidationRunner implements Runnable {
 		return true;
 	}
 	
-	private void writeResults(final Map<String , Object> responseMap, final State state) throws IOException, NoSuchAlgorithmException, JSONException, DecoderException {
+	private void writeResults(final Map<String , Object> responseMap, final State state) throws IOException, NoSuchAlgorithmException, DecoderException {
 		final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
-		writeToS3(prettyGson.toJson(responseMap), resultsFilePath);
+		final File temp = File.createTempFile("resultJson", ".tmp"); 
+		try {
+			try (final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp),Charset.forName(UTF_8)))) {
+				prettyGson.toJson(responseMap, bw);
+				//Now copy to our S3 Location
+			} 
+			s3Helper.putFile(temp, resultsFilePath);
+		}
+		finally {
+			temp.delete();
+		}
 		writeState(state);
 	}
 	
 	private void writeState(final State state) throws IOException, NoSuchAlgorithmException, DecoderException {
-		logger.info("RVF run {} setting state as {}", config.getRunId(), state.toString());
+		logger.info("RVF run {} setting state as {}", validationConfig.getRunId(), state.toString());
 		writeToS3(state.name(), stateFilePath);
 	}
 	
@@ -270,7 +283,7 @@ public class ValidationRunner implements Runnable {
 		//First write the data to a local temp file
 		final File temp = File.createTempFile("tempfile", ".tmp"); 
 		try {
-			try (BufferedWriter bw = new BufferedWriter(new FileWriter(temp))) {
+			try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp),Charset.forName(UTF_8)))) {
 				bw.write(writeMe);
 			}
 			//Now copy to our S3 Location
@@ -289,14 +302,14 @@ public class ValidationRunner implements Runnable {
 		logger.info("Complete combining two known versions {}, {} into {}", firstKnown, secondKnown, combinedVersion);
 	}*/
 
-	private void runAssertionTests(final ExecutionConfig config, final Map<String, Object> responseMap) throws IOException {
+	private void runAssertionTests(final ExecutionConfig executionConfig, final Map<String, Object> responseMap) throws IOException {
 		final long timeStart = System.currentTimeMillis();
-		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(config.getGroupNames());
+		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
 		final List<Assertion> resourceAssertions = assertionService.getResourceAssertions();
 		logger.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
 		writeProgress("Start executing assertions...");
-		 final List<TestRunItem> items = executeAssertions(config, resourceAssertions);
+		 final List<TestRunItem> items = executeAssertions(executionConfig, resourceAssertions);
 		final Set<Assertion> assertions = new HashSet<>();
 		for (final AssertionGroup group : groups) {
 			for (final Assertion assertion : assertionService.getAssertionsForGroup(group)) {
@@ -304,7 +317,7 @@ public class ValidationRunner implements Runnable {
 			}
 		}
 		logger.info("Total assertions to run: " + assertions.size());
-		items.addAll(executeAssertions(config,assertions));
+		items.addAll(executeAssertions(executionConfig,assertions));
 		//failed tests
 		final List<TestRunItem> failedItems = new ArrayList<>();
 		for (final TestRunItem item : items) {
@@ -314,7 +327,7 @@ public class ValidationRunner implements Runnable {
 		}
 		final long timeEnd = System.currentTimeMillis();
 		final ValidationReport report = new ValidationReport(TestType.SQL);
-		report.setExecutionId(config.getExecutionId());
+		report.setExecutionId(executionConfig.getExecutionId());
 		report.setTotalTestsRun(items.size());
 		report.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
 		report.setTotalFailures(failedItems.size());
@@ -414,7 +427,7 @@ public class ValidationRunner implements Runnable {
 	}
 
 	public void setConfig(final ValidationRunConfig config) {
-		this.config = config;
+		this.validationConfig = config;
 		s3Helper = new FileHelper(bucketName, s3Client);
 		stateFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "state.txt";
 		resultsFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "results.json";
@@ -428,7 +441,7 @@ public class ValidationRunner implements Runnable {
 			if (is == null) {
 				logger.warn("Failed to find state file {}, in bucket {}", stateFilePath, bucketName);
 			}
-			final String stateStr = IOUtils.toString(is, "UTF-8");
+			final String stateStr = IOUtils.toString(is, UTF_8);
 			currentState = State.valueOf(stateStr);
 		} catch (final Exception e) {
 			logger.warn("Failed to determine validation run state in file {} due to {}", stateFilePath, e.toString());
@@ -438,12 +451,15 @@ public class ValidationRunner implements Runnable {
 
 	public void recoverResult(final Map<String, Object> responseMap) throws IOException {
 		final InputStream is = s3Helper.getFileStream(resultsFilePath);
-		Object jsonResults = new String("Failed to recover results in " + resultsFilePath);
+		Object jsonResults = null;
 		if (is == null) {
 			logger.warn("Failed to find results file {}, in bucket {}", stateFilePath, bucketName);
 		} else {
 			final Gson gson = new Gson();
-			jsonResults = gson.fromJson(new InputStreamReader(is), Map.class);
+			jsonResults = gson.fromJson(new InputStreamReader(is,Charset.forName(UTF_8)), Map.class);
+		}
+		if (jsonResults == null) {
+			jsonResults = new String("Failed to recover results in " + resultsFilePath);
 		}
 		responseMap.put("RVF Validation Result", jsonResults);
 	}
@@ -455,7 +471,7 @@ public class ValidationRunner implements Runnable {
 			logger.warn("Failed to find progress file {}, in bucket {}", progressFilePath, bucketName);
 		} else {
 			try {
-				progressMsg = IOUtils.toString(is, "UTF-8");
+				progressMsg = IOUtils.toString(is, UTF_8);
 			} catch (final IOException e) {
 				logger.warn("Failed to read data from progress file {}, in bucket {}", progressFilePath, bucketName);
 			}

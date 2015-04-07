@@ -23,7 +23,7 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 	@Override
 	public List<Assertion> findAll() {
 		return getCurrentSession()
-				.createQuery("from Assertion assertion order by assertion.name")
+				.createQuery("from Assertion assertion order by assertion.id")
 				.list();
 	}
 
