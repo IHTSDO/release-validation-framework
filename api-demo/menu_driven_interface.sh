@@ -59,6 +59,13 @@ function listAssertions() {
 	callURL GET ${api}/assertions/
 } 
 
+function listAssertionsByGroupId() {
+	echo
+	read -p "Which group id to list?:" groupId
+	echo "Listing Assertions for group id ${groupId}"
+	callURL GET ${api}//groups/${groupId}/assertions/
+} 
+
 function listGroups() {
 	echo
 	echo "Listing Groups"
@@ -239,6 +246,7 @@ function mainMenu() {
 	echo "1 - test a package against a single assertion"
 	echo "a - list known assertions"
 	echo "b - list known groups"
+	echo "c - list assertions by group ID"
 	echo "e - test an extension specifying baseline and previous"
 	echo "g - group all known assertions"
 	echo "h - group specified assertions"
@@ -256,6 +264,7 @@ function mainMenu() {
 			1)   doTest "single"; break;;
 			a|A) listAssertions ; break ;;
 			b|B) listGroups ; break ;;
+			c|C) listAssertionsByGroupId; break;;
 			e|E) doTest "extension"; break;;
 			l|L) listKnownReleases ; break;;
 			g|G) groupAllAssertions; break;; 

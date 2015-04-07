@@ -284,9 +284,6 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 				resultStatement.setLong(1, assertion.getId());
 				resultStatement.setLong(2, config.getExecutionId());
 				try (ResultSet resultSet = resultStatement.executeQuery()) {
-					String sqlQueryString = resultStatement.toString();
-					sqlQueryString = sqlQueryString.substring(sqlQueryString.indexOf(":"));
-					logger.info("Getting test result using SQL : " + resultStatement);
 					long counter = 0;
 					while (resultSet.next())
 					{
@@ -296,8 +293,6 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 						}
 						counter++;
 					}
-					logger.info("counter = " + counter);
-					// if counter is > 0, then we know there are failures
 					runItem.setFailureCount(counter);
 				}
 			}
