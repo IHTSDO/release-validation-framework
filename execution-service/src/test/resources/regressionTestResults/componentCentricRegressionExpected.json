@@ -98,7 +98,7 @@
     "firstNInstances" : [ "TEXTDEF: id=2983208019:Definitions are not case sensitive." ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "The first letter of the Definition should be capitalized.",
+    "assertionName" : "The first letter of the active definition should be capitalized.",
     "assertionUuid" : "6138248d-8cc8-4bc2-8043-cd609fdd640c",
     "firstNInstances" : [ "TEXTDEFINITION: id=3008053018 contains a term that the first letter is not capitalized." ],
     "totalFailed" : 1
@@ -193,7 +193,7 @@
     "firstNInstances" : [ "DESC: id=2984057008:Case-sensitivity terms containing inappropriate caseSignificanceId.", "DESC: id=2984057008:Case-sensitivity terms containing inappropriate caseSignificanceId." ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "All definitions are preferred.",
+    "assertionName" : "All active definitions are preferred.",
     "assertionUuid" : "73e46e72-6fdb-407b-9d50-d86a36a3a862",
     "firstNInstances" : [ "CONCEPT: Concept=703672002: concept has definition not \"preferred\".", "CONCEPT: Concept=703672002: concept has definition not \"preferred\"." ],
     "totalFailed" : 2
