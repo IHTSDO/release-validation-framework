@@ -13,6 +13,7 @@
 	select distinct a.term, a.conceptid
 	from curr_textdefinition_s a , curr_langrefset_s b 
 	where a.id = b.referencedcomponentid
+	and a.active =1
 	and b.acceptabilityid != '900000000000548007'; 
 	
 

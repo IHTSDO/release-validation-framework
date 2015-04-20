@@ -305,10 +305,10 @@
 		<script uuid="6614ff12-fca2-42b7-a5da-ea26353979fe" category="component-centric-validation" sqlFile="component-centric-snapshot-description-valid-characters.sql" text="Active description of active concept consists of valid characters." />		
 		
 		<script uuid="b4930ea7-4078-4599-979c-2dde18164f01" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-case-sensitive.sql" text="All definitions are case sensitive." />
-		<script uuid="73e46e72-6fdb-407b-9d50-d86a36a3a862" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-preferred.sql" text="All definitions are preferred." />
+		<script uuid="73e46e72-6fdb-407b-9d50-d86a36a3a862" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-preferred.sql" text="All active definitions are preferred." />
 		<script uuid="da3ae7c4-6144-4cd5-9530-2a7780c53c9a" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-trim.sql" text="No active definitions contain leading or trailing spaces." />
 		<script uuid="f7b7cefe-858d-4749-ab98-7106700feaee" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-double-spaces.sql" text="No active definitions contain double spaces." />
-		<script uuid="6138248d-8cc8-4bc2-8043-cd609fdd640c" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-uppercase.sql" text="The first letter of the Definition should be capitalized." />
+		<script uuid="6138248d-8cc8-4bc2-8043-cd609fdd640c" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-uppercase.sql" text="The first letter of the active definition should be capitalized." />
 		
 		<script uuid="d76f1430-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-inactive-members.sql" text="Members are inactive for inactive descriptions in the language refset snapshot file." />
 		<script uuid="e658fb00-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-unique-term.sql" text="Descriptions in a language refset are unique for a given concept." />
