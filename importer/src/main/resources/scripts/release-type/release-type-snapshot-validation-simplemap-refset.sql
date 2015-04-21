@@ -20,7 +20,7 @@
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('SIMPLE MAP REFSET: id=',a.id, ': Member is in SNAPSHOT file, but not in FULL file.')
+	concat('SIMPLE MAP REFSET: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
 	from curr_simplemaprefset_s a
 	left join v_temp_view b
 	on a.id = b.id
@@ -44,7 +44,7 @@
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
-	concat('SIMPLE MAP REFSET: id=',a.id, ': Member is in FULL file, but not in SNAPSHOT file.') 
+	concat('SIMPLE MAP REFSET: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
 	from v_temp_view a
 	left join curr_simplemaprefset_s b 
 	on a.id = b.id

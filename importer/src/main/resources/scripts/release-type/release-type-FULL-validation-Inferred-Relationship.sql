@@ -12,53 +12,14 @@
 	prior.
 ********************************************************************************/
 	
-
-	drop table if exists v_curr_view;
-  create table if not exists v_curr_view like curr_relationship_f;
-  insert into v_curr_view
-		select *
-		from curr_relationship_f
-		where cast(effectivetime as datetime) <=
-			(select max(cast(effectivetime as datetime)) 
-			 from prev_stated_relationship_f);
-
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
-	select
-		<RUNID>,
-		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
-		concat('inferred relationship id=',a.id, '; inferred relationship in current release file, but not in prior release file.') 	
-	from v_curr_view a
-	left join prev_relationship_f b
-		on a.id = b.id
-		and a.effectivetime = b.effectivetime
-		and a.active = b.active
-		and a.moduleid = b.moduleid
-		and a.sourceid = b.sourceid
-		and a.destinationid = b.destinationid
-		and a.relationshipgroup = b.relationshipgroup
-		and a.typeid = b.typeid
-		and a.characteristictypeid = b.characteristictypeid
-		and a.modifierid = b.modifierid	
-	where b.id is null
-	or b.effectivetime is null
-	or b.active is null
-	or b.moduleid is null
-	or b.sourceid is null
-	or b.destinationid is null
-	or b.relationshipgroup is null
-	or b.typeid is null
-	or b.characteristictypeid is null
-	or b.modifierid is null;
-
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('inferred relationship: id=',a.id, '; relationship in prior release file but not in current release file.') 	
+		concat('Inferred relationship: id=',a.id, ' is in previous full file but not in current full file.') 	
 	from prev_relationship_f a
-	left join v_curr_view b
+	left join curr_relationship_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -79,10 +40,4 @@
 	or b.typeid is null
 	or b.characteristictypeid is null
 	or b.modifierid is null;
-
-  truncate table v_curr_view;
-  drop table if exists v_curr_view;
-
-	commit;	
-	
-	
+commit;
