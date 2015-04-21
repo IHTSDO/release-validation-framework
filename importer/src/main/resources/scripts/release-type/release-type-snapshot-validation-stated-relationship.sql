@@ -19,7 +19,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('Stated relationship: id=',a.id, ': Relationship is in SNAPSHOT file, but not in FULL file.') 	
+		concat('Stated relationship: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
 	from curr_stated_relationship_s a
 	left join v_temp_view b
 		on a.id = b.id
@@ -49,7 +49,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('Stated relationship: id=',a.id, ': Relationship is in FULL file, but not in SNAPSHOT file.') 
+		concat('Stated relationship: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
 	from v_temp_view a
 	left join curr_stated_relationship_s b 
 		on a.id = b.id

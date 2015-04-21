@@ -21,6 +21,7 @@ import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
+import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
 import org.junit.Before;
@@ -71,12 +72,16 @@ public class RvfAssertionTestHarness {
 	    	
 	    	 resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
 	        final List<Assertion> resources = assertionDao.getAssertionsByKeywords("resource");
-			 assertionExecutionService.executeAssertions(resources, null);
+	        final Long runId =201503130924L;
+			final ExecutionConfig config = new ExecutionConfig(runId);
+			config.setPreviousVersion(PREVIOUS_RELEASE);
+			config.setProspectiveVersion(PROSPECTIVE_RELEASE);
+			assertionExecutionService.executeAssertions(resources, config);
 	    	//Assertion 111 and assertion test 107
 	    	//36L
 	    	//150L
 	    	//"release-type-validation", "component-centric-validation""release-type-validation","file-centric-validation"
-	    	final List<String> groupNames = Arrays.asList("component-centric-validation","release-type-validation","file-centric-validation");
+	    	final List<String> groupNames = Arrays.asList("release-type-validation");
 	    	final List<AssertionGroup> groups = new ArrayList<>();
 	    	for (final String name : groupNames) {
 	    		groups.add(assertionDao.getAssertionGroupsByName(name));
@@ -94,18 +99,10 @@ public class RvfAssertionTestHarness {
 	    	for(final Assertion assertion : assertions) {
 	    		tests.addAll(assertionDao.getAssertionTests(assertion));
 	    	}
-	    	//15012015112L;
-	    	//1425919799121L
-	    	//201503101114L;
-	    	//201503120846L
-	    	//201503120939L;
-	    	//201503121422L;
-	    	//201503122311L;
-	    	//201503130923L;
-	        final Long runId =201503130924L;
+	       
 	        System.out.println("RunID:" + runId);
 			// set both prospective and previous release
-	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, null);
+	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, config);
 	        System.out.println("TOTAL of assertions run:" + runItems.size());
 	    }
 }

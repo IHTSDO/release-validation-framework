@@ -7,3 +7,5 @@ id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignific
 2989562013	20140731	1	900000000000207008	3961000119101	en	900000000000550004	Head circumference is less than two standard deviations above the mean, but appears disproportionately large when other factors such as stature are considered.	900000000000017005
 3010125011	20140731	1	900000000000207008	702316007	en	900000000000550004	A form of dyskinetic cerebral palsy with irregular movements that are not repetitive or rhythmic, and tend to be more jerky and shaky.	900000000000017005
 3005888018	20140731	1	900000000000207008	702561005	en	900000000000550004	Fracture caused by normal stress upon weakened bone.	900000000000017005
+2988954017	20140131	1	900000000000207008	699683004	en	900000000000550004	Caries in which the lesion has removed so much of the crown that its original site of initiation cannot be determined with any certainty.	900000000000017005
+2983208030	20140131	1	900000000000207008	699220008	en	900000000000550004	A common taste disorder where there is a lingering, often unpleasant taste despite the absence of any stimulus to initiate the distorted taste.	900000000000017005
