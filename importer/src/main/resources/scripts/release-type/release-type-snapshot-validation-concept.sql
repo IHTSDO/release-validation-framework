@@ -14,13 +14,13 @@
 		 from curr_concept_f z
 		 where z.id = a.id);
 
-/* in the delta; not in the full */
+/* in the snapshot; not in the full */
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',a.id, ': Concept in SNAPSHOT file, but not in FULL file.')
+		concat('CONCEPT: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
 	from curr_concept_s a
 	left join v_temp_view b
 	on a.id = b.id
@@ -34,13 +34,13 @@
 	or b.moduleid is null
 	or b.definitionstatusid is null;
 
-/* in the full; not in the delta */
+/* in the full; not in the snapshot */
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',a.id, ': Concept in FULL file, but not in SNAPSHOT file.') 
+		concat('CONCEPT: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
 	from v_temp_view a
 	left join curr_concept_s b 
 		on a.id = b.id

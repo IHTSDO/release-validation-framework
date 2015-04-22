@@ -20,7 +20,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('Definition: id=',a.id, ': Definition is in SNAPSHOT file, but not in FULL file.') 	
+		concat('Definition: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
 	from curr_textdefinition_s a
 	left join v_temp_view b
 		on a.id = b.id
@@ -48,7 +48,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('Definition: id=',a.id, ': Definition is in FULL file, but not in SNAPSHOT file.') 
+		concat('Definition: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
 	from v_temp_view a
 	left join curr_textdefinition_s b 
 		on a.id = b.id

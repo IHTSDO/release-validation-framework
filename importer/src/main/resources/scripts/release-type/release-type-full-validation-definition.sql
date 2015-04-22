@@ -18,51 +18,14 @@
 
 ********************************************************************************/
 	
-
-	drop table if exists v_curr_view;
-  create table if not exists v_curr_view like curr_textdefinition_f;
-  insert into v_curr_view
-		select *
-		from curr_textdefinition_f
-		where cast(effectivetime as datetime) <=
-			(select max(cast(effectivetime as datetime)) 
-			 from prev_textdefinition_f);
-
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
-	select
-		<RUNID>,
-		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
-    concat('DEFINITION: id=',a.id, ': component is in current release file, but not in prior release file.')
-	from v_curr_view a
-	left join prev_textdefinition_f b
-		on a.id = b.id
-		and a.effectivetime = b.effectivetime
-		and a.active = b.active
-		and a.moduleid = b.moduleid
-		and a.conceptid = b.conceptid
-		and a.languagecode = b.languagecode
-		and a.typeid = b.typeid
-		and a.term = b.term
-		and a.casesignificanceid = b.casesignificanceid
-	where b.id is null
-	or b.effectivetime is null
-	or b.active is null
-	or b.moduleid is null
-	or b.conceptid is null
-	or b.languagecode is null
-	or b.typeid is null
-	or b.term is null
-	or b.casesignificanceid is null;
-
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-    concat('DEFINITION: id=',a.id, ': component is in the prior release file, but not in the current release file.')
+    concat('DEFINITION: id=',a.id, ' is in the previous full file, but not in the current full file.')
 	from prev_textdefinition_f a
-	left join v_curr_view b
+	left join curr_textdefinition_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -73,7 +36,7 @@
 		and a.term = b.term
 		and a.casesignificanceid = b.casesignificanceid
 	where b.id is null
-  or b.effectivetime is null
+  	or b.effectivetime is null
 	or b.active is null
 	or b.moduleid is null
 	or b.conceptid is null
@@ -81,7 +44,4 @@
 	or b.typeid is null
 	or b.term is null
 	or b.casesignificanceid is null;
-
-
-  truncate table v_curr_view;
-  drop table if exists v_curr_view;
+	

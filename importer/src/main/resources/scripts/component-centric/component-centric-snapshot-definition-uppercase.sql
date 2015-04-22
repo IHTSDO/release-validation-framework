@@ -11,7 +11,7 @@
 	drop table if exists v_curr_snapshot;
 	create table if not exists  v_curr_snapshot as
 	select SUBSTRING(a.term , 1, 1) as originalcase ,  UCASE(SUBSTRING(a.term , 1, 1)) as uppercase , a.id 
-	from curr_textdefinition_s a ;
+	from curr_textdefinition_s a where a.active =1;
 	 
 
 /* 	inserting exceptions in the result table */
