@@ -9,13 +9,13 @@ public class RF2FileTableMapper {
 
 	private static final String TEXT_DEFINITION_FILE_HEADER = "sct2_TextDefinition_";
 	private static final String STATED_RELATIONSHIP_FILE_HEADER = "sct2_StatedRelationship_";
-	private static final String SIMPLE_FILE_HEADER = "der2_Refset_Simple";
-	private static final String SIMPLE_MAP_FILE_HEADER = "der2_sRefset_SimpleMap";
+	private static final String SIMPLE_FILE_HEADER = "der2_Refset_.*Simple";
+	private static final String SIMPLE_MAP_FILE_HEADER = "der2_sRefset_.*SimpleMap";
 	private static final String RELATIONSHIP_FILE_HEADER = "sct2_Relationship";
-	private static final String LANGUAGE_FILE_HEADER = "der2_cRefset_Language";
-	private static final String COMPLEX_MAP_FILE_HEADER = "der2_iissscRefset_ComplexMap";
-	private static final String ATTRIBUTE_VALUE_FILE_HEADER = "der2_cRefset_AttributeValue";
-	private static final String ASSOCIATION_REFERENCE_FILE_HEADER = "der2_cRefset_AssociationReference";
+	private static final String LANGUAGE_FILE_HEADER = "der2_cRefset_.*Language";
+	private static final String COMPLEX_MAP_FILE_HEADER = "der2_iissscRefset_.*ComplexMap";
+	private static final String ATTRIBUTE_VALUE_FILE_HEADER = "der2_cRefset_.*AttributeValue";
+	private static final String ASSOCIATION_REFERENCE_FILE_HEADER = "der2_cRefset_.*AssociationReference";
 	private static final String DESCRIPTION_FILE_HEADER = "sct2_Description_";
 	private static final String CONCEPT_FILE_HEADER = "sct2_Concept_";
 	private static final Map<String,String> tableNameMap = new HashMap<>();
@@ -64,8 +64,9 @@ public class RF2FileTableMapper {
 	}
 	
 	public static String getLegacyTableName(final String filename) {
+		final String fileName = filename.startsWith("x") ? filename.substring(1) : filename;
 		for(final String regex : tableNameMap.keySet()) {
-			if (Pattern.compile(regex).matcher(filename).matches()) {
+			if (Pattern.compile(regex).matcher(fileName).matches()) {
 				return tableNameMap.get(regex);
 			}
 		}
