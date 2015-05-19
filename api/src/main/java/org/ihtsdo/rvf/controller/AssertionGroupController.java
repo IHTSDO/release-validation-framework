@@ -7,10 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 import javax.servlet.http.HttpServletResponse;
 >>>>>>> Tidy up the RVF validation result and assertion text
+=======
+
+import javax.servlet.http.HttpServletResponse;
+>>>>>>> develop
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -34,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -41,6 +47,8 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import javax.servlet.http.HttpServletResponse;
 =======
 >>>>>>> Tidy up the RVF validation result and assertion text
+=======
+>>>>>>> develop
 
 @Controller
 @RequestMapping("/groups")
