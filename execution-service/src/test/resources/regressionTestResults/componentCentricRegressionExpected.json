@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 55,
-  "totalAssertionsFailed" : 55,
+  "totalAssertionsRun" : 75,
+  "totalAssertionsFailed" : 75,
   "results" : [ {
     "assertionName" : "Active historical association refset members have active concepts as targets.",
     "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
@@ -163,6 +163,51 @@
     "firstNInstances" : [ "C-D1637" ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "Rule based complex MapGroup must be in sequential order and not blank",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42b58",
+    "firstNInstances" : [ "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: Non-sequential map group:3" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Gender rules must be in alphabetical order in complex map refset",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44b56",
+    "firstNInstances" : [ "ComplexMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b2 : Gender mapRules out of order" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active complex maps should not have the same mapTarget in different groups for a given referenced component",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44b55",
+    "firstNInstances" : [ "ComplexMap: id=433cf306-fbc0-50be-ba64-939089978794: mapTarget=313.0 is in more than one mapGroup" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active rule based extended map must have sequentially ordered mapGroup values without gaps",
+    "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e42e65",
+    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Non-sequential map group:3" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active extended maps should not have the same mapTarget in different groups for a given referenced component",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f67",
+    "firstNInstances" : [ "ExtendedMap: id=1d507f04-26a6-5a9d-8f3c-abb34b971a62: mapTarget=O03.8 is in more than one mapGroup" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active higher extended mapGroup have at least one non blank mapTarget",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f68",
+    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Higher-level map group with only blank map targets" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Gender rules must be in alphabetical order in extended map refset",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f70",
+    "firstNInstances" : [ "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1: Gender mapRules out of order" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active extended map with age rules do not have mapRule value ending with less or equal than 0",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f72",
+    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086: illegal mapRule value for age rule:Age is <= 0" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active rule based extended maps do not have the same mapRule and mapTarget in a different mapGroup",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f74",
+    "firstNInstances" : [ "ExtendedMap: id=1d507f04-26a6-5a9d-8f3c-abb34b971a62 : duplicate mapRule and mapTarget in different groups" ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "All inactive concepts have definition status of PRIMITIVE.",
     "assertionUuid" : "fdf6a1b0-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "CONCEPT: id=699765003:There is an inactive concept whose definition status is not Primitive.", "CONCEPT: id=609452007:There is an inactive concept whose definition status is not Primitive." ],
@@ -233,6 +278,31 @@
     "firstNInstances" : [ "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag.", "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag." ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "MapPriority must be in sequential order",
+    "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e43b59",
+    "firstNInstances" : [ "ComplexMap: id=433cf306-fbc0-50be-ba64-939089978795: Non-sequential mapPriority:2", "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: Non-sequential mapPriority:2" ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "Active higher mapGroup must have at least one non empty mapTarget",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44b54",
+    "firstNInstances" : [ "ComplexMap: id=d2e6a1dd-6735-5f3c-878f-d28bb3260599: Higher-level map group with only blank map targets", "ComplexMap: id=d2e6a1dd-6735-5f3c-878f-d28bb3260509: Higher-level map group with only blank map targets" ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "Active extended maps that are rule based have sequentially ordered mapPriority values without gaps within each mapGroup",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42f66",
+    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f082: Non-sequential mapPriority:2", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084: Non-sequential mapPriority:2" ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "The mapRule for active rule based extended maps should end with a default rule and not blank",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f73",
+    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 does not end with default rule", "ExtendedMap: id=174a7931-88f1-5fc7-99fc-f0fc8f104f87 does not end with default rule" ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "Active extended map with gender mapAdvice must have corresponding gender rule",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f75",
+    "firstNInstances" : [ "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 : Gender rule without gender advice", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : Gender rule without gender advice" ],
+    "totalFailed" : 2
+  }, {
     "assertionName" : "Relationship groups contain at least 2 relationships.",
     "assertionUuid" : "411e9840-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=100000028: Relationship is in a relationship group with a single active inferred member." ],
@@ -263,19 +333,49 @@
     "firstNInstances" : [ "CONCEPT: id=700132006: Concept has more than one associated CTV3 refset member.", "CONCEPT: id=702411003: Concept does not have an associated CTV3 refset member.", "CONCEPT: id=699765003: Concept does not have an associated CTV3 refset member.", "CONCEPT: id=609452007: Concept does not have an associated CTV3 refset member." ],
     "totalFailed" : 4
   }, {
+    "assertionName" : "Active complex map IFA rules referenced concepts and terms must be active ",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44c61",
+    "firstNInstances" : [ "ComplexMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b2: IFA rule references missing conceptId and term", "ComplexMap: id=69703317-411e-5d4d-b853-eef523f0109d: IFA rule references missing conceptId and term", "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: IFA rule references missing conceptId and term", "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term" ],
+    "totalFailed" : 4
+  }, {
     "assertionName" : "Relationship groups contain at least 2 relationships.",
     "assertionUuid" : "59b574a0-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4998022027: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4969198024: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4969200029: Relationship is in a relationship group with a single active inferred member." ],
     "totalFailed" : 5
+  }, {
+    "assertionName" : "Active extended maps have valid mapCategoryId",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42d63",
+    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f083: invalid mapCategory=447637011", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f085: invalid mapCategory=447637011", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086: invalid mapCategory=447637011", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613: invalid mapCategory=447562006", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619: invalid mapCategory=447562006", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616: invalid mapCategory=447562003", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042618: invalid mapCategory=447562006" ],
+    "totalFailed" : 7
+  }, {
+    "assertionName" : "Active ICD 10 extended maps must have valid mapAdvice values for corresponding mapCategory",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42d64",
+    "firstNInstances" : [ "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : misaligned mapCategory and mapAdvice for ambiguous WHO concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : misaligned mapCategory and mapAdvice for ambiguous WHO concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : misaligned mapCategory and mapAdvice for Non Classifiable", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615: misaligned mapCategory and mapAdvice for ambiguous snomed concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616: misaligned mapCategory and mapAdvice for ambiguous snomed concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042617: misaligned mapCategory and mapAdvice for incompletely modeled concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042618: misaligned mapCategory and mapAdvice for incompletely modeled concepts" ],
+    "totalFailed" : 7
   }, {
     "assertionName" : "All concepts have at least one stated is-a relationship.",
     "assertionUuid" : "5555c400-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "CONCEPT: id=702769005: Concept does not have a stated is-a relationship.", "CONCEPT: id=703860006: Concept does not have a stated is-a relationship.", "CONCEPT: id=703155005: Concept does not have a stated is-a relationship.", "CONCEPT: id=702386002: Concept does not have a stated is-a relationship.", "CONCEPT: id=703672002: Concept does not have a stated is-a relationship.", "CONCEPT: id=702850005: Concept does not have a stated is-a relationship.", "CONCEPT: id=700132006: Concept does not have a stated is-a relationship.", "CONCEPT: id=700132006: Concept does not have a stated is-a relationship." ],
     "totalFailed" : 8
   }, {
+    "assertionName" : "Active extended IFA rule maps reference active concepts and terms",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f71",
+    "firstNInstances" : [ "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b0 : IFA rule references an inactive concept", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109b : IFA rule references an inactive concept", "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 : IFA rule references an inactive concept", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : IFA rule references an inactive concept", "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b0 : IFA map rule references an inactive term", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109b : IFA map rule references an inactive term", "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 : IFA map rule references an inactive term", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : IFA map rule references an inactive term" ],
+    "totalFailed" : 8
+  }, {
     "assertionName" : "All concepts have at least one inferred is-a relationship.",
     "assertionUuid" : "3ab84230-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "CONCEPT: id=702411003: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702769005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703860006: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703155005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702386002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703672002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702850005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship.", "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship." ],
     "totalFailed" : 9
+  }, {
+    "assertionName" : "Non empty mapTarget should be part of mapAdvice",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f60",
+    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 : map target missing from advice:O03.8", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042617 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042618 : map target missing from advice:F31.1" ],
+    "totalFailed" : 9
+  }, {
+    "assertionName" : "MapTarget should not be empty for classifiable mapCategory",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f69",
+    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Empty mapTarget for classifiable mapCategory", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f083 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f085 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616 : Non-empty mapTarget for unclassifiable mapCategory" ],
+    "totalFailed" : 12
   } ]
 }

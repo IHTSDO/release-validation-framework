@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
-import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.Test;
 
 public class ZipFileUtilsTest {

@@ -37,8 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RvfAssertionTestHarness {
 	
-	 private static final String PROSPECTIVE_RELEASE = "20141031";
-	private static final String PREVIOUS_RELEASE = "20140430";
+	 private static final String PROSPECTIVE_RELEASE = "20140731";
+	private static final String PREVIOUS_RELEASE = "20150131";
 	@Autowired
 	    private AssertionExecutionService assertionExecutionService;
 	    @Resource(name = "dataSource")
@@ -62,8 +62,8 @@ public class RvfAssertionTestHarness {
 	        assertNotNull(entityService);
 	        assertNotNull(releaseDataManager);
 	        // register releases with release manager, since they will be used during SQL replacement
-	        releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_int_spanishedition_20140430");
-	        releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_int_spanishedition_20141031");
+	        releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_int_20140731");
+	        releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_int_20150131");
 
 	    }
 	    
@@ -72,7 +72,7 @@ public class RvfAssertionTestHarness {
 	    	
 	    	 resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
 	        final List<Assertion> resources = assertionDao.getAssertionsByKeywords("resource");
-	        final Long runId =201503130924L;
+	        final Long runId =201503130926L;
 			final ExecutionConfig config = new ExecutionConfig(runId);
 			config.setPreviousVersion(PREVIOUS_RELEASE);
 			config.setProspectiveVersion(PROSPECTIVE_RELEASE);
@@ -80,8 +80,9 @@ public class RvfAssertionTestHarness {
 	    	//Assertion 111 and assertion test 107
 	    	//36L
 	    	//150L
-	    	//"release-type-validation", "component-centric-validation""release-type-validation","file-centric-validation"
-	    	final List<String> groupNames = Arrays.asList("release-type-validation");
+	    	//"release-type-validation", "component-centric-validation","file-centric-validation"
+			//complexAndExtendedMapRefsetValidation
+	    	final List<String> groupNames = Arrays.asList("complexAndExtendedMapRefsetValidation");
 	    	final List<AssertionGroup> groups = new ArrayList<>();
 	    	for (final String name : groupNames) {
 	    		groups.add(assertionDao.getAssertionGroupsByName(name));

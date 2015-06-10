@@ -53,6 +53,7 @@
 		or c.typeid is null
 		or c.characteristictypeid is null
 		or c.modifierid is null);
+	commit;
 	
 	/* in the full; not in the delta */
 	insert into qa_result (runid, assertionuuid, assertiontext, details)

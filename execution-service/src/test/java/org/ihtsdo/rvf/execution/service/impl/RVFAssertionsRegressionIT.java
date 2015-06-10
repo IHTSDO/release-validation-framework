@@ -175,10 +175,10 @@ public class RVFAssertionsRegressionIT {
 			assertTrue("Acutal test result should have assertion uuid but doesn't.", actualResultByNameMap.containsKey(uuid));
 			final RVFTestResult expectedResult = expectedResultByNameMap.get(uuid);
 			final RVFTestResult actualResult = actualResultByNameMap.get(uuid);
-			
 			assertEquals("Assertion name is not the same" + " for assertion uuid:" + uuid, expectedResult.getAssertionName(),actualResult.getAssertionName());
 			assertEquals("Total failures count doesn't match"  + " for assertion uuid:" + uuid, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
 			assertEquals("First N instances not matching" + " for assertion uuid:" + uuid, expectedResult.getFirstNInstances(), actualResult.getFirstNInstances());
+			
 		}
 		
 		Collections.sort(expected);

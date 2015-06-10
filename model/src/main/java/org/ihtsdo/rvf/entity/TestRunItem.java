@@ -42,7 +42,7 @@ public class TestRunItem {
 	@Override
 	public String toString() {
 		return "TestRunItem{" +
-				"assertionUuid=" + assertionUuid + +  '\'' +
+				"assertionUuid=" + assertionUuid +  '\'' +
 				"assertionText=" + assertionText +  '\'' +	
 				"executionId=" + executionId + '\'' +
 				"testCategory=" + testCategory + '\'' +
