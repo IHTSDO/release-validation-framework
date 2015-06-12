@@ -24,10 +24,11 @@ insert into qa_result (runid, assertionuuid, assertiontext, details)
  	<RUNID>,
  	'<ASSERTIONUUID>',
  	'<ASSERTIONTEXT>',
-	concat('ExtendedMap: id=',a.id,' : mapRule as IFA rule but with an invalid mapCategory:', a.mapCategoryId)
+	concat('ExtendedMap: id=',a.id,' : IFA rule but with an invalid mapCategory:', a.mapCategoryId)
  from curr_extendedmaprefset_s a
  	where a.active = 1
   	and a.mapRule like 'IFA%'
+  	and a.maptarget != ''
   	and a.mapCategoryId != 447639009;
  commit;
  

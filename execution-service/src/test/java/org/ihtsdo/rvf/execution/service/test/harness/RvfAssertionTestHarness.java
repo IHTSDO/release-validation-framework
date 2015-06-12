@@ -72,7 +72,7 @@ public class RvfAssertionTestHarness {
 	    	
 	    	 resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
 	        final List<Assertion> resources = assertionDao.getAssertionsByKeywords("resource");
-	        final Long runId =201503130926L;
+	        final Long runId =201503130928L;
 			final ExecutionConfig config = new ExecutionConfig(runId);
 			config.setPreviousVersion(PREVIOUS_RELEASE);
 			config.setProspectiveVersion(PROSPECTIVE_RELEASE);

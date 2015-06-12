@@ -1,5 +1,5 @@
 /*
- * Active extended maps should not have the same mapTarget within different groups for a given refereced component
+ * Active extended maps should not have the same mapTarget and mapRule within different groups for a given refereced component
  * 
  */
  
@@ -12,6 +12,6 @@ insert into qa_result (runid, assertionuuid, assertiontext, details)
  from curr_extendedmaprefset_s a
 	where a.active = 1
   	and a.mapTarget != ''
-	group by a.referencedComponentId, a.mapTarget
+	group by a.referencedComponentId, a.mapTarget, a.mapRule
 	having count(distinct a.mapGroup) > 1;
  commit;

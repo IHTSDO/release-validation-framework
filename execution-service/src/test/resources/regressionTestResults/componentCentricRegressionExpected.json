@@ -183,7 +183,7 @@
     "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Non-sequential map group:3" ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Active extended maps should not have the same mapTarget in different groups for a given referenced component",
+    "assertionName" : "Active extended maps should not have the same mapTarget and mapRule in different groups for a given referenced component",
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f67",
     "firstNInstances" : [ "ExtendedMap: id=1d507f04-26a6-5a9d-8f3c-abb34b971a62: mapTarget=O03.8 is in more than one mapGroup" ],
     "totalFailed" : 1
