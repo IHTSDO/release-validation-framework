@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+
 /**
  * A controller that handles API calls for uploading and checking status of previously published releases.
  * Note: The GET methods in this controller do not allow a release file to be downloaded - instead it only tells you if
@@ -25,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Controller
 @RequestMapping("/releases")
+@Api(value = "Releases")
+@ApiIgnore //this is being marked as ignore as these services are already provided by SRS
 public class ReleaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReleaseController.class);
@@ -33,6 +39,7 @@ public class ReleaseController {
 
     @RequestMapping(value = "{version}", method = RequestMethod.POST)
     @ResponseBody
+	@ApiOperation( value = "TBD", notes = "?" )
     public ResponseEntity uploadRelease(@RequestParam(value = "file") final MultipartFile file,
                                  @PathVariable final String version) {
         try {
@@ -47,6 +54,7 @@ public class ReleaseController {
 
     @RequestMapping(value = "{version}", method = RequestMethod.GET)
     @ResponseBody
+	@ApiOperation( value = "TBD", notes = "?" )
     public ResponseEntity getRelease(@PathVariable final String version) {
 
         if(releaseDataManager.isKnownRelease(version)){
@@ -60,6 +68,7 @@ public class ReleaseController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "TBD", notes = "?" )
     public java.util.Set<String> getAllKnownReleases() {
 
         return releaseDataManager.getAllKnownReleases();

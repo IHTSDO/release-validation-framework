@@ -1,0 +1,35 @@
+/*
+ * Active extended map with mapAdvice containing "MAP IS CONTEXT DEPENDENT FOR GENDER" use gender mapRule values
+ *
+ */
+insert into qa_result (runid, assertionuuid, assertiontext, details)
+ select
+ 	<RUNID>,
+ 	'<ASSERTIONUUID>',
+ 	'<ASSERTIONTEXT>',
+ 	concat('ExtendedMap: id=',a.id, ' : Gender advice but without gender rule')   
+ from curr_extendedmaprefset_s a
+	where a.active = 1
+  	and mapAdvice like '%MAP IS CONTEXT DEPENDENT FOR GENDER%'
+ 	and a.mapRule != 'IFA 248153007 | Male (finding) |'
+  	and a.mapRule != 'IFA 248152002 | Female (finding) |';
+ commit;
+ 
+/*
+ * Also the inverse:
+ */
+ 
+insert into qa_result (runid, assertionuuid, assertiontext, details)
+ select
+ 	<RUNID>,
+ 	'<ASSERTIONUUID>',
+ 	'<ASSERTIONTEXT>',
+ 	concat('ExtendedMap: id=',a.id,' : Gender rule without gender advice')   
+ from curr_extendedmaprefset_s a
+where a.active = 1
+  and mapAdvice not like '%MAP IS CONTEXT DEPENDENT FOR GENDER%'
+  and (a.mapRule = 'IFA 248153007 | Male (finding) |'
+       or a.mapRule = 'IFA 248152002 | Female (finding) |');
+ commit;
+
+ 

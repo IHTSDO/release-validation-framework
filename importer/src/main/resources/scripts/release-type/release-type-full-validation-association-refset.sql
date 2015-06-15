@@ -40,3 +40,4 @@
   		or b.refsetid is null
   		or b.referencedcomponentid is null
   		or b.targetcomponentid is null;
+commit;

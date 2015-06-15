@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 46,
-  "totalAssertionsFailed" : 46,
+  "totalAssertionsRun" : 48,
+  "totalAssertionsFailed" : 48,
   "results" : [ {
     "assertionName" : "ID is unique in CONCEPT snapshot.",
     "assertionUuid" : "309d0620-0a32-43a6-9d08-8e6bdefda3be",
@@ -101,6 +101,16 @@
     "assertionName" : "All stated relationships inactivated in current release must have been active in the previous release.",
     "assertionUuid" : "89ceaf00-79b9-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "4768117023" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "ComplexMap refset id is unique in the snapshot file",
+    "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e41b57",
+    "firstNInstances" : [ "ComplexMap: id=d2e6a1dd-6735-5f3c-878f-d28bb3260599 is duplicate in Snapshot file" ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Extendedmap refset id must be unique in the snapshot file",
+    "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e42c62",
+    "firstNInstances" : [ "ExtendedMap: id=9d7c45ee-5a0d-5a3c-95dd-30b8b4853550 is duplicate in Snapshot file" ],
     "totalFailed" : 1
   }, {
     "assertionName" : "Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot.",

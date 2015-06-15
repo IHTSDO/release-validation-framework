@@ -23,8 +23,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+
 @Controller
 @RequestMapping("/assertions")
+@Api(value = "Assertions")
 public class AssertionController {
 
 	@Autowired
@@ -37,6 +41,8 @@ public class AssertionController {
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Get all assertions",
+		notes = "Retrieves currently available assertions in the system" )
 	public List<Assertion> getAssertions() {
 		return assertionService.findAll();
 	}
@@ -44,6 +50,8 @@ public class AssertionController {
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Retrieves all tests for an assertion",
+		notes = "Retrieves all test which belongs to a given assertion id" )
 	public List<Test> getTestsForAssertion(@PathVariable final Long id) {
 
 		final Assertion assertion = assertionService.find(id);
@@ -53,6 +61,9 @@ public class AssertionController {
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Add tests to an assertion",
+		notes = "Add one or more test to an assertion identified with provided assertion id."
+				+ "And returns that assertion " )
 	public Assertion setTestsForAssertion(@PathVariable final Long id, @RequestBody(required = false) final List<Test> tests) {
 
 		final Assertion assertion = assertionService.find(id);
@@ -64,6 +75,8 @@ public class AssertionController {
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.DELETE)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Delete tests from an assertion",
+		notes = "Delete tests from an assertion and returns an assertion from which tests was deleted" )
 	public Assertion deleteTestsForAssertion(@PathVariable final Long id, @RequestBody(required = false) final List<Test> tests) {
 
 		final Assertion assertion = assertionService.find(id);
@@ -75,6 +88,8 @@ public class AssertionController {
 	@RequestMapping(value = "{id}", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Get an assertion",
+		notes = "Retrieves an assertion identified with given assertion id" )
 	public Assertion getAssertion(@PathVariable final Long id) {
 		return assertionService.find(id);
 	}
@@ -82,6 +97,8 @@ public class AssertionController {
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Delete an assertion",
+		notes = "Delete an assertion identified by given assertion id and returns deleted assertion" )
 	public Assertion deleteAssertion(@PathVariable final Long id) {
 		final Assertion assertion = assertionService.find(id);
 		assertionService.delete(assertion);
@@ -91,6 +108,8 @@ public class AssertionController {
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation( value = "Create an assertion",
+		notes = "Create an assertion with input supplied and returns it popluated with an assertion id" )
 	public Assertion createAssertion(@RequestBody final Assertion assertion) {
 		return assertionService.create(assertion);
 	}
@@ -98,6 +117,8 @@ public class AssertionController {
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Update an assertion",
+		notes = "Update an assertion and returns this updated assertion" )
 	public Assertion updateAssertion(@PathVariable final Long id,
 			@RequestBody(required = false) final Assertion assertion) {
 		final Assertion assertion1 = assertionService.find(id);
@@ -108,6 +129,10 @@ public class AssertionController {
 	@RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Execute tests of an assertion",
+		notes = "Execute all tests under an assertion with provided runid ( a user supplied identifier), "
+				+ " prospective release version and previous release version."
+				+ "Run id later used to retrieve assertion " )
 	public Map<String, Object> executeTest(@PathVariable final Long id,
 										   @RequestParam final Long runId, @RequestParam final String prospectiveReleaseVersion,
 										   @RequestParam final String previousReleaseVersion) {
@@ -124,6 +149,10 @@ public class AssertionController {
 	@RequestMapping(value = "/run", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Execute tests of required assertions",
+		notes = "Execute tests belongs to required assertions identified by their ids. "
+				+ " This excution requires an user supplied run id to identify this run, "
+				+ " previous release version and prospective release version" )
 	public Map<String, Object> executeTest(@PathVariable final List<Long> ids,
 										   @RequestParam final Long runId, @RequestParam final String prospectiveReleaseVersion,
 										   @RequestParam final String previousReleaseVersion) {

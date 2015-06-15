@@ -14,6 +14,7 @@ public class RF2FileTableMapper {
 	private static final String RELATIONSHIP_FILE_HEADER = "sct2_Relationship";
 	private static final String LANGUAGE_FILE_HEADER = "der2_cRefset_.*Language";
 	private static final String COMPLEX_MAP_FILE_HEADER = "der2_iissscRefset_.*ComplexMap";
+	private static final String EXTENDED_MAP_FILE_HEADER = "der2_iisssccRefset_.*ExtendedMap";
 	private static final String ATTRIBUTE_VALUE_FILE_HEADER = "der2_cRefset_.*AttributeValue";
 	private static final String ASSOCIATION_REFERENCE_FILE_HEADER = "der2_cRefset_.*AssociationReference";
 	private static final String DESCRIPTION_FILE_HEADER = "sct2_Description_";
@@ -30,6 +31,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(ASSOCIATION_REFERENCE_FILE_HEADER+ DELTA, "associationrefset_d");
 		tableNameMap.put(ATTRIBUTE_VALUE_FILE_HEADER + DELTA, "attributevaluerefset_d");
 		tableNameMap.put(COMPLEX_MAP_FILE_HEADER + DELTA, "complexmaprefset_d");
+		tableNameMap.put(EXTENDED_MAP_FILE_HEADER + DELTA, "extendedmaprefset_d");
 		tableNameMap.put(LANGUAGE_FILE_HEADER + DELTA, "langrefset_d");
 		tableNameMap.put(RELATIONSHIP_FILE_HEADER + DELTA, "relationship_d");
 		tableNameMap.put(SIMPLE_MAP_FILE_HEADER + DELTA, "simplemaprefset_d");
@@ -43,6 +45,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(ASSOCIATION_REFERENCE_FILE_HEADER+ FULL, "associationrefset_f");
 		tableNameMap.put(ATTRIBUTE_VALUE_FILE_HEADER + FULL, "attributevaluerefset_f");
 		tableNameMap.put(COMPLEX_MAP_FILE_HEADER + FULL, "complexmaprefset_f");
+		tableNameMap.put(EXTENDED_MAP_FILE_HEADER + FULL, "extendedmaprefset_f");
 		tableNameMap.put(LANGUAGE_FILE_HEADER + FULL, "langrefset_f");
 		tableNameMap.put(RELATIONSHIP_FILE_HEADER + FULL, "relationship_f");
 		tableNameMap.put(SIMPLE_MAP_FILE_HEADER + FULL, "simplemaprefset_f");
@@ -55,6 +58,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(ASSOCIATION_REFERENCE_FILE_HEADER+ SNAPSHOT, "associationrefset_s");
 		tableNameMap.put(ATTRIBUTE_VALUE_FILE_HEADER + SNAPSHOT, "attributevaluerefset_s");
 		tableNameMap.put(COMPLEX_MAP_FILE_HEADER + SNAPSHOT, "complexmaprefset_s");
+		tableNameMap.put(EXTENDED_MAP_FILE_HEADER + SNAPSHOT, "extendedmaprefset_s");
 		tableNameMap.put(LANGUAGE_FILE_HEADER + SNAPSHOT, "langrefset_s");
 		tableNameMap.put(RELATIONSHIP_FILE_HEADER + SNAPSHOT, "relationship_s");
 		tableNameMap.put(SIMPLE_MAP_FILE_HEADER + SNAPSHOT, "simplemaprefset_s");
