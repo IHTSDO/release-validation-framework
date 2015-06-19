@@ -1,9 +1,9 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-attribute-value-unique-id
+	file-centric-snapshot-attribute-value-unique-pair
 
 	Assertion:
-	ID is unique in the ATTRIBUTE VALUE snapshot.
+	Reference componentId and valueId pair is unique in the ATTRIBUTE VALUE snapshot.
 
 ********************************************************************************/
 
@@ -12,8 +12,9 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('Attribute value refset: id=',a.id, ':Non unique id in snapshot file.') 	
+		concat('Reference component id:',a.referencedcomponentid, ' valueid=', a.valueid, ' pair is not unique in the Attribute Value snapshot') 	
 	from curr_attributevaluerefset_s a	
-	group by a.id
+	group by a.referencedcomponentid,a.valueid
 	having  count(a.id) > 1;
 	commit;
+	

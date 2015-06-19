@@ -11,7 +11,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('CONCEPT: id=',a.id, ' has two inferred relationships with same typeid and same destinationid within a single relationship-group.') 	
+		concat('Source id=', a.sourceid, ' has two inferred relationships with same typeid and same destinationid within a single relationship-group.') 	
 	from curr_relationship_s a
 	where a.active = '1'
 	group by a.sourceid, a.typeid, a.destinationid, a.relationshipgroup

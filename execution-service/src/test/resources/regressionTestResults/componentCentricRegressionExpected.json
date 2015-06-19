@@ -215,7 +215,7 @@
   }, {
     "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
     "assertionUuid" : "4572d730-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=1000005028 has two inferred relationships with same typeid and same destinationid within a single relationship-group.", "CONCEPT: id=1000006026 has two inferred relationships with same typeid and same destinationid within a single relationship-group." ],
+    "firstNInstances" : [ "Source id=702386002 has two inferred relationships with same typeid and same destinationid within a single relationship-group.", "Source id=703649004 has two inferred relationships with same typeid and same destinationid within a single relationship-group." ],
     "totalFailed" : 2
   }, {
     "assertionName" : "For each active FSN there is a synonym that has the same text.",

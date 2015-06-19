@@ -22,5 +22,19 @@
 	and a.active = 0
 	and a.id = b.id
 	and a.active = b.active;
-
+	commit;
+	
+	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	select 
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		'<ASSERTIONTEXT>',
+		concat('Language Refset: id=',a.id, ' should not have a new inactive state in the current snapshot as no active stated found in previous release') 
+	from curr_langrefset_s a
+	left join prev_langrefset_s b
+	on a.id = b.id
+	where
+	a.active = 0
+	and b.id is null;
+	commit;
 
