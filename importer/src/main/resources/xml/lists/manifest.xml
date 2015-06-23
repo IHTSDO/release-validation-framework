@@ -267,6 +267,7 @@
 			<keywords>Referencedcomponentid refers to valid concepts in the SIMPLE REFSET snapshot.</keywords>
 		</script>
 		
+		<script uuid="eff30fb0-7856-11e1-b0c4-0800200c9a60" category="file-centric-validation" sqlFile="file-centric-snapshot-attribute-value-unique-pair.sql" text="Reference componentId and valueId pair is unique in the ATTRIBUTE VALUE snapshot." />
 		<script uuid="eff30fb0-7856-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-language-successive-states.sql" text="All language refset members inactivated in current snapshot must have been active in the previous release." />
 		<script uuid="f5d9ae70-7856-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-language-valid-descriptionid.sql" text="All members refer to a description that is referenced in either the description table or the text definition table." />
 		<script uuid="fc24db60-7856-11e1-b0c4-0800200c9a66" category="file-centric-validation" sqlFile="file-centric-snapshot-language-unique-id.sql" text="The current Language Refset snapshot file does not contain duplicate Member Ids." />

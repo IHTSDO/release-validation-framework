@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 48,
-  "totalAssertionsFailed" : 48,
+  "totalAssertionsRun" : 49,
+  "totalAssertionsFailed" : 49,
   "results" : [ {
     "assertionName" : "ID is unique in CONCEPT snapshot.",
     "assertionUuid" : "309d0620-0a32-43a6-9d08-8e6bdefda3be",
@@ -73,11 +73,6 @@
     "firstNInstances" : [ "Simple Refset: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 has more than one set of immutable keys in the snapshot file." ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "All language refset members inactivated in current snapshot must have been active in the previous release.",
-    "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 should not have a new inactive state in the current release as it was inactive already in the previvous SNAPSHOT." ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "Preferred Term exists exactly once in each language refset for each concept.",
     "assertionUuid" : "03cf9850-7857-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "CONCEPT: id=702386002: Concept has multiple active preferred terms." ],
@@ -130,7 +125,7 @@
   }, {
     "assertionName" : "ID is unique in the ATTRIBUTE VALUE snapshot.",
     "assertionUuid" : "e202807d-915d-4c8a-8f02-c6e4e6f969fc",
-    "firstNInstances" : [ "ATT RS: id=00017ef3-2384-5c71-b548-7c528b43ccc5:Non unique id in ATTRIBUTE VALUE snapshot file.", "ATT RS: id=0001d24b-d872-5077-8955-b9c7e055b015:Non unique id in ATTRIBUTE VALUE snapshot file." ],
+    "firstNInstances" : [ "Attribute value refset: id=00017ef3-2384-5c71-b548-7c528b43ccc5:Non unique id in snapshot file.", "Attribute value refset: id=0001d24b-d872-5077-8955-b9c7e055b015:Non unique id in snapshot file." ],
     "totalFailed" : 2
   }, {
     "assertionName" : "ID is unique in the SIMPLEMAP REFSET snapshot.",
@@ -148,6 +143,11 @@
     "firstNInstances" : [ "Simple RS: id=65f4359b-bf19-5d99-abc1-7139bbff5d47:Non unique id in current SIMPLE REFSET snapshot file.", "Simple RS: id=74d0e838-34eb-5a9a-8f02-5584487d55db:Non unique id in current SIMPLE REFSET snapshot file." ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "Reference componentId and valueId pair is unique in the ATTRIBUTE VALUE snapshot.",
+    "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a60",
+    "firstNInstances" : [ "Reference component id:527806011 valueid=900000000000495008 pair is not unique in the Attribute Value snapshot", "Reference component id:2608473011 valueid=900000000000495008 pair is not unique in the Attribute Value snapshot" ],
+    "totalFailed" : 2
+  }, {
     "assertionName" : "The current Language Refset snapshot file does not contain duplicate Member Ids.",
     "assertionUuid" : "fc24db60-7856-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c7: Member Id is repeated in the language refset snapshot file.", "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c9: Member Id is repeated in the language refset snapshot file." ],
@@ -162,6 +162,11 @@
     "assertionUuid" : "3b2c1824-8445-410e-8ae2-d943be01c33f",
     "firstNInstances" : [ "Definition id =2995945017: Term=[A subtype of non-spastic cerebral palsy with loss of muscular coordination with abnormal force and rhythm, and impairment of accuracy; commonly presents with gait and trunk ataxia, poor balance, past pointing, terminal intention tremor, scanning speech, nystagmus and other abnormal eye movements, and hypotonia. Low tone is a prominent feature.] is duplicate in the DEFINITION snapshot file.", "Definition id =3005197017: Term=[Arthralgia of knee less than three months.] is duplicate in the DEFINITION snapshot file." ],
     "totalFailed" : 2
+  }, {
+    "assertionName" : "All language refset members inactivated in current snapshot must have been active in the previous release.",
+    "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 should not have a new inactive state in the current release as it was inactive already in the previvous SNAPSHOT.", "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7 should not have a new inactive state in the current snapshot as no active stated found in previous release", "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c9 should not have a new inactive state in the current snapshot as no active stated found in previous release" ],
+    "totalFailed" : 3
   }, {
     "assertionName" : "The current Inferred Relationship snapshot file does not contain duplicate Relationship Ids.",
     "assertionUuid" : "6336ec40-79b9-11e1-b0c4-0800200c9a66",
