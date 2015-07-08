@@ -40,7 +40,7 @@ import org.springframework.stereotype.Service;
 public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingBean {
 
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManagerImpl.class);
-	private static final String RVF_DB_PREFIX = "rvf_int_";
+	private static final String RVF_DB_PREFIX = "rvf_";
 	private String sctDataLocation;
 	private File sctDataFolder;
 	@Resource(name = "snomedDataSource")
@@ -60,12 +60,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		//TODO remove this so that it doesn't load release data during start up 
 		logger.info("Sct Data Location passed = " + sctDataLocation);
 		if (sctDataLocation == null || sctDataLocation.length() == 0) {
 			sctDataLocation = FileUtils.getTempDirectoryPath() + System.getProperty("file.separator") + "rvf-sct-data";
 		}
-
 		sctDataFolder = new File(sctDataLocation);
 		if (!sctDataFolder.exists()) {
 			if (sctDataFolder.mkdirs()) {
@@ -90,7 +88,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 				final String schemaName = catalogs.getString(1);
 				if (schemaName.startsWith(RVF_DB_PREFIX)) {
 					final String version = schemaName.substring(RVF_DB_PREFIX.length());
-					releaseSchemaNameLookup.put(version, schemaName);
+						releaseSchemaNameLookup.put(version, schemaName);
 				}
 			}
 		} catch (final SQLException e) {
@@ -104,14 +102,9 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 * This method is not intended to be used
 	 * for uploading prospective releases since they do not need to be stored for later use.
 	 *
-	 * @param inputStream the release as an input stream
-	 * @param overWriteExisting if existing file has to over written
-	 * @param purgeExistingDatabase if existing database must be recreated
-	 * @return result of the copy operation - false if there are errors.
-	 * @throws BusinessServiceException 
 	 */
 	@Override
-	public boolean uploadPublishedReleaseData(final InputStream inputStream, final String fileName, final String version) throws BusinessServiceException {
+	public boolean uploadPublishedReleaseData(final InputStream inputStream, final String fileName, final String product, final String version) throws BusinessServiceException {
 		// copy release pack zip to data location
 		logger.info("Receiving release data - " + fileName);
 		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
@@ -130,14 +123,16 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		// if we are here then release date is a valid date format
 		// now call loadSnomedData method passing release zip, if there is no matching database
-		if (releaseSchemaNameLookup.keySet().contains(version) ) {
-			logger.info("Version is already known in RVF and the existing one will be deleted and reloaded: " + version);
+		String productVersion = product + "_" + version;
+		logger.info("Product version:" + productVersion);
+		if (releaseSchemaNameLookup.keySet().contains(productVersion) ) {
+			logger.info("Product version is already known in RVF and the existing one will be deleted and reloaded: " + productVersion);
 		}
-		logger.info("Loading data into schema " + RVF_DB_PREFIX + version);
-		final String schemaName = loadSnomedData(version, fileDestination);
+		logger.info("Loading data into schema " + RVF_DB_PREFIX + productVersion);
+		final String schemaName = loadSnomedData(productVersion, fileDestination);
 		logger.info("schemaName = " + schemaName);
 		// now add to releaseSchemaNameLookup
-		releaseSchemaNameLookup.put(version, schemaName);
+		releaseSchemaNameLookup.put(productVersion, schemaName);
 		return true;
 	}
 
@@ -154,11 +149,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 * @throws FileNotFoundException 
 	 */
 	@Override
-	//TODO seems that this is only used in test
-	public boolean uploadPublishedReleaseData(final File releasePackZip, final String version) throws BusinessServiceException {
+	public boolean uploadPublishedReleaseData(final File releasePackZip, final String product, final String version) throws BusinessServiceException {
 		boolean result = false;
 		try(InputStream inputStream = new FileInputStream(releasePackZip)) {
-			 result = uploadPublishedReleaseData(inputStream, releasePackZip.getName(), version);
+			 result = uploadPublishedReleaseData(inputStream, releasePackZip.getName(), product, version);
 		} catch (final IOException e) {
 			logger.error("Error during upload release:" + releasePackZip.getName(), e);
 		}

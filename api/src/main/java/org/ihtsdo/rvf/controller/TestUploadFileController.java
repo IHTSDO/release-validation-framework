@@ -45,7 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import com.google.common.io.Files;
 
 /**
  * The controller that handles uploaded files for the validation to run
@@ -150,7 +149,7 @@ public class TestUploadFileController {
 			@RequestParam(value = "groups") final List<String> groupsList,
 			@RequestParam(value = "previousIntReleaseVersion") final String prevIntReleaseVersion,
 			@RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
-			@RequestParam(value = "extensionBaseLineReleaseVersion", required = false) final String extensionBaseLine,
+			@RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
 			@RequestParam(value = "runId") final Long runId,
 			@RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@RequestParam(value = "storageLocation") final String storageLocation,
@@ -167,7 +166,7 @@ public class TestUploadFileController {
 				.addManifestFile(manifestFile)
 				.addPrevIntReleaseVersion(prevIntReleaseVersion)
 				.addPreviousExtVersion(previousExtVersion)
-				.addExtensionBaseLine(extensionBaseLine)
+				.addExtensionDependencyVersion(extensionDependency)
 				.addRunId(runId)
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax);
