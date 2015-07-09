@@ -13,11 +13,11 @@ import org.ihtsdo.otf.rest.exception.BusinessServiceException;
  */
 public interface ReleaseDataManager {
 
-    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName, String version) throws BusinessServiceException;
+    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName, String product, String version) throws BusinessServiceException;
 
-    boolean uploadPublishedReleaseData(File releasePackZip, String version) throws BusinessServiceException;
+    boolean uploadPublishedReleaseData(File releasePackZip, String product, String version) throws BusinessServiceException;
 
-    String loadSnomedData(String versionName, File ... zipDataFile) throws BusinessServiceException;
+    String loadSnomedData(String productVersion, File ... zipDataFile) throws BusinessServiceException;
 
     boolean isKnownRelease(String releaseVersion);
 

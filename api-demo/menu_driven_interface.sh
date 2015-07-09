@@ -11,9 +11,9 @@ fileToTest="rel2_Refset_SimpleDelta_INT_20140131.txt"
 
 # Target API Deployment
 #TODO - allow the user to change the API at runtime
-#api="http://localhost:8080/api/v1"
+api="http://localhost:8080/api/v1"
 #api="http://localhost:8081/api/v1"
-api="https://dev-rvf.ihtsdotools.org/api/v1"
+#api="https://dev-rvf.ihtsdotools.org/api/v1"
 #api="https://uat-rvf.ihtsdotools.org/api/v1"
 #api="https://rvf.ihtsdotools.org/api/v1"
 
@@ -88,7 +88,8 @@ function uploadRelease() {
 		echo "${releaseFile} not found."
 		return
 	fi
-	read -p "What version (schema) are we storing this under?: " version
+	read -p "What is the product name?: " product
+	read -p "What is the release date?: " version
 	
 	read -p "Do you wish to append an extension to an international release? (Y/N): " append
 	appendStr="false"
@@ -97,7 +98,7 @@ function uploadRelease() {
 		appendStr="true"
 	fi
 	
-	url=" ${api}/releases/${version}"
+	url=" ${api}/releases/${product}/${version}"
 	echo "Uploading release file to ${url} with append = "
 	curl --retry 0 -X POST ${url} --progress-bar -F file=@${releaseFile} \
 		 -F "append=${appendStr}" \
@@ -148,8 +149,8 @@ function doTest() {
 	elif [ ${testType} == "single" ]
 	then 
 		read -p "What assertion id should be used?: " assertionId
-		read -p "What is the current (ie the one before the prospective one being tested) release version (YYYYMMDD): " currentReleaseVersion
-		read -p "What is the prospective (ie the one being tested) release version (YYYYMMDD): " prospectiveReleaseVersion
+		read -p "What is the current (ie the one before the prospective one being tested) release version: " currentReleaseVersion
+		read -p "What is the prospective (ie the one being tested) release version: " prospectiveReleaseVersion
 		curl --retry 0 -i -X POST "${api}/assertions/${assertionId}/run" \
 		--progress-bar \
 		-F "prospectiveReleaseVersion=${prospectiveReleaseVersion}" \
@@ -160,16 +161,16 @@ function doTest() {
 		read -p "What assertion group id(s) / name(s) should be used? (comma separate): " assertionGroups
 		if [ ${testType} == "extension" ]
 		then
-			read -p "What is the baseline (ie the International Release that is being extended) release version (YYYYMMDD): " baselineReleaseVersion
-			read -p "What is the previous Extension release version (YYYYMMDD): " previousExtensionVersion
+			read -p "What is the dependency (ie the International Release that is being extended) release version: " extensionDependencyRelease
+			read -p "What is the previous Extension release version: " previousExtensionVersion
 		fi
-		read -p "What is the previous International release version (YYYYMMDD): " prevReleaseVersion
+		read -p "What is the previous International release version: " prevReleaseVersion
 		curl --retry 0 -i -X POST "$api/run-post" \
 		--progress-bar \
 		${fileParam} \
 		${manifestFileParam} \
 		-F "previousIntReleaseVersion=${prevReleaseVersion}" \
-		-F "extensionBaseLineReleaseVersion=${baselineReleaseVersion}" \
+		-F "extensionDependencyReleaseVersion=${extensionDependencyRelease}" \
 		-F "previousExtensionReleaseVersion=${previousExtensionVersion}" \
 		-F "groups=${assertionGroups}" \
 		-F "runId=${datestamp}" \

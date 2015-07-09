@@ -82,7 +82,8 @@ public class RVFAssertionsRegressionIT {
             assertNotNull("Must not be null", previousReleaseUrl);
 			final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
-			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFile);
+			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
+//			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFile);
         }
         if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
         	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
@@ -98,14 +99,14 @@ public class RVFAssertionsRegressionIT {
         assertNotNull("Must not be null", componentCentrilExpected);
         fileCentricExpected = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
         assertNotNull("Must not be null", fileCentricExpected);
-        releaseDataManager.setSchemaForRelease("20130131", "rvf_int_" + PREVIOUS_RELEASE);
-        releaseDataManager.setSchemaForRelease("20130731", "rvf_int_"+ PROSPECTIVE_RELEASE);
+        releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_" + PREVIOUS_RELEASE);
+        releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_"+ PROSPECTIVE_RELEASE);
         
-        resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease("20130731"));
+        resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
         final List<Assertion> assertions = assertionDao.getAssertionsByKeywords("resource");
 		config = new ExecutionConfig(System.currentTimeMillis());
-		config.setPreviousVersion("20130131");
-		config.setProspectiveVersion("20130731");
+		config.setPreviousVersion(PREVIOUS_RELEASE);
+		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
 		config.setFailureExportMax(10);
 		assertionExecutionService.executeAssertions(assertions, config);
         

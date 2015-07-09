@@ -15,7 +15,7 @@ public class ValidationRunConfig {
 	private List<String> groupsList;
 	private String prevIntReleaseVersion;
 	private String previousExtVersion;
-	private String extensionBaseLine;
+	private String extensionDependency;
 	private String storageLocation;
 	private String url;
 	private Integer failureExportMax;
@@ -62,11 +62,11 @@ public class ValidationRunConfig {
 		this.previousExtVersion = previousExtVersion;
 		return this;
 	}
-	public String getExtensionBaseLine() {
-		return extensionBaseLine;
+	public String getExtensionDependencyVersion() {
+		return extensionDependency;
 	}
-	public ValidationRunConfig addExtensionBaseLine(final String extensionBaseLine) {
-		this.extensionBaseLine = extensionBaseLine;
+	public ValidationRunConfig addExtensionDependencyVersion(final String extensionDependency) {
+		this.extensionDependency = extensionDependency;
 		return this;
 	}
 	public ValidationRunConfig addFailureExportMax(final Integer exportMax) {
@@ -122,7 +122,7 @@ public class ValidationRunConfig {
 				+ ", writeSucceses=" + writeSucceses + ", groupsList="
 				+ groupsList + ", prevIntReleaseVersion="
 				+ prevIntReleaseVersion + ", previousExtVersion="
-				+ previousExtVersion + ", extensionBaseLine="
-				+ extensionBaseLine + ", runId=" + runId + ", url=" + url + "]";
+				+ previousExtVersion + ", extensionDependency="
+				+ extensionDependency + ", runId=" + runId + ", url=" + url + "]";
 	}
 }

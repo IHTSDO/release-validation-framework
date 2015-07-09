@@ -87,6 +87,9 @@ public class ValidationRunner implements Runnable {
 	@Autowired
 	private ResourceDataLoader resourceLoader;
 	
+	@Autowired
+	private RvfDbScheduledEventGenerator scheduleEventGenerator;
+	
 	private String stateFilePath;
 	private String resultsFilePath;
 	private String progressFilePath;
@@ -133,7 +136,7 @@ public class ValidationRunner implements Runnable {
 		} else {
 			isFailed = checkKnownVersion(validationConfig.getPrevIntReleaseVersion(),
 										 validationConfig.getPreviousExtVersion(),
-										 validationConfig.getExtensionBaseLine(),
+										 validationConfig.getExtensionDependencyVersion(),
 										 responseMap);
 			if (isFailed) {
 				writeResults(responseMap, State.FAILED);
@@ -141,15 +144,13 @@ public class ValidationRunner implements Runnable {
 			}
 			
 			final String[] tokens = Files.getNameWithoutExtension(validationConfig.getFile().getOriginalFilename()).split("_");
-			final String releaseDate = tokens[tokens.length - 1];
-			String prospectiveVersion = releaseDate;
+			String prospectiveVersion = validationConfig.getRunId().toString();
 			String prevReleaseVersion = validationConfig.getPrevIntReleaseVersion();
 			final boolean isExtension = validationConfig.getPreviousExtVersion() != null && !validationConfig.getPreviousExtVersion().trim().isEmpty() ? true : false;
 			if (isExtension) {
 				//SnomedCT_Release-es_INT_20140430.zip
 				//SnomedCT_SpanishRelease_INT_20141031.zip
 				final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("edition_");
-				prospectiveVersion = extensionName.toLowerCase() + releaseDate;
 				prevReleaseVersion = validationConfig.getPreviousExtVersion();
 				if (validationConfig.getPrevIntReleaseVersion() != null) {
 					//previous extension release is being specified as already being merged, but we might have already done it anyway
@@ -172,7 +173,7 @@ public class ValidationRunner implements Runnable {
 			} 
 			writeProgress("Loading prospective file into DB.");
 			if (isExtension) {
-				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionBaseLine(), validationConfig.getProspectiveFile());
+				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getProspectiveFile());
 			} else {
 				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getProspectiveFile());
 			}
@@ -198,6 +199,14 @@ public class ValidationRunner implements Runnable {
 			responseMap.put("Start time", startTime.getTime());
 			responseMap.put("End time", endTime.getTime());
 			writeResults(responseMap, State.COMPLETE);
+			//house keeping prospective version and combined previous extension 
+			scheduleEventGenerator.createDropReleaseSchemaEvent(prospectiveSchema);
+			if (isExtension) {
+				scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(prevReleaseVersion));
+			}
+			// house keeping qa_result for the given run id
+			scheduleEventGenerator.createQaResultDeleteEvent(validationConfig.getRunId());
+			
 			
 		}
 		

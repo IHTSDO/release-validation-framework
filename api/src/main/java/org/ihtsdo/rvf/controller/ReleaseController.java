@@ -37,13 +37,14 @@ public class ReleaseController {
     @Autowired
     private ReleaseDataManager releaseDataManager;
 
-    @RequestMapping(value = "{version}", method = RequestMethod.POST)
+    @RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
     @ResponseBody
 	@ApiOperation( value = "TBD", notes = "?" )
     public ResponseEntity uploadRelease(@RequestParam(value = "file") final MultipartFile file,
+    							 @PathVariable final String product,
                                  @PathVariable final String version) {
         try {
-            final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), version);
+            final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), product, version);
             return new ResponseEntity<>(result, HttpStatus.OK);
         }
         catch (final IOException |BusinessServiceException e) {
