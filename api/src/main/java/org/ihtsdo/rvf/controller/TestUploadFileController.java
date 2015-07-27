@@ -147,7 +147,7 @@ public class TestUploadFileController {
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
 			@RequestParam(value = "groups") final List<String> groupsList,
-			@RequestParam(value = "previousIntReleaseVersion") final String prevIntReleaseVersion,
+			@RequestParam(value = "previousIntReleaseVersion" ,required = false) final String prevIntReleaseVersion,
 			@RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
 			@RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
 			@RequestParam(value = "runId") final Long runId,

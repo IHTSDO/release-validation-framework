@@ -9,8 +9,8 @@
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
 	concat('mapcorrelationOriginRefset: id=',a.id, ' is in delta file but not in snapshot file.') 	
-	from curr_mapcorrelationOriginRefset_d a
-	left join curr_mapcorrelationOriginRefset_s b
+	from curr_mapCorrelationOriginRefset_d a
+	left join curr_mapCorrelationOriginRefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

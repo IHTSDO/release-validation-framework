@@ -7,7 +7,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('ExpressionAssociation: id=',a.id, ' is in DELTA file, but not in FULL file.') 	
-	from curr_mapcorrelationOriginRefset_d a
+	from curr_mapCorrelationOriginRefset_d a
 	left join curr_mapCorrelationOriginRefset_f b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime

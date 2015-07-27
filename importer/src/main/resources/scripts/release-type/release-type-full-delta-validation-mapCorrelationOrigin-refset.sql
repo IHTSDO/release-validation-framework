@@ -8,8 +8,8 @@
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
 	concat('mapcorrelationOriginRefset: id=',a.id, ' is in current full file, but not in prior full or current delta file.') 	
-	from curr_mapcorrelationOriginRefset_f a
-	left join curr_mapcorrelationOriginRefset_d b
+	from curr_mapCorrelationOriginRefset_f a
+	left join curr_mapCorrelationOriginRefset_d b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -20,7 +20,7 @@
 		and a.attributeId = b.attributeId
 		and a.correlationId = b.correlationId
 		and a.contentOriginId = b.contentOriginId
-	left join prev_mapcorrelationOriginRefset_f c
+	left join prev_mapCorrelationOriginRefset_f c
 		on a.id = c.id
 		and a.effectivetime = c.effectivetime
 		and a.active = c.active
