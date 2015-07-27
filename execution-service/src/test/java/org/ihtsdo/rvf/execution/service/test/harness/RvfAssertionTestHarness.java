@@ -71,7 +71,7 @@ public class RvfAssertionTestHarness {
 	    public void testAssertions() throws BusinessServiceException, SQLException, IOException {
 	    	
 	    	 resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
-	        final List<Assertion> resources = assertionDao.getAssertionsByKeywords("resource");
+	        final List<Assertion> resources = assertionDao.getAssertionsByContainingKeyword("resource");
 	        final Long runId =201503130928L;
 			final ExecutionConfig config = new ExecutionConfig(runId);
 			config.setPreviousVersion(PREVIOUS_RELEASE);

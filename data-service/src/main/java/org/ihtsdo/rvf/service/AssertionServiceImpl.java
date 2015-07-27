@@ -267,7 +267,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 
 	@Override
 	public List<Assertion> getResourceAssertions() {
-		return assertionDao.getAssertionsByKeywords("resource");
+		return assertionDao.getAssertionsByContainingKeyword("resource");
 				
 	}
 

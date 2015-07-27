@@ -22,7 +22,9 @@ public class RF2FileTableMapperTest {
 //			"sct2_Identifier_Delta_INT_20150131.txt",
 			"sct2_Relationship_Delta_INT_20150131.txt",
 			"sct2_StatedRelationship_Delta_INT_20150131.txt",
-			"sct2_TextDefinition_Delta-en_INT_20150131.txt"
+			"sct2_TextDefinition_Delta-en_INT_20150131.txt",
+			"xder2_sscccRefset_ExpressionAssociationDelta_INT_20150714.txt",
+			"xder2_scccRefset_MapCorrelationOriginDelta_INT_20150714.txt"
 			};
 	
 	private static final String[] SPANISH_DELTA_FILES = {
@@ -52,7 +54,9 @@ public class RF2FileTableMapperTest {
 			"description_d",
 			"relationship_d",
 			"stated_relationship_d",
-			"textdefinition_d"				
+			"textdefinition_d",
+			"expressionAssociationRefset_d",
+			"mapCorrelationOriginRefset_d"
 		};
 	
 	private static final String[] EXTENSION_EXPECTED_DELTA = {
