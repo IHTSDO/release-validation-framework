@@ -32,7 +32,7 @@ begin
 			select 
 				runId,
 				assertionId,
-				concat('Concept: id=',result.conceptId, ' referenced in the ExpressionAssociationRefset SNAPSHOT is invalid') 
+				concat('Concept: id=',result.conceptId, ' referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.') 
 			from  (select distinct(conceptId) from temp_concept a left join concept_s b on a.conceptId = b.id where b.id is null) as result;
 		drop table temp_concept;
 end;

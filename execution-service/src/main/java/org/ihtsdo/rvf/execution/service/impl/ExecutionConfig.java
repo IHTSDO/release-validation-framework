@@ -9,9 +9,15 @@ public class ExecutionConfig {
 	private Long executionId;
 	private List<String> groupNames;
 	private int failureExportMax = -1;
+	private boolean firstTimeRelease;
 
 	public ExecutionConfig(final Long runId) {
+		this(runId,false);
+	}
+
+	public ExecutionConfig(Long runId, boolean firstTimeRelease) {
 		executionId = runId;
+		this.firstTimeRelease = firstTimeRelease;
 	}
 
 	public void setProspectiveVersion(final String prospectiveVersion) {
@@ -54,4 +60,13 @@ public class ExecutionConfig {
 	public void setFailureExportMax(final int max) {
 		failureExportMax = max;
 	}
+
+	public boolean isFirstTimeRelease() {
+		return firstTimeRelease;
+	}
+
+	public void setFirstTimeRelease(boolean firstTimeRelease) {
+		this.firstTimeRelease = firstTimeRelease;
+	}
+	
 }

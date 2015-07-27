@@ -182,12 +182,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			parts = command.getStatements().toArray(new String[command.getStatements().size()]);
 		}
 		// parse sql to get select statement
-		String selectSQL = null;
-		final Long executionId = config.getExecutionId();
-		
-		final String prospectiveReleaseVersion = config.getProspectiveVersion();
-		final String previousReleaseVersion = config.getPreviousVersion();
-		final List<String> sqlStatements = transformSql(parts,executionId,assertion,prospectiveReleaseVersion,previousReleaseVersion);
+		final List<String> sqlStatements = transformSql(parts,assertion, config);
 		for (String sqlStatement: sqlStatements)
 		{
 			// remove any leading and train white space
@@ -202,8 +197,8 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			else if (sqlStatement.startsWith("select")){
 				//TODO need to verify this is required.
 				logger.info("Select query found:" + sqlStatement);
-				selectSQL = sqlStatement;
-				try (PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+				final Long executionId = config.getExecutionId();
+				try (PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement)) {
 					try (ResultSet execResult = preparedStatement.executeQuery()) {
 						final String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, details) values (?, ?, ?)";
 						try (Connection qaDbConnecion = dataSource.getConnection()) {
@@ -235,9 +230,12 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		}
 	}
 
-	private List<String> transformSql(final String[] parts, final Long executionId, final Assertion assertion, final String prospectiveRelease, final String previousRelease) throws ConfigurationException {
+	private List<String> transformSql(String[] parts, Assertion assertion, ExecutionConfig config) throws ConfigurationException {
 		final List<String> result = new ArrayList<>();
 		final String defaultCatalog = dataSource.getDefaultCatalog();
+		
+		final String prospectiveRelease = config.getProspectiveVersion();
+		final String previousRelease = config.getPreviousVersion();
 		final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveRelease);
 		final String previousReleaseSchema = releaseDataManager.getSchemaForRelease(previousRelease);
 		
@@ -246,7 +244,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			throw new ConfigurationException ("Failed to determine a prospective schema for release " + prospectiveRelease);
 		}
 		
-		if (previousReleaseSchema == null) {
+		if (!config.isFirstTimeRelease() && previousReleaseSchema == null) {
 			throw new ConfigurationException ("Failed to determine a schema for previous release " + previousRelease);
 		}
 		for( String part : parts) {
@@ -255,7 +253,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
 			part = commentPattern.matcher(part).replaceAll("");
 			// replace all substitutions for exec
-			part = part.replaceAll("<RUNID>", String.valueOf(executionId));
+			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
 			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getId()));
 			// watch out for any 's that users might have introduced
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
@@ -270,7 +268,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			result.add(part);
 		}
 		return result;
-	}
+}
 
 	private void extractTestResult(final Assertion assertion, final TestRunItem runItem, final ExecutionConfig config)
 			throws SQLException {

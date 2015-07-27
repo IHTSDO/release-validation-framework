@@ -135,7 +135,7 @@
   }, {
     "assertionName" : "The current MapCorrelationOriginRefset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "4bdb1e4d-0ee9-4b5b-a486-cf8c561a3bc1",
-    "firstNInstances" : [ "MapcorrelationOriginRefset: id=bba35386-acbe-4389-ab28-81d4ffe654a8 is in SNAPSHOT file, but not in FULL file.", "MapcorrelationOriginRefset: id=bba35386-acbe-4389-ab28-81d4ffe654a8 is in SNAPSHOT file, but not in FULL file.", "mapcorrelationOriginRefset: id=9918EE37-16A7-4A8D-9C89-281DE1A1E718 is in FULL file, but not in SNAPSHOT file." ],
+    "firstNInstances" : [ "mapCorrelationOriginRefset: id=bba35386-acbe-4389-ab28-81d4ffe654a8 is in SNAPSHOT file, but not in FULL file.", "mapCorrelationOriginRefset: id=bba35386-acbe-4389-ab28-81d4ffe654a8 is in SNAPSHOT file, but not in FULL file.", "mapCorrelationOriginRefset: id=9918EE37-16A7-4A8D-9C89-281DE1A1E718 is in FULL file, but not in SNAPSHOT file." ],
     "totalFailed" : 3
   }, {
     "assertionName" : "The current data in the Concept snapshot file are the same as the data in the current delta file.",

@@ -19,6 +19,7 @@ public class ValidationRunConfig {
 	private String storageLocation;
 	private String url;
 	private Integer failureExportMax;
+	private boolean firstTimeRelease;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -116,6 +117,13 @@ public class ValidationRunConfig {
 		return testFileName;
 	}
 	
+	public boolean isFirstTimeRelease() {
+		return firstTimeRelease;
+	}
+	public void setFirstTimeRelease(boolean firstTimeRelease) {
+		this.firstTimeRelease = firstTimeRelease;
+	}
+	
 	@Override
 	public String toString() {
 		return "ValidationRunConfig [testFileName=" + testFileName
@@ -124,5 +132,9 @@ public class ValidationRunConfig {
 				+ prevIntReleaseVersion + ", previousExtVersion="
 				+ previousExtVersion + ", extensionDependency="
 				+ extensionDependency + ", runId=" + runId + ", url=" + url + "]";
+	}
+	public ValidationRunConfig addFirstTimeRelease(boolean firstTimeRelease) {
+		this.firstTimeRelease = firstTimeRelease;
+		return this;
 	}
 }

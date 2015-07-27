@@ -169,7 +169,8 @@ public class TestUploadFileController {
 				.addExtensionDependencyVersion(extensionDependency)
 				.addRunId(runId)
 				.addStorageLocation(storageLocation)
-				.addFailureExportMax(exportMax);
+				.addFailureExportMax(exportMax)
+				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion));
 		
 		//Before we start running, ensure that we've made our mark in the storage location
 		//Init will fail if we can't write the "running" state to storage
@@ -184,6 +185,11 @@ public class TestUploadFileController {
 			responseMap.put("resultURL", urlToPoll);
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
+	}
+
+	private boolean isFirstTimeRelease(String prevIntReleaseVersion) {
+		
+		 return prevIntReleaseVersion == null || prevIntReleaseVersion.isEmpty() ? true: false;
 	}
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)

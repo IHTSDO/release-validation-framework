@@ -108,6 +108,11 @@
     "firstNInstances" : [ "ExtendedMap: id=9d7c45ee-5a0d-5a3c-95dd-30b8b4853550 is duplicate in Snapshot file" ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "ReferenceComponentIds refers to valid concepts in the LOINC ExpressionAssociationRefset snapshot file.",
+    "assertionUuid" : "e33922c3-5200-458b-b8f3-2cd08252234e",
+    "firstNInstances" : [ "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id." ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "ID is unique in the LOINC ExpressionAssociationRefset snapshot.",
     "assertionUuid" : "b9b535f0-5b68-4192-81f6-115dea2f49c0",
     "firstNInstances" : [ "id=da1539dd-d763-4cd6-bc5c-4b52a840ae70:Non unique id in Association Expression Snapshot file." ],
@@ -203,6 +208,11 @@
     "firstNInstances" : [ "RELATIONSHIP: id=100000028: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000001020: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000002029: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000002029: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=10000023: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000003023: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000004028: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000005027: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000002029: Inferred Relationship contains source id that does not exist in the Concept snapshot file." ],
     "totalFailed" : 9
   }, {
+    "assertionName" : "ReferenceComponentIds refers to valid concepts in the LOINC MapCorrelationOriginRefset snapshot file.",
+    "assertionUuid" : "9e113c74-c6a7-4e22-bff5-58827a348a31",
+    "firstNInstances" : [ "ReferencedcomponentId=415067009 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=703064003 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707682000 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707683005 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707684004 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707685003 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707687006 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707688001 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707689009 in MapCorrelationOriginRefset snapshot is not a concept Id" ],
+    "totalFailed" : 9
+  }, {
     "assertionName" : "Referencedcomponentid refers to valid concepts in the ASSOCIATION REFSET snapshot file.",
     "assertionUuid" : "bec23e05-e977-4190-aa6a-137e5742f513",
     "firstNInstances" : [ "ASSOC RS: id=1000004:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.", "ASSOC RS: id=10086003:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.", "ASSOC RS: id=10086003:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.", "ASSOC RS: id=10123006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.", "ASSOC RS: id=10123006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.", "ASSOC RS: id=10171006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.", "ASSOC RS: id=10171006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.", "ASSOC RS: id=10171006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.", "ASSOC RS: id=128534003:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.", "ASSOC RS: id=700241009:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot." ],
@@ -216,16 +226,6 @@
     "assertionName" : "All members refer to a description that is referenced in either the description table or the text definition table.",
     "assertionUuid" : "f5d9ae70-7856-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "Language Refset: id=00000692-31c5-5aac-81a8-2e54b488c824 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=0000097d-42b2-500d-88bb-46066baa9bad references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00000b14-886f-5d9f-bba5-64e03752cbbc references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00000fa8-54c4-5611-a39b-946ae76fd2f6 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00001558-7a36-5f18-94f3-6c2d9d22a428 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00001828-bc61-59f0-811d-56732d1a8507 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00001f12-ad7d-54d9-9bef-89f5d2ef6b2b references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=000026dd-7c22-5d1f-870f-30a64f5bef55 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 references a description which is in neither the description nor the definition snapshot file.", "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7 references a description which is in neither the description nor the definition snapshot file." ],
-    "totalFailed" : 10
-  }, {
-    "assertionName" : "ReferenceComponentIds refers to valid concepts in the LOINC ExpressionAssociationRefset snapshot file.",
-    "assertionUuid" : "e33922c3-5200-458b-b8f3-2cd08252234e",
-    "firstNInstances" : [ "Association expression: referencedcomponentid=705114005is an invalid concept", "Association expression: referencedcomponentid=705114005is an invalid concept", "Association expression: referencedcomponentid=705114005is an invalid concept", "Association expression: referencedcomponentid=705114005is an invalid concept", "Association expression: referencedcomponentid=705114005is an invalid concept", "Association expression: referencedcomponentid=705114005is an invalid concept", "Association expression: referencedcomponentid=705114005is an invalid concept", "Association expression: referencedcomponentid=705114005is an invalid concept", "Association expression: referencedcomponentid=705114005is an invalid concept", "Association expression: referencedcomponentid=705114005is an invalid concept" ],
-    "totalFailed" : 10
-  }, {
-    "assertionName" : "ReferenceComponentIds refers to valid concepts in the LOINC MapCorrelationOriginRefset snapshot file.",
-    "assertionUuid" : "9e113c74-c6a7-4e22-bff5-58827a348a31",
-    "firstNInstances" : [ "MapCorrelationOrigin: referencedcomponentid=415067009is an invalid concept", "MapCorrelationOrigin: referencedcomponentid=703064003is an invalid concept", "MapCorrelationOrigin: referencedcomponentid=707682000is an invalid concept", "MapCorrelationOrigin: referencedcomponentid=707683005is an invalid concept", "MapCorrelationOrigin: referencedcomponentid=707684004is an invalid concept", "MapCorrelationOrigin: referencedcomponentid=707685003is an invalid concept", "MapCorrelationOrigin: referencedcomponentid=707685003is an invalid concept", "MapCorrelationOrigin: referencedcomponentid=707687006is an invalid concept", "MapCorrelationOrigin: referencedcomponentid=707688001is an invalid concept", "MapCorrelationOrigin: referencedcomponentid=707689009is an invalid concept" ],
     "totalFailed" : 10
   }, {
     "assertionName" : "Every concept's FSN exists exactly once in each language refset.",

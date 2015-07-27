@@ -77,21 +77,21 @@ public class RVFAssertionsRegressionIT {
 	public void setUp() throws FileNotFoundException, IOException, SQLException, BusinessServiceException {
 		//load previous and prospective versions if not loaded already
         assertNotNull(releaseDataManager);
-//        if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
+        if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
         	final URL previousReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130131");
             assertNotNull("Must not be null", previousReleaseUrl);
 			final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
 			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
-//			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFile);
-//        }
-//        if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
+			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFile);
+        }
+        if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
         	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
             assertNotNull("Must not be null", prospectiveReleaseUrl);
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
         	releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, prospectiveFile);
-//        }
+        }
         
         releaseTypeExpectedResults = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
         assertNotNull("Must not be null", releaseTypeExpectedResults);

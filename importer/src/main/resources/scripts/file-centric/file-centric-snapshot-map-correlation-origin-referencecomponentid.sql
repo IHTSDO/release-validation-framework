@@ -11,8 +11,9 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
-		concat('MapCorrelationOrigin: referencedcomponentid=',a.referencedcomponentid, 'is an invalid concept') 	
-	from curr_mapCorrelationOriginRefset_s a
-	left join curr_concept_s b
-	on a.referencedcomponentid = b.id
-	where b.id is null;
+		concat('ReferencedcomponentId=',result.referencedcomponentid, ' in MapCorrelationOriginRefset snapshot is not a concept Id') 
+	from ( select distinct a.referencedcomponentid
+		from curr_mapCorrelationOriginRefset_s a
+		left join curr_concept_s b
+		on a.referencedcomponentid = b.id
+		where b.id is null) as result;

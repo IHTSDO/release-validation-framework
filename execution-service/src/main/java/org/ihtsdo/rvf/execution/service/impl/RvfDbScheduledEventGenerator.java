@@ -30,8 +30,9 @@ public class RvfDbScheduledEventGenerator implements InitializingBean{
 		try (Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchema)) {
 			String dropSchemaSQL = "drop database "  + prospectiveSchema;
 			String createDropEvent = "create event if not exists " + "drop_" + prospectiveSchema + " on schedule at now() + INTERVAL " + maxKeepTimeInHour + " HOUR" + " DO " + dropSchemaSQL + ";";
-			PreparedStatement statement = connection.prepareStatement(createDropEvent);
-			statement.execute();
+			try( PreparedStatement statement = connection.prepareStatement(createDropEvent);) {
+				statement.execute();
+			}
 		}
 	}
 
@@ -39,8 +40,9 @@ public class RvfDbScheduledEventGenerator implements InitializingBean{
 		try (Connection connection = dataSource.getConnection()) {
 			String deleteQaResultSQL = " delete from qa_result where run_id = " + runId;
 			String createDeleteEvent = "create event if not exists " + "delete_qaResultForRunId_" + runId  + " on schedule at now() + INTERVAL " + maxKeepTimeInHour + " HOUR" + " DO " + deleteQaResultSQL + ";";
-			PreparedStatement statement = connection.prepareStatement(createDeleteEvent);
-			statement.execute();
+			try (PreparedStatement statement = connection.prepareStatement(createDeleteEvent);) {
+				statement.execute();
+			}
 		}
 	}
 

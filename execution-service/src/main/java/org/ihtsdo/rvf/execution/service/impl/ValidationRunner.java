@@ -146,8 +146,8 @@ public class ValidationRunner implements Runnable {
 			final String[] tokens = Files.getNameWithoutExtension(validationConfig.getFile().getOriginalFilename()).split("_");
 			String prospectiveVersion = validationConfig.getRunId().toString();
 			String prevReleaseVersion = validationConfig.getPrevIntReleaseVersion();
-			final boolean isExtension = validationConfig.getPreviousExtVersion() != null && !validationConfig.getPreviousExtVersion().trim().isEmpty() ? true : false;
-			if (isExtension) {
+			final boolean isExtension = isExtension(validationConfig); 
+			if (isExtension && !validationConfig.isFirstTimeRelease()) {
 				//SnomedCT_Release-es_INT_20140430.zip
 				//SnomedCT_SpanishRelease_INT_20141031.zip
 				final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("edition_");
@@ -183,7 +183,7 @@ public class ValidationRunner implements Runnable {
 				resourceLoader.loadResourceData(prospectiveSchema);
 				logger.info("completed loading resource data for schema:" + prospectiveSchema);
 			}
-			final ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId());
+			final ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
 			executionConfig.setProspectiveVersion(prospectiveVersion);
 			executionConfig.setPreviousVersion(prevReleaseVersion);
 			executionConfig.setGroupNames(validationConfig.getGroupsList());
@@ -201,15 +201,16 @@ public class ValidationRunner implements Runnable {
 			writeResults(responseMap, State.COMPLETE);
 			//house keeping prospective version and combined previous extension 
 			scheduleEventGenerator.createDropReleaseSchemaEvent(prospectiveSchema);
-			if (isExtension) {
+			if (isExtension && !validationConfig.isFirstTimeRelease()) {
 				scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(prevReleaseVersion));
 			}
 			// house keeping qa_result for the given run id
 			scheduleEventGenerator.createQaResultDeleteEvent(validationConfig.getRunId());
-			
-			
 		}
-		
+	}
+
+	private boolean isExtension(ValidationRunConfig validationConfig) {
+		return (validationConfig.getExtensionDependencyVersion() != null && !validationConfig.getExtensionDependencyVersion().trim().isEmpty()) ? true : false;
 	}
 
 	public boolean init(final ValidationRunConfig config, final Map<String, String> responseMap) {
@@ -383,7 +384,7 @@ public class ValidationRunner implements Runnable {
 	private void uploadProspectiveVersion(final String prospectiveVersion, final String knownVersion, final File tempFile) throws ConfigurationException, BusinessServiceException {
 		
 		if (knownVersion != null && !knownVersion.trim().isEmpty()) {
-			logger.info("Baseline verison: [%1s] will be combined with prospective release file: [%2s]", knownVersion, tempFile.getName());
+			logger.info(String.format("Baseline verison: [%1s] will be combined with prospective release file: [%2s]", knownVersion, tempFile.getName()));
 			//load them together here as opposed to clone the existing DB so that to make sure it is clean.
 			String versionDate = knownVersion;
 			if (knownVersion.length() > 8) {
