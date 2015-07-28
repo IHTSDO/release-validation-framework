@@ -19,6 +19,8 @@ public class RF2FileTableMapper {
 	private static final String ASSOCIATION_REFERENCE_FILE_HEADER = "der2_cRefset_.*AssociationReference";
 	private static final String DESCRIPTION_FILE_HEADER = "sct2_Description_";
 	private static final String CONCEPT_FILE_HEADER = "sct2_Concept_";
+	private static final String EXPRESSION_ASSOCIATION_FILE_HEADER = "der2_sscccRefset_.*ExpressionAssociation";
+	private static final String MAP_CORRELATION_ORIGIN_FILE_HEADER = "der2_scccRefset_.*MapCorrelationOrigin";
 	private static final Map<String,String> tableNameMap = new HashMap<>();
 	private static final String DELTA = ".*Delta.*_INT_\\d{8}.txt";
 	private static final String SNAPSHOT = ".*Snapshot.*_INT_\\d{8}.txt";
@@ -38,6 +40,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(SIMPLE_FILE_HEADER + DELTA, "simplerefset_d");
 		tableNameMap.put(STATED_RELATIONSHIP_FILE_HEADER + DELTA, "stated_relationship_d");
 		tableNameMap.put(TEXT_DEFINITION_FILE_HEADER + DELTA, "textdefinition_d");
+		tableNameMap.put(EXPRESSION_ASSOCIATION_FILE_HEADER + DELTA, "expressionAssociationRefset_d");
+		tableNameMap.put(MAP_CORRELATION_ORIGIN_FILE_HEADER + DELTA, "mapCorrelationOriginRefset_d");
 		
 		//Full
 		tableNameMap.put(CONCEPT_FILE_HEADER + FULL, "concept_f");
@@ -52,6 +56,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(SIMPLE_FILE_HEADER + FULL, "simplerefset_f");
 		tableNameMap.put(STATED_RELATIONSHIP_FILE_HEADER + FULL, "stated_relationship_f");
 		tableNameMap.put(TEXT_DEFINITION_FILE_HEADER + FULL, "textdefinition_f");
+		tableNameMap.put(EXPRESSION_ASSOCIATION_FILE_HEADER + FULL, "expressionAssociationRefset_f");
+		tableNameMap.put(MAP_CORRELATION_ORIGIN_FILE_HEADER + FULL, "mapCorrelationOriginRefset_f");
 		//Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
 		tableNameMap.put(DESCRIPTION_FILE_HEADER + SNAPSHOT, "description_s");
@@ -65,6 +71,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(SIMPLE_FILE_HEADER + SNAPSHOT, "simplerefset_s");
 		tableNameMap.put(STATED_RELATIONSHIP_FILE_HEADER + SNAPSHOT, "stated_relationship_s");
 		tableNameMap.put(TEXT_DEFINITION_FILE_HEADER + SNAPSHOT, "textdefinition_s");
+		tableNameMap.put(EXPRESSION_ASSOCIATION_FILE_HEADER + SNAPSHOT, "expressionAssociationRefset_s");
+		tableNameMap.put(MAP_CORRELATION_ORIGIN_FILE_HEADER + SNAPSHOT, "mapCorrelationOriginRefset_s");
 	}
 	
 	public static String getLegacyTableName(final String filename) {

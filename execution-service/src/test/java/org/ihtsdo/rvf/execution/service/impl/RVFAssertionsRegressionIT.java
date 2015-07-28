@@ -83,7 +83,7 @@ public class RVFAssertionsRegressionIT {
 			final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
 			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
-//			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFile);
+			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFile);
         }
         if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
         	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
@@ -103,7 +103,7 @@ public class RVFAssertionsRegressionIT {
         releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_"+ PROSPECTIVE_RELEASE);
         
         resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
-        final List<Assertion> assertions = assertionDao.getAssertionsByKeywords("resource");
+        final List<Assertion> assertions = assertionDao.getAssertionsByContainingKeyword("resource");
 		config = new ExecutionConfig(System.currentTimeMillis());
 		config.setPreviousVersion(PREVIOUS_RELEASE);
 		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
@@ -127,7 +127,7 @@ public class RVFAssertionsRegressionIT {
 	}
 	 
 	private void runAssertionsTest(final String groupName, final String expectedJsonFile) throws Exception {
-		 final List<Assertion> assertions= assertionDao.getAssertionsByKeywords(groupName);
+		 final List<Assertion> assertions= assertionDao.getAssertionsByContainingKeyword(groupName);
 		 System.out.println("found total assertions:" + assertions.size());
 			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
 			assertTestResult(groupName, expectedJsonFile, runItems);

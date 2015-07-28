@@ -132,10 +132,10 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 	}
 
 	@Override
-	public List<Assertion> getAssertionsByKeywords(final String keyName) {
+	public List<Assertion> getAssertionsByContainingKeyword(final String keyName) {
 		return getCurrentSession()
-				.createQuery("from Assertion assertion where assertion.keywords = :keyWord order by assertion.id")
-				.setParameter("keyWord", keyName).list();
+				.createQuery("from Assertion assertion where assertion.keywords like :keyWord order by assertion.id")
+				.setParameter("keyWord", "%" + keyName + "%").list();
 	}
 
 	@Override

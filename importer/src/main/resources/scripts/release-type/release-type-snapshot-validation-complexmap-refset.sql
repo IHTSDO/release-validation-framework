@@ -1,5 +1,5 @@
 /*  
-*	Content in the the current extended map delta file must be in the current full file
+*	Content in the the current extended map snapshot file must be in the current full file
 */
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 

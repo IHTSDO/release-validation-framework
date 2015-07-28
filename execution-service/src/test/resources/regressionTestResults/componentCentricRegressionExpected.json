@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 75,
-  "totalAssertionsFailed" : 75,
+  "totalAssertionsRun" : 79,
+  "totalAssertionsFailed" : 79,
   "results" : [ {
     "assertionName" : "Active historical association refset members have active concepts as targets.",
     "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
@@ -208,6 +208,21 @@
     "firstNInstances" : [ "ExtendedMap: id=1d507f04-26a6-5a9d-8f3c-abb34b971a62 : duplicate mapRule and mapTarget in different groups" ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "The mapTarget in LOINC ExpressionAssociationRefset snapshot is unique.",
+    "assertionUuid" : "a6f78382-91c4-4e0a-a9d6-6d47b1a16979",
+    "firstNInstances" : [ "MapTarget:54320-7 is not unique in the expression association refset snapshot." ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The mapTarget in LOINC ExpressionAssociationRefset snapshot is a valid LOINC code",
+    "assertionUuid" : "18d36527-9247-406a-bd1f-d7d608b0663a",
+    "firstNInstances" : [ "MapTarget:351411 is not a valid LOINC code in the expression association refset snapshot." ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The LOINC parts in MapCorrelationOriginRefset snapshot are in correct format",
+    "assertionUuid" : "335b2810-8cbb-43bf-807e-092dacb20f6a",
+    "firstNInstances" : [ "LOINC part:20608-3 is not correctly formated in the MapCorrelationOrigin refset snapshot." ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "All inactive concepts have definition status of PRIMITIVE.",
     "assertionUuid" : "fdf6a1b0-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "CONCEPT: id=699765003:There is an inactive concept whose definition status is not Primitive.", "CONCEPT: id=609452007:There is an inactive concept whose definition status is not Primitive." ],
@@ -377,5 +392,10 @@
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f69",
     "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Empty mapTarget for classifiable mapCategory", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f083 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f085 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616 : Non-empty mapTarget for unclassifiable mapCategory" ],
     "totalFailed" : 12
+  }, {
+    "assertionName" : "The concepts referenced by expressions in LOINC ExpressionAssociationRefset SNAPSHOT file must exist in the concept snapshot",
+    "assertionUuid" : "30947783-78f5-4ffc-a22b-b03d83c5909d",
+    "firstNInstances" : [ "Concept: id=363787002 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=704346009 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=386053000 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=246501002 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=703447009 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=704327008 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=119297000 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=704347000 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=414237002 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=704319004 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown." ],
+    "totalFailed" : 50
   } ]
 }

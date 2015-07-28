@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 49,
-  "totalAssertionsFailed" : 49,
+  "totalAssertionsRun" : 53,
+  "totalAssertionsFailed" : 53,
   "results" : [ {
     "assertionName" : "ID is unique in CONCEPT snapshot.",
     "assertionUuid" : "309d0620-0a32-43a6-9d08-8e6bdefda3be",
@@ -108,6 +108,21 @@
     "firstNInstances" : [ "ExtendedMap: id=9d7c45ee-5a0d-5a3c-95dd-30b8b4853550 is duplicate in Snapshot file" ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "ReferenceComponentIds refers to valid concepts in the LOINC ExpressionAssociationRefset snapshot file.",
+    "assertionUuid" : "e33922c3-5200-458b-b8f3-2cd08252234e",
+    "firstNInstances" : [ "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id." ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "ID is unique in the LOINC ExpressionAssociationRefset snapshot.",
+    "assertionUuid" : "b9b535f0-5b68-4192-81f6-115dea2f49c0",
+    "firstNInstances" : [ "id=da1539dd-d763-4cd6-bc5c-4b52a840ae70:Non unique id in Association Expression Snapshot file." ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "ID is unique in the LOINC MapCorrelationOriginRefset snapshot.",
+    "assertionUuid" : "160a9eeb-883d-4e24-8b3f-556d5d517ef1",
+    "firstNInstances" : [ "id=bba35386-acbe-4389-ab28-81d4ffe654a8:Non unique id in the MapCorrelationOrigin Snapshot file." ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot.",
     "assertionUuid" : "8ea2e5d9-5c35-4436-b67d-c5268b5da06c",
     "firstNInstances" : [ "DESC: Active FSN =Proglumetacin (substance): is not unique in DESCRIPTION snapshot.", "DESC: Active FSN =Proglumetacin, different semantic tag (procedure): is not unique in DESCRIPTION snapshot." ],
@@ -191,6 +206,11 @@
     "assertionName" : "All source ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "72184790-79b9-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "RELATIONSHIP: id=100000028: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000001020: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000002029: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000002029: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=10000023: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000003023: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000004028: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000005027: Inferred Relationship contains source id that does not exist in the Concept snapshot file.", "RELATIONSHIP: id=1000002029: Inferred Relationship contains source id that does not exist in the Concept snapshot file." ],
+    "totalFailed" : 9
+  }, {
+    "assertionName" : "ReferenceComponentIds refers to valid concepts in the LOINC MapCorrelationOriginRefset snapshot file.",
+    "assertionUuid" : "9e113c74-c6a7-4e22-bff5-58827a348a31",
+    "firstNInstances" : [ "ReferencedcomponentId=415067009 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=703064003 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707682000 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707683005 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707684004 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707685003 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707687006 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707688001 in MapCorrelationOriginRefset snapshot is not a concept Id", "ReferencedcomponentId=707689009 in MapCorrelationOriginRefset snapshot is not a concept Id" ],
     "totalFailed" : 9
   }, {
     "assertionName" : "Referencedcomponentid refers to valid concepts in the ASSOCIATION REFSET snapshot file.",

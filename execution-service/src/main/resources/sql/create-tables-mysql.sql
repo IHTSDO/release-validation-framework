@@ -727,3 +727,139 @@ create table extendedmaprefset_s(
 ) engine=myisam default charset=utf8;
 
 
+drop table if exists expressionAssociationRefset_s;
+create table expressionAssociationRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mapTarget varchar(20) not null,
+	expression varchar(500) not null,
+	definitionStatusId bigint(20) not null,
+	correlationId bigint(20) not null,
+	contentOriginId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_mapTarget(mapTarget)
+) engine=myisam default charset=utf8;
+
+
+drop table if exists expressionAssociationRefset_d;
+create table expressionAssociationRefset_d(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mapTarget varchar(20) not null,
+	expression varchar(500) not null,
+	definitionStatusId bigint(20) not null,
+	correlationId bigint(20) not null,
+	contentOriginId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_mapTarget(mapTarget)
+) engine=myisam default charset=utf8;
+
+
+drop table if exists expressionAssociationRefset_f;
+create table expressionAssociationRefset_f(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mapTarget varchar(20) not null,
+	expression varchar(500) not null,
+	definitionStatusId bigint(20) not null,
+	correlationId bigint(20) not null,
+	contentOriginId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_mapTarget(mapTarget)
+) engine=myisam default charset=utf8;
+
+
+
+drop table if exists mapCorrelationOriginRefset_f;
+create table mapCorrelationOriginRefset_f(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mapTarget varchar(20) not null,
+	attributeId bigint(20) not null,
+	correlationId bigint(20) not null,
+	contentOriginId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_mapTarget(mapTarget)
+) engine=myisam default charset=utf8;
+
+drop table if exists mapCorrelationOriginRefset_s;
+create table mapCorrelationOriginRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mapTarget varchar(20) not null,
+	attributeId bigint(20) not null,
+	correlationId bigint(20) not null,
+	contentOriginId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_mapTarget(mapTarget)
+) engine=myisam default charset=utf8;
+
+
+
+drop table if exists mapCorrelationOriginRefset_d;
+create table mapCorrelationOriginRefset_d(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mapTarget varchar(20) not null,
+	attributeId bigint(20) not null,
+	correlationId bigint(20) not null,
+	contentOriginId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_mapTarget(mapTarget)
+) engine=myisam default charset=utf8;
+
+
