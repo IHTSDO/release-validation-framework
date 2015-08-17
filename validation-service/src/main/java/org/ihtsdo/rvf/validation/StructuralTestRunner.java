@@ -49,11 +49,21 @@ public class StructuralTestRunner implements InitializingBean{
 		testReport.setWriteSuccesses(writeSuccesses);
 		final ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
 		runColumnTests(resourceManager, testReport, validationLog);
-
+		
+		runLineFeedTests(resourceManager, testReport);
+		testReport.getResult();
 		final String summary = testReport.writeSummary();
 		validationLog.info(summary);
 
 		return testReport;
+	}
+
+	private void runLineFeedTests(ResourceProvider resourceManager, StreamTestReport testReport) {
+		
+		final RF2FileStructureTester lineFeedPatternTest = new RF2FileStructureTester(validationLogFactory.getValidationLog(RF2FileStructureTester.class), 
+				resourceManager, testReport);
+		lineFeedPatternTest.runTests();
+		
 	}
 
 	public TestReportable execute(final ResourceProvider resourceManager, final PrintWriter writer, final boolean writeSuccesses) {
@@ -61,6 +71,8 @@ public class StructuralTestRunner implements InitializingBean{
 		final StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), writer, writeSuccesses);
 		final ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
 		runColumnTests(resourceManager, testReport, validationLog);
+		runLineFeedTests(resourceManager, testReport);
+		testReport.getResult();
 		final String summary = testReport.writeSummary();
 		validationLog.info(summary);
 		return testReport;
@@ -104,6 +116,8 @@ public class StructuralTestRunner implements InitializingBean{
 				final ManifestFile mf = new ManifestFile(tempManifestFile);
 				report = execute(resourceManager, writer, writeSucceses, mf);
 			}
+			report.getResult();
+			logger.info(report.writeSummary());
 			validationReport.setTotalTestsRun(report.getNumTestRuns());
 			// verify if manifest is valid
 			if(report.getNumErrors() > 0) {

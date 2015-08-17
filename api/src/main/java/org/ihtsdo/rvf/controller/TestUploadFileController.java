@@ -102,36 +102,45 @@ public class TestUploadFileController {
 			final HttpServletResponse response) throws IOException {
 		// load the filename
 		final String filename = file.getOriginalFilename();
-
-		final File tempFile = File.createTempFile(filename, ".zip");
-		tempFile.deleteOnExit();
+	
 		if (!filename.endsWith(".zip")) {
 			throw new IllegalArgumentException("Post condition test package has to be zipped up");
 		}
+		File tempFile = null;
+		File tempManifestFile = null;
+		try {
+			tempFile = File.createTempFile(filename, ".zip");
+			// set up the response in order to strean directly to the response
+			response.setContentType("text/csv;charset=utf-8");
+			response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
+			try (PrintWriter writer = response.getWriter()) {
+				// must be a zip
+				file.transferTo(tempFile);
+				final ResourceProvider resourceManager = new ZipFileResourceProvider(tempFile);
 
-		// set up the response in order to strean directly to the response
-		response.setContentType("text/csv;charset=utf-8");
-		response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
-		try (PrintWriter writer = response.getWriter()) {
-			// must be a zip
-			file.transferTo(tempFile);
-			final ResourceProvider resourceManager = new ZipFileResourceProvider(tempFile);
+				TestReportable report;
 
-			TestReportable report;
-
-			if (manifestFile == null) {
-				report = validationRunner.execute(resourceManager, writer, writeSucceses);
-			} else {
-				final String originalFilename = manifestFile.getOriginalFilename();
-				final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
-				tempManifestFile.deleteOnExit();
-				file.transferTo(tempManifestFile);
-				final ManifestFile mf = new ManifestFile(tempManifestFile);
-				report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+				if (manifestFile == null) {
+					report = validationRunner.execute(resourceManager, writer, writeSucceses);
+				} else {
+					final String originalFilename = manifestFile.getOriginalFilename();
+					tempManifestFile = File.createTempFile(originalFilename, ".xml");
+					manifestFile.transferTo(tempManifestFile);
+					final ManifestFile mf = new ManifestFile(tempManifestFile);
+					report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+				}
+				// store the report to disk for now with a timestamp
+				if (report.getNumErrors() > 0) {
+					LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+				}
+			} 
+		}finally {
+			
+			if (tempFile != null) {
+				tempFile.delete();
 			}
-			// store the report to disk for now with a timestamp
-			if (report.getNumErrors() > 0) {
-				LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+			if (tempManifestFile != null) {
+				tempManifestFile.delete();
 			}
 		}
 		return null;
@@ -170,6 +179,7 @@ public class TestUploadFileController {
 				.addRunId(runId)
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
+				.addUrl(urlPrefix)
 				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion));
 		
 		//Before we start running, ensure that we've made our mark in the storage location

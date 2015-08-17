@@ -1,5 +1,14 @@
 package org.ihtsdo.rvf.validation;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 import org.ihtsdo.rvf.validation.model.ManifestFile;
 import org.ihtsdo.rvf.validation.resource.TextFileResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
@@ -8,15 +17,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/validationContext.xml"})
@@ -28,9 +28,10 @@ public class StructuralTestRunnerTest {
 	@Test
 	public void testExecute_DataInResponse() throws Exception {
 		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile("/SnomedCT_Release_INT_20140831.zip"));
-		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), true);
+		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), false);
 
 		assertTrue(response.getResult() != null);
+		System.out.println(response.getResult());
 		assertEquals(0, response.getNumErrors());
 	}
 
@@ -64,8 +65,7 @@ public class StructuralTestRunnerTest {
 		String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
 
 		assertTrue(response.getResult() != null);
-		assertEquals("Not meant to be failures but there are, there are 3 file names that are not valid", 3, response.getNumErrors());
-		assertEquals(invalidFileNames.length, response.getNumErrors());
+		assertEquals("There are 3 file names that are not valid plus 4 other erros", 7, response.getNumErrors());
 	}
 
 	@Test
@@ -83,8 +83,8 @@ public class StructuralTestRunnerTest {
 		assertTrue(sw.getBuffer().length() > 0);
 
 		assertTrue(response.getResult() != null);
-		assertEquals("Not meant to be failures but there are, there are 3 file names that are not valid", 3, response.getNumErrors());
-		assertEquals(invalidFileNames.length, response.getNumErrors());
+		System.out.println(response.getResult());
+		assertEquals("There are 3 file names that are not valid plus 4 other errors", 7, response.getNumErrors());
 	}
 
 	@Test

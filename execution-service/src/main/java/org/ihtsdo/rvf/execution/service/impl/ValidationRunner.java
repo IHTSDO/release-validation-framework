@@ -162,7 +162,7 @@ public class ValidationRunner implements Runnable {
 						final boolean isSuccess = releaseDataManager.combineKnownVersions(prevReleaseVersion, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
 						if (!isSuccess) {
 							responseMap.put(FAILURE_MESSAGE, "Failed to combine known versions:" 
-									+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + "into" + prevReleaseVersion);
+									+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + prevReleaseVersion);
 							writeResults(responseMap, State.FAILED);
 							return;
 						}
@@ -172,11 +172,15 @@ public class ValidationRunner implements Runnable {
 				}
 			} 
 			writeProgress("Loading prospective file into DB.");
+			List<String> rf2FilesLoaded = new ArrayList<>();
 			if (isExtension) {
-				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getProspectiveFile());
+				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getProspectiveFile(), rf2FilesLoaded);
 			} else {
-				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getProspectiveFile());
+				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getProspectiveFile(), rf2FilesLoaded);
 			}
+			responseMap.put("Total RF2 Files loaded", rf2FilesLoaded.size());
+			responseMap.put("RF2 Files", rf2FilesLoaded);
+			
 			final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
 			if (prospectiveSchema != null) {
 				writeProgress("Loading resource data for prospective schema:" + prospectiveSchema);
@@ -209,8 +213,9 @@ public class ValidationRunner implements Runnable {
 		}
 	}
 
-	private boolean isExtension(ValidationRunConfig validationConfig) {
-		return (validationConfig.getExtensionDependencyVersion() != null && !validationConfig.getExtensionDependencyVersion().trim().isEmpty()) ? true : false;
+	private boolean isExtension(final ValidationRunConfig runConfig) {
+		return (runConfig.getExtensionDependencyVersion() != null 
+				&& !runConfig.getExtensionDependencyVersion().trim().isEmpty()) ? true : false;
 	}
 
 	public boolean init(final ValidationRunConfig config, final Map<String, String> responseMap) {
@@ -381,7 +386,8 @@ public class ValidationRunner implements Runnable {
 		return isFailed;
 	}
 
-	private void uploadProspectiveVersion(final String prospectiveVersion, final String knownVersion, final File tempFile) throws ConfigurationException, BusinessServiceException {
+	private void uploadProspectiveVersion(final String prospectiveVersion, final String knownVersion, final File tempFile, 
+			List<String> rf2FilesLoaded) throws ConfigurationException, BusinessServiceException {
 		
 		if (knownVersion != null && !knownVersion.trim().isEmpty()) {
 			logger.info(String.format("Baseline verison: [%1s] will be combined with prospective release file: [%2s]", knownVersion, tempFile.getName()));
@@ -394,13 +400,13 @@ public class ValidationRunner implements Runnable {
 			if (preLoadedZipFile != null) {
 				logger.info("Start loading release version {} with release file {} and baseline {}", 
 						prospectiveVersion, tempFile.getName(), preLoadedZipFile.getName());
-				releaseDataManager.loadSnomedData(prospectiveVersion, tempFile, preLoadedZipFile);
+				releaseDataManager.loadSnomedData(prospectiveVersion,rf2FilesLoaded, tempFile, preLoadedZipFile);
 			} else {
 				throw new ConfigurationException("Can't find the cached release zip file for known version: " + versionDate);
 			}
 		} else {
 			logger.info("Start loading release version {} with release file {}", prospectiveVersion, tempFile.getName());
-			releaseDataManager.loadSnomedData(prospectiveVersion, tempFile);
+			releaseDataManager.loadSnomedData(prospectiveVersion,rf2FilesLoaded, tempFile);
 		}
 		logger.info("Completed loading release version {}", prospectiveVersion);
 	}

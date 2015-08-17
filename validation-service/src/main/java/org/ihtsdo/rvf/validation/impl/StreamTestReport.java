@@ -1,15 +1,14 @@
 package org.ihtsdo.rvf.validation.impl;
 
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.validation.ResultFormatter;
-import org.ihtsdo.rvf.validation.TestReportable;
-import org.ihtsdo.rvf.validation.StructuralTestRunItem;
-
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.ihtsdo.rvf.validation.ResultFormatter;
+import org.ihtsdo.rvf.validation.StructuralTestRunItem;
+import org.ihtsdo.rvf.validation.TestReportable;
 
 public class StreamTestReport implements TestReportable {
 
@@ -44,7 +43,6 @@ public class StreamTestReport implements TestReportable {
 			TestRunItemCount value = entry.getValue();
 			writer.write(formatter.formatRow(value.getItem(), value.getErrorCount()));
 		}
-		//writeSummary();
 		return writer.toString();
 	}
 
@@ -61,10 +59,9 @@ public class StreamTestReport implements TestReportable {
 		writer.write("/n/n");
 	}
 
+	@Override
 	public void addError( String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue) {
 		StructuralTestRunItem item = new StructuralTestRunItem (executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, actualValue, expectedValue);
-		String row = formatter.formatRow(item, 0);
-		writer.write(row);
 		if (errorMap.containsKey(columnName)) {
 			TestRunItemCount errorCounter = errorMap.get(columnName);
 			errorCounter.addError();
@@ -75,6 +72,7 @@ public class StreamTestReport implements TestReportable {
 		numTestRuns++;
 	}
 
+	@Override
 	public void addSuccess( String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern) {
 		if (writeSuccesses) {
 			StructuralTestRunItem item = new StructuralTestRunItem(executionId, testTime, fileName, filePath, columnName, testType, testPattern, false, null, null);
@@ -84,18 +82,22 @@ public class StreamTestReport implements TestReportable {
 		numTestRuns++;
 	}
 
+	@Override
 	public int getNumErrors() {
 		return numFailures;
 	}
 
+	@Override
 	public int getNumberRecordedErrors() {
 		return errorMap.size();
 	}
 
+	@Override
 	public int getNumSuccesses() {
 		return numTestRuns - numFailures;
 	}
 
+	@Override
 	public int getNumTestRuns() {
 		return numTestRuns;
 	}
