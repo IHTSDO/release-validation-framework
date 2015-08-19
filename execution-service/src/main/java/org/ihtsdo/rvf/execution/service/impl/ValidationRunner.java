@@ -24,6 +24,7 @@ import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.dao.s3.S3Client;
 import org.ihtsdo.otf.dao.s3.helper.FileHelper;
@@ -116,6 +117,8 @@ public class ValidationRunner implements Runnable {
 				//Can't even record the error to disk!  Lets hope Telemetry is working
 				logger.error("Failed to record failure (which was: " + failureMsg + ") due to " + e2.getMessage());
 			}
+		} finally {
+			FileUtils.deleteQuietly(validationConfig.getProspectiveFile());
 		}
 	}
 
@@ -252,8 +255,8 @@ public class ValidationRunner implements Runnable {
 	 */
 	private boolean saveUploadedFiles(final ValidationRunConfig config, final Map<String, String> responseMap) throws IOException {
 		final String filename = config.getFile().getOriginalFilename();
+		//temp file will be deleted when validation is done.
 		final File tempFile = File.createTempFile(filename, ".zip");
-		tempFile.deleteOnExit();
 		if (!filename.endsWith(".zip")) {
 			responseMap.put(FAILURE_MESSAGE, "Post condition test package has to be zipped up");
 			return false;
@@ -274,8 +277,7 @@ public class ValidationRunner implements Runnable {
 				//Now copy to our S3 Location
 			} 
 			s3Helper.putFile(temp, resultsFilePath);
-		}
-		finally {
+		} finally {
 			temp.delete();
 		}
 		writeState(state);

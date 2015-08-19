@@ -108,13 +108,16 @@ public class StructuralTestRunner implements InitializingBean{
 			if (manifestFile == null) {
 				report = execute(resourceManager, writer, writeSucceses);
 			} else {
-				final String originalFilename = manifestFile.getOriginalFilename();
-				final File tempManifestFile = File.createTempFile(originalFilename, ".xml");
-				tempManifestFile.deleteOnExit();
-				manifestFile.transferTo(tempManifestFile);
-
-				final ManifestFile mf = new ManifestFile(tempManifestFile);
-				report = execute(resourceManager, writer, writeSucceses, mf);
+				File tempManifestFile  = null;
+				try {
+					final String originalFilename = manifestFile.getOriginalFilename();
+					tempManifestFile = File.createTempFile(originalFilename, ".xml");
+					manifestFile.transferTo(tempManifestFile);
+					final ManifestFile mf = new ManifestFile(tempManifestFile);
+					report = execute(resourceManager, writer, writeSucceses, mf);
+				} finally {
+					FileUtils.deleteQuietly(tempManifestFile);
+				}
 			}
 			report.getResult();
 			logger.info(report.writeSummary());

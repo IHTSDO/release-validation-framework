@@ -13,6 +13,7 @@ import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
@@ -218,23 +219,26 @@ public class TestUploadFileController {
 		}
 
 		final File tempFile = File.createTempFile(filename, ".txt");
-		tempFile.deleteOnExit();
-		if (!filename.endsWith(".txt")) {
-			throw new IllegalArgumentException("Pre condition file should always be a .txt file");
-		}
-		response.setContentType("text/csv;charset=utf-8");
-		response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
-		
-		try (PrintWriter writer = response.getWriter()) {
-			file.transferTo(tempFile);
-			final ResourceProvider resourceManager = new TextFileResourceProvider(tempFile, filename);
-			final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
-			// store the report to disk for now with a timestamp
-			if (report.getNumErrors() > 0) {
-				LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+		try {
+			if (!filename.endsWith(".txt")) {
+				throw new IllegalArgumentException("Pre condition file should always be a .txt file");
 			}
+			response.setContentType("text/csv;charset=utf-8");
+			response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
+			
+			try (PrintWriter writer = response.getWriter()) {
+				file.transferTo(tempFile);
+				final ResourceProvider resourceManager = new TextFileResourceProvider(tempFile, filename);
+				final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
+				// store the report to disk for now with a timestamp
+				if (report.getNumErrors() > 0) {
+					LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+				}
+			}
+			return null;
+		} finally {
+			FileUtils.deleteQuietly(tempFile);
 		}
-		return null;
 	}
 
 	@RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
