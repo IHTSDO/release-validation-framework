@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -32,7 +34,8 @@ public class ReleaseDataManagerImplIntegrationTest {
         final File inputFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
         assertNotNull(inputFile);
         final String versionName = "20140131";
-        final String schemaName = releaseDataManager.loadSnomedData(versionName, inputFile);
+        List<String> rf2FilesLoaded = new ArrayList<>();
+        final String schemaName = releaseDataManager.loadSnomedData(versionName, rf2FilesLoaded, inputFile);
         try (
         		Connection connection = snomedDataSource.getConnection();
         		ResultSet catalogs = connection.getMetaData().getCatalogs(); ) {

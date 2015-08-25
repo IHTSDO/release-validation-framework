@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.execution.service;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
@@ -17,7 +18,7 @@ public interface ReleaseDataManager {
 
     boolean uploadPublishedReleaseData(File releasePackZip, String product, String version) throws BusinessServiceException;
 
-    String loadSnomedData(String productVersion, File ... zipDataFile) throws BusinessServiceException;
+    String loadSnomedData(String productVersion,List<String> rf2FilesLoaded,File ... zipDataFile) throws BusinessServiceException;
 
     boolean isKnownRelease(String releaseVersion);
 

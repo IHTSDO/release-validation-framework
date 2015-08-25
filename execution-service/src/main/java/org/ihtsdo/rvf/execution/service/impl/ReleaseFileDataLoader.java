@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.execution.service.impl;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import org.ihtsdo.snomed.util.rf2.schema.ComponentType;
 import org.ihtsdo.snomed.util.rf2.schema.DataType;
@@ -46,15 +47,17 @@ public class ReleaseFileDataLoader {
 	/**
 	 * @param rf2TextFileRootPath
 	 * @param rf2Files
+	 * @param rf2FilesLoaded 
 	 * @throws SQLException
 	 */
-	public void loadFilesIntoDB(final String rf2TextFileRootPath, final String[] rf2Files) throws SQLException {
+	public void loadFilesIntoDB(final String rf2TextFileRootPath, final String[] rf2Files, List<String> rf2FilesLoaded) throws SQLException {
 		for (final String rf2FileName : rf2Files) {
 			final String rvfTableName = RF2FileTableMapper.getLegacyTableName(rf2FileName);
 			if( rvfTableName == null) {
 				LOGGER.warn("No matching table name found for RF2 file:" + rf2FileName);
 				continue;
 			}
+			rf2FilesLoaded.add(rf2FileName);
 			final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
 			final String disableIndex = "ALTER TABLE " + rvfTableName + " DISABLE KEYS;";
 			final String enableIndex = "ALTER TABLE " + rvfTableName + " ENABLE KEYS;";

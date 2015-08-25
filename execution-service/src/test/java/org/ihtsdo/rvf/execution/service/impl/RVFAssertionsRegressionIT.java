@@ -32,6 +32,7 @@ import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,6 +73,7 @@ public class RVFAssertionsRegressionIT {
 	private URL fileCentricExpected;
 	private ExecutionConfig config;
 	private final ObjectMapper mapper = new ObjectMapper();
+	private  List<String> rf2FilesLoaded = new ArrayList<>();
 	
 	@Before
 	public void setUp() throws FileNotFoundException, IOException, SQLException, BusinessServiceException {
@@ -83,14 +85,14 @@ public class RVFAssertionsRegressionIT {
 			final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
 			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
-			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE, previousFile);
+			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE,rf2FilesLoaded, previousFile);
         }
         if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
         	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
             assertNotNull("Must not be null", prospectiveReleaseUrl);
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
-        	releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, prospectiveFile);
+        	releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE,rf2FilesLoaded, prospectiveFile);
         }
         
         releaseTypeExpectedResults = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
@@ -109,7 +111,6 @@ public class RVFAssertionsRegressionIT {
 		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
 		config.setFailureExportMax(10);
 		assertionExecutionService.executeAssertions(assertions, config);
-        
 	}
 	
 	@Test
@@ -271,8 +272,11 @@ public class RVFAssertionsRegressionIT {
 			return true;
 		}
 		
-		
-		
+	}
+	
+	@After
+	public void tearDown() {
+		rf2FilesLoaded.clear();
 	}
 	private static class RVFTestResult implements Comparable<RVFTestResult> {
 		private String assertionName;

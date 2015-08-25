@@ -12,8 +12,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -129,7 +131,8 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			logger.info("Product version is already known in RVF and the existing one will be deleted and reloaded: " + productVersion);
 		}
 		logger.info("Loading data into schema " + RVF_DB_PREFIX + productVersion);
-		final String schemaName = loadSnomedData(productVersion, fileDestination);
+		List<String> rf2FilesLoaded = new ArrayList<>();
+		final String schemaName = loadSnomedData(productVersion, rf2FilesLoaded, fileDestination);
 		logger.info("schemaName = " + schemaName);
 		// now add to releaseSchemaNameLookup
 		releaseSchemaNameLookup.put(productVersion, schemaName);
@@ -171,7 +174,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 * @throws BusinessServiceException 
 	 */
 	@Override
-	public String loadSnomedData(final String versionName, final File... zipDataFile) throws BusinessServiceException {
+	public String loadSnomedData(final String versionName, List<String> rf2FilesLoaded, final File... zipDataFile) throws BusinessServiceException {
 		File outputFolder = null;
 		final String createdSchemaName = RVF_DB_PREFIX + versionName;
 		final long startTime = Calendar.getInstance().getTimeInMillis();
@@ -191,7 +194,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			try (Connection connection = snomedDataSource.getConnection()) {
 				connection.setAutoCommit(true);
 				createDBAndTables(createdSchemaName, connection);
-				loadReleaseFilesToDB(outputFolder, connection);
+				loadReleaseFilesToDB(outputFolder, connection,rf2FilesLoaded);
 			}
 			// add schema name to look up map
 			releaseSchemaNameLookup.put(versionName, createdSchemaName);
@@ -223,7 +226,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 	}
 
-	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final Connection connection) throws SQLException, FileNotFoundException {
+	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final Connection connection, List<String> rf2FilesLoaded) throws SQLException, FileNotFoundException {
 		
 		if (rf2TextFilesDir != null) {
 			final String[] rf2Files = rf2TextFilesDir.list( new FilenameFilter() {
@@ -238,7 +241,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 				}
 			});
 			final ReleaseFileDataLoader dataLoader = new ReleaseFileDataLoader(connection, new MySqlDataTypeConverter());
-			dataLoader.loadFilesIntoDB(rf2TextFilesDir.getAbsolutePath(), rf2Files);
+			dataLoader.loadFilesIntoDB(rf2TextFilesDir.getAbsolutePath(), rf2Files, rf2FilesLoaded);
 		}
 	}
 

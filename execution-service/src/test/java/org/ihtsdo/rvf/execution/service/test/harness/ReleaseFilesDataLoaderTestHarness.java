@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -42,7 +44,8 @@ public class ReleaseFilesDataLoaderTestHarness {
 	       
 	        assertNotNull(extentionFile);
 	        final String versionName = "test_20150131";
-	        releaseDataManager.loadSnomedData(versionName, intFile, extentionFile);
+	        List<String> rf2FilesLoaded = new ArrayList<>();
+	        releaseDataManager.loadSnomedData(versionName,rf2FilesLoaded, intFile, extentionFile);
 //	        releaseDataManager.combineKnownVersions(versionName, "20150131", "20141031");
 	        try (
 	        		Connection connection = snomedDataSource.getConnection();
