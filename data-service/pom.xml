@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.ihtsdo.snomed.rvf</groupId>
 		<artifactId>release-validation-framework</artifactId>
-		<version>0.1.27</version>
+		<version>0.1.28</version>
 	</parent>
 
 	<artifactId>data-service</artifactId>
@@ -22,11 +22,6 @@
 			<groupId>javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.12.1.GA</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ihtsdo.otf.common</groupId>
-			<artifactId>otf-common</artifactId>
-			<version>0.0.3</version>
 		</dependency>
 		<!--spring dependencies -->
 		<dependency>
