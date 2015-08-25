@@ -23,11 +23,6 @@
 			<artifactId>javassist</artifactId>
 			<version>3.12.1.GA</version>
 		</dependency>
-		<dependency>
-			<groupId>org.ihtsdo.otf.common</groupId>
-			<artifactId>otf-common</artifactId>
-			<version>0.0.14</version>
-		</dependency>
 		<!--spring dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
