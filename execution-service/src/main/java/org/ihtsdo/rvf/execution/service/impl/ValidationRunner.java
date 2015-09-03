@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -154,23 +155,26 @@ public class ValidationRunner implements Runnable {
 				//SnomedCT_Release-es_INT_20140430.zip
 				//SnomedCT_SpanishRelease_INT_20141031.zip
 				final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("edition_");
-				prevReleaseVersion = validationConfig.getPreviousExtVersion();
 				if (validationConfig.getPrevIntReleaseVersion() != null) {
 					//previous extension release is being specified as already being merged, but we might have already done it anyway
-					prevReleaseVersion = extensionName.toLowerCase() + validationConfig.getPreviousExtVersion();
-					if (!releaseDataManager.isKnownRelease(prevReleaseVersion)) {
-						final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), prevReleaseVersion);
+					String combinedVersionName = extensionName.toLowerCase() + validationConfig.getPreviousExtVersion();
+					if (!releaseDataManager.isKnownRelease(combinedVersionName)) {
+						final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
 						logger.info(startCombiningMsg);
 						writeProgress(startCombiningMsg);
-						final boolean isSuccess = releaseDataManager.combineKnownVersions(prevReleaseVersion, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
+						final boolean isSuccess = releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
 						if (!isSuccess) {
 							responseMap.put(FAILURE_MESSAGE, "Failed to combine known versions:" 
-									+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + prevReleaseVersion);
+									+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName);
 							writeResults(responseMap, State.FAILED);
+							String schemaName = releaseDataManager.getSchemaForRelease(combinedVersionName);
+							if (schemaName != null) {
+								scheduleEventGenerator.createDropReleaseSchemaEvent(schemaName);
+							}
 							return;
 						}
 					} else {
-						logger.info("Skipping merge of {} with {} as already detected in database as {}",validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion(), prevReleaseVersion);
+						logger.info("Skipping merge of {} with {} as already detected in database as {}",validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion(), combinedVersionName);
 					}
 				}
 			} 
@@ -182,6 +186,7 @@ public class ValidationRunner implements Runnable {
 				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getProspectiveFile(), rf2FilesLoaded);
 			}
 			responseMap.put("Total RF2 Files loaded", rf2FilesLoaded.size());
+			Collections.sort(rf2FilesLoaded);
 			responseMap.put("RF2 Files", rf2FilesLoaded);
 			
 			final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
