@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -331,6 +332,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		final String schemaName = RVF_DB_PREFIX + combinedVersionName;
 		try (Connection connection = snomedDataSource.getConnection()) {
 			createDBAndTables(schemaName, connection);
+			releaseSchemaNameLookup.put(combinedVersionName, schemaName);
 		} catch (SQLException | IOException e) {
 			isFailed = true;
 			logger.error("Failed to create db schema and tables for version:" + combinedVersionName +" due to " + e.fillInStackTrace());
@@ -338,8 +340,13 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		//select data from known version schema and insert into the new schema
 		for (final String known : knownVersions) {
 			final String knownSchema = releaseSchemaNameLookup.get(known);
+			if (knownSchema == null) {
+				isFailed = true;
+				logger.error("Known schema doesn't exist for:" + known);
+				break;
+			}
 			logger.info("Adding known version {} in schema {}", known, knownSchema);
-			for (final String tableName : RF2FileTableMapper.getAllTableNames()) {
+			for (final String tableName : getValidTableNamesFromSchema(knownSchema)) {
 				final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
 				final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
 				final String sql = "insert into " + schemaName + "." + tableName  + " select * from " + knownSchema + "." + tableName;
@@ -357,9 +364,25 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		final long endTime = System.currentTimeMillis();
 		logger.info("Time taken to combine both known versions into one schema in seconds: " + (endTime-startTime)/1000);
-		if (!isFailed) {
-			releaseSchemaNameLookup.put(combinedVersionName, schemaName);
-		}
 		return !isFailed;
+	}
+	
+	private List<String> getValidTableNamesFromSchema(String schemaName) {
+		List<String> result = new ArrayList<>();
+		Collection<String> mappedTables = RF2FileTableMapper.getAllTableNames();
+		try (Connection connection = snomedDataSource.getConnection();
+				Statement statement = connection.createStatement() ) {
+			String sql = "select table_name from INFORMATION_SCHEMA.TABLES WHERE table_schema ='" + schemaName + "'";
+			ResultSet resultSet = statement.executeQuery(sql);
+			while( resultSet.next()) {
+				String tableName = resultSet.getString(1);
+				if (mappedTables.contains(tableName)) {
+					result.add(tableName);
+				}
+			}
+		} catch (SQLException e) {
+			logger.error("Failed to select table name from db schema: " + schemaName +" due to " + e.fillInStackTrace());
+		}
+		return result;
 	}
 }
