@@ -173,6 +173,7 @@ public class ValidationRunner implements Runnable {
 							}
 							return;
 						}
+						prevReleaseVersion = combinedVersionName;
 					} else {
 						logger.info("Skipping merge of {} with {} as already detected in database as {}",validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion(), combinedVersionName);
 					}
