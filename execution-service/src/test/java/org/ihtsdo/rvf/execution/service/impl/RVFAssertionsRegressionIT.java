@@ -87,13 +87,13 @@ public class RVFAssertionsRegressionIT {
 			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
 			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE,rf2FilesLoaded, previousFile);
         }
-        if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
+//        if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
         	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
             assertNotNull("Must not be null", prospectiveReleaseUrl);
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
         	releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE,rf2FilesLoaded, prospectiveFile);
-        }
+//        }
         
         releaseTypeExpectedResults = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
         assertNotNull("Must not be null", releaseTypeExpectedResults);

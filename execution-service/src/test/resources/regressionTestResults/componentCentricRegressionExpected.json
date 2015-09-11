@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 79,
-  "totalAssertionsFailed" : 79,
+  "totalAssertionsRun" : 80,
+  "totalAssertionsFailed" : 80,
   "results" : [ {
     "assertionName" : "Active historical association refset members have active concepts as targets.",
     "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
@@ -91,6 +91,11 @@
     "assertionName" : "Active description of active concept consists of valid characters.",
     "assertionUuid" : "6614ff12-fca2-42b7-a5da-ea26353979fe",
     "firstNInstances" : [ "DESCRIPTION ID=3006276018: Synonym=Fracture \\clinic  contains invalid character." ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The FSN term should be uqniue in active content.",
+    "assertionUuid" : "8d6ab114-caca-4d99-9fec-bb8fd9cea518",
+    "firstNInstances" : [ "FSN=Toxic effect of antimony AND/OR its compounds (disorder) concept=703860006: FSN term is not unique in description snapshot" ],
     "totalFailed" : 1
   }, {
     "assertionName" : "All definitions are case sensitive.",
@@ -233,11 +238,6 @@
     "firstNInstances" : [ "Source id=702386002 has two inferred relationships with same typeid and same destinationid within a single relationship-group.", "Source id=703649004 has two inferred relationships with same typeid and same destinationid within a single relationship-group." ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "For each active FSN there is a synonym that has the same text.",
-    "assertionUuid" : "19423070-7118-45bd-98ba-6d0dc18bc619",
-    "firstNInstances" : [ "700132006 |Proglumetacin, different semantic tag (procedure)|", "702386002 |Epilepsy in mother complicating childbirth(disorder|" ],
-    "totalFailed" : 2
-  }, {
     "assertionName" : "All FSNs have a space before the semantic tag.",
     "assertionUuid" : "32369add-8d9f-48de-a129-29b32c79a9d7",
     "firstNInstances" : [ "DESCRIPTION: id=3004397016 : The FSN has no space before the semantic tag.", "DESCRIPTION: id=2990804014 : The FSN has no space before the semantic tag." ],
@@ -283,16 +283,6 @@
     "firstNInstances" : [ "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components.", "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components." ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "Terms are unique in Description hierarchy.",
-    "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
-    "firstNInstances" : [ "Proglumetacin", "Proglumetacin" ],
-    "totalFailed" : 2
-  }, {
-    "assertionName" : "All active FSNs for a given concept have the same semantic tag.",
-    "assertionUuid" : "5c0186f3-0b72-4685-8aad-eff15a7f8880",
-    "firstNInstances" : [ "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag.", "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag." ],
-    "totalFailed" : 2
-  }, {
     "assertionName" : "MapPriority must be in sequential order",
     "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e43b59",
     "firstNInstances" : [ "ComplexMap: id=433cf306-fbc0-50be-ba64-939089978795: Non-sequential mapPriority:2", "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: Non-sequential mapPriority:2" ],
@@ -328,9 +318,19 @@
     "firstNInstances" : [ "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces.", "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces.", "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces." ],
     "totalFailed" : 3
   }, {
+    "assertionName" : "All active FSNs for a given concept have the same semantic tag.",
+    "assertionUuid" : "5c0186f3-0b72-4685-8aad-eff15a7f8880",
+    "firstNInstances" : [ "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag.", "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag.", "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag." ],
+    "totalFailed" : 3
+  }, {
     "assertionName" : "All inferred relationships in which the concept associated is inactive, are inactive relationships.",
     "assertionUuid" : "2e4fd620-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "RELATIONSHIP: id=1000006026: Active inferred relationship is associated with an inactive sourceid concept.", "RELATIONSHIP: id=1000006026: Active inferred relationship is associated with an inactive sourceid concept.", "RELATIONSHIP: id=1000002029: Active inferred relationship is associated with an inactive destinationid concept.", "RELATIONSHIP: id=1000002029: Active inferred relationship is associated with an inactive typeid concept." ],
+    "totalFailed" : 4
+  }, {
+    "assertionName" : "For each active FSN there is a synonym that has the same text.",
+    "assertionUuid" : "19423070-7118-45bd-98ba-6d0dc18bc619",
+    "firstNInstances" : [ "700132006 |Proglumetacin, different semantic tag (procedure)|", "702386002 |Epilepsy in mother complicating childbirth(disorder|", "702386002 |Toxic effect of antimony and/or its compounds (disorder)|", "703860006 |Toxic effect of antimony AND/OR its compounds (disorder)|" ],
     "totalFailed" : 4
   }, {
     "assertionName" : "For a given concept, all description terms are unique.",
@@ -357,6 +357,11 @@
     "assertionUuid" : "59b574a0-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4998022027: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4969198024: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4969200029: Relationship is in a relationship group with a single active inferred member." ],
     "totalFailed" : 5
+  }, {
+    "assertionName" : "Terms are unique in Description hierarchy.",
+    "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
+    "firstNInstances" : [ "  Fracture clinic", "  Fracture clinic", "Exposure to vibration  ", "Proglumetacin", "Proglumetacin", "Toenail abnormality (observable entity)", "Toenail abnormality (observable entity)" ],
+    "totalFailed" : 7
   }, {
     "assertionName" : "Active extended maps have valid mapCategoryId",
     "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42d63",
