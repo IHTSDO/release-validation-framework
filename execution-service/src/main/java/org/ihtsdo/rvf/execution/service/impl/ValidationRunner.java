@@ -151,13 +151,15 @@ public class ValidationRunner implements Runnable {
 			String prospectiveVersion = validationConfig.getRunId().toString();
 			String prevReleaseVersion = validationConfig.getPrevIntReleaseVersion();
 			final boolean isExtension = isExtension(validationConfig); 
+			String combinedVersionName = null;
 			if (isExtension && !validationConfig.isFirstTimeRelease()) {
 				//SnomedCT_Release-es_INT_20140430.zip
 				//SnomedCT_SpanishRelease_INT_20141031.zip
 				final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("edition_");
 				if (validationConfig.getPrevIntReleaseVersion() != null) {
 					//previous extension release is being specified as already being merged, but we might have already done it anyway
-					String combinedVersionName = extensionName.toLowerCase() + validationConfig.getPreviousExtVersion();
+					combinedVersionName = extensionName.toLowerCase() + validationConfig.getPreviousExtVersion();
+					prevReleaseVersion = combinedVersionName;
 					if (!releaseDataManager.isKnownRelease(combinedVersionName)) {
 						final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
 						logger.info(startCombiningMsg);
@@ -173,10 +175,7 @@ public class ValidationRunner implements Runnable {
 							}
 							return;
 						}
-						prevReleaseVersion = combinedVersionName;
-					} else {
-						logger.info("Skipping merge of {} with {} as already detected in database as {}",validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion(), combinedVersionName);
-					}
+					} 
 				}
 			} 
 			writeProgress("Loading prospective file into DB.");
@@ -214,8 +213,8 @@ public class ValidationRunner implements Runnable {
 			writeResults(responseMap, State.COMPLETE);
 			//house keeping prospective version and combined previous extension 
 			scheduleEventGenerator.createDropReleaseSchemaEvent(prospectiveSchema);
-			if (isExtension && !validationConfig.isFirstTimeRelease()) {
-				scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(prevReleaseVersion));
+			if (combinedVersionName != null) {
+				scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(combinedVersionName));
 			}
 			// house keeping qa_result for the given run id
 			scheduleEventGenerator.createQaResultDeleteEvent(validationConfig.getRunId());
