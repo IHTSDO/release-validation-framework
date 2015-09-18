@@ -46,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -147,7 +146,6 @@ public class ValidationRunner implements Runnable {
 				return;
 			}
 			
-			final String[] tokens = Files.getNameWithoutExtension(validationConfig.getFile().getOriginalFilename()).split("_");
 			String prospectiveVersion = validationConfig.getRunId().toString();
 			String prevReleaseVersion = validationConfig.getPrevIntReleaseVersion();
 			final boolean isExtension = isExtension(validationConfig); 
@@ -155,27 +153,24 @@ public class ValidationRunner implements Runnable {
 			if (isExtension && !validationConfig.isFirstTimeRelease()) {
 				//SnomedCT_Release-es_INT_20140430.zip
 				//SnomedCT_SpanishRelease_INT_20141031.zip
-				final String extensionName = tokens[1].replace("Release", "").replace("-", "").concat("edition_");
 				if (validationConfig.getPrevIntReleaseVersion() != null) {
-					//previous extension release is being specified as already being merged, but we might have already done it anyway
-					combinedVersionName = extensionName.toLowerCase() + validationConfig.getPreviousExtVersion();
+					combinedVersionName = validationConfig.getPreviousExtVersion() + "_" + validationConfig.getPreviousExtVersion() + "_" + validationConfig.getRunId();
 					prevReleaseVersion = combinedVersionName;
-					if (!releaseDataManager.isKnownRelease(combinedVersionName)) {
-						final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
-						logger.info(startCombiningMsg);
-						writeProgress(startCombiningMsg);
-						final boolean isSuccess = releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
-						if (!isSuccess) {
-							responseMap.put(FAILURE_MESSAGE, "Failed to combine known versions:" 
-									+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName);
-							writeResults(responseMap, State.FAILED);
-							String schemaName = releaseDataManager.getSchemaForRelease(combinedVersionName);
-							if (schemaName != null) {
-								scheduleEventGenerator.createDropReleaseSchemaEvent(schemaName);
-							}
-							return;
+					final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
+					logger.info(startCombiningMsg);
+					writeProgress(startCombiningMsg);
+					final boolean isSuccess = releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
+					if (!isSuccess) {
+						responseMap.put(FAILURE_MESSAGE, "Failed to combine known versions:" 
+								+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName);
+						writeResults(responseMap, State.FAILED);
+						String schemaName = releaseDataManager.getSchemaForRelease(combinedVersionName);
+						if (schemaName != null) {
+							scheduleEventGenerator.createDropReleaseSchemaEvent(schemaName);
+							releaseDataManager.dropVersion(combinedVersionName);
 						}
-					} 
+						return;
+					}
 				}
 			} 
 			writeProgress("Loading prospective file into DB.");
@@ -213,8 +208,10 @@ public class ValidationRunner implements Runnable {
 			writeResults(responseMap, State.COMPLETE);
 			//house keeping prospective version and combined previous extension 
 			scheduleEventGenerator.createDropReleaseSchemaEvent(prospectiveSchema);
+			releaseDataManager.dropVersion(prospectiveVersion);
 			if (combinedVersionName != null) {
 				scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(combinedVersionName));
+				releaseDataManager.dropVersion(combinedVersionName);
 			}
 			// house keeping qa_result for the given run id
 			scheduleEventGenerator.createQaResultDeleteEvent(validationConfig.getRunId());

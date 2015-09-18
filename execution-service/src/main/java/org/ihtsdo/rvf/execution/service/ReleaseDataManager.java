@@ -31,4 +31,6 @@ public interface ReleaseDataManager {
 	File getZipFileForKnownRelease(String knownVersion);
 	
 	boolean combineKnownVersions(final String combinedVersionName, final String ... knownVersions);
+	
+	void dropVersion(String version);
 }

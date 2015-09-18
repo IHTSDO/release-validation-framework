@@ -385,4 +385,13 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		return result;
 	}
+
+	@Override
+	public void dropVersion(String version) {
+		//just remove the schema name from the map for the time being as the actual schema data is
+		//removed a RvfDbScheduleEventGenerator
+		if (version != null) {
+			releaseSchemaNameLookup.remove(version);
+		}
+	}
 }
