@@ -6,7 +6,7 @@ public class JMSBrokerManager {
 
 	public JMSBrokerManager() throws Exception {
 		BrokerService broker = new BrokerService();
-		broker.addConnector("tcp://localhost:61616");
+		broker.addConnector("tcp://localhost:61617");
 		broker.start();
 	}
 }
