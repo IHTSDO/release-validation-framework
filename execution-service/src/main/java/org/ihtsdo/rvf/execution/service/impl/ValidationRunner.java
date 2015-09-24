@@ -371,7 +371,7 @@ public class ValidationRunner {
 
 	private List<TestRunItem> executeAssertionsConcurrently(final ExecutionConfig executionConfig, final Collection<Assertion> assertions) {
 		
-		final List<Future<Collection<TestRunItem>>> concurrentTasks = new ArrayList<>();
+		final List<Future<Collection<TestRunItem>>> tasks = new ArrayList<>();
 		final List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
 		List<Assertion> batch = null;
@@ -392,18 +392,18 @@ public class ValidationRunner {
 				logger.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
 				//reporting every 10 assertions
 				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are started.", counter, assertions.size()));
-				concurrentTasks.add(future);
+				tasks.add(future);
 				batch = null;
 			}
 			counter++;
 		}
 		
 		// Wait for all concurrent tasks to finish
-		for (final Future<Collection<TestRunItem>> concurrentTask : concurrentTasks) {
+		for (final Future<Collection<TestRunItem>> task : tasks) {
 			try {
-				results.addAll(concurrentTask.get());
+				results.addAll(task.get());
 			} catch (ExecutionException | InterruptedException e) {
-				logger.error("Thread interrupted while waiting for future result.", e);
+				logger.error("Thread interrupted while waiting for future result for run item:" + task , e);
 			}
 		}
 		return results;

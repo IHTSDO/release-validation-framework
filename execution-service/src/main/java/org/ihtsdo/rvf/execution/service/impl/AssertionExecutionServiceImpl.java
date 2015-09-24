@@ -191,8 +191,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			// create a single connection for entire test and close it after running test - avoid creating too many connections
 			try (Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName)) {
 				executeCommand(assertion, config, command, connection);
-			}
-			catch (final SQLException | ConfigurationException e) {
+			} catch (final Exception e) {
 				logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command);
 				runItem.setFailureMessage("Error executing SQL command object. Nested exception : " + e.fillInStackTrace());
 			} 
