@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
-import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +22,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ResultController {
 	
 	private static final String MESSAGE = "Message";
-	@Autowired
-	private Provider<ValidationRunner> validationRunnerProvider;
 //	@Autowired
 //	private ResultExtractorService resultExtractor;
 	
@@ -50,7 +45,7 @@ public class ResultController {
 		} else {
 			responseMap.put("Status", state.toString());
 			switch (state) {
-				case READY : 	responseMap.put(MESSAGE, "Validation hasn't started running yet!");
+				case QUEUED : 	responseMap.put(MESSAGE, "Validation hasn't started running yet!");
 								break;
 				case RUNNING :  final String progress = reportService.recoverProgress();
 								responseMap.put(MESSAGE, "Validation is still running.");

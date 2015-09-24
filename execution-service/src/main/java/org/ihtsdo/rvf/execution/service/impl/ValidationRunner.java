@@ -19,11 +19,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
 
 import org.apache.commons.io.FileUtils;
-import org.ihtsdo.otf.dao.s3.S3Client;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -49,9 +47,6 @@ public class ValidationRunner {
 	public static final String FAILURE_MESSAGE = "failureMessage";
 
 	private final Logger logger = LoggerFactory.getLogger(ValidationRunner.class);
-	
-	@Resource
-	private S3Client s3Client;
 	
 	@Autowired
 	private StructuralTestRunner structuralTestRunner;
@@ -83,6 +78,7 @@ public class ValidationRunner {
 		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		try {
 			responseMap.put("Validation config", validationConfig);
+			reportService.writeState(State.RUNNING);
 			runValidation(responseMap, validationConfig);
 		} catch (final Exception e) {
 			final StringWriter errors = new StringWriter();
@@ -105,8 +101,6 @@ public class ValidationRunner {
 		
 		final Calendar startTime = Calendar.getInstance();
 		logger.info(String.format("Started execution with runId [%1s] : ", validationConfig.getRunId()));
-		reportService.writeState(State.RUNNING);
-		
 		// load the filename
 		final String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
 		logger.info(structureTestStartMsg);
@@ -375,6 +369,7 @@ public class ValidationRunner {
 				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()));
 			}
 		}
+		reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()));
 		return results;
 	}
 }

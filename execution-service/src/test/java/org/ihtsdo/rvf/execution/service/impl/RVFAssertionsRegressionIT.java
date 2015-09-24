@@ -87,7 +87,6 @@ public class RVFAssertionsRegressionIT {
 			final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
 			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
-			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE,rf2FilesLoaded, previousFile);
         }
         if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
         	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
@@ -161,8 +160,8 @@ public class RVFAssertionsRegressionIT {
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
-//		System.out.println("Test result");
-//		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
+		System.out.println("Test result");
+		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
 		final Gson gson = new Gson();
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));
 		final TestReport expectedReport = gson.fromJson(br, TestReport.class);

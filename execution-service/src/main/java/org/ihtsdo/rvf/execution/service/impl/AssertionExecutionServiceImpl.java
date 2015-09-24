@@ -191,6 +191,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				long timeEnd = System.currentTimeMillis();
 				runItem.setRunTime((timeEnd - timeStart));
 			} catch (final Exception e) {
+				e.printStackTrace();
 				logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command);
 				runItem.setFailureMessage("Error executing SQL command object Nested exception : " + e.fillInStackTrace());
 				return runItem;
