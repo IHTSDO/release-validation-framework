@@ -170,13 +170,10 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 	@Override
 	public TestRunItem executeTest(final Assertion assertion, final Test test, final ExecutionConfig config) {
 
-		final Long executionId = config.getExecutionId();
-		logger.info("Starting execution id = " + executionId);
 		long timeStart = System.currentTimeMillis();
-
+		logger.debug("Start executing assertion:" + assertion.getUuid());
 		// set prospective version as default schema to use since SQL has calls that do not specify schema name
 		final String prospectiveSchemaName = releaseDataManager.getSchemaForRelease(config.getProspectiveVersion());
-		logger.info("Setting default catalog as : " + prospectiveSchemaName);
 
 		final TestRunItem runItem = new TestRunItem();
 		runItem.setTestCategory(assertion.getKeywords());
@@ -191,26 +188,27 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			// create a single connection for entire test and close it after running test - avoid creating too many connections
 			try (Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName)) {
 				executeCommand(assertion, config, command, connection);
+				long timeEnd = System.currentTimeMillis();
+				runItem.setRunTime((timeEnd - timeStart));
 			} catch (final Exception e) {
 				logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command);
-				runItem.setFailureMessage("Error executing SQL command object. Nested exception : " + e.fillInStackTrace());
+				runItem.setFailureMessage("Error executing SQL command object Nested exception : " + e.fillInStackTrace());
+				return runItem;
 			} 
-		}
-		else {
+		} else {
 			runItem.setFailureMessage("Test does not have any associated execution command:" + test);
+			return runItem;
 		}
-		long timeEnd = System.currentTimeMillis();
-		runItem.setRunTime((timeEnd - timeStart));
 		
 		try {
-			timeStart = System.currentTimeMillis();
+			long extractTimeStart = System.currentTimeMillis();
 			extractTestResult(assertion, runItem, config);
-			timeEnd = System.currentTimeMillis();
+			long extractTimeEnd = System.currentTimeMillis();
+			runItem.setExtractResultInMillis((extractTimeEnd - extractTimeStart));
 		} catch (SQLException e) {
 			logger.warn("Failed to extract test result : " + e.fillInStackTrace());
 			runItem.setFailureMessage("Error extracting test result. Nested exception : " + e.fillInStackTrace() + runItem);
 		}
-		runItem.setExtractResultInMillis((timeEnd - timeStart));
 		logger.info(runItem.toString());
 		return runItem;
 	}

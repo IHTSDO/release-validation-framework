@@ -13,7 +13,7 @@ public class TestRunItem {
 	private UUID assertionUuid;
 	private String assertionText;
 	private String executionId;
-	private Long runTimeInMilliSeconds;
+	private Long queryInMilliSeconds;
 	private Long failureCount;
 	private String failureMessage;
 	private List<String> firstNInstances;
@@ -47,7 +47,7 @@ public class TestRunItem {
 				"assertionText=" + assertionText +  '\'' +	
 				"executionId=" + executionId + '\'' +
 				"testCategory=" + testCategory + '\'' +
-				"runTime=" + runTimeInMilliSeconds + '\'' +
+				"runTime=" + queryInMilliSeconds + '\'' +
 				"failureCount=" + failureCount +
 				'}';
 	}
@@ -61,11 +61,11 @@ public class TestRunItem {
 	}
 
 	public Long getRunTime() {
-		return runTimeInMilliSeconds;
+		return queryInMilliSeconds;
 	}
 
 	public void setRunTime(final long runTime) {
-		this.runTimeInMilliSeconds = runTime;
+		this.queryInMilliSeconds = runTime;
 	}
 
 	public void setFailureMessage(final String failureMessage) {

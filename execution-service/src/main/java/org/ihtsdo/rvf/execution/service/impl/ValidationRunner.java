@@ -202,55 +202,6 @@ public class ValidationRunner {
 		return (runConfig.getExtensionDependencyVersion() != null 
 				&& !runConfig.getExtensionDependencyVersion().trim().isEmpty()) ? true : false;
 	}
-
-//	public boolean init(final ValidationRunConfig config, final Map<String, String> responseMap) {
-////		setConfig(config);
-//		logger.info("Run config:" + config);
-//		//check assertion groups
-//		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(config.getGroupsList());
-//		if (groups.size() != config.getGroupsList().size()) {
-//			final List<String> found = new ArrayList<>();
-//			for (final AssertionGroup group : groups) {
-//				found.add(group.getName());
-//			}
-//			final String groupNotFoundMsg = String.format("Assertion groups requested: %s but found in RVF: %s", config.getGroupsList(), found);
-//			responseMap.put(FAILURE_MESSAGE, groupNotFoundMsg);
-//			logger.warn("Invalid assertion groups requested." + groupNotFoundMsg);
-//			return false;
-//			
-//		}
-//		//Setting this before we actually start running to ensure we have access to storageLocation
-//		try {
-//			if (saveUploadedFiles(config, responseMap)) {
-//				reportService.writeState(State.READY);
-//				initialized = true;
-//			}
-//		} catch (final Exception e) {
-//			responseMap.put(FAILURE_MESSAGE, "Failed to write Ready State to Storage Location due to " + e.getMessage());
-//		}
-//		return initialized;
-//	}
-	
-//	/*
-//	 * The issue here is that spring cleans up Multipart files when Dispatcher is complete, so 
-//	 * we need to save off the file before we allow the parent thread to finish.
-//	 */
-//	private boolean saveUploadedFiles(final ValidationRunConfig config, final Map<String, String> responseMap) throws IOException {
-//		final String filename = config.getFile().getOriginalFilename();
-//		//temp file will be deleted when validation is done.
-//		final File tempFile = File.createTempFile(filename, ".zip");
-//		if (!filename.endsWith(".zip")) {
-//			responseMap.put(FAILURE_MESSAGE, "Post condition test package has to be zipped up");
-//			return false;
-//		}
-//		// must be a zip, save it off
-//		config.getFile().transferTo(tempFile);	
-//		config.setProspectiveFile(tempFile);
-//		config.setTestFileName(filename);
-//		return true;
-//	}
-	
-	
 	
 	/*private void combineKnownVersions(final String combinedVersion, final String firstKnown, final String secondKnown) {
 		logger.info("Start combining two known versions {}, {} into {}", firstKnown, secondKnown, combinedVersion);
@@ -275,8 +226,8 @@ public class ValidationRunner {
 			}
 		}
 		logger.info("Total assertions to run: " + assertions.size());
-		items.addAll(executeAssertionsConcurrently(executionConfig,assertions));
-//		items.addAll(executeAssertions(executionConfig,assertions));
+//		items.addAll(executeAssertionsConcurrently(executionConfig,assertions));
+		items.addAll(executeAssertions(executionConfig,assertions));
 		//failed tests
 		final List<TestRunItem> failedItems = new ArrayList<>();
 		for (final TestRunItem item : items) {
@@ -426,100 +377,4 @@ public class ValidationRunner {
 		}
 		return results;
 	}
-
-//	public void setConfig(final ValidationRunConfig config) {
-//		s3Helper = new FileHelper(bucketName, s3Client);
-//		stateFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "state.txt";
-//		resultsFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "results.json";
-//		progressFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "progress.txt";
-//	}
-	
-//	public State getCurrentState() {
-//		State currentState = null;
-//		try {
-//			final InputStream is = s3Helper.getFileStream(stateFilePath);
-//			if (is == null) {
-//				logger.warn("Failed to find state file {}, in bucket {}", stateFilePath, bucketName);
-//			}
-//			final String stateStr = IOUtils.toString(is, UTF_8);
-//			currentState = State.valueOf(stateStr);
-//		} catch (final Exception e) {
-//			logger.warn("Failed to determine validation run state in file {} due to {}", stateFilePath, e.toString());
-//		}
-//		return currentState;
-//	}
-
-//	public void recoverResult(final Map<String, Object> responseMap) throws IOException {
-//		final InputStream is = s3Helper.getFileStream(resultsFilePath);
-//		Object jsonResults = null;
-//		if (is == null) {
-//			logger.warn("Failed to find results file {}, in bucket {}", stateFilePath, bucketName);
-//		} else {
-//			final Gson gson = new Gson();
-//			jsonResults = gson.fromJson(new InputStreamReader(is,Charset.forName(UTF_8)), Map.class);
-//		}
-//		if (jsonResults == null) {
-//			jsonResults = new String("Failed to recover results in " + resultsFilePath);
-//		}
-//		responseMap.put("RVF Validation Result", jsonResults);
-//	}
-//
-//	public String recoverProgress() {
-//		final InputStream is = s3Helper.getFileStream(progressFilePath);
-//		String progressMsg = new String("Failed to read from " + progressFilePath);
-//		if (is == null) {
-//			logger.warn("Failed to find progress file {}, in bucket {}", progressFilePath, bucketName);
-//		} else {
-//			try {
-//				progressMsg = IOUtils.toString(is, UTF_8);
-//			} catch (final IOException e) {
-//				logger.warn("Failed to read data from progress file {}, in bucket {}", progressFilePath, bucketName);
-//			}
-//		}
-//		return progressMsg;
-//	}
-	
-//	
-//	private void writeResults(final Map<String , Object> responseMap, final State state) throws IOException, NoSuchAlgorithmException, DecoderException {
-//		final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
-//		final File temp = File.createTempFile("resultJson", ".tmp"); 
-//		try {
-//			try (final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp),Charset.forName(UTF_8)))) {
-//				prettyGson.toJson(responseMap, bw);
-//				//Now copy to our S3 Location
-//			} 
-//			s3Helper.putFile(temp, resultsFilePath);
-//		} finally {
-//			temp.delete();
-//		}
-//		writeState(state);
-//	}
-//	
-//	private void writeState(final State state, long runId) throws IOException, NoSuchAlgorithmException, DecoderException {
-//		logger.info("RVF run {} setting state as {}", runId, state.toString());
-//		writeToS3(state.name(), stateFilePath);
-//	}
-//	
-//	private void writeProgress(final String progress) {
-//		try {
-//			writeToS3(progress, progressFilePath);
-//		} catch (NoSuchAlgorithmException | IOException | DecoderException e) {
-//			logger.error("Failed to write progress to S3: " + progressFilePath);
-//		}
-//		
-//	}
-//	private void writeToS3(final String writeMe, final String targetPath) throws IOException, NoSuchAlgorithmException, DecoderException {
-//		//First write the data to a local temp file
-//		final File temp = File.createTempFile("tempfile", ".tmp"); 
-//		try {
-//			try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp),Charset.forName(UTF_8)))) {
-//				bw.write(writeMe);
-//			}
-//			//Now copy to our S3 Location
-//			s3Helper.putFile(temp, targetPath);
-//		} finally {
-//			//And clean up
-//			temp.delete();
-//		}
-//	}
 }
