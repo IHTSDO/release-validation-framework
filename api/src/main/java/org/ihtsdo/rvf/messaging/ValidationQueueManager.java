@@ -9,6 +9,8 @@ import org.apache.commons.codec.DecoderException;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
@@ -24,6 +26,8 @@ public class ValidationQueueManager {
 	private JmsTemplate jmsTemplate;
 	@Autowired
 	private ValidationReportService reportService;
+	
+	private static final Logger logger = LoggerFactory.getLogger(ValidationQueueManager.class);
 
 
 	public void queueValidationRequest(ValidationRunConfig config, Map<String, String> responseMap) {
@@ -32,8 +36,9 @@ public class ValidationQueueManager {
 			reportService.init(config);
 			if (saveUploadedFiles(config, responseMap)) {
 				Gson gson = new Gson();
-				System.out.println(gson.toJson(config));
-				jmsTemplate.convertAndSend(gson.toJson(config)); // Send to default queue
+				String configJson = gson.toJson(config);
+				logger.info("Send Jms message to queue for validation config json:" + configJson);
+				jmsTemplate.convertAndSend(configJson); // Send to default queue
 				reportService.writeState(State.QUEUED);
 			}
 		} catch (IOException e) {

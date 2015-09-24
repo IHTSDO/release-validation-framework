@@ -20,13 +20,11 @@ import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 @Service
-@Scope(value = "prototype")
 public class ValidationReportService {
 
 	private FileHelper s3Helper;
@@ -47,14 +45,14 @@ public class ValidationReportService {
 	public enum State { QUEUED, READY, RUNNING, FAILED, COMPLETE,  } 
 	
 	
-	private ValidationRunConfig validationConfig;
+	private Long runId;
 	
 	public ValidationReportService(final String bucketName) {
 		this.bucketName = bucketName;
 	}
 	
 	public void init(ValidationRunConfig config) {
-		validationConfig = config;
+		runId = config.getRunId();
 		s3Helper = new FileHelper(bucketName, s3Client);
 		stateFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "state.txt";
 		resultsFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "results.json";
@@ -78,7 +76,7 @@ public class ValidationReportService {
 	}
 	
 	public void writeState(final State state) throws IOException, NoSuchAlgorithmException, DecoderException {
-		logger.info("RVF run {} setting state as {}", validationConfig.getRunId(), state.toString());
+		logger.info("RVF run {} setting state as {}", runId, state.toString());
 		writeToS3(state.name(), stateFilePath);
 	}
 	

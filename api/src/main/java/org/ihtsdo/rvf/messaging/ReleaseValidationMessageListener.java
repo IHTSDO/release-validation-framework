@@ -11,12 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-@Component
+@Service
 public class ReleaseValidationMessageListener {
 	@Autowired
 	private ValidationRunner runner;
@@ -30,6 +30,7 @@ public class ReleaseValidationMessageListener {
 		ValidationRunConfig config = null;
 		try {
 			config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
+			logger.info("validation config from queue:" + config);
 		} catch (JsonSyntaxException | JMSException e) {
 			logger.error("JMS message listener error:", e);
 		}

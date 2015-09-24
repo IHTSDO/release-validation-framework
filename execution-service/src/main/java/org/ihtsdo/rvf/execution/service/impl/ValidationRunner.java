@@ -37,11 +37,9 @@ import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 @Service
-@Scope(value = "prototype")
 public class ValidationRunner {
 	
 	public static final String FAILURE_MESSAGE = "failureMessage";
@@ -78,7 +76,6 @@ public class ValidationRunner {
 		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		try {
 			responseMap.put("Validation config", validationConfig);
-			reportService.writeState(State.RUNNING);
 			runValidation(responseMap, validationConfig);
 		} catch (final Exception e) {
 			final StringWriter errors = new StringWriter();
@@ -105,6 +102,7 @@ public class ValidationRunner {
 		final String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
 		logger.info(structureTestStartMsg);
 		reportService.writeProgress(structureTestStartMsg);
+		reportService.writeState(State.RUNNING);
 		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getProspectiveFile(), validationConfig.getRunId(), validationConfig.getManifestFileFullPath(), validationConfig.isWriteSucceses(), validationConfig.getUrl());
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED);
