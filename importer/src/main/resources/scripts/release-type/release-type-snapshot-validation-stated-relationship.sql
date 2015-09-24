@@ -3,9 +3,9 @@
 */
 
 /* 	view of current snapshot, derived from current full */
-	drop table if exists v_temp_view;
-  	create table if not exists v_temp_view like curr_stated_relationship_f;
-  	insert into v_temp_view
+	drop table if exists temp_stated_relationship_v;
+  	create table if not exists temp_stated_relationship_v like curr_stated_relationship_f;
+  	insert into temp_stated_relationship_v
 	select a.*
 	from curr_stated_relationship_f a
 	where cast(a.effectivetime as datetime) = 
@@ -21,7 +21,7 @@
 		'<ASSERTIONTEXT>',
 		concat('Stated relationship: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
 	from curr_stated_relationship_s a
-	left join v_temp_view b
+	left join temp_stated_relationship_v b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -50,7 +50,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('Stated relationship: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
-	from v_temp_view a
+	from temp_stated_relationship_v a
 	left join curr_stated_relationship_s b 
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
@@ -74,6 +74,6 @@
 	or b.modifierid is null;
 
 commit;
-drop table if exists v_temp_view;
+drop table if exists temp_stated_relationship_v;
 
 

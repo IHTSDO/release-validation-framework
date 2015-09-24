@@ -4,9 +4,9 @@
 */
 
 /* view of current snapshot, derived from current full */
-	drop table if exists v_temp_view;
-  	create table if not exists v_temp_view like curr_associationrefset_f;
-  	insert into v_temp_view
+	drop table if exists temp_associationrefset;
+  	create table if not exists temp_associationrefset like curr_associationrefset_f;
+  	insert into temp_associationrefset
 	select a.*
 	from curr_associationrefset_f a
 	where cast(a.effectivetime as datetime) = 
@@ -22,7 +22,7 @@
 	'<ASSERTIONTEXT>',
 	concat('ASSOCIATION REFSET: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
 	from curr_associationrefset_s a
-	left join v_temp_view b
+	left join temp_associationrefset b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
 	and a.active = b.active
@@ -45,7 +45,7 @@
 	'<ASSERTIONUUID>',
 	'<ASSERTIONTEXT>',
 	concat('ASSOCIATION REFSET: id=',a.id, '  is in FULL file, but not in SNAPSHOT file.') 
-	from v_temp_view a
+	from temp_associationrefset a
 	left join curr_associationrefset_s b 
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
@@ -63,7 +63,7 @@
   	or b.targetcomponentid is null;
 	
 	commit;
-	drop table if exists v_temp_view;
+	drop table if exists temp_associationrefset;
 
 
 

@@ -17,6 +17,7 @@ public class TestRunItem {
 	private Long failureCount;
 	private String failureMessage;
 	private List<String> firstNInstances;
+	private Long extractResultInMillis;
 
 
 	/**
@@ -109,4 +110,13 @@ public class TestRunItem {
 	public void setAssertionUuid(final UUID assertionUuid) {
 		this.assertionUuid = assertionUuid;
 	}
+
+	public Long getExtractResultInMillis() {
+		return extractResultInMillis;
+	}
+
+	public void setExtractResultInMillis(Long extractResultInMillis) {
+		this.extractResultInMillis = extractResultInMillis;
+	}
+	
 }

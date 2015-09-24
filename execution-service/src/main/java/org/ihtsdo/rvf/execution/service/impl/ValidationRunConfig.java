@@ -10,6 +10,7 @@ public class ValidationRunConfig {
 	private Long runId;
 	private transient MultipartFile file;
 	private transient File prospectiveFile;
+	private String prospectiveFilePath;
 	private boolean writeSucceses;
 	private transient MultipartFile manifestFile;
 	private List<String> groupsList;
@@ -20,6 +21,7 @@ public class ValidationRunConfig {
 	private String url;
 	private Integer failureExportMax;
 	private boolean firstTimeRelease;
+	private String manifestFileFullPath;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -106,8 +108,15 @@ public class ValidationRunConfig {
 	}
 	public void setProspectiveFile(final File prospectiveFile) {
 		this.prospectiveFile = prospectiveFile;
+		this.prospectiveFilePath = prospectiveFile.getAbsolutePath();
 	}
-
+	
+	public String getProspectiveFilePath() {
+		return prospectiveFilePath;
+	}
+	public void setProspectiveFilePath(String prospectiveFilePath) {
+		this.prospectiveFilePath = prospectiveFilePath;
+	}
 	public void setTestFileName(final String filename) {
 		testFileName = filename;
 		
@@ -117,13 +126,40 @@ public class ValidationRunConfig {
 		return testFileName;
 	}
 	
-	public boolean isFirstTimeRelease() {
+	public boolean getFirstTimeRelease() {
 		return firstTimeRelease;
 	}
 	public void setFirstTimeRelease(boolean firstTimeRelease) {
 		this.firstTimeRelease = firstTimeRelease;
 	}
 	
+	public String getExtensionDependency() {
+		return extensionDependency;
+	}
+	public void setExtensionDependency(String extensionDependency) {
+		this.extensionDependency = extensionDependency;
+	}
+	public void setRunId(Long runId) {
+		this.runId = runId;
+	}
+	public void setWriteSucceses(boolean writeSucceses) {
+		this.writeSucceses = writeSucceses;
+	}
+	public void setGroupsList(List<String> groupsList) {
+		this.groupsList = groupsList;
+	}
+	public void setPrevIntReleaseVersion(String prevIntReleaseVersion) {
+		this.prevIntReleaseVersion = prevIntReleaseVersion;
+	}
+	public void setPreviousExtVersion(String previousExtVersion) {
+		this.previousExtVersion = previousExtVersion;
+	}
+	public void setStorageLocation(String storageLocation) {
+		this.storageLocation = storageLocation;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
 	@Override
 	public String toString() {
 		return "ValidationRunConfig [testFileName=" + testFileName
@@ -136,5 +172,14 @@ public class ValidationRunConfig {
 	public ValidationRunConfig addFirstTimeRelease(boolean firstTimeRelease) {
 		this.firstTimeRelease = firstTimeRelease;
 		return this;
+	}
+	public String getManifestFileFullPath() {
+		return this.manifestFileFullPath;
+	}
+	public void setManifestFileFullPath(String manifestFileFullPath) {
+		this.manifestFileFullPath = manifestFileFullPath;
+	}
+	public boolean isFirstTimeRelease() {
+		return firstTimeRelease;
 	}
 }

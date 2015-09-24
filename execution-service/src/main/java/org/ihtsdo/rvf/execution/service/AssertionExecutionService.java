@@ -1,12 +1,13 @@
 package org.ihtsdo.rvf.execution.service;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
-
-import java.util.Collection;
 
 /**
  * An interface specification for service that is capable of transforming {@link org.ihtsdo.rvf.entity.Assertion}
@@ -23,5 +24,7 @@ public interface AssertionExecutionService {
 	Collection<TestRunItem> executeAssertions(Collection<Assertion> assertions, ExecutionConfig config);
 
 	TestRunItem executeTest(Assertion assertion, Test test, ExecutionConfig config);
+
+	Collection<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertions, ExecutionConfig config);
 
 }

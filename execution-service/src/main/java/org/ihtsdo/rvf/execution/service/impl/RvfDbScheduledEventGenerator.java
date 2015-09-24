@@ -33,6 +33,8 @@ public class RvfDbScheduledEventGenerator implements InitializingBean{
 			try( PreparedStatement statement = connection.prepareStatement(createDropEvent);) {
 				statement.execute();
 			}
+		} finally {
+			rvfDynamicDataSource.close(prospectiveSchema);
 		}
 	}
 

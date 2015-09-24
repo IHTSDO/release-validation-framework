@@ -3,8 +3,15 @@ package org.ihtsdo.rvf.execution.service.impl;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.ihtsdo.snomed.util.rf2.schema.ComponentType;
 import org.ihtsdo.snomed.util.rf2.schema.DataType;
 import org.ihtsdo.snomed.util.rf2.schema.Field;
@@ -20,15 +27,25 @@ import org.slf4j.LoggerFactory;
  */
 public class ReleaseFileDataLoader {
 
-	private final MySqlDataTypeConverter dataTypeConverter;
-	private final Connection connection;
+	private MySqlDataTypeConverter dataTypeConverter;
+	private Connection connection;
 	private final Logger LOGGER = LoggerFactory.getLogger(ReleaseFileDataLoader.class);
+	private RvfDynamicDataSource dataSource;
+	private String schemaName;
 
 	public ReleaseFileDataLoader(final Connection dbConnection, final MySqlDataTypeConverter typeConverter) {
 		connection = dbConnection;
 		dataTypeConverter = typeConverter;
 	}
 	
+	public ReleaseFileDataLoader(RvfDynamicDataSource dataSource, String schemaName, MySqlDataTypeConverter typeConverter) {
+		this.dataSource = dataSource;
+		this.schemaName = schemaName;
+		dataTypeConverter = typeConverter;
+		
+	}
+
+
 	/**TODO
 	 * @param rf2FileName
 	 * @return
@@ -51,31 +68,48 @@ public class ReleaseFileDataLoader {
 	 * @throws SQLException
 	 */
 	public void loadFilesIntoDB(final String rf2TextFileRootPath, final String[] rf2Files, List<String> rf2FilesLoaded) throws SQLException {
+		final long start = System.currentTimeMillis();
+		ExecutorService executorService =  Executors.newCachedThreadPool();
+		List<Future<String>> tasks = new ArrayList<>();
 		for (final String rf2FileName : rf2Files) {
 			final String rvfTableName = RF2FileTableMapper.getLegacyTableName(rf2FileName);
 			if( rvfTableName == null) {
 				LOGGER.warn("No matching table name found for RF2 file:" + rf2FileName);
 				continue;
 			}
-			rf2FilesLoaded.add(rf2FileName);
-			final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
-			final String disableIndex = "ALTER TABLE " + rvfTableName + " DISABLE KEYS;";
-			final String enableIndex = "ALTER TABLE " + rvfTableName + " ENABLE KEYS;";
-			final String loadFile = "load data local infile '" + rf2TextFileRootPath + "/" + rf2FileName + "' into table " + rvfTableName
-					+ " columns terminated by '\\t' "
-					+ " lines terminated by '\\r\\n' "
-					+ " ignore 1 lines";
-			LOGGER.info(loadFile);
-			final long start = System.currentTimeMillis();
-			try (Statement statement = connection.createStatement()) {
-				statement.execute(configStr);
-				statement.execute(disableIndex);
-				statement.execute(loadFile);
-				statement.execute(enableIndex);
-			}
-			final long end = System.currentTimeMillis();
-			LOGGER.info("Time taken to load in seconds " + (end-start)/1000);
+			final Future<String> future = executorService.submit(new Callable<String>() {
+
+				@Override
+				public String call() throws Exception {
+					final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
+					final String disableIndex = "ALTER TABLE " + rvfTableName + " DISABLE KEYS;";
+					final String enableIndex = "ALTER TABLE " + rvfTableName + " ENABLE KEYS;";
+					final String loadFile = "load data local infile '" + rf2TextFileRootPath + "/" + rf2FileName + "' into table " + rvfTableName
+							+ " columns terminated by '\\t' "
+							+ " lines terminated by '\\r\\n' "
+							+ " ignore 1 lines";
+					LOGGER.info(loadFile);
+					
+					try (Statement statement = dataSource.getConnection(schemaName).createStatement()) {
+						statement.execute(configStr);
+						statement.execute(disableIndex);
+						statement.execute(loadFile);
+						statement.execute(enableIndex);
+					}
+					return rvfTableName;
+				}
+			});
+			tasks.add(future);
 		}
+		for (Future<String> task : tasks) {
+			try {
+				rf2FilesLoaded.add(task.get());
+			} catch (InterruptedException | ExecutionException e) {
+				LOGGER.error("Thread interrupted while waiting for get rf2 file loading result.", e);
+			}
+		}
+		final long end = System.currentTimeMillis();
+		LOGGER.info("Time taken to load in seconds " + (end-start)/1000);
 	}
 	
 	/* "create table concept_d(\n" + 

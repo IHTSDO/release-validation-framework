@@ -9,6 +9,6 @@
 		">
 
     <context:component-scan base-package="org.ihtsdo.rvf.controller, org.ihtsdo.rvf.helper" />
-
+	<import resource="jms-api-context.xml"/>
     <import resource="servletContext.xml"/>
 </beans>

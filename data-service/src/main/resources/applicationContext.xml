@@ -21,14 +21,14 @@
 	<bean id="entityService" class="org.ihtsdo.rvf.service.EntityServiceImpl">
 		<constructor-arg ref="entityDao"/>
 	</bean>
-	<bean id="qaResultService" class="org.ihtsdo.rvf.service.QAResultServiceImpl"/>
+	<!--  <bean id="qaResultService" class="org.ihtsdo.rvf.service.QAResultServiceImpl"/>-->
 	
 	<!-- dao mappings here -->
 	<bean class="org.ihtsdo.rvf.dao.helper.TestDatabasePrimerDao"/>
 	<bean id="assertionDao" class="org.ihtsdo.rvf.dao.AssertionDaoImpl"/>
 	<bean id="entityDao" class="org.ihtsdo.rvf.dao.EntityDaoImpl"/>
 	<bean id="assertionGroupDao" class="org.ihtsdo.rvf.dao.AssertionGroupDaoImpl"/>
-	<bean id="qaResultDao" class="org.ihtsdo.rvf.dao.QAResultDaoImpl"/>
+	<!--  <bean id="qaResultDao" class="org.ihtsdo.rvf.dao.QAResultDaoImpl"/> -->
 
 	<!--data source-->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">

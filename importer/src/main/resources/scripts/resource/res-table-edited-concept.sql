@@ -41,5 +41,15 @@
 	union
         select referencedcomponentid from curr_simplemaprefset_d
     );
+    commit;
+    
+    drop table if exists res_edited_active_concepts;
+	create table if not exists res_edited_active_concepts as
+	select b.*
+	from res_concepts_edited a 
+		join curr_concept_s b
+			on a.conceptid = b.id
+			and b.active = 1;
+	commit;
     
      

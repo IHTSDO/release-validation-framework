@@ -26,7 +26,9 @@
 		<property name="password" value="${rvf.snomed.jdbc.password}"/>
 		<property name="minEvictableIdleTimeMillis" value="1800000"/>
 		<property name="timeBetweenEvictionRunsMillis" value="1800000"/>
-		<property name="maxActive" value="-1"/>
+		<property name="maxActive" value="50"/>
+		<property name="minIdle" value="5"/>
+		<property name="maxIdle" value ="20"/>
 		<property name="testOnBorrow" value="true"/>
 		<property name="testOnReturn" value="true"/>
 		<property name="testWhileIdle" value="true"/>
@@ -77,11 +79,13 @@
 		<property name="snomedDataSource" ref="snomedDataSource"/>
 	</bean>
 	
-	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner" scope="prototype">
+	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner" scope="prototype"/>
+	
+	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService" scope="prototype">
 		<constructor-arg name="bucketName" ref="bucketName"/>
 	</bean>
 	
-	<bean id ="resultExtractor" class="org.ihtsdo.rvf.execution.service.impl.ResultExtractorServiceImpl"/>
+	<!--  <bean id ="resultExtractor" class="org.ihtsdo.rvf.execution.service.impl.ResultExtractorServiceImpl"/> -->
 	<bean id="scheduleEventGenerator" class ="org.ihtsdo.rvf.execution.service.impl.RvfDbScheduledEventGenerator">
 	<constructor-arg value="${rvf.qa.data.maxKeepTime}"/>
 	</bean>

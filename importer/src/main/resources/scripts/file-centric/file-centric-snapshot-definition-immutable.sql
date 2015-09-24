@@ -6,15 +6,7 @@
 	There is a 1:1 relationship between the ID and the immutable values in DEFINITION snapshot.
 
 ********************************************************************************/
-	
-/* 	view of current snapshot made by immutable values in DEFINITION */
-	drop table if exists v_curr_snapshot;
-	create table if not exists  v_curr_snapshot as
-	select a.id , a.typeid , a.languagecode , a.conceptid 
-	from curr_textdefinition_s a 
-	group by a.id , a.typeid , a.languagecode , a.conceptid
-	having count(a.id) > 1 and count(a.typeid ) > 1 and count(languagecode) > 1 and count(conceptid) > 1;
-	
+
 /* 	inserting exceptions in the result table */
 	insert into qa_result (runid, assertionuuid, assertiontext, details)
 	select 
@@ -22,7 +14,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('DEFINITION: id=',a.id, ' is referneced with more than one set of immutable values in the definition snapshot.') 	
-	from v_curr_snapshot a;
-
-	drop table if exists v_curr_snapshot;
+	from curr_textdefinition_s a 
+	group by a.id , a.typeid , a.languagecode , a.conceptid
+	having count(a.id) > 1 and count(a.typeid ) > 1 and count(languagecode) > 1 and count(conceptid) > 1;
 	

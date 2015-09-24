@@ -4,9 +4,9 @@
 */
 
 /* view of current snapshot, derived from current full */
-	drop table if exists v_temp_view;
-  	create table if not exists v_temp_view like curr_langrefset_f;
-  	insert into v_temp_view
+	drop table if exists temp_langrefset_view;
+  	create table if not exists temp_langrefset_view like curr_langrefset_f;
+  	insert into temp_langrefset_view
 	select a.*
 	from curr_langrefset_f a
 	where cast(a.effectivetime as datetime) = 
@@ -22,7 +22,7 @@
 	'<ASSERTIONTEXT>',
 	concat('LANGUAGE REFSET: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
 	from curr_langrefset_s a
-	left join v_temp_view b
+	left join temp_langrefset_view b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
 	and a.active = b.active
@@ -45,7 +45,7 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('LANGUAGE REFSET: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
-	from v_temp_view a
+	from temp_langrefset_view a
 	left join curr_langrefset_s b 
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
@@ -63,7 +63,7 @@
   	or b.acceptabilityid is null;
 	
 	commit;
-	drop table if exists v_temp_view;
+	drop table if exists temp_langrefset_view;
 
 
 

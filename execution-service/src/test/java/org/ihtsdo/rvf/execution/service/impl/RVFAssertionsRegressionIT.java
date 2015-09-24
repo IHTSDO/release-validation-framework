@@ -53,6 +53,8 @@ public class RVFAssertionsRegressionIT {
 	private static final String COMPONENT_CENTRIC_VALIDATION = "component-centric-validation";
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
 	private static final String PROSPECTIVE_RELEASE = "regression_test_prospective";
+	
+	
 	private static final String PREVIOUS_RELEASE = "regression_test_previous";
 	@Autowired
     private AssertionExecutionService assertionExecutionService;
@@ -87,13 +89,13 @@ public class RVFAssertionsRegressionIT {
 			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
 			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE,rf2FilesLoaded, previousFile);
         }
-//        if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
+        if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
         	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
             assertNotNull("Must not be null", prospectiveReleaseUrl);
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
         	releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE,rf2FilesLoaded, prospectiveFile);
-//        }
+        }
         
         releaseTypeExpectedResults = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
         assertNotNull("Must not be null", releaseTypeExpectedResults);
@@ -103,7 +105,6 @@ public class RVFAssertionsRegressionIT {
         assertNotNull("Must not be null", fileCentricExpected);
         releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_" + PREVIOUS_RELEASE);
         releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_"+ PROSPECTIVE_RELEASE);
-        
         resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
         final List<Assertion> assertions = assertionDao.getAssertionsByContainingKeyword("resource");
 		config = new ExecutionConfig(System.currentTimeMillis());
@@ -116,6 +117,7 @@ public class RVFAssertionsRegressionIT {
 	@Test
 	public void testReleaseTypeAssertions() throws Exception {
 		runAssertionsTest(RELEASE_TYPE_VALIDATION, releaseTypeExpectedResults.getFile());
+		
 	}
 	
 	@Test
@@ -130,7 +132,12 @@ public class RVFAssertionsRegressionIT {
 	private void runAssertionsTest(final String groupName, final String expectedJsonFile) throws Exception {
 		 final List<Assertion> assertions= assertionDao.getAssertionsByContainingKeyword(groupName);
 		 System.out.println("found total assertions:" + assertions.size());
-			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
+		 long timeStart = System.currentTimeMillis();
+			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
+//		 final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
+			
+			long timeEnd = System.currentTimeMillis();
+			System.out.println("Time taken:" +(timeEnd-timeStart));
 			assertTestResult(groupName, expectedJsonFile, runItems);
 	 }
 	private void assertTestResult(final String type, final String expectedJsonFileName,final Collection<TestRunItem> runItems) throws Exception {
@@ -154,8 +161,8 @@ public class RVFAssertionsRegressionIT {
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
-		System.out.println("Test result");
-		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
+//		System.out.println("Test result");
+//		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
 		final Gson gson = new Gson();
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));
 		final TestReport expectedReport = gson.fromJson(br, TestReport.class);
