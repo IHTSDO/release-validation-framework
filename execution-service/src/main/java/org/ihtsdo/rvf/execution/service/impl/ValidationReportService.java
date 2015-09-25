@@ -20,11 +20,13 @@ import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 @Service
+@Scope("prototype")
 public class ValidationReportService {
 
 	private FileHelper s3Helper;
