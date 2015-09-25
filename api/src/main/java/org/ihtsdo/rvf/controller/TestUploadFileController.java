@@ -189,16 +189,11 @@ public class TestUploadFileController {
 		//Before we start running, ensure that we've made our mark in the storage location
 		//Init will fail if we can't write the "running" state to storage
 		final Map <String, String> responseMap = new HashMap<>();
-//		final ValidationRunner validationRunner = validationRunnerProvider.get();
-//		final boolean initialisedOK = validationRunner.init(vrConfig, responseMap);
 		HttpStatus returnStatus =  HttpStatus.OK;
 		
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
 			//Queue incoming validation request
 			queueManager.queueValidationRequest( vrConfig, responseMap);
-			
-//			final Thread asyncValidationProcess = new Thread(validationRunner);
-//			asyncValidationProcess.start();
 			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
 			responseMap.put("resultURL", urlToPoll);
 		} else {

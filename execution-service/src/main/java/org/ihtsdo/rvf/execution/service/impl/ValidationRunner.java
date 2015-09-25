@@ -218,8 +218,8 @@ public class ValidationRunner {
 			}
 		}
 		logger.info("Total assertions to run: " + assertions.size());
-//		items.addAll(executeAssertionsConcurrently(executionConfig,assertions));
-		items.addAll(executeAssertions(executionConfig,assertions));
+		items.addAll(executeAssertionsConcurrently(executionConfig,assertions));
+//		items.addAll(executeAssertions(executionConfig,assertions));
 		//failed tests
 		final List<TestRunItem> failedItems = new ArrayList<>();
 		for (final TestRunItem item : items) {

@@ -315,7 +315,9 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
 			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
 			part = part.replaceAll("<TEMP>", prospectiveSchema);
-			part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
+			if (previousReleaseSchema != null) {
+				part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
+			}
 			part = part.replaceAll("<DELTA>", deltaTableSuffix);
 			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
 			part = part.replaceAll("<FULL>", fullTableSuffix);
