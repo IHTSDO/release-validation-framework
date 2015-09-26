@@ -37,9 +37,11 @@ import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 @Service
+@Scope("prototype")
 public class ValidationRunner {
 	
 	public static final String FAILURE_MESSAGE = "failureMessage";
@@ -64,15 +66,17 @@ public class ValidationRunner {
 	@Autowired
 	private RvfDbScheduledEventGenerator scheduleEventGenerator;
 	
+	private int batchSize = 0;
+
+	private ExecutorService executorService = Executors.newCachedThreadPool();
 	@Autowired
 	private ValidationReportService reportService;
 	
-	
-	private ExecutorService executorService = Executors.newCachedThreadPool();
-	
+	public ValidationRunner( int batchSize) {
+		this.batchSize = batchSize;
+	}
 	
 	public void run(ValidationRunConfig validationConfig) {
-		reportService.init(validationConfig);
 		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		try {
 			responseMap.put("Validation config", validationConfig);
@@ -84,7 +88,7 @@ public class ValidationRunner {
 			responseMap.put(FAILURE_MESSAGE, failureMsg);
 			logger.error("Exception thrown, writing as result",e);
 			try {
-				reportService.writeResults(responseMap, State.FAILED);
+				reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
 			} catch (final Exception e2) {
 				//Can't even record the error to disk!  Lets hope Telemetry is working
 				logger.error("Failed to record failure (which was: " + failureMsg + ") due to " + e2.getMessage());
@@ -101,11 +105,12 @@ public class ValidationRunner {
 		// load the filename
 		final String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
 		logger.info(structureTestStartMsg);
-		reportService.writeProgress(structureTestStartMsg);
-		reportService.writeState(State.RUNNING);
+		String reportStorage = validationConfig.getStorageLocation();
+		reportService.writeProgress(structureTestStartMsg, reportStorage);
+		reportService.writeState(State.RUNNING, reportStorage);
 		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getProspectiveFile(), validationConfig.getRunId(), validationConfig.getManifestFileFullPath(), validationConfig.isWriteSucceses(), validationConfig.getUrl());
 		if (isFailed) {
-			reportService.writeResults(responseMap, State.FAILED);
+			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;
 		} else {
 			isFailed = checkKnownVersion(validationConfig.getPrevIntReleaseVersion(),
@@ -113,7 +118,7 @@ public class ValidationRunner {
 										 validationConfig.getExtensionDependencyVersion(),
 										 responseMap);
 			if (isFailed) {
-				reportService.writeResults(responseMap, State.FAILED);
+				reportService.writeResults(responseMap, State.FAILED, reportStorage);
 				return;
 			}
 			
@@ -129,12 +134,12 @@ public class ValidationRunner {
 					prevReleaseVersion = combinedVersionName;
 					final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
 					logger.info(startCombiningMsg);
-					reportService.writeProgress(startCombiningMsg);
+					reportService.writeProgress(startCombiningMsg, reportStorage);
 					final boolean isSuccess = releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
 					if (!isSuccess) {
 						responseMap.put(FAILURE_MESSAGE, "Failed to combine known versions:" 
 								+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName);
-						reportService.writeResults(responseMap, State.FAILED);
+						reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
 						String schemaName = releaseDataManager.getSchemaForRelease(combinedVersionName);
 						if (schemaName != null) {
 							scheduleEventGenerator.createDropReleaseSchemaEvent(schemaName);
@@ -144,7 +149,7 @@ public class ValidationRunner {
 					}
 				}
 			} 
-			reportService.writeProgress("Loading prospective file into DB.");
+			reportService.writeProgress("Loading prospective file into DB.", reportStorage);
 			List<String> rf2FilesLoaded = new ArrayList<>();
 			if (isExtension) {
 				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getProspectiveFile(), rf2FilesLoaded);
@@ -157,7 +162,7 @@ public class ValidationRunner {
 			
 			final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
 			if (prospectiveSchema != null) {
-				reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveSchema);
+				reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveSchema, reportStorage);
 				resourceLoader.loadResourceData(prospectiveSchema);
 				logger.info("completed loading resource data for schema:" + prospectiveSchema);
 			}
@@ -170,13 +175,13 @@ public class ValidationRunner {
 			if (validationConfig.getFailureExportMax() != null) {
 				executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
 			}
-			runAssertionTests(executionConfig,responseMap);
+			runAssertionTests(executionConfig,responseMap, reportStorage);
 			final Calendar endTime = Calendar.getInstance();
 			final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 			logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
 			responseMap.put("Start time", startTime.getTime());
 			responseMap.put("End time", endTime.getTime());
-			reportService.writeResults(responseMap, State.COMPLETE);
+			reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
 			//house keeping prospective version and combined previous extension 
 			scheduleEventGenerator.createDropReleaseSchemaEvent(prospectiveSchema);
 			releaseDataManager.dropVersion(prospectiveVersion);
@@ -203,14 +208,14 @@ public class ValidationRunner {
 		logger.info("Complete combining two known versions {}, {} into {}", firstKnown, secondKnown, combinedVersion);
 	}*/
 
-	private void runAssertionTests(final ExecutionConfig executionConfig, final Map<String, Object> responseMap) throws IOException {
+	private void runAssertionTests(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, String reportStorage) throws IOException {
 		final long timeStart = System.currentTimeMillis();
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
 		final List<Assertion> resourceAssertions = assertionService.getResourceAssertions();
 		logger.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
-		reportService.writeProgress("Start executing assertions...");
-		 final List<TestRunItem> items = executeAssertions(executionConfig, resourceAssertions);
+		reportService.writeProgress("Start executing assertions...", reportStorage);
+		 final List<TestRunItem> items = executeAssertions(executionConfig, resourceAssertions, reportStorage);
 		final Set<Assertion> assertions = new HashSet<>();
 		for (final AssertionGroup group : groups) {
 			for (final Assertion assertion : assertionService.getAssertionsForGroup(group)) {
@@ -218,8 +223,13 @@ public class ValidationRunner {
 			}
 		}
 		logger.info("Total assertions to run: " + assertions.size());
-		items.addAll(executeAssertionsConcurrently(executionConfig,assertions));
-//		items.addAll(executeAssertions(executionConfig,assertions));
+		if (batchSize == 0) {
+			items.addAll(executeAssertions(executionConfig, assertions, reportStorage));
+		} else {
+			items.addAll(executeAssertionsConcurrently(executionConfig,assertions, batchSize, reportStorage));
+		}
+		
+
 		//failed tests
 		final List<TestRunItem> failedItems = new ArrayList<>();
 		for (final TestRunItem item : items) {
@@ -274,7 +284,7 @@ public class ValidationRunner {
 	}
 
 	private void uploadProspectiveVersion(final String prospectiveVersion, final String knownVersion, final File tempFile, 
-			List<String> rf2FilesLoaded) throws ConfigurationException, BusinessServiceException {
+			final List<String> rf2FilesLoaded) throws ConfigurationException, BusinessServiceException {
 		
 		if (knownVersion != null && !knownVersion.trim().isEmpty()) {
 			logger.info(String.format("Baseline verison: [%1s] will be combined with prospective release file: [%2s]", knownVersion, tempFile.getName()));
@@ -312,7 +322,7 @@ public class ValidationRunner {
 	
 
 
-	private List<TestRunItem> executeAssertionsConcurrently(final ExecutionConfig executionConfig, final Collection<Assertion> assertions) {
+	private List<TestRunItem> executeAssertionsConcurrently(final ExecutionConfig executionConfig, final Collection<Assertion> assertions, int batchSize, String reportStorage) {
 		
 		final List<Future<Collection<TestRunItem>>> tasks = new ArrayList<>();
 		final List<TestRunItem> results = new ArrayList<>();
@@ -323,7 +333,7 @@ public class ValidationRunner {
 				batch = new ArrayList<Assertion>();
 			}
 			batch.add(assertion);
-			if (counter % 10 == 0 || counter == assertions.size()) {
+			if (counter % batchSize == 0 || counter == assertions.size()) {
 				final List<Assertion> work = batch;
 				logger.info(String.format("Started executing assertion [%1s] of [%2s]", counter, assertions.size()));
 				final Future<Collection<TestRunItem>> future = executorService.submit(new Callable<Collection<TestRunItem>>() {
@@ -334,7 +344,7 @@ public class ValidationRunner {
 				});
 				logger.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
 				//reporting every 10 assertions
-				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are started.", counter, assertions.size()));
+				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are started.", counter, assertions.size()), reportStorage);
 				tasks.add(future);
 				batch = null;
 			}
@@ -352,8 +362,7 @@ public class ValidationRunner {
 		return results;
 	}
 
-
-	private List<TestRunItem> executeAssertions(final ExecutionConfig executionConfig, final Collection<Assertion> assertions) {
+	private List<TestRunItem> executeAssertions(final ExecutionConfig executionConfig, final Collection<Assertion> assertions, String reportStorage) {
 		
 		final List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
@@ -364,10 +373,10 @@ public class ValidationRunner {
 			counter++;
 			if (counter % 10 == 0) {
 				//reporting every 10 assertions
-				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()));
+				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()), reportStorage);
 			}
 		}
-		reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()));
+		reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()), reportStorage);
 		return results;
 	}
 }

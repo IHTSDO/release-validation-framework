@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
-import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +31,9 @@ public class ResultController {
 	@ResponseBody
 	public ResponseEntity<Map<String,Object>> getResult(@PathVariable final Long runId, 
 			@RequestParam(value = "storageLocation") final String storageLocation) throws IOException {
-		final ValidationRunConfig config = new ValidationRunConfig();
-		config.addRunId(runId).addStorageLocation(storageLocation);
-		reportService.init(config);
-		
 		//Can we find an rvf status file at that location?  Return 404 if not.
 		final Map<String, Object> responseMap = new LinkedHashMap<>();
-		final State state = reportService.getCurrentState();
+		final State state = reportService.getCurrentState( runId, storageLocation);
 		final HttpStatus returnStatus = HttpStatus.OK;
 		if (state == null) {
 			responseMap.put(MESSAGE, "No validation state found at " + storageLocation);
@@ -47,13 +42,13 @@ public class ResultController {
 			switch (state) {
 				case QUEUED : 	responseMap.put(MESSAGE, "Validation hasn't started running yet!");
 								break;
-				case RUNNING :  final String progress = reportService.recoverProgress();
+				case RUNNING :  final String progress = reportService.recoverProgress(storageLocation);
 								responseMap.put(MESSAGE, "Validation is still running.");
 								responseMap.put("Progress", progress);
 								break;
-				case FAILED :   reportService.recoverResult(responseMap);
+				case FAILED :   reportService.recoverResult(responseMap, runId, storageLocation);
 								break;
-				case COMPLETE : reportService.recoverResult(responseMap);
+				case COMPLETE : reportService.recoverResult(responseMap, runId, storageLocation);
 								break;
 			}
 		}

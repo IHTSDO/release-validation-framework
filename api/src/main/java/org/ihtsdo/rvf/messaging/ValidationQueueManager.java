@@ -33,13 +33,12 @@ public class ValidationQueueManager {
 	public void queueValidationRequest(ValidationRunConfig config, Map<String, String> responseMap) {
 
 		try {
-			reportService.init(config);
 			if (saveUploadedFiles(config, responseMap)) {
 				Gson gson = new Gson();
 				String configJson = gson.toJson(config);
 				logger.info("Send Jms message to queue for validation config json:" + configJson);
 				jmsTemplate.convertAndSend(configJson); // Send to default queue
-				reportService.writeState(State.QUEUED);
+				reportService.writeState(State.QUEUED, config.getStorageLocation());
 			}
 		} catch (IOException e) {
 			responseMap.put(FAILURE_MESSAGE, "Failed to save uploaded prospective release file due to " + e.getMessage());

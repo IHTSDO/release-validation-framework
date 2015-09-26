@@ -5,9 +5,10 @@ import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,7 +20,9 @@ public class RvfDynamicDataSource {
     private String url;
     @Resource(name = "snomedDataSource")
     BasicDataSource basicDataSource;
-    private ConcurrentHashMap<String, DataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, BasicDataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
+    
+	private final Logger LOGGER = LoggerFactory.getLogger(RvfDynamicDataSource.class);
 
     /**
      * Returns a connection for the given schema. It uses an underlying map to store relevant {@link org.apache.commons.dbcp.BasicDataSource}
@@ -58,6 +61,14 @@ public class RvfDynamicDataSource {
     
     public void close( String schema) {
     	if ( schema != null) {
+    		BasicDataSource dataSource = schemaDatasourceMap.get(schema);
+    		if (dataSource != null) {
+    			try {
+					dataSource.close();
+				} catch (SQLException e) {
+					LOGGER.error("Failed to close datasource for schema:" + schema, e);
+				}
+    		}
     		schemaDatasourceMap.remove(schema);
     	}
     }

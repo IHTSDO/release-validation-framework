@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.codec.DecoderException;
@@ -20,15 +21,14 @@ import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 @Service
-@Scope("prototype")
 public class ValidationReportService {
 
+	private static final String RVF = "rvf";
 	private FileHelper s3Helper;
 	@Resource
 	private S3Client s3Client;
@@ -46,23 +46,19 @@ public class ValidationReportService {
 	
 	public enum State { QUEUED, READY, RUNNING, FAILED, COMPLETE,  } 
 	
-	
-	private Long runId;
-	
 	public ValidationReportService(final String bucketName) {
 		this.bucketName = bucketName;
 	}
 	
-	public void init(ValidationRunConfig config) {
-		runId = config.getRunId();
+	@PostConstruct
+	public void init() {
 		s3Helper = new FileHelper(bucketName, s3Client);
-		stateFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "state.txt";
-		resultsFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "results.json";
-		progressFilePath = config.getStorageLocation() + File.separator + "rvf" + File.separator + "progress.txt";
+		stateFilePath = File.separator + RVF + File.separator + "state.txt";
+		resultsFilePath =  File.separator + RVF + File.separator + "results.json";
+		progressFilePath =  File.separator + RVF + File.separator + "progress.txt";
 	}
 	
-	
-	public void writeResults(final Map<String , Object> responseMap, final State state) throws IOException, NoSuchAlgorithmException, DecoderException {
+	public void writeResults(final Map<String , Object> responseMap, final State state, String storageLocation) throws IOException, NoSuchAlgorithmException, DecoderException {
 		final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 		final File temp = File.createTempFile("resultJson", ".tmp"); 
 		try {
@@ -70,27 +66,28 @@ public class ValidationReportService {
 				prettyGson.toJson(responseMap, bw);
 				//Now copy to our S3 Location
 			} 
-			s3Helper.putFile(temp, resultsFilePath);
+			s3Helper.putFile(temp, storageLocation + resultsFilePath);
 		} finally {
 			temp.delete();
 		}
-		writeState(state);
+		writeState(state, storageLocation);
 	}
 	
-	public void writeState(final State state) throws IOException, NoSuchAlgorithmException, DecoderException {
-		logger.info("RVF run {} setting state as {}", runId, state.toString());
-		writeToS3(state.name(), stateFilePath);
+	public void writeState(final State state, String storageLocation) throws IOException, NoSuchAlgorithmException, DecoderException {
+		writeToS3(state.name(), storageLocation + stateFilePath);
 	}
 	
-	public void writeProgress(final String progress) {
+	public void writeProgress(final String progress,  String storageLocation) {
+		String filePath = storageLocation + progressFilePath;
 		try {
-			writeToS3(progress, progressFilePath);
+			writeToS3(progress, filePath);
 		} catch (NoSuchAlgorithmException | IOException | DecoderException e) {
-			logger.error("Failed to write progress to S3: " + progressFilePath);
+			logger.error("Failed to write progress to S3: " + filePath);
 		}
 		
 	}
-	 public void writeToS3(final String writeMe, final String targetPath) throws IOException, NoSuchAlgorithmException, DecoderException {
+	
+	 private void writeToS3(final String writeMe, final String targetPath) throws IOException, NoSuchAlgorithmException, DecoderException {
 		//First write the data to a local temp file
 		final File temp = File.createTempFile("tempfile", ".tmp"); 
 		try {
@@ -105,51 +102,52 @@ public class ValidationReportService {
 		}
 	}
 	 
-	 public String recoverProgress() {
-			final InputStream is = s3Helper.getFileStream(progressFilePath);
-			String progressMsg = new String("Failed to read from " + progressFilePath);
+	 public String recoverProgress(String storageLocation) {
+			String filePath = storageLocation + progressFilePath;
+			final InputStream is = s3Helper.getFileStream( filePath);
+			String progressMsg = new String("Failed to read from " + filePath);
 			if (is == null) {
-				logger.warn("Failed to find progress file {}, in bucket {}", progressFilePath, bucketName);
+				logger.warn("Failed to find progress file {}, in bucket {}", filePath, bucketName);
 			} else {
 				try {
 					progressMsg = IOUtils.toString(is, UTF_8);
 				} catch (final IOException e) {
-					logger.warn("Failed to read data from progress file {}, in bucket {}", progressFilePath, bucketName);
+					logger.warn("Failed to read data from progress file {}, in bucket {}", filePath, bucketName);
 				}
 			}
 			return progressMsg;
 		}
 	 
-	 public void recoverResult(final Map<String, Object> responseMap) throws IOException {
-			final InputStream is = s3Helper.getFileStream(resultsFilePath);
+	 public void recoverResult(final Map<String, Object> responseMap, Long runId, String storageLocation) throws IOException {
+			String filePath = storageLocation + resultsFilePath;
+			final InputStream is = s3Helper.getFileStream(filePath);
 			Object jsonResults = null;
 			if (is == null) {
-				logger.warn("Failed to find results file {}, in bucket {}", stateFilePath, bucketName);
+				logger.warn("Failed to find results file {}, in bucket {}", filePath, bucketName);
 			} else {
 				final Gson gson = new Gson();
 				jsonResults = gson.fromJson(new InputStreamReader(is,Charset.forName(UTF_8)), Map.class);
 			}
 			if (jsonResults == null) {
-				jsonResults = new String("Failed to recover results in " + resultsFilePath);
+				jsonResults = new String("Failed to recover results in " + filePath);
 			}
 			responseMap.put("RVF Validation Result", jsonResults);
 		}
 	 
 	 
-		public State getCurrentState() {
+		public State getCurrentState(Long runId, String storageLocation) {
 			State currentState = null;
+			String filePath = storageLocation + stateFilePath;
 			try {
-				final InputStream is = s3Helper.getFileStream(stateFilePath);
+				final InputStream is = s3Helper.getFileStream(filePath);
 				if (is == null) {
-					logger.warn("Failed to find state file {}, in bucket {}", stateFilePath, bucketName);
+					logger.warn("Failed to find state file {}, in bucket {}", filePath, bucketName);
 				}
 				final String stateStr = IOUtils.toString(is, UTF_8);
 				currentState = State.valueOf(stateStr);
 			} catch (final Exception e) {
-				logger.warn("Failed to determine validation run state in file {} due to {}", stateFilePath, e.toString());
+				logger.warn("Failed to determine validation run state in file {} due to {}", filePath, e.toString());
 			}
 			return currentState;
 		}
-	 
-
 }

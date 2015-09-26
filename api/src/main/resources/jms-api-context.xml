@@ -21,7 +21,7 @@
 	
 	<bean id="jmsListenerContainerFactory" class="org.springframework.jms.config.DefaultJmsListenerContainerFactory">
     	<property name="connectionFactory" ref="connectionFactory"/>
-   	 <property name="concurrency" value="1-3"/>
+   	 <property name="concurrency" value="${rvf.validation.queue.concurrency}" />
 	</bean>
 	
 	<bean id="defaultDestination" class="org.apache.activemq.command.ActiveMQQueue">

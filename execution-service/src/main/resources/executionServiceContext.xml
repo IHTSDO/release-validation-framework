@@ -77,9 +77,11 @@
 		<property name="snomedDataSource" ref="snomedDataSource"/>
 	</bean>
 	
-	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner" scope="prototype"/>
+	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner">
+		<constructor-arg value="${rvf.assertion.execution.BatchSize}"/>
+	</bean>
 	
-	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService" scope="prototype">
+	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService">
 		<constructor-arg name="bucketName" ref="bucketName"/>
 	</bean>
 	
