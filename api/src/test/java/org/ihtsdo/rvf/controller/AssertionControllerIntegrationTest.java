@@ -86,7 +86,7 @@ public class AssertionControllerIntegrationTest {
         mockMvc.perform(get("/assertions").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(content().string(containsString(assertion.getName())));
+                .andExpect(content().string(containsString(assertion.getAssertionText())));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class AssertionControllerIntegrationTest {
     public void testCreateAssertion() throws Exception {
 
         final Assertion assertion1 = new Assertion();
-        assertion1.setName("Testing assertion");
+        assertion1.setAssertionText("Testing assertion");
         String paramsString = objectMapper.writeValueAsString(assertion1);
         System.out.println("paramsString = " + paramsString);
         // we have to strip the id property added by Jackson since this causes conflicts when Spring tries to convert content into Assertion

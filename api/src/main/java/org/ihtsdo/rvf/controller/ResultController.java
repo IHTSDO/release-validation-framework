@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.controller;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
@@ -62,7 +63,7 @@ public class ResultController {
 //		 final HttpStatus returnStatus = HttpStatus.OK;
 //		String result = String.format("No results found for runId [%s] and assertion UUID [%s].",runId, assertionUUID);
 //		try {
-//			final String jsonResult = resultExtractor.extractResultToJson( runId, assertionUUID);
+//			final String jsonResult = resultExtractor.extractResultToJson( runId, UUID.fromString(assertionUUID));
 //			if (jsonResult != null) {
 //				result = jsonResult;
 //			} 

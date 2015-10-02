@@ -10,8 +10,7 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * An Assertion represents a truth in snomed, it consists of a number of tests to verify
@@ -20,27 +19,37 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 @Entity
 @XmlRootElement(name = "assertion")
 @Table(name = "assertion")
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = Assertion.class)
+//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = Assertion.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Assertion {
 
 	@Id
 	@GeneratedValue
-    @Column(name = "assertion_id")
-    private Long id;
-	private String name;
+	@Column(name = "assertion_id")
+	private Long id;
+	
+	@Column(name = "assertion_text")
+	private String assertionText;
+	
+	@Column(name = "short_name")
+	private String shortName;
+	
+	@Column(name = "doc_ref")
+	private String docRef;
+	
 	private String keywords;
-    private String uuid = UUID.randomUUID().toString();
+	private String uuid = UUID.randomUUID().toString();
 
-    public Assertion() {
+	public Assertion() {
 	}
 
-	public Assertion(final Long id, final String name) {
-		this.name = name;
+	public Assertion(final Long id, final String assertionText) {
+		this.assertionText = assertionText;
 		this.id = id;
 	}
 
-    @XmlElement
-    public Long getId() {
+	@XmlElement
+	public Long getId() {
 		return id;
 	}
 
@@ -48,13 +57,13 @@ public class Assertion {
 		this.id = id;
 	}
 
-    @XmlElement
-    public String getName() {
-		return name;
+	@XmlElement
+	public String getAssertionText() {
+		return assertionText;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
+	public void setAssertionText(final String assertionText) {
+		this.assertionText = assertionText;
 	}
 
 	public String getKeywords() {
@@ -65,20 +74,20 @@ public class Assertion {
 		this.keywords = keywords;
 	}
 
-    @XmlElement
-    public UUID getUuid() {
-        return UUID.fromString(uuid);
-    }
+	@XmlElement
+	public UUID getUuid() {
+		return UUID.fromString(uuid);
+	}
 
-    public void setUuid(final UUID uuid) {
-        this.uuid = uuid.toString();
-    }
+	public void setUuid(final UUID uuid) {
+		this.uuid = uuid.toString();
+	}
 
 	@Override
 	public String toString() {
 		return "Assertion{" +
 				"id=" + id +
-				", name='" + name + '\'' +
+				", name='" + assertionText + '\'' +
 				'}';
 	}
 
@@ -89,7 +98,7 @@ public class Assertion {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result
 				+ ((keywords == null) ? 0 : keywords.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((assertionText == null) ? 0 : assertionText.hashCode());
 		result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
 		return result;
 	}
@@ -113,10 +122,10 @@ public class Assertion {
 				return false;
 		} else if (!keywords.equals(other.keywords))
 			return false;
-		if (name == null) {
-			if (other.name != null)
+		if (assertionText == null) {
+			if (other.assertionText != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!assertionText.equals(other.assertionText))
 			return false;
 		if (uuid == null) {
 			if (other.uuid != null)
@@ -124,5 +133,21 @@ public class Assertion {
 		} else if (!uuid.equals(other.uuid))
 			return false;
 		return true;
+	}
+
+	public String getShortName() {
+		return shortName;
+	}
+
+	public void setShortName(String shortName) {
+		this.shortName = shortName;
+	}
+
+	public String getDocRef() {
+		return docRef;
+	}
+
+	public void setDocRef(String docRef) {
+		this.docRef = docRef;
 	}
 }

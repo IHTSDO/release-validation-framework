@@ -15,6 +15,7 @@ import org.ihtsdo.rvf.helper.AssertionHelper;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -69,7 +70,6 @@ public class AssertionController {
 
 		final Assertion assertion = find(id);
 		assertionService.addTests(assertion, tests);
-
 		return assertion;
 	}
 
@@ -82,7 +82,6 @@ public class AssertionController {
 
 		final Assertion assertion = find(id);
 		assertionService.deleteTests(assertion, tests);
-
 		return assertion;
 	}
 
@@ -111,8 +110,20 @@ public class AssertionController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation( value = "Create an assertion",
 		notes = "Create an assertion with input supplied and returns it popluated with an assertion id" )
-	public Assertion createAssertion(@RequestBody final Assertion assertion) {
-		return assertionService.create(assertion);
+	public ResponseEntity<Assertion> createAssertion(@RequestBody final Assertion assertion) {
+		//Firstly, the assertion must have a UUID (otherwise malformed request)
+		if (assertion.getUuid() == null) {
+			return new ResponseEntity<Assertion>((Assertion)null, HttpStatus.BAD_REQUEST);
+		}
+		
+		//Now make sure we don't already have one of those (otherwise conflict)
+		Assertion existingAssertion = assertionService.find(assertion.getUuid());
+		if (existingAssertion != null) {
+			return new ResponseEntity<Assertion>((Assertion)null, HttpStatus.CONFLICT);
+		}
+		
+		Assertion newAssertion = assertionService.create(assertion);
+		return new ResponseEntity<Assertion>(newAssertion, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
@@ -165,9 +176,9 @@ public class AssertionController {
 	}
 	
 	/**
-	 * Attempts to look up id first as a UUID and if not, a database value
+	 * Attempts to look up id first as a UUID and if not, a database integer id value
 	 * @param id
-	 * @return
+	 * @return the referenced assertion
 	 */
 	private Assertion find(String id) {
 		if (id == null || id.isEmpty()) {

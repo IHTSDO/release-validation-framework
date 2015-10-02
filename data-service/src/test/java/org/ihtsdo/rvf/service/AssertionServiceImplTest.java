@@ -66,7 +66,7 @@ public class AssertionServiceImplTest {
         assert entityService.count(Assertion.class) == 0;
 
         assertion = new Assertion();
-        assertion.setName("Test assertion");
+        assertion.setAssertionText("Test assertion");
         assertion = assertionService.create(assertion);
         assertNotNull(assertion.getId());
         assertNotNull(assertion.getUuid());
@@ -300,14 +300,14 @@ public class AssertionServiceImplTest {
     public void testSaveForAssertionGroup() throws Exception {
 
         Assertion assertion2 = new Assertion();
-        assertion2.setName("Second assertion in group");
+        assertion2.setAssertionText("Second assertion in group");
         // save assertion2
         assertion2 = assertionService.create(assertion2);
         assertNotNull(assertion2.getId());
 
 
         Assertion assertion3 = new Assertion();
-        assertion3.setName("Third assertion in group");
+        assertion3.setAssertionText("Third assertion in group");
         // save assertion3
         assertion3 = assertionService.create(assertion3);
         assertNotNull(assertion3.getId());
@@ -343,7 +343,7 @@ public class AssertionServiceImplTest {
         assertTrue("updatedGroup must contain 3 assertions", 3 == retrievedAssertions.size());
         for(final Assertion a : retrievedAssertions){
             System.out.println("a.getId() = " + a.getId());
-            System.out.println("a.getName() = " + a.getName());
+            System.out.println("a.getAssertionText() = " + a.getAssertionText());
         }
         assertTrue("updatedGroup must contain assertion", retrievedAssertions.contains(assertion));
         assertTrue("updatedGroup must contain assertion2", retrievedAssertions.contains(assertion2));
@@ -355,7 +355,7 @@ public class AssertionServiceImplTest {
         System.out.println("retrievedAssertions.size() = " + retrievedAssertions.size());
         for(final Assertion a : retrievedAssertions){
             System.out.println("a.getId() = " + a.getId());
-            System.out.println("a.getName() = " + a.getName());
+            System.out.println("a.getAssertionText() = " + a.getAssertionText());
         }
         assertTrue("updatedGroup must contain 2 assertions", 2 == retrievedAssertions.size());
         assertTrue("updatedGroup must contain assertion", retrievedAssertions.contains(assertion));

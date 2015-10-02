@@ -38,8 +38,8 @@ public class TestDataBootStrap {
         assert releaseCenter.getId() != null;
         assert assertionService != null;
         assertion = new Assertion();
-        assertion.setName("Assertion Name");
-        assertion.setName("Assertion Description");
+        assertion.setShortName("Assertion Name");
+        assertion.setAssertionText("Assertion Description");
         assertion = assertionService.create(assertion);
         assert assertion != null;
     }

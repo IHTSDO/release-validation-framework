@@ -119,7 +119,7 @@ public class TestUploadFileControllerIntegrationTest {
     public void testRunPostTestPackage() throws Exception {
 
         final Assertion assertion = new Assertion();
-        assertion.setName("Concept has 1 defining relationship but is not primitive");
+        assertion.setAssertionText("Concept has 1 defining relationship but is not primitive");
         // save assertion
         String paramsString = objectMapper.writeValueAsString(assertion);
         System.out.println("paramsString = " + paramsString);

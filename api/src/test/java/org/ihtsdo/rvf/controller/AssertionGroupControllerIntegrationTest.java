@@ -206,7 +206,7 @@ public class AssertionGroupControllerIntegrationTest {
         test.setCommand(new ExecutionCommand());
 
         Assertion assertion = new Assertion();
-        assertion.setName("Test assertion");
+        assertion.setAssertionText("Test assertion");
         // save assertion
         assertion = assertionService.addTest(assertion, test);
         assertNotNull(assertion.getId());

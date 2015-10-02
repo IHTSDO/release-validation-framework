@@ -11,6 +11,6 @@
     </bean>
 
 	<!-- service beans will go here -->
-	<bean id="importerService" class="org.ihtsdo.snomed.rvf.importer.impl.AssertionsImporterImpl"/>
+	<bean id="importerService" class="org.ihtsdo.snomed.rvf.importer.AssertionsImporter"/>
     <bean id="rvfRestClient" class="org.ihtsdo.snomed.rvf.importer.helper.RvfRestClient"/>
 </beans>

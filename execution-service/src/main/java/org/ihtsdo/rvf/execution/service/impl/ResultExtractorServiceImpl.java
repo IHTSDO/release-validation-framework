@@ -2,12 +2,12 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 //@Service
 //public class ResultExtractorServiceImpl implements ResultExtractorService {
-//
+
 //	@Autowired QAResultService qaResultService;
 //	@Autowired AssertionService assertionService;
 //	@Override
-//	public String extractResultToJson(final Long runId, final String assertionUUID) throws BusinessServiceException {
-//		final Assertion assertion = assertionService.getAssertionByUUID( assertionUUID);
+//	public String extractResultToJson(final Long runId, final UUID assertionUUID) throws BusinessServiceException {
+//		final Assertion assertion = assertionService.find(assertionUUID);
 //		if ( assertion == null ) {
 //			throw new BusinessServiceException("No assertion found for assertion UUID:" + assertionUUID);
 //		}
@@ -17,8 +17,8 @@ package org.ihtsdo.rvf.execution.service.impl;
 //		}
 //		final TestRunItem item = new TestRunItem();
 //		item.setExecutionId(runId.toString());
-//		item.setAssertionText(assertion.getName());
-//		item.setAssertionUuid(UUID.fromString(assertionUUID));
+//		item.setAssertionText(assertion.getAssertionText());
+//		item.setAssertionUuid(assertionUUID);
 //		item.setTestCategory(assertion.getKeywords());
 //		item.setFirstNInstances(failures);
 //		item.setFailureCount((long) failures.size());
@@ -26,4 +26,3 @@ package org.ihtsdo.rvf.execution.service.impl;
 //		return prettyGson.toJson(item);
 //	}
 //}
-

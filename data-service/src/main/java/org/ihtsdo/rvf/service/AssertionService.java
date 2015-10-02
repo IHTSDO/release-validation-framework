@@ -66,6 +66,4 @@ public interface AssertionService extends EntityService<Assertion> {
 
 	List<AssertionGroup> getAssertionGroupsByNames(List<String> groupNames);
 	List<AssertionGroup> getAllAssertionGroups();
-
-	Assertion getAssertionByUUID(String assertionUUID);
 }

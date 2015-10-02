@@ -7,7 +7,7 @@ package org.ihtsdo.rvf.service;
 //	@Autowired
 //	private QAResultDao resultDao;
 //	@Override
-//	public List<String> getResult(final Long runId, final String assertionUUID) {
+//	public List<String> getResult(final Long runId, final UUID assertionUUID) {
 //		return resultDao.getResultDetails(runId, assertionUUID);
 //	}
 //}

@@ -177,7 +177,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 
 		final TestRunItem runItem = new TestRunItem();
 		runItem.setTestCategory(assertion.getKeywords());
-		runItem.setAssertionText(assertion.getName());
+		runItem.setAssertionText(assertion.getAssertionText());
 		runItem.setAssertionUuid(assertion.getUuid());
 
 		// get command from test and validate the included command object
@@ -268,7 +268,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 								}
 								// execute insert statement
 								insertStatement.executeBatch();
-								logger.debug("batch insert completed for test:" + assertion.getName());
+								logger.debug("batch insert completed for assertion:" + assertion.getAssertionText());
 							}
 						}
 					}

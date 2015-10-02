@@ -4,7 +4,7 @@ package org.ihtsdo.rvf.dao;
 //public class QAResultDaoImpl extends  EntityDaoImpl<QAResult> implements QAResultDao {
 //
 //	@Override
-//	public List<String> getResultDetails(final Long runId, final String assertionUUID) {
+//	public List<String> getResultDetails(final Long runId, final UUID assertionUUID) {
 //		
 //		@SuppressWarnings("unchecked")
 //		final List<QAResult> results = getCurrentSession()
