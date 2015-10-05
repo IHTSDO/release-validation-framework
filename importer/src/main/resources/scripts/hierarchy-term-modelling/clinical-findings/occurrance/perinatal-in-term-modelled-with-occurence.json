@@ -1,0 +1,22 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+ " SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"perinatal\" in any term not modelled with \"Occurrence \" = \"Perinatal period\": ', term)  ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
+ " WHERE  lower(term) LIKE '%perinatal%'  ", 
+ " AND d.conceptid = c.id ", 
+ " AND c.active = 1   ", 
+ " AND d.active = 1 ",
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (term LIKE '%finding%' OR term LIKE '%disorder%' )  ", 
+ " AND  NOT EXISTS (", 
+ " SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r  ", 
+ " WHERE  r.sourceid = d.conceptid  ", 
+ " AND  r.typeid = 246454002  ", 
+ " AND r.active = 1 ",
+ " AND  r.destinationid = 371578004) "]], 
+"assertionText" : "Current concept with \"perinatal\" in any term not modelled with \"Occurrence \" = \"Perinatal period\"",
+"shortName" : "perinatal in term modelled with occurence",
+"docRef" : "SNOMED CT Style Guide: Clinical Findings Section2.12 Occurrence",
+"id" : "b3f5f8b2-18ac-46d3-a835-31f7eab2a340"
+}

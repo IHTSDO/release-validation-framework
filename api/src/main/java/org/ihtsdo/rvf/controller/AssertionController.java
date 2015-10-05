@@ -155,17 +155,20 @@ public class AssertionController {
 		notes = "Execute all tests under an assertion with provided runid ( a user supplied identifier), "
 				+ " prospective release version and previous release version."
 				+ "Run id later used to retrieve assertion " )
-	public Map<String, Object> executeTest(@PathVariable final String id,
+	public ResponseEntity<Map<String, Object>> executeTest(@PathVariable final String id,
 										   @RequestParam final Long runId, @RequestParam final String prospectiveReleaseVersion,
 										   @RequestParam final String previousReleaseVersion) {
 
 		final Assertion assertion = find(id);
+		if (assertion == null) {
+			return new ResponseEntity<Map<String, Object>>((Map<String, Object>)null, HttpStatus.NOT_FOUND);
+		}
 		//Creating a list of 1 here so we can use the same code and receive the same json as response
 		final Collection<Assertion> assertions = new ArrayList<Assertion>(Arrays.asList(assertion));
 		final ExecutionConfig config = new ExecutionConfig(runId);
 		config.setProspectiveVersion(prospectiveReleaseVersion);
 		config.setPreviousVersion(previousReleaseVersion);
-		return assertionHelper.assertAssertions(assertions, config);
+		return new ResponseEntity<Map<String, Object>> (assertionHelper.assertAssertions(assertions, config), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/run", method = RequestMethod.POST)

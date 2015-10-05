@@ -1,0 +1,22 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+ " SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"fetal\" in any term not modelled with Relationship type \"Occurrence \" = \"Fetalperiod\"', term)  ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
+ " WHERE  lower(term) LIKE '%fetal%'  ", 
+ " AND d.conceptid = c.id ", 
+ " AND c.active = 1   ", 
+ " AND d.active = 1 ",
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (term LIKE '%finding%' OR term LIKE '%disorder%' )  ", 
+ " AND  NOT EXISTS (", 
+ " SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r  ", 
+ " WHERE  r.sourceid = d.conceptid  ", 
+ " AND  r.typeid = 246454002  ", 
+ " AND r.active = 1 ",
+ " AND  r.destinationid = 303112003)"]], 
+"assertionText" : "Current concept with \"fetal\" in any term not modelled with Relationship type \"Occurrence \" = \"Fetalperiod\"",
+"docRef" : "SNOMED CT StyleGuide: Clinical Findings Section2.12 Occurrence",
+"shortName" : "fetal in term modelled with occurrence",
+"id" : "61fe99d5-7d4a-4d25-80a3-5807785ea041"
+}

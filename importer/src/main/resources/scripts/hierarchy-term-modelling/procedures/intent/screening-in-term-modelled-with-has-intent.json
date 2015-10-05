@@ -1,0 +1,21 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+ " SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"screening\" in term not modelled with \"Has intent\" = \"Screening intent\": ', term) ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
+ " WHERE  lower(term) LIKE '%screening%'", 
+ " AND d.conceptid =c.id  ", 
+ " AND c.active = 1  ", 
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (term LIKE '%procedure%' OR term LIKE '%regime%') ", 
+ " AND  NOT EXISTS(", 
+ " SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r ", 
+ " WHERE  r.sourceid = d.conceptid ", 
+ " AND  r.typeid = 363703001 ", 
+  " AND r.active = 1 ",
+ " AND  r.destinationid = 360156006)"]], 
+"assertionText" : "Current concept with \"screening\" in term not modelled with \"Has intent\" = \"Screening intent\"",
+"shortName" : "screening in term modelled with has intent",
+"docRef" : "SNOMED CT StyleGuide: Procedures Section 2.12 Has intent",
+"id" : "7d876a64-3212-4886-836d-4c0bd2822d29"
+}

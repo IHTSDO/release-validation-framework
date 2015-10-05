@@ -1,0 +1,15 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+" SELECT <RUNID>, '<ASSERTIONUUID>', r.sourceid, " ,
+" concat('Current concept (',r.sourceid, ') with \"mild\" in any term not modelled with r.typeid \"Severity\" = \"mild\": ', term) ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.relationship_s r ", 
+ " WHERE d.conceptid = r.sourceid  ", 
+ " AND  lower(term) LIKE '%mild%'  ", 
+ " AND  r.typeid = 246112005  ", 
+ " AND  r.active = 1 ",
+ " AND  NOT r.destinationid = 255604002 "]], 
+"assertionText" : "Concept with \"mild\" in any term not modelled with r.typeid \"Severity\" = \"mild\"",
+"shortName" : "mild in term modelled with severity",
+"docRef" : "SNOMED CT Style Guide: Clinical Findings Section 2.7 Severity ",
+"id" : "17ddf219-a48e-4826-8301-a5614395e0b3"
+}

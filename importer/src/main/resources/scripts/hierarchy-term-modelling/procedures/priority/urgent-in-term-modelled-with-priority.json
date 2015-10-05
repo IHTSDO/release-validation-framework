@@ -1,0 +1,22 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+ " SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"urgent\" in any term not modelled with \"Priority \" = \"Urgent\": ', term) ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
+ " WHERE  lower(term) LIKE '%urgent%'",  
+ " AND  lower(term) NOT LIKE '%non-urgent%'",
+ " AND d.conceptid = c.id  ", 
+ " AND c.active = 1  ", 
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (term LIKE '%procedure%' OR term LIKE '%regime' ", 
+ " AND  NOT EXISTS(", 
+ " SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r ", 
+ " WHERE  r.sourceid = d.conceptid ", 
+ " AND r.active = 1 ",
+ " AND  r.typeid = 260870009 ", 
+ " AND  r.destinationid = 103391001)"]], 
+"assertionText" : "Current concept with \"urgent\" in any term not modelled with \"Priority \" = \"Urgent\"",
+"docRef" : "SNOMED CT StyleGuide: Procedures Section 2.10 Priority",
+"shortName" : "urgent in term modelled with priority",
+"id" : "7b62d983-78b2-4972-87b4-529b9b88ecd4"
+}

@@ -1,0 +1,21 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+ " SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"recurrent\" in any term not modelled with \"Clinical course\" = \"Recurrent\": ', term)  ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
+ " WHERE  lower(term) LIKE '%recurrent%'  ", 
+ " AND d.conceptid = c.id ", 
+ " AND c.active = 1   ", 
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (term LIKE '%finding%' OR term LIKE '%disorder%' )  ", 
+ " AND  NOT EXISTS (", 
+ " SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r  ", 
+ " WHERE  r.sourceid = d.conceptid  ", 
+ " AND r.active = 1 ",
+ " AND  r.typeid = 263502005  ", 
+ " AND  r.destinationid = 255227004)"]], 
+"assertionText" : "Current concept with \"recurrent\" in any term not modelled with \"Clinical course\" = \"Recurrent\"",
+"shortName" : "recurrent in term modelled with clinical course",
+"docRef" : "SNOMED CT Style Guide: Clinical Findings Section 2.8 Clinical course ",
+"id" : "548e7a00-4772-4b08-8ef8-e2545963c56f"
+}

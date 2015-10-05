@@ -228,7 +228,7 @@ public class AssertionsImporter {
 		{
 			//First delete any existing tests for that assertion
 			restClient.delete("assertions/"+assertion.getUuid()+"/tests", String.class);
-			logger.info("Creating {} tests for assertion {}.", tests.size(), assertion.getUuid());
+			logger.info("Creating {} test(s) for assertion {}.", tests.size(), assertion.getUuid());
 			return restClient.post("assertions/"+assertion.getUuid()+"/tests", objectMapper.writeValueAsString(tests));
 		}
 		catch (final IOException e) {
