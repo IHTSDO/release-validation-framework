@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -69,6 +72,9 @@ public class AssertionController {
 	public Assertion setTestsForAssertion(@PathVariable final String id, @RequestBody(required = false) final List<Test> tests) {
 
 		final Assertion assertion = find(id);
+		if (assertion == null) {
+			throw new EntityNotFoundException("Could not find assertion " + id );
+		}
 		assertionService.addTests(assertion, tests);
 		return assertion;
 	}
@@ -90,8 +96,12 @@ public class AssertionController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Get an assertion",
 		notes = "Retrieves an assertion identified with given assertion id" )
-	public Assertion getAssertion(@PathVariable final String id) {
-		return find(id);
+	public ResponseEntity<Assertion> getAssertion(@PathVariable final String id) {
+		Assertion assertion = find(id);
+		if (assertion == null) {
+			return new ResponseEntity<Assertion>((Assertion)null, HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<Assertion>(assertion, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)

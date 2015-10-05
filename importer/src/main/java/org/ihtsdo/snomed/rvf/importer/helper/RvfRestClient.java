@@ -10,9 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -25,12 +28,18 @@ public class RvfRestClient {
 	//private final static String defaultServerUrl = "https://dev-rvf.ihtsdotools.org/api/v1/";
 	private final static String defaultServerUrl = "http://localhost:8080/api/v1/";
 	private String serverUrl;
-	@Autowired
 	private final RestTemplate restTemplate;
 	private final HttpHeaders headers;
 
 	public RvfRestClient() {
 		this.restTemplate = new RestTemplate();
+		/*this.restTemplate.setErrorHandler(new DefaultResponseErrorHandler(){
+			protected boolean hasError(HttpStatus statusCode) {
+				return false; }
+			public void handleError(ClientHttpResponse response) {
+				return;
+			}
+		});*/
 		this.headers = new HttpHeaders();
 		headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
 		headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);

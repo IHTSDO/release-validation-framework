@@ -1,0 +1,20 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+" SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"O/E\" or \"on examination\" in any term not modelled for the attribute \"Finding informer\": ', term)  ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
+ " WHERE  (lower(term) LIKE \"%o/e%\" OR lower(term) LIKE \"%on examination%\" ) ", 
+ " AND d.conceptid = c.id  ", 
+ " AND c.active = 1  ", 
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (term LIKE \"%finding%\" OR term LIKE \"%disorder%\" )  ", 
+ " AND  NOT EXISTS ", 
+ " (SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r  ", 
+ " WHERE  r.sourceid = d.conceptid  ", 
+ " AND  r.typeid = 419066007 ", 
+ " AND  r.destinationid = 420158005)"]], 
+"assertionText" : "Current concept with \"O/E\" or \"on examination\" in any term not modelled for the attribute \"Finding informer\" with a value of \"Performer of method\"",
+"shortName" : "on examination modelled finding informer",
+"docRef" : "SNOMED CT Style Guide: Clinical Findings Section 2.14 Finding informer ",
+"id" : "598fdbbf-033b-4252-805b-a0d69bff58cb"
+}

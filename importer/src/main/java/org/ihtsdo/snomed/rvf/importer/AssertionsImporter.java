@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.facebook.presto.sql.parser.SqlParser;
 import com.facebook.presto.sql.parser.StatementSplitter;
@@ -227,6 +228,7 @@ public class AssertionsImporter {
 		{
 			//First delete any existing tests for that assertion
 			restClient.delete("assertions/"+assertion.getUuid()+"/tests", String.class);
+			logger.info("Creating {} tests for assertion {}.", tests.size(), assertion.getUuid());
 			return restClient.post("assertions/"+assertion.getUuid()+"/tests", objectMapper.writeValueAsString(tests));
 		}
 		catch (final IOException e) {
@@ -351,15 +353,21 @@ public class AssertionsImporter {
 		}
 		
 	}
-
+	
+	@SuppressWarnings("rawtypes")
 	private ResponseEntity createOrUpdateAssertion(SimpleAssertion simpleAssertion) throws JsonProcessingException {
 		Assertion assertion = simpleAssertion.toAssertion();
 		//Do we need to create that assertion or does it already exist?
-		ResponseEntity response = restClient.get("assertions/" + simpleAssertion.getId());
-		if (response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-			response = restClient.post("assertions", objectMapper.writeValueAsString(assertion));
-		} else {
+		try{
+			ResponseEntity response = restClient.get("assertions/" + simpleAssertion.getId());
 			logger.info ("Assertion " + simpleAssertion.getId() + " already exists.  Replacing tests...");
+		} catch (HttpClientErrorException e) {
+			try{
+				restClient.post("assertions", objectMapper.writeValueAsString(assertion));
+				logger.info ("Created Assertion " + simpleAssertion.getId());
+			} catch (HttpClientErrorException e2) { 
+				logger.error ("Failed to create Assertion " + simpleAssertion.getId(), e2);
+			}
 		}
 		List<String> tests = simpleAssertion.getTestsAsList();
 		return uploadTest(assertion, null, tests);

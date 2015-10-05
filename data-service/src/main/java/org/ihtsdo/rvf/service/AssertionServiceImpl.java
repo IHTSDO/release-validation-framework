@@ -96,13 +96,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 
 	@Override
 	public Assertion find(final UUID uuid) {
-		final Assertion assertion = assertionDao.findByUuid(Assertion.class, uuid);
-		if(assertion != null){
-			return assertion;
-		}
-		else{
-			throw new MissingEntityException(uuid);
-		}
+		return assertionDao.findByUuid(Assertion.class, uuid);
 	}
 
 	// todo use beanUtils/propertyUtils reflection for each of the properties
