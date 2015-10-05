@@ -8,7 +8,7 @@
  " AND  r.typeid = 246112005  ", 
  " AND  r.active = 1 ",
  " AND  NOT r.destinationid = 6736007 "]], 
-"assertionText" : "Concept with \"moderate\" in any term not modelled with r.typeid \"Severity\" = \"moderate\"",
+"assertionText" : "Concept with \"moderate\" in any term not modelled with \"Severity\" = \"moderate\"",
 "shortName" : "moderate in term modelled with severity",
 "docRef" : "SNOMED CT Style Guide: Clinical Findings Section 2.7 Severity ",
 "id" : "5fd1715b-cee6-4887-ac97-9737dc6baa0f"
