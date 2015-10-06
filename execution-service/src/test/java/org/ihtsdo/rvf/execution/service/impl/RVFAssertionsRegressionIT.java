@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
@@ -287,14 +288,14 @@ public class RVFAssertionsRegressionIT {
 	private static class RVFTestResult implements Comparable<RVFTestResult> {
 		private String assertionName;
 		private UUID assertionUuid;
-		private List<String> firstNInstances;
+		private List<FailureDetail> firstNInstances;
 		private long totalFailed;
 		public void setAssertonName(final String assertionText) {
 			assertionName = assertionText;
 		}
 
-		public void setFirstNInstances(final List<String> firstNInstances) {
-			this.firstNInstances = firstNInstances;
+		public void setFirstNInstances(final List<FailureDetail> list) {
+			this.firstNInstances = list;
 		}
 
 		public void setTotalFailed(final long failureCount) {
@@ -304,7 +305,7 @@ public class RVFAssertionsRegressionIT {
 		public String getAssertionName() {
 			return assertionName;
 		}
-		public List<String> getFirstNInstances() {
+		public List<FailureDetail> getFirstNInstances() {
 			return firstNInstances;
 		}
 		public long getTotalFailed() {

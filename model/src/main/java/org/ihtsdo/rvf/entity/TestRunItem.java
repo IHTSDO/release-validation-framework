@@ -16,7 +16,7 @@ public class TestRunItem {
 	private Long queryInMilliSeconds;
 	private Long failureCount;
 	private String failureMessage;
-	private List<String> firstNInstances;
+	private List<FailureDetail> firstNInstances;
 	private Long extractResultInMillis;
 
 
@@ -72,15 +72,15 @@ public class TestRunItem {
 		this.failureMessage = failureMessage;
 	}
 
-	public List<String> getFirstNInstances() {
+	public List<FailureDetail> getFirstNInstances() {
 		return firstNInstances;
 	}
 
-	public void setFirstNInstances(final List<String> firstNInstances) {
+	public void setFirstNInstances(final List<FailureDetail> firstNInstances) {
 		this.firstNInstances = firstNInstances;
 	}
 
-	public void addFirstNInstance(final String failureInstance){
+	public void addFirstNInstance(final FailureDetail failureInstance){
 		if (firstNInstances == null) {
 			firstNInstances = new ArrayList<>();
 		}

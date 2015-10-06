@@ -23,6 +23,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
+import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
@@ -333,7 +334,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		/*
 		 create a prepared statement for retrieving matching results.
 		*/
-		String resultSQL = "select details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
+		String resultSQL = "select concept_id, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
 		//use limit to save memory and improve performance for worst case when containing thousands of errors
 		if (config.getFailureExportMax() > 0) {
 			resultSQL = resultSQL + " limit ?";
@@ -353,7 +354,8 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 					{
 						// only get first N failed results
 						if (config.getFailureExportMax() < 0 || counter < config.getFailureExportMax()) {
-							runItem.addFirstNInstance(resultSet.getString(1));
+							FailureDetail detail = new FailureDetail(resultSet.getLong(1), resultSet.getString(2));
+							runItem.addFirstNInstance(detail);
 						}
 						counter++;
 					}
