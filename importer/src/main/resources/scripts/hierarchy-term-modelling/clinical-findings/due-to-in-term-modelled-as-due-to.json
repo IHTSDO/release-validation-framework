@@ -1,9 +1,9 @@
 {
 "tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
-" SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"due to\" in term not modelled on the attribute \"Due to\": ', term ", 
- " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
- " WHERE  lower(term) LIKE '%due to%'  ", 
- " AND  lower(term) NOT LIKE '%not due to%'  ", 
+" SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"due to\" in term not modelled on the attribute \"Due to\": ', term) ", 
+ " FROM <PROSPECTIVE>.description_s d, <PROSPECTIVE>.concept_s c ", 
+ " WHERE lower(term) LIKE '%due to%'  ", 
+ " AND lower(term) NOT LIKE '%not due to%'  ", 
  " AND c.active = 1 ",
  " AND d.conceptid = c.id  ", 
  " AND d.typeid = 900000000000003001 -- FSN ", 
