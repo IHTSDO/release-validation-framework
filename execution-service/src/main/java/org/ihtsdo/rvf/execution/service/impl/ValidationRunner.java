@@ -81,7 +81,7 @@ public class ValidationRunner {
 		try {
 			responseMap.put("Validation config", validationConfig);
 			runValidation(responseMap, validationConfig);
-		} catch (final Exception e) {
+		} catch (final Throwable e) {
 			final StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			final String failureMsg = "System Failure: " + e.getMessage() + " : " + errors.toString();
@@ -113,10 +113,7 @@ public class ValidationRunner {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;
 		} else {
-			isFailed = checkKnownVersion(validationConfig.getPrevIntReleaseVersion(),
-										 validationConfig.getPreviousExtVersion(),
-										 validationConfig.getExtensionDependencyVersion(),
-										 responseMap);
+			isFailed = checkKnownVersion(validationConfig,responseMap);
 			if (isFailed) {
 				reportService.writeResults(responseMap, State.FAILED, reportStorage);
 				return;
@@ -193,6 +190,41 @@ public class ValidationRunner {
 			scheduleEventGenerator.createQaResultDeleteEvent(validationConfig.getRunId());
 			
 		}
+	}
+
+	private boolean checkKnownVersion(ValidationRunConfig validationConfig, Map<String, Object> responseMap) {
+		logger.debug("Checking known versions...");
+		String previousExtVersion =validationConfig.getPreviousExtVersion();
+		String extensionBaseLine = validationConfig.getExtensionDependencyVersion();
+		String prevIntReleaseVersion = validationConfig.getPrevIntReleaseVersion();
+		if (previousExtVersion != null) {
+			if (extensionBaseLine == null) {
+				responseMap.put(FAILURE_MESSAGE, "PreviousExtensionVersion is :" 
+						+ prevIntReleaseVersion + " but extension release base line has not been specified.");
+				return true;
+			}
+		}
+		if (!validationConfig.isFirstTimeRelease() && prevIntReleaseVersion == null && previousExtVersion == null && extensionBaseLine == null) {
+			responseMap.put(FAILURE_MESSAGE, "None of the known release version is specified");
+			return true;
+		}
+		boolean isFailed = false;
+		if (prevIntReleaseVersion != null && !prevIntReleaseVersion.isEmpty()) {
+			if (!isKnownVersion(prevIntReleaseVersion, responseMap)) {
+				isFailed = true;
+			}
+		}
+		if (previousExtVersion != null && !previousExtVersion.isEmpty()) {
+			if (!isKnownVersion(previousExtVersion, responseMap)) {
+				isFailed = true;
+			}
+		}
+		if (extensionBaseLine != null && !extensionBaseLine.isEmpty()) {
+			if (!isKnownVersion(extensionBaseLine, responseMap)) {
+				isFailed = true;
+			}
+		}
+		return isFailed;
 	}
 
 	private boolean isExtension(final ValidationRunConfig runConfig) {

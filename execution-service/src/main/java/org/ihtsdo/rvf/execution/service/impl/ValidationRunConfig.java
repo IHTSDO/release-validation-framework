@@ -133,12 +133,6 @@ public class ValidationRunConfig {
 		this.firstTimeRelease = firstTimeRelease;
 	}
 	
-	public String getExtensionDependency() {
-		return extensionDependency;
-	}
-	public void setExtensionDependency(String extensionDependency) {
-		this.extensionDependency = extensionDependency;
-	}
 	public void setRunId(Long runId) {
 		this.runId = runId;
 	}
