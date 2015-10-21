@@ -30,6 +30,14 @@
     <bean factory-bean="objectMapperFactory" factory-method="createObjectMapper"/>
 
     <bean id="objectMapperFactory" class="org.ihtsdo.rvf.service.mapping.JacksonObjectMapperFactory"/>
+    <bean id="instanceManager" class ="org.ihtsdo.rvf.autoscaling.InstanceManager">
+    	<constructor-arg>
+					<bean class="com.amazonaws.auth.BasicAWSCredentials">
+						<constructor-arg value="${aws.key}" />
+						<constructor-arg value="${aws.privateKey}" />
+					</bean>
+		</constructor-arg>
+	</bean>
 
     <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>
     <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.impl.ValidationLogFactoryImpl"/>

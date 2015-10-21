@@ -22,6 +22,8 @@ public class ValidationRunConfig {
 	private Integer failureExportMax;
 	private boolean firstTimeRelease;
 	private String manifestFileFullPath;
+	private String s3BucketName;
+	private String s3FilePath;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -175,5 +177,17 @@ public class ValidationRunConfig {
 	}
 	public boolean isFirstTimeRelease() {
 		return firstTimeRelease;
+	}
+	public void setS3BucketName(String bucketName) {
+		s3BucketName = bucketName;
+	}
+	public void setS3FilePath(String targetFilePath) {
+		s3FilePath = targetFilePath;
+	}
+	public String getS3BucketName() {
+		return s3BucketName;
+	}
+	public String getS3FilePath() {
+		return s3FilePath;
 	}
 }

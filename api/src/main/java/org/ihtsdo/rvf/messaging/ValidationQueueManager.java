@@ -5,7 +5,12 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
 import org.apache.commons.codec.DecoderException;
+import org.ihtsdo.otf.dao.s3.S3Client;
+import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
@@ -27,7 +32,19 @@ public class ValidationQueueManager {
 	@Autowired
 	private ValidationReportService reportService;
 	
+	private FileHelper s3Helper;
+	@Resource
+	private S3Client s3Client;
+	
+	@Autowired
+	private String bucketName;
+	
 	private static final Logger logger = LoggerFactory.getLogger(ValidationQueueManager.class);
+	
+	@PostConstruct
+	public void init() {
+		s3Helper = new FileHelper(bucketName, s3Client);
+	}
 
 
 	public void queueValidationRequest(ValidationRunConfig config, Map<String, String> responseMap) {
@@ -60,14 +77,15 @@ public class ValidationQueueManager {
 	private boolean saveUploadedFiles(final ValidationRunConfig config, final Map<String, String> responseMap) throws IOException {
 		final String filename = config.getFile().getOriginalFilename();
 		//temp file will be deleted when validation is done.
-		final File tempFile = File.createTempFile(filename, ".zip");
 		if (!filename.endsWith(".zip")) {
 			responseMap.put(FAILURE_MESSAGE, "Post condition test package has to be zipped up");
 			return false;
 		}
 		// must be a zip, save it off
-		config.getFile().transferTo(tempFile);	
-		config.setProspectiveFile(tempFile);
+		String targetFilePath = config.getStorageLocation() + File.separator + config.getRunId() + File.separator + filename;
+		s3Helper.putFile(config.getFile().getInputStream(), targetFilePath);
+		config.setS3BucketName(bucketName);
+		config.setS3FilePath(targetFilePath);
 		config.setTestFileName(filename);
 		if ( config.getManifestFile() != null ) {
 			File manifestLocalFile = File.createTempFile( config.getManifestFile().getOriginalFilename() + config.getRunId(), ".xml");

@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
+import org.ihtsdo.rvf.autoscaling.InstanceManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.slf4j.Logger;
@@ -25,30 +26,51 @@ public class ReleaseValidationMessageListener {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	//Using runner as prototype scope or using executor to process message asynchronously
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
+	
+	private InstanceManager instanceManager;
 
 	@JmsListener(containerFactory = "jmsListenerContainerFactory", destination = "rvf-validation-queue")
 	public void triggerValidation(final TextMessage incomingMessage) {
 		logger.info("Received message {}", incomingMessage);
-//		executor.submit( new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//				Gson gson = new Gson();
-//				ValidationRunConfig config = null;
-//				try {
-//					config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
-//					logger.info("validation config from queue:" + config);
-//				} catch (JsonSyntaxException | JMSException e) {
-//					logger.error("JMS message listener error:", e);
-//				}
-//				if ( config != null) {
-//					if (config.getProspectiveFilePath() != null) {
-//						config.setProspectiveFile(new File(config.getProspectiveFilePath()));
-//					}
-//					runner.run(config);
-//				}
-//			}
-//		});
+		createEC2WorkerInstance();
+//		runValidationAsynchronously(incomingMessage);
+//		runValidation(incomingMessage);
+	}
+
+	
+	private void createEC2WorkerInstance() {
+		executor.submit( new Runnable() {
+			@Override
+			public void run() {
+				instanceManager.createInstance();
+			} });
+	}
+	
+	
+	private void runValidationAsynchronously(final TextMessage incomingMessage) {
+		executor.submit( new Runnable() {
+			
+			@Override
+			public void run() {
+				Gson gson = new Gson();
+				ValidationRunConfig config = null;
+				try {
+					config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
+					logger.info("validation config from queue:" + config);
+				} catch (JsonSyntaxException | JMSException e) {
+					logger.error("JMS message listener error:", e);
+				}
+				if ( config != null) {
+					if (config.getProspectiveFilePath() != null) {
+						config.setProspectiveFile(new File(config.getProspectiveFilePath()));
+					}
+					runner.run(config);
+				}
+			}
+		});
+	}
+
+	private void runValidation(final TextMessage incomingMessage) {
 		Gson gson = new Gson();
 		ValidationRunConfig config = null;
 		try {
