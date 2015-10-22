@@ -9,6 +9,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
@@ -18,6 +23,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
+import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
@@ -48,21 +54,23 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	private String deltaTableSuffix = "d";
 	private String snapshotTableSuffix = "s";
 	private String fullTableSuffix = "f";
+	
+	private ExecutorService executorService = Executors.newCachedThreadPool();
 
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceImpl.class);
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-//		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(run_id BIGINT, assertion_id BIGINT, " + 
-//				"details VARCHAR(500), INDEX (run_id), INDEX (assertion_id)) default charset=utf8";
-//		try (Connection connection = dataSource.getConnection()) {
-//			try (Statement statement = connection.createStatement()) {
-//				statement.execute(createSQLString);
-//			}
-//		}
-//		catch (final SQLException e) {
-//			logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
-//		}
+		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(run_id BIGINT, assertion_id BIGINT, " + 
+				"details VARCHAR(500)) engine=innodb default charset=utf8";
+		try (Connection connection = dataSource.getConnection()) {
+			try (Statement statement = connection.createStatement()) {
+				statement.execute(createSQLString);
+			}
+		}
+		catch (final SQLException e) {
+			logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
+		}
 	}
 
 	@Override
@@ -105,6 +113,48 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		return items;
 	}
 	
+	
+	
+	
+@Override
+public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertions, final ExecutionConfig executionConfig) {
+		
+		final List<Future<Collection<TestRunItem>>> concurrentTasks = new ArrayList<>();
+		final List<TestRunItem> results = new ArrayList<>();
+		int counter = 1;
+		List<Assertion> batch = null;
+		for (final Assertion assertion: assertions) {
+			if (batch == null) {
+				batch = new ArrayList<Assertion>();
+			}
+			batch.add(assertion);
+			if (counter % 10 == 0 || counter == assertions.size()) {
+				final List<Assertion> work = batch;
+				logger.info(String.format("Started executing assertion [%1s] of [%2s]", counter, assertions.size()));
+				final Future<Collection<TestRunItem>> future = executorService.submit(new Callable<Collection<TestRunItem>>() {
+					@Override
+					public Collection<TestRunItem> call() throws Exception {
+						return executeAssertions(work, executionConfig);
+					}
+				});
+				logger.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
+				//reporting every 10 assertions
+				concurrentTasks.add(future);
+				batch = null;
+			}
+			counter++;
+		}
+		
+		// Wait for all concurrent tasks to finish
+		for (final Future<Collection<TestRunItem>> concurrentTask : concurrentTasks) {
+			try {
+				results.addAll(concurrentTask.get());
+			} catch (ExecutionException | InterruptedException e) {
+				logger.error("Thread interrupted while waiting for future result.", e);
+			}
+		}
+		return results;
+	}
 	/** Executes an update using statement sql and logs the time taken **/
 	private int executeUpdateStatement (final Connection connection, final String sql) throws SQLException{
 		final long startTime = System.currentTimeMillis();
@@ -121,17 +171,14 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	@Override
 	public TestRunItem executeTest(final Assertion assertion, final Test test, final ExecutionConfig config) {
 
-		final Long executionId = config.getExecutionId();
-		logger.info("Starting execution id = " + executionId);
-		final long timeStart = System.currentTimeMillis();
-
+		long timeStart = System.currentTimeMillis();
+		logger.debug("Start executing assertion:" + assertion.getUuid());
 		// set prospective version as default schema to use since SQL has calls that do not specify schema name
 		final String prospectiveSchemaName = releaseDataManager.getSchemaForRelease(config.getProspectiveVersion());
-		logger.info("Setting default catalog as : " + prospectiveSchemaName);
 
 		final TestRunItem runItem = new TestRunItem();
 		runItem.setTestCategory(assertion.getKeywords());
-		runItem.setAssertionText(assertion.getName());
+		runItem.setAssertionText(assertion.getAssertionText());
 		runItem.setAssertionUuid(assertion.getUuid());
 
 		// get command from test and validate the included command object
@@ -142,18 +189,28 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			// create a single connection for entire test and close it after running test - avoid creating too many connections
 			try (Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName)) {
 				executeCommand(assertion, config, command, connection);
-				extractTestResult(assertion, runItem, config);
-			}
-			catch (final SQLException | ConfigurationException e) {
+				long timeEnd = System.currentTimeMillis();
+				runItem.setRunTime((timeEnd - timeStart));
+			} catch (final Exception e) {
+				e.printStackTrace();
 				logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command);
-				runItem.setFailureMessage("Error executing SQL command object. Nested exception : " + e.fillInStackTrace());
-			}
-		}
-		else {
+				runItem.setFailureMessage("Error executing SQL command object Nested exception : " + e.fillInStackTrace());
+				return runItem;
+			} 
+		} else {
 			runItem.setFailureMessage("Test does not have any associated execution command:" + test);
+			return runItem;
 		}
-		final long timeEnd = System.currentTimeMillis();
-		runItem.setRunTime((timeEnd - timeStart));
+		
+		try {
+			long extractTimeStart = System.currentTimeMillis();
+			extractTestResult(assertion, runItem, config);
+			long extractTimeEnd = System.currentTimeMillis();
+			runItem.setExtractResultInMillis((extractTimeEnd - extractTimeStart));
+		} catch (SQLException e) {
+			logger.warn("Failed to extract test result : " + e.fillInStackTrace());
+			runItem.setFailureMessage("Error extracting test result. Nested exception : " + e.fillInStackTrace() + runItem);
+		}
 		logger.info(runItem.toString());
 		return runItem;
 	}
@@ -212,7 +269,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 								}
 								// execute insert statement
 								insertStatement.executeBatch();
-								logger.debug("batch insert completed for test:" + assertion.getName());
+								logger.debug("batch insert completed for assertion:" + assertion.getAssertionText());
 							}
 						}
 					}
@@ -259,7 +316,9 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
 			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
 			part = part.replaceAll("<TEMP>", prospectiveSchema);
-			part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
+			if (previousReleaseSchema != null) {
+				part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
+			}
 			part = part.replaceAll("<DELTA>", deltaTableSuffix);
 			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
 			part = part.replaceAll("<FULL>", fullTableSuffix);
@@ -275,24 +334,48 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 		/*
 		 create a prepared statement for retrieving matching results.
 		*/
-		final String resultSQL = "select assertion_id, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
+		String resultSQL = "select concept_id, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
+		//use limit to save memory and improve performance for worst case when containing thousands of errors
+		if (config.getFailureExportMax() > 0) {
+			resultSQL = resultSQL + " limit ?";
+		}
 		try (Connection connection = dataSource.getConnection()) {
-			try (PreparedStatement resultStatement = connection.prepareStatement(resultSQL)) {
+			long counter = 0;
+			try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
 				// select results that match execution
-				resultStatement.setLong(1, assertion.getId());
-				resultStatement.setLong(2, config.getExecutionId());
-				try (ResultSet resultSet = resultStatement.executeQuery()) {
-					long counter = 0;
+				preparedStatement.setLong(1, assertion.getId());
+				preparedStatement.setLong(2, config.getExecutionId());
+				if( config.getFailureExportMax() > 0) {
+					preparedStatement.setLong(3, config.getFailureExportMax());
+				}
+				try (ResultSet resultSet = preparedStatement.executeQuery()) {
+					
 					while (resultSet.next())
 					{
 						// only get first N failed results
 						if (config.getFailureExportMax() < 0 || counter < config.getFailureExportMax()) {
-							runItem.addFirstNInstance(resultSet.getString(2));
+							FailureDetail detail = new FailureDetail(resultSet.getLong(1), resultSet.getString(2));
+							runItem.addFirstNInstance(detail);
 						}
 						counter++;
 					}
-					runItem.setFailureCount(counter);
 				}
+			}
+			
+			if ( counter < config.getFailureExportMax() ) {
+				runItem.setFailureCount(counter);
+			} else {
+				String totalSQL = "select count(*) total from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
+				try (PreparedStatement preparedStatement = connection.prepareStatement(totalSQL)) {
+					// select results that match execution
+					preparedStatement.setLong(1, assertion.getId());
+					preparedStatement.setLong(2, config.getExecutionId());
+					try (ResultSet resultSet = preparedStatement.executeQuery()) {
+						if (resultSet.next()) {
+							runItem.setFailureCount(new Long(resultSet.getInt(1)));
+						}
+					}
+					}
 			}
 		}
 	}

@@ -1,0 +1,22 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+ " SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"juvenile\" or \"childhood\" in any term not modelled with \"Occurrence \" = \"Childhood\": ', term)  ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
+ " WHERE  (lower(term) LIKE '%juvenile%' OR lower(term) LIKE '%childhood%')  ", 
+ " AND d.conceptid = c.id ", 
+ " AND c.active = 1   ", 
+ " AND d.active = 1 ",
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (term LIKE '%finding%' OR term LIKE '%disorder%' )  ", 
+ " AND  NOT EXISTS (", 
+ " SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r  ", 
+ " WHERE  r.sourceid = d.conceptid  ", 
+ " AND  r.typeid = 246454002  ", 
+ " AND r.active = 1 ",
+ " AND  r.destinationid = 255398004)"]], 
+"assertionText" : "Current concept with \"juvenile\" or \"childhood\" in any term not modelled with \"Occurrence \" = \"Childhood\"",
+"shortName" : "childhood in term modelled with occurrence",
+"docRef" : "SNOMED CT Style Guide: Clinical Findings Section2.12 Occurrence ",
+"id" : "a3d65004-e8a5-4283-9a22-40e2dad85494"
+}

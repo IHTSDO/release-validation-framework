@@ -6,11 +6,12 @@
 	New inactive states follow active states in the ATTRIBUTEVALUE snapshot.
 
 ********************************************************************************/
-	
-/* 	view of current snapshot made by finding invalid inactive states*/
-	drop table if exists v_curr_snapshot;
-	create table if not exists  v_curr_snapshot as
-	select a.id 
+	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	select 
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		'<ASSERTIONTEXT>',
+		concat('AttributeRefsetId=',a.id, ' should not have a new inactive state in the snapshot file as was inactive previously.') 	
 	from curr_attributevaluerefset_s a , prev_attributevaluerefset_s b
 	where cast(a.effectivetime as datetime) >
 				(select max(cast(effectivetime as datetime)) 
@@ -18,17 +19,4 @@
 	and a.active = 0
 	and a.id = b.id
 	and a.active = b.active;
-	
-
-	
-/* 	inserting exceptions in the result table */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
-	select 
-		<RUNID>,
-		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
-		concat('AttributeRefsetId=',a.id, ' should not have a new inactive state in the snapshot file as was inactive previously.') 	
-	from v_curr_snapshot a;
-
-
-	drop table if exists v_curr_snapshot;
+	commit;

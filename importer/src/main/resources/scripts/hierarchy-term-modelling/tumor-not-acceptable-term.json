@@ -1,0 +1,16 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+ " SELECT <RUNID>, '<ASSERTIONUUID>', c.id, ", 
+ " concat('Current concept (', c.id, ') with \"tumor\" in FSN: ', term)  ", 
+ " FROM <PROSPECTIVE>.description_s d, <PROSPECTIVE>.concept_s c ", 
+ " WHERE d.conceptid = c.id ",
+ " AND lower(d.term) LIKE '%tumor%'  ", 
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (d.term LIKE '%finding%' OR d.term LIKE '%disorder%' )  ", 
+ " AND c.active = 1 ",
+ " AND d.active = 1 "]], 
+"assertionText" : "Current concept with \"tumor\" in FSN",
+"shortName" : "tumor not acceptable term",
+"docRef" : "SNOMED CT Style Guide: Clinical Findings Section 3.5 ",
+"id" : "54cd215f-c766-4254-9de8-8abdbabe5999"
+}

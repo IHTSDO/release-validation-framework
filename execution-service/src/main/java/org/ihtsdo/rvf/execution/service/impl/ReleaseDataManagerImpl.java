@@ -28,10 +28,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -48,6 +50,8 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	private File sctDataFolder;
 	@Resource(name = "snomedDataSource")
 	private BasicDataSource snomedDataSource;
+	@Autowired
+	private RvfDynamicDataSource rvfDynamicDataSource;
 	private final Map<String, String> releaseSchemaNameLookup = new HashMap<>();
 	/**
 	 * No args constructor for IOC. Always call 'init' method after creation
@@ -195,8 +199,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			try (Connection connection = snomedDataSource.getConnection()) {
 				connection.setAutoCommit(true);
 				createDBAndTables(createdSchemaName, connection);
-				loadReleaseFilesToDB(outputFolder, connection,rf2FilesLoaded);
 			}
+			
+			loadReleaseFilesToDB(outputFolder,rvfDynamicDataSource,rf2FilesLoaded, createdSchemaName);
+			
 			// add schema name to look up map
 			releaseSchemaNameLookup.put(versionName, createdSchemaName);
 		} catch (final SQLException | IOException e) {
@@ -227,8 +233,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 	}
 
-	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final Connection connection, List<String> rf2FilesLoaded) throws SQLException, FileNotFoundException {
-		
+	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final RvfDynamicDataSource dataSource, List<String> rf2FilesLoaded, String schemaName) throws SQLException, FileNotFoundException {
 		if (rf2TextFilesDir != null) {
 			final String[] rf2Files = rf2TextFilesDir.list( new FilenameFilter() {
 				
@@ -241,7 +246,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 					return false;
 				}
 			});
-			final ReleaseFileDataLoader dataLoader = new ReleaseFileDataLoader(connection, new MySqlDataTypeConverter());
+			final ReleaseFileDataLoader dataLoader = new ReleaseFileDataLoader(dataSource, schemaName, new MySqlDataTypeConverter());
 			dataLoader.loadFilesIntoDB(rf2TextFilesDir.getAbsolutePath(), rf2Files, rf2FilesLoaded);
 		}
 	}

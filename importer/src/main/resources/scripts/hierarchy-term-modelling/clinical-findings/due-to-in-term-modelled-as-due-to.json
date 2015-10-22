@@ -1,0 +1,20 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+" SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"due to\" in term not modelled on the attribute \"Due to\": ', term) ", 
+ " FROM <PROSPECTIVE>.description_s d, <PROSPECTIVE>.concept_s c ", 
+ " WHERE lower(term) LIKE '%due to%'  ", 
+ " AND lower(term) NOT LIKE '%not due to%'  ", 
+ " AND c.active = 1 ",
+ " AND d.conceptid = c.id  ", 
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (term LIKE '%finding%' OR term LIKE '%disorder%' ) ", 
+ " AND  NOT EXISTS ", 
+" (SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r  ", 
+	 " WHERE  r.typeid = 42752001  ", 
+	 " AND  r.sourceid = d.conceptid) "]], 
+"assertionText" : "Current concept  with \"due to\" in term not modelled on the attribute \"Due to\"",
+"shortName" : "due to in term modelled as due to",
+"docRef" : "SNOMED CT Style Guide: Clinical Findings Section 2.6.2 Due to",
+"id" : "37e5e590-b8b3-4fe5-aa7d-384498f17c6d"
+}

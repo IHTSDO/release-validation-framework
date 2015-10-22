@@ -13,10 +13,11 @@ public class TestRunItem {
 	private UUID assertionUuid;
 	private String assertionText;
 	private String executionId;
-	private Long runTimeInMilliSeconds;
+	private Long queryInMilliSeconds;
 	private Long failureCount;
 	private String failureMessage;
-	private List<String> firstNInstances;
+	private List<FailureDetail> firstNInstances;
+	private Long extractResultInMillis;
 
 
 	/**
@@ -46,7 +47,7 @@ public class TestRunItem {
 				"assertionText=" + assertionText +  '\'' +	
 				"executionId=" + executionId + '\'' +
 				"testCategory=" + testCategory + '\'' +
-				"runTime=" + runTimeInMilliSeconds + '\'' +
+				"runTime=" + queryInMilliSeconds + '\'' +
 				"failureCount=" + failureCount +
 				'}';
 	}
@@ -60,26 +61,26 @@ public class TestRunItem {
 	}
 
 	public Long getRunTime() {
-		return runTimeInMilliSeconds;
+		return queryInMilliSeconds;
 	}
 
 	public void setRunTime(final long runTime) {
-		this.runTimeInMilliSeconds = runTime;
+		this.queryInMilliSeconds = runTime;
 	}
 
 	public void setFailureMessage(final String failureMessage) {
 		this.failureMessage = failureMessage;
 	}
 
-	public List<String> getFirstNInstances() {
+	public List<FailureDetail> getFirstNInstances() {
 		return firstNInstances;
 	}
 
-	public void setFirstNInstances(final List<String> firstNInstances) {
+	public void setFirstNInstances(final List<FailureDetail> firstNInstances) {
 		this.firstNInstances = firstNInstances;
 	}
 
-	public void addFirstNInstance(final String failureInstance){
+	public void addFirstNInstance(final FailureDetail failureInstance){
 		if (firstNInstances == null) {
 			firstNInstances = new ArrayList<>();
 		}
@@ -109,4 +110,13 @@ public class TestRunItem {
 	public void setAssertionUuid(final UUID assertionUuid) {
 		this.assertionUuid = assertionUuid;
 	}
+
+	public Long getExtractResultInMillis() {
+		return extractResultInMillis;
+	}
+
+	public void setExtractResultInMillis(Long extractResultInMillis) {
+		this.extractResultInMillis = extractResultInMillis;
+	}
+	
 }

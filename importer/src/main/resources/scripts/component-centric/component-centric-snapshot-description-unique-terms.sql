@@ -6,9 +6,8 @@
 
 ********************************************************************************/
 
-/* 	a list of concepts and their semantic tags, for active concepts edited this release */
-	drop table if exists tmp_hierarchy;
-	create table if not exists tmp_hierarchy as
+drop table if exists temp_active_fsn_hierarchy;
+	create table if not exists temp_active_fsn_hierarchy as
 	select distinct a.conceptid, a.languagecode, concat('(',substring_index(a.term, '(', -1)) as semantictag
 	from curr_description_s a
 		join curr_description_d  b
@@ -21,11 +20,11 @@
 	commit;	 
 
 /* 	a list of descriptions and their hierarchies */
-	drop table if exists tmp_description;
-	create table if not exists tmp_description
+	drop table if exists tmp_description_syn;
+	create table if not exists tmp_description_syn
 	select a.id, a.languagecode, a.conceptid, a.term, b.semantictag as semantictag
 	from curr_description_s a
-	join tmp_hierarchy b
+	join temp_active_fsn_hierarchy b
 	on a.conceptid = b.conceptid
 	and a.active = 1
 	and a.languagecode = b.languagecode
@@ -39,8 +38,8 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		a.term
-	from tmp_description a
-	join tmp_hierarchy b
+	from tmp_description_syn a
+	join temp_active_fsn_hierarchy b
 	on a.conceptid = b.conceptid
 	and a.languagecode = b.languagecode
 	group by binary a.term, a.semantictag, a.conceptid
@@ -48,6 +47,6 @@
 	and count(a.semantictag) > 1;
 	commit;
 	
-	drop table if exists tmp_hierarchy;
-	drop table if exists tmp_description;
+	drop table if exists temp_active_fsn_hierarchy;
+	drop table if exists tmp_description_syn;
 	

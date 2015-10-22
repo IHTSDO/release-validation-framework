@@ -341,7 +341,7 @@
 		<script uuid="805ab37c-33fa-45aa-876b-f86365a828c8" category="component-centric-validation" sqlFile="component-centric-snapshot-description-case-word-match.sql" text="Case-sensitive terms that share initial words also share caseSignificanceId value." />
 		<script uuid="22a95293-3acb-4671-95f8-1ff13ba3202c" category="component-centric-validation" sqlFile="component-centric-snapshot-description-casesignificanceid.sql" text="Case-sensitive terms have appropriate caseSignificanceId." />		
 		<script uuid="6614ff12-fca2-42b7-a5da-ea26353979fe" category="component-centric-validation" sqlFile="component-centric-snapshot-description-valid-characters.sql" text="Active description of active concept consists of valid characters." />		
-		
+		<script uuid="8D6AB114-CACA-4D99-9FEC-BB8FD9CEA518" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-fsn.sql" text="The FSN term should be uqniue in active content." />		
 		<script uuid="b4930ea7-4078-4599-979c-2dde18164f01" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-case-sensitive.sql" text="All definitions are case sensitive." />
 		<script uuid="73e46e72-6fdb-407b-9d50-d86a36a3a862" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-preferred.sql" text="All active definitions are preferred." />
 		<script uuid="da3ae7c4-6144-4cd5-9530-2a7780c53c9a" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-trim.sql" text="No active definitions contain leading or trailing spaces." />

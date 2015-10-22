@@ -1,0 +1,12 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+ " SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (',d.conceptid, ') with dash in FSN: ', term)  ", 
+ " FROM <PROSPECTIVE>.description_s d ", 
+ " WHERE  lower(term) LIKE '% - %' ", 
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND d.active = 1"]], 
+"assertionText" : "Current concept with dash in FSN",
+"shortName" : "dash not acceptable in FSN",
+"docRef" : "SNOMED CT StyleGuide: TermConventions Spelling,Style, and AllowableChanges (UK Dialect)",
+"id" : "6cfd7cdd-6938-4722-875f-e3bb502de7e2"
+}

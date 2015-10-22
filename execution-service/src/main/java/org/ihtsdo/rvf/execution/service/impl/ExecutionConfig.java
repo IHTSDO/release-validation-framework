@@ -8,7 +8,7 @@ public class ExecutionConfig {
 	private String previousVersion;
 	private Long executionId;
 	private List<String> groupNames;
-	private int failureExportMax = -1;
+	private int failureExportMax = 10;
 	private boolean firstTimeRelease;
 
 	public ExecutionConfig(final Long runId) {

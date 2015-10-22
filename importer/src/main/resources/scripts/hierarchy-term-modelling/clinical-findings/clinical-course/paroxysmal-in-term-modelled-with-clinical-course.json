@@ -1,0 +1,20 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+" SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"paroxysmal\" in any term not modelled with \"Clinical course\" = \"Paroxysmal\"', term)  ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
+ " WHERE  lower(term) LIKE '%paroxysmal%'  ", 
+ " AND d.conceptid = c.id ", 
+ " AND c.active = 1   ", 
+ " AND (term LIKE '%finding%' OR term LIKE '%disorder%' )  ", 
+ " AND  NOT EXISTS ", 
+" (SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r  ", 
+	 " WHERE  r.sourceid = d.conceptid  ", 
+	 " AND  r.active = 1 ",
+	 " AND  r.typeid = 263502005  ", 
+	 " AND  r.destinationid = 26593000)"]], 
+"assertionText" : "Current concept with \"paroxysmal\" in any term not modelled with \"Clinical course\" = \"Paroxysmal\"",
+"shortName" : "paroxysmal in term modelled with clinical course",
+"docRef" : "SNOMED CT Style Guide: Clinical Findings Section 2.8 Clinical course ",
+"id" : "778bfd46-8f90-4d16-803b-5f0f109c0e7f"
+}

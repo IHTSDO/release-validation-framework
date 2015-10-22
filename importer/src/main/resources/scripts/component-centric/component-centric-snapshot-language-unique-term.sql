@@ -9,21 +9,12 @@
 	for the current prospective release
 
 ********************************************************************************/
-/*	list of active concepts edited for the current prospective release */
-	drop table if exists v_tmp_active_con;
-	create table if not exists v_tmp_active_con as
-	select b.*
-	from res_concepts_edited a 
-		join curr_concept_s b
-			on a.conceptid = b.id
-			and b.active = 1;
-	commit;
 
 /* 	list of refset members per concept, per refset */
 	drop table if exists tmp_member;
 	create table if not exists tmp_member as
 	select a.id as conceptid, c.refsetid, c.referencedcomponentid
-	from v_tmp_active_con a
+	from res_edited_active_concepts a
 		join curr_description_s b
 			on a.id = b.conceptid
 			and a.active = b.active

@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class StructuralTestRunner implements InitializingBean{
@@ -90,7 +89,7 @@ public class StructuralTestRunner implements InitializingBean{
 		columnPatternTest.runTests();
 	}
 	
-	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final MultipartFile manifestFile, 
+	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final String manifestFilePath, 
 			final boolean writeSucceses, final String urlPrefix ) throws IOException {
 		 boolean isFailed = false;
 		 final long timeStart = System.currentTimeMillis();
@@ -105,15 +104,12 @@ public class StructuralTestRunner implements InitializingBean{
 
 			TestReportable report;
 
-			if (manifestFile == null) {
+			if (manifestFilePath == null) {
 				report = execute(resourceManager, writer, writeSucceses);
 			} else {
 				File tempManifestFile  = null;
 				try {
-					final String originalFilename = manifestFile.getOriginalFilename();
-					tempManifestFile = File.createTempFile(originalFilename, ".xml");
-					manifestFile.transferTo(tempManifestFile);
-					final ManifestFile mf = new ManifestFile(tempManifestFile);
+					final ManifestFile mf = new ManifestFile(new File(manifestFilePath));
 					report = execute(resourceManager, writer, writeSucceses, mf);
 				} finally {
 					FileUtils.deleteQuietly(tempManifestFile);

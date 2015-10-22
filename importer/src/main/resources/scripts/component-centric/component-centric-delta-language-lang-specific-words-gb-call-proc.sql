@@ -9,8 +9,8 @@
 
 ********************************************************************************/
 
-	drop table if exists v_curr_delta;
-	create table if not exists v_curr_delta as
+	drop table if exists v_curr_delta_gb;
+	create table if not exists v_curr_delta_gb as
 	select distinct a.id, a.term
 		from curr_description_d a 
 		inner join curr_langrefset_s b on a.id = b.referencedComponentId
@@ -21,5 +21,4 @@
 		and a.typeid = '900000000000013009';	/* synonym */	
 
 	call gbTerm_procedure(<RUNID>,'<ASSERTIONUUID>');
-
-	/* drop table if exists v_curr_delta; */
+	

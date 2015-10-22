@@ -13,6 +13,7 @@ import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 public class ManifestPatternTester {
 
 	private static final String MANIFEST_STRUCTURE_TEST = "ManifestPackageStructureTest";
+	private static final String MANIFEST = "manifest.xml";
 	private final ValidationLog validationLog;
 	private final ResourceProvider resourceManager;
 	private final ManifestFile manifestFile;
@@ -27,13 +28,17 @@ public class ManifestPatternTester {
 	}
 
 	public void runTests() {
-
-		final List<Folder> folders = manifestFile.getListing().getFolders();
 		final Date startTime = new Date();
-		final AtomicInteger folderCounter = new AtomicInteger(0);
-		final AtomicInteger fileCounter = new AtomicInteger(0);
-		testStructure(folders, folderCounter, fileCounter, startTime);
-		validationLog.info("Manifest file structure testing for {} files and {} folders completed in {} milliseconds.", fileCounter, folderCounter, (new Date().getTime() - startTime.getTime()));
+		if (manifestFile == null) {
+			validationLog.assertionError("Manifest file expected but not found.");
+			report.addError("0", startTime, MANIFEST, MANIFEST, MANIFEST, MANIFEST_STRUCTURE_TEST, "", "No Manifest File Found", MANIFEST);
+		} else {
+			final List<Folder> folders = manifestFile.getListing().getFolders();
+			final AtomicInteger folderCounter = new AtomicInteger(0);
+			final AtomicInteger fileCounter = new AtomicInteger(0);
+			testStructure(folders, folderCounter, fileCounter, startTime);
+			validationLog.info("Manifest file structure testing for {} files and {} folders completed in {} milliseconds.", fileCounter, folderCounter, (new Date().getTime() - startTime.getTime()));
+		}
 	}
 
 	private void testStructure(final List<Folder> folders, final AtomicInteger folderCounter, final AtomicInteger fileCounter, final Date startTime) {

@@ -20,3 +20,4 @@ api-demo/tmp
 /bin
 
 config_local
+activemq-data/

@@ -12,6 +12,6 @@ insert into qa_result (runid, assertionuuid, assertiontext, details)
  from curr_extendedmaprefset_s a
 	where a.active = 1
   	and a.mapTarget != ''
-	group by a.referencedComponentId, a.mapTarget, a.mapRule
+	group by a.referencedComponentId, a.mapTarget, a.mapRule,a.refsetid
 	having count(distinct a.mapGroup) > 1;
  commit;

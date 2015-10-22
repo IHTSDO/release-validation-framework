@@ -1,14 +1,15 @@
 package org.ihtsdo.rvf.execution.service.util;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.dbcp.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * A wrapper around {@link org.apache.commons.dbcp.BasicDataSource} that handles dynamic schema changes
@@ -19,7 +20,9 @@ public class RvfDynamicDataSource {
     private String url;
     @Resource(name = "snomedDataSource")
     BasicDataSource basicDataSource;
-    private Map<String, DataSource> schemaDatasourceMap = new HashMap<>();
+    private ConcurrentHashMap<String, BasicDataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
+    
+	private final Logger LOGGER = LoggerFactory.getLogger(RvfDynamicDataSource.class);
 
     /**
      * Returns a connection for the given schema. It uses an underlying map to store relevant {@link org.apache.commons.dbcp.BasicDataSource}
@@ -41,6 +44,7 @@ public class RvfDynamicDataSource {
             dataSource.setDefaultCatalog(schema);
             dataSource.setMaxActive(basicDataSource.getMaxActive());
             dataSource.setMaxIdle(basicDataSource.getMaxIdle());
+            dataSource.setMinIdle(basicDataSource.getMinIdle());
             dataSource.setTestOnBorrow(basicDataSource.getTestOnBorrow());
             dataSource.setTestOnReturn(basicDataSource.getTestOnReturn());
             dataSource.setTestWhileIdle(basicDataSource.getTestWhileIdle());
@@ -49,10 +53,24 @@ public class RvfDynamicDataSource {
             dataSource.setMinEvictableIdleTimeMillis(basicDataSource.getMinEvictableIdleTimeMillis());
             dataSource.setTimeBetweenEvictionRunsMillis(basicDataSource.getTimeBetweenEvictionRunsMillis());
             // add to map
-            schemaDatasourceMap.put(schema, dataSource);
-
+            schemaDatasourceMap.putIfAbsent(schema, dataSource);
             return dataSource.getConnection();
         }
+    }
+    
+    
+    public void close( String schema) {
+    	if ( schema != null) {
+    		BasicDataSource dataSource = schemaDatasourceMap.get(schema);
+    		if (dataSource != null) {
+    			try {
+					dataSource.close();
+				} catch (SQLException e) {
+					LOGGER.error("Failed to close datasource for schema:" + schema, e);
+				}
+    		}
+    		schemaDatasourceMap.remove(schema);
+    	}
     }
 
     public void setUrl(String url) {

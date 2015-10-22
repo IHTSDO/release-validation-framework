@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
@@ -53,6 +54,8 @@ public class RVFAssertionsRegressionIT {
 	private static final String COMPONENT_CENTRIC_VALIDATION = "component-centric-validation";
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
 	private static final String PROSPECTIVE_RELEASE = "regression_test_prospective";
+	
+	
 	private static final String PREVIOUS_RELEASE = "regression_test_previous";
 	@Autowired
     private AssertionExecutionService assertionExecutionService;
@@ -85,7 +88,6 @@ public class RVFAssertionsRegressionIT {
 			final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
 			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
-			releaseDataManager.loadSnomedData(PREVIOUS_RELEASE,rf2FilesLoaded, previousFile);
         }
         if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
         	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
@@ -103,7 +105,6 @@ public class RVFAssertionsRegressionIT {
         assertNotNull("Must not be null", fileCentricExpected);
         releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_" + PREVIOUS_RELEASE);
         releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_"+ PROSPECTIVE_RELEASE);
-        
         resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
         final List<Assertion> assertions = assertionDao.getAssertionsByContainingKeyword("resource");
 		config = new ExecutionConfig(System.currentTimeMillis());
@@ -116,6 +117,7 @@ public class RVFAssertionsRegressionIT {
 	@Test
 	public void testReleaseTypeAssertions() throws Exception {
 		runAssertionsTest(RELEASE_TYPE_VALIDATION, releaseTypeExpectedResults.getFile());
+		
 	}
 	
 	@Test
@@ -130,7 +132,12 @@ public class RVFAssertionsRegressionIT {
 	private void runAssertionsTest(final String groupName, final String expectedJsonFile) throws Exception {
 		 final List<Assertion> assertions= assertionDao.getAssertionsByContainingKeyword(groupName);
 		 System.out.println("found total assertions:" + assertions.size());
-			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
+		 long timeStart = System.currentTimeMillis();
+			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
+//		 final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
+			
+			long timeEnd = System.currentTimeMillis();
+			System.out.println("Time taken:" +(timeEnd-timeStart));
 			assertTestResult(groupName, expectedJsonFile, runItems);
 	 }
 	private void assertTestResult(final String type, final String expectedJsonFileName,final Collection<TestRunItem> runItems) throws Exception {
@@ -281,14 +288,14 @@ public class RVFAssertionsRegressionIT {
 	private static class RVFTestResult implements Comparable<RVFTestResult> {
 		private String assertionName;
 		private UUID assertionUuid;
-		private List<String> firstNInstances;
+		private List<FailureDetail> firstNInstances;
 		private long totalFailed;
 		public void setAssertonName(final String assertionText) {
 			assertionName = assertionText;
 		}
 
-		public void setFirstNInstances(final List<String> firstNInstances) {
-			this.firstNInstances = firstNInstances;
+		public void setFirstNInstances(final List<FailureDetail> list) {
+			this.firstNInstances = list;
 		}
 
 		public void setTotalFailed(final long failureCount) {
@@ -298,7 +305,7 @@ public class RVFAssertionsRegressionIT {
 		public String getAssertionName() {
 			return assertionName;
 		}
-		public List<String> getFirstNInstances() {
+		public List<FailureDetail> getFirstNInstances() {
 			return firstNInstances;
 		}
 		public long getTotalFailed() {

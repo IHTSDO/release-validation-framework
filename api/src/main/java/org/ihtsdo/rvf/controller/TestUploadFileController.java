@@ -19,6 +19,7 @@ import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
+import org.ihtsdo.rvf.messaging.ValidationQueueManager;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
@@ -71,6 +72,8 @@ public class TestUploadFileController {
 	private TaskExecutor taskExecutor;
 	@Autowired
 	Provider<ValidationRunner> validationRunnerProvider;
+	@Autowired
+	ValidationQueueManager queueManager;
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
@@ -164,11 +167,10 @@ public class TestUploadFileController {
 			@RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@RequestParam(value = "storageLocation") final String storageLocation,
             final HttpServletRequest request) throws IOException {
-		
+
 		final String requestUrl = String.valueOf(request.getRequestURL());
 		final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
 
-		final ValidationRunner validationRunner = validationRunnerProvider.get();
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
 		vrConfig.addFile(file)
 				.addWriteSucceses(writeSucceses)
@@ -183,19 +185,37 @@ public class TestUploadFileController {
 				.addUrl(urlPrefix)
 				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion));
 		
+		
 		//Before we start running, ensure that we've made our mark in the storage location
 		//Init will fail if we can't write the "running" state to storage
 		final Map <String, String> responseMap = new HashMap<>();
-		final boolean initialisedOK = validationRunner.init(vrConfig, responseMap);
+		HttpStatus returnStatus =  HttpStatus.OK;
 		
-		final HttpStatus returnStatus = initialisedOK ? HttpStatus.OK : HttpStatus.PRECONDITION_FAILED;
-		if (initialisedOK) {
-			final Thread asyncValidationProcess = new Thread(validationRunner);
-			asyncValidationProcess.start();
+		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
+			//Queue incoming validation request
+			queueManager.queueValidationRequest( vrConfig, responseMap);
 			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
 			responseMap.put("resultURL", urlToPoll);
+		} else {
+			returnStatus = HttpStatus.PRECONDITION_FAILED;
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
+	}
+	
+	private boolean isAssertionGroupsValid(List<String> validationGroups, Map<String,String> responseMap) {
+		//check assertion groups
+		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(validationGroups);
+		if (groups.size() != validationGroups.size()) {
+			final List<String> found = new ArrayList<>();
+			for (final AssertionGroup group : groups) {
+				found.add(group.getName());
+			}
+			final String groupNotFoundMsg = String.format("Assertion groups requested: %s but found in RVF: %s",validationGroups, found);
+			responseMap.put("failureMessage", groupNotFoundMsg);
+			LOGGER.warn("Invalid assertion groups requested." + groupNotFoundMsg);
+			return false;
+		}
+		return true;
 	}
 
 	private boolean isFirstTimeRelease(String prevIntReleaseVersion) {

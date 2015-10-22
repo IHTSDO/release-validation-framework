@@ -12,35 +12,22 @@
 
 ********************************************************************************/
 	
-/*  view of active concepts associated with descriptions that have been edited 
-	for the currently prospective release
-*/
-	drop table if exists v_tmp_active_con;
-	create table if not exists v_tmp_active_con as
-	select a.*
-	from curr_concept_s a
-		join curr_description_d b
-			on a.id = b.conceptid
-			and a.active = 1 
-			and b.active = 1;
-	commit;
-
 /* 	view of current snapshot made by finding all the casesitive term for the 
 	above concepts 
 */
-	drop table if exists v_curr_snapshot_1;
-	create table if not exists v_curr_snapshot_1 as
+	drop table if exists tmp_active_caseSensitive_description;
+	create table if not exists tmp_active_caseSensitive_description as
 	select SUBSTRING_INDEX(term, ' ', 1) as firstword , a.conceptid , a.id , a.term , a.casesignificanceid, a.effectivetime
-	from  curr_description_s a , v_tmp_active_con b
+	from  curr_description_s a , res_edited_active_concepts b
 	where a.casesignificanceid = 900000000000017005
 	and a.active = 1
 	and b.active = 1
 	and a.conceptid = b.id;
 	
-	drop table if exists v_curr_snapshot_2;
-	create table if not exists v_curr_snapshot_2 (INDEX(conceptid)) as
+	drop table if exists tmp_caseSignificanceId_not_match;
+	create table if not exists tmp_caseSignificanceId_not_match (INDEX(conceptid)) as
 	select distinct (a.conceptid)
-	from v_curr_snapshot_1 a , curr_description_s b , v_tmp_active_con c
+	from tmp_active_caseSensitive_description a , curr_description_s b , res_edited_active_concepts c
 	where b.casesignificanceid = 900000000000020002
 	and b.active = 1
 	and c.active = 1
@@ -56,10 +43,10 @@
 		'<ASSERTIONUUID>',
 		'<ASSERTIONTEXT>',
 		concat('DESC: conceptid=',a.conceptid, ':has terms not sharing case-sensitivity.') 	
-	from v_curr_snapshot_2 a;
+	from tmp_caseSignificanceId_not_match a;
 
 
-	drop table if exists v_curr_snapshot_1;
-	drop table if exists v_curr_snapshot_2;
+	drop table if exists tmp_active_caseSensitive_description;
+	drop table if exists tmp_caseSignificanceId_not_match;
 
 	

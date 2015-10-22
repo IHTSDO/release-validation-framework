@@ -1,0 +1,20 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+			" SELECT <RUNID>, '<ASSERTIONUUID>',  d.conceptid, concat('Current concept (', c.id ,') with \"C/O\" or \"complaining of\" in any term not modelled for the attribute \"Finding informer\": ',term)  ", 
+			" FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c", 
+			" WHERE  (lower(term) LIKE '%c/o%' OR lower(term) LIKE '%complaining of%' )", 
+			" AND  d.conceptid = c.id  ", 
+			" AND  c.active = 1  ", 
+			" AND d.typeid = 900000000000003001 -- FSN ",
+			" AND  (term LIKE '%finding%' OR term LIKE '%disorder%' ) ", 
+			" AND  NOT EXISTS ", 
+			" ( SELECT *  FROM <PROSPECTIVE>.relationship_s r ", 
+			" WHERE r.sourceid = d.conceptid  ",
+			" AND r.typeid = 419066007  ", 
+			" AND r.active = 1 ",
+			" AND r.destinationid = 419358007)"]],
+"assertionText" : "Current concept with 'C/O' or 'complaining of' in any term not modelled for the attribute ‘Finding informer’ with a value of ‘Subject of record or other provider of history’ (For completeness with rule for 'O/E' but no violations)",
+"shortName" : "complaining of modelled finding informer",
+"docRef" : "SNOMED CT Style Guide: Clinical Findings Section 2.14 Finding informer",
+"id" : "065fe173-46dc-4ac4-9373-d189fc60f7b9"
+}

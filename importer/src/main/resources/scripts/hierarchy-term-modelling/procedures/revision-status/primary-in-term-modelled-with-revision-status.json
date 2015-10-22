@@ -1,0 +1,21 @@
+{
+"tests" : [["INSERT INTO qa_result (run_id, assertion_id, concept_id, details) ", 
+ " SELECT <RUNID>, '<ASSERTIONUUID>', d.conceptid, concat('Current concept (', c.id, ') with \"primary\" in any term not modelled with \"Revision status\" = \"Primary operation\": ', term) ", 
+ " FROM <PROSPECTIVE>.description_s d , <PROSPECTIVE>.concept_s c ", 
+ " WHERE  lower(term) LIKE '%primary%'", 
+ " AND d.conceptid =c.id  ", 
+ " AND c.active = 1  ", 
+ " AND d.typeid = 900000000000003001 -- FSN ", 
+ " AND  (term LIKE '%procedure%' OR term LIKE '%regime%') ", 
+ " AND  NOT EXISTS(", 
+ " SELECT *  ", 
+ " FROM <PROSPECTIVE>.relationship_s r ", 
+ " WHERE  r.sourceid = d.conceptid ", 
+ " AND  r.typeid = 246513007 ", 
+ " AND r.active = 1 ",
+ " AND  r.destinationid = 261424001)"]], 
+"assertionText" : "Current concept with \"primary\" in any term not modelled with \"Revision status\" = \"Primary operation\"",
+"shortName" : "primary in term modelled with revision status",
+"docRef" : "SNOMED CT StyleGuide: Procedures Section 2.14 Revision status",
+"id" : "f743c0e2-52ce-4a75-bd63-cfc11d7ed4bd"
+}

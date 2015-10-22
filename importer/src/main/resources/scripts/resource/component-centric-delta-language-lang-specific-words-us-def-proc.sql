@@ -33,7 +33,7 @@
 				runid,
 				assertionid,
 				concat('DESCRIPTION: id=',a.id, ': Synonym is prefered in US Language refset but refers to a word has en-gb spelling: ',gbTerm) 
-			from v_curr_delta a 
+			from v_curr_delta_us a 
 			where a.term REGEXP concat('[[:<:]]',gbTerm,'[[:>:]]');
 		end loop validate; 
 	end;

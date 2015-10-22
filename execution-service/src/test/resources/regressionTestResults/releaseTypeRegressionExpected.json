@@ -351,6 +351,6 @@
     "assertionName" : "The current description snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "8f2a12df-6088-433a-85a5-866410314fe6",
     "firstNInstances" : [ "Description: id=2984057023 is in SNAPSHOT file, but not in FULL file.", "Description: id=2984057025 is in SNAPSHOT file, but not in FULL file.", "Description: id=3004397016 is in SNAPSHOT file, but not in FULL file.", "Description: id=3006276018 is in SNAPSHOT file, but not in FULL file.", "Description: id=2989194011 is in SNAPSHOT file, but not in FULL file.", "Description: id=2990804014 is in SNAPSHOT file, but not in FULL file.", "Description: id=3006191013 is in SNAPSHOT file, but not in FULL file.", "Description: id=3007330011 is in SNAPSHOT file, but not in FULL file.", "Description: id=2989790014 is in SNAPSHOT file, but not in FULL file.", "Description: id=2989790014 is in SNAPSHOT file, but not in FULL file." ],
-    "totalFailed" : 27
+    "totalFailed" : 29
   } ]
 }

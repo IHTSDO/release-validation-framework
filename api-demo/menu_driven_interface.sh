@@ -88,7 +88,7 @@ function uploadRelease() {
 		echo "${releaseFile} not found."
 		return
 	fi
-	read -p "What is the product name?: " product
+	read -p "What is the product name (eg int) ?: " product
 	read -p "What is the release date?: " version
 	
 	read -p "Do you wish to append an extension to an international release? (Y/N): " append

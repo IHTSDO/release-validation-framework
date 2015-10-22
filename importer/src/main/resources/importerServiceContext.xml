@@ -7,10 +7,10 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<context:annotation-config/>
-    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
-    </bean>
+<!--  <bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>-->
+
 
 	<!-- service beans will go here -->
-	<bean id="importerService" class="org.ihtsdo.snomed.rvf.importer.impl.AssertionsImporterImpl"/>
-    <bean id="rvfRestClient" class="org.ihtsdo.snomed.rvf.importer.helper.RvfRestClient"/>
+	<bean id="importerService" class="org.ihtsdo.snomed.rvf.importer.AssertionsImporter"/>
+	<bean id="rvfRestClient" class="org.ihtsdo.snomed.rvf.importer.helper.RvfRestClient"/>
 </beans>
