@@ -10,11 +10,11 @@
 ********************************************************************************/
 	
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		a.id
 	from curr_stated_relationship_s a
 	inner join prev_stated_relationship_s b on a.id = b.id 

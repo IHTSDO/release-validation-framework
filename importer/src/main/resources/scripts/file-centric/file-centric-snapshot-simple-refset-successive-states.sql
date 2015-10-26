@@ -6,11 +6,11 @@
 	New inactive states for existing components must have active states in the previous SIMPLE REFSET snapshot
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('Simple Refset: id=',a.id, ' should not have a new invalid inactive state in the SIMPLE REFSET snapshot.') 	
 	from curr_simplerefset_s a , prev_simplerefset_s b
 	where 

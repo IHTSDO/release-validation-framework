@@ -17,11 +17,11 @@
 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.id,
 		concat('CONCEPT: id=',a.id, ' is in previous full but not in current full.') 	
 	from prev_concept_f a
 	left join curr_concept_f b

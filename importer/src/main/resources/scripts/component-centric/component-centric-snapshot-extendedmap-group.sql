@@ -1,11 +1,11 @@
 /*
  * Active extended maps that are rule based have at least one mapGroup
  */
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
 	 concat('ExtendedMap: id=',a.id,' : mapgroup is blank for rule based map' )     
  from curr_extendedmaprefset_s a
 	where a.active = 1 
@@ -20,11 +20,11 @@ insert into qa_result (runid, assertionuuid, assertiontext, details)
  * Active extended maps that are rule based have sequentially ordered mapGroup values without gaps
  *
  */
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id,' : Non-sequential map group:',a.mapGroup)   
  from curr_extendedmaprefset_s a
 	where a.active = 1

@@ -14,11 +14,11 @@
 		 where z.id = a.id);
 
 /* in the snapshot; not in the full */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('Stated relationship: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
 	from curr_stated_relationship_s a
 	left join temp_stated_relationship_v b
@@ -44,11 +44,11 @@
 	or b.modifierid is null;
 
 /* in the full; not in the snapshot */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('Stated relationship: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
 	from temp_stated_relationship_v a
 	left join curr_stated_relationship_s b 

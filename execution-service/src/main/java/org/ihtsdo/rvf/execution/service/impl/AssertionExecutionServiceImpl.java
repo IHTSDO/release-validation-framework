@@ -61,7 +61,7 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(run_id BIGINT, assertion_id BIGINT, " + 
+		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(run_id BIGINT, assertion_id BIGINT, concept_id BIGINT, " + 
 				"details VARCHAR(500)) engine=innodb default charset=utf8";
 		try (Connection connection = dataSource.getConnection()) {
 			try (Statement statement = connection.createStatement()) {

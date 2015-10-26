@@ -8,13 +8,12 @@
 ********************************************************************************/
 	
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('MEMBER: id=',a.id, ': CTV3 simple map refset member is not active.') 
-	
 	from curr_simplemaprefset_s a
 	where a.refsetid = '900000000000497000'
 	and a.active != '1';

@@ -1,11 +1,11 @@
 /*  
 *	Content in the the current ExpressionAssociationRefset snapshot file must be in the current full file
 */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ExpressionAssociationRefset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
 	from curr_expressionAssociationRefset_s a
 	left join curr_expressionAssociationRefset_f b
@@ -35,11 +35,11 @@
 commit;
 
 
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ExpressionAssociationRefset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 	
 	from curr_expressionAssociationRefset_f a
 	left join curr_expressionAssociationRefset_s b

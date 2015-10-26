@@ -7,11 +7,11 @@
 	this assertion is only to validate contents added for new concepts during each release.
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('FSN=',a.term, ' concept=',a.conceptid, ': FSN term is not unique in description snapshot')
 		from curr_description_s a,
 		(select b.term,count(*) as total from curr_description_s b, (select distinct c.term from curr_description_s c, curr_concept_d d 

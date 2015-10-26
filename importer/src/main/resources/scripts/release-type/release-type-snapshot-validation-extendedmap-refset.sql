@@ -1,11 +1,11 @@
 /*  
 *	Content in the the current extended map snapshot file must be in the current full file
 */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ExtendedMap: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
 	from curr_extendedmaprefset_s a
 	left join curr_extendedmaprefset_f b
@@ -40,11 +40,11 @@ commit;
 /*  
 *	Snapshot view derived from the current full file must be in in the current snapshot file
 */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ExtendedMap: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 	
 	from curr_extendedmaprefset_f a
 	left join curr_extendedmaprefset_s b

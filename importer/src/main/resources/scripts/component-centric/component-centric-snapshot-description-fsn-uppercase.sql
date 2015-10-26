@@ -11,11 +11,11 @@
 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('DESC: id=',a.id, ':First letter of the active FSN of active concept not capitalized.') 	
 	from curr_description_d a
 		join curr_concept_s b

@@ -6,11 +6,11 @@
 	No active Terms contain leading or trailing spaces.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('Description: id=',a.id, ' has active term with leading or trailing spaces.') 	
 	from curr_description_s a 
 	where a.active = 1

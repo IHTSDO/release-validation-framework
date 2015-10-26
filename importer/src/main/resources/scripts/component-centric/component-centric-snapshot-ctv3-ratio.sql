@@ -9,11 +9,11 @@
 	
 	
 	/* Concept maps to multiple CTV3 Refset Members */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('CONCEPT: id=',a.referencedcomponentid, ': Concept has more than one associated CTV3 refset member.') 
 	from curr_simplemaprefset_s a
 	where a.refsetid = '900000000000497000'
@@ -30,11 +30,11 @@
 		where refsetid = '900000000000497000';
 		
 /* Concept is without a CTV3 Refset Member mapping */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.id,
 		concat('CONCEPT: id=',a.id, ': Concept does not have an associated CTV3 refset member.') 
 	from curr_concept_s a
 	left join v_ctv3 b 

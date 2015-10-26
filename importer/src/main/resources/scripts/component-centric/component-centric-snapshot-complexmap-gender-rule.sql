@@ -5,11 +5,11 @@
  * unless you have the target terminology loaded, there's no way to answer this question
  * 
  */
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedComponentId,
  	concat('ComplexMap: id=',a.id,' : Gender mapRules out of order')    
  from curr_complexmaprefset_s a, curr_complexmaprefset_s b
 	where a.active = 1 and b.active = 1

@@ -4,11 +4,11 @@
  * 
  */ 
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id,': invalid mapCategory=', a.mapCategoryId)
  from curr_extendedmaprefset_s a
  where a.active = 1
@@ -19,11 +19,11 @@ insert into qa_result (runid, assertionuuid, assertiontext, details)
  * Active extended map with mapRule starting with IFA has mapCategortyId=447639009
  *
  */
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
 	concat('ExtendedMap: id=',a.id,' : IFA rule but with an invalid mapCategory:', a.mapCategoryId)
  from curr_extendedmaprefset_s a
  	where a.active = 1

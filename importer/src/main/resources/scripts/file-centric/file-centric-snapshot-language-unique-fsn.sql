@@ -15,13 +15,12 @@
 	
 	
 	/* TEST: Recently edited Concept has FSN that is defined 2+ times for a given refset*/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		c.id,
 		concat('CONCEPT: id=',c.id, ': Concept has FSN that is defined more than one time within a given refset.') 
-		
 	from curr_description_d a 
 	inner join curr_langrefset_s b on a.id = b.referencedcomponentid 
 	inner join curr_concept_s c on a.conceptid = c.id
@@ -41,11 +40,11 @@
 	on a.conceptid = b.id
 	and b.active = 1;
 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		b.id,
 		concat('DESC: id=',b.id,': active description appears more than once within a given refset.')
 	from curr_langrefset_s a
 	join tmp_descsedited b
@@ -54,11 +53,7 @@
 	group by refsetid, referencedcomponentid
 	having count(referencedcomponentid) > (select count(distinct(refsetid)) from curr_langrefset_s);
 	
-
 	drop table if exists  tmp_descsedited;
-	
-	
-	
 	
 	
 	/* TEST: Concept does not have an FSN defined */
@@ -70,36 +65,27 @@
 		from curr_description_s  
 		where active = '1'
 		and typeid = '900000000000003001';
-
-
 		
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.id,
 		concat('CONCEPT: id=',a.id, ': Concept does not have an FSN defined.') 
-	
 	from curr_concept_s a 
 	left join v_curr_fsn  b on b.conceptid = a.id
 	where a.active = '1'
 	and b.conceptid is null;
-		
 	
 	drop table if exists v_curr_fsn;
 	
-	
-	
-	
-	
 	/* TEST: Concept does not have an FSN in any refset */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		c.id,
 		concat('CONCEPT: id=',c.id, ': Concept does not have an FSN in any refset.') 
-	
 	from curr_description_s a 
 	left join curr_langrefset_s b on a.id = b.referencedcomponentid 
 	inner join curr_concept_s c on a.conceptid = c.id
@@ -109,20 +95,13 @@
 	and a.typeid = '900000000000003001';
 	
 	
-	
-	
-	
-	
-	
-	
 	/* TEST: Concept does not have an FSN in each possible refset */
 	/*Only for core module concepts*/
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		c.id,
 		concat('CONCEPT: id=',c.id, ': Concept does not have an FSN in each possible refset.') 
-	
 	from curr_langrefset_s a
 	inner join curr_description_s b on b.id = a.referencedcomponentid 
 	inner join curr_concept_s c on b.conceptid = c.id

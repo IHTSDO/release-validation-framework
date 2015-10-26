@@ -6,11 +6,11 @@
 	New inactive states follow active states in the CONCEPT snapshot.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.id,
 		concat('CONCEPT: id=',a.id, ':New inactive states follow active states in the CONCEPT snapshot.') 	
 	from curr_concept_s a , prev_concept_s b
 	where cast(a.effectivetime as datetime) >

@@ -8,11 +8,11 @@
 ********************************************************************************/
 	
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('Language Refset: id=',a.id, ' should not have a new inactive state in the current release as it was inactive already in the previvous SNAPSHOT.') 
 	from curr_langrefset_s a
 	join prev_langrefset_s b
@@ -24,11 +24,11 @@
 	and a.active = b.active;
 	commit;
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('Language Refset: id=',a.id, ' should not have a new inactive state in the current snapshot as no active stated found in previous release') 
 	from curr_langrefset_s a
 	left join prev_langrefset_s b

@@ -2,11 +2,11 @@
  * Active complex maps should not have the same mapTarget in different groups for a given referenced component
  */
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
 	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedComponentId,
  	concat('ComplexMap: id=',a.id,': mapTarget=', a.mapTarget, ' is in more than one mapGroup')
  from curr_complexmaprefset_s a
 	where a.active = 1

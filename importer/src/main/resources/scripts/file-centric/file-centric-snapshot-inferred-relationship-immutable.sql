@@ -7,11 +7,11 @@
 
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		b.id,
 		concat('CONCEPT: id=',b.id, ' contains two or more version of the immutable values in Inferred Relationship Snapshot.') 	
 
 	from curr_relationship_s a 

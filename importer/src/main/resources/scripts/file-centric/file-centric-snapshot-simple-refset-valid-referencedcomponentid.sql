@@ -7,11 +7,11 @@
 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('Simple RS: id=',a.referencedcomponentid, ':Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.') 	
 	from curr_associationrefset_s a
 	left join curr_concept_s b

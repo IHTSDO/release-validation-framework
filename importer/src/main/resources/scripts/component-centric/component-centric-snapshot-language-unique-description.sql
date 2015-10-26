@@ -9,11 +9,11 @@
 ********************************************************************************/
 	
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.id,
 		concat('CONCEPT: id=',a.id, ': Concept contains more than one definition for a given dialect.') 
 	
 	from curr_concept_s a

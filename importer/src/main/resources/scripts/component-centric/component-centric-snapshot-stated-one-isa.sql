@@ -14,13 +14,12 @@
 		where active = '1'
 		and typeid = 116680003;
 			
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.id,
 		concat('CONCEPT: id=',a.id, ': Concept does not have a stated is-a relationship.') 	
-	
 	from curr_concept_s a
 	left join v_act_stated_isa b on a.id = b.sourceid
 	where a.active = '1'

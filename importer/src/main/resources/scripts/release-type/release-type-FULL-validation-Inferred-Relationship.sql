@@ -12,11 +12,11 @@
 	prior.
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('Inferred relationship: id=',a.id, ' is in previous full file but not in current full file.') 	
 	from prev_relationship_f a
 	left join curr_relationship_f b

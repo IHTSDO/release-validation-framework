@@ -25,10 +25,11 @@
 				leave validate; 
 			end if; 
 
-			insert into qa_result (runid, assertion_id, details)
+			insert into qa_result (runid, assertion_id,concept_id, details)
 			select 
 				runid,
 				assertionid,
+				a.conceptid,
 				concat('DESCRIPTION: id=',a.id, ': Synonym is prefered in the GB Language refset but refers to a word has en-us spelling: ',usTerm) 
 			from v_curr_delta_gb a 	
 			where a.term REGEXP  concat('[[:<:]]', usTerm, '[[:>:]]');

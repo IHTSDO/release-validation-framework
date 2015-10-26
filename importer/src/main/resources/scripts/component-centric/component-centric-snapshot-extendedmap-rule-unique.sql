@@ -1,11 +1,11 @@
 /*
  * Active extended maps that are rule based do not have multiple entries with the same mapRule and mapTarget in different groups
  */ 
- insert into qa_result (runid, assertionuuid, assertiontext, details)
+ insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id,' : duplicate mapRule and mapTarget in different groups')     
  	from curr_extendedmaprefset_s a, curr_extendedmaprefset_s b
 where a.active = 1 and b.active = 1

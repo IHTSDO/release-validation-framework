@@ -6,11 +6,11 @@
 	as the data in the current delta file.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('Simple refset: id=',a.id, ' is in delta file, but not in snapshot file.') 	
 	from curr_simplerefset_d a
 	left join curr_simplerefset_s b

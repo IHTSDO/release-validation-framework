@@ -6,11 +6,11 @@
 	Stated relationship modifier is always Some.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('RELATIONSHIP: id=',a.id, ': Stated relationship has a non -SOME- modifier.') 	
 	from curr_stated_relationship_s a
 	where a.active = '1'

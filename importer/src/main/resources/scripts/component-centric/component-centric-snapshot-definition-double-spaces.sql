@@ -7,11 +7,11 @@
 
 ********************************************************************************/
 /* 	inserting exceptions in the result table */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('TEXTDEF : id=',a.id, ':Active Terms of active concept containing double spaces.') 	
 	from curr_textdefinition_s a , curr_concept_s b
 	where a.active = 1

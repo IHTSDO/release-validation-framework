@@ -6,11 +6,11 @@
 	Referencedcomponentid refers to valid concepts in the ATTRIBUTEVALUE snapshot file.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ATT RS: id=',a.referencedcomponentid, ':Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot.') 	
 	from curr_attributevaluerefset_s a
 	left join curr_concept_s b

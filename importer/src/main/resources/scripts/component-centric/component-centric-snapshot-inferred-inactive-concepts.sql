@@ -8,13 +8,12 @@
 ********************************************************************************/
 	
 	/* Inactive Source Id */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		b.id,
 		concat('RELATIONSHIP: id=',a.id, ': Active inferred relationship is associated with an inactive sourceid concept.') 	
-	
 	from curr_relationship_s a
 	inner join curr_concept_s b on a.sourceid = b.id
 	where a.active = '1'
@@ -23,11 +22,11 @@
 
 	
 	/* Inactive Destination Id */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		b.id,
 		concat('RELATIONSHIP: id=',a.id, ': Active inferred relationship is associated with an inactive destinationid concept.') 	
 	
 	from curr_relationship_s a
@@ -38,11 +37,11 @@
 	
 	
 	/* Inactive Destination Id */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		b.id,
 		concat('RELATIONSHIP: id=',a.id, ': Active inferred relationship is associated with an inactive typeid concept.') 	
 	
 	from curr_relationship_s a

@@ -9,13 +9,12 @@
 ********************************************************************************/
 	
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		sourceid,
 		concat('RELATIONSHIP : id=',id, ': Relationship Id is repeated in the Inferred Relationship snapshot file.') 
-
 	from curr_relationship_s
 	group by id
 	having count(id) > 1;

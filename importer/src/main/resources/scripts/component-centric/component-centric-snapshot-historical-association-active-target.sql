@@ -14,11 +14,11 @@
 	   select referencedcomponentid from curr_attributevaluerefset_s 
 	   where active = '1'
 	   and valueid = '900000000000486000';
-
+   insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		b.id,
 		concat('AssociationRefset id=',a.id, ' is active  but the target component is an inactive concept: ', b.id) 	
 	from curr_associationrefset_s a
 	inner join curr_concept_s b on a.targetcomponentid = b.id

@@ -6,11 +6,11 @@
 	The definition status is PRIMITIVE for concepts having only one defining relationship.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.id,
 		concat('CONCEPT: id=',a.id, ':Concept has only one defining relationship but the definition status is not primitive.') 	
 	from curr_concept_s a 
 	inner join curr_stated_relationship_s b	on a.id = b.sourceid

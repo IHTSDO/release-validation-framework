@@ -6,11 +6,11 @@
 	All active FSNs associated with active concepts have a space before the semantic tag.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('DESCRIPTION: id=',a.id, ' : The FSN has no space before the semantic tag.')	
 	from curr_description_s a , curr_concept_s b
 	where typeid ='900000000000003001'

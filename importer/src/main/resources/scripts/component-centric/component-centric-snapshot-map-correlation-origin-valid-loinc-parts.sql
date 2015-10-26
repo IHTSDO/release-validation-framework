@@ -7,11 +7,11 @@ component-centric-snapshot-map-correlation-origin-valid-loinc-parts.sql
 
 ********************************************************************************/
  
- insert into qa_result (runid, assertionuuid, assertiontext, details)
+ insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
 	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('LOINC part:',a.mapTarget,' is not correctly formated in the MapCorrelationOrigin refset snapshot.')
  from curr_mapCorrelationOriginRefset_s a
  	where a.contentOriginId=705117003

@@ -7,11 +7,11 @@
 	Note: Only check current release changes.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('MEMBER: id=',a.id, ': Active Historical refset member maps to Target Component that is an active navigation concept.') 	
 	
 	from curr_associationrefset_d a

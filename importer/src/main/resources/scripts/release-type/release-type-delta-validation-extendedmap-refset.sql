@@ -1,11 +1,11 @@
 /*  
 *	Content in the the current extended map delta file must be in the current full file
 */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ExtendedMap: id=',a.id, ' is in DELTA file, but not in FULL file.') 	
 	from curr_extendedmaprefset_d a
 	left join curr_extendedmaprefset_f b

@@ -28,10 +28,11 @@ begin
 		PREPARE statement FROM @sqlStr;
 		execute statement;
 		end loop validate; 
-		insert into qa_result (run_id, assertion_id, details)
+		insert into qa_result (run_id, assertion_id,concept_id, details)
 			select 
 				runId,
 				assertionId,
+				result.conceptId,
 				concat('Concept: id=',result.conceptId, ' referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.') 
 			from  (select distinct(conceptId) from temp_concept a left join concept_s b on a.conceptId = b.id where b.id is null) as result;
 		drop table temp_concept;

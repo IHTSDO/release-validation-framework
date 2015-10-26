@@ -53,11 +53,11 @@
 /* 	violators are active descriptions of which the terms are the same as 
 	inactive descriptions for a given concept 
 */ 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('Active description id = ',a.id,' and inactive description id = ', b.id, ' share the same term') 
 	from tmp_active_desc a
 	join tmp_inactive_desc b

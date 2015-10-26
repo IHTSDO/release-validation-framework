@@ -4,11 +4,11 @@
 */
 
 /* in the delta; not in the full */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ATTRIBUTE VALUE REFSET: id=',a.id, ' is in DELTA file, but not in FULL file.')
 	from curr_attributevaluerefset_d a
 	left join curr_attributevaluerefset_f b

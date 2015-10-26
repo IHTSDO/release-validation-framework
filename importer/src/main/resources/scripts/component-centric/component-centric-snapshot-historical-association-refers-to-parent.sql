@@ -9,11 +9,11 @@
 	
 	
 	/* Test against Inferred Parents */	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('MEMBER: id=',a.id, ': Historical association refset member associates inactive source concept with its stated parent.') 
 	
 	from curr_associationrefset_s a, curr_stated_relationship_s b
@@ -27,11 +27,11 @@
 		
 		
 	/* Test against Stated Parents */	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('MEMBER: id=',a.id, ': Historical association refset member associates inactive source concept with its inferred parent.') 
 	
 	from curr_associationrefset_s a, curr_relationship_s b

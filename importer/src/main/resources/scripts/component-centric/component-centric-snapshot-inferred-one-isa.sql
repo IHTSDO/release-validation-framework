@@ -14,11 +14,11 @@
 		where active = '1'
 		and typeid = 116680003;
 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.id,
 		concat('CONCEPT: id=',a.id, ': Concept does not have an inferred is-a relationship.') 	
 	
 	from curr_concept_s a

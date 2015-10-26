@@ -2,11 +2,11 @@
  * Active extended map with mapAdvice containing "MAP IS CONTEXT DEPENDENT FOR GENDER" use gender mapRule values
  *
  */
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id, ' : Gender advice but without gender rule')   
  from curr_extendedmaprefset_s a
 	where a.active = 1
@@ -19,11 +19,11 @@ insert into qa_result (runid, assertionuuid, assertiontext, details)
  * Also the inverse:
  */
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id,' : Gender rule without gender advice')   
  from curr_extendedmaprefset_s a
 where a.active = 1
