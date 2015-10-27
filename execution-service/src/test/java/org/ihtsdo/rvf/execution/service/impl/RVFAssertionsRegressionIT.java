@@ -186,13 +186,14 @@ public class RVFAssertionsRegressionIT {
 			assertEquals("Assertion name is not the same" + " for assertion uuid:" + uuid, expectedResult.getAssertionName(),actualResult.getAssertionName());
 			assertEquals("Total failures count doesn't match"  + " for assertion uuid:" + uuid, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
 			assertTrue("First N instances not matching" + " for assertion uuid:" + uuid, expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()));
-			
 		}
-		
 		Collections.sort(expected);
 		Collections.sort(actual);
 		for(int i=0;i < expected.size();i++) {
 			assertEquals(expected.get(i), actual.get(i));
+			for (FailureDetail detail : actual.get(i).getFirstNInstances()) {
+				assertTrue("ConceptId should not be null", detail.getConceptId() != null); 
+			}
 		}
 	}
 	

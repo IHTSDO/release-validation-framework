@@ -97,10 +97,11 @@
 	
 	/* TEST: Concept does not have an FSN in each possible refset */
 	/*Only for core module concepts*/
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		c.id,
+		b.conceptid,
 		concat('CONCEPT: id=',c.id, ': Concept does not have an FSN in each possible refset.') 
 	from curr_langrefset_s a
 	inner join curr_description_s b on b.id = a.referencedcomponentid 

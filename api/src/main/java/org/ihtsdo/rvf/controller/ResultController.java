@@ -3,7 +3,6 @@ package org.ihtsdo.rvf.controller;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
@@ -39,7 +38,7 @@ public class ResultController {
 		if (state == null) {
 			responseMap.put(MESSAGE, "No validation state found at " + storageLocation);
 		} else {
-			responseMap.put("Status", state.toString());
+			responseMap.put("status", state.toString());
 			switch (state) {
 				case QUEUED : 	responseMap.put(MESSAGE, "Validation hasn't started running yet!");
 								break;

@@ -137,7 +137,7 @@ public class StructuralTestRunner implements InitializingBean{
 		}
 		final long timeEnd = System.currentTimeMillis();
 		validationReport.setTimeTakenInSeconds((timeEnd-timeStart)/1000);
-		responseMap.put(TestType.ARCHIVE_STRUCTURAL.toString() + " test result", validationReport);
+		responseMap.put(TestType.ARCHIVE_STRUCTURAL.toString() + "TestResult", validationReport);
 		logger.debug("Finished verifying zip file structure of {} against manifest", tempFile.getName());		
 		return isFailed;
 	}
