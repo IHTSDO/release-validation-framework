@@ -12,8 +12,8 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		b.conceptid,
-		concat('MEMBER: id=',a.id, ': is repeated in the language refset snapshot file.') 
-	from curr_langrefset_s a, curr_description_s b
-	where a.referencedcomponentid = b.id
-	group by a.id
-	having count(a.id) > 1;
+		concat('MEMBER: id=',c.id, ': is repeated in the language refset snapshot file.') 
+	from (select a.id from curr_langrefset_s a group by a.id having count(a.id) > 1) as duplicate,
+	 curr_description_s b,
+	 curr_langrefset_s c
+	where duplicate.id=c.id and c.referencedcomponentid = b.id;

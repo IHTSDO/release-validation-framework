@@ -3,8 +3,8 @@ package org.ihtsdo.rvf.validation.impl;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.ihtsdo.rvf.validation.ResultFormatter;
 import org.ihtsdo.rvf.validation.StructuralTestRunItem;
@@ -19,7 +19,7 @@ public class StreamTestReport implements TestReportable {
 	private int numFailures = 0;
 	private int numTestRuns = 0;
 	private boolean writeSuccesses;
-	private Map<String, TestRunItemCount> errorMap = new HashMap<>();
+	private ConcurrentHashMap<String, TestRunItemCount> errorMap = new ConcurrentHashMap<>();
 
 	public StreamTestReport(ResultFormatter formatter, OutputStream outputStream, boolean writeSuccesses) {
 		this.formatter = formatter;

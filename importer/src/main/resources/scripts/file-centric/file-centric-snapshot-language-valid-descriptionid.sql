@@ -16,7 +16,9 @@
 		a.referencedcomponentid,
 		concat('Language Refset: id=',a.id, ' references a description which is in neither the description nor the definition snapshot file.') 
 	from curr_langrefset_s a
-	where not exists
+	where 
+	a.active=1
+	and not exists
 		(select b.id
 		 from curr_description_s b
 		 where b.id = a.referencedcomponentid)

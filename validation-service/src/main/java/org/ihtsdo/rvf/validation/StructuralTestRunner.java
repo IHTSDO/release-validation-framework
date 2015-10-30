@@ -10,7 +10,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.validation.impl.CsvMetadataResultFormatter;
-import org.ihtsdo.rvf.validation.impl.CsvResultFormatter;
 import org.ihtsdo.rvf.validation.impl.StreamTestReport;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.log.ValidationLogFactory;
@@ -33,27 +32,26 @@ public class StructuralTestRunner implements InitializingBean{
 
 	@Autowired
 	private ValidationLogFactory validationLogFactory;
+	
 
 	public TestReportable execute(final ResourceProvider resourceManager, final PrintWriter writer, final boolean writeSuccesses,
 			final ManifestFile manifest) {
-
 		// the information for the manifest testing
-		final StreamTestReport testReport = new StreamTestReport(new CsvMetadataResultFormatter(), writer, true);
-		// run manifest tests
-		runManifestTests(resourceManager, testReport, manifest, validationLogFactory.getValidationLog(ManifestPatternTester.class));
-		testReport.addNewLine();
-
-		// run column tests
-		testReport.setFormatter(new CsvResultFormatter());
-		testReport.setWriteSuccesses(writeSuccesses);
+		long start = System.currentTimeMillis();
+		final StreamTestReport testReport = new StreamTestReport(new CsvMetadataResultFormatter(), writer, writeSuccesses);
 		final ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
+		// run manifest tests
+		if ( manifest != null) {
+			runManifestTests(resourceManager, testReport, manifest, validationLogFactory.getValidationLog(ManifestPatternTester.class));
+			testReport.addNewLine();
+		}
 		runColumnTests(resourceManager, testReport, validationLog);
-		
 		runLineFeedTests(resourceManager, testReport);
+		
 		testReport.getResult();
 		final String summary = testReport.writeSummary();
 		validationLog.info(summary);
-
+		logger.debug(("Time taken for structure validation:" + (System.currentTimeMillis() - start)));
 		return testReport;
 	}
 
@@ -66,15 +64,7 @@ public class StructuralTestRunner implements InitializingBean{
 	}
 
 	public TestReportable execute(final ResourceProvider resourceManager, final PrintWriter writer, final boolean writeSuccesses) {
-
-		final StreamTestReport testReport = new StreamTestReport(new CsvResultFormatter(), writer, writeSuccesses);
-		final ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
-		runColumnTests(resourceManager, testReport, validationLog);
-		runLineFeedTests(resourceManager, testReport);
-		testReport.getResult();
-		final String summary = testReport.writeSummary();
-		validationLog.info(summary);
-		return testReport;
+		return execute(resourceManager, writer, writeSuccesses, null);
 	}
 
 	private void runManifestTests(final ResourceProvider resourceManager, final TestReportable report,
@@ -105,7 +95,7 @@ public class StructuralTestRunner implements InitializingBean{
 			TestReportable report;
 
 			if (manifestFilePath == null) {
-				report = execute(resourceManager, writer, writeSucceses);
+				report = execute(resourceManager, writer, writeSucceses,null);
 			} else {
 				File tempManifestFile  = null;
 				try {

@@ -249,7 +249,7 @@ public class TestUploadFileController {
 			try (PrintWriter writer = response.getWriter()) {
 				file.transferTo(tempFile);
 				final ResourceProvider resourceManager = new TextFileResourceProvider(tempFile, filename);
-				final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses);
+				final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses,null);
 				// store the report to disk for now with a timestamp
 				if (report.getNumErrors() > 0) {
 					LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
