@@ -12,7 +12,7 @@ key idx_effectivetime(effectivetime),
 key idx_active(active),
 key idx_moduleid(moduleid),
 key idx_definitionstatusid(definitionstatusid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 drop table if exists description_f;
@@ -34,7 +34,7 @@ key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
 key idx_casesignificanceid(casesignificanceid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists textdefinition_f;
 create table textdefinition_f(
@@ -55,7 +55,7 @@ key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
 key idx_casesignificanceid(casesignificanceid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists relationship_f;
 create table relationship_f(
@@ -79,7 +79,7 @@ key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists stated_relationship_f;
 create table stated_relationship_f(
@@ -103,7 +103,7 @@ key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists langrefset_f;
 create table langrefset_f(
@@ -121,7 +121,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_acceptabilityid(acceptabilityid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists associationrefset_f;
 create table associationrefset_f(
@@ -139,7 +139,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_targetcomponentid(targetcomponentid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists attributevaluerefset_f;
 create table attributevaluerefset_f(
@@ -157,7 +157,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_valueid(valueid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists simplemaprefset_f;
 create table simplemaprefset_f(
@@ -175,7 +175,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_maptarget(maptarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists simplerefset_f;
 create table simplerefset_f(
@@ -191,7 +191,7 @@ create table simplerefset_f(
 	key idx_moduleid(moduleid),
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists complexmaprefset_f;
 create table complexmaprefset_f(
@@ -214,7 +214,7 @@ create table complexmaprefset_f(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 /* create the Snapshot S-CT data tables */
 
@@ -230,7 +230,7 @@ key idx_effectivetime(effectivetime),
 key idx_active(active),
 key idx_moduleid(moduleid),
 key idx_definitionstatusid(definitionstatusid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 drop table if exists description_s;
@@ -253,7 +253,7 @@ key idx_languagecode(languagecode),
 key idx_typeid(typeid),
 key idx_casesignificanceid(casesignificanceid),
 key idx_term(term)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists textdefinition_s;
 create table textdefinition_s(
@@ -274,7 +274,7 @@ key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
 key idx_casesignificanceid(casesignificanceid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists relationship_s;
 create table relationship_s(
@@ -298,7 +298,7 @@ key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists stated_relationship_s;
 create table stated_relationship_s(
@@ -322,7 +322,7 @@ key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists langrefset_s;
 create table langrefset_s(
@@ -340,7 +340,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_acceptabilityid(acceptabilityid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists associationrefset_s;
 create table associationrefset_s(
@@ -358,7 +358,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_targetcomponentid(targetcomponentid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists attributevaluerefset_s;
 create table attributevaluerefset_s(
@@ -376,7 +376,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_valueid(valueid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists simplemaprefset_s;
 create table simplemaprefset_s(
@@ -394,7 +394,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_maptarget(maptarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists simplerefset_s;
 create table simplerefset_s(
@@ -410,7 +410,7 @@ create table simplerefset_s(
 	key idx_moduleid(moduleid),
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists complexmaprefset_s;
 create table complexmaprefset_s(
@@ -433,7 +433,7 @@ create table complexmaprefset_s(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 /* create the Delta S-CT data tables */
@@ -450,7 +450,7 @@ key idx_effectivetime(effectivetime),
 key idx_active(active),
 key idx_moduleid(moduleid),
 key idx_definitionstatusid(definitionstatusid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 drop table if exists description_d;
@@ -473,7 +473,7 @@ key idx_languagecode(languagecode),
 key idx_typeid(typeid),
 key idx_term(term),
 key idx_casesignificanceid(casesignificanceid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists textdefinition_d;
 create table textdefinition_d(
@@ -494,7 +494,7 @@ key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
 key idx_casesignificanceid(casesignificanceid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists relationship_d;
 create table relationship_d(
@@ -518,7 +518,7 @@ key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists stated_relationship_d;
 create table stated_relationship_d(
@@ -542,7 +542,7 @@ key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists langrefset_d;
 create table langrefset_d(
@@ -560,7 +560,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_acceptabilityid(acceptabilityid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists associationrefset_d;
 create table associationrefset_d(
@@ -578,7 +578,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_targetcomponentid(targetcomponentid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists attributevaluerefset_d;
 create table attributevaluerefset_d(
@@ -596,7 +596,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_valueid(valueid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists simplemaprefset_d;
 create table simplemaprefset_d(
@@ -614,7 +614,7 @@ key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
 key idx_maptarget(maptarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists simplerefset_d;
 create table simplerefset_d(
@@ -630,7 +630,7 @@ create table simplerefset_d(
 	key idx_moduleid(moduleid),
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists complexmaprefset_d;
 create table complexmaprefset_d(
@@ -653,7 +653,7 @@ create table complexmaprefset_d(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists extendedmaprefset_f;
 create table extendedmaprefset_f(
@@ -677,7 +677,7 @@ create table extendedmaprefset_f(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 drop table if exists extendedmaprefset_d;
@@ -702,7 +702,7 @@ create table extendedmaprefset_d(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists extendedmaprefset_s;
 create table extendedmaprefset_s(
@@ -726,7 +726,7 @@ create table extendedmaprefset_s(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 drop table if exists expressionAssociationRefset_s;
@@ -749,7 +749,7 @@ create table expressionAssociationRefset_s(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 drop table if exists expressionAssociationRefset_d;
@@ -772,7 +772,7 @@ create table expressionAssociationRefset_d(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 drop table if exists expressionAssociationRefset_f;
@@ -795,7 +795,7 @@ create table expressionAssociationRefset_f(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 
@@ -818,7 +818,7 @@ create table mapCorrelationOriginRefset_f(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 drop table if exists mapCorrelationOriginRefset_s;
 create table mapCorrelationOriginRefset_s(
@@ -839,7 +839,7 @@ create table mapCorrelationOriginRefset_s(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
 
@@ -862,6 +862,6 @@ create table mapCorrelationOriginRefset_d(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid),
 	key idx_mapTarget(mapTarget)
-) engine=myisam default charset=utf8;
+) engine=memory default charset=utf8;
 
 
