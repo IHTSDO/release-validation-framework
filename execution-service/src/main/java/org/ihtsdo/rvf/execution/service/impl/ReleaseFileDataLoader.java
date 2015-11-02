@@ -106,6 +106,7 @@ public class ReleaseFileDataLoader {
 			try {
 				rf2FilesLoaded.add(task.get());
 			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
 				LOGGER.error("Thread interrupted while waiting for get rf2 file loading result.", e.fillInStackTrace());
 			}
 		}
