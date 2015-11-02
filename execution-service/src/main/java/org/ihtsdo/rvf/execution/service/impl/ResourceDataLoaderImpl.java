@@ -11,35 +11,28 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-import javax.annotation.Resource;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
+import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 @Service
 public class ResourceDataLoaderImpl implements ResourceDataLoader {
-	
-	@Resource(name = "snomedDataSource")
-	private BasicDataSource snomedDataSource;
+	@Autowired
+	RvfDynamicDataSource rvfDynamicDataSource;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResourceDataLoaderImpl.class);
 	
 	@Override
 	public void loadResourceData(final String schemaName) throws BusinessServiceException {
 		if (schemaName != null) {
-			final String  useStr = "use " + schemaName + ";";
-			try (final Connection connection = snomedDataSource.getConnection()) {
+			try (final Connection connection = rvfDynamicDataSource.getConnection(schemaName)) {
 				final ScriptRunner runner = new ScriptRunner(connection);
-				try (Statement statement = connection.createStatement()) {
-					statement.execute(useStr);
-				} 
 				try (InputStream input = getClass().getResourceAsStream("/sql/create-resource-tables.sql")) {
 
 					runner.runScript(new InputStreamReader(input));
@@ -80,9 +73,5 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 			}
 		}
 			
-	}
-
-	public void setSnomedDataSource(final BasicDataSource snomedDataSourceX) {
-		snomedDataSource = snomedDataSourceX;
 	}
 }

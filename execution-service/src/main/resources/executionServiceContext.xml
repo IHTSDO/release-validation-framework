@@ -73,9 +73,7 @@
 		<property name="snomedDataSource" ref="snomedDataSource"/>
 		<property name="sctDataLocation" value="${rvf.data.folder.location}"/>
 	</bean>
-	<bean id="resourceDataLoader" class="org.ihtsdo.rvf.execution.service.impl.ResourceDataLoaderImpl">
-		<property name="snomedDataSource" ref="snomedDataSource"/>
-	</bean>
+	<bean id="resourceDataLoader" class="org.ihtsdo.rvf.execution.service.impl.ResourceDataLoaderImpl"/>
 	
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner">
 		<constructor-arg value="${rvf.assertion.execution.BatchSize}"/>
