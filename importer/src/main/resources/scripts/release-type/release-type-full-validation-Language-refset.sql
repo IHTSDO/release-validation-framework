@@ -18,11 +18,11 @@
 
 ********************************************************************************/
 
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
     concat('LANGUAGE-REFSET: id=',a.id, ' is in previous full file, but not in current full file.') 	        
 	from prev_langrefset_f a
 	left join curr_langrefset_f b

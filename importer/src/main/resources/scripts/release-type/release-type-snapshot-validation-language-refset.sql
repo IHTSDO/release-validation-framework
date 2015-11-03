@@ -15,11 +15,11 @@
 		 where z.id = a.id);
 
 /* in the delta; not in the full */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
-	'<ASSERTIONTEXT>',
+	a.referencedcomponentid,
 	concat('LANGUAGE REFSET: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
 	from curr_langrefset_s a
 	left join temp_langrefset_view b
@@ -39,11 +39,11 @@
   	or b.acceptabilityid is null;
 
 /* in the full; not in the delta */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('LANGUAGE REFSET: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
 	from temp_langrefset_view a
 	left join curr_langrefset_s b 

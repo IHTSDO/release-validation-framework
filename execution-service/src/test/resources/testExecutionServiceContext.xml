@@ -18,7 +18,7 @@
 			<!--</list>-->
 		<!--</property>-->
 	<!--</bean>-->
-
+	 <import resource="validationContext.xml"/>
     <import resource="executionServiceContext.xml"/>
 
     <!--&lt;!&ndash; Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing&ndash;&gt;-->

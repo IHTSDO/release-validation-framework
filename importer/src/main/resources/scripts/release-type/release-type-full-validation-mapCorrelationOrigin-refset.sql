@@ -2,11 +2,11 @@
  * The current mapCorrelationOriginRefset full file contains all previously published data unchanged.
  */
 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('mapCorrelationOriginRefset: id=',a.id, ' is in previous full file but not in current full file.') 	
 	from prev_ mapCorrelationOriginRefset_f a
 	left join curr_ mapCorrelationOriginRefset_f b

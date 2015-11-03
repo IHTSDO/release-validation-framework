@@ -12,11 +12,11 @@
 /* http://ihtsdo.org/fileadmin/user_upload/doc/en_us/tig.html?t=trg2main_relatefiles */
 	
 	/* 	inserting exceptions in the result table for FSN*/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('DESCRIPTION ID=',a.id, ': FSN=',a.term, ' contains invalid character.') 	
 	from  curr_description_d a , curr_concept_s b 
 	where a.active = 1
@@ -27,11 +27,11 @@
 	
 	
 	/* 	inserting exceptions in the result table for Synonym */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('DESCRIPTION ID=',a.id, ': Synonym=',a.term, ' contains invalid character.') 	
 	from  curr_description_d a , curr_concept_s b 
 	where a.active = 1

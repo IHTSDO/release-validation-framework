@@ -4,11 +4,11 @@
 */
 
 /* in the delta; not in the full */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
-	'<ASSERTIONTEXT>',
+	a.sourceid,
 	concat('Inferred relationship: id=',a.id, ' is in current full file, but not in prior full file.') 	
 	from curr_relationship_f a
 	left join curr_relationship_d b
@@ -56,11 +56,11 @@
 	commit;
 	
 	/* in the full; not in the delta */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('Inferred relationship: id=',a.id, ' is in current FULL file, but not in delta file.') 
 	from curr_relationship_f a
 	left join prev_relationship_f b

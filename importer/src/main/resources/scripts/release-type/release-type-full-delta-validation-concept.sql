@@ -3,11 +3,11 @@
 	The current full concept file consists of the previously published full file and the changes for the current release
 */
 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.id,
 		concat('CONCEPT: id=',a.id, ' is in current full file, but not in prior full or current delta file.') 	
 	from curr_concept_f a
 	left join curr_concept_d b

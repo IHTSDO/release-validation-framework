@@ -7,11 +7,11 @@
 	Note: Unless there are changes in other fields since last release due to data correction in current release 
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('DESCRIPTION: id=',a.id, ' should not have a new inactive state in the current release as it was already inactive in previous snapshot.') 	
 	from curr_description_s a , prev_description_s b	
 	where cast(a.effectivetime as datetime) >

@@ -4,11 +4,11 @@
 */
 
 /* in the delta; not in the full */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
-	'<ASSERTIONTEXT>',
+	a.conceptid,
 	concat('Definition: id=',a.id, ' is in DELTA file, but not in FULL file.') 	
 	from curr_textdefinition_d a
 	left join curr_textdefinition_f b

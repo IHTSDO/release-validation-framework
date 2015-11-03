@@ -6,11 +6,11 @@
 	ReferenceComponentIds refers to valid concepts in the ASSOCIATION Expression REFSET snapshot file.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		result.referencedcomponentid,
 		concat('Referencedcomponentid=',result.referencedcomponentid, '  in AssociationExpressionis snapshot not a concept id.') 	
 	from (  select distinct a.referencedcomponentid
 	from curr_expressionAssociationRefset_s a

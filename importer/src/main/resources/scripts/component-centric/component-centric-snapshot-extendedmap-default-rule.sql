@@ -2,11 +2,11 @@
  * Active rule based extended map groups should end with a default rule (e.g. mapRule=TRUE,OTHERWISE TRUE)
  * ...list of refsetIds for "rule based" mappings.. ,e.g. 447562003
  */
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
 select
 	 <RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id,' does not end with default rule')      
  from curr_extendedmaprefset_s a join
   	(select referencedComponentId, mapGroup,max(mapPriority) as maxPriority from curr_extendedmaprefset_s  group by referencedComponentId, mapGroup ) b
@@ -25,11 +25,11 @@ select
  * NOTE: theres's no complexmap data for this at the moment, but the same assertion technically applies.
  */
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id, ' is a rule based map but with a blank rule')   
  from curr_extendedmaprefset_s a
 	where a.active = 1 

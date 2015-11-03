@@ -19,7 +19,6 @@ public class TestRunItem {
 	private List<FailureDetail> firstNInstances;
 	private Long extractResultInMillis;
 
-
 	/**
 	 * Empty constructor for IOC
 	 */
@@ -72,6 +71,7 @@ public class TestRunItem {
 		this.failureMessage = failureMessage;
 	}
 
+	
 	public List<FailureDetail> getFirstNInstances() {
 		return firstNInstances;
 	}

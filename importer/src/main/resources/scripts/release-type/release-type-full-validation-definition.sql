@@ -18,11 +18,11 @@
 
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
     concat('DEFINITION: id=',a.id, ' is in the previous full file, but not in the current full file.')
 	from prev_textdefinition_f a
 	left join curr_textdefinition_f b

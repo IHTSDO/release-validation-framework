@@ -3,404 +3,971 @@
   "totalAssertionsRun" : 80,
   "totalAssertionsFailed" : 80,
   "results" : [ {
-    "assertionName" : "Active historical association refset members have active concepts as targets.",
-    "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "AssociationRefset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is active  but the target component is an inactive concept: 609452007" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "No active Historical Association member associates an inactive concept with its parent.",
-    "assertionUuid" : "90bcb7f0-7f25-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "MEMBER: id=499c1966-65d3-5384-aafb-28f4a20e34eb: Historical association refset member associates inactive source concept with its stated parent." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Active historical association refset members have inactive concepts as reference components.",
-    "assertionUuid" : "f7117eb0-7cd6-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "MEMBER: id=499c1966-65d3-5384-aafb-28f4a20e34eb:Historical refset member is active, but refers to an active concept." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The definition status is PRIMITIVE for concepts having only one defining relationship.",
-    "assertionUuid" : "f2293d20-7cd6-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=702411003:Concept has only one defining relationship but the definition status is not primitive." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Inferred relationship modifier is always SOME.",
-    "assertionUuid" : "32b41aa0-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=1000000021: Inferred Relationship has a non -SOME- modifier." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "All inferred is-a relationships have relationship group of 0.",
-    "assertionUuid" : "36f43550-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=100000028: Inferred is-a relationship exists in a non-zero relationship group." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "All stated relationships in which the source concept is inactive, are inactive relationships.",
-    "assertionUuid" : "49487040-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=4969200029: Active stated relationship is associated with an inactive sourceid concept." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Stated relationship modifier is always SOME.",
-    "assertionUuid" : "4d32c9d0-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=4969198024: Stated relationship has a non -SOME- modifier." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "All stated is-a relationships have relationship group of 0.",
-    "assertionUuid" : "50e809a0-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=4969198024: Stated is-a relationship exists in a non-zero relationship group." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "No Concept has 2 stated relationships with the same type, destination and group.",
-    "assertionUuid" : "5d27df10-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=702386002: Concept has two stated relationships with same typeid and destinationid within a single relationship group." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "No active Terms contain leading or trailing spaces.",
-    "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",
-    "firstNInstances" : [ "Description: id=3006276018 has active term with leading or trailing spaces." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "No synonyms have semantic tags.",
-    "assertionUuid" : "e95acdbd-0a20-4010-9e78-00e70491e800",
-    "firstNInstances" : [ "Concept: id=702386002 has synonym containing a semantic tag (observable entity)" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "All FSNs end in closing parentheses.",
-    "assertionUuid" : "5a605c09-db1e-453f-aa4a-064faab2d310",
-    "firstNInstances" : [ "DESC: Term=Epilepsy in mother complicating childbirth(disorder:Fully Specified Name not ending with closing parantheses." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The first letter of the FSN should be capitalized.",
-    "assertionUuid" : "dd0d0406-7481-444a-9f04-b6fc7db49039",
-    "firstNInstances" : [ "DESC: id=3004397016:First letter of the active FSN of active concept not capitalized." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "No active term matches that of an inactive Description.",
-    "assertionUuid" : "c2975dd5-3869-4bf7-ac75-53fd53b90144",
-    "firstNInstances" : [ "Active description id = 2984057025 and inactive description id = 2984057023 share the same term" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Terms contains balanced parentheses.",
-    "assertionUuid" : "50907ee7-ddf6-4cb5-ba8b-be150644430b",
-    "firstNInstances" : [ "DESC: Term=Epilepsy in mother complicating childbirth(disorder:Active Terms of active concept without balanced parentheses." ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
-    "firstNInstances" : [ "DESC: conceptid=700132006:has terms not sharing case-sensitivity." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Active description of active concept consists of valid characters.",
-    "assertionUuid" : "6614ff12-fca2-42b7-a5da-ea26353979fe",
-    "firstNInstances" : [ "DESCRIPTION ID=3006276018: Synonym=Fracture \\clinic  contains invalid character." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The FSN term should be uqniue in active content.",
-    "assertionUuid" : "8d6ab114-caca-4d99-9fec-bb8fd9cea518",
-    "firstNInstances" : [ "FSN=Toxic effect of antimony AND/OR its compounds (disorder) concept=703860006: FSN term is not unique in description snapshot" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "All definitions are case sensitive.",
-    "assertionUuid" : "b4930ea7-4078-4599-979c-2dde18164f01",
-    "firstNInstances" : [ "TEXTDEF: id=2983208019:Definitions are not case sensitive." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The first letter of the active definition should be capitalized.",
-    "assertionUuid" : "6138248d-8cc8-4bc2-8043-cd609fdd640c",
-    "firstNInstances" : [ "TEXTDEFINITION: id=3008053018 contains a term that the first letter is not capitalized." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Descriptions in a language refset are unique for a given concept.",
-    "assertionUuid" : "e658fb00-7e9a-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=702386002: Concept has duplicate terms within a single language refset." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "There is only zero or one active Definition per concept per dialect in the snapshot file.",
-    "assertionUuid" : "00e87310-7e9b-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=703672002: Concept contains more than one definition for a given dialect." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "SNOMED RT identifier simple map refset refers to active components.",
-    "assertionUuid" : "695cea40-7f25-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "SimpleMapRefset: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249623 is not an active SNOMED RT member." ],
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "DESC: conceptid=700132006:has terms not sharing case-sensitivity."
+    } ],
     "totalFailed" : 1
   }, {
     "assertionName" : "SNOMED RT identifier simple map refset members are unique.",
     "assertionUuid" : "83638340-7f25-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "MEMBER: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249621: SNOMED RT member key (referencedcomponentid, maptarget) is not unique." ],
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "MEMBER: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249621: SNOMED RT member key (referencedcomponentid, maptarget) is not unique."
+    } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "CTV3 simple map refset members are unique.",
-    "assertionUuid" : "a2e01ee0-7f25-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "MEMBER: id=82f3de7e-e15a-56c2-80a7-8ba824b9bd8e: CTV3 member key (referencedcomponentid, maptarget) is not unique." ],
+    "assertionName" : "Active Non-human refset members refer to active components.",
+    "assertionUuid" : "8479317e-8459-4362-bee8-628b8220f1e4",
+    "firstNInstances" : [ {
+      "conceptId" : 699765003,
+      "detail" : "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components."
+    }, {
+      "conceptId" : 699765003,
+      "detail" : "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components."
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "The FSN term should be uqniue in active content.",
+    "assertionUuid" : "8d6ab114-caca-4d99-9fec-bb8fd9cea518",
+    "firstNInstances" : [ {
+      "conceptId" : 703860006,
+      "detail" : "FSN=Toxic effect of antimony AND/OR its compounds (disorder) concept=703860006: FSN term is not unique in description snapshot"
+    } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "CTV3 simple map refset members are always active.",
-    "assertionUuid" : "c0869af0-7f25-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "MEMBER: id=82f3de7e-e15a-56c2-80a7-8ba824b9bd79: CTV3 simple map refset member is not active." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Active VTM simple refset members refer to active components.",
-    "assertionUuid" : "9715b1dd-7de5-4f80-ad28-f97ab52b9359",
-    "firstNInstances" : [ "Simple refset: id=74d0e838-34eb-5a9a-8f02-5584487d55db is an active VTM but refers to an inactive component." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Active VMP simple refset members refer to active components.",
-    "assertionUuid" : "f5092a2b-8874-4290-ae96-a04bf568b1ab",
-    "firstNInstances" : [ "MEMBER: id=f9732f68-2af3-555a-bc7a-fa4a852caca6: Active VMP refset members refer to inactive components." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Calling procedure testing that terms that contain EN-US language-specific words are in the same US language refset.",
-    "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word has en-gb spelling: tumour" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset.",
-    "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "DESCRIPTION: id=3005197021: Synonym is prefered in the GB Language refset but refers to a word has en-us spelling: tumor" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "CTV3 codes are unique in the CTV3 simple map refset",
-    "assertionUuid" : "f14d521f-2472-4871-9c4e-356f0f075a3a",
-    "firstNInstances" : [ "CTV3 Code = XUjjkis not unique" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "SNOMED RT codes are unique in the SNOMED RT simple map refset",
-    "assertionUuid" : "5e80ea3e-c4dd-4ae3-8b75-f0567e42b962",
-    "firstNInstances" : [ "C-D1637" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Rule based complex MapGroup must be in sequential order and not blank",
-    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42b58",
-    "firstNInstances" : [ "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: Non-sequential map group:3" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Gender rules must be in alphabetical order in complex map refset",
-    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44b56",
-    "firstNInstances" : [ "ComplexMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b2 : Gender mapRules out of order" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Active complex maps should not have the same mapTarget in different groups for a given referenced component",
-    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44b55",
-    "firstNInstances" : [ "ComplexMap: id=433cf306-fbc0-50be-ba64-939089978794: mapTarget=313.0 is in more than one mapGroup" ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "Active rule based extended map must have sequentially ordered mapGroup values without gaps",
-    "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e42e65",
-    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Non-sequential map group:3" ],
-    "totalFailed" : 1
+    "assertionName" : "Non empty mapTarget should be part of mapAdvice",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f60",
+    "firstNInstances" : [ {
+      "conceptId" : 127011,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 : map target missing from advice:O03.8"
+    }, {
+      "conceptId" : 162004,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : map target missing from advice:F31.1"
+    }, {
+      "conceptId" : 162005,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : map target missing from advice:F31.1"
+    }, {
+      "conceptId" : 162006,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : map target missing from advice:F31.1"
+    }, {
+      "conceptId" : 162006,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619 : map target missing from advice:F31.1"
+    }, {
+      "conceptId" : 162007,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615 : map target missing from advice:F31.1"
+    }, {
+      "conceptId" : 162007,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616 : map target missing from advice:F31.1"
+    }, {
+      "conceptId" : 162008,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042617 : map target missing from advice:F31.1"
+    }, {
+      "conceptId" : 162008,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042618 : map target missing from advice:F31.1"
+    } ],
+    "totalFailed" : 9
   }, {
     "assertionName" : "Active extended maps should not have the same mapTarget and mapRule in different groups for a given referenced component",
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f67",
-    "firstNInstances" : [ "ExtendedMap: id=1d507f04-26a6-5a9d-8f3c-abb34b971a62: mapTarget=O03.8 is in more than one mapGroup" ],
+    "firstNInstances" : [ {
+      "conceptId" : 127008,
+      "detail" : "ExtendedMap: id=1d507f04-26a6-5a9d-8f3c-abb34b971a62: mapTarget=O03.8 is in more than one mapGroup"
+    } ],
     "totalFailed" : 1
   }, {
     "assertionName" : "Active higher extended mapGroup have at least one non blank mapTarget",
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f68",
-    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Higher-level map group with only blank map targets" ],
+    "firstNInstances" : [ {
+      "conceptId" : 127010,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Higher-level map group with only blank map targets"
+    } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "MapTarget should not be empty for classifiable mapCategory",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f69",
+    "firstNInstances" : [ {
+      "conceptId" : 127010,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Empty mapTarget for classifiable mapCategory"
+    }, {
+      "conceptId" : 127009,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f083 : Non-empty mapTarget for unclassifiable mapCategory"
+    }, {
+      "conceptId" : 127010,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f085 : Non-empty mapTarget for unclassifiable mapCategory"
+    }, {
+      "conceptId" : 127011,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 : Non-empty mapTarget for unclassifiable mapCategory"
+    }, {
+      "conceptId" : 162004,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : Non-empty mapTarget for unclassifiable mapCategory"
+    }, {
+      "conceptId" : 162005,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : Non-empty mapTarget for unclassifiable mapCategory"
+    }, {
+      "conceptId" : 162006,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : Non-empty mapTarget for unclassifiable mapCategory"
+    }, {
+      "conceptId" : 162006,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619 : Non-empty mapTarget for unclassifiable mapCategory"
+    }, {
+      "conceptId" : 162007,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615 : Non-empty mapTarget for unclassifiable mapCategory"
+    }, {
+      "conceptId" : 162007,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616 : Non-empty mapTarget for unclassifiable mapCategory"
+    } ],
+    "totalFailed" : 12
   }, {
     "assertionName" : "Gender rules must be in alphabetical order in extended map refset",
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f70",
-    "firstNInstances" : [ "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1: Gender mapRules out of order" ],
+    "firstNInstances" : [ {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1: Gender mapRules out of order"
+    } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "Active extended IFA rule maps reference active concepts and terms",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f71",
+    "firstNInstances" : [ {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b0 : IFA rule references an inactive concept"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109b : IFA rule references an inactive concept"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 : IFA rule references an inactive concept"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : IFA rule references an inactive concept"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b0 : IFA map rule references an inactive term"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109b : IFA map rule references an inactive term"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 : IFA map rule references an inactive term"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : IFA map rule references an inactive term"
+    } ],
+    "totalFailed" : 8
   }, {
     "assertionName" : "Active extended map with age rules do not have mapRule value ending with less or equal than 0",
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f72",
-    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086: illegal mapRule value for age rule:Age is <= 0" ],
+    "firstNInstances" : [ {
+      "conceptId" : 127011,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086: illegal mapRule value for age rule:Age is <= 0"
+    } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "The mapRule for active rule based extended maps should end with a default rule and not blank",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f73",
+    "firstNInstances" : [ {
+      "conceptId" : 127011,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 does not end with default rule"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=174a7931-88f1-5fc7-99fc-f0fc8f104f87 does not end with default rule"
+    } ],
+    "totalFailed" : 2
   }, {
     "assertionName" : "Active rule based extended maps do not have the same mapRule and mapTarget in a different mapGroup",
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f74",
-    "firstNInstances" : [ "ExtendedMap: id=1d507f04-26a6-5a9d-8f3c-abb34b971a62 : duplicate mapRule and mapTarget in different groups" ],
+    "firstNInstances" : [ {
+      "conceptId" : 127008,
+      "detail" : "ExtendedMap: id=1d507f04-26a6-5a9d-8f3c-abb34b971a62 : duplicate mapRule and mapTarget in different groups"
+    } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "The mapTarget in LOINC ExpressionAssociationRefset snapshot is unique.",
-    "assertionUuid" : "a6f78382-91c4-4e0a-a9d6-6d47b1a16979",
-    "firstNInstances" : [ "MapTarget:54320-7 is not unique in the expression association refset snapshot." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The mapTarget in LOINC ExpressionAssociationRefset snapshot is a valid LOINC code",
-    "assertionUuid" : "18d36527-9247-406a-bd1f-d7d608b0663a",
-    "firstNInstances" : [ "MapTarget:351411 is not a valid LOINC code in the expression association refset snapshot." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The LOINC parts in MapCorrelationOriginRefset snapshot are in correct format",
-    "assertionUuid" : "335b2810-8cbb-43bf-807e-092dacb20f6a",
-    "firstNInstances" : [ "LOINC part:20608-3 is not correctly formated in the MapCorrelationOrigin refset snapshot." ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "All inactive concepts have definition status of PRIMITIVE.",
-    "assertionUuid" : "fdf6a1b0-7cd6-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=699765003:There is an inactive concept whose definition status is not Primitive.", "CONCEPT: id=609452007:There is an inactive concept whose definition status is not Primitive." ],
+    "assertionName" : "Active extended map with gender mapAdvice must have corresponding gender rule",
+    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f75",
+    "firstNInstances" : [ {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 : Gender rule without gender advice"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : Gender rule without gender advice"
+    } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
-    "assertionUuid" : "4572d730-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "Source id=702386002 has two inferred relationships with same typeid and same destinationid within a single relationship-group.", "Source id=703649004 has two inferred relationships with same typeid and same destinationid within a single relationship-group." ],
-    "totalFailed" : 2
+    "assertionName" : "No active Historical Association member associates an inactive concept with its parent.",
+    "assertionUuid" : "90bcb7f0-7f25-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "MEMBER: id=499c1966-65d3-5384-aafb-28f4a20e34eb: Historical association refset member associates inactive source concept with its stated parent."
+    } ],
+    "totalFailed" : 1
   }, {
-    "assertionName" : "All FSNs have a space before the semantic tag.",
-    "assertionUuid" : "32369add-8d9f-48de-a129-29b32c79a9d7",
-    "firstNInstances" : [ "DESCRIPTION: id=3004397016 : The FSN has no space before the semantic tag.", "DESCRIPTION: id=2990804014 : The FSN has no space before the semantic tag." ],
-    "totalFailed" : 2
+    "assertionName" : "Active VTM simple refset members refer to active components.",
+    "assertionUuid" : "9715b1dd-7de5-4f80-ad28-f97ab52b9359",
+    "firstNInstances" : [ {
+      "conceptId" : 703649004,
+      "detail" : "Simple refset: id=74d0e838-34eb-5a9a-8f02-5584487d55db is an active VTM but refers to an inactive component."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "CTV3 simple map refset members are unique.",
+    "assertionUuid" : "a2e01ee0-7f25-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "MEMBER: id=82f3de7e-e15a-56c2-80a7-8ba824b9bd8e: CTV3 member key (referencedcomponentid, maptarget) is not unique."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "All active FSNs have a semantic tag.",
     "assertionUuid" : "a4ed3a89-170e-4d9c-995a-716447c4fe64",
-    "firstNInstances" : [ "DESC: Term=Epilepsy in mother complicating childbirth(disorder:Fully Specified Name without semantic tag.", "DESC: Term=DoloTest profile(observable entity):Fully Specified Name without semantic tag." ],
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "DESC: Term=Epilepsy in mother complicating childbirth(disorder:Fully Specified Name without semantic tag."
+    }, {
+      "conceptId" : 702411003,
+      "detail" : "DESC: Term=DoloTest profile(observable entity):Fully Specified Name without semantic tag."
+    } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "Case-sensitive terms have appropriate caseSignificanceId.",
-    "assertionUuid" : "22a95293-3acb-4671-95f8-1ff13ba3202c",
-    "firstNInstances" : [ "DESC: id=2984057008:Case-sensitivity terms containing inappropriate caseSignificanceId.", "DESC: id=2984057008:Case-sensitivity terms containing inappropriate caseSignificanceId." ],
-    "totalFailed" : 2
+    "assertionName" : "The mapTarget in LOINC ExpressionAssociationRefset snapshot is unique.",
+    "assertionUuid" : "a6f78382-91c4-4e0a-a9d6-6d47b1a16979",
+    "firstNInstances" : [ {
+      "conceptId" : 705114005,
+      "detail" : "MapTarget:54320-7 is not unique in the expression association refset snapshot."
+    } ],
+    "totalFailed" : 1
   }, {
-    "assertionName" : "All active definitions are preferred.",
-    "assertionUuid" : "73e46e72-6fdb-407b-9d50-d86a36a3a862",
-    "firstNInstances" : [ "CONCEPT: Concept=703672002: concept has definition not \"preferred\".", "CONCEPT: Concept=703672002: concept has definition not \"preferred\"." ],
+    "assertionName" : "All definitions are case sensitive.",
+    "assertionUuid" : "b4930ea7-4078-4599-979c-2dde18164f01",
+    "firstNInstances" : [ {
+      "conceptId" : 699220008,
+      "detail" : "TEXTDEF: id=2983208019:Definitions are not case sensitive."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "There is one and only one CTV3 simple map refset member per concept.",
+    "assertionUuid" : "bab42070-7f25-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "CONCEPT: id=700132006: Concept has more than one associated CTV3 refset member."
+    }, {
+      "conceptId" : 702411003,
+      "detail" : "CONCEPT: id=702411003: Concept does not have an associated CTV3 refset member."
+    }, {
+      "conceptId" : 699765003,
+      "detail" : "CONCEPT: id=699765003: Concept does not have an associated CTV3 refset member."
+    }, {
+      "conceptId" : 609452007,
+      "detail" : "CONCEPT: id=609452007: Concept does not have an associated CTV3 refset member."
+    } ],
+    "totalFailed" : 4
+  }, {
+    "assertionName" : "CTV3 simple map refset members are always active.",
+    "assertionUuid" : "c0869af0-7f25-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "MEMBER: id=82f3de7e-e15a-56c2-80a7-8ba824b9bd79: CTV3 simple map refset member is not active."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "No active term matches that of an inactive Description.",
+    "assertionUuid" : "c2975dd5-3869-4bf7-ac75-53fd53b90144",
+    "firstNInstances" : [ {
+      "conceptId" : 703860006,
+      "detail" : "Active description id = 2984057025 and inactive description id = 2984057023 share the same term"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Calling procedure testing that terms that contain EN-US language-specific words are in the same US language refset.",
+    "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word has en-gb spelling: tumour"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Terms are unique in Description hierarchy.",
+    "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "  Fracture clinic"
+    }, {
+      "conceptId" : 702386002,
+      "detail" : "  Fracture clinic"
+    }, {
+      "conceptId" : 703860006,
+      "detail" : "Exposure to vibration  "
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "Proglumetacin"
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "Proglumetacin"
+    }, {
+      "conceptId" : 702386002,
+      "detail" : "Toenail abnormality (observable entity)"
+    }, {
+      "conceptId" : 702386002,
+      "detail" : "Toenail abnormality (observable entity)"
+    } ],
+    "totalFailed" : 7
+  }, {
+    "assertionName" : "Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset.",
+    "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "DESCRIPTION: id=3005197021: Synonym is prefered in the GB Language refset but refers to a word has en-us spelling: tumor"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Members are inactive for inactive descriptions in the language refset snapshot file.",
+    "assertionUuid" : "d76f1430-7e9a-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 699400005,
+      "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c9: Refset member is active for an inactive description."
+    }, {
+      "conceptId" : 699400005,
+      "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c4: Refset member is active for an inactive description."
+    } ],
     "totalFailed" : 2
   }, {
     "assertionName" : "No active definitions contain leading or trailing spaces.",
     "assertionUuid" : "da3ae7c4-6144-4cd5-9530-2a7780c53c9a",
-    "firstNInstances" : [ "TEXTDEF: id=2989768014:Active Terms with leading or trailing spaces.", "TEXTDEF: id=2989691019:Active Terms with leading or trailing spaces." ],
+    "firstNInstances" : [ {
+      "conceptId" : 702769005,
+      "detail" : "TEXTDEF: id=2989768014:Active Terms with leading or trailing spaces."
+    }, {
+      "conceptId" : 700237005,
+      "detail" : "TEXTDEF: id=2989691019:Active Terms with leading or trailing spaces."
+    } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "No active definitions contain double spaces.",
-    "assertionUuid" : "f7b7cefe-858d-4749-ab98-7106700feaee",
-    "firstNInstances" : [ "TEXTDEF : id=3008053018:Active Terms of active concept containing double spaces.", "TEXTDEF : id=2989768014:Active Terms of active concept containing double spaces." ],
-    "totalFailed" : 2
+    "assertionName" : "The first letter of the FSN should be capitalized.",
+    "assertionUuid" : "dd0d0406-7481-444a-9f04-b6fc7db49039",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "DESC: id=3004397016:First letter of the active FSN of active concept not capitalized."
+    } ],
+    "totalFailed" : 1
   }, {
-    "assertionName" : "Members are inactive for inactive descriptions in the language refset snapshot file.",
-    "assertionUuid" : "d76f1430-7e9a-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c9: Refset member is active for an inactive description.", "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c4: Refset member is active for an inactive description." ],
-    "totalFailed" : 2
+    "assertionName" : "Descriptions in a language refset are unique for a given concept.",
+    "assertionUuid" : "e658fb00-7e9a-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "CONCEPT: id=702386002: Concept has duplicate terms within a single language refset."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "No synonyms have semantic tags.",
+    "assertionUuid" : "e95acdbd-0a20-4010-9e78-00e70491e800",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "Concept: id=702386002 has synonym containing a semantic tag (observable entity)"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active historical association refset members have active concepts as targets.",
+    "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 609452007,
+      "detail" : "AssociationRefset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is active  but the target component is an inactive concept: 609452007"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "CTV3 codes are unique in the CTV3 simple map refset",
+    "assertionUuid" : "f14d521f-2472-4871-9c4e-356f0f075a3a",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "CTV3 Code = XUjjkis not unique"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The definition status is PRIMITIVE for concepts having only one defining relationship.",
+    "assertionUuid" : "f2293d20-7cd6-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "CONCEPT: id=702411003:Concept has only one defining relationship but the definition status is not primitive."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active VMP simple refset members refer to active components.",
+    "assertionUuid" : "f5092a2b-8874-4290-ae96-a04bf568b1ab",
+    "firstNInstances" : [ {
+      "conceptId" : 703649004,
+      "detail" : "MEMBER: id=f9732f68-2af3-555a-bc7a-fa4a852caca6: Active VMP refset members refer to inactive components."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "Members are active for active descriptions in the language refset snapshot file.",
     "assertionUuid" : "f636b7b0-7e9a-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "3008913019", "3008913019" ],
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "Language refset: id=00002fb2-d982-5fbd-822f-045c938480c9 is inactive for an active description"
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "Language refset: id=00002fb2-d982-5fbd-822f-045c938480c9 is inactive for an active description"
+    } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "Active Non-human refset members refer to active components.",
-    "assertionUuid" : "8479317e-8459-4362-bee8-628b8220f1e4",
-    "firstNInstances" : [ "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components.", "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components." ],
+    "assertionName" : "Active historical association refset members have inactive concepts as reference components.",
+    "assertionUuid" : "f7117eb0-7cd6-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "MEMBER: id=499c1966-65d3-5384-aafb-28f4a20e34eb:Historical refset member is active, but refers to an active concept."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "No active definitions contain double spaces.",
+    "assertionUuid" : "f7b7cefe-858d-4749-ab98-7106700feaee",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "TEXTDEF : id=3008053018:Active Terms of active concept containing double spaces."
+    }, {
+      "conceptId" : 702769005,
+      "detail" : "TEXTDEF : id=2989768014:Active Terms of active concept containing double spaces."
+    } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "MapPriority must be in sequential order",
-    "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e43b59",
-    "firstNInstances" : [ "ComplexMap: id=433cf306-fbc0-50be-ba64-939089978795: Non-sequential mapPriority:2", "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: Non-sequential mapPriority:2" ],
+    "assertionName" : "All inactive concepts have definition status of PRIMITIVE.",
+    "assertionUuid" : "fdf6a1b0-7cd6-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 699765003,
+      "detail" : "CONCEPT: id=699765003:There is an inactive concept whose definition status is not Primitive."
+    }, {
+      "conceptId" : 609452007,
+      "detail" : "CONCEPT: id=609452007:There is an inactive concept whose definition status is not Primitive."
+    } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "Active higher mapGroup must have at least one non empty mapTarget",
-    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44b54",
-    "firstNInstances" : [ "ComplexMap: id=d2e6a1dd-6735-5f3c-878f-d28bb3260599: Higher-level map group with only blank map targets", "ComplexMap: id=d2e6a1dd-6735-5f3c-878f-d28bb3260509: Higher-level map group with only blank map targets" ],
-    "totalFailed" : 2
+    "assertionName" : "There is only zero or one active Definition per concept per dialect in the snapshot file.",
+    "assertionUuid" : "00e87310-7e9b-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 703672002,
+      "detail" : "CONCEPT: id=703672002: Concept contains more than one definition for a given dialect."
+    } ],
+    "totalFailed" : 1
   }, {
-    "assertionName" : "Active extended maps that are rule based have sequentially ordered mapPriority values without gaps within each mapGroup",
-    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42f66",
-    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f082: Non-sequential mapPriority:2", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084: Non-sequential mapPriority:2" ],
-    "totalFailed" : 2
-  }, {
-    "assertionName" : "The mapRule for active rule based extended maps should end with a default rule and not blank",
-    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f73",
-    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 does not end with default rule", "ExtendedMap: id=174a7931-88f1-5fc7-99fc-f0fc8f104f87 does not end with default rule" ],
-    "totalFailed" : 2
-  }, {
-    "assertionName" : "Active extended map with gender mapAdvice must have corresponding gender rule",
-    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f75",
-    "firstNInstances" : [ "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 : Gender rule without gender advice", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : Gender rule without gender advice" ],
-    "totalFailed" : 2
-  }, {
-    "assertionName" : "Relationship groups contain at least 2 relationships.",
-    "assertionUuid" : "411e9840-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=100000028: Relationship is in a relationship group with a single active inferred member." ],
-    "totalFailed" : 3
-  }, {
-    "assertionName" : "No active Terms contain double spaces.",
-    "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
-    "firstNInstances" : [ "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces.", "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces.", "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces." ],
-    "totalFailed" : 3
-  }, {
-    "assertionName" : "All active FSNs for a given concept have the same semantic tag.",
-    "assertionUuid" : "5c0186f3-0b72-4685-8aad-eff15a7f8880",
-    "firstNInstances" : [ "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag.", "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag.", "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag." ],
-    "totalFailed" : 3
-  }, {
-    "assertionName" : "All inferred relationships in which the concept associated is inactive, are inactive relationships.",
-    "assertionUuid" : "2e4fd620-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=1000006026: Active inferred relationship is associated with an inactive sourceid concept.", "RELATIONSHIP: id=1000006026: Active inferred relationship is associated with an inactive sourceid concept.", "RELATIONSHIP: id=1000002029: Active inferred relationship is associated with an inactive destinationid concept.", "RELATIONSHIP: id=1000002029: Active inferred relationship is associated with an inactive typeid concept." ],
-    "totalFailed" : 4
+    "assertionName" : "The mapTarget in LOINC ExpressionAssociationRefset snapshot is a valid LOINC code",
+    "assertionUuid" : "18d36527-9247-406a-bd1f-d7d608b0663a",
+    "firstNInstances" : [ {
+      "conceptId" : 705114005,
+      "detail" : "MapTarget:351411 is not a valid LOINC code in the expression association refset snapshot."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "For each active FSN there is a synonym that has the same text.",
     "assertionUuid" : "19423070-7118-45bd-98ba-6d0dc18bc619",
-    "firstNInstances" : [ "700132006 |Proglumetacin, different semantic tag (procedure)|", "702386002 |Epilepsy in mother complicating childbirth(disorder|", "702386002 |Toxic effect of antimony and/or its compounds (disorder)|", "703860006 |Toxic effect of antimony AND/OR its compounds (disorder)|" ],
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
+    }, {
+      "conceptId" : 702386002,
+      "detail" : "702386002 |Epilepsy in mother complicating childbirth(disorder|"
+    }, {
+      "conceptId" : 702386002,
+      "detail" : "702386002 |Toxic effect of antimony and/or its compounds (disorder)|"
+    }, {
+      "conceptId" : 703860006,
+      "detail" : "703860006 |Toxic effect of antimony AND/OR its compounds (disorder)|"
+    } ],
     "totalFailed" : 4
+  }, {
+    "assertionName" : "Case-sensitive terms have appropriate caseSignificanceId.",
+    "assertionUuid" : "22a95293-3acb-4671-95f8-1ff13ba3202c",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "DESC: id=2984057008:Case-sensitivity terms containing inappropriate caseSignificanceId."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "No active Terms contain double spaces.",
+    "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces."
+    }, {
+      "conceptId" : 703860006,
+      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
+    }, {
+      "conceptId" : 703860006,
+      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
+    } ],
+    "totalFailed" : 3
   }, {
     "assertionName" : "For a given concept, all description terms are unique.",
     "assertionUuid" : "2e0eb135-fd7d-4f24-83c1-0cba797ee766",
-    "firstNInstances" : [ "DESC: Id=700132006: non-unique term within concept.", "DESC: Id=700132006: non-unique term within concept.", "DESC: Id=700132006: non-unique term within concept.", "DESC: Id=703860006: non-unique term within concept." ],
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "DESC: Id=3008862015: non-unique term within concept."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "DESC: Id=3008913019: non-unique term within concept."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "DESC: Id=3008913020: non-unique term within concept."
+    }, {
+      "conceptId" : 703860006,
+      "detail" : "DESC: Id=2989790014: non-unique term within concept."
+    } ],
     "totalFailed" : 4
   }, {
-    "assertionName" : "There is one and only one SNOMED RT simple map refset member per concept.",
-    "assertionUuid" : "730720b0-7f25-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=700132006: Concept has more than one associated SNOMED RT refset member.", "CONCEPT: id=702411003: Concept does not have an associated SNOMED RT refset member.", "CONCEPT: id=699765003: Concept does not have an associated SNOMED RT refset member.", "CONCEPT: id=609452007: Concept does not have an associated SNOMED RT refset member." ],
+    "assertionName" : "All inferred relationships in which the concept associated is inactive, are inactive relationships.",
+    "assertionUuid" : "2e4fd620-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 703649004,
+      "detail" : "RELATIONSHIP: id=1000006026: Active inferred relationship is associated with an inactive sourceid concept."
+    }, {
+      "conceptId" : 703649004,
+      "detail" : "RELATIONSHIP: id=1000006026: Active inferred relationship is associated with an inactive sourceid concept."
+    }, {
+      "conceptId" : 700132008,
+      "detail" : "RELATIONSHIP: id=1000002029: Active inferred relationship is associated with an inactive destinationid concept."
+    }, {
+      "conceptId" : 699765003,
+      "detail" : "RELATIONSHIP: id=1000002029: Active inferred relationship is associated with an inactive typeid concept."
+    } ],
     "totalFailed" : 4
   }, {
-    "assertionName" : "There is one and only one CTV3 simple map refset member per concept.",
-    "assertionUuid" : "bab42070-7f25-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=700132006: Concept has more than one associated CTV3 refset member.", "CONCEPT: id=702411003: Concept does not have an associated CTV3 refset member.", "CONCEPT: id=699765003: Concept does not have an associated CTV3 refset member.", "CONCEPT: id=609452007: Concept does not have an associated CTV3 refset member." ],
-    "totalFailed" : 4
+    "assertionName" : "The concepts referenced by expressions in LOINC ExpressionAssociationRefset SNAPSHOT file must exist in the concept snapshot",
+    "assertionUuid" : "30947783-78f5-4ffc-a22b-b03d83c5909d",
+    "firstNInstances" : [ {
+      "conceptId" : 363787002,
+      "detail" : "Concept: id=363787002 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    }, {
+      "conceptId" : 704346009,
+      "detail" : "Concept: id=704346009 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    }, {
+      "conceptId" : 386053000,
+      "detail" : "Concept: id=386053000 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    }, {
+      "conceptId" : 246501002,
+      "detail" : "Concept: id=246501002 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    }, {
+      "conceptId" : 703447009,
+      "detail" : "Concept: id=703447009 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    }, {
+      "conceptId" : 704327008,
+      "detail" : "Concept: id=704327008 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    }, {
+      "conceptId" : 119297000,
+      "detail" : "Concept: id=119297000 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    }, {
+      "conceptId" : 704347000,
+      "detail" : "Concept: id=704347000 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    }, {
+      "conceptId" : 414237002,
+      "detail" : "Concept: id=414237002 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    }, {
+      "conceptId" : 704319004,
+      "detail" : "Concept: id=704319004 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
+    } ],
+    "totalFailed" : 50
   }, {
-    "assertionName" : "Active complex map IFA rules referenced concepts and terms must be active ",
-    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44c61",
-    "firstNInstances" : [ "ComplexMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b2: IFA rule references missing conceptId and term", "ComplexMap: id=69703317-411e-5d4d-b853-eef523f0109d: IFA rule references missing conceptId and term", "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: IFA rule references missing conceptId and term", "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term" ],
-    "totalFailed" : 4
+    "assertionName" : "All FSNs have a space before the semantic tag.",
+    "assertionUuid" : "32369add-8d9f-48de-a129-29b32c79a9d7",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "DESCRIPTION: id=3004397016 : The FSN has no space before the semantic tag."
+    }, {
+      "conceptId" : 702411003,
+      "detail" : "DESCRIPTION: id=2990804014 : The FSN has no space before the semantic tag."
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "Inferred relationship modifier is always SOME.",
+    "assertionUuid" : "32b41aa0-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "RELATIONSHIP: id=1000000021: Inferred Relationship has a non -SOME- modifier."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The LOINC parts in MapCorrelationOriginRefset snapshot are in correct format",
+    "assertionUuid" : "335b2810-8cbb-43bf-807e-092dacb20f6a",
+    "firstNInstances" : [ {
+      "conceptId" : 707688001,
+      "detail" : "LOINC part:20608-3 is not correctly formated in the MapCorrelationOrigin refset snapshot."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "All inferred is-a relationships have relationship group of 0.",
+    "assertionUuid" : "36f43550-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 280844000,
+      "detail" : "RELATIONSHIP: id=100000028: Inferred is-a relationship exists in a non-zero relationship group."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "All concepts have at least one inferred is-a relationship.",
+    "assertionUuid" : "3ab84230-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "CONCEPT: id=702411003: Concept does not have an inferred is-a relationship."
+    }, {
+      "conceptId" : 702769005,
+      "detail" : "CONCEPT: id=702769005: Concept does not have an inferred is-a relationship."
+    }, {
+      "conceptId" : 703860006,
+      "detail" : "CONCEPT: id=703860006: Concept does not have an inferred is-a relationship."
+    }, {
+      "conceptId" : 703155005,
+      "detail" : "CONCEPT: id=703155005: Concept does not have an inferred is-a relationship."
+    }, {
+      "conceptId" : 702386002,
+      "detail" : "CONCEPT: id=702386002: Concept does not have an inferred is-a relationship."
+    }, {
+      "conceptId" : 703672002,
+      "detail" : "CONCEPT: id=703672002: Concept does not have an inferred is-a relationship."
+    }, {
+      "conceptId" : 702850005,
+      "detail" : "CONCEPT: id=702850005: Concept does not have an inferred is-a relationship."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship."
+    } ],
+    "totalFailed" : 9
+  }, {
+    "assertionName" : "Relationship groups contain at least 2 relationships.",
+    "assertionUuid" : "411e9840-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 10002003,
+      "detail" : "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member."
+    }, {
+      "conceptId" : 255135009,
+      "detail" : "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member."
+    }, {
+      "conceptId" : 280844000,
+      "detail" : "RELATIONSHIP: id=100000028: Relationship is in a relationship group with a single active inferred member."
+    } ],
+    "totalFailed" : 3
+  }, {
+    "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
+    "assertionUuid" : "4572d730-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "Source id=702386002 has two inferred relationships with same typeid and same destinationid within a single relationship-group."
+    }, {
+      "conceptId" : 703649004,
+      "detail" : "Source id=703649004 has two inferred relationships with same typeid and same destinationid within a single relationship-group."
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "All stated relationships in which the source concept is inactive, are inactive relationships.",
+    "assertionUuid" : "49487040-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 703649004,
+      "detail" : "RELATIONSHIP: id=4969200029: Active stated relationship is associated with an inactive sourceid concept."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Stated relationship modifier is always SOME.",
+    "assertionUuid" : "4d32c9d0-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "RELATIONSHIP: id=4969198024: Stated relationship has a non -SOME- modifier."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Terms contains balanced parentheses.",
+    "assertionUuid" : "50907ee7-ddf6-4cb5-ba8b-be150644430b",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "DESC: Term=Epilepsy in mother complicating childbirth(disorder:Active Terms of active concept without balanced parentheses."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "All stated is-a relationships have relationship group of 0.",
+    "assertionUuid" : "50e809a0-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "RELATIONSHIP: id=4969198024: Stated is-a relationship exists in a non-zero relationship group."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "All concepts have at least one stated is-a relationship.",
+    "assertionUuid" : "5555c400-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702769005,
+      "detail" : "CONCEPT: id=702769005: Concept does not have a stated is-a relationship."
+    }, {
+      "conceptId" : 703860006,
+      "detail" : "CONCEPT: id=703860006: Concept does not have a stated is-a relationship."
+    }, {
+      "conceptId" : 703155005,
+      "detail" : "CONCEPT: id=703155005: Concept does not have a stated is-a relationship."
+    }, {
+      "conceptId" : 702386002,
+      "detail" : "CONCEPT: id=702386002: Concept does not have a stated is-a relationship."
+    }, {
+      "conceptId" : 703672002,
+      "detail" : "CONCEPT: id=703672002: Concept does not have a stated is-a relationship."
+    }, {
+      "conceptId" : 702850005,
+      "detail" : "CONCEPT: id=702850005: Concept does not have a stated is-a relationship."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "CONCEPT: id=700132006: Concept does not have a stated is-a relationship."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "CONCEPT: id=700132006: Concept does not have a stated is-a relationship."
+    } ],
+    "totalFailed" : 8
+  }, {
+    "assertionName" : "No active Terms contain leading or trailing spaces.",
+    "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "Description: id=3006276018 has active term with leading or trailing spaces."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "Relationship groups contain at least 2 relationships.",
     "assertionUuid" : "59b574a0-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4998022027: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4969198024: Relationship is in a relationship group with a single active inferred member.", "RELATIONSHIP: id=4969200029: Relationship is in a relationship group with a single active inferred member." ],
+    "firstNInstances" : [ {
+      "conceptId" : 109443007,
+      "detail" : "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member."
+    }, {
+      "conceptId" : 128534003,
+      "detail" : "RELATIONSHIP: id=4998022027: Relationship is in a relationship group with a single active inferred member."
+    }, {
+      "conceptId" : 205627002,
+      "detail" : "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member."
+    }, {
+      "conceptId" : 702411003,
+      "detail" : "RELATIONSHIP: id=4969198024: Relationship is in a relationship group with a single active inferred member."
+    }, {
+      "conceptId" : 703649004,
+      "detail" : "RELATIONSHIP: id=4969200029: Relationship is in a relationship group with a single active inferred member."
+    } ],
     "totalFailed" : 5
   }, {
-    "assertionName" : "Terms are unique in Description hierarchy.",
-    "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
-    "firstNInstances" : [ "  Fracture clinic", "  Fracture clinic", "Exposure to vibration  ", "Proglumetacin", "Proglumetacin", "Toenail abnormality (observable entity)", "Toenail abnormality (observable entity)" ],
-    "totalFailed" : 7
+    "assertionName" : "All FSNs end in closing parentheses.",
+    "assertionUuid" : "5a605c09-db1e-453f-aa4a-064faab2d310",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "DESC: Term=Epilepsy in mother complicating childbirth(disorder:Fully Specified Name not ending with closing parantheses."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "All active FSNs for a given concept have the same semantic tag.",
+    "assertionUuid" : "5c0186f3-0b72-4685-8aad-eff15a7f8880",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "DESC: conceptid=700132006:Active FSN for a given concept with different semantic tag."
+    }, {
+      "conceptId" : 702386002,
+      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
+    } ],
+    "totalFailed" : 3
+  }, {
+    "assertionName" : "No Concept has 2 stated relationships with the same type, destination and group.",
+    "assertionUuid" : "5d27df10-7d08-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "CONCEPT: id=702386002: Concept has two stated relationships with same typeid and destinationid within a single relationship group."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "SNOMED RT codes are unique in the SNOMED RT simple map refset",
+    "assertionUuid" : "5e80ea3e-c4dd-4ae3-8b75-f0567e42b962",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "C-D1637"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The first letter of the active definition should be capitalized.",
+    "assertionUuid" : "6138248d-8cc8-4bc2-8043-cd609fdd640c",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "TEXTDEFINITION: id=3008053018 contains a term that the first letter is not capitalized."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active description of active concept consists of valid characters.",
+    "assertionUuid" : "6614ff12-fca2-42b7-a5da-ea26353979fe",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "DESCRIPTION ID=3006276018: Synonym=Fracture \\clinic  contains invalid character."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "SNOMED RT identifier simple map refset refers to active components.",
+    "assertionUuid" : "695cea40-7f25-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "SimpleMapRefset: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249623 is not an active SNOMED RT member."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active rule based extended map must have sequentially ordered mapGroup values without gaps",
+    "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e42e65",
+    "firstNInstances" : [ {
+      "conceptId" : 127010,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Non-sequential map group:3"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "MapPriority must be in sequential order",
+    "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e43b59",
+    "firstNInstances" : [ {
+      "conceptId" : 122003,
+      "detail" : "ComplexMap: id=433cf306-fbc0-50be-ba64-939089978795: Non-sequential mapPriority:2"
+    }, {
+      "conceptId" : 140005,
+      "detail" : "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: Non-sequential mapPriority:2"
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "There is one and only one SNOMED RT simple map refset member per concept.",
+    "assertionUuid" : "730720b0-7f25-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 700132006,
+      "detail" : "CONCEPT: id=700132006: Concept has more than one associated SNOMED RT refset member."
+    }, {
+      "conceptId" : 702411003,
+      "detail" : "CONCEPT: id=702411003: Concept does not have an associated SNOMED RT refset member."
+    }, {
+      "conceptId" : 699765003,
+      "detail" : "CONCEPT: id=699765003: Concept does not have an associated SNOMED RT refset member."
+    }, {
+      "conceptId" : 609452007,
+      "detail" : "CONCEPT: id=609452007: Concept does not have an associated SNOMED RT refset member."
+    } ],
+    "totalFailed" : 4
+  }, {
+    "assertionName" : "All active definitions are preferred.",
+    "assertionUuid" : "73e46e72-6fdb-407b-9d50-d86a36a3a862",
+    "firstNInstances" : [ {
+      "conceptId" : 703672002,
+      "detail" : "CONCEPT: Concept=703672002: concept has definition not \"preferred\"."
+    }, {
+      "conceptId" : 703672002,
+      "detail" : "CONCEPT: Concept=703672002: concept has definition not \"preferred\"."
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "Rule based complex MapGroup must be in sequential order and not blank",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42b58",
+    "firstNInstances" : [ {
+      "conceptId" : 140005,
+      "detail" : "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: Non-sequential map group:3"
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "Active extended maps have valid mapCategoryId",
     "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42d63",
-    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f083: invalid mapCategory=447637011", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f085: invalid mapCategory=447637011", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086: invalid mapCategory=447637011", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613: invalid mapCategory=447562006", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619: invalid mapCategory=447562006", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616: invalid mapCategory=447562003", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042618: invalid mapCategory=447562006" ],
+    "firstNInstances" : [ {
+      "conceptId" : 127009,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f083: invalid mapCategory=447637011"
+    }, {
+      "conceptId" : 127010,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f085: invalid mapCategory=447637011"
+    }, {
+      "conceptId" : 127011,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086: invalid mapCategory=447637011"
+    }, {
+      "conceptId" : 162005,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613: invalid mapCategory=447562006"
+    }, {
+      "conceptId" : 162006,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619: invalid mapCategory=447562006"
+    }, {
+      "conceptId" : 162007,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616: invalid mapCategory=447562003"
+    }, {
+      "conceptId" : 162008,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042618: invalid mapCategory=447562006"
+    } ],
     "totalFailed" : 7
   }, {
     "assertionName" : "Active ICD 10 extended maps must have valid mapAdvice values for corresponding mapCategory",
     "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42d64",
-    "firstNInstances" : [ "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : misaligned mapCategory and mapAdvice for ambiguous WHO concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : misaligned mapCategory and mapAdvice for ambiguous WHO concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : misaligned mapCategory and mapAdvice for Non Classifiable", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615: misaligned mapCategory and mapAdvice for ambiguous snomed concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616: misaligned mapCategory and mapAdvice for ambiguous snomed concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042617: misaligned mapCategory and mapAdvice for incompletely modeled concepts", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042618: misaligned mapCategory and mapAdvice for incompletely modeled concepts" ],
+    "firstNInstances" : [ {
+      "conceptId" : 162004,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : misaligned mapCategory and mapAdvice for ambiguous WHO concepts"
+    }, {
+      "conceptId" : 162005,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : misaligned mapCategory and mapAdvice for ambiguous WHO concepts"
+    }, {
+      "conceptId" : 162006,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : misaligned mapCategory and mapAdvice for Non Classifiable"
+    }, {
+      "conceptId" : 162007,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615: misaligned mapCategory and mapAdvice for ambiguous snomed concepts"
+    }, {
+      "conceptId" : 162007,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616: misaligned mapCategory and mapAdvice for ambiguous snomed concepts"
+    }, {
+      "conceptId" : 162008,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042617: misaligned mapCategory and mapAdvice for incompletely modeled concepts"
+    }, {
+      "conceptId" : 162008,
+      "detail" : "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042618: misaligned mapCategory and mapAdvice for incompletely modeled concepts"
+    } ],
     "totalFailed" : 7
   }, {
-    "assertionName" : "All concepts have at least one stated is-a relationship.",
-    "assertionUuid" : "5555c400-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=702769005: Concept does not have a stated is-a relationship.", "CONCEPT: id=703860006: Concept does not have a stated is-a relationship.", "CONCEPT: id=703155005: Concept does not have a stated is-a relationship.", "CONCEPT: id=702386002: Concept does not have a stated is-a relationship.", "CONCEPT: id=703672002: Concept does not have a stated is-a relationship.", "CONCEPT: id=702850005: Concept does not have a stated is-a relationship.", "CONCEPT: id=700132006: Concept does not have a stated is-a relationship.", "CONCEPT: id=700132006: Concept does not have a stated is-a relationship." ],
-    "totalFailed" : 8
+    "assertionName" : "Active extended maps that are rule based have sequentially ordered mapPriority values without gaps within each mapGroup",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42f66",
+    "firstNInstances" : [ {
+      "conceptId" : 127008,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f082: Non-sequential mapPriority:2"
+    }, {
+      "conceptId" : 127010,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084: Non-sequential mapPriority:2"
+    } ],
+    "totalFailed" : 2
   }, {
-    "assertionName" : "Active extended IFA rule maps reference active concepts and terms",
-    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f71",
-    "firstNInstances" : [ "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b0 : IFA rule references an inactive concept", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109b : IFA rule references an inactive concept", "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 : IFA rule references an inactive concept", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : IFA rule references an inactive concept", "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b0 : IFA map rule references an inactive term", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109b : IFA map rule references an inactive term", "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 : IFA map rule references an inactive term", "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : IFA map rule references an inactive term" ],
-    "totalFailed" : 8
+    "assertionName" : "Active higher mapGroup must have at least one non empty mapTarget",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44b54",
+    "firstNInstances" : [ {
+      "conceptId" : 105000,
+      "detail" : "ComplexMap: id=d2e6a1dd-6735-5f3c-878f-d28bb3260599: Higher-level map group with only blank map targets"
+    }, {
+      "conceptId" : 105000,
+      "detail" : "ComplexMap: id=d2e6a1dd-6735-5f3c-878f-d28bb3260509: Higher-level map group with only blank map targets"
+    } ],
+    "totalFailed" : 2
   }, {
-    "assertionName" : "All concepts have at least one inferred is-a relationship.",
-    "assertionUuid" : "3ab84230-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ "CONCEPT: id=702411003: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702769005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703860006: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703155005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702386002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=703672002: Concept does not have an inferred is-a relationship.", "CONCEPT: id=702850005: Concept does not have an inferred is-a relationship.", "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship.", "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship." ],
-    "totalFailed" : 9
+    "assertionName" : "Active complex maps should not have the same mapTarget in different groups for a given referenced component",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44b55",
+    "firstNInstances" : [ {
+      "conceptId" : 122003,
+      "detail" : "ComplexMap: id=433cf306-fbc0-50be-ba64-939089978794: mapTarget=313.0 is in more than one mapGroup"
+    } ],
+    "totalFailed" : 1
   }, {
-    "assertionName" : "Non empty mapTarget should be part of mapAdvice",
-    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f60",
-    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 : map target missing from advice:O03.8", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042617 : map target missing from advice:F31.1", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042618 : map target missing from advice:F31.1" ],
-    "totalFailed" : 9
+    "assertionName" : "Gender rules must be in alphabetical order in complex map refset",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44b56",
+    "firstNInstances" : [ {
+      "conceptId" : 140004,
+      "detail" : "ComplexMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b2 : Gender mapRules out of order"
+    } ],
+    "totalFailed" : 1
   }, {
-    "assertionName" : "MapTarget should not be empty for classifiable mapCategory",
-    "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f69",
-    "firstNInstances" : [ "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 : Empty mapTarget for classifiable mapCategory", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f083 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f085 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042612 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042613 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042614 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042619 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042615 : Non-empty mapTarget for unclassifiable mapCategory", "ExtendedMap: id=02dc8b54-b1ce-5fbb-8b2c-9f8414042616 : Non-empty mapTarget for unclassifiable mapCategory" ],
-    "totalFailed" : 12
-  }, {
-    "assertionName" : "The concepts referenced by expressions in LOINC ExpressionAssociationRefset SNAPSHOT file must exist in the concept snapshot",
-    "assertionUuid" : "30947783-78f5-4ffc-a22b-b03d83c5909d",
-    "firstNInstances" : [ "Concept: id=363787002 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=704346009 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=386053000 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=246501002 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=703447009 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=704327008 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=119297000 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=704347000 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=414237002 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.", "Concept: id=704319004 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown." ],
-    "totalFailed" : 50
+    "assertionName" : "Active complex map IFA rules referenced concepts and terms must be active ",
+    "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e44c61",
+    "firstNInstances" : [ {
+      "conceptId" : 140004,
+      "detail" : "ComplexMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b2: IFA rule references missing conceptId and term"
+    }, {
+      "conceptId" : 140004,
+      "detail" : "ComplexMap: id=69703317-411e-5d4d-b853-eef523f0109d: IFA rule references missing conceptId and term"
+    }, {
+      "conceptId" : 140005,
+      "detail" : "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3: IFA rule references missing conceptId and term"
+    }, {
+      "conceptId" : 140005,
+      "detail" : "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term"
+    } ],
+    "totalFailed" : 4
   } ]
 }

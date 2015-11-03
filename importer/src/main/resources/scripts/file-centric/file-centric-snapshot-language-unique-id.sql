@@ -7,14 +7,13 @@
 	Member Ids.
 
 ********************************************************************************/
-	
-	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
-		concat('MEMBER: id=',id, ': Member Id is repeated in the language refset snapshot file.') 
-	from curr_langrefset_s
-	group by id
-	having count(id) > 1;
+		b.conceptid,
+		concat('MEMBER: id=',c.id, ': is repeated in the language refset snapshot file.') 
+	from (select a.id from curr_langrefset_s a group by a.id having count(a.id) > 1) as duplicate,
+	 curr_description_s b,
+	 curr_langrefset_s c
+	where duplicate.id=c.id and c.referencedcomponentid = b.id;

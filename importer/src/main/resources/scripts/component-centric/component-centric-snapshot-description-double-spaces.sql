@@ -6,11 +6,11 @@
 	No active Terms associated with active concepts contain double spaces.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('CONCEPT: Term=',a.term, ':Active Terms containing double spaces.') 	
 	from curr_description_s a , curr_concept_s b
 	where a.active = 1

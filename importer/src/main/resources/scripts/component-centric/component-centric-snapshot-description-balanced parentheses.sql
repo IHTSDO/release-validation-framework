@@ -8,11 +8,11 @@
 ********************************************************************************/
 	
 /* 	inserting exceptions in the result table */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('DESC: Term=',a.term, ':Active Terms of active concept without balanced parentheses.') 	
 	from curr_description_s  a , curr_concept_s b
 	where (LENGTH(term) - LENGTH(REPLACE(term, '(', ''))) - (LENGTH(term) - LENGTH(REPLACE(term, ')', ''))) !=0 

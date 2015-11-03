@@ -3,11 +3,11 @@
  * 
  */
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
 	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id,': mapTarget=',a.mapTarget,' is in more than one mapGroup')
  from curr_extendedmaprefset_s a
 	where a.active = 1

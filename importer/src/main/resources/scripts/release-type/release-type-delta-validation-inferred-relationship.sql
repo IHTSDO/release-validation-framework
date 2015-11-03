@@ -3,11 +3,11 @@
 */
 
 /* in the delta; not in the full */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('Inferred relationship: id=',a.id, ' is in delta file, but not in FULL file.') 	
 	from curr_relationship_d a
 	left join curr_relationship_f b

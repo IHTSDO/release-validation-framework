@@ -6,11 +6,11 @@
 	ConceptId value refers to valid concept identifier in DESCRIPTION snapshot.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('DESCRIPTION: id=',a.id, ' refers to an invalid concept identifier in the DESCRIPTION snapshot.') 	
 	from curr_description_s a
 	left join curr_concept_s b

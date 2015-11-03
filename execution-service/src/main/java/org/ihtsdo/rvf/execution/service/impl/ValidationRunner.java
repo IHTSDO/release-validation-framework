@@ -79,7 +79,7 @@ public class ValidationRunner {
 	public void run(ValidationRunConfig validationConfig) {
 		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		try {
-			responseMap.put("Validation config", validationConfig);
+			responseMap.put("validationConfig", validationConfig);
 			runValidation(responseMap, validationConfig);
 		} catch (final Throwable e) {
 			final StringWriter errors = new StringWriter();
@@ -153,9 +153,9 @@ public class ValidationRunner {
 			} else {
 				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getProspectiveFile(), rf2FilesLoaded);
 			}
-			responseMap.put("Total RF2 Files loaded", rf2FilesLoaded.size());
+			responseMap.put("totalRF2FilesLoaded", rf2FilesLoaded.size());
 			Collections.sort(rf2FilesLoaded);
-			responseMap.put("RF2 Files", rf2FilesLoaded);
+			responseMap.put("rf2Files", rf2FilesLoaded);
 			
 			final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
 			if (prospectiveSchema != null) {
@@ -176,8 +176,8 @@ public class ValidationRunner {
 			final Calendar endTime = Calendar.getInstance();
 			final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 			logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
-			responseMap.put("Start time", startTime.getTime());
-			responseMap.put("End time", endTime.getTime());
+			responseMap.put("startTime", startTime.getTime());
+			responseMap.put("endTime", endTime.getTime());
 			reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
 			//house keeping prospective version and combined previous extension 
 			scheduleEventGenerator.createDropReleaseSchemaEvent(prospectiveSchema);
@@ -278,7 +278,7 @@ public class ValidationRunner {
 		report.setFailedAssertions(failedItems);
 		items.removeAll(failedItems);
 		report.setPassedAssertions(items);
-		responseMap.put(report.getTestType().name() + " test result", report);
+		responseMap.put(report.getTestType().toString() + "TestResult", report);
 		
 	}
 

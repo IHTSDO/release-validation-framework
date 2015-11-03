@@ -6,11 +6,11 @@
 	CTV3 simple map refset members are unique.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('MEMBER: id=',a.id, ': CTV3 member key (referencedcomponentid, maptarget) is not unique.') 
 	from curr_simplemaprefset_s a
 	where a.refsetid = '900000000000497000'

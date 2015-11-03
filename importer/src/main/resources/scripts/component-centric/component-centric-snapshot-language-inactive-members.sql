@@ -11,11 +11,11 @@
 	
 	*/
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('MEMBER: id=',b.id, ': Refset member is active for an inactive description.') 
 	from curr_description_s a
 	inner join curr_langrefset_s b 

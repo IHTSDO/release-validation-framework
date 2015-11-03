@@ -6,11 +6,11 @@
 	ReferenceComponentIds refers to valid concepts in the Map Correlation Origin  Refset snapshot file.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		result.referencedcomponentid,
 		concat('ReferencedcomponentId=',result.referencedcomponentid, ' in MapCorrelationOriginRefset snapshot is not a concept Id') 
 	from ( select distinct a.referencedcomponentid
 		from curr_mapCorrelationOriginRefset_s a

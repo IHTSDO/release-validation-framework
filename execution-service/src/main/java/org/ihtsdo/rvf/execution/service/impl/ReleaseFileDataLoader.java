@@ -90,7 +90,8 @@ public class ReleaseFileDataLoader {
 							+ " ignore 1 lines";
 					LOGGER.info(loadFile);
 					
-					try (Statement statement = dataSource.getConnection(schemaName).createStatement()) {
+					try (Connection connection =dataSource.getConnection(schemaName); 
+						Statement statement = connection.createStatement()) {
 						statement.execute(configStr);
 						statement.execute(disableIndex);
 						statement.execute(loadFile);
@@ -105,7 +106,7 @@ public class ReleaseFileDataLoader {
 			try {
 				rf2FilesLoaded.add(task.get());
 			} catch (InterruptedException | ExecutionException e) {
-				LOGGER.error("Thread interrupted while waiting for get rf2 file loading result.", e);
+				LOGGER.error("Thread interrupted while waiting for get rf2 file loading result.", e.fillInStackTrace());
 			}
 		}
 		final long end = System.currentTimeMillis();

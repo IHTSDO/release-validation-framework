@@ -131,7 +131,7 @@ public class ValidationReportService {
 			if (jsonResults == null) {
 				jsonResults = new String("Failed to recover results in " + filePath);
 			}
-			responseMap.put("RVF Validation Result", jsonResults);
+			responseMap.put("rvfValidationResult", jsonResults);
 		}
 	 
 	 

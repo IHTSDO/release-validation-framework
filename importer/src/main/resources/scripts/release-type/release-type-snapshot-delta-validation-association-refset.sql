@@ -5,11 +5,11 @@
 
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ASSOCIATION REFSET: id=',a.id, ' is in delta but not in snapshot file.') 	
 	from curr_associationrefset_d a
 	left join curr_associationrefset_s b

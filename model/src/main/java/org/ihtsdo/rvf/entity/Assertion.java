@@ -7,8 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.hibernate.annotations.Index;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -18,7 +21,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @Entity
 @XmlRootElement(name = "assertion")
-@Table(name = "assertion")
+@Table(name = "assertion",
+	uniqueConstraints = @UniqueConstraint(columnNames={"uuid"}))
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = Assertion.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Assertion {
@@ -38,6 +42,8 @@ public class Assertion {
 	private String docRef;
 	
 	private String keywords;
+	
+	@Index(name="assertion_uuid_idx",columnNames={"uuid"})
 	private String uuid = UUID.randomUUID().toString();
 
 	public Assertion() {

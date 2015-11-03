@@ -10,7 +10,7 @@
 
 	drop table if exists v_curr_delta_us;
 	create table if not exists v_curr_delta_us as
-	select distinct a.id, a.term
+	select distinct a.id, a.term,a.conceptid
 		from curr_description_d a 
 		inner join curr_langrefset_s b on a.id = b.referencedComponentId
 		and a.active = '1'

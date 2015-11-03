@@ -20,10 +20,11 @@
 	where b.active = 1;		
 
 /*  descriptions in the temp table having duplicate preferred language refset members */	
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('CONCEPT: id=',a.conceptid, ': Concept has multiple active preferred terms.') 
 	from description_tmp a
 	join curr_langrefset_s b
@@ -54,10 +55,11 @@
 
 /*  identify concepts that have been edited this cycle, for which there is no 
 	US preferred term */
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('CONCEPT: id=',a.conceptid, ': Concept has no active preferred term.') 
 	from tmp_edited_concept a
 	left join tmp_pt b
@@ -67,10 +69,11 @@
 
 /*  identify concepts that have been edited this cycle, for which there is no 
 	GB preferred term */
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('CONCEPT: id=',a.conceptid, ': Concept has no active preferred term.') 
 	from tmp_edited_concept a
 	left join tmp_pt b

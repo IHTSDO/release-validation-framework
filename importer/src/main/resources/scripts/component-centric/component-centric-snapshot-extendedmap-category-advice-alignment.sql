@@ -7,11 +7,11 @@
  
  */
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  <RUNID>,
  '<ASSERTIONUUID>',
- '<ASSERTIONTEXT>',
+ a.referencedcomponentid,
  concat('ExtendedMap: id=',a.id,' : misaligned mapCategory and mapAdvice for ambiguous WHO concepts')     
  from curr_extendedmaprefset_s a
 where a.active = 1
@@ -21,11 +21,11 @@ where a.active = 1
   and a.refSetId = 447562003;
  commit;
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
 	 <RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  concat('ExtendedMap: id=',a.id,' : misaligned mapCategory and mapAdvice for Non Classifiable')
  from curr_extendedmaprefset_s a
 where a.active = 1
@@ -36,11 +36,11 @@ where a.active = 1
  commit;
  
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id,': misaligned mapCategory and mapAdvice for ambiguous snomed concepts')       
  from curr_extendedmaprefset_s a
 	where a.active = 1
@@ -51,11 +51,11 @@ insert into qa_result (runid, assertionuuid, assertiontext, details)
  commit;
  
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id,': misaligned mapCategory and mapAdvice for incompletely modeled concepts') 
  from curr_extendedmaprefset_s a
 where a.active = 1

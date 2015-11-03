@@ -6,11 +6,11 @@
 	New inactive states follow active states in the ASSOCIATION REFSET snapshot file.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ASSOC RS: id=',a.id, ':Invalid inactive states in the ASSOCIATION REFSET snapshot file.') 	
 	from curr_associationrefset_s a , prev_associationrefset_s b
 	where cast(a.effectivetime as datetime) >

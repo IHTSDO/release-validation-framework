@@ -4,11 +4,11 @@
 */
 
 /* in the delta; not in the full */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('SIMPLE MAP REFSET: id=',a.id, ' is in DELTA file, but not in FULL file.')
 	from curr_simplemaprefset_d a
 	left join curr_simplemaprefset_f b

@@ -251,7 +251,8 @@ key idx_moduleid(moduleid),
 key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
-key idx_casesignificanceid(casesignificanceid)
+key idx_casesignificanceid(casesignificanceid),
+key idx_term(term)
 ) engine=myisam default charset=utf8;
 
 drop table if exists textdefinition_s;
@@ -470,6 +471,7 @@ key idx_moduleid(moduleid),
 key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
+key idx_term(term),
 key idx_casesignificanceid(casesignificanceid)
 ) engine=myisam default charset=utf8;
 

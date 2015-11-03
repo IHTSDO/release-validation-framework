@@ -7,11 +7,11 @@
 
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('MEMBER: id=',a.id, ': SNOMED RT member key (referencedcomponentid, maptarget) is not unique.')
 	from curr_simplemaprefset_s a
 	where a.refsetid = '900000000000498005'

@@ -1,11 +1,11 @@
 /*
  * Active complex map refset members must have a non blank mapTarget for higher map group.
  */
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
-	 '<ASSERTIONTEXT>',
+	a.referencedComponentId,
  	concat('ComplexMap: id=',a.id,': Higher-level map group with only blank map targets') 
  from curr_complexmaprefset_s a
 	where a.active = 1

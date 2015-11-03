@@ -8,11 +8,11 @@
 ********************************************************************************/
 
 /* 	inserting exceptions in the result table */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('DEFINITION: id=',a.id, ' is referneced with more than one set of immutable values in the definition snapshot.') 	
 	from curr_textdefinition_s a 
 	group by a.id , a.typeid , a.languagecode , a.conceptid

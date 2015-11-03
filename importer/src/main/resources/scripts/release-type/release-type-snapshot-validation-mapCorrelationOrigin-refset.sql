@@ -1,11 +1,11 @@
 /*  
 *	Content in the the current mapCorrelationOriginRefset snapshot file must be in the current full file
 */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('mapCorrelationOriginRefset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
 	from curr_mapCorrelationOriginRefset_s a
 	left join curr_mapCorrelationOriginRefset_f b
@@ -33,11 +33,11 @@
 commit;
 
 
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('mapCorrelationOriginRefset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 	
 	from curr_mapCorrelationOriginRefset_f a
 	left join curr_mapCorrelationOriginRefset_s b

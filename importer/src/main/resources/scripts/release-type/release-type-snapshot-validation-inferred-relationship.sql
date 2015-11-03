@@ -14,11 +14,11 @@
 		 where a.id = z.id);
 
 /* in the snapshot; not in the full */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('Inferred relationship: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
 	from curr_relationship_s a
 	left join temp_relationship_view b
@@ -46,11 +46,11 @@
 	commit;
 
 /* in the full; not in the snapshot */
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('Inferred relationship: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
 	from temp_relationship_view a
 	left join curr_relationship_s b 

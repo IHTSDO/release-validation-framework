@@ -3,10 +3,16 @@ package org.ihtsdo.rvf.validation;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -60,82 +66,108 @@ public class ColumnPatternTester {
 
 		// for each config file (should only the one)
 		final List<String> fileNames = resourceManager.getFileNames();
+		final SchemaFactory schemaFactory = new SchemaFactory();
+		ExecutorService executor = Executors.newCachedThreadPool();
+		List<Future<Long>> tasks = new ArrayList<>();
 		for (final String fileName : fileNames) {
-			if (fileName == null) {
-				validationLog.executionError("Null file");
-				continue;
-			}
-			if (!fileName.endsWith("txt")) {
-				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "Incorrect file extension, should end with a .txt");
-				continue;
-			}
-
-			final SchemaFactory schemaFactory = new SchemaFactory();
-			TableSchema tableSchema;
-			try {
-				tableSchema = schemaFactory.createSchemaBean(fileName);
-			} catch (final FileRecognitionException e) {
-				// log the problem and continue to the next file
-				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, e.getMessage());
-				continue;
-			}
-			if (tableSchema == null) {
-				// log the problem and continue to the next file
-				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "unexpected filename format.");
-				continue;
-			}
-
-			final boolean releaseInputFile = fileName.startsWith("rel2");
-			List<Field> fields = tableSchema.getFields();
-
-			if (fields != null) {
-				try (BufferedReader reader = resourceManager.getReader(fileName, Charset.forName(UTF_8))) {
-					filesTested++;
-					String line;
-					long lineNumber = 0;
-
-					String[] columnData;
-					final int configColumnCount = fields.size();
-
-					while ((line = reader.readLine()) != null) {
-						int columnIndex = 0;
-						linesTested++;
-						lineNumber++;
-						columnData = line.split("\t");
-
-						final int dataColumnCount = columnData.length;
-
-						if (!(validateRow(startTime, fileName, line, lineNumber, configColumnCount, dataColumnCount))) {
-							continue;
-						}
-						//check whether header fields not containing null values due to specific additional fields
-						if ( (lineNumber == 1) && havingAdditionalFields(tableSchema)) {
-							schemaFactory.populateExtendedRefsetAdditionalFieldNames(tableSchema, line);
-							fields = tableSchema.getFields();
-						}
-						for (final Field column : fields) {
-							final String value = columnData[columnIndex];
-							if (lineNumber == 1) {
-								// Test header value
-								testHeaderValue(value, column, startTime, fileName, columnIndex);
-							} else {
-								testDataValue(lineNumber + "-" + columnIndex, lineNumber, value, column, startTime, fileName, releaseInputFile);
-							}
-							columnIndex++;
-						}
-					}
-				} catch (final IOException e) {
-					validationLog.executionError("Problem reading file {}", fileName, e);
-					testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", fileName, "Unable to read the file");
+			Future<Long> task = executor.submit(new Callable<Long>() {
+				@Override
+				public Long call() throws Exception {
+					return runTestForFile(fileName, schemaFactory);
 				}
-
-			} else {
-				validationLog.executionError("Invalid fileName {} does not match the expected pattern ", fileName);
-				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "", fileName, "valid release 2 filename");
+			});
+			tasks.add(task);
+		}
+		
+		for (Future<Long> task : tasks) {
+			try {
+				long totalLines = task.get();
+				if (totalLines > 0) {
+					filesTested++;
+					linesTested += totalLines;
+				}
+			} catch (InterruptedException | ExecutionException e) {
+				//TODO
+				e.printStackTrace();
 			}
 		}
-
 		validationLog.info("{} files and {} lines tested in {} milliseconds.", filesTested, linesTested, (new Date().getTime() - startTime.getTime()));
+	}
+
+	private long runTestForFile(String fileName, SchemaFactory schemaFactory) {
+		final Date startTime = new Date();
+		long linesTested = 0;
+		if (fileName == null) {
+			validationLog.executionError("Null file");
+			return linesTested;
+		}
+		if (!fileName.endsWith("txt")) {
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "Incorrect file extension, should end with a .txt");
+			return linesTested;
+		}
+
+		TableSchema tableSchema;
+		try {
+			tableSchema = schemaFactory.createSchemaBean(fileName);
+		} catch (final FileRecognitionException e) {
+			// log the problem and continue to the next file
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, e.getMessage());
+			return linesTested;
+		}
+		if (tableSchema == null) {
+			// log the problem and continue to the next file
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "unexpected filename format.");
+			return linesTested;
+		}
+
+		final boolean releaseInputFile = fileName.startsWith("rel2");
+		List<Field> fields = tableSchema.getFields();
+		if (fields != null) {
+			try (BufferedReader reader = resourceManager.getReader(fileName, Charset.forName(UTF_8))) {
+				String line;
+				long lineNumber = 0;
+
+				String[] columnData;
+				final int configColumnCount = fields.size();
+
+				while ((line = reader.readLine()) != null) {
+					int columnIndex = 0;
+					linesTested++;
+					lineNumber++;
+					columnData = line.split("\t");
+
+					final int dataColumnCount = columnData.length;
+
+					if (!(validateRow(startTime, fileName, line, lineNumber, configColumnCount, dataColumnCount))) {
+						continue;
+					}
+					//check whether header fields not containing null values due to specific additional fields
+					if ( (lineNumber == 1) && havingAdditionalFields(tableSchema)) {
+						schemaFactory.populateExtendedRefsetAdditionalFieldNames(tableSchema, line);
+						fields = tableSchema.getFields();
+					}
+					for (final Field column : fields) {
+						final String value = columnData[columnIndex];
+						if (lineNumber == 1) {
+							// Test header value
+							testHeaderValue(value, column, startTime, fileName, columnIndex);
+						} else {
+							testDataValue(lineNumber + "-" + columnIndex, lineNumber, value, column, startTime, fileName, releaseInputFile);
+						}
+						columnIndex++;
+					}
+				}
+			} catch (final IOException e) {
+				validationLog.executionError("Problem reading file {}", fileName, e);
+				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", fileName, "Unable to read the file");
+			}
+
+		} else {
+			validationLog.executionError("Invalid fileName {} does not match the expected pattern ", fileName);
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "", fileName, "valid release 2 filename");
+		}
+		return linesTested;
+		
 	}
 
 	private boolean havingAdditionalFields(final TableSchema tableSchema) {

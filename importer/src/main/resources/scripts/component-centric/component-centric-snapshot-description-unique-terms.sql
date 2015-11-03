@@ -32,11 +32,11 @@ drop table if exists temp_active_fsn_hierarchy;
 	commit;
 
 /* 	violators to the results table */	
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		a.term
 	from tmp_description_syn a
 	join temp_active_fsn_hierarchy b

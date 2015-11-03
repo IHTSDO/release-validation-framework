@@ -1,11 +1,11 @@
 /*  
 *	Current full extended map refset file consists of the previously published full file and the current delta file
 */
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('ExtendedMap: id=',a.id, ' is in current full file, but not in prior full or current delta file.') 	
 	from curr_extendedmaprefset_f a
 	left join curr_extendedmaprefset_d b

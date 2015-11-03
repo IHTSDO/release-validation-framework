@@ -6,11 +6,11 @@
 	All inferred is-a relationships have relationship group of 0.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('RELATIONSHIP: id=',a.id, ': Inferred is-a relationship exists in a non-zero relationship group.') 	
 	from curr_relationship_s a
 	where a.typeid = '116680003'

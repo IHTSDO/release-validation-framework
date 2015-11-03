@@ -19,11 +19,11 @@
 ********************************************************************************/
 	
 
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
     concat('AtributeValue: id=',a.id, ' is in previous full file, but not in current full file.') 	        
 	from prev_attributevaluerefset_f a
 	left join curr_attributevaluerefset_f b

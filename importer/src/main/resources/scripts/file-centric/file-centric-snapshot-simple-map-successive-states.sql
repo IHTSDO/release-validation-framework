@@ -6,11 +6,11 @@
 	New inactive states follow active states in the SIMPLE MAP REFSET snapshot.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.referencedcomponentid,
 		concat('SM RS: id=',a.id, ':Invalid inactive states in the SIMPLE MAP REFSET snapshot.') 	
 	from curr_simplemaprefset_s a , prev_simplemaprefset_s b
 	where cast(a.effectivetime as datetime) >

@@ -4,11 +4,11 @@
  *
  */
 
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',
+ 	a.referencedcomponentid,
  	concat('ExtendedMap: id=',a.id,' : Empty mapTarget for classifiable mapCategory')    
  from curr_extendedmaprefset_s a
  where a.active = 1
@@ -22,11 +22,11 @@ insert into qa_result (runid, assertionuuid, assertiontext, details)
  * Active extended map has an empty mapTarget when mapCategoryId!=447637006,447639009 (propery classified or context dependent)
  */
  
-insert into qa_result (runid, assertionuuid, assertiontext, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
- 	'<ASSERTIONTEXT>',concat('ExtendedMap: id=',a.id,' : Non-empty mapTarget for unclassifiable mapCategory')    
+ 	a.referencedcomponentid,concat('ExtendedMap: id=',a.id,' : Non-empty mapTarget for unclassifiable mapCategory')    
  from curr_extendedmaprefset_s a
  where a.active = 1
   	and a.mapTarget != ''

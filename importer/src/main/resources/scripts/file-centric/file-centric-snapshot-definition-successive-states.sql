@@ -6,11 +6,11 @@
 	New inactive states follow active states in the DEFINITION snapshot.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.conceptid,
 		concat('TEXTDEF: id=',a.id, ':New inactive states follow active states in the DEFINITION snapshot.') 	
 	from curr_textdefinition_s a , prev_textdefinition_s b
 	where cast(a.effectivetime as datetime) >

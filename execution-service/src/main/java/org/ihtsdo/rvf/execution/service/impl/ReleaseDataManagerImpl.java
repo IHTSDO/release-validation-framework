@@ -213,7 +213,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			// remove output directory so it does not occupy space
 			FileUtils.deleteQuietly(outputFolder);
 		}
-		logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime) / 60000) + " minutes.");
+		logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime) / 1000) + " seconds.");
 		return createdSchemaName;
 	}
 

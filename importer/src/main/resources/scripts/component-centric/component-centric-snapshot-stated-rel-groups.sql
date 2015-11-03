@@ -7,11 +7,11 @@
 .
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, assertiontext, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		'<ASSERTIONTEXT>',
+		a.sourceid,
 		concat('RELATIONSHIP: id=',a.id, ': Relationship is in a relationship group with a single active inferred member.') 	
 	from curr_stated_relationship_s a
 	where a.relationshipgroup != 0 
