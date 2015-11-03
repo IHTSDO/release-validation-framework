@@ -33,6 +33,7 @@ public class RvfDynamicDataSource {
      */
     public Connection getConnection(String schema) throws SQLException {
         if(schemaDatasourceMap.containsKey(schema)){
+        	LOGGER.debug("get connection for schema:" + schema);
             return schemaDatasourceMap.get(schema).getConnection();
         }
         else{
@@ -54,6 +55,7 @@ public class RvfDynamicDataSource {
             dataSource.setTimeBetweenEvictionRunsMillis(basicDataSource.getTimeBetweenEvictionRunsMillis());
             // add to map
             schemaDatasourceMap.putIfAbsent(schema, dataSource);
+        	LOGGER.debug("Create datasource for schema:" + schema);
             return dataSource.getConnection();
         }
     }
@@ -70,6 +72,7 @@ public class RvfDynamicDataSource {
 				}
     		}
     		schemaDatasourceMap.remove(schema);
+    		LOGGER.debug("Close and remove datasource from map for schema:" + schema);
     	}
     }
 
