@@ -32,20 +32,10 @@ public class ReleaseValidationMessageListener {
 	@JmsListener(containerFactory = "jmsListenerContainerFactory", destination = "rvf-validation-queue")
 	public void triggerValidation(final TextMessage incomingMessage) {
 		logger.info("Received message {}", incomingMessage);
-		createEC2WorkerInstance();
 //		runValidationAsynchronously(incomingMessage);
-//		runValidation(incomingMessage);
+		runValidation(incomingMessage);
 	}
 
-	
-	private void createEC2WorkerInstance() {
-		executor.submit( new Runnable() {
-			@Override
-			public void run() {
-				instanceManager.createInstance();
-			} });
-	}
-	
 	
 	private void runValidationAsynchronously(final TextMessage incomingMessage) {
 		executor.submit( new Runnable() {

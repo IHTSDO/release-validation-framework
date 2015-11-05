@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.ihtsdo.rvf.autoscaling.AutoScalingManager;
 import org.ihtsdo.rvf.autoscaling.InstanceManager;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
@@ -77,6 +78,8 @@ public class TestUploadFileController {
 	ValidationQueueManager queueManager;
 	@Autowired 
 	InstanceManager instanceManager;
+	@Autowired
+	AutoScalingManager autoScaleManager;
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
@@ -198,7 +201,7 @@ public class TestUploadFileController {
 			//Queue incoming validation request
 			queueManager.queueValidationRequest( vrConfig, responseMap);
 			//create new instance to process 
-			instanceManager.createInstance();
+//			instanceManager.createInstance();
 			
 			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
 			responseMap.put("resultURL", urlToPoll);

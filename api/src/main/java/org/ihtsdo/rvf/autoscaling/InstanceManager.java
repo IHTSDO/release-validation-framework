@@ -41,5 +41,5 @@ public class InstanceManager {
 			  createTagsRequest.withTags(new Tag ( "Name", "RVF_Worker"));
 			  amazonEC2Client.createTags(createTagsRequest);
 			  return runInstancesResult;
-	}
+	}	
 }
