@@ -48,7 +48,7 @@ public class AutoScalingManager {
 							logger.info("Messages have been increated by:" + (lastPolledQueueSize-current) + " since last poll.");
 							lastPolledQueueSize = current;
 							logger.info("Start creating new worker instance...");
-//							instanceManager.createInstance();
+							instanceManager.createInstance();
 						}
 						try {
 							Thread.sleep(2*60000);

@@ -87,7 +87,7 @@ public class RvfValidationMessageConsumer {
 									config.setProspectiveFile(new File(config.getProspectiveFilePath()));
 								}
 								logger.info("Running validaiton:" + config.toString());
-//								runner.run(config);
+								runner.run(config);
 							}
 				}
 				
