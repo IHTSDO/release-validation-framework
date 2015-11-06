@@ -11,7 +11,6 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
@@ -24,21 +23,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 @Service
 public class RvfValidationMessageConsumer {
-	
-	
-	private String brokerUrl;
 	private String queueName;
 	@Autowired
 	private ValidationRunner runner;
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private boolean shutDown;
+	@Autowired
 	private ConnectionFactory connectionFactory;
 	private boolean isWorker;
 	
-	public RvfValidationMessageConsumer( String brokerUrl, String queueName,Boolean isRvfWorker) {
-		this.brokerUrl = brokerUrl;
+	public RvfValidationMessageConsumer( String queueName,Boolean isRvfWorker) {
 		isWorker = isRvfWorker.booleanValue();
-		connectionFactory = new ActiveMQConnectionFactory(this.brokerUrl);
 		this.queueName = queueName;
 	}
 	

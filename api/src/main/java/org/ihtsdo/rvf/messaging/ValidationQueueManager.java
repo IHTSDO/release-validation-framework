@@ -48,7 +48,6 @@ public class ValidationQueueManager {
 
 
 	public void queueValidationRequest(ValidationRunConfig config, Map<String, String> responseMap) {
-
 		try {
 			if (saveUploadedFiles(config, responseMap)) {
 				Gson gson = new Gson();
@@ -82,15 +81,16 @@ public class ValidationQueueManager {
 			return false;
 		}
 		// must be a zip, save it off
-		String targetFilePath = config.getStorageLocation() + File.separator + config.getRunId() + File.separator + filename;
+		String s3StoragePath = config.getStorageLocation() + File.separator + config.getRunId() + File.separator;
+		String targetFilePath = s3StoragePath + filename;
 		s3Helper.putFile(config.getFile().getInputStream(), targetFilePath);
 		config.setS3BucketName(bucketName);
-		config.setS3FilePath(targetFilePath);
+		config.setProspectiveFileS3FileFullPath(targetFilePath);
 		config.setTestFileName(filename);
 		if ( config.getManifestFile() != null ) {
-			File manifestLocalFile = File.createTempFile( config.getManifestFile().getOriginalFilename() + config.getRunId(), ".xml");
-			config.getManifestFile().transferTo(manifestLocalFile);
-			config.setManifestFileFullPath(manifestLocalFile.getAbsolutePath());
+			String manifestS3Path = s3StoragePath + config.getManifestFile().getOriginalFilename();
+			s3Helper.putFile(config.getManifestFile().getInputStream(), manifestS3Path);
+			config.setManifestFileS3FileFullPath(manifestS3Path);
 		}
 		return true;
 	}

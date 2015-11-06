@@ -79,7 +79,7 @@ public class StructuralTestRunner implements InitializingBean{
 		columnPatternTest.runTests();
 	}
 	
-	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final String manifestFilePath, 
+	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final File manifestFile, 
 			final boolean writeSucceses, final String urlPrefix ) throws IOException {
 		 boolean isFailed = false;
 		 final long timeStart = System.currentTimeMillis();
@@ -94,12 +94,12 @@ public class StructuralTestRunner implements InitializingBean{
 
 			TestReportable report;
 
-			if (manifestFilePath == null) {
+			if (manifestFile == null) {
 				report = execute(resourceManager, writer, writeSucceses,null);
 			} else {
 				File tempManifestFile  = null;
 				try {
-					final ManifestFile mf = new ManifestFile(new File(manifestFilePath));
+					final ManifestFile mf = new ManifestFile(manifestFile);
 					report = execute(resourceManager, writer, writeSucceses, mf);
 				} finally {
 					FileUtils.deleteQuietly(tempManifestFile);

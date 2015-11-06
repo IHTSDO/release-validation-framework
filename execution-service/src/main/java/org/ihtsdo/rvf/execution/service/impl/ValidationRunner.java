@@ -1,7 +1,9 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -19,9 +21,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.ihtsdo.otf.dao.s3.S3Client;
+import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -66,6 +72,9 @@ public class ValidationRunner {
 	@Autowired
 	private RvfDbScheduledEventGenerator scheduleEventGenerator;
 	
+	@Resource
+	private S3Client s3Client;
+	
 	private int batchSize = 0;
 
 	private ExecutorService executorService = Executors.newCachedThreadPool();
@@ -108,7 +117,26 @@ public class ValidationRunner {
 		String reportStorage = validationConfig.getStorageLocation();
 		reportService.writeProgress(structureTestStartMsg, reportStorage);
 		reportService.writeState(State.RUNNING, reportStorage);
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getProspectiveFile(), validationConfig.getRunId(), validationConfig.getManifestFileFullPath(), validationConfig.isWriteSucceses(), validationConfig.getUrl());
+		//streaming file from S3 to local
+		File prospectiveFile = validationConfig.getProspectiveFile();
+		if (prospectiveFile == null) {
+			FileHelper s3Helper = new FileHelper(validationConfig.getS3BucketName(), s3Client);
+			InputStream input = s3Helper.getFileStream(validationConfig.getProspectiveFileS3FileFullPath());
+			prospectiveFile = File.createTempFile(validationConfig.getTestFileName() + validationConfig.getRunId(), null);
+			IOUtils.copy(input, new FileOutputStream(prospectiveFile));
+			validationConfig.setProspectiveFile(prospectiveFile);
+		}
+		File manifestFile = null;
+		if (validationConfig.getManifestFile() != null ) {
+			 manifestFile = File.createTempFile(validationConfig.getManifestFile().getOriginalFilename() + validationConfig.getRunId(), null);
+			validationConfig.getManifestFile().transferTo(manifestFile);
+		} else if (validationConfig.getManifestFileS3FileFullPath() != null) {
+			FileHelper s3Helper = new FileHelper(validationConfig.getS3BucketName(), s3Client);
+			InputStream input = s3Helper.getFileStream(validationConfig.getManifestFileS3FileFullPath());
+			 manifestFile = File.createTempFile("manifest.xml" + validationConfig.getRunId(), null);
+			IOUtils.copy(input, new FileOutputStream(manifestFile));
+		}
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, prospectiveFile, validationConfig.getRunId(), manifestFile, validationConfig.isWriteSucceses(), validationConfig.getUrl());
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;

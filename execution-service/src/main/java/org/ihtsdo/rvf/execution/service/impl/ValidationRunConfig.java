@@ -21,9 +21,9 @@ public class ValidationRunConfig {
 	private String url;
 	private Integer failureExportMax;
 	private boolean firstTimeRelease;
-	private String manifestFileFullPath;
+	private String manifestFileS3FileFullPath;
 	private String s3BucketName;
-	private String s3FilePath;
+	private String prospectiveFileS3FileFullPath;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -169,11 +169,11 @@ public class ValidationRunConfig {
 		this.firstTimeRelease = firstTimeRelease;
 		return this;
 	}
-	public String getManifestFileFullPath() {
-		return this.manifestFileFullPath;
+	public String getManifestFileS3FileFullPath() {
+		return this.manifestFileS3FileFullPath;
 	}
-	public void setManifestFileFullPath(String manifestFileFullPath) {
-		this.manifestFileFullPath = manifestFileFullPath;
+	public void setManifestFileS3FileFullPath(String manifestFileFullPath) {
+		this.manifestFileS3FileFullPath = manifestFileFullPath;
 	}
 	public boolean isFirstTimeRelease() {
 		return firstTimeRelease;
@@ -181,13 +181,13 @@ public class ValidationRunConfig {
 	public void setS3BucketName(String bucketName) {
 		s3BucketName = bucketName;
 	}
-	public void setS3FilePath(String targetFilePath) {
-		s3FilePath = targetFilePath;
+	public void setProspectiveFileS3FileFullPath(String targetFilePath) {
+		this.prospectiveFileS3FileFullPath = targetFilePath;
 	}
 	public String getS3BucketName() {
 		return s3BucketName;
 	}
-	public String getS3FilePath() {
-		return s3FilePath;
+	public String getProspectiveFileS3FileFullPath() {
+		return this.prospectiveFileS3FileFullPath;
 	}
 }

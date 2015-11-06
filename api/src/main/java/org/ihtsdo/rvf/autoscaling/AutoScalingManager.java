@@ -10,7 +10,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,20 +17,22 @@ public class AutoScalingManager {
 	
 	
 	private static final String SIZE = "size";
-	private String brokerUrl;
 	private boolean shutDown;
 	private Logger logger = Logger.getLogger(AutoScalingManager.class);
 	@Autowired
-	InstanceManager instanceManager;
+	private InstanceManager instanceManager;
 	private boolean isAutoScalling;
+	@Autowired
 	private ConnectionFactory connectionFactory;
 	private String queueName;
 	private long lastPolledQueueSize;
 	
-	public AutoScalingManager( String jmsBrokerUrl, Boolean isAutoScalling, String destinationQueueName) {
+	private final int MAX_INSTANCE = 1;
+	
+	private int totalInstanceCreated;
+	
+	public AutoScalingManager( Boolean isAutoScalling, String destinationQueueName) {
 		this.isAutoScalling = isAutoScalling.booleanValue();
-		brokerUrl = jmsBrokerUrl;
-		connectionFactory = new ActiveMQConnectionFactory(brokerUrl);
 		queueName = "ActiveMQ.Statistics.Destination."+ destinationQueueName; 
 	}
 	public void startUp() {
@@ -45,10 +46,18 @@ public class AutoScalingManager {
 						if (current > lastPolledQueueSize ){
 							//will add logic later in terms how many instances need to create for certain size
 							// the current approach is to create one instance per message.
-							logger.info("Messages have been increated by:" + (lastPolledQueueSize-current) + " since last poll.");
+							logger.info("Messages have been increated by:" + (current - lastPolledQueueSize) + " since last poll.");
 							lastPolledQueueSize = current;
-							logger.info("Start creating new worker instance...");
-							instanceManager.createInstance();
+							if (totalInstanceCreated < MAX_INSTANCE) {
+								logger.info("Start creating new worker instance...");
+								long start = System.currentTimeMillis();
+								instanceManager.createInstance();
+								logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start)/1000);
+								totalInstanceCreated++;
+							} else {
+								//limit to 1 for the time being while testing.
+								logger.info("No new instance will be created as total instance created:" + totalInstanceCreated + " has reached max:" + MAX_INSTANCE);
+							}
 						}
 						try {
 							Thread.sleep(2*60000);
@@ -85,6 +94,7 @@ public class AutoScalingManager {
 	        if (reply != null) {
 	        	result = reply.getLong(SIZE);
 	 	        logger.info("Queue size:" + result);
+	 	        consumer.close();
 	        }
 		} catch (JMSException e) {
 			logger.error("Error in sending statistics message", e);
