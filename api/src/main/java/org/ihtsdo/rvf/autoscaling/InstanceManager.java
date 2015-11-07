@@ -18,7 +18,7 @@ public class InstanceManager {
 	
 	public InstanceManager(AWSCredentials credentials) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
-		amazonEC2Client.setEndpoint("us-west-2.compute.amazonaws.com");
+		amazonEC2Client.setEndpoint("ec2.us-west-2.amazonaws.com");
 	}
 
 	public RunInstancesResult createInstance() {
