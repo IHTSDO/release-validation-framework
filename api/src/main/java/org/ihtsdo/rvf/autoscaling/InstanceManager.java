@@ -25,11 +25,11 @@ public class InstanceManager {
 		RunInstancesRequest runInstancesRequest = 
 				  new RunInstancesRequest();
 			        	
-			  runInstancesRequest.withImageId("ami-00b4a361")
+			  runInstancesRequest.withImageId("ami-d00412b1")
 			                     .withInstanceType("t2.micro")
 			                     .withMinCount(1)
 			                     .withMaxCount(1)
-			                     .withKeyName("WestAutoScaling")
+			                     .withKeyName("WestDevops")
 			                     .withSecurityGroups("SSH_HTTPS")
 			  					 .withSecurityGroupIds("sg-5624cd32");
 			  					 
