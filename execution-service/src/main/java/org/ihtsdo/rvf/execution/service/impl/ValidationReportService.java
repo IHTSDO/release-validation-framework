@@ -150,4 +150,8 @@ public class ValidationReportService {
 			}
 			return currentState;
 		}
+
+	public void putFileIntoS3(String reportStorage, File file) throws NoSuchAlgorithmException, IOException, DecoderException {
+			s3Helper.putFile(file, reportStorage + file.getName());
+		}
 }

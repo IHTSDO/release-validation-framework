@@ -86,6 +86,7 @@ public class ValidationRunner {
 	}
 	
 	public void run(ValidationRunConfig validationConfig) {
+		
 		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		try {
 			responseMap.put("validationConfig", validationConfig);
@@ -137,6 +138,7 @@ public class ValidationRunner {
 			IOUtils.copy(input, new FileOutputStream(manifestFile));
 		}
 		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, prospectiveFile, validationConfig.getRunId(), manifestFile, validationConfig.isWriteSucceses(), validationConfig.getUrl());
+		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;

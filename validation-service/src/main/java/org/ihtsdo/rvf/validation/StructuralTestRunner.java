@@ -29,6 +29,7 @@ public class StructuralTestRunner implements InitializingBean{
 	protected String reportFolderLocation;
 	protected File reportDataFolder;
 	protected int failureThreshold;
+	private String structureTestReportPath;
 
 	@Autowired
 	private ValidationLogFactory validationLogFactory;
@@ -88,8 +89,9 @@ public class StructuralTestRunner implements InitializingBean{
 		 validationReport.setExecutionId(runId);
 		// convert groups which is passed as string to assertion groups
 		// set up the response in order to stream directly to the response
-		final File manifestTestReport = new File(getReportDataFolder(), "manifest_validation_"+runId+".txt");
-		try (PrintWriter writer = new PrintWriter(manifestTestReport)) {
+		final File structureTestReport = new File(getReportDataFolder(), "structure_validation_"+ runId+".txt");
+		structureTestReportPath = structureTestReport.getAbsolutePath();
+		try (PrintWriter writer = new PrintWriter(structureTestReport)) {
 			final ResourceProvider resourceManager = new ZipFileResourceProvider(tempFile);
 
 			TestReportable report;
@@ -111,9 +113,9 @@ public class StructuralTestRunner implements InitializingBean{
 			// verify if manifest is valid
 			if(report.getNumErrors() > 0) {
 				validationReport.setTotalFailures(report.getNumErrors());
-				validationReport.setReportUrl(urlPrefix+"/reports/"+ FilenameUtils.removeExtension(manifestTestReport.getName()));
+				validationReport.setReportUrl(urlPrefix+"/reports/"+ FilenameUtils.removeExtension(structureTestReport.getName()));
 				logger.error("No Errors expected but got " + report.getNumErrors() + " errors");
-				logger.info("reportPhysicalUrl : " + manifestTestReport.getAbsolutePath());
+				logger.info("reportPhysicalUrl : " + structureTestReport.getAbsolutePath());
 				// pass file name without extension - we add this back when we retrieve using controller
 				logger.info("report.getNumErrors() = " + report.getNumErrors());
 				logger.info("report.getNumTestRuns() = " + report.getNumTestRuns());
@@ -166,6 +168,10 @@ public class StructuralTestRunner implements InitializingBean{
 		return reportDataFolder;
 	}
 
+	public String getStructureTestReportFullPath() {
+		return this.structureTestReportPath;
+	}
+	
 	public int getFailureThreshold() {
 		return failureThreshold;
 	}

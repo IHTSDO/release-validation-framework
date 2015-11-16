@@ -17,7 +17,6 @@
 								  ignore-unresolvable="true" ignore-resource-not-found="true" />
 	<context:property-placeholder location="classpath*:execution-service-defaults.properties" />
 
-
 	<!-- Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing-->
 	<bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${rvf.snomed.jdbc.driverClassName}"/>
@@ -91,7 +90,6 @@
 	<bean class="java.lang.String" id="bucketName">
 		<constructor-arg value="${bucketName}" />
 	</bean>
-
 	<import resource="applicationContext.xml"/>
 
 </beans>

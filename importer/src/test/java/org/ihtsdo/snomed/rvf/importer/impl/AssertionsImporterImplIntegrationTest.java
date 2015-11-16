@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -27,11 +26,11 @@ public class AssertionsImporterImplIntegrationTest {
 	public static final String scriptsDir = "/scripts";
 	public static final String hierarchyTermModellingDir = "hierarchy-term-modelling";
 
-	@Autowired
-	AssertionsImporter assertionsImporter;
+	private AssertionsImporter assertionsImporter;
 
 	@Before
 	public void setUp() throws Exception {
+		assertionsImporter = new AssertionsImporter();
 		assertNotNull("Assertions Importer must not be null", assertionsImporter);
 	}
 

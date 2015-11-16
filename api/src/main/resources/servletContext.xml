@@ -32,11 +32,16 @@
     <bean id="objectMapperFactory" class="org.ihtsdo.rvf.service.mapping.JacksonObjectMapperFactory"/>
     <bean id="instanceManager" class ="org.ihtsdo.rvf.autoscaling.InstanceManager">
     	<constructor-arg>
-					<bean class="com.amazonaws.auth.BasicAWSCredentials">
-						<constructor-arg value="${aws.key}" />
-						<constructor-arg value="${aws.privateKey}" />
-					</bean>
+			<bean class="com.amazonaws.auth.BasicAWSCredentials">
+				<constructor-arg value="${aws.key}" />
+				<constructor-arg value="${aws.privateKey}" />
+			</bean>
 		</constructor-arg>
+		<!-- <property name="imageId" value="${rvf.workrer.imageid}"/>
+		<property name="instanceType" value="${rvf.workrer.instanceType}"/>
+		<property name="keyName" value="${rvf.workrer.keyName}"/>
+		<property name="securityGroupName" value ="${rvf.workrer.securityGroupName}"/>
+		<property name="securityGroupId" value ="${rvf.workrer.securityGroupId}"/> -->
 	</bean>
 
     <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>
@@ -44,7 +49,8 @@
 
 	<import resource="validationContext.xml"/>
 	<import resource="executionServiceContext.xml"/>
-	
+	<import resource="importerServiceContext.xml"/>
+		
 	<mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 	<mvc:resources mapping="/api-doc.html" location="/" />
 	<bean class="org.ihtsdo.rvf.config.SwaggerConfig" />

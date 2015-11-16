@@ -18,7 +18,6 @@ import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.SimpleAssertion;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.snomed.rvf.importer.AssertionsImporter;
 import org.ihtsdo.snomed.rvf.importer.helper.RvfRestClient;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -28,7 +27,6 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -51,7 +49,6 @@ public class AssertionsImporter {
 	private static final String JSON_EXTENSION = ".json";
 	private static final SqlParser SQL_PARSER = new SqlParser();
 	private static final Logger logger = LoggerFactory.getLogger(AssertionsImporter.class);
-	@Autowired
 	protected RvfRestClient restClient;
 	protected ObjectMapper objectMapper = new ObjectMapper();
 	protected Map<String, String> lookupMap = new HashMap<>();
@@ -60,6 +57,7 @@ public class AssertionsImporter {
 	 * No args constructor for IOC
 	 */
 	public AssertionsImporter() {
+		restClient = new RvfRestClient();
 	}
 
 	public void importAssertionsFromFile(final String xmlFilePath, final String sqlResourcesFolderLocation){
