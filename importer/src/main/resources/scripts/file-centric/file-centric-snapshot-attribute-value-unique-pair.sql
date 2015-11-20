@@ -13,7 +13,8 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('Reference component id:',a.referencedcomponentid, ' valueid=', a.valueid, ' pair is not unique in the Attribute Value snapshot') 	
-	from curr_attributevaluerefset_s a	
+	from curr_attributevaluerefset_s a
+	where a.active =1
 	group by a.referencedcomponentid,a.valueid
 	having  count(a.id) > 1;
 	commit;

@@ -404,10 +404,10 @@
     "assertionUuid" : "f636b7b0-7e9a-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : 700132006,
-      "detail" : "Language refset: id=00002fb2-d982-5fbd-822f-045c938480c9 is inactive for an active description"
+      "detail" : "Active description id=3008913019 has no active langrefset member"
     }, {
       "conceptId" : 700132006,
-      "detail" : "Language refset: id=00002fb2-d982-5fbd-822f-045c938480c9 is inactive for an active description"
+      "detail" : "Active description id=3008913019 has no active langrefset member"
     } ],
     "totalFailed" : 2
   }, {

@@ -358,13 +358,10 @@
     "assertionName" : "Reference componentId and valueId pair is unique in the ATTRIBUTE VALUE snapshot.",
     "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a60",
     "firstNInstances" : [ {
-      "conceptId" : 527806011,
-      "detail" : "Reference component id:527806011 valueid=900000000000495008 pair is not unique in the Attribute Value snapshot"
-    }, {
       "conceptId" : 2608473011,
       "detail" : "Reference component id:2608473011 valueid=900000000000495008 pair is not unique in the Attribute Value snapshot"
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 1
   }, {
     "assertionName" : "All language refset members inactivated in current snapshot must have been active in the previous release.",
     "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a66",
@@ -383,9 +380,6 @@
     "assertionName" : "All members refer to a description that is referenced in either the description table or the text definition table.",
     "assertionUuid" : "f5d9ae70-7856-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
-      "conceptId" : 758399015,
-      "detail" : "Language Refset: id=00000692-31c5-5aac-81a8-2e54b488c824 references a description which is in neither the description nor the definition snapshot file."
-    }, {
       "conceptId" : 132462014,
       "detail" : "Language Refset: id=0000097d-42b2-500d-88bb-46066baa9bad references a description which is in neither the description nor the definition snapshot file."
     }, {
@@ -401,27 +395,24 @@
       "conceptId" : 2794052013,
       "detail" : "Language Refset: id=00001828-bc61-59f0-811d-56732d1a8507 references a description which is in neither the description nor the definition snapshot file."
     }, {
-      "conceptId" : 712835011,
-      "detail" : "Language Refset: id=00001f12-ad7d-54d9-9bef-89f5d2ef6b2b references a description which is in neither the description nor the definition snapshot file."
-    }, {
       "conceptId" : 467510012,
       "detail" : "Language Refset: id=000026dd-7c22-5d1f-870f-30a64f5bef55 references a description which is in neither the description nor the definition snapshot file."
-    }, {
-      "conceptId" : 713135019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 references a description which is in neither the description nor the definition snapshot file."
-    }, {
-      "conceptId" : 713135019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7 references a description which is in neither the description nor the definition snapshot file."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 6
   }, {
     "assertionName" : "The current Language Refset snapshot file does not contain duplicate Member Ids.",
     "assertionUuid" : "fc24db60-7856-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c7: is repeated in the language refset snapshot file."
+    }, {
       "conceptId" : 699400005,
       "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c9: is repeated in the language refset snapshot file."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c9: is repeated in the language refset snapshot file."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 3
   }, {
     "assertionName" : "Every concept's FSN exists exactly once in each language refset.",
     "assertionUuid" : "ffe6c560-7856-11e1-b0c4-0800200c9a66",
@@ -583,13 +574,10 @@
     "assertionName" : "There are no duplicate Definition terms in the DEFINITION snapshot file.",
     "assertionUuid" : "3b2c1824-8445-410e-8ae2-d943be01c33f",
     "firstNInstances" : [ {
-      "conceptId" : 278512001,
-      "detail" : "Definition id =2995945017: Term=[A subtype of non-spastic cerebral palsy with loss of muscular coordination with abnormal force and rhythm, and impairment of accuracy; commonly presents with gait and trunk ataxia, poor balance, past pointing, terminal intention tremor, scanning speech, nystagmus and other abnormal eye movements, and hypotonia. Low tone is a prominent feature.] is duplicate in the DEFINITION snapshot file."
-    }, {
       "conceptId" : 703672002,
       "detail" : "Definition id =3005197017: Term=[Arthralgia of knee less than three months.] is duplicate in the DEFINITION snapshot file."
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 1
   }, {
     "assertionName" : "ID is unique in DESCRIPTION snapshot.",
     "assertionUuid" : "3be8c763-a5bc-404b-af9f-a2cb681f6f3d",
