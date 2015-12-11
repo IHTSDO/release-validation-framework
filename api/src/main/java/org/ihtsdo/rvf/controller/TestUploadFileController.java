@@ -172,6 +172,7 @@ public class TestUploadFileController {
 		final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
 
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
+		vrConfig.setProspectiveFilesInS3(false);
 		vrConfig.addFile(file)
 				.addWriteSucceses(writeSucceses)
 				.addGroupsList(groupsList)
@@ -226,10 +227,11 @@ public class TestUploadFileController {
 		final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
 
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
-		vrConfig.addProspectiveFileS3FileFullPath(releaseFileS3Path)
+		vrConfig.setProspectiveFilesInS3(true);
+		vrConfig.addProspectiveFileFullPath(releaseFileS3Path)
 				.addWriteSucceses(writeSucceses)
 				.addGroupsList(groupsList)
-				.addManifestFileS3FileFullPath(manifestFileS3Path)
+				.addManifestFileFullPath(manifestFileS3Path)
 				.addPrevIntReleaseVersion(prevIntReleaseVersion)
 				.addPreviousExtVersion(previousExtVersion)
 				.addExtensionDependencyVersion(extensionDependency)

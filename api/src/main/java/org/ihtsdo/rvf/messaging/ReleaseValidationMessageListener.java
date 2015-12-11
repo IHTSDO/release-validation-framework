@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.messaging;
 
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -54,10 +53,9 @@ public class ReleaseValidationMessageListener {
 			logger.error("JMS message listener error:", e);
 		}
 		if ( config != null) {
-			if (config.getProspectiveLocalFilePath() != null) {
-				config.setProspectiveFile(new File(config.getProspectiveLocalFilePath()));
-			}
 			runner.run(config);
+		} else {
+			logger.error("Null validation config found for message:" + incomingMessage);
 		}
 	}
 }

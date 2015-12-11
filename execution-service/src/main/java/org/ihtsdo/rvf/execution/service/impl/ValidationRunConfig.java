@@ -9,8 +9,6 @@ public class ValidationRunConfig {
 	private String testFileName;
 	private Long runId;
 	private transient MultipartFile file;
-	private transient File prospectiveFile;
-	private String prospectiveLocalFilePath;
 	private boolean writeSucceses;
 	private transient MultipartFile manifestFile;
 	private List<String> groupsList;
@@ -21,10 +19,12 @@ public class ValidationRunConfig {
 	private String url;
 	private Integer failureExportMax;
 	private boolean firstTimeRelease;
-	private String manifestFileS3FileFullPath;
+	private String manifestFileFullPath;
 	private String s3BucketName;
-	private String prospectiveFileS3FileFullPath;
+	private String prospectiveFileFullPath;
 	private boolean isProspectiveFilesInS3;
+	private transient File localProspectiveFile;
+	private transient File localManifestFile;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -106,20 +106,7 @@ public class ValidationRunConfig {
 		this.url = url;
 		return this;
 	}
-	public File getProspectiveFile() {
-		return prospectiveFile;
-	}
-	public void setProspectiveFile(final File prospectiveFile) {
-		this.prospectiveFile = prospectiveFile;
-		this.prospectiveLocalFilePath = prospectiveFile.getAbsolutePath();
-	}
 	
-	public String getProspectiveLocalFilePath() {
-		return prospectiveLocalFilePath;
-	}
-	public void setProspectiveLocalFilePath(String prospectiveFilePath) {
-		this.prospectiveLocalFilePath = prospectiveFilePath;
-	}
 	public void setTestFileName(final String filename) {
 		testFileName = filename;
 		
@@ -170,40 +157,57 @@ public class ValidationRunConfig {
 		this.firstTimeRelease = firstTimeRelease;
 		return this;
 	}
-	public String getManifestFileS3FileFullPath() {
-		return this.manifestFileS3FileFullPath;
+	public String getManifestFileFullPath() {
+		return this.manifestFileFullPath;
 	}
-	public void setManifestFileS3FileFullPath(String manifestFileFullPath) {
-		this.manifestFileS3FileFullPath = manifestFileFullPath;
+	public void setManifestFileFullPath(String manifestFileFullPath) {
+		this.manifestFileFullPath = manifestFileFullPath;
 	}
 	public boolean isFirstTimeRelease() {
 		return firstTimeRelease;
 	}
-	public ValidationRunConfig addProspectiveFileS3FileFullPath(String s3File) {
-		this.prospectiveFileS3FileFullPath = s3File;
-		isProspectiveFilesInS3 = true;
+	public ValidationRunConfig addProspectiveFileFullPath(String s3File) {
+		this.prospectiveFileFullPath = s3File;
+		String[] parts = s3File.split("/");
+		testFileName =  parts[parts.length-1];
 		return this;
 	}
 	
-	public  ValidationRunConfig addManifestFileS3FileFullPath(String manifestFileFullPath) {
-		this.manifestFileS3FileFullPath = manifestFileFullPath;
+	public  ValidationRunConfig addManifestFileFullPath(String manifestFileFullPath) {
+		this.manifestFileFullPath = manifestFileFullPath;
 		return this;
 	}
 	public void setS3BucketName(String bucketName) {
 		s3BucketName = bucketName;
 	}
 	
-	public void setProspectiveFileS3FileFullPath(String targetFilePath) {
-		this.prospectiveFileS3FileFullPath = targetFilePath;
-		isProspectiveFilesInS3 = true;
+	public void setProspectiveFileFullPath(String targetFilePath) {
+		this.prospectiveFileFullPath = targetFilePath;
 	}
 	public String getS3BucketName() {
 		return s3BucketName;
 	}
-	public String getProspectiveFileS3FileFullPath() {
-		return this.prospectiveFileS3FileFullPath;
+	public String getProspectiveFileFullPath() {
+		return this.prospectiveFileFullPath;
 	}
-	public boolean isProspectiveFileInS3Already() {
+	
+	public boolean isProspectiveFilesInS3() {
 		return isProspectiveFilesInS3;
 	}
+	public void setProspectiveFilesInS3(boolean isProspectiveFilesInS3) {
+		this.isProspectiveFilesInS3 = isProspectiveFilesInS3;
+	}
+	public void setLocalProspectiveFile(File localProspectiveFile) {
+		this.localProspectiveFile = localProspectiveFile;
+	}
+	public File getLocalProspectiveFile() {
+		return this.localProspectiveFile;
+	}
+	public void setLocalManifestFile(File manifestLocalFile) {
+		this.localManifestFile = manifestLocalFile;
+	}
+	public File getLocalManifestFile() {
+		return this.localManifestFile;
+	}
+	
 }

@@ -103,7 +103,8 @@ public class ValidationRunner {
 				logger.error("Failed to record failure (which was: " + failureMsg + ") due to " + e2.getMessage());
 			}
 		} finally {
-			FileUtils.deleteQuietly(validationConfig.getProspectiveFile());
+			FileUtils.deleteQuietly(validationConfig.getLocalProspectiveFile());
+			FileUtils.deleteQuietly(validationConfig.getLocalManifestFile());
 		}
 	}
 
@@ -117,26 +118,27 @@ public class ValidationRunner {
 		String reportStorage = validationConfig.getStorageLocation();
 		reportService.writeProgress(structureTestStartMsg, reportStorage);
 		reportService.writeState(State.RUNNING, reportStorage);
-		//streaming file from S3 to local
-		File prospectiveFile = validationConfig.getProspectiveFile();
-		if (prospectiveFile == null) {
+		if (validationConfig.isProspectiveFilesInS3()) {
+			//streaming file from S3 to local
 			FileHelper s3Helper = new FileHelper(validationConfig.getS3BucketName(), s3Client);
-			InputStream input = s3Helper.getFileStream(validationConfig.getProspectiveFileS3FileFullPath());
-			prospectiveFile = File.createTempFile(validationConfig.getTestFileName() + validationConfig.getRunId(), null);
+			InputStream input = s3Helper.getFileStream(validationConfig.getProspectiveFileFullPath());
+			File prospectiveFile = File.createTempFile(validationConfig.getTestFileName() + validationConfig.getRunId(), null);
 			IOUtils.copy(input, new FileOutputStream(prospectiveFile));
-			validationConfig.setProspectiveFile(prospectiveFile);
+			validationConfig.setLocalProspectiveFile(prospectiveFile);
+			if (validationConfig.getManifestFileFullPath() != null) {
+				InputStream manifestInput = s3Helper.getFileStream(validationConfig.getManifestFileFullPath());
+				File manifestFile = File.createTempFile("manifest.xml" + validationConfig.getRunId(), null);
+				IOUtils.copy(manifestInput, new FileOutputStream(manifestFile));
+				validationConfig.setLocalManifestFile(manifestFile);
+			}
+		} else {
+			validationConfig.setLocalProspectiveFile(new File(validationConfig.getProspectiveFileFullPath()));
+			if (validationConfig.getManifestFileFullPath() != null) {
+				validationConfig.setLocalManifestFile(new File(validationConfig.getManifestFileFullPath()));
+			}
 		}
-		File manifestFile = null;
-		if (validationConfig.getManifestFile() != null ) {
-			 manifestFile = File.createTempFile(validationConfig.getManifestFile().getOriginalFilename() + validationConfig.getRunId(), null);
-			validationConfig.getManifestFile().transferTo(manifestFile);
-		} else if (validationConfig.getManifestFileS3FileFullPath() != null) {
-			FileHelper s3Helper = new FileHelper(validationConfig.getS3BucketName(), s3Client);
-			InputStream input = s3Helper.getFileStream(validationConfig.getManifestFileS3FileFullPath());
-			 manifestFile = File.createTempFile("manifest.xml" + validationConfig.getRunId(), null);
-			IOUtils.copy(input, new FileOutputStream(manifestFile));
-		}
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, prospectiveFile, validationConfig.getRunId(), manifestFile, validationConfig.isWriteSucceses(), validationConfig.getUrl());
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(), 
+				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl());
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
@@ -178,9 +180,9 @@ public class ValidationRunner {
 			reportService.writeProgress("Loading prospective file into DB.", reportStorage);
 			List<String> rf2FilesLoaded = new ArrayList<>();
 			if (isExtension) {
-				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getProspectiveFile(), rf2FilesLoaded);
+				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 			} else {
-				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getProspectiveFile(), rf2FilesLoaded);
+				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 			}
 			responseMap.put("totalRF2FilesLoaded", rf2FilesLoaded.size());
 			Collections.sort(rf2FilesLoaded);
