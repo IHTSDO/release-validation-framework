@@ -13,6 +13,9 @@
 	<jms:annotation-driven/>
 	<context:annotation-config/>
 	
+	<bean class="java.lang.Boolean" id="isAutoScallingEnabled">
+		<constructor-arg value="${rvf.execution.isAutoScalingEnabled}"/>
+	</bean>
 	<bean class="org.ihtsdo.rvf.messaging.JMSBrokerManager"/>
 	
 	<bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">

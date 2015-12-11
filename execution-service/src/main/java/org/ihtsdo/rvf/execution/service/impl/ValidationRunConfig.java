@@ -10,7 +10,7 @@ public class ValidationRunConfig {
 	private Long runId;
 	private transient MultipartFile file;
 	private transient File prospectiveFile;
-	private String prospectiveFilePath;
+	private String prospectiveLocalFilePath;
 	private boolean writeSucceses;
 	private transient MultipartFile manifestFile;
 	private List<String> groupsList;
@@ -21,7 +21,10 @@ public class ValidationRunConfig {
 	private String url;
 	private Integer failureExportMax;
 	private boolean firstTimeRelease;
-	private String manifestFileFullPath;
+	private String manifestFileS3FileFullPath;
+	private String s3BucketName;
+	private String prospectiveFileS3FileFullPath;
+	private boolean isProspectiveFileInS3Already;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -108,14 +111,14 @@ public class ValidationRunConfig {
 	}
 	public void setProspectiveFile(final File prospectiveFile) {
 		this.prospectiveFile = prospectiveFile;
-		this.prospectiveFilePath = prospectiveFile.getAbsolutePath();
+		this.prospectiveLocalFilePath = prospectiveFile.getAbsolutePath();
 	}
 	
-	public String getProspectiveFilePath() {
-		return prospectiveFilePath;
+	public String getProspectiveLocalFilePath() {
+		return prospectiveLocalFilePath;
 	}
-	public void setProspectiveFilePath(String prospectiveFilePath) {
-		this.prospectiveFilePath = prospectiveFilePath;
+	public void setProspectiveLocalFilePath(String prospectiveFilePath) {
+		this.prospectiveLocalFilePath = prospectiveFilePath;
 	}
 	public void setTestFileName(final String filename) {
 		testFileName = filename;
@@ -167,13 +170,40 @@ public class ValidationRunConfig {
 		this.firstTimeRelease = firstTimeRelease;
 		return this;
 	}
-	public String getManifestFileFullPath() {
-		return this.manifestFileFullPath;
+	public String getManifestFileS3FileFullPath() {
+		return this.manifestFileS3FileFullPath;
 	}
-	public void setManifestFileFullPath(String manifestFileFullPath) {
-		this.manifestFileFullPath = manifestFileFullPath;
+	public void setManifestFileS3FileFullPath(String manifestFileFullPath) {
+		this.manifestFileS3FileFullPath = manifestFileFullPath;
 	}
 	public boolean isFirstTimeRelease() {
 		return firstTimeRelease;
+	}
+	public ValidationRunConfig addProspectiveFileS3FileFullPath(String s3File) {
+		this.prospectiveFileS3FileFullPath = s3File;
+		isProspectiveFileInS3Already = true;
+		return this;
+	}
+	
+	public  ValidationRunConfig addManifestFileS3FileFullPath(String manifestFileFullPath) {
+		this.manifestFileS3FileFullPath = manifestFileFullPath;
+		return this;
+	}
+	public void setS3BucketName(String bucketName) {
+		s3BucketName = bucketName;
+	}
+	
+	public void setProspectiveFileS3FileFullPath(String targetFilePath) {
+		this.prospectiveFileS3FileFullPath = targetFilePath;
+		isProspectiveFileInS3Already = true;
+	}
+	public String getS3BucketName() {
+		return s3BucketName;
+	}
+	public String getProspectiveFileS3FileFullPath() {
+		return this.prospectiveFileS3FileFullPath;
+	}
+	public boolean isProspectiveFileInS3Already() {
+		return isProspectiveFileInS3Already;
 	}
 }
