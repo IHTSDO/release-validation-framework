@@ -97,7 +97,7 @@ public class ReleaseFileDataLoader {
 						statement.execute(loadFile);
 						statement.execute(enableIndex);
 					}
-					return rvfTableName;
+					return rf2FileName;
 				}
 			});
 			tasks.add(future);

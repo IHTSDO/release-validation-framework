@@ -24,7 +24,7 @@ public class ValidationRunConfig {
 	private String manifestFileS3FileFullPath;
 	private String s3BucketName;
 	private String prospectiveFileS3FileFullPath;
-	private boolean isProspectiveFileInS3Already;
+	private boolean isProspectiveFilesInS3;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -181,7 +181,7 @@ public class ValidationRunConfig {
 	}
 	public ValidationRunConfig addProspectiveFileS3FileFullPath(String s3File) {
 		this.prospectiveFileS3FileFullPath = s3File;
-		isProspectiveFileInS3Already = true;
+		isProspectiveFilesInS3 = true;
 		return this;
 	}
 	
@@ -195,7 +195,7 @@ public class ValidationRunConfig {
 	
 	public void setProspectiveFileS3FileFullPath(String targetFilePath) {
 		this.prospectiveFileS3FileFullPath = targetFilePath;
-		isProspectiveFileInS3Already = true;
+		isProspectiveFilesInS3 = true;
 	}
 	public String getS3BucketName() {
 		return s3BucketName;
@@ -204,6 +204,6 @@ public class ValidationRunConfig {
 		return this.prospectiveFileS3FileFullPath;
 	}
 	public boolean isProspectiveFileInS3Already() {
-		return isProspectiveFileInS3Already;
+		return isProspectiveFilesInS3;
 	}
 }
