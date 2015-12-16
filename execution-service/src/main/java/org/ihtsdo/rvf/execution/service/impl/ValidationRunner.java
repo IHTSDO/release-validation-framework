@@ -132,7 +132,7 @@ public class ValidationRunner {
 				IOUtils.copy(manifestInput, new FileOutputStream(manifestFile));
 				validationConfig.setLocalManifestFile(manifestFile);
 			}
-			logger.info("Time taken {} in seconds to download files {} from s3", (System.currentTimeMillis()-s3StreamingStart)/1000 , validationConfig.getProspectiveFileFullPath());
+			logger.info("Time taken {} seconds to download files {} from s3", (System.currentTimeMillis()-s3StreamingStart)/1000 , validationConfig.getProspectiveFileFullPath());
 		} else {
 			validationConfig.setLocalProspectiveFile(new File(validationConfig.getProspectiveFileFullPath()));
 			if (validationConfig.getManifestFileFullPath() != null) {
