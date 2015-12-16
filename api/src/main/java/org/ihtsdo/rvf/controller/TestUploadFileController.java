@@ -172,7 +172,6 @@ public class TestUploadFileController {
 		final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
 
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
-		vrConfig.setProspectiveFilesInS3(false);
 		vrConfig.addFile(file)
 				.addWriteSucceses(writeSucceses)
 				.addGroupsList(groupsList)
@@ -184,7 +183,8 @@ public class TestUploadFileController {
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
 				.addUrl(urlPrefix)
-				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion));
+				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion))
+				.addProspectiveFilesInS3(false);
 		
 		
 		//Before we start running, ensure that we've made our mark in the storage location
@@ -227,7 +227,6 @@ public class TestUploadFileController {
 		final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
 
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
-		vrConfig.setProspectiveFilesInS3(true);
 		vrConfig.addProspectiveFileFullPath(releaseFileS3Path)
 				.addWriteSucceses(writeSucceses)
 				.addGroupsList(groupsList)
@@ -239,7 +238,8 @@ public class TestUploadFileController {
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
 				.addUrl(urlPrefix)
-				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion));
+				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion))
+				.addProspectiveFilesInS3(true);
 		
 		
 		//Before we start running, ensure that we've made our mark in the storage location

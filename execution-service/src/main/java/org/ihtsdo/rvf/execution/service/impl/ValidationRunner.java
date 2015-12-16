@@ -120,17 +120,19 @@ public class ValidationRunner {
 		reportService.writeState(State.RUNNING, reportStorage);
 		if (validationConfig.isProspectiveFilesInS3()) {
 			//streaming file from S3 to local
+			long s3StreamingStart = System.currentTimeMillis();
 			FileHelper s3Helper = new FileHelper(validationConfig.getS3BucketName(), s3Client);
 			InputStream input = s3Helper.getFileStream(validationConfig.getProspectiveFileFullPath());
-			File prospectiveFile = File.createTempFile(validationConfig.getTestFileName() + validationConfig.getRunId(), null);
+			File prospectiveFile = File.createTempFile(validationConfig.getRunId() + "_" + validationConfig.getTestFileName(), null);
 			IOUtils.copy(input, new FileOutputStream(prospectiveFile));
 			validationConfig.setLocalProspectiveFile(prospectiveFile);
 			if (validationConfig.getManifestFileFullPath() != null) {
 				InputStream manifestInput = s3Helper.getFileStream(validationConfig.getManifestFileFullPath());
-				File manifestFile = File.createTempFile("manifest.xml" + validationConfig.getRunId(), null);
+				File manifestFile = File.createTempFile("manifest.xml_" + validationConfig.getRunId(), null);
 				IOUtils.copy(manifestInput, new FileOutputStream(manifestFile));
 				validationConfig.setLocalManifestFile(manifestFile);
 			}
+			logger.info("Time taken {} in seconds to download files {} from s3", (System.currentTimeMillis()-s3StreamingStart)/1000 , validationConfig.getProspectiveFileFullPath());
 		} else {
 			validationConfig.setLocalProspectiveFile(new File(validationConfig.getProspectiveFileFullPath()));
 			if (validationConfig.getManifestFileFullPath() != null) {

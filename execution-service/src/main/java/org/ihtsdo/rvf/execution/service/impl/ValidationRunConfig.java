@@ -209,5 +209,9 @@ public class ValidationRunConfig {
 	public File getLocalManifestFile() {
 		return this.localManifestFile;
 	}
+	public ValidationRunConfig addProspectiveFilesInS3(boolean isFileInS3) {
+		this.isProspectiveFilesInS3 = isFileInS3;
+		return this;
+	}
 	
 }

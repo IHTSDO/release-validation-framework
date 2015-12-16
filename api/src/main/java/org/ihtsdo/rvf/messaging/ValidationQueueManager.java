@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 @Service
 public class ValidationQueueManager {
 	
+	private static final String FILES_TO_VALIDATE = "files_to_validate";
 	private static final String FAILURE_MESSAGE = "failureMessage";
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -99,7 +100,7 @@ public class ValidationQueueManager {
 			} else {
 				LOGGER.info("Autoscaling is enabled. RVF needs to save files to S3 for ec2 worker");
 				config.setProspectiveFilesInS3(true);
-				String s3StoragePath = config.getStorageLocation() + File.separator + config.getRunId() + File.separator;
+				String s3StoragePath = config.getStorageLocation() + File.separator + FILES_TO_VALIDATE + File.separator;
 				String targetFilePath = s3StoragePath + filename;
 				s3Helper.putFile(config.getFile().getInputStream(), targetFilePath);
 				config.setProspectiveFileFullPath(targetFilePath);
