@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.messaging;
 
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,26 +28,22 @@ public class ReleaseValidationMessageListener {
 	@JmsListener(containerFactory = "jmsListenerContainerFactory", destination = "rvf-validation-queue")
 	public void triggerValidation(final TextMessage incomingMessage) {
 		logger.info("Received message {}", incomingMessage);
-//		executor.submit( new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//				Gson gson = new Gson();
-//				ValidationRunConfig config = null;
-//				try {
-//					config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
-//					logger.info("validation config from queue:" + config);
-//				} catch (JsonSyntaxException | JMSException e) {
-//					logger.error("JMS message listener error:", e);
-//				}
-//				if ( config != null) {
-//					if (config.getProspectiveFilePath() != null) {
-//						config.setProspectiveFile(new File(config.getProspectiveFilePath()));
-//					}
-//					runner.run(config);
-//				}
-//			}
-//		});
+//		runValidationAsynchronously(incomingMessage);
+		runValidation(incomingMessage);
+	}
+
+	
+	private void runValidationAsynchronously(final TextMessage incomingMessage) {
+		executor.submit( new Runnable() {
+			
+			@Override
+			public void run() {
+				runValidation(incomingMessage);
+			}
+		});
+	}
+
+	private void runValidation(final TextMessage incomingMessage) {
 		Gson gson = new Gson();
 		ValidationRunConfig config = null;
 		try {
@@ -58,10 +53,9 @@ public class ReleaseValidationMessageListener {
 			logger.error("JMS message listener error:", e);
 		}
 		if ( config != null) {
-			if (config.getProspectiveFilePath() != null) {
-				config.setProspectiveFile(new File(config.getProspectiveFilePath()));
-			}
 			runner.run(config);
+		} else {
+			logger.error("Null validation config found for message:" + incomingMessage);
 		}
 	}
 }
