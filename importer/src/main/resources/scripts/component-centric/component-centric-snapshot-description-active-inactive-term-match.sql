@@ -33,11 +33,8 @@
 	drop table if exists tmp_active_desc;
 	create table if not exists tmp_active_desc as
 	select a.*
-	from curr_description_s a
-		join tmp_edited_con b
-			on a.conceptid = b.id
-			and a.active = 1
-			and cast(a.effectivetime as datetime) >= (select min(cast(effectivetime as datetime)) from curr_description_d);
+	from curr_description_d a 
+	where a.active=1 and not exists (select count(*) as total from curr_description_f b where a.id=b.id having total > 1);
 	commit;
 
 /* list of inactive description of active concepts edited for this release */

@@ -370,10 +370,10 @@
       "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 should not have a new inactive state in the current release as it was inactive already in the previvous SNAPSHOT."
     }, {
       "conceptId" : 713135019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7 should not have a new inactive state in the current snapshot as no active stated found in previous release"
+      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7 should not have a new inactive state in the current snapshot as no active state found in previous release"
     }, {
       "conceptId" : 3008913019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c9 should not have a new inactive state in the current snapshot as no active stated found in previous release"
+      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c9 should not have a new inactive state in the current snapshot as no active state found in previous release"
     } ],
     "totalFailed" : 3
   }, {

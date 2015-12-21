@@ -276,7 +276,7 @@
     "assertionUuid" : "c2975dd5-3869-4bf7-ac75-53fd53b90144",
     "firstNInstances" : [ {
       "conceptId" : 703860006,
-      "detail" : "Active description id = 2984057025 and inactive description id = 2984057023 share the same term"
+      "detail" : "Active description id = 3008366010 and inactive description id = 2984057023 share the same term"
     } ],
     "totalFailed" : 1
   }, {
