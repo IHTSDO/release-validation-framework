@@ -29,7 +29,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Language Refset: id=',a.id, ' should not have a new inactive state in the current snapshot as no active stated found in previous release') 
+		concat('Language Refset: id=',a.id, ' should not have a new inactive state in the current snapshot as no active state found in previous release') 
 	from curr_langrefset_s a
 	left join prev_langrefset_s b
 	on a.id = b.id

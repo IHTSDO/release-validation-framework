@@ -12,7 +12,10 @@
 
 	<jms:annotation-driven/>
 	<context:annotation-config/>
-
+	
+		<bean class="java.lang.Boolean" id="isAutoScallingEnabled">
+		<constructor-arg value="${rvf.execution.isAutoScalingEnabled}"/>
+	</bean>
 	<bean class="org.ihtsdo.rvf.messaging.JMSBrokerManager">
 		<constructor-arg value="${rvf.validation.queue.brokerUrl}"/>
 		<constructor-arg type="java.lang.Boolean" value="${rvf.execution.isAutoScalingEnabled}"/>

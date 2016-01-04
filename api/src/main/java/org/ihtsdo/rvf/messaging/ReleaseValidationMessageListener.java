@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.messaging;
 
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,20 +41,7 @@ public class ReleaseValidationMessageListener {
 			
 			@Override
 			public void run() {
-				Gson gson = new Gson();
-				ValidationRunConfig config = null;
-				try {
-					config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
-					logger.info("validation config from queue:" + config);
-				} catch (JsonSyntaxException | JMSException e) {
-					logger.error("JMS message listener error:", e);
-				}
-				if ( config != null) {
-					if (config.getProspectiveFilePath() != null) {
-						config.setProspectiveFile(new File(config.getProspectiveFilePath()));
-					}
-					runner.run(config);
-				}
+				runValidation(incomingMessage);
 			}
 		});
 	}
@@ -70,10 +56,9 @@ public class ReleaseValidationMessageListener {
 			logger.error("JMS message listener error:", e);
 		}
 		if ( config != null) {
-			if (config.getProspectiveFilePath() != null) {
-				config.setProspectiveFile(new File(config.getProspectiveFilePath()));
-			}
 			runner.run(config);
+		} else {
+			logger.error("Null validation config found for message:" + incomingMessage);
 		}
 	}
 }

@@ -189,7 +189,63 @@ public class TestUploadFileController {
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
 				.addUrl(urlPrefix)
-				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion));
+				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion))
+				.addProspectiveFilesInS3(false);
+		
+		
+		//Before we start running, ensure that we've made our mark in the storage location
+		//Init will fail if we can't write the "running" state to storage
+		final Map <String, String> responseMap = new HashMap<>();
+		HttpStatus returnStatus =  HttpStatus.OK;
+		
+		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
+			//Queue incoming validation request
+			queueManager.queueValidationRequest( vrConfig, responseMap);
+			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
+			responseMap.put("resultURL", urlToPoll);
+		} else {
+			returnStatus = HttpStatus.PRECONDITION_FAILED;
+		}
+		return new ResponseEntity<>(responseMap, returnStatus);
+	}
+	
+	
+	
+	@RequestMapping(value = "/run-post-via-s3", method = RequestMethod.POST)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Upload test file from S3",
+			notes = "This api is for testing release files stored in S3" )
+	public ResponseEntity runPostTestPackageViaS3(
+			@RequestParam(value = "releaseFileS3Path") final String releaseFileS3Path,
+			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			@RequestParam(value = "manifestFileS3Path", required = false) final String manifestFileS3Path,
+			@RequestParam(value = "groups") final List<String> groupsList,
+			@RequestParam(value = "previousIntReleaseVersion" ,required = false) final String prevIntReleaseVersion,
+			@RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
+			@RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
+			@RequestParam(value = "runId") final Long runId,
+			@RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
+			@RequestParam(value = "storageLocation") final String storageLocation,
+            final HttpServletRequest request) throws IOException {
+
+		final String requestUrl = String.valueOf(request.getRequestURL());
+		final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
+
+		final ValidationRunConfig vrConfig = new ValidationRunConfig();
+		vrConfig.addProspectiveFileFullPath(releaseFileS3Path)
+				.addWriteSucceses(writeSucceses)
+				.addGroupsList(groupsList)
+				.addManifestFileFullPath(manifestFileS3Path)
+				.addPrevIntReleaseVersion(prevIntReleaseVersion)
+				.addPreviousExtVersion(previousExtVersion)
+				.addExtensionDependencyVersion(extensionDependency)
+				.addRunId(runId)
+				.addStorageLocation(storageLocation)
+				.addFailureExportMax(exportMax)
+				.addUrl(urlPrefix)
+				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion))
+				.addProspectiveFilesInS3(true);
 		
 		
 		//Before we start running, ensure that we've made our mark in the storage location

@@ -448,10 +448,13 @@
     "assertionName" : "The current attribute-value refset delta file is an accurate derivative of the current full file",
     "assertionUuid" : "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
     "firstNInstances" : [ {
-      "conceptId" : 569651017,
-      "detail" : "ATTRIBUTE VALUE REFSET: id=000e70b1-5825-5abd-a4c3-5ced92f3f7ed is in DELTA file, but not in FULL file."
-    } ],
-    "totalFailed" : 1
+        "conceptId" : 569651017,
+        "detail" : "ATTRIBUTE VALUE REFSET: id=000e70b1-5825-5abd-a4c3-5ced92f3f7ed is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 2608473011,
+        "detail" : "ATTRIBUTE VALUE REFSET: id=00000629-2697-5041-9438-3845fb99fe93 is in DELTA file, but not in FULL file."
+      } ],
+      "totalFailed" : 2
   }, {
     "assertionName" : "The current full attribute value refset file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "f41f178e-0fe9-42c8-91f2-581c5ad09a5b",

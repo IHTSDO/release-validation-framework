@@ -1,7 +1,5 @@
 package org.ihtsdo.rvf.messaging;
 
-import java.io.File;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -78,11 +76,9 @@ public class RvfValidationMessageConsumer {
 								logger.error("JMS message listener error:", e);
 							}
 							if ( config != null) {
-								if (config.getProspectiveFilePath() != null) {
-									config.setProspectiveFile(new File(config.getProspectiveFilePath()));
-								}
+								
 								logger.info("Running validaiton:" + config.toString());
-								runner.run(config);
+								runner.run(config);								
 							}
 				}
 				

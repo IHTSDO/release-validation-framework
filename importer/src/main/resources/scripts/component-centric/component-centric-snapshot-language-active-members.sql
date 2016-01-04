@@ -6,16 +6,37 @@
 	Members are active for active descriptions in the snapshot file.
 
 ********************************************************************************/
+
+/* 	view of current snapshot of language refset referencedcomponentids of active members */
+	
+	drop table if exists v_act_langrs;
+	create table if not exists v_act_langrs (INDEX(referencedcomponentid)) as
+	 select distinct referencedcomponentid
+		from curr_langrefset_s 
+		where active = '1';
+
+/* 	view of current snapshot of language refset referencedcomponentids of inactive only members */
+
+	drop table if exists v_inact_only_langrs;
+	create table if not exists v_inact_only_langrs (INDEX(referencedcomponentid)) as
+	 select distinct a.referencedcomponentid
+		from curr_langrefset_s a
+		left join v_act_langrs b on a.referencedcomponentid = b.referencedcomponentid
+		where a.active = '0'
+		and b.referencedcomponentid is null;
+	
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		c.id,
-		concat('Language refset: id=',a.id, ' is inactive for an active description') 
-	from curr_langrefset_s a
-	inner join curr_description_s b on a.referencedComponentId = b.id 
-	inner join curr_concept_s c on b.conceptid = c.id
-	where a.active = '0' 
-	and b.active = '1'
-	and c.active='1';
+		concat('Active description id=',a.id, ' has no active langrefset member') 
+	from curr_description_s a
+	inner join curr_concept_s c on a.conceptid = c.id
+	inner join v_inact_only_langrs b on a.id = b.referencedComponentId
+	where a.active = '1' 
+	and c.active = '1';
+
+	drop table if exists v_act_langrs;
+	drop table if exists v_inact_only_langrs;
 	

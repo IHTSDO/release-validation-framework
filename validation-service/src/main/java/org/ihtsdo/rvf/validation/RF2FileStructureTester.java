@@ -15,6 +15,8 @@ import java.util.concurrent.Future;
 import org.ihtsdo.rvf.validation.impl.StreamTestReport;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.resource.ResourceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * To verify that each line (including last line) in RF2 file is terminated by CR followed by LF (i.e "\r\n").
@@ -31,6 +33,7 @@ public class RF2FileStructureTester {
 	private Date startTime;
 	public static final String LINE_ENDING = RF2_LINE_SEPARATOR;
 	private static final String UTF_8 = "UTF-8";
+	private static final Logger LOGGER = LoggerFactory.getLogger(RF2FileStructureTester.class);
 	
 	
 	/**
@@ -67,8 +70,8 @@ public class RF2FileStructureTester {
 			try {
 				task.get();
 			} catch (InterruptedException | ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.error("Task failed when structure testing due to:", e);
+				validationLog.executionError("Error", "Failed to check file due to:" + e.fillInStackTrace());
 			}
 		}
 	}
