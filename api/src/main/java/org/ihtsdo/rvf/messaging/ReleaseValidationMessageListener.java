@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
-import org.ihtsdo.rvf.autoscaling.InstanceManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.slf4j.Logger;
@@ -25,10 +24,8 @@ public class ReleaseValidationMessageListener {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	//Using runner as prototype scope or using executor to process message asynchronously
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
-	
-	private InstanceManager instanceManager;
 
-	@JmsListener(containerFactory = "jmsListenerContainerFactory", destination = "rvf-validation-queue")
+	@JmsListener(containerFactory = "jmsListenerContainerFactory", destination = "${rvf.validation.queue.name}")
 	public void triggerValidation(final TextMessage incomingMessage) {
 		logger.info("Received message {}", incomingMessage);
 //		runValidationAsynchronously(incomingMessage);

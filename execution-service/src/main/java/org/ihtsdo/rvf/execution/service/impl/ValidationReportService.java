@@ -20,7 +20,6 @@ import org.ihtsdo.otf.dao.s3.S3Client;
 import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -34,7 +33,6 @@ public class ValidationReportService {
 	private S3Client s3Client;
 	
 	private final Logger logger = LoggerFactory.getLogger(ValidationReportService.class);
-	@Autowired
 	private String bucketName;
 	
 	private String stateFilePath;

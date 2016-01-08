@@ -9,7 +9,7 @@
 	
 /* 	view of current snapshot made by finding all the active term for active concepts containing invalid character*/
 
-/* http://ihtsdo.org/fileadmin/user_upload/doc/en_us/tig.html?t=trg2main_relatefiles */
+/* www.snomed.org/tig?t=terms_SpecialCharacters */
 	
 	/* 	inserting exceptions in the result table for FSN*/
 	insert into qa_result (runid, assertionuuid, concept_id, details)

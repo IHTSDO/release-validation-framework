@@ -79,16 +79,12 @@
 	</bean>
 	
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService">
-		<constructor-arg name="bucketName" ref="bucketName"/>
+		<constructor-arg name="bucketName" ref="s3ExecutionBucketName"/>
 	</bean>
 	
 	<!--  <bean id ="resultExtractor" class="org.ihtsdo.rvf.execution.service.impl.ResultExtractorServiceImpl"/> -->
 	<bean id="scheduleEventGenerator" class ="org.ihtsdo.rvf.execution.service.impl.RvfDbScheduledEventGenerator">
 	<constructor-arg value="${rvf.qa.data.maxKeepTime}"/>
-	</bean>
-	
-	<bean class="java.lang.String" id="bucketName">
-		<constructor-arg value="${bucketName}" />
 	</bean>
 	<import resource="applicationContext.xml"/>
 

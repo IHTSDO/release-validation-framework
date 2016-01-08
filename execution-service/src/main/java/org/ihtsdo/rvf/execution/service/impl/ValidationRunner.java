@@ -50,6 +50,12 @@ import org.springframework.stereotype.Service;
 @Scope("prototype")
 public class ValidationRunner {
 	
+	private static final String SEPARATOR = "/";
+
+	private static final String INTERNATIONAL = "international";
+
+	private static final String ZIP_FILE_EXTENSION = ".zip";
+
 	public static final String FAILURE_MESSAGE = "failureMessage";
 
 	private final Logger logger = LoggerFactory.getLogger(ValidationRunner.class);
@@ -121,7 +127,7 @@ public class ValidationRunner {
 		if (validationConfig.isProspectiveFilesInS3()) {
 			//streaming file from S3 to local
 			long s3StreamingStart = System.currentTimeMillis();
-			FileHelper s3Helper = new FileHelper(validationConfig.getS3BucketName(), s3Client);
+			FileHelper s3Helper = new FileHelper(validationConfig.getS3ExecutionBucketName(), s3Client);
 			InputStream input = s3Helper.getFileStream(validationConfig.getProspectiveFileFullPath());
 			File prospectiveFile = File.createTempFile(validationConfig.getRunId() + "_" + validationConfig.getTestFileName(), null);
 			IOUtils.copy(input, new FileOutputStream(prospectiveFile));
@@ -145,66 +151,9 @@ public class ValidationRunner {
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;
-		} else {
-			isFailed = checkKnownVersion(validationConfig,responseMap);
-			if (isFailed) {
-				reportService.writeResults(responseMap, State.FAILED, reportStorage);
-				return;
-			}
-			
-			String prospectiveVersion = validationConfig.getRunId().toString();
-			String prevReleaseVersion = validationConfig.getPrevIntReleaseVersion();
-			final boolean isExtension = isExtension(validationConfig); 
-			String combinedVersionName = null;
-			if (isExtension && !validationConfig.isFirstTimeRelease()) {
-				//SnomedCT_Release-es_INT_20140430.zip
-				//SnomedCT_SpanishRelease_INT_20141031.zip
-				if (validationConfig.getPrevIntReleaseVersion() != null) {
-					combinedVersionName = validationConfig.getPreviousExtVersion() + "_" + validationConfig.getPreviousExtVersion() + "_" + validationConfig.getRunId();
-					prevReleaseVersion = combinedVersionName;
-					final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
-					logger.info(startCombiningMsg);
-					reportService.writeProgress(startCombiningMsg, reportStorage);
-					final boolean isSuccess = releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
-					if (!isSuccess) {
-						responseMap.put(FAILURE_MESSAGE, "Failed to combine known versions:" 
-								+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName);
-						reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
-						String schemaName = releaseDataManager.getSchemaForRelease(combinedVersionName);
-						if (schemaName != null) {
-							scheduleEventGenerator.createDropReleaseSchemaEvent(schemaName);
-							releaseDataManager.dropVersion(combinedVersionName);
-						}
-						return;
-					}
-				}
-			} 
-			reportService.writeProgress("Loading prospective file into DB.", reportStorage);
-			List<String> rf2FilesLoaded = new ArrayList<>();
-			if (isExtension) {
-				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
-			} else {
-				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
-			}
-			responseMap.put("totalRF2FilesLoaded", rf2FilesLoaded.size());
-			Collections.sort(rf2FilesLoaded);
-			responseMap.put("rf2Files", rf2FilesLoaded);
-			
-			final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
-			if (prospectiveSchema != null) {
-				reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveSchema, reportStorage);
-				resourceLoader.loadResourceData(prospectiveSchema);
-				logger.info("completed loading resource data for schema:" + prospectiveSchema);
-			}
-			final ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
-			executionConfig.setProspectiveVersion(prospectiveVersion);
-			executionConfig.setPreviousVersion(prevReleaseVersion);
-			executionConfig.setGroupNames(validationConfig.getGroupsList());
-			//default to 10
-			executionConfig.setFailureExportMax(10);
-			if (validationConfig.getFailureExportMax() != null) {
-				executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
-			}
+		} 
+		ExecutionConfig executionConfig = loadPublishedVersions(validationConfig, responseMap, reportStorage);
+		if (executionConfig != null) {
 			runAssertionTests(executionConfig,responseMap, reportStorage);
 			final Calendar endTime = Calendar.getInstance();
 			final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
@@ -213,16 +162,164 @@ public class ValidationRunner {
 			responseMap.put("endTime", endTime.getTime());
 			reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
 			//house keeping prospective version and combined previous extension 
-			scheduleEventGenerator.createDropReleaseSchemaEvent(prospectiveSchema);
-			releaseDataManager.dropVersion(prospectiveVersion);
-			if (combinedVersionName != null) {
-				scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(combinedVersionName));
-				releaseDataManager.dropVersion(combinedVersionName);
+			scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(executionConfig.getProspectiveVersion()));
+			releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
+			if (executionConfig.isExtensionValidation()) {
+				scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(executionConfig.getPreviousVersion()));
+				releaseDataManager.dropVersion(executionConfig.getPreviousVersion());
 			}
 			// house keeping qa_result for the given run id
-			scheduleEventGenerator.createQaResultDeleteEvent(validationConfig.getRunId());
-			
+			scheduleEventGenerator.createQaResultDeleteEvent(executionConfig.getExecutionId());
 		}
+		
+	}
+
+	private ExecutionConfig loadPublishedVersions(ValidationRunConfig validationConfig, Map<String, Object> responseMap, String reportStorage) throws Exception {
+		
+		String prospectiveVersion = validationConfig.getRunId().toString();
+		String prevReleaseVersion = resolvePreviousVersion(validationConfig.getPrevIntReleaseVersion());
+		final boolean isExtension = isExtension(validationConfig);
+		if (isExtension) {
+			prevReleaseVersion = "previous_" + validationConfig.getRunId();
+		}
+		final ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
+		executionConfig.setProspectiveVersion(prospectiveVersion);
+		executionConfig.setPreviousVersion(prevReleaseVersion);
+		executionConfig.setGroupNames(validationConfig.getGroupsList());
+		executionConfig.setExtensionValidation(isExtension);
+		//default to 10
+		executionConfig.setFailureExportMax(10);
+		if (validationConfig.getFailureExportMax() != null) {
+			executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
+		}
+		List<String> rf2FilesLoaded = new ArrayList<>();
+		boolean isSucessful = false;
+		if (!isPublishedVersionsLoaded(validationConfig)) {
+			//load published versions from s3
+			isSucessful = prepareVersionsFromS3Files(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
+			
+		} else {
+			isSucessful = combineKnownReleases(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
+		}
+		if (!isSucessful) {
+			return null;
+		}
+		responseMap.put("totalRF2FilesLoaded", rf2FilesLoaded.size());
+		Collections.sort(rf2FilesLoaded);
+		responseMap.put("rf2Files", rf2FilesLoaded);
+
+		final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
+		if (prospectiveSchema != null) {
+			reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveSchema, reportStorage);
+			resourceLoader.loadResourceData(prospectiveSchema);
+			logger.info("completed loading resource data for schema:" + prospectiveSchema);
+		}
+		return executionConfig;
+	}
+	
+	private boolean combineKnownReleases(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap, List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception{
+		boolean isFailed = checkKnownVersion(validationConfig,responseMap);
+		if (isFailed) {
+			reportService.writeResults(responseMap, State.FAILED, reportStorage);
+			return false;
+		}
+		if (isExtension(validationConfig) && !validationConfig.isFirstTimeRelease()) {
+			//SnomedCT_Release-es_INT_20140430.zip
+			//SnomedCT_SpanishRelease_INT_20141031.zip
+			if (validationConfig.getPrevIntReleaseVersion() != null) {
+				String combinedVersionName = executionConfig.getPreviousVersion();
+				final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
+				logger.info(startCombiningMsg);
+				reportService.writeProgress(startCombiningMsg, reportStorage);
+				final boolean isSuccess = releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
+				if (!isSuccess) {
+					String message = "Failed to combine known versions:" 
+							+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName;
+					responseMap.put(FAILURE_MESSAGE, message);
+					reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
+					String schemaName = releaseDataManager.getSchemaForRelease(combinedVersionName);
+					if (schemaName != null) {
+						scheduleEventGenerator.createDropReleaseSchemaEvent(schemaName);
+						releaseDataManager.dropVersion(combinedVersionName);
+					}
+					return false;
+				}
+			}
+		} 
+		reportService.writeProgress("Loading prospective file into DB.", reportStorage);
+		String prospectiveVersion = validationConfig.getRunId().toString();
+		if (isExtension(validationConfig)) {
+			uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+		} else {
+			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+		}
+		return true;
+	}
+
+	private String resolvePreviousVersion(String releasePkgName) {
+		String version = releasePkgName;
+		if (releasePkgName.endsWith(ZIP_FILE_EXTENSION)) {
+			version = releasePkgName.replace(ZIP_FILE_EXTENSION, "");
+			String [] splits = version.split("_");
+			if (splits.length >=4) {
+				version = splits[2] + "_" + splits[3];
+			}
+		}
+		return version;
+	}
+	
+	private boolean prepareVersionsFromS3Files(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap,List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception {
+		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName() + SEPARATOR + INTERNATIONAL + SEPARATOR, s3Client);
+		if (validationConfig.getPrevIntReleaseVersion() != null) {
+			InputStream previousIntInput = s3PublishFileHelper.getFileStream(validationConfig.getPrevIntReleaseVersion());
+			File previousVersionTemp = File.createTempFile(validationConfig.getPrevIntReleaseVersion(), null);
+			IOUtils.copy(previousIntInput, new FileOutputStream(previousVersionTemp));
+			List<String> prevRf2FilesLoaded = new ArrayList<>();
+			if (isExtension(validationConfig) && !validationConfig.isFirstTimeRelease()) {
+				String combinedVersionName = executionConfig.getPreviousVersion();
+				final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
+				logger.info(startCombiningMsg);
+				reportService.writeProgress(startCombiningMsg, reportStorage);
+				InputStream previousExtInput = s3PublishFileHelper.getFileStream(validationConfig.getPreviousExtVersion());
+				File previousExtTemp = File.createTempFile(validationConfig.getPreviousExtVersion(), null);
+				IOUtils.copy(previousExtInput, new FileOutputStream(previousExtTemp));
+				
+				releaseDataManager.loadSnomedData(combinedVersionName, prevRf2FilesLoaded, previousVersionTemp,previousExtTemp);
+				String schemaName = releaseDataManager.getSchemaForRelease(executionConfig.getPreviousVersion());
+				if (schemaName == null) {
+					responseMap.put(FAILURE_MESSAGE, "Failed to load two versions:" 
+							+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName);
+					reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
+					return false;
+				}
+			} else {
+				releaseDataManager.loadSnomedData(executionConfig.getPreviousVersion(), prevRf2FilesLoaded, previousVersionTemp);
+			}
+		} 
+		
+		String prospectiveVersion = validationConfig.getRunId().toString();
+		if (isExtension(validationConfig)) {
+			InputStream extensionDependencyInput = s3PublishFileHelper.getFileStream(validationConfig.getExtensionDependencyVersion());
+			File extensionDependencyTemp = File.createTempFile(validationConfig.getExtensionDependencyVersion(), null);
+			IOUtils.copy(extensionDependencyInput, new FileOutputStream(extensionDependencyTemp));
+			releaseDataManager.loadSnomedData(prospectiveVersion, rf2FilesLoaded, validationConfig.getLocalProspectiveFile(),extensionDependencyTemp);
+		} else {
+			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+		}
+		return true;
+	}
+
+	private boolean isPublishedVersionsLoaded(ValidationRunConfig validationConfig) {
+		if (validationConfig.getPrevIntReleaseVersion() != null && validationConfig.getPrevIntReleaseVersion().endsWith(ZIP_FILE_EXTENSION)) {
+			return false;
+		}
+		if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
+			return false;
+		}
+		if (validationConfig.getExtensionDependencyVersion() != null && validationConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
+			return false;
+		}
+		return true;
 	}
 
 	private boolean checkKnownVersion(ValidationRunConfig validationConfig, Map<String, Object> responseMap) {
