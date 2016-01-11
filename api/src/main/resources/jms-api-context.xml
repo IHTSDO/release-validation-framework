@@ -48,7 +48,7 @@
     <property name="defaultDestination" ref="defaultDestination" />
   </bean> 
 	<bean class="org.ihtsdo.rvf.messaging.ValidationQueueManager"/>
-	<bean class="org.ihtsdo.rvf.messaging.ReleaseValidationMessageListener"/>
+	<!--  <bean class="org.ihtsdo.rvf.messaging.ReleaseValidationMessageListener"/> -->
 	<bean class="org.ihtsdo.rvf.messaging.RvfValidationMessageConsumer" init-method="start">
 		<constructor-arg value="${rvf.validation.queue.name}"/>
 		<constructor-arg type="java.lang.Boolean" value="${rvf.execution.isWorker}"/>

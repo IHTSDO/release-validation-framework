@@ -62,6 +62,7 @@ public class RvfValidationMessageConsumer {
 				
 				Message msg = consumer.receive(10000);
 				if ( msg == null) {
+					logger.debug("No message received for destination:" + queueName);
 					continue;
 				}
 				if ( msg instanceof TextMessage) {
