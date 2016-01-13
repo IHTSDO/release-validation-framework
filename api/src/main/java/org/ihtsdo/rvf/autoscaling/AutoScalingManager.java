@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.autoscaling;
 
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -15,6 +16,8 @@ import javax.jms.Session;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.amazonaws.services.ec2.model.Instance;
 
 public class AutoScalingManager {
 	
@@ -33,6 +36,7 @@ public class AutoScalingManager {
 	private final int MAX_INSTANCE = 1;
 	
 	private static int totalInstanceCreated;
+	private static List<Instance> instancesCreated;
 	
 	public AutoScalingManager( Boolean isAutoScalling, String destinationQueueName) {
 		this.isAutoScalling = isAutoScalling.booleanValue();
@@ -50,11 +54,10 @@ public class AutoScalingManager {
 							//will add logic later in terms how many instances need to create for certain size
 							// the current approach is to create one instance per message.
 							logger.info("Messages have been increated by:" + (current - lastPolledQueueSize) + " since last poll.");
-							lastPolledQueueSize = current;
 							if (totalInstanceCreated < MAX_INSTANCE) {
 								logger.info("Start creating new worker instance...");
 								long start = System.currentTimeMillis();
-								instanceManager.createInstance();
+								instancesCreated.add(instanceManager.createInstance());
 								logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start)/1000);
 								totalInstanceCreated++;
 							} else {
@@ -62,11 +65,16 @@ public class AutoScalingManager {
 								logger.info("No new instance will be created as total instance created:" + totalInstanceCreated + " has reached max:" + MAX_INSTANCE);
 							}
 						}
+						
+						//terminate instance which comes to an hour mark
+						instanceManager.terminateInstances(instancesCreated);
+						lastPolledQueueSize = current;
 						try {
 							Thread.sleep(2*60000);
 						} catch (InterruptedException e) {
 							logger.error("AutoScalingManager delay is interrupted.", e);
 						}
+						
 					}
 				}
 			});

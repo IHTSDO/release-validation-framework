@@ -269,9 +269,11 @@ public class ValidationRunner {
 	}
 	
 	private boolean prepareVersionsFromS3Files(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap,List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception {
-		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName() + SEPARATOR + INTERNATIONAL + SEPARATOR, s3Client);
+		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
 		if (validationConfig.getPrevIntReleaseVersion() != null) {
-			InputStream previousIntInput = s3PublishFileHelper.getFileStream(validationConfig.getPrevIntReleaseVersion());
+			String previousPublished = INTERNATIONAL + SEPARATOR + validationConfig.getPrevIntReleaseVersion();
+			logger.debug("download published version from s3:" + previousPublished );
+			InputStream previousIntInput = s3PublishFileHelper.getFileStream(previousPublished);
 			File previousVersionTemp = File.createTempFile(validationConfig.getPrevIntReleaseVersion(), null);
 			IOUtils.copy(previousIntInput, new FileOutputStream(previousVersionTemp));
 			List<String> prevRf2FilesLoaded = new ArrayList<>();
@@ -280,7 +282,9 @@ public class ValidationRunner {
 				final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
 				logger.info(startCombiningMsg);
 				reportService.writeProgress(startCombiningMsg, reportStorage);
-				InputStream previousExtInput = s3PublishFileHelper.getFileStream(validationConfig.getPreviousExtVersion());
+				String previousExtZipFile = INTERNATIONAL + SEPARATOR + validationConfig.getPreviousExtVersion();
+				logger.debug("downloading published extension from s3:" + previousExtZipFile);
+				InputStream previousExtInput = s3PublishFileHelper.getFileStream(previousExtZipFile);
 				File previousExtTemp = File.createTempFile(validationConfig.getPreviousExtVersion(), null);
 				IOUtils.copy(previousExtInput, new FileOutputStream(previousExtTemp));
 				
@@ -299,7 +303,9 @@ public class ValidationRunner {
 		
 		String prospectiveVersion = validationConfig.getRunId().toString();
 		if (isExtension(validationConfig)) {
-			InputStream extensionDependencyInput = s3PublishFileHelper.getFileStream(validationConfig.getExtensionDependencyVersion());
+			String extensionDependency = INTERNATIONAL + SEPARATOR + validationConfig.getExtensionDependencyVersion();
+			logger.debug("download published  extension dependency version from s3:" +  extensionDependency);
+			InputStream extensionDependencyInput = s3PublishFileHelper.getFileStream(extensionDependency);
 			File extensionDependencyTemp = File.createTempFile(validationConfig.getExtensionDependencyVersion(), null);
 			IOUtils.copy(extensionDependencyInput, new FileOutputStream(extensionDependencyTemp));
 			releaseDataManager.loadSnomedData(prospectiveVersion, rf2FilesLoaded, validationConfig.getLocalProspectiveFile(),extensionDependencyTemp);
