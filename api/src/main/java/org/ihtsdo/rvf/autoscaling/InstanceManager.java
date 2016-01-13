@@ -46,8 +46,7 @@ public class InstanceManager {
 			                     .withInstanceType(instanceType)
 			                     .withMinCount(1)
 			                     .withMaxCount(1)
-			  					 .withSecurityGroupIds(securityGroupId)
-			  					 .withEbsOptimized(Boolean.TRUE);
+			  					 .withSecurityGroupIds(securityGroupId);
 			  RunInstancesResult runInstancesResult = 
 					  amazonEC2Client.runInstances(runInstancesRequest);
 
