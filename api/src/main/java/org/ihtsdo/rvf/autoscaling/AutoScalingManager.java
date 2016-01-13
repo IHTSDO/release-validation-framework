@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.autoscaling;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class AutoScalingManager {
 	public AutoScalingManager( Boolean isAutoScalling, String destinationQueueName) {
 		this.isAutoScalling = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
+		instancesCreated = new ArrayList<>();
 	}
 	public void startUp() throws Exception {
 		logger.info("isAutoScalingEnabled:" + isAutoScalling);
@@ -74,7 +76,6 @@ public class AutoScalingManager {
 						} catch (InterruptedException e) {
 							logger.error("AutoScalingManager delay is interrupted.", e);
 						}
-						
 					}
 				}
 			});

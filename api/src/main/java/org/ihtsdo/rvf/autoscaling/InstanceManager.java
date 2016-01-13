@@ -1,7 +1,6 @@
 package org.ihtsdo.rvf.autoscaling;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -52,7 +51,7 @@ public class InstanceManager {
 
 			  Instance instance = runInstancesResult.getReservation().getInstances().get(0);
 			  String instanceId = instance.getInstanceId();
-			  logger.info("RVF worker new instance created with id:" + instanceId);
+			  logger.info("RVF worker new instance created with id {} and lanched at {}", instanceId, instance.getLaunchTime());
 			  CreateTagsRequest createTagsRequest = new CreateTagsRequest();
 			  createTagsRequest.withResources(instanceId);
 			  createTagsRequest.withTags(new Tag( "Name", "RVF_Worker" + counter++));
@@ -111,7 +110,7 @@ public class InstanceManager {
 	public void terminateInstances(List<Instance> instancesCreated) {
 		  List<Instance> instancesToTerminate = new ArrayList<>();
 		  for (Instance instance : instancesCreated) {
-			  if ( Calendar.getInstance().getTimeInMillis() >= (instance.getLaunchTime().getTime() + TIME_TO_DELTE)) {
+			  if ( System.currentTimeMillis() >= (instance.getLaunchTime().getTime() + TIME_TO_DELTE)) {
 				  logger.info("Instance id {} was lanched at {} and will be terminated", instance.getInstanceId(),instance.getLaunchTime());
 				  instancesToTerminate.add(instance);
 			  }
