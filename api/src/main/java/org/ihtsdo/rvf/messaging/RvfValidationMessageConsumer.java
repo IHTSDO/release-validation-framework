@@ -41,8 +41,6 @@ public class RvfValidationMessageConsumer {
 	private InstanceManager instanceManager;
 	private static long timeStart;
 	
-	private boolean isFirstTime = true;
-	
 	public RvfValidationMessageConsumer( String queueName,Boolean isRvfWorker) {
 		isWorker = isRvfWorker.booleanValue();
 		this.queueName = queueName;
@@ -55,15 +53,14 @@ public class RvfValidationMessageConsumer {
 				
 				@Override
 				public void run() {
-					if (!isFirstTime) {
-						consumeMessage();
-					}
-					isFirstTime = false;
+					consumeMessage();
 				}
 			});
 			thread.start();
 			timeStart = Calendar.getInstance().getTimeInMillis();
+			logger.info("RvfWorker instance started at:" + Calendar.getInstance().getTime());
 		}
+		
 	}
 	
 	private void consumeMessage() {
