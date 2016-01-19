@@ -1,6 +1,10 @@
 package org.ihtsdo.rvf.messaging;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -12,6 +16,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.command.ActiveMQQueue;
+import org.ihtsdo.rvf.autoscaling.InstanceManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.slf4j.Logger;
@@ -32,8 +37,12 @@ public class RvfValidationMessageConsumer {
 	@Autowired
 	private ConnectionFactory connectionFactory;
 	private boolean isWorker;
-	
+	@Autowired
+	private InstanceManager instanceManager;
 	private static long timeStart;
+	
+	private boolean isFirstTime = true;
+	private Object ec2;
 	
 	public RvfValidationMessageConsumer( String queueName,Boolean isRvfWorker) {
 		isWorker = isRvfWorker.booleanValue();
@@ -47,7 +56,10 @@ public class RvfValidationMessageConsumer {
 				
 				@Override
 				public void run() {
-					consumeMessage();
+					if (!isFirstTime) {
+						consumeMessage();
+					}
+					isFirstTime = false;
 				}
 			});
 			thread.start();
@@ -112,9 +124,28 @@ public class RvfValidationMessageConsumer {
 	
 	public boolean shutDown() {
 		if ((Calendar.getInstance().getTimeInMillis() - timeStart + DEFAULT_PROCESSING_TIME  )  >=  TIME_TO_LIVE) {
-			logger.info("Shut down as no time left to processing another one");
+			logger.info("Shut down message consumer as no time left to process another one");
 			return true;
 		}
 		return false;
+	}
+	
+	private void autoTerminate() {
+		List<String> instancesToTerminate = new ArrayList<>();
+		try {
+			String wget = "sudo wget -q -O - http://169.254.169.254/latest/meta-data/instance-id";
+			Process p = Runtime.getRuntime().exec(wget);
+			p.waitFor();
+			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String instanceId = br.readLine();
+			logger.info("Instance id to terminate:" + instanceId);
+			if (instanceId != null) {
+				instancesToTerminate.add(instanceId);
+			}
+		} catch(Exception e) {
+			logger.error("Failed to get instance id", e);
+		}
+		
+       instanceManager.terminate(instancesToTerminate);
 	}
 }

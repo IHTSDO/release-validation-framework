@@ -79,7 +79,7 @@
 	</bean>
 	
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService">
-		<constructor-arg name="bucketName" ref="s3ExecutionBucketName"/>
+		<constructor-arg name="bucketName" value="${executionBucketName}"/>
 	</bean>
 	
 	<!--  <bean id ="resultExtractor" class="org.ihtsdo.rvf.execution.service.impl.ResultExtractorServiceImpl"/> -->

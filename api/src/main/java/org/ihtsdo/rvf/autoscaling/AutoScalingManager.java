@@ -34,15 +34,17 @@ public class AutoScalingManager {
 	private String queueName;
 	private static int lastPolledQueueSize;
 	
-	private final int MAX_INSTANCE = 1;
+	private int maxRunningInstance;
 	
-	private static int totalInstanceCreated;
 	private static List<Instance> instancesCreated;
 	
-	public AutoScalingManager( Boolean isAutoScalling, String destinationQueueName) {
+	private boolean isFirstTime = true;
+	
+	public AutoScalingManager( Boolean isAutoScalling, String destinationQueueName, int maxRunningInstance) {
 		this.isAutoScalling = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
 		instancesCreated = new ArrayList<>();
+		this.maxRunningInstance = maxRunningInstance;
 	}
 	public void startUp() throws Exception {
 		logger.info("isAutoScalingEnabled:" + isAutoScalling);
@@ -51,31 +53,34 @@ public class AutoScalingManager {
 				@Override
 				public void run() {
 					while (!shutDown) {
-						int current = getQueueSize();
-						if (current > lastPolledQueueSize ){
-							//will add logic later in terms how many instances need to create for certain size
-							// the current approach is to create one instance per message.
-							logger.info("Messages have been increated by:" + (current - lastPolledQueueSize) + " since last poll.");
-							if (totalInstanceCreated < MAX_INSTANCE) {
-								logger.info("Start creating new worker instance...");
-								long start = System.currentTimeMillis();
-								instancesCreated.add(instanceManager.createInstance());
-								logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start)/1000);
-								totalInstanceCreated++;
-							} else {
-								//limit to 1 for the time being while testing.
-								logger.info("No new instance will be created as total instance created:" + totalInstanceCreated + " has reached max:" + MAX_INSTANCE);
+						if (!isFirstTime) {
+							int current = getQueueSize();
+							if (current > lastPolledQueueSize ){
+								//will add logic later in terms how many instances need to create for certain size
+								// the current approach is to create one instance per message.
+								logger.info("Messages have been increased by:" + (current - lastPolledQueueSize) + " since last poll.");
+								int activeInstances = instanceManager.getActiveInstances(instancesCreated);
+								logger.info("Current active instances total:" + activeInstances);
+								if (activeInstances < maxRunningInstance) {
+									logger.info("Start creating new worker instance...");
+									long start = System.currentTimeMillis();
+									instancesCreated.add(instanceManager.createInstance());
+									logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start)/1000);
+								} else {
+									logger.info("No new instance will be created as total running instances" + instancesCreated.size() + " has reached max" + maxRunningInstance);
+								}
+							}
+							
+							//terminate instance which comes to an hour mark
+							instanceManager.checkAndTerminateInstances(instancesCreated);
+							lastPolledQueueSize = current;
+							try {
+								Thread.sleep(1*60*1000);
+							} catch (InterruptedException e) {
+								logger.error("AutoScalingManager delay is interrupted.", e);
 							}
 						}
-						
-						//terminate instance which comes to an hour mark
-						instanceManager.terminateInstances(instancesCreated);
-						lastPolledQueueSize = current;
-						try {
-							Thread.sleep(2*60000);
-						} catch (InterruptedException e) {
-							logger.error("AutoScalingManager delay is interrupted.", e);
-						}
+						isFirstTime = false;
 					}
 				}
 			});
@@ -87,7 +92,7 @@ public class AutoScalingManager {
 	
 	private int getQueueSize() {
 		logger.debug("Retrieving message size in queue:" + queueName);
-		int counter =0;
+		int counter = 0;
 		Connection connection = null;
 		try {
 			connection = connectionFactory.createConnection();
@@ -114,6 +119,9 @@ public class AutoScalingManager {
 		logger.info("Total messages in queue:" + counter);
 		return counter;
 	}
+	
+	
+	
 	/**
 	 * queueName = "ActiveMQ.Statistics.Destination."+ destinationQueueName; 
 	 * monitoring the queue size and create new instance when there is message

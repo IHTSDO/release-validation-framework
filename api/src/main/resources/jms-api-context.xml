@@ -25,7 +25,8 @@
 	 -->
 	<bean class = "org.ihtsdo.rvf.autoscaling.AutoScalingManager" init-method="startUp">
 		<constructor-arg type="java.lang.Boolean" value="${rvf.execution.isAutoScalingEnabled}"/>
-		<constructor-arg value="${rvf.validation.queue.name}"/>
+		<constructor-arg  type="java.lang.String" value="${rvf.validation.queue.name}"/>
+		<constructor-arg  type="java.lang.Integer" value="${rvf.autoscaling.maxInstances}"/>
 	</bean>
 	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
 		<property name="brokerURL" value="${orchestration.jms.url}"/>
