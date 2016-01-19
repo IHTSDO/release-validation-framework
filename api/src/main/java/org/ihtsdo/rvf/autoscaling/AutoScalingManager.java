@@ -67,7 +67,7 @@ public class AutoScalingManager {
 									instancesCreated.add(instanceManager.createInstance());
 									logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start)/1000);
 								} else {
-									logger.info("No new instance will be created as total running instances" + instancesCreated.size() + " has reached max" + maxRunningInstance);
+									logger.info("No new instance will be created as total running instances:" + instancesCreated.size() + " has reached max:" + maxRunningInstance);
 								}
 							}
 							

@@ -64,55 +64,53 @@ public class RvfValidationMessageConsumer {
 	}
 	
 	private void consumeMessage() {
-	
-		Destination destination = new ActiveMQQueue(queueName);
 		Connection connection = null;
 		MessageConsumer consumer = null;
-		try {
-			connection =  connectionFactory.createConnection();
-			connection.start();
-			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			consumer = session.createConsumer(destination);
+		Destination destination = new ActiveMQQueue(queueName);
 			while (!shutDown()) {
-				Message msg = consumer.receive(30000);
-				if ( msg == null) {
-					logger.debug("No message received for destination:" + queueName);
-					continue;
-				}
-				if ( msg instanceof TextMessage) {
-					logger.info("Message received.");
-					TextMessage message = (TextMessage) msg;
-					Gson gson = new Gson();
-					ValidationRunConfig config = null;
-					try {
-						config = gson.fromJson(message.getText(), ValidationRunConfig.class);
-						logger.info("validation config from queue:" + config);
-					} catch (JsonSyntaxException | JMSException e) {
-						logger.error("JMS message listener error:", e);
+				try {
+					connection =  connectionFactory.createConnection();
+					connection.start();
+					Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+					consumer = session.createConsumer(destination);
+					Message msg = consumer.receive(30000);
+					if ( msg == null) {
+						logger.debug("No message received for destination:" + queueName);
+						continue;
 					}
-					if ( config != null) {
+					if ( msg instanceof TextMessage) {
+						logger.info("Message received.");
+						TextMessage message = (TextMessage) msg;
+						Gson gson = new Gson();
+						ValidationRunConfig config = null;
+						try {
+							config = gson.fromJson(message.getText(), ValidationRunConfig.class);
+							logger.info("validation config from queue:" + config);
+						} catch (JsonSyntaxException | JMSException e) {
+							logger.error("JMS message listener error:", e);
+						}
+						if ( config != null) {
 
-						logger.info("Running validaiton:" + config.toString());
-						runner.run(config);								
+							logger.info("Running validaiton:" + config.toString());
+							runner.run(config);								
+						}
 					}
-				}
-			}
-
-			} catch (JMSException e) {
-				logger.error("Error when consuming RVF validaiton message.", e);
-			} finally {
-				if (connection != null) {
-					try {
-						connection.close();
-					} catch (JMSException e) {
-						logger.error("Error when closing message queue connection.", e);
+				} catch (JMSException e) {
+					logger.error("Error when consuming RVF validaiton message.", e);
+				} finally {
+					if (connection != null) {
+						try {
+							connection.close();
+						} catch (JMSException e) {
+							logger.error("Error when closing message queue connection.", e);
+						}
 					}
-				}
-				if (consumer != null) {
-					try {
-						consumer.close();
-					} catch (JMSException e) {
-						logger.error("Error when closing message consumer.", e);
+					if (consumer != null) {
+						try {
+							consumer.close();
+						} catch (JMSException e) {
+							logger.error("Error when closing message consumer.", e);
+						}
 					}
 				}
 			}
