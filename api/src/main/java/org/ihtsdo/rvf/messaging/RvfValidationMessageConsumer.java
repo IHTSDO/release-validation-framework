@@ -1,7 +1,5 @@
 package org.ihtsdo.rvf.messaging;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -23,11 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 @Service
 public class RvfValidationMessageConsumer {
+	private static final String EC2_INSTANCE_ID_URL = "http://169.254.169.254/latest/meta-data/instance-id";
 	private static final long TIME_TO_LIVE = 55*60*1000;
 	private static final long DEFAULT_PROCESSING_TIME = 20*60*1000;
 	private String queueName;
@@ -128,11 +128,8 @@ public class RvfValidationMessageConsumer {
 	private void autoTerminate() {
 		List<String> instancesToTerminate = new ArrayList<>();
 		try {
-			String wget = "sudo wget -q -O - http://169.254.169.254/latest/meta-data/instance-id";
-			Process p = Runtime.getRuntime().exec(wget);
-			p.waitFor();
-			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String instanceId = br.readLine();
+			RestTemplate restTemplate = new RestTemplate();
+			String instanceId = restTemplate.getForObject(EC2_INSTANCE_ID_URL, String.class);
 			logger.info("Instance id  will be terminated:" + instanceId);
 			if (instanceId != null) {
 				instancesToTerminate.add(instanceId);
