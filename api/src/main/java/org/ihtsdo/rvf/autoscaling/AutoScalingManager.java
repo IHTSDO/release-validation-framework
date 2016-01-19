@@ -40,7 +40,7 @@ public class AutoScalingManager {
 	
 	private boolean isFirstTime = true;
 	
-	public AutoScalingManager( Boolean isAutoScalling, String destinationQueueName, int maxRunningInstance) {
+	public AutoScalingManager( Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
 		this.isAutoScalling = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
 		instancesCreated = new ArrayList<>();
