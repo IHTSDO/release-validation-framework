@@ -42,7 +42,6 @@ public class RvfValidationMessageConsumer {
 	private static long timeStart;
 	
 	private boolean isFirstTime = true;
-	private Object ec2;
 	
 	public RvfValidationMessageConsumer( String queueName,Boolean isRvfWorker) {
 		isWorker = isRvfWorker.booleanValue();
@@ -125,6 +124,7 @@ public class RvfValidationMessageConsumer {
 	public boolean shutDown() {
 		if ((Calendar.getInstance().getTimeInMillis() - timeStart + DEFAULT_PROCESSING_TIME  )  >=  TIME_TO_LIVE) {
 			logger.info("Shut down message consumer as no time left to process another one");
+			autoTerminate();
 			return true;
 		}
 		return false;
@@ -138,14 +138,13 @@ public class RvfValidationMessageConsumer {
 			p.waitFor();
 			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String instanceId = br.readLine();
-			logger.info("Instance id to terminate:" + instanceId);
+			logger.info("Instance id  will be terminated:" + instanceId);
 			if (instanceId != null) {
 				instancesToTerminate.add(instanceId);
 			}
 		} catch(Exception e) {
 			logger.error("Failed to get instance id", e);
 		}
-		
        instanceManager.terminate(instancesToTerminate);
 	}
 }
