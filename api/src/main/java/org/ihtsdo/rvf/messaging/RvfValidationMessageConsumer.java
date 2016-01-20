@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.messaging;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -124,7 +125,7 @@ public class RvfValidationMessageConsumer {
 	}
 	
 	public boolean shutDown() {
-		if ((Calendar.getInstance().getTimeInMillis() - timeStart + DEFAULT_PROCESSING_TIME  )  >=  TIME_TO_LIVE) {
+		if ((Calendar.getInstance().getTimeInMillis() - timeStart + DEFAULT_PROCESSING_TIME  ) >= TIME_TO_LIVE) {
 			logger.info("Shut down message consumer as no time left to process another one");
 			autoTerminate();
 			return true;
@@ -144,10 +145,18 @@ public class RvfValidationMessageConsumer {
 		} catch(Exception e) {
 			logger.error("Failed to get instance id", e);
 		}
-		if (!instancesToTerminate.isEmpty()) {
-			 instanceManager.terminate(instancesToTerminate);
-		     logger.info("Instance id  will be terminated:" + instancesToTerminate.get(0) );
+		//Tested this but doesn't seem to work
+//		if (!instancesToTerminate.isEmpty()) {
+//			 instanceManager.terminate(instancesToTerminate);
+//		     logger.info("Instance id  will be terminated:" + instancesToTerminate.get(0) );
+//		}
+		String command = "sudo poweroff";
+		logger.info("Start executing command:" + command);
+		try {
+			 Runtime.getRuntime().exec(command);
+		} catch (IOException e) {
+			logger.error("Failed to issue command at runtime:" + command, e);
 		}
-      
+		System.exit(0);
 	}
 }
