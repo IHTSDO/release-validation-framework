@@ -66,12 +66,13 @@ public class RvfValidationMessageConsumer {
 	private void consumeMessage() {
 		Connection connection = null;
 		MessageConsumer consumer = null;
-		Destination destination = new ActiveMQQueue(queueName);
+		Destination destination = new ActiveMQQueue("queueName?consumer.prefetchSize=1");
+		Session session = null;
 			while (!shutDown()) {
 				try {
 					connection =  connectionFactory.createConnection();
 					connection.start();
-					Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+					session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 					consumer = session.createConsumer(destination);
 					Message msg = consumer.receive(30000);
 					if ( msg == null) {
@@ -90,7 +91,6 @@ public class RvfValidationMessageConsumer {
 							logger.error("JMS message listener error:", e);
 						}
 						if ( config != null) {
-
 							logger.info("Running validaiton:" + config.toString());
 							runner.run(config);								
 						}
@@ -110,6 +110,13 @@ public class RvfValidationMessageConsumer {
 							consumer.close();
 						} catch (JMSException e) {
 							logger.error("Error when closing message consumer.", e);
+						}
+					}
+					if (session != null) {
+						try {
+							session.close();
+						} catch (JMSException e) {
+							logger.error("Error when closing session.", e);
 						}
 					}
 				}
