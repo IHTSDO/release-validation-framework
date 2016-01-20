@@ -69,6 +69,7 @@
 				<constructor-arg value="${aws.privateKey}" />
 			</bean>
 		</constructor-arg>
+		<constructor-arg ref="ec2Endpoint"/>
 	</bean>
 
     <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>

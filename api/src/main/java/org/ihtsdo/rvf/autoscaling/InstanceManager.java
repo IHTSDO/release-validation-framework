@@ -13,13 +13,17 @@ import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.CreateTagsRequest;
 import com.amazonaws.services.ec2.model.DescribeInstanceStatusRequest;
 import com.amazonaws.services.ec2.model.DescribeInstanceStatusResult;
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.InstanceStateChange;
 import com.amazonaws.services.ec2.model.InstanceStatus;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 @Service
 public class InstanceManager {
 	
@@ -39,18 +43,15 @@ public class InstanceManager {
 	@Autowired
 	private String securityGroupId;
 	@Autowired
-	private String ec2Endpoint;
-	@Autowired
 	private String keyName;
-	
 	private String instanceTagName;
 	
-	public InstanceManager(AWSCredentials credentials) {
+	public InstanceManager(AWSCredentials credentials, String ec2Endpoint ) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
-	}
-
-	public Instance createInstance() {
 		amazonEC2Client.setEndpoint(ec2Endpoint);
+	}
+	
+	public Instance createInstance() {
 		RunInstancesRequest runInstancesRequest = 
 				  new RunInstancesRequest();
 			
@@ -109,14 +110,6 @@ public class InstanceManager {
 	public void setSecurityGroupId(String securityGroupId) {
 		this.securityGroupId = securityGroupId;
 	}
-	public String getEc2Endpoint() {
-		return ec2Endpoint;
-	}
-
-	public void setEc2Endpoint(String ec2Endpoint) {
-		this.ec2Endpoint = ec2Endpoint;
-	}
-
 	
 	public int getActiveInstances(List<Instance> instancesToCheck) {
 		//check instances that are in pending or running status
@@ -141,7 +134,6 @@ public class InstanceManager {
 		
 	}
 	public void checkAndTerminateInstances(List<Instance> instancesToCheck) {
-		
 		  List<Instance> instancesToTerminate = new ArrayList<>();
 		  for (Instance instance : instancesToCheck) {
 			  if ( System.currentTimeMillis() >= (instance.getLaunchTime().getTime() + TIME_TO_DELTE)) {
@@ -156,14 +148,24 @@ public class InstanceManager {
 			  }
 			  TerminateInstancesRequest deleteRequest = new TerminateInstancesRequest();
 			  deleteRequest.withInstanceIds(instanceIds);
-			  amazonEC2Client.terminateInstances(deleteRequest);
+			  TerminateInstancesResult result = amazonEC2Client.terminateInstances(deleteRequest);
+			  for (InstanceStateChange state :  result.getTerminatingInstances()) {
+				  logger.info("Instance id {} current state {}", state.getInstanceId(), state.getCurrentState().getName());
+			  }
 			  instancesToCheck.removeAll(instancesToTerminate);
 		  }
 	}
+	
+	public Instance getInstanceById(String instanceId) {
+		DescribeInstancesRequest request = new DescribeInstancesRequest();
+		request.withInstanceIds(instanceId);
+		DescribeInstancesResult result = amazonEC2Client.describeInstances();
+		return result.getReservations().get(0).getInstances().get(0);
+	}
 
-	public void terminate(List<String> instancesToTerminate) {
+	public TerminateInstancesResult terminate(List<String> instancesToTerminate) {
 		TerminateInstancesRequest deleteRequest = new TerminateInstancesRequest();
-		  deleteRequest.withInstanceIds(instancesToTerminate);
-		  amazonEC2Client.terminateInstances(deleteRequest);
+		 deleteRequest.withInstanceIds(instancesToTerminate);
+		 return amazonEC2Client.terminateInstances(deleteRequest);
 	}
 }

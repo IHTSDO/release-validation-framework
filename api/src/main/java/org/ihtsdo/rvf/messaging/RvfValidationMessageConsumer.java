@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.messaging;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -49,6 +48,7 @@ public class RvfValidationMessageConsumer {
 	
 	public void start() {
 		logger.info("isRvfWorker instance:" + isWorker);
+		timeStart = Calendar.getInstance().getTimeInMillis();
 		if (isWorker) {
 			Thread thread = new Thread ( new Runnable() {
 				
@@ -58,7 +58,6 @@ public class RvfValidationMessageConsumer {
 				}
 			});
 			thread.start();
-			timeStart = Calendar.getInstance().getTimeInMillis();
 			logger.info("RvfWorker instance started at:" + Calendar.getInstance().getTime());
 		}
 		
@@ -145,18 +144,10 @@ public class RvfValidationMessageConsumer {
 		} catch(Exception e) {
 			logger.error("Failed to get instance id", e);
 		}
-		//Tested this but doesn't seem to work
-//		if (!instancesToTerminate.isEmpty()) {
-//			 instanceManager.terminate(instancesToTerminate);
-//		     logger.info("Instance id  will be terminated:" + instancesToTerminate.get(0) );
-//		}
-		String command = "sudo poweroff";
-		logger.info("Start executing command:" + command);
-		try {
-			 Runtime.getRuntime().exec(command);
-		} catch (IOException e) {
-			logger.error("Failed to issue command at runtime:" + command, e);
+		if (!instancesToTerminate.isEmpty()) {
+			 instanceManager.terminate(instancesToTerminate);
+		     logger.info("Instance id  will be terminated:" + instancesToTerminate.get(0) );
 		}
-		System.exit(0);
+		
 	}
 }
