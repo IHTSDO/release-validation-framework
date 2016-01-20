@@ -137,13 +137,17 @@ public class RvfValidationMessageConsumer {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 			String instanceId = restTemplate.getForObject(EC2_INSTANCE_ID_URL, String.class);
-			logger.info("Instance id  will be terminated:" + instanceId);
+			logger.debug("Current instance id is:" + instanceId);
 			if (instanceId != null) {
 				instancesToTerminate.add(instanceId);
 			}
 		} catch(Exception e) {
 			logger.error("Failed to get instance id", e);
 		}
-       instanceManager.terminate(instancesToTerminate);
+		if (!instancesToTerminate.isEmpty()) {
+			 instanceManager.terminate(instancesToTerminate);
+		     logger.info("Instance id  will be terminated:" + instancesToTerminate.get(0) );
+		}
+      
 	}
 }

@@ -23,9 +23,9 @@ import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 @Service
 public class InstanceManager {
 	
+	private static final String TERMINATE = "terminate";
 	private static final String RUNNING = "running";
 	private static final String PENDING = "pending";
-	private static final String ENV_NAME = "ENV_NAME";
 	private static final String RVF_WORKER = "RVF_Worker_";
 	private static final String NAME = "Name";
 	private static final long TIME_TO_DELTE = 56*60*1000;
@@ -43,10 +43,12 @@ public class InstanceManager {
 	@Autowired
 	private String keyName;
 	
+	private String instanceTagName;
+	
 	public InstanceManager(AWSCredentials credentials) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
 	}
-	
+
 	public Instance createInstance() {
 		amazonEC2Client.setEndpoint(ec2Endpoint);
 		RunInstancesRequest runInstancesRequest = 
@@ -57,22 +59,20 @@ public class InstanceManager {
 			                     .withMinCount(1)
 			                     .withMaxCount(1)
 			                     .withKeyName(keyName)
+			                     .withInstanceInitiatedShutdownBehavior(TERMINATE)
 			  					 .withSecurityGroupIds(securityGroupId);
-			  RunInstancesResult runInstancesResult = 
-					  amazonEC2Client.runInstances(runInstancesRequest);
+			  RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);
 
 			  Instance instance = runInstancesResult.getReservation().getInstances().get(0);
 			  String instanceId = instance.getInstanceId();
 			  logger.info("RVF worker new instance created with id {} and launched at {}", instanceId, instance.getLaunchTime());
 			  CreateTagsRequest createTagsRequest = new CreateTagsRequest();
 			  createTagsRequest.withResources(instanceId);
-			  String envName = System.getProperty(ENV_NAME);
-			  if ( envName != null) {
-				  createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + envName + counter++));
+			  if ( instanceTagName != null) {
+				  createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + instanceTagName + "_" + counter++));
 			  } else {
-				  createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + imageId + counter++));
+				  createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + imageId + "_" + counter++));
 			  }
-			 
 			  amazonEC2Client.createTags(createTagsRequest);
 			  return instance;
 	}
