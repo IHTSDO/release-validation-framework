@@ -66,7 +66,7 @@ public class RvfValidationMessageConsumer {
 	private void consumeMessage() {
 		Connection connection = null;
 		MessageConsumer consumer = null;
-		Destination destination = new ActiveMQQueue("queueName?consumer.prefetchSize=1");
+		Destination destination = new ActiveMQQueue(queueName + "?consumer.prefetchSize=1");
 		Session session = null;
 			while (!shutDown()) {
 				try {
