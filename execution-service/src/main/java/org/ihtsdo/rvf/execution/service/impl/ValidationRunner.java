@@ -121,7 +121,7 @@ public class ValidationRunner {
 		if (validationConfig.isProspectiveFilesInS3()) {
 			//streaming file from S3 to local
 			long s3StreamingStart = System.currentTimeMillis();
-			FileHelper s3Helper = new FileHelper(validationConfig.getS3BucketName(), s3Client);
+			FileHelper s3Helper = new FileHelper(validationConfig.getS3ExecutionBucketName(), s3Client);
 			InputStream input = s3Helper.getFileStream(validationConfig.getProspectiveFileFullPath());
 			File prospectiveFile = File.createTempFile(validationConfig.getRunId() + "_" + validationConfig.getTestFileName(), null);
 			IOUtils.copy(input, new FileOutputStream(prospectiveFile));
@@ -183,6 +183,9 @@ public class ValidationRunner {
 			List<String> rf2FilesLoaded = new ArrayList<>();
 			if (isExtension) {
 				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+			} else if (validationConfig.isRf2DeltaOnly()) {
+				ProspectiveReleaseDataLoader loader = new ProspectiveReleaseDataLoader(validationConfig, releaseDataManager);
+				rf2FilesLoaded = loader.loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion);
 			} else {
 				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 			}
