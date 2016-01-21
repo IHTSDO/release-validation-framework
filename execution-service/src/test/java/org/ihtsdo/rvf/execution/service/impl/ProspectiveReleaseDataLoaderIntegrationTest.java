@@ -18,7 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
-public class ProspectiveReleaseDataLoaderTest {
+public class ProspectiveReleaseDataLoaderIntegrationTest {
 	@Resource(name = "snomedDataSource")
 	private DataSource snomedDataSource;
 	@Autowired
