@@ -152,7 +152,7 @@ public class ValidationRunner {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;
 		} 
-		ExecutionConfig executionConfig = loadPublishedVersions(validationConfig, responseMap, reportStorage);
+		ExecutionConfig executionConfig = loadPublishedAndProspectiveVersions(validationConfig, responseMap, reportStorage);
 		if (executionConfig != null) {
 			runAssertionTests(executionConfig,responseMap, reportStorage);
 			final Calendar endTime = Calendar.getInstance();
@@ -174,7 +174,7 @@ public class ValidationRunner {
 		
 	}
 
-	private ExecutionConfig loadPublishedVersions(ValidationRunConfig validationConfig, Map<String, Object> responseMap, String reportStorage) throws Exception {
+	private ExecutionConfig loadPublishedAndProspectiveVersions(ValidationRunConfig validationConfig, Map<String, Object> responseMap, String reportStorage) throws Exception {
 		
 		String prospectiveVersion = validationConfig.getRunId().toString();
 		String prevReleaseVersion = resolvePreviousVersion(validationConfig.getPrevIntReleaseVersion());
@@ -195,7 +195,7 @@ public class ValidationRunner {
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		boolean isSucessful = false;
 		if (!isPublishedVersionsLoaded(validationConfig)) {
-			//load published versions from s3
+			//load published versions from s3 and load prospective file
 			isSucessful = prepareVersionsFromS3Files(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
 			
 		} else {
