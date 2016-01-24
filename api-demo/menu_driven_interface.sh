@@ -126,7 +126,14 @@ function doTest() {
 		else
 			fileParam="-F file=@${releaseFile}" 
 		fi
-		
+
+        read -p "Is prospective file only containing RF2 Delta(Y/N) ?: " isDeltaExport
+            deltaOnlyParamStr="false"
+        if [ ${isDeltaExport} == "y" ] ||  [ ${isDeltaExport} == "Y" ]
+        then
+            deltaOnlyParamStr="true"
+        fi
+
 		read -p "What manifest should be uploaded?: " manifestFile
 		if [ ! -e ${manifestFile} ] 
 		then
@@ -175,6 +182,7 @@ function doTest() {
 		-F "groups=${assertionGroups}" \
 		-F "runId=${datestamp}" \
 		-F "storageLocation=RVFMisc/${datestamp}" \
+        -F "rf2DeltaOnly=${deltaOnlyParamStr}" \
 		-o tmp/uploadprogress.txt
 
 		echo "Server call complete.  Server returned:  "

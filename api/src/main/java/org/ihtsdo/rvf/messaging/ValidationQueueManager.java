@@ -38,7 +38,7 @@ public class ValidationQueueManager {
 	private S3Client s3Client;
 	
 	@Autowired
-	private String bucketName;
+	private String s3ExecutionBucketName;
 	@Autowired
 	private Boolean isAutoScalingEnabled;
 	
@@ -46,13 +46,13 @@ public class ValidationQueueManager {
 	
 	@PostConstruct
 	public void init() {
-		s3Helper = new FileHelper(bucketName, s3Client);
+		s3Helper = new FileHelper(s3ExecutionBucketName, s3Client);
 	}
 
 
 	public void queueValidationRequest(ValidationRunConfig config, Map<String, String> responseMap) {
 		try {
-			config.setS3BucketName(bucketName);
+			config.setS3ExecutionBucketName(s3ExecutionBucketName);
 			if (saveUploadedFiles(config, responseMap)) {
 				Gson gson = new Gson();
 				String configJson = gson.toJson(config);

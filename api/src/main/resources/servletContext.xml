@@ -30,13 +30,19 @@
     <bean factory-bean="objectMapperFactory" factory-method="createObjectMapper"/>
 
     <bean id="objectMapperFactory" class="org.ihtsdo.rvf.service.mapping.JacksonObjectMapperFactory"/>
+    
+	<bean class="java.lang.String" id="s3ExecutionBucketName">
+		<constructor-arg value="${executionBucketName}" />
+	</bean>
+	<bean class="java.lang.String" id="s3PublishBucketName">
+		<constructor-arg value="${publishBucketName}" />
+	</bean>
 
     <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>
     <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.impl.ValidationLogFactoryImpl"/>
 
 	<import resource="validationContext.xml"/>
 	<import resource="executionServiceContext.xml"/>
-	
 	<mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 	<mvc:resources mapping="/api-doc.html" location="/" />
 	<bean class="org.ihtsdo.rvf.config.SwaggerConfig" />
