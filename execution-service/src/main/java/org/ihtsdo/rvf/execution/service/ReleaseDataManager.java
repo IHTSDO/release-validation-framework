@@ -33,4 +33,8 @@ public interface ReleaseDataManager {
 	boolean combineKnownVersions(final String combinedVersionName, final String ... knownVersions);
 	
 	void dropVersion(String version);
+
+	void copyTableData(String sourceVersion,String destinationVersion, String tableNamePattern);
+
+	void updateSnapshotTableWithDataFromDelta(String prospectiveVersion);
 }

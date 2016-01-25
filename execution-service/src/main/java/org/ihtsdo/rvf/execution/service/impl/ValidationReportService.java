@@ -33,6 +33,7 @@ public class ValidationReportService {
 	private S3Client s3Client;
 	
 	private final Logger logger = LoggerFactory.getLogger(ValidationReportService.class);
+	
 	private String bucketName;
 	
 	private String stateFilePath;

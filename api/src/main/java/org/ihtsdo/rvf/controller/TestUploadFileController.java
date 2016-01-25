@@ -157,6 +157,7 @@ public class TestUploadFileController {
 			notes = "? - TBD" )
 	public ResponseEntity runPostTestPackage(
 			@RequestParam(value = "file") final MultipartFile file,
+			@RequestParam(value = "rf2DeltaOnly", required = false) final boolean isRf2DeltaOnly,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
 			@RequestParam(value = "groups") final List<String> groupsList,
@@ -173,6 +174,7 @@ public class TestUploadFileController {
 
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
 		vrConfig.addFile(file)
+				.addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses)
 				.addGroupsList(groupsList)
 				.addManifestFile(manifestFile)

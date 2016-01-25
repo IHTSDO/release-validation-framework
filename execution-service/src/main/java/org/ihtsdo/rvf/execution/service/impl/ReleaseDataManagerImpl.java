@@ -351,19 +351,11 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 				break;
 			}
 			logger.info("Adding known version {} in schema {}", known, knownSchema);
-			for (final String tableName : getValidTableNamesFromSchema(knownSchema)) {
-				final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
-				final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
-				final String sql = "insert into " + schemaName + "." + tableName  + " select * from " + knownSchema + "." + tableName;
-				logger.debug("Copying table {}", tableName);
-				try (Connection connection = snomedDataSource.getConnection();
-						Statement statement = connection.createStatement() ) {
-					statement.execute(disableIndex);
-					statement.execute(sql);
-					statement.execute(enableIndex);
-				} catch (final SQLException e) {
-					isFailed = true;
-					logger.error("Failed to insert data to table: " + tableName +" due to " + e.fillInStackTrace());
+			for (final String tableName : getValidTableNamesFromSchema(knownSchema, null)) {
+				
+				isFailed = copyTable(tableName, knownSchema, schemaName);
+				if (isFailed) {
+					break;
 				}
 			}
 		}
@@ -372,12 +364,34 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		return !isFailed;
 	}
 	
-	private List<String> getValidTableNamesFromSchema(String schemaName) {
+	private boolean copyTable(String tableName, String sourceSchema, String targetSchema) {
+		boolean isFailed = false;
+		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
+		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
+		final String sql = "insert into " + targetSchema + "." + tableName  + " select * from " + sourceSchema + "." + tableName;
+		logger.debug("Copying table {}", tableName);
+		try (Connection connection = snomedDataSource.getConnection();
+				Statement statement = connection.createStatement() ) {
+			statement.execute(disableIndex);
+			statement.execute(sql);
+			statement.execute(enableIndex);
+		} catch (final SQLException e) {
+			isFailed = true;
+			logger.error("Failed to insert data to table: " + tableName +" due to " + e.fillInStackTrace());
+		}
+		return isFailed;
+	}
+	
+	
+	private List<String> getValidTableNamesFromSchema(String schemaName, String tableNamePattern) {
 		List<String> result = new ArrayList<>();
 		Collection<String> mappedTables = RF2FileTableMapper.getAllTableNames();
 		try (Connection connection = snomedDataSource.getConnection();
 				Statement statement = connection.createStatement() ) {
 			String sql = "select table_name from INFORMATION_SCHEMA.TABLES WHERE table_schema ='" + schemaName + "'";
+			if ( tableNamePattern != null) {
+				sql = sql + " and table_name like '" + tableNamePattern + "'";
+			}
 			ResultSet resultSet = statement.executeQuery(sql);
 			while( resultSet.next()) {
 				String tableName = resultSet.getString(1);
@@ -398,5 +412,40 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		if (version != null) {
 			releaseSchemaNameLookup.remove(version);
 		}
+	}
+
+	@Override
+	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern) {
+		final long startTime = System.currentTimeMillis();
+		String sourceSchema = releaseSchemaNameLookup.get(sourceVersion);
+		String destinationSchema = releaseSchemaNameLookup.get(destinationVersion);
+		for (final String tableName : getValidTableNamesFromSchema(sourceSchema, tableNamePattern)) {
+			if (copyTable(tableName, sourceSchema, destinationSchema)) {
+				break;
+			}
+		}
+		final long endTime = System.currentTimeMillis();
+		logger.info("Copy data with table name like {} from {} into {} completed in seconds {} ", tableNamePattern, sourceSchema, destinationSchema, (endTime-startTime)/1000);
+	}
+
+	@Override
+	public void updateSnapshotTableWithDataFromDelta(String prospectiveVersion) {
+		String schema = releaseSchemaNameLookup.get(prospectiveVersion);
+		List<String> deltaTableNames = getValidTableNamesFromSchema(schema, "%_d");
+		for (String deltaTbl : deltaTableNames) {
+			String snapshotTbl = deltaTbl.replace("_d", "_s");
+			final String deleteSql = "delete a.* from " + schema + "." + snapshotTbl + " a where exists ( select b.id from " + schema + "." + deltaTbl + " b where a.id=b.id)";
+			logger.debug("Delete data from snapshot table sql:" + deleteSql);
+			final String insertSql = "insert into " + schema + "." + snapshotTbl  + " select * from " + schema + "." + deltaTbl;
+			logger.debug("Insert delta into snapshot table sql:" + insertSql);
+			try (Connection connection = snomedDataSource.getConnection();
+					Statement statement = connection.createStatement() ) {
+				statement.execute(deleteSql);
+				statement.execute(insertSql);
+			} catch (final SQLException e) {
+				logger.error("Failed to update table {} with data from {}  due to {} ", snapshotTbl, deltaTbl, e.fillInStackTrace());
+			}
+		}
+		
 	}
 }
