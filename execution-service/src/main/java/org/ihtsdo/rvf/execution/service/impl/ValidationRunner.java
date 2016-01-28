@@ -154,61 +154,6 @@ public class ValidationRunner {
 		} 
 		ExecutionConfig executionConfig = loadPublishedAndProspectiveVersions(validationConfig, responseMap, reportStorage);
 		if (executionConfig != null) {
-		} else {
-			isFailed = checkKnownVersion(validationConfig,responseMap);
-			if (isFailed) {
-				reportService.writeResults(responseMap, State.FAILED, reportStorage);
-				return;
-			}
-			
-			String prospectiveVersion = validationConfig.getRunId().toString();
-			String prevReleaseVersion = validationConfig.getPrevIntReleaseVersion();
-			final boolean isExtension = isExtension(validationConfig); 
-			String combinedVersionName = null;
-			if (isExtension && !validationConfig.isFirstTimeRelease()) {
-				//SnomedCT_Release-es_INT_20140430.zip
-				//SnomedCT_SpanishRelease_INT_20141031.zip
-				if (validationConfig.getPrevIntReleaseVersion() != null) {
-					combinedVersionName = validationConfig.getPreviousExtVersion() + "_" + validationConfig.getPreviousExtVersion() + "_" + validationConfig.getRunId();
-					prevReleaseVersion = combinedVersionName;
-					final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
-					logger.info(startCombiningMsg);
-					reportService.writeProgress(startCombiningMsg, reportStorage);
-					final boolean isSuccess = releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
-					if (!isSuccess) {
-						responseMap.put(FAILURE_MESSAGE, "Failed to combine known versions:" 
-								+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName);
-						reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
-						String schemaName = releaseDataManager.getSchemaForRelease(combinedVersionName);
-						if (schemaName != null) {
-							scheduleEventGenerator.createDropReleaseSchemaEvent(schemaName);
-							releaseDataManager.dropVersion(combinedVersionName);
-						}
-						return;
-					}
-				}
-			} 
-			reportService.writeProgress("Loading prospective file into DB.", reportStorage);
-			List<String> rf2FilesLoaded = new ArrayList<>();
-			if (isExtension) {
-				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
-			} else if (validationConfig.isRf2DeltaOnly()) {
-				ProspectiveReleaseDataLoader loader = new ProspectiveReleaseDataLoader(validationConfig, releaseDataManager);
-				rf2FilesLoaded = loader.loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion);
-			} else {
-				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
-			}
-			responseMap.put("totalRF2FilesLoaded", rf2FilesLoaded.size());
-			Collections.sort(rf2FilesLoaded);
-			responseMap.put("rf2Files", rf2FilesLoaded);
-			
-			final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
-			if (prospectiveSchema != null) {
-				reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveSchema, reportStorage);
-				resourceLoader.loadResourceData(prospectiveSchema);
-				logger.info("completed loading resource data for schema:" + prospectiveSchema);
-			}
-			
 			runAssertionTests(executionConfig,responseMap, reportStorage);
 			final Calendar endTime = Calendar.getInstance();
 			final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;

@@ -36,22 +36,28 @@
 		
 	<bean id="jmsListenerContainerFactory" class="org.springframework.jms.config.DefaultJmsListenerContainerFactory">
     	<property name="connectionFactory" ref="connectionFactory"/>
-   	 <property name="concurrency" value="${rvf.validation.queue.concurrency}" />
-	</bean> 
+   	 	<property name="concurrency" value="${rvf.validation.queue.concurrency}"/>
+   	 </bean>
  
   <!-- JmsTemplate Definition used by the Validation queue manager-->
   	<bean id="defaultDestination" class="org.apache.activemq.command.ActiveMQQueue">
     	<constructor-arg index="0" value="${rvf.validation.queue.name}" />
   	</bean> 
-  
+	
   <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
     <constructor-arg ref="connectionFactory"/>
     <property name="defaultDestination" ref="defaultDestination" />
   </bean> 
 	<bean class="org.ihtsdo.rvf.messaging.ValidationQueueManager"/>
-	<!--  <bean class="org.ihtsdo.rvf.messaging.ReleaseValidationMessageListener"/> -->
+	<!--  
+	<bean class="org.ihtsdo.rvf.messaging.ReleaseValidationMessageListener" init-method="start">
+	  <constructor-arg type="java.lang.Boolean" value="${rvf.execution.isWorker}"/>
+	   <constructor-arg type="java.lang.Boolean" value="${rvf.autoscaling.isEc2Instance}"/>
+	 </bean>-->
+	 
 	<bean class="org.ihtsdo.rvf.messaging.RvfValidationMessageConsumer" init-method="start">
 		<constructor-arg value="${rvf.validation.queue.name}"/>
 		<constructor-arg type="java.lang.Boolean" value="${rvf.execution.isWorker}"/>
+		<constructor-arg type="java.lang.Boolean" value="${rvf.autoscaling.isEc2Instance}"/>
 	</bean>
 </beans>

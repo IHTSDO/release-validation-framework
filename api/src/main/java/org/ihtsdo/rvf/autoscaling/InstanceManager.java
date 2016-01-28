@@ -1,8 +1,18 @@
 package org.ihtsdo.rvf.autoscaling;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+import org.ihtsdo.rvf.controller.VersionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +37,8 @@ import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 @Service
 public class InstanceManager {
 	
+	private static final String PROPERTIES = ".properties";
+	private static final String RVF_CONFIG_LOCATION = "rvfConfigLocation";
 	private static final String TERMINATE = "terminate";
 	private static final String RUNNING = "running";
 	private static final String PENDING = "pending";
@@ -44,11 +56,14 @@ public class InstanceManager {
 	private String securityGroupId;
 	@Autowired
 	private String keyName;
+	@Autowired
 	private String instanceTagName;
+	private String ec2InstanceStartupScript;
 	
 	public InstanceManager(AWSCredentials credentials, String ec2Endpoint ) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
 		amazonEC2Client.setEndpoint(ec2Endpoint);
+		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
 	
 	public Instance createInstance() {
@@ -61,7 +76,8 @@ public class InstanceManager {
 			                     .withMaxCount(1)
 			                     .withKeyName(keyName)
 			                     .withInstanceInitiatedShutdownBehavior(TERMINATE)
-			  					 .withSecurityGroupIds(securityGroupId);
+			  					 .withSecurityGroupIds(securityGroupId)
+			  					 .withUserData(ec2InstanceStartupScript);
 			  RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);
 
 			  Instance instance = runInstancesResult.getReservation().getInstances().get(0);
@@ -167,5 +183,82 @@ public class InstanceManager {
 		TerminateInstancesRequest deleteRequest = new TerminateInstancesRequest();
 		 deleteRequest.withInstanceIds(instancesToTerminate);
 		 return amazonEC2Client.terminateInstances(deleteRequest);
+	}
+	
+	private Map<String, String> getProperties(String rvfConfig) {
+		File configDir = new File(rvfConfig);
+		String [] propertyFiles = null;
+		if (configDir.isDirectory()) {
+			propertyFiles = configDir.list( new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					if (name.endsWith(PROPERTIES)) {
+						return true;
+					}
+					return false;
+				}
+			});
+		}
+		Map<String, String> propertiesByFileName = new HashMap<>();
+		if (propertyFiles != null) {
+			for (String fileName : propertyFiles) {
+				List<String> lines = new ArrayList<>();
+				try {
+					lines.addAll(IOUtils.readLines(new FileReader(new File(configDir, fileName))));
+				} catch (IOException e) {
+					logger.error("Error when reading proerty file:" + fileName , e);
+				}
+				StringBuilder result = new StringBuilder();
+				for (String line : lines) {
+					//set ec2 instance worker properties
+					if (line.startsWith("rvf.execution.isWorker")) {
+						result.append("rvf.execution.isWorker=true");
+					}
+					else if (line.startsWith("rvf.execution.isAutoScalingEnabled")) {
+						result.append("rvf.execution.isAutoScalingEnabled=false");
+					} else if (line.startsWith("rvf.autoscaling.isEc2Instance")) {
+						result.append("rvf.autoscaling.isEc2Instance=true");
+					} else {
+						result.append(line);
+					}
+					result.append("\n");
+				}
+				propertiesByFileName.put(fileName, result.toString());
+			}
+		}
+		return propertiesByFileName;
+	}
+	
+	private String constructStartUpScript() {
+		String appVersion = getAppVersion();
+		StringBuilder builder = new StringBuilder();
+		builder.append("#!/bin/sh\n");
+		builder.append("sudo apt-get update -o Dir::Etc::sourcelist=\"sources.list.d/maven_ihtsdotools_org_content_repositories_*\"" + "\n");
+		if (appVersion != null && !appVersion.isEmpty()) {
+			builder.append("sudo apt-get install rvf-api=" + appVersion + "\n" );
+		} else {
+			builder.append("sudo apt-get install rvf-api \n" );
+		}
+		builder.append("sudo dpkg -s rvf-api\n");
+		String rvfConfig = System.getProperty(RVF_CONFIG_LOCATION);
+		Map<String,String> propertyStrByFilename = getProperties(rvfConfig);
+		for (String filename : propertyStrByFilename.keySet()) {
+			builder.append("sudo echo \"" + propertyStrByFilename.get(filename) + "\" > " + rvfConfig + "/" + filename + "\n");
+		}
+		builder.append("exit 0");
+		return builder.toString();
+	}
+	
+	private String getAppVersion() {
+		String version = null;
+		File file = new File(VersionController.VERSION_FILE_PATH);
+		if (file.isFile()) {
+			try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+				version = bufferedReader.readLine();
+			} catch (IOException e) {
+				logger.error("Error to read the version number from file.", e);
+			}
+		} 
+		return version;
 	}
 }

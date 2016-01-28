@@ -10,6 +10,7 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
@@ -29,7 +30,7 @@ import com.google.gson.JsonSyntaxException;
 public class RvfValidationMessageConsumer {
 	private static final String EC2_INSTANCE_ID_URL = "http://169.254.169.254/latest/meta-data/instance-id";
 	private static final long TIME_TO_LIVE = 55*60*1000;
-	private static final long DEFAULT_PROCESSING_TIME = 20*60*1000;
+	private static final long DEFAULT_PROCESSING_TIME = 15*60*1000;
 	private String queueName;
 	@Autowired
 	private ValidationRunner runner;
@@ -39,11 +40,13 @@ public class RvfValidationMessageConsumer {
 	private boolean isWorker;
 	@Autowired
 	private InstanceManager instanceManager;
+	private boolean isEc2Instance;
 	private static long timeStart;
 	
-	public RvfValidationMessageConsumer( String queueName,Boolean isRvfWorker) {
+	public RvfValidationMessageConsumer( String queueName,Boolean isRvfWorker, Boolean ec2Instance) {
 		isWorker = isRvfWorker.booleanValue();
 		this.queueName = queueName;
+		this.isEc2Instance = ec2Instance.booleanValue();
 	}
 	
 	public void start() {
@@ -66,70 +69,76 @@ public class RvfValidationMessageConsumer {
 	private void consumeMessage() {
 		Connection connection = null;
 		MessageConsumer consumer = null;
-		Destination destination = new ActiveMQQueue(queueName + "?consumer.prefetchSize=0");
+		Destination destination = new ActiveMQQueue(queueName);
 		Session session = null;
-			while (!shutDown()) {
+		try {
+			connection =  connectionFactory.createConnection();
+			connection.start();
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			consumer = session.createConsumer(destination);
+			consumer.setMessageListener(new MessageListener() {
+
+				@Override
+				public void onMessage(Message message) {
+					if (message instanceof TextMessage) {
+						runValidation((TextMessage)message);
+					}
+
+				}
+			});
+			
+			while (!shutDown(consumer)) {
 				try {
-					connection =  connectionFactory.createConnection();
-					connection.start();
-					session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-					consumer = session.createConsumer(destination);
-					Message msg = consumer.receive(30000);
-					if ( msg == null) {
-						logger.debug("No message received for destination:" + queueName);
-						continue;
-					}
-					if ( msg instanceof TextMessage) {
-						logger.info("Message received.");
-						TextMessage message = (TextMessage) msg;
-						Gson gson = new Gson();
-						ValidationRunConfig config = null;
-						try {
-							config = gson.fromJson(message.getText(), ValidationRunConfig.class);
-							logger.info("validation config from queue:" + config);
-						} catch (JsonSyntaxException | JMSException e) {
-							logger.error("JMS message listener error:", e);
-						}
-						if ( config != null) {
-							logger.info("Running validaiton:" + config.toString());
-							runner.run(config);								
-						}
-					}
-				} catch (JMSException e) {
-					logger.error("Error when consuming RVF validaiton message.", e);
-				} finally {
-					if (connection != null) {
-						try {
-							connection.close();
-						} catch (JMSException e) {
-							logger.error("Error when closing message queue connection.", e);
-						}
-					}
-					if (consumer != null) {
-						try {
-							consumer.close();
-						} catch (JMSException e) {
-							logger.error("Error when closing message consumer.", e);
-						}
-					}
-					if (session != null) {
-						try {
-							session.close();
-						} catch (JMSException e) {
-							logger.error("Error when closing session.", e);
-						}
-					}
+					Thread.sleep(30000);
+				} catch (InterruptedException e) {
+					logger.error("Consumer thread is interupted", e);
 				}
 			}
+			
+		} catch (JMSException e) {
+			logger.error("Error when consuming RVF validaiton message.", e);
+		} finally {
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (JMSException e) {
+					logger.error("Error when closing message queue connection.", e);
+				}
+			}
+			if (consumer != null) {
+				try {
+					consumer.close();
+				} catch (JMSException e) {
+					logger.error("Error when closing message consumer.", e);
+				}
+			}
+			if (session != null) {
+				try {
+					session.close();
+				} catch (JMSException e) {
+					logger.error("Error when closing session.", e);
+				}
+			}
+		}
 	}
 	
-	public boolean shutDown() {
-		if ((Calendar.getInstance().getTimeInMillis() - timeStart + DEFAULT_PROCESSING_TIME  ) >= TIME_TO_LIVE) {
-			logger.info("Shut down message consumer as no time left to process another one");
-			autoTerminate();
-			return true;
+	public boolean shutDown(MessageConsumer consumer) {
+		if (!isEc2Instance) {
+			return false;
+		} else {
+			if ((Calendar.getInstance().getTimeInMillis() - timeStart + DEFAULT_PROCESSING_TIME  ) >= TIME_TO_LIVE) {
+				logger.info("Shut down message consumer as no time left to process another one");
+				try {
+					consumer.close();
+				} catch (JMSException e) {
+					logger.error("Failed to close message consumer!", e);
+				}
+				autoTerminate();
+				return true;
+			}
+			return false;
 		}
-		return false;
+		
 	}
 	
 	private void autoTerminate() {
@@ -150,4 +159,24 @@ public class RvfValidationMessageConsumer {
 		}
 		
 	}
+	
+	private void runValidation(final TextMessage incomingMessage) {
+		Gson gson = new Gson();
+		ValidationRunConfig config = null;
+		try {
+			config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
+			logger.info("validation config:" + config);
+		} catch (JsonSyntaxException | JMSException e) {
+			logger.error("JMS message listener error:", e);
+		}
+		if ( config != null) {
+			long start = System.currentTimeMillis();
+			runner.run(config);
+			long end = System.currentTimeMillis();
+			logger.info("last validation taken in seconds:" + (end-start) /1000);
+		} else {
+			logger.error("Null validation config found for message:" + incomingMessage);
+		}
+	}
+
 }

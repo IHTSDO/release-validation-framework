@@ -57,10 +57,9 @@
 	<bean class="java.lang.String" id="keyName">
 		<constructor-arg value="${rvf.autoscaling.keyPairName}"/>
 	</bean>
-	<!--  
 	<bean class="java.lang.String" id="instanceTagName">
 		<constructor-arg value="${rvf.autoscaling.tagName}"/>
-	</bean> -->
+	</bean>
     
     <bean id="instanceManager" class ="org.ihtsdo.rvf.autoscaling.InstanceManager">
     	<constructor-arg>
