@@ -56,6 +56,7 @@ public class AutoScalingManager {
 						if (!isFirstTime) {
 							int current = getQueueSize();
 							if (current > lastPolledQueueSize ){
+								logger.info("Total messages in queue:" + current);
 								//will add logic later in terms how many instances need to create for certain size
 								// the current approach is to create one instance per message.
 								logger.info("Messages have been increased by:" + (current - lastPolledQueueSize) + " since last poll.");
@@ -91,7 +92,6 @@ public class AutoScalingManager {
 	
 	
 	private int getQueueSize() {
-		logger.debug("Retrieving message size in queue:" + queueName);
 		int counter = 0;
 		Connection connection = null;
 		try {
@@ -116,7 +116,6 @@ public class AutoScalingManager {
 				}
 			}
 		}
-		logger.info("Total messages in queue:" + counter);
 		return counter;
 	}
 	
