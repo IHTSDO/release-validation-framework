@@ -156,17 +156,15 @@ public class InstanceManager {
 	}
 	
 	public List<Instance> getActiveInstances() {
-		
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
-		String tagFilter = WORKER_TYPE + "="+ instanceTagName;
-		request.withFilters(new Filter(TAG, Arrays.asList(tagFilter)));
+		request.withFilters(new Filter(TAG + WORKER_TYPE, Arrays.asList(instanceTagName)));
 		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
 		List<Reservation> reservations = result.getReservations();
 		List<Instance> instances = new ArrayList<>();
 		for (Reservation reserv : reservations) {
 			instances.addAll(reserv.getInstances());
 		}
-		logger.info("Total instances found with tag filter:" + tagFilter);
+		logger.info("Total instances {} found with tag filter {}", instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
 		List<Instance> activeInstances = new ArrayList<>();
 		for (Instance instance : instances) {
 			InstanceState state = instance.getState();

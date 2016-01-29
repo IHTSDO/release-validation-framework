@@ -24,10 +24,10 @@ public class InstanceManagerIntegrationTest {
 	
 	@Test
 	public void testCreateEc2Instance() {
-		Instance instance = instanceManager.createInstance();
-		Assert.assertNotNull(instance);
-		Assert.assertNotNull(instance.getInstanceId());
-		System.out.println("Instance is created with id:" + instance.getInstanceId());
+//		Instance instance = instanceManager.createInstance();
+//		Assert.assertNotNull(instance);
+//		Assert.assertNotNull(instance.getInstanceId());
+//		System.out.println("Instance is created with id:" + instance.getInstanceId());
 		List<Instance> result = instanceManager.getActiveInstances();
 		Assert.assertNotNull(result);
 	}

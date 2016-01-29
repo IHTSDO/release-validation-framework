@@ -69,7 +69,7 @@ public class AutoScalingManager {
 							}
 							lastPolledQueueSize = current;
 							try {
-								Thread.sleep(1*60*1000);
+								Thread.sleep(30*1000);
 							} catch (InterruptedException e) {
 								logger.error("AutoScalingManager delay is interrupted.", e);
 							}
@@ -78,7 +78,6 @@ public class AutoScalingManager {
 							// check any running instances
 							instancesCreated.addAll(instanceManager.getActiveInstances());
 						}
-						
 					}
 				}
 			});
