@@ -11,8 +11,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.amazonaws.services.ec2.model.Instance;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testDispatcherServletContext.xml"})
@@ -28,7 +26,7 @@ public class InstanceManagerIntegrationTest {
 //		Assert.assertNotNull(instance);
 //		Assert.assertNotNull(instance.getInstanceId());
 //		System.out.println("Instance is created with id:" + instance.getInstanceId());
-		List<Instance> result = instanceManager.getActiveInstances();
+		List<String> result = instanceManager.getActiveInstances();
 		Assert.assertNotNull(result);
 //		instanceManager.terminate( Arrays.asList("i-e3021268"));
 	}
