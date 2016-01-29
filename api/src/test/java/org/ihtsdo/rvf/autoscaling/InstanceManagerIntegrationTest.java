@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.autoscaling;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,5 +28,7 @@ public class InstanceManagerIntegrationTest {
 		Assert.assertNotNull(instance);
 		Assert.assertNotNull(instance.getInstanceId());
 		System.out.println("Instance is created with id:" + instance.getInstanceId());
+		List<Instance> result = instanceManager.getActiveInstances();
+		Assert.assertNotNull(result);
 	}
 }

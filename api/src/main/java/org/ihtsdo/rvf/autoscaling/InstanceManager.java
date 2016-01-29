@@ -40,7 +40,7 @@ import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 @Service
 public class InstanceManager {
 	
-	private static final String TAG = "tag";
+	private static final String TAG = "tag:";
 	private static final String WORKER_TYPE = "workerType";
 	private static final String PROPERTIES = ".properties";
 	private static final String RVF_CONFIG_LOCATION = "rvfConfigLocation";
@@ -156,6 +156,7 @@ public class InstanceManager {
 	}
 	
 	public List<Instance> getActiveInstances() {
+		
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		String tagFilter = WORKER_TYPE + "="+ instanceTagName;
 		request.withFilters(new Filter(TAG, Arrays.asList(tagFilter)));
@@ -165,7 +166,7 @@ public class InstanceManager {
 		for (Reservation reserv : reservations) {
 			instances.addAll(reserv.getInstances());
 		}
-		logger.info("Total instances found with tag fileter:" + tagFilter);
+		logger.info("Total instances found with tag filter:" + tagFilter);
 		List<Instance> activeInstances = new ArrayList<>();
 		for (Instance instance : instances) {
 			InstanceState state = instance.getState();
