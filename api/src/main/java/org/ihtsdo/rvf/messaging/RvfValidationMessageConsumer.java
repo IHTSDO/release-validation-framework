@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 @Service
@@ -87,7 +89,7 @@ public class RvfValidationMessageConsumer {
 				}
 			});
 			
-			while (!shutDown(consumer)) {
+			while (!shutDown()) {
 				try {
 					Thread.sleep(30000);
 				} catch (InterruptedException e) {
@@ -122,7 +124,7 @@ public class RvfValidationMessageConsumer {
 		}
 	}
 	
-	public boolean shutDown(MessageConsumer consumer) {
+	public boolean shutDown() {
 		if (!isEc2Instance) {
 			return false;
 		} else {
@@ -131,17 +133,18 @@ public class RvfValidationMessageConsumer {
 			}
 			if (!isValidationRunning) {
 				//only shutdown when no message to process and close to the hourly mark
-				if (((Calendar.getInstance().getTimeInMillis() - instance.getLaunchTime().getTime()) % HOUR_IN_MILLIS) >= FITY_NINE_MINUTES ) {
-					logger.info("Shut down message consumer as no messages left to process in queue and it is approaching to hourly mark.");
-					try {
-						consumer.close();
-					} catch (JMSException e) {
-						logger.error("Failed to close message consumer!", e);
+				long timeTaken = Calendar.getInstance().getTimeInMillis() - instance.getLaunchTime().getTime();
+				if ((timeTaken % HOUR_IN_MILLIS) >= FITY_NINE_MINUTES ) {
+					logger.info("Shut down instance message consumer as no messages left to process in queue and it is approaching to hourly mark.");
+					logger.info("Instance total running time in minutes:" + (timeTaken / 60*1000));
+					logger.info("Instance will be terminated with id:" + instance.getInstanceId());
+					TerminateInstancesResult result = instanceManager.terminate(Arrays.asList(instance.getInstanceId()));
+					InstanceState state = result.getTerminatingInstances().get(0).getCurrentState();
+					if ("running".equals(state.getName())) {
+						return false;
+					} else {
+						return true;
 					}
-					logger.info("Instance total running time in minutes:" + ((System.currentTimeMillis() - instance.getLaunchTime().getTime()) / 60*1000));
-					logger.info("Instance will be terminated");
-					instanceManager.terminate(Arrays.asList(instance.getInstanceId()));
-					return true;
 				}
 			}
 			return false;

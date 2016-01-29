@@ -30,5 +30,6 @@ public class InstanceManagerIntegrationTest {
 //		System.out.println("Instance is created with id:" + instance.getInstanceId());
 		List<Instance> result = instanceManager.getActiveInstances();
 		Assert.assertNotNull(result);
+//		instanceManager.terminate( Arrays.asList("i-e3021268"));
 	}
 }

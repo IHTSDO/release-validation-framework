@@ -133,29 +133,26 @@ public class InstanceManager {
 		this.securityGroupId = securityGroupId;
 	}
 	
-	public int getActiveInstances(List<Instance> instancesToCheck) {
+	public void checkActiveInstances(List<String> instanceIds) {
 		//check instances that are in pending or running status
-		int totalRunning = 0;
+		List<String> nonActiveIds = new ArrayList<>();
 		DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
-		List<String> instanceIds = new ArrayList<>();
-		for (Instance instance : instancesToCheck) {
-			instanceIds.add(instance.getInstanceId());
-		}
 		describeInstanceStatusRequest.withInstanceIds(instanceIds);
 		DescribeInstanceStatusResult result = amazonEC2Client.describeInstanceStatus(describeInstanceStatusRequest);
 		List<InstanceStatus> statusList = result.getInstanceStatuses();
 		for (InstanceStatus status : statusList) {
 			InstanceState state = status.getInstanceState();
 			if (state != null) {
-				if (PENDING.equalsIgnoreCase(state.getName()) || RUNNING.equalsIgnoreCase(state.getName())) {
-					totalRunning++;
+				if (!PENDING.equalsIgnoreCase(state.getName()) && !RUNNING.equalsIgnoreCase(state.getName())) {
+					logger.info("Instance {} is not active with status {}", status.getInstanceId(), state.getName());
+					nonActiveIds.add(status.getInstanceId());
 				}
 			}
 		}
-		return totalRunning;
+		instanceIds.removeAll(nonActiveIds);
 	}
 	
-	public List<Instance> getActiveInstances() {
+	public List<String> getActiveInstances() {
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		request.withFilters(new Filter(TAG + WORKER_TYPE, Arrays.asList(instanceTagName)));
 		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
@@ -164,12 +161,12 @@ public class InstanceManager {
 		for (Reservation reserv : reservations) {
 			instances.addAll(reserv.getInstances());
 		}
-		logger.info("Total instances {} found with tag filter {}", instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
-		List<Instance> activeInstances = new ArrayList<>();
+		logger.info("Total instances {} found with filter {}", instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
+		List<String> activeInstances = new ArrayList<>();
 		for (Instance instance : instances) {
 			InstanceState state = instance.getState();
 			if (PENDING.equalsIgnoreCase(state.getName()) || RUNNING.equalsIgnoreCase(state.getName())) {
-				activeInstances.add(instance);
+				activeInstances.add(instance.getInstanceId());
 			}
 		}
 		logger.info("Total active instances:" + activeInstances.size());
