@@ -7,10 +7,6 @@ import java.util.List;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
-import javax.jms.MapMessage;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
@@ -71,25 +67,24 @@ public class AutoScalingManager {
 									logger.info("No new instance will be created as total running instances:" + instancesCreated.size() + " has reached max:" + maxRunningInstance);
 								}
 							}
-							
-							//terminate instance which comes to an hour mark
-							instanceManager.checkAndTerminateInstances(instancesCreated);
 							lastPolledQueueSize = current;
 							try {
 								Thread.sleep(1*60*1000);
 							} catch (InterruptedException e) {
 								logger.error("AutoScalingManager delay is interrupted.", e);
 							}
+						} else {
+							isFirstTime = false;
+							// check any running instances
+							instancesCreated.addAll(instanceManager.getActiveInstances());
 						}
-						isFirstTime = false;
+						
 					}
 				}
 			});
 			thread.start();
 		}
 	}
-	
-	
 	
 	private int getQueueSize() {
 		int counter = 0;
@@ -119,50 +114,6 @@ public class AutoScalingManager {
 		return counter;
 	}
 	
-	
-	
-	/**
-	 * queueName = "ActiveMQ.Statistics.Destination."+ destinationQueueName; 
-	 * monitoring the queue size and create new instance when there is message
-	 */
-	private long getQueueSizeViaStatisticsBroker() {
-		logger.debug("Retrieving queue size....");
-		long result = 0;
-		
-		Connection connection = null;
-		try {
-			connection = connectionFactory.createConnection();
-			connection.start();
-	        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-	        Queue replyTo = session.createTemporaryQueue();
-	        MessageConsumer consumer = session.createConsumer(replyTo);
-	        Queue testQueue = session.createQueue(queueName);
-	        MessageProducer producer = session.createProducer(testQueue);
-	        Message msg = session.createMessage();
-	        msg.setJMSReplyTo(replyTo);
-	        producer.send(msg);
-	        MapMessage reply = (MapMessage) consumer.receive(10000);
-	        if (reply != null) {
-	        	result = reply.getLong(SIZE);
-	 	        logger.info("Queue size:" + result);
-	 	        consumer.close();
-	        } else {
-	        	logger.info("No reply from queue:" + queueName + " after 10 seconds");
-	        }
-		} catch (JMSException e) {
-			logger.error("Error in sending statistics message", e);
-		} finally {
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (JMSException e) {
-					logger.error("Error in closing queue connection", e);
-				}
-			}
-		}
-		 return result;
-	}
-		
 	public void shutDown() {
 		this.shutDown = true;
 	}

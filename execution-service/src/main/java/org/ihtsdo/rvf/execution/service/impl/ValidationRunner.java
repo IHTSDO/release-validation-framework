@@ -96,17 +96,17 @@ public class ValidationRunner {
 		try {
 			responseMap.put("validationConfig", validationConfig);
 			runValidation(responseMap, validationConfig);
-		} catch (final Throwable e) {
+		} catch (final Throwable t) {
 			final StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			final String failureMsg = "System Failure: " + e.getMessage() + " : " + errors.toString();
+			t.printStackTrace(new PrintWriter(errors));
+			final String failureMsg = "System Failure: " + t.getMessage() + " : " + errors.toString();
 			responseMap.put(FAILURE_MESSAGE, failureMsg);
-			logger.error("Exception thrown, writing as result",e);
+			logger.error("Exception thrown, writing as result",t);
 			try {
 				reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
-			} catch (final Exception e2) {
+			} catch (final Exception e) {
 				//Can't even record the error to disk!  Lets hope Telemetry is working
-				logger.error("Failed to record failure (which was: " + failureMsg + ") due to " + e2.getMessage());
+				logger.error("Failed to record failure (which was: " + failureMsg + ") due to " + e.getMessage());
 			}
 		} finally {
 			FileUtils.deleteQuietly(validationConfig.getLocalProspectiveFile());

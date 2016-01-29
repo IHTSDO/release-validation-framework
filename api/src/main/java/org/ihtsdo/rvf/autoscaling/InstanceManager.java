@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +26,12 @@ import com.amazonaws.services.ec2.model.DescribeInstanceStatusRequest;
 import com.amazonaws.services.ec2.model.DescribeInstanceStatusResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Filter;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.InstanceStateChange;
 import com.amazonaws.services.ec2.model.InstanceStatus;
+import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.Tag;
@@ -37,6 +40,8 @@ import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 @Service
 public class InstanceManager {
 	
+	private static final String TAG = "tag";
+	private static final String WORKER_TYPE = "workerType";
 	private static final String PROPERTIES = ".properties";
 	private static final String RVF_CONFIG_LOCATION = "rvfConfigLocation";
 	private static final String TERMINATE = "terminate";
@@ -86,7 +91,8 @@ public class InstanceManager {
 			  CreateTagsRequest createTagsRequest = new CreateTagsRequest();
 			  createTagsRequest.withResources(instanceId);
 			  if ( instanceTagName != null) {
-				  createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + instanceTagName + "_" + counter++));
+				  Tag typeTag =  new Tag(WORKER_TYPE, instanceTagName);
+				  createTagsRequest.withTags(typeTag, new Tag( NAME, RVF_WORKER + instanceTagName + "_" + counter++));
 			  } else {
 				  createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + imageId + "_" + counter++));
 			  }
@@ -147,8 +153,31 @@ public class InstanceManager {
 			}
 		}
 		return totalRunning;
-		
 	}
+	
+	public List<Instance> getActiveInstances() {
+		DescribeInstancesRequest request = new DescribeInstancesRequest();
+		String tagFilter = WORKER_TYPE + "="+ instanceTagName;
+		request.withFilters(new Filter(TAG, Arrays.asList(tagFilter)));
+		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+		List<Reservation> reservations = result.getReservations();
+		List<Instance> instances = new ArrayList<>();
+		for (Reservation reserv : reservations) {
+			instances.addAll(reserv.getInstances());
+		}
+		logger.info("Total instances found with tag fileter:" + tagFilter);
+		List<Instance> activeInstances = new ArrayList<>();
+		for (Instance instance : instances) {
+			InstanceState state = instance.getState();
+			if (PENDING.equalsIgnoreCase(state.getName()) || RUNNING.equalsIgnoreCase(state.getName())) {
+				activeInstances.add(instance);
+			}
+		}
+		logger.info("Total active instances:" + activeInstances.size());
+		return activeInstances;
+	}
+	
+	
 	public void checkAndTerminateInstances(List<Instance> instancesToCheck) {
 		  List<Instance> instancesToTerminate = new ArrayList<>();
 		  for (Instance instance : instancesToCheck) {
@@ -173,6 +202,10 @@ public class InstanceManager {
 	}
 	
 	public Instance getInstanceById(String instanceId) {
+		if (instanceId == null) {
+			logger.warn("instanceId is null");
+			return null;
+		} 
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		request.withInstanceIds(instanceId);
 		DescribeInstancesResult result = amazonEC2Client.describeInstances();
