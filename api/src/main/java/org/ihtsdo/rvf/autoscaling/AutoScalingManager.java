@@ -48,21 +48,21 @@ public class AutoScalingManager {
 					while (!shutDown) {
 						if (!isFirstTime) {
 							int current = getQueueSize();
-							if (current > lastPolledQueueSize ){
+							if (current != lastPolledQueueSize) {
 								logger.info("Total messages in queue:" + current);
+							}
+							if (current > lastPolledQueueSize ){
 								//will add logic later in terms how many instances need to create for certain size
 								// the current approach is to create one instance per message.
 								logger.info("Messages have been increased by:" + (current - lastPolledQueueSize) + " since last poll.");
 								instanceManager.checkActiveInstances(instancesCreated);
 								int activeInstances = instancesCreated.size();
-								logger.info("Current active instances total:" + activeInstances);
-								if (activeInstances < maxRunningInstance) {
-									logger.info("Start creating new worker instance...");
+								int totalToCreate = getTotalInstancesToCreate(current, activeInstances, maxRunningInstance);
+								if (totalToCreate != 0) {
+									logger.info("Start creating " + totalToCreate + " new worker instance");
 									long start = System.currentTimeMillis();
-									instancesCreated.add(instanceManager.createInstance().getInstanceId());
+									instancesCreated.addAll(instanceManager.createInstance(totalToCreate));
 									logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start)/1000);
-								} else {
-									logger.info("No new instance will be created as total running instances:" + activeInstances + " has reached max:" + maxRunningInstance);
 								}
 							}
 							lastPolledQueueSize = current;
@@ -81,6 +81,26 @@ public class AutoScalingManager {
 			});
 			thread.start();
 		}
+	}
+	
+	
+	private int getTotalInstancesToCreate(int currentMsgSize, int activeInstances, int maxRunningInstance) {
+		int result = 0;
+		logger.info("Current active instances total:" + activeInstances);
+		if (activeInstances < maxRunningInstance) {
+			if (currentMsgSize <= activeInstances) {
+				logger.info("No new instance will be created as message size is:" + currentMsgSize);
+			} else {
+				if (currentMsgSize <= maxRunningInstance) {
+					result = currentMsgSize - activeInstances;
+				} else {
+					result = maxRunningInstance - activeInstances;
+				}
+			}
+		} else {
+			logger.info("No new instance will be created as total running instances:" + activeInstances + " has reached max:" + maxRunningInstance);
+		}
+		return result;
 	}
 	
 	private int getQueueSize() {

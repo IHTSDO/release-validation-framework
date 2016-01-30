@@ -71,33 +71,35 @@ public class InstanceManager {
 		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
 	
-	public Instance createInstance() {
-		RunInstancesRequest runInstancesRequest = 
-				  new RunInstancesRequest();
-			
-			runInstancesRequest.withImageId(imageId)
-			                     .withInstanceType(instanceType)
-			                     .withMinCount(1)
-			                     .withMaxCount(1)
-			                     .withKeyName(keyName)
-			                     .withInstanceInitiatedShutdownBehavior(TERMINATE)
-			  					 .withSecurityGroupIds(securityGroupId)
-			  					 .withUserData(ec2InstanceStartupScript);
-			  RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);
+	public List<String> createInstance(int totalToCreate) {
+		RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
+		runInstancesRequest.withImageId(imageId)
+			.withInstanceType(instanceType)
+			.withMinCount(1)
+			.withMaxCount(totalToCreate)
+			.withKeyName(keyName)
+			.withInstanceInitiatedShutdownBehavior(TERMINATE)
+			.withSecurityGroupIds(securityGroupId)
+			.withUserData(ec2InstanceStartupScript);
+		RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);
 
-			  Instance instance = runInstancesResult.getReservation().getInstances().get(0);
-			  String instanceId = instance.getInstanceId();
-			  logger.info("RVF worker new instance created with id {} and launched at {}", instanceId, instance.getLaunchTime());
-			  CreateTagsRequest createTagsRequest = new CreateTagsRequest();
-			  createTagsRequest.withResources(instanceId);
-			  if ( instanceTagName != null) {
-				  Tag typeTag =  new Tag(WORKER_TYPE, instanceTagName);
-				  createTagsRequest.withTags(typeTag, new Tag( NAME, RVF_WORKER + instanceTagName + "_" + counter++));
-			  } else {
-				  createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + imageId + "_" + counter++));
-			  }
-			  amazonEC2Client.createTags(createTagsRequest);
-			  return instance;
+		List<Instance> instances = runInstancesResult.getReservation().getInstances();
+		List<String> ids = new ArrayList<>();
+		for (Instance instance : instances) {
+			String instanceId = instance.getInstanceId();
+			logger.info("RVF worker new instance created with id {} and launched at {}", instanceId, instance.getLaunchTime());
+			CreateTagsRequest createTagsRequest = new CreateTagsRequest();
+			createTagsRequest.withResources(instanceId);
+			if ( instanceTagName != null) {
+				Tag typeTag =  new Tag(WORKER_TYPE, instanceTagName);
+				createTagsRequest.withTags(typeTag, new Tag( NAME, RVF_WORKER + instanceTagName + "_" + counter++));
+			} else {
+				createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + imageId + "_" + counter++));
+			}
+			amazonEC2Client.createTags(createTagsRequest);
+			ids.add(instanceId);
+		}
+		return ids;
 	}
 	
 
