@@ -84,6 +84,14 @@ public class AssertionGroupImporter {
 		group = assertionGroupDao.create(group);
 		for (Assertion assertion : allAssertions) {
 			if (!assertion.getKeywords().contains(RESOURCE) && !assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION)) {
+				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
+				if (!"4572d730-7d08-11e1-b0c4-0800200c9a66".equals(assertion.getUuid())) {
+					continue;
+				}
+				//exclude simple map file checking as term server extracts don't contain these
+				if (assertion.getKeywords().contains(COMPONENT_CENTRIC_VALIDATION ) && assertion.getAssertionText().contains("simple map")) {
+					continue;
+				}
 				assertionService.addAssertionToGroup(assertion, group);
 			}
 		}

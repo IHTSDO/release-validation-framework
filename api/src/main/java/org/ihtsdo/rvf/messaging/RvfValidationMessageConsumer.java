@@ -66,7 +66,6 @@ public class RvfValidationMessageConsumer {
 			thread.start();
 			logger.info("RvfWorker instance started at:" + Calendar.getInstance().getTime());
 		}
-		
 	}
 	
 	private void consumeMessage() {
@@ -136,15 +135,26 @@ public class RvfValidationMessageConsumer {
 				long timeTaken = Calendar.getInstance().getTimeInMillis() - instance.getLaunchTime().getTime();
 				if ((timeTaken % HOUR_IN_MILLIS) >= FITY_NINE_MINUTES ) {
 					logger.info("Shut down instance message consumer as no messages left to process in queue and it is approaching to hourly mark.");
-					logger.info("Instance total running time in minutes:" + (timeTaken / 60*1000));
+					logger.info("Instance total running time in hours:" + (timeTaken/HOUR_IN_MILLIS));
 					logger.info("Instance will be terminated with id:" + instance.getInstanceId());
-					TerminateInstancesResult result = instanceManager.terminate(Arrays.asList(instance.getInstanceId()));
-					InstanceState state = result.getTerminatingInstances().get(0).getCurrentState();
-					if ("running".equals(state.getName())) {
-						return false;
-					} else {
-						return true;
+					boolean isTerminated = false;
+					while (!isTerminated) {
+						try {
+							TerminateInstancesResult result = instanceManager.terminate(Arrays.asList(instance.getInstanceId()));
+							InstanceState state = result.getTerminatingInstances().get(0).getCurrentState();
+							if (!"terminated".equals(state.getName())) {
+								logger.error("Instance has not been shutdown yet");
+								isTerminated = false;
+							} else {
+								logger.info("Instance is terminated");
+								isTerminated = true;
+							}
+						} catch (Exception e) {
+							logger.error("Error when shutting down instance", e);
+							isTerminated = false;
+						}
 					}
+					return true;
 				}
 			}
 			return false;

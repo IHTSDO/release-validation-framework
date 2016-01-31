@@ -136,22 +136,24 @@ public class InstanceManager {
 	}
 	
 	public void checkActiveInstances(List<String> instanceIds) {
-		//check instances that are in pending or running status
-		List<String> nonActiveIds = new ArrayList<>();
-		DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
-		describeInstanceStatusRequest.withInstanceIds(instanceIds);
-		DescribeInstanceStatusResult result = amazonEC2Client.describeInstanceStatus(describeInstanceStatusRequest);
-		List<InstanceStatus> statusList = result.getInstanceStatuses();
-		for (InstanceStatus status : statusList) {
-			InstanceState state = status.getInstanceState();
-			if (state != null) {
-				if (!PENDING.equalsIgnoreCase(state.getName()) && !RUNNING.equalsIgnoreCase(state.getName())) {
-					logger.info("Instance {} is not active with status {}", status.getInstanceId(), state.getName());
-					nonActiveIds.add(status.getInstanceId());
+		if (instanceIds != null && instanceIds.isEmpty()) {
+			//check instances that are in pending or running status
+			List<String> nonActiveIds = new ArrayList<>();
+			DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
+			describeInstanceStatusRequest.withInstanceIds(instanceIds);
+			DescribeInstanceStatusResult result = amazonEC2Client.describeInstanceStatus(describeInstanceStatusRequest);
+			List<InstanceStatus> statusList = result.getInstanceStatuses();
+			for (InstanceStatus status : statusList) {
+				InstanceState state = status.getInstanceState();
+				if (state != null) {
+					if (!PENDING.equalsIgnoreCase(state.getName()) && !RUNNING.equalsIgnoreCase(state.getName())) {
+						logger.info("Instance {} is not active with status {}", status.getInstanceId(), state.getName());
+						nonActiveIds.add(status.getInstanceId());
+					}
 				}
 			}
+			instanceIds.removeAll(nonActiveIds);
 		}
-		instanceIds.removeAll(nonActiveIds);
 	}
 	
 	public List<String> getActiveInstances() {
