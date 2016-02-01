@@ -208,7 +208,7 @@ public class InstanceManager {
 		} 
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		request.withInstanceIds(instanceId);
-		DescribeInstancesResult result = amazonEC2Client.describeInstances();
+		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
 		return result.getReservations().get(0).getInstances().get(0);
 	}
 
