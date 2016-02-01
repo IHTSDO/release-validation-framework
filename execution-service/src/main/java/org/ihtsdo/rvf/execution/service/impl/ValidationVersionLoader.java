@@ -292,7 +292,7 @@ public class ValidationVersionLoader {
 		if (isExtension(validationConfig)) {
 			uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		} else if (validationConfig.isRf2DeltaOnly()) {
-			loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig);
+			rf2FilesLoaded.addAll(loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig));
 		} else {		  			
 			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		}
