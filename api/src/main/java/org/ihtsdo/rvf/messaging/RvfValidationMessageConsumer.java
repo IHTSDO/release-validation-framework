@@ -34,6 +34,7 @@ public class RvfValidationMessageConsumer {
 	private static final String EC2_INSTANCE_ID_URL = "http://169.254.169.254/latest/meta-data/instance-id";
 	private static final long FITY_NINE_MINUTES = 59*60*1000;
 	private static final long HOUR_IN_MILLIS = 60*60*1000;
+	private static final long ONE_MINUTE_IN_MILLIS = 60*1000;
 	private String queueName;
 	@Autowired
 	private ValidationRunner runner;
@@ -44,8 +45,8 @@ public class RvfValidationMessageConsumer {
 	@Autowired
 	private InstanceManager instanceManager;
 	private boolean isEc2Instance;
-	private static Instance instance;
-	private static boolean isValidationRunning = false;
+	private Instance instance;
+	private boolean isValidationRunning = false;
 	
 	public RvfValidationMessageConsumer( String queueName,Boolean isRvfWorker, Boolean ec2Instance) {
 		isWorker = isRvfWorker.booleanValue();
@@ -135,14 +136,15 @@ public class RvfValidationMessageConsumer {
 				long timeTaken = Calendar.getInstance().getTimeInMillis() - instance.getLaunchTime().getTime();
 				if ((timeTaken % HOUR_IN_MILLIS) >= FITY_NINE_MINUTES ) {
 					logger.info("Shut down instance message consumer as no messages left to process in queue and it is approaching to hourly mark.");
-					logger.info("Instance total running time in hours:" + (timeTaken/HOUR_IN_MILLIS));
+					logger.info("Instance total running time in minutes:" + (timeTaken/ONE_MINUTE_IN_MILLIS));
 					logger.info("Instance will be terminated with id:" + instance.getInstanceId());
 					boolean isTerminated = false;
-					while (!isTerminated) {
+					int counter =0;
+					while (!isTerminated && counter++ < 3) {
 						try {
 							TerminateInstancesResult result = instanceManager.terminate(Arrays.asList(instance.getInstanceId()));
 							InstanceState state = result.getTerminatingInstances().get(0).getCurrentState();
-							if (!"terminated".equals(state.getName())) {
+							if ("running".equals(state.getName())) {
 								logger.error("Instance has not been shutdown yet");
 								isTerminated = false;
 							} else {
@@ -185,10 +187,7 @@ public class RvfValidationMessageConsumer {
 			logger.error("JMS message listener error:", e);
 		}
 		if ( config != null) {
-			long start = System.currentTimeMillis();
 			runner.run(config);
-			long end = System.currentTimeMillis();
-			logger.info("last validation taken in seconds:" + (end-start) /1000);
 		} else {
 			logger.error("Null validation config found for message:" + incomingMessage);
 		}

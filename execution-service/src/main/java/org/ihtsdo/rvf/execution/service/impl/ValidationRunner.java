@@ -250,7 +250,10 @@ public class ValidationRunner {
 		String prospectiveVersion = validationConfig.getRunId().toString();
 		if (isExtension(validationConfig)) {
 			uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
-		} else {
+		} else if (validationConfig.isRf2DeltaOnly()) {
+			 ProspectiveReleaseDataLoader loader = new ProspectiveReleaseDataLoader(validationConfig, releaseDataManager);
+			 rf2FilesLoaded = loader.loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion);
+		} else {		  			
 			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		}
 		return true;
