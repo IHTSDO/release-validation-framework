@@ -350,7 +350,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 				logger.error("Known schema doesn't exist for:" + known);
 				break;
 			}
-			logger.info("Adding known version {} in schema {}", known, knownSchema);
+			logger.info("Adding known version {} to schema {}", known, combinedVersionName);
 			for (final String tableName : getValidTableNamesFromSchema(knownSchema, null)) {
 				
 				isFailed = copyTable(tableName, knownSchema, schemaName);
