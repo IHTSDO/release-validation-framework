@@ -134,7 +134,7 @@ public class InstanceManager {
 	
 	public List<String> checkActiveInstances(List<String> instanceIds) {
 		List<String> activeInstances = new ArrayList<>();
-		if (instanceIds != null && instanceIds.isEmpty()) {
+		if (instanceIds != null && !instanceIds.isEmpty()) {
 			DescribeInstancesRequest request = new DescribeInstancesRequest();
 			request.withInstanceIds(instanceIds);
 			DescribeInstancesResult result = amazonEC2Client.describeInstances(request);

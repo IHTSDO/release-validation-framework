@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.autoscaling;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -22,12 +24,22 @@ public class InstanceManagerIntegrationTest {
 	
 	@Test
 	public void testCreateEc2Instance() {
-//		Instance instance = instanceManager.createInstance();
-//		Assert.assertNotNull(instance);
-//		Assert.assertNotNull(instance.getInstanceId());
-//		System.out.println("Instance is created with id:" + instance.getInstanceId());
+		List<String> instance = instanceManager.createInstance(1);
+		Assert.assertNotNull(instance);
+		System.out.println("Instance is created with id:" + instance.get(0));
 		List<String> result = instanceManager.getActiveInstances();
 		Assert.assertNotNull(result);
-//		instanceManager.terminate( Arrays.asList("i-e3021268"));
+		instanceManager.terminate( Arrays.asList("i-e3021268"));
+	}
+	
+	
+	@Test
+	public void testGetInstanceStatus() {
+		List<String> instanceIds = new ArrayList<>();
+		instanceIds.add("i-8720390c");
+		instanceIds.add("i-98233a13");
+		List<String> result = instanceManager.checkActiveInstances(instanceIds);
+		Assert.assertNotNull(result);
+		Assert.assertEquals(2, instanceIds.size());
 	}
 }
