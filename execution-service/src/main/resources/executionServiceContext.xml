@@ -17,7 +17,6 @@
 								  ignore-unresolvable="true" ignore-resource-not-found="true" />
 	<context:property-placeholder location="classpath*:execution-service-defaults.properties" />
 
-
 	<!-- Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing-->
 	<bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${rvf.snomed.jdbc.driverClassName}"/>
@@ -78,6 +77,7 @@
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner">
 		<constructor-arg value="${rvf.assertion.execution.BatchSize}"/>
 	</bean>
+	<bean id="versionLoader" class =" org.ihtsdo.rvf.execution.service.impl.ValidationVersionLoader"/>
 	
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService">
 		<constructor-arg name="bucketName" value="${executionBucketName}"/>
@@ -87,7 +87,6 @@
 	<bean id="scheduleEventGenerator" class ="org.ihtsdo.rvf.execution.service.impl.RvfDbScheduledEventGenerator">
 	<constructor-arg value="${rvf.qa.data.maxKeepTime}"/>
 	</bean>
-
 	<import resource="applicationContext.xml"/>
 
 </beans>

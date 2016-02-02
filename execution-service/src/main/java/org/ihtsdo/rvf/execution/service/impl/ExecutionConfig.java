@@ -10,6 +10,7 @@ public class ExecutionConfig {
 	private List<String> groupNames;
 	private int failureExportMax = 10;
 	private boolean firstTimeRelease;
+	private boolean extensionValidation;
 
 	public ExecutionConfig(final Long runId) {
 		this(runId,false);
@@ -68,5 +69,12 @@ public class ExecutionConfig {
 	public void setFirstTimeRelease(boolean firstTimeRelease) {
 		this.firstTimeRelease = firstTimeRelease;
 	}
+
+	public void setExtensionValidation(boolean isExtension) {
+		this.extensionValidation = isExtension;
+	}
 	
+	public boolean isExtensionValidation() {
+		return this.extensionValidation;
+	}
 }

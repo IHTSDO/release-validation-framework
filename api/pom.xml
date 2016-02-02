@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.ihtsdo.snomed.rvf</groupId>
         <artifactId>release-validation-framework</artifactId>
-        <version>0.1.37</version>
+        <version>0.1.38</version>
     </parent>
 
     <artifactId>api</artifactId>
@@ -33,6 +33,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>execution-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>importer</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- Spring -->

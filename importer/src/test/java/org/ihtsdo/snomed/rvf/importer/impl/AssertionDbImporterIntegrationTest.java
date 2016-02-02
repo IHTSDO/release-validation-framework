@@ -4,15 +4,16 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.snomed.rvf.importer.AssertionsImporter;
+import org.ihtsdo.snomed.rvf.importer.AssertionsDatabaseImporter;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -21,16 +22,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/importerServiceContext.xml"})
-public class AssertionsImporterImplIntegrationTest {
+public class AssertionDbImporterIntegrationTest {
 	
 	public static final String scriptsDir = "/scripts";
 	public static final String hierarchyTermModellingDir = "hierarchy-term-modelling";
 
-	private AssertionsImporter assertionsImporter;
+	@Autowired
+	AssertionsDatabaseImporter assertionsImporter;
 
 	@Before
 	public void setUp() throws Exception {
-		assertionsImporter = new AssertionsImporter();
 		assertNotNull("Assertions Importer must not be null", assertionsImporter);
 	}
 
@@ -38,13 +39,11 @@ public class AssertionsImporterImplIntegrationTest {
 	public void testImportAssertionsFromFile() throws Exception {
 		//"/xml/lists/manifest.xml"
 		//"/testManifest.xml"
-		final URL manifestUrl = AssertionsImporterImplIntegrationTest.class.getResource("/xml/lists/manifest.xml");
-		assertNotNull("manifestUrl must not be null", manifestUrl);
-		final URL scriptsFolderUrl = AssertionsImporterImplIntegrationTest.class.getResource(scriptsDir);
-		assertNotNull("scriptsFolderUrl must not be null", scriptsFolderUrl);
+		final InputStream manifestInputStream = AssertionsImporterImplIntegrationTest.class.getResourceAsStream("/xml/lists/manifest.xml");
+		assertNotNull("manifestUrl must not be null", manifestInputStream);
 
 		// import content
-		assertionsImporter.importAssertionsFromFile(manifestUrl.getPath(), scriptsFolderUrl.getPath());
+		assertionsImporter.importAssertionsFromFile(manifestInputStream, scriptsDir);
 	}
 	
 	@Test
@@ -56,9 +55,7 @@ public class AssertionsImporterImplIntegrationTest {
 	}
 	
 	@Test
-	@Ignore
 	public void testAddSqlScript() throws IOException {
-		final AssertionsImporter importer = new AssertionsImporter();
-		importer.addSqlTestToAssertion(new Assertion(), IOUtils.toString(AssertionsImporterImplIntegrationTest.class.getResource("/scripts/release-type/release-type-full-validation-concept.sql")));
+		assertionsImporter.addSqlTestToAssertion(new Assertion(), IOUtils.toString(AssertionsImporterImplIntegrationTest.class.getResource("/scripts/release-type/release-type-full-validation-concept.sql")));
 	}
 }

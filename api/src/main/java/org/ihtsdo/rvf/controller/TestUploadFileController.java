@@ -252,6 +252,9 @@ public class TestUploadFileController {
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
 			//Queue incoming validation request
 			queueManager.queueValidationRequest( vrConfig, responseMap);
+			//create new instance to process 
+//			instanceManager.createInstance();
+			
 			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
 			responseMap.put("resultURL", urlToPoll);
 		} else {

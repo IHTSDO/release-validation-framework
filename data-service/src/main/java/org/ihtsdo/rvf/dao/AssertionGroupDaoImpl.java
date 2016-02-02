@@ -16,5 +16,10 @@ public class AssertionGroupDaoImpl extends EntityDaoImpl<AssertionGroup> impleme
 		return getCurrentSession()
 				.createQuery("from AssertionGroup ag order by ag.id").list();
 	}
+	@Override
+	public AssertionGroup create(AssertionGroup group) {
+		save(group);
+		return group;
+	}
 
 }

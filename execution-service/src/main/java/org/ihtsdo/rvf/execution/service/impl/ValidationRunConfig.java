@@ -27,7 +27,6 @@ public class ValidationRunConfig {
 	private transient File localManifestFile;
 	private String s3PublishBucketName;
 	private boolean isRf2DeltaOnly;
-	
 	public MultipartFile getFile() {
 		return file;
 	}
@@ -211,10 +210,12 @@ public class ValidationRunConfig {
 	public File getLocalManifestFile() {
 		return this.localManifestFile;
 	}
+	
 	public ValidationRunConfig addProspectiveFilesInS3(boolean isFileInS3) {
 		this.isProspectiveFilesInS3 = isFileInS3;
 		return this;
 	}
+
 	public ValidationRunConfig addRF2DeltaOnly(boolean isRf2DeltaOnly) {
 		this.isRf2DeltaOnly = isRf2DeltaOnly;
 		return this;
@@ -225,6 +226,7 @@ public class ValidationRunConfig {
 	public void setS3PublishBucketName(String s3PublishBucketName) {
 		this.s3PublishBucketName = s3PublishBucketName;
 	}
+	
 	public boolean isRf2DeltaOnly() {
 		return isRf2DeltaOnly;
 	}

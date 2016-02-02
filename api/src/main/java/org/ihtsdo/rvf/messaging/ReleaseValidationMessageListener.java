@@ -25,7 +25,7 @@ public class ReleaseValidationMessageListener {
 	//Using runner as prototype scope or using executor to process message asynchronously
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
 
-	@JmsListener(containerFactory = "jmsListenerContainerFactory", destination = "rvf-validation-queue")
+	@JmsListener(containerFactory = "jmsListenerContainerFactory", destination = "${rvf.validation.queue.name}")
 	public void triggerValidation(final TextMessage incomingMessage) {
 		logger.info("Received message {}", incomingMessage);
 //		runValidationAsynchronously(incomingMessage);
