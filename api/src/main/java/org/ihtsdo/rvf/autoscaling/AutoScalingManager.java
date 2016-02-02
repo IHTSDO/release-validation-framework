@@ -86,7 +86,6 @@ public class AutoScalingManager {
 	
 	private int getTotalInstancesToCreate(int currentMsgSize, int activeInstances, int maxRunningInstance) {
 		int result = 0;
-		logger.info("Current active instances total:" + activeInstances);
 		if (activeInstances < maxRunningInstance) {
 			if (currentMsgSize <= activeInstances) {
 				logger.info("No new instance will be created as message size is:" + currentMsgSize);
