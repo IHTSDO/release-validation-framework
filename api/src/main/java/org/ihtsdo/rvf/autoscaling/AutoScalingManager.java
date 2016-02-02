@@ -42,7 +42,7 @@ public class AutoScalingManager {
 	public void startUp() throws Exception {
 		logger.info("isAutoScalingEnabled:" + isAutoScalling);
 		if (isAutoScalling) {
-			Thread thread = new Thread( new Runnable() {
+			Thread thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
 					while (!shutDown) {
@@ -51,22 +51,24 @@ public class AutoScalingManager {
 							if (current != lastPolledQueueSize) {
 								logger.info("Total messages in queue:" + current);
 							}
-							if (current > lastPolledQueueSize ){
+							if ((current > lastPolledQueueSize) || (current > activeInstances.size())) {
 								//will add logic later in terms how many instances need to create for certain size
 								// the current approach is to create one instance per message.
-								logger.info("Messages have been increased by:" + (current - lastPolledQueueSize) + " since last poll.");
+								if (current > lastPolledQueueSize) {
+									logger.info("Messages have been increased by:" + (current - lastPolledQueueSize) + " since last poll.");
+								}
 								activeInstances = instanceManager.checkActiveInstances(activeInstances);
 								int totalToCreate = getTotalInstancesToCreate(current, activeInstances.size(), maxRunningInstance);
 								if (totalToCreate != 0) {
 									logger.info("Start creating " + totalToCreate + " new worker instance");
 									long start = System.currentTimeMillis();
 									activeInstances.addAll(instanceManager.createInstance(totalToCreate));
-									logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start)/1000);
+									logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start) / 1000);
 								}
-							}
+							} 
 							lastPolledQueueSize = current;
 							try {
-								Thread.sleep(30*1000);
+								Thread.sleep(30 * 1000);
 							} catch (InterruptedException e) {
 								logger.error("AutoScalingManager delay is interrupted.", e);
 							}
