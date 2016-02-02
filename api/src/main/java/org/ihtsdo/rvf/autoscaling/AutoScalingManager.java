@@ -28,14 +28,14 @@ public class AutoScalingManager {
 	
 	private int maxRunningInstance;
 	
-	private static List<String> instancesCreated;
+	private static List<String> activeInstances;
 	
 	private boolean isFirstTime = true;
 	
 	public AutoScalingManager( Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
 		this.isAutoScalling = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
-		instancesCreated = new ArrayList<>();
+		activeInstances = new ArrayList<>();
 		this.maxRunningInstance = maxRunningInstance;
 		
 	}
@@ -55,13 +55,12 @@ public class AutoScalingManager {
 								//will add logic later in terms how many instances need to create for certain size
 								// the current approach is to create one instance per message.
 								logger.info("Messages have been increased by:" + (current - lastPolledQueueSize) + " since last poll.");
-								instanceManager.checkActiveInstances(instancesCreated);
-								int activeInstances = instancesCreated.size();
-								int totalToCreate = getTotalInstancesToCreate(current, activeInstances, maxRunningInstance);
+								activeInstances = instanceManager.checkActiveInstances(activeInstances);
+								int totalToCreate = getTotalInstancesToCreate(current, activeInstances.size(), maxRunningInstance);
 								if (totalToCreate != 0) {
 									logger.info("Start creating " + totalToCreate + " new worker instance");
 									long start = System.currentTimeMillis();
-									instancesCreated.addAll(instanceManager.createInstance(totalToCreate));
+									activeInstances.addAll(instanceManager.createInstance(totalToCreate));
 									logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start)/1000);
 								}
 							}
@@ -74,7 +73,7 @@ public class AutoScalingManager {
 						} else {
 							isFirstTime = false;
 							// check any running instances
-							instancesCreated.addAll(instanceManager.getActiveInstances());
+							activeInstances.addAll(instanceManager.getActiveInstances());
 						}
 					}
 				}
@@ -82,7 +81,6 @@ public class AutoScalingManager {
 			thread.start();
 		}
 	}
-	
 	
 	private int getTotalInstancesToCreate(int currentMsgSize, int activeInstances, int maxRunningInstance) {
 		int result = 0;

@@ -22,15 +22,12 @@ import org.springframework.stereotype.Service;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.CreateTagsRequest;
-import com.amazonaws.services.ec2.model.DescribeInstanceStatusRequest;
-import com.amazonaws.services.ec2.model.DescribeInstanceStatusResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Filter;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.InstanceStateChange;
-import com.amazonaws.services.ec2.model.InstanceStatus;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
@@ -135,25 +132,26 @@ public class InstanceManager {
 		this.securityGroupId = securityGroupId;
 	}
 	
-	public void checkActiveInstances(List<String> instanceIds) {
+	public List<String> checkActiveInstances(List<String> instanceIds) {
+		List<String> activeInstances = new ArrayList<>();
 		if (instanceIds != null && instanceIds.isEmpty()) {
-			//check instances that are in pending or running status
-			List<String> nonActiveIds = new ArrayList<>();
-			DescribeInstanceStatusRequest describeInstanceStatusRequest = new DescribeInstanceStatusRequest();
-			describeInstanceStatusRequest.withInstanceIds(instanceIds);
-			DescribeInstanceStatusResult result = amazonEC2Client.describeInstanceStatus(describeInstanceStatusRequest);
-			List<InstanceStatus> statusList = result.getInstanceStatuses();
-			for (InstanceStatus status : statusList) {
-				InstanceState state = status.getInstanceState();
-				if (state != null) {
-					if (!PENDING.equalsIgnoreCase(state.getName()) && !RUNNING.equalsIgnoreCase(state.getName())) {
-						logger.info("Instance {} is not active with status {}", status.getInstanceId(), state.getName());
-						nonActiveIds.add(status.getInstanceId());
-					}
+			DescribeInstancesRequest request = new DescribeInstancesRequest();
+			request.withInstanceIds(instanceIds);
+			DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+			List<Reservation> reservations = result.getReservations();
+			List<Instance> instances = new ArrayList<>();
+			for (Reservation reserv : reservations) {
+				instances.addAll(reserv.getInstances());
+			}
+			for (Instance instance : instances) {
+				InstanceState state = instance.getState();
+				if (PENDING.equalsIgnoreCase(state.getName()) || RUNNING.equalsIgnoreCase(state.getName())) {
+					activeInstances.add(instance.getInstanceId());
 				}
 			}
-			instanceIds.removeAll(nonActiveIds);
+			logger.info("Current total active instances:" + activeInstances.size());
 		}
+		return activeInstances;
 	}
 	
 	public List<String> getActiveInstances() {
@@ -173,7 +171,7 @@ public class InstanceManager {
 				activeInstances.add(instance.getInstanceId());
 			}
 		}
-		logger.info("Total active instances:" + activeInstances.size());
+		logger.info("Total active instances found:" + activeInstances.size());
 		return activeInstances;
 	}
 	
