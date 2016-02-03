@@ -38,7 +38,7 @@
 		<script uuid="c19b9008-bbc9-4209-a3d7-896d414df565" category="release-type-validation" sqlFile="release-type-full-validation-simplemap-refset.sql" text="The current SimpleMap refset full file contains all previously published data unchanged."  >
 			<keywords>snomedid snomed rt ctv3 simple map</keywords>
 		</script>	
-		<script uuid="f0b4c712-781a-4ca5-872e-883cf1949f12" category="release-type-validation" sqlFile="release-type-full-validation-Language-refset.sql" text="The current Language refset full file contains all previously published data unchanged."  >
+		<script uuid="f0b4c712-781a-4ca5-872e-883cf1949f12" category="release-type-validation" sqlFile="release-type-full-validation-language-refset.sql" text="The current Language refset full file contains all previously published data unchanged."  >
 			<keywords>US UK EN GB language</keywords>
 		</script>	
 		<!-- release-type-snapshot-delta-validation -->

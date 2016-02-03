@@ -35,7 +35,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 	/**
-	 * An implementation of a {@link org.ihtsdo.snomed.rvf.importer.AssertionsImporter} that imports older
+	 * An implementation of a {@link org.ihtsdo.snomed.rvf.importer.AssertionsDatabaseImporter} that imports older
 	 * Release Assertion Toolkit content via XML and SQL files. The XML file defines the assertions and the SQL files are
 	 * used to populate the corresponding tests.
 	 */
@@ -46,7 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
 		private static final String JSON_EXTENSION = ".json";
 		private static final SqlParser SQL_PARSER = new SqlParser();
-		private static final Logger logger = LoggerFactory.getLogger(AssertionsImporter.class);
+		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 	
 		protected ObjectMapper objectMapper = new ObjectMapper();
 		protected Map<String, String> lookupMap = new HashMap<>();
@@ -94,9 +94,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 									// add test to assertion
 									addSqlTestToAssertion(assertion, sqlString);
 								} else {
-									logger.error("Failed to find sql file name from source:" + sqlResourceFileName);
+									String msg = "Failed to find sql file name from source:" + sqlResourceFileName + " for assertion uuid:" + assertion.getUuid();
+									logger.error(msg);
+									throw new IllegalStateException(msg);
 								}
-							
 							}
 							catch (final Exception e) {
 								logger.warn("Error reading sql from input stream. Nested exception is : " + e.getMessage());
@@ -104,9 +105,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 							}
 						}
 						else{
-							logger.error("Error creating assertion");
+							throw new IllegalStateException("Error creating assertion");
 						}
-
 					}
 
 					// finally print all lookup map contents for debugging - //todo save somewhere?
@@ -217,10 +217,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 			//import via assertion service
 			if( assertionService.find(assertion.getUuid()) == null ) {
-				assertionService.create(assertion);
+				assertion = assertionService.create(assertion);
 			}
+			logger.debug("Adding tests for assertion id" + assertion.getId());
 			assertionService.addTests(assertion, tests);
-			
 				
 		}
 
