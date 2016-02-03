@@ -1,21 +1,15 @@
-
 /******************************************************************************** 
-
 	PRIOR RELEASE FROM CURRENT RELEASE FULL FILE
 	release-type-FULL-validation-Language-refset
   
 	Assertion:
 	The current Language refset full file contains all previously published 
 	data unchanged.
-
 	The current full file is the same as the prior version of the same full 
 	file, except for the delta rows. Therefore, when the delta rows are excluded 
 	from the current file, it should be identical to the prior version.
-
 	This test identifies rows in prior, not in current, and in current, not in 
 	prior.
-
-
 ********************************************************************************/
 
 insert into qa_result (runid, assertionuuid, concept_id, details)

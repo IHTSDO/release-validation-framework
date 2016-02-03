@@ -1,13 +1,9 @@
 /******************************************************************************** 
-
 	release-type-FULL-validation-Inferred-Relationship 
-
 	Assertion:	The current Inferred Relationship full file contains all previously published data unchanged.
-
 	The current full file is the same as the prior version of the same full 
 	file, except for the delta rows. Therefore, when the delta rows are excluded 
 	from the current file, it should be identical to the prior version.
-
 	This test identifies rows in prior, not in current, and in current, not in 
 	prior.
 ********************************************************************************/
