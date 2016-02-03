@@ -15,7 +15,7 @@ public class RvfAssertionsDatabasePrimerService {
 	private static final String scriptsDir = "/scripts";
 	public void importAssertionsAndGroups() {
 		if (assertionGroupImporter.isImportRequired()) {
-			InputStream manifestInputStream = AssertionsImporter.class.getResourceAsStream("/xml/lists/manifest.xml");
+			InputStream manifestInputStream = AssertionsDatabaseImporter.class.getResourceAsStream("/xml/lists/manifest.xml");
 			// import content
 			dbImporter.importAssertionsFromFile(manifestInputStream, scriptsDir);
 			//create assertion group

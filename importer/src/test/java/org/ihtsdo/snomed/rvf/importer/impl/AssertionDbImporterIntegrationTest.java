@@ -21,7 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * A test class for {@link org.ihtsdo.snomed.rvf.importer.AssertionsImporter}
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/importerServiceContext.xml"})
+@ContextConfiguration(locations = {"/testImporterServiceContext.xml"})
 public class AssertionDbImporterIntegrationTest {
 	
 	public static final String scriptsDir = "/scripts";
