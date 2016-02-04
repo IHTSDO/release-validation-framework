@@ -3,6 +3,8 @@ package org.ihtsdo.snomed.rvf.importer;
 
 import java.io.InputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +15,23 @@ public class RvfAssertionsDatabasePrimerService {
 	@Autowired
 	private AssertionGroupImporter assertionGroupImporter;
 	private static final String scriptsDir = "/scripts";
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(RvfAssertionsDatabasePrimerService.class);
+	
 	public void importAssertionsAndGroups() {
-		if (assertionGroupImporter.isImportRequired()) {
+		if (dbImporter.isAssertionImportRequired()) {
+			LOGGER.info("No assertons exist and start importing...");
 			InputStream manifestInputStream = AssertionsDatabaseImporter.class.getResourceAsStream("/xml/lists/manifest.xml");
 			// import content
 			dbImporter.importAssertionsFromFile(manifestInputStream, scriptsDir);
+			
+			LOGGER.info("Assertions imported");
+		}
+		if (assertionGroupImporter.isImportRequired()) {
 			//create assertion group
+			LOGGER.info("No groups exist and start importing assertion group ...");
 			assertionGroupImporter.importAssertionGroups();
+			LOGGER.info("Assertion group imported");
 		}
 	}
 }
