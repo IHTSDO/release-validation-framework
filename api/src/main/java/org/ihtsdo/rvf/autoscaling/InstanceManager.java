@@ -276,6 +276,7 @@ public class InstanceManager {
 		for (String filename : propertyStrByFilename.keySet()) {
 			builder.append("sudo echo \"" + propertyStrByFilename.get(filename) + "\" > " + rvfConfig + "/" + filename + "\n");
 		}
+		builder.append("sudo supervisorctl start rvf-api" + "\n");
 		builder.append("exit 0");
 		return builder.toString();
 	}
