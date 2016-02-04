@@ -52,7 +52,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		protected Map<String, String> lookupMap = new HashMap<>();
 		@Autowired
 		AssertionService assertionService;
-
+		
+		public boolean isAssertionImportRequired() {
+			List<Assertion> assertions = assertionService.findAll();
+			if (assertions == null || assertions.isEmpty()) {
+				return true;
+			}
+			return false;
+		}
+		
 		public void importAssertionsFromFile(final InputStream manifestInputStream, final String sqlResourcesFolderLocation){
 			// get JDOM document from given manifest file
 			final Document xmlDocument = getJDomDocumentFromFile(manifestInputStream);
