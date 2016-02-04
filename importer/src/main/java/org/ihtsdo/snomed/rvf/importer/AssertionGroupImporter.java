@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class AssertionGroupImporter {
+	private static final String SIMPLE_MAP = "simple map";
 	private static final String SPANISH_EDITION = "SpanishEdition";
 	private static final String INTERNATIONAL_EDITION = "InternationalEdition";
 	private static final String SNAPSHOT_CONTENT_VALIDATION = "SnapshotContentValidation";
@@ -51,17 +52,16 @@ public class AssertionGroupImporter {
 			
 	public void importAssertionGroups() {
 		List<Assertion> allAssertions = assertionService.findAll();
-		//international
-		createInternationalAssertionGroup(allAssertions);
 		//assertion group by keywords
 		createAssertionGroupByKeyWord(allAssertions,FILE_CENTRIC_VALIDATION);
 		createAssertionGroupByKeyWord(allAssertions,RELEASE_TYPE_VALIDATION);
 		createAssertionGroupByKeyWord(allAssertions,COMPONENT_CENTRIC_VALIDATION);
-		//Snapshot
-		createSnapshotContentAssertionGroup(allAssertions);
 		//Spanish edition
 		createSpanishEditionAssertionGroup(allAssertions);
-		
+		//international
+		createInternationalAssertionGroup(allAssertions);
+		//Snapshot
+		createSnapshotContentAssertionGroup(allAssertions);
 	}
 
 
@@ -72,7 +72,7 @@ public class AssertionGroupImporter {
 		group = assertionGroupDao.create(group);
 		for (Assertion assertion : allAssertions) {
 			if (!assertion.getKeywords().contains(RESOURCE) && !assertion.getKeywords().contains(LOINC)) {
-				if (!Arrays.asList(SPANISH_EDITION_EXCLUDE_LIST).contains(assertion.getUuid())) {
+				if (!Arrays.asList(SPANISH_EDITION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 					assertionService.addAssertionToGroup(assertion, group);
 				}
 			}
@@ -90,7 +90,7 @@ public class AssertionGroupImporter {
 					continue;
 				}
 				//exclude simple map file checking as term server extracts don't contain these
-				if (assertion.getKeywords().contains(COMPONENT_CENTRIC_VALIDATION ) && assertion.getAssertionText().contains("simple map")) {
+				if (assertion.getKeywords().contains(COMPONENT_CENTRIC_VALIDATION ) && assertion.getAssertionText().contains(SIMPLE_MAP)) {
 					continue;
 				}
 				assertionService.addAssertionToGroup(assertion, group);
@@ -105,7 +105,8 @@ public class AssertionGroupImporter {
 		internationalGroup.setName(INTERNATIONAL_EDITION);
 		internationalGroup = assertionGroupDao.create(internationalGroup);
 		for (Assertion assertion : allAssertions) {
-			if (!assertion.getKeywords().contains(RESOURCE)) {
+			String keywords = assertion.getKeywords();
+			if (!keywords.contains(RESOURCE) && !keywords.contains(LOINC)) {
 				assertionService.addAssertionToGroup(assertion, internationalGroup);
 			}
 		}
