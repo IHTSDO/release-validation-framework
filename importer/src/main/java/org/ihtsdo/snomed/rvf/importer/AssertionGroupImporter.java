@@ -2,12 +2,13 @@ package org.ihtsdo.snomed.rvf.importer;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import org.ihtsdo.rvf.dao.AssertionGroupDao;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.service.AssertionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,17 @@ public class AssertionGroupImporter {
 	private AssertionGroupDao assertionGroupDao;
 	
 	private static final String[] SPANISH_EDITION_EXCLUDE_LIST = {"dd0d0406-7481-444a-9f04-b6fc7db49039","cc9c5340-84f0-11e1-b0c4-0800200c9a66","c3249e80-84f0-11e1-b0c4-0800200c9a66"};
+	
+	private static final String[] SNAPSHOT_EXCLUDE_LIST = {"4dbfed80-79b9-11e1-b0c4-0800200c9a66",
+			"6336ec40-79b9-11e1-b0c4-0800200c9a66",
+			"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
+			"72184790-79b9-11e1-b0c4-0800200c9a66",
+			"77fc7550-79b9-11e1-b0c4-0800200c9a66",
+			"2e4fd620-7d08-11e1-b0c4-0800200c9a66",
+			"32b41aa0-7d08-11e1-b0c4-0800200c9a66",
+			"4572d730-7d08-11e1-b0c4-0800200c9a66"};
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AssertionGroupImporter.class);
 	
 	public boolean isImportRequired() {
 		List<AssertionGroup> allGroups = assertionGroupDao.findAll();
@@ -83,10 +95,12 @@ public class AssertionGroupImporter {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(SNAPSHOT_CONTENT_VALIDATION);
 		group = assertionGroupDao.create(group);
+		//TODO we should create a SCA task level validation assertion group
+		int counter = 0;
 		for (Assertion assertion : allAssertions) {
 			if (!assertion.getKeywords().contains(RESOURCE) && !assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION)) {
 				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
-				if (UUID.fromString("4572d730-7d08-11e1-b0c4-0800200c9a66").equals(assertion.getUuid())) {
+				if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 					continue;
 				}
 				//exclude simple map file checking as term server extracts don't contain these
@@ -94,9 +108,10 @@ public class AssertionGroupImporter {
 					continue;
 				}
 				assertionService.addAssertionToGroup(assertion, group);
+				counter++;
 			}
 		}
-		
+		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
 	}
 
 	private void createInternationalAssertionGroup(List<Assertion> allAssertions) {
@@ -111,7 +126,6 @@ public class AssertionGroupImporter {
 			}
 		}
 	}
-	
 	
 	private void createAssertionGroupByKeyWord(List<Assertion> allAssertions, String assertionGroupName) {
 		AssertionGroup group = new AssertionGroup();
