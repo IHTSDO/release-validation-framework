@@ -117,10 +117,13 @@ public class ValidationRunner {
 			return;
 		} 
 		//load previous published version
-		ExecutionConfig executionConfig = releaseVersionLoader.loadPreviousVersion(responseMap, validationConfig);
-		if (executionConfig == null) {
-			reportService.writeResults(responseMap, State.FAILED, reportStorage);
-			return;
+		ExecutionConfig executionConfig = null;
+		if (!validationConfig.isFirstTimeRelease()) {
+			executionConfig = releaseVersionLoader.loadPreviousVersion(responseMap, validationConfig);
+			if (executionConfig == null) {
+				reportService.writeResults(responseMap, State.FAILED, reportStorage);
+				return;
+			}
 		}
 		//load prospective version
 		boolean isSuccessful = releaseVersionLoader.loadProspectiveVersion(executionConfig, responseMap, validationConfig);

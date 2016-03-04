@@ -58,15 +58,9 @@ public class ValidationVersionLoader {
 		if (isExtension) {
 			prevReleaseVersion = "previous_" + validationConfig.getRunId();
 		}
-		final ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
+		final ExecutionConfig executionConfig = createExecutionConfig(validationConfig);
 		executionConfig.setPreviousVersion(prevReleaseVersion);
-		executionConfig.setGroupNames(validationConfig.getGroupsList());
-		executionConfig.setExtensionValidation(isExtension);
-		//default to 10
-		executionConfig.setFailureExportMax(10);
-		if (validationConfig.getFailureExportMax() != null) {
-			executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
-		}
+		
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		boolean isSucessful = false;
 		String reportStorage = validationConfig.getStorageLocation();
@@ -81,6 +75,9 @@ public class ValidationVersionLoader {
 		}
 		
 	public boolean loadProspectiveVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
+		if (executionConfig == null) {
+			executionConfig = createExecutionConfig(validationConfig);
+		}
 		String prospectiveVersion = executionConfig.getExecutionId().toString();
 		executionConfig.setProspectiveVersion(prospectiveVersion);
 		List<String> rf2FilesLoaded = new ArrayList<>();
@@ -105,6 +102,19 @@ public class ValidationVersionLoader {
 			logger.info("completed loading resource data for schema:" + prospectiveSchema);
 		}
 		return true;
+	}
+
+	private ExecutionConfig createExecutionConfig(ValidationRunConfig validationConfig) {
+		final ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
+		executionConfig.setGroupNames(validationConfig.getGroupsList());
+		executionConfig.setExtensionValidation( isExtension(validationConfig));
+		//default to 10
+		executionConfig.setFailureExportMax(10);
+		if (validationConfig.getFailureExportMax() != null) {
+			executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
+		}
+		return executionConfig;
+		
 	}
 
 	public List<String> loadProspectiveDeltaWithPreviousSnapshotIntoDB(String prospectiveVersion, ValidationRunConfig validationConfig) throws BusinessServiceException {
