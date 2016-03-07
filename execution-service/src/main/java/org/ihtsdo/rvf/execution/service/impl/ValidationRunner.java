@@ -117,10 +117,10 @@ public class ValidationRunner {
 			return;
 		} 
 		//load previous published version
-		ExecutionConfig executionConfig = null;
+		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		if (!validationConfig.isFirstTimeRelease()) {
-			executionConfig = releaseVersionLoader.loadPreviousVersion(responseMap, validationConfig);
-			if (executionConfig == null) {
+			boolean isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+			if (!isLoaded) {
 				reportService.writeResults(responseMap, State.FAILED, reportStorage);
 				return;
 			}
@@ -141,7 +141,7 @@ public class ValidationRunner {
 		//house keeping prospective version and combined previous extension 
 		scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(executionConfig.getProspectiveVersion()));
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
-		if (executionConfig.isExtensionValidation()) {
+		if (executionConfig.isExtensionValidation() && !executionConfig.isFirstTimeRelease()) {
 			scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(executionConfig.getPreviousVersion()));
 			releaseDataManager.dropVersion(executionConfig.getPreviousVersion());
 		}

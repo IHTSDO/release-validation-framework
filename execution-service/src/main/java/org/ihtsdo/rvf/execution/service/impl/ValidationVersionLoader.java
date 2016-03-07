@@ -52,15 +52,13 @@ public class ValidationVersionLoader {
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
 	
 	
-	public ExecutionConfig loadPreviousVersion(Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
+	public boolean loadPreviousVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
 		String prevReleaseVersion = resolvePreviousVersion(validationConfig.getPrevIntReleaseVersion());
 		final boolean isExtension = isExtension(validationConfig);
 		if (isExtension) {
 			prevReleaseVersion = "previous_" + validationConfig.getRunId();
 		}
-		final ExecutionConfig executionConfig = createExecutionConfig(validationConfig);
-		executionConfig.setPreviousVersion(prevReleaseVersion);
-		
+		executionConfig.setPreviousVersion(prevReleaseVersion.toLowerCase());
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		boolean isSucessful = false;
 		String reportStorage = validationConfig.getStorageLocation();
@@ -71,13 +69,10 @@ public class ValidationVersionLoader {
 		} else {
 			isSucessful = combineKnownReleases(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
 		}
-		return isSucessful ? executionConfig : null;
+		return isSucessful;
 		}
 		
 	public boolean loadProspectiveVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
-		if (executionConfig == null) {
-			executionConfig = createExecutionConfig(validationConfig);
-		}
 		String prospectiveVersion = executionConfig.getExecutionId().toString();
 		executionConfig.setProspectiveVersion(prospectiveVersion);
 		List<String> rf2FilesLoaded = new ArrayList<>();
@@ -104,8 +99,8 @@ public class ValidationVersionLoader {
 		return true;
 	}
 
-	private ExecutionConfig createExecutionConfig(ValidationRunConfig validationConfig) {
-		final ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
+	public ExecutionConfig createExecutionConfig(ValidationRunConfig validationConfig) {
+		ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
 		executionConfig.setGroupNames(validationConfig.getGroupsList());
 		executionConfig.setExtensionValidation( isExtension(validationConfig));
 		//default to 10
@@ -318,7 +313,7 @@ public class ValidationVersionLoader {
 		if (previousExtVersion != null) {
 			if (extensionBaseLine == null) {
 				responseMap.put(FAILURE_MESSAGE, "PreviousExtensionVersion is :" 
-						+ prevIntReleaseVersion + " but extension release base line has not been specified.");
+						+ previousExtVersion + " but extension release base line has not been specified.");
 				return true;
 			}
 		}
