@@ -251,9 +251,10 @@ public class ValidationVersionLoader {
 			} else {
 				throw new ConfigurationException("Can't find the cached release zip file for known version: " + versionDate);
 			}
+			
 		} else {
 			logger.info("Start loading release version {} with release file {}", prospectiveVersion, tempFile.getName());
-			releaseDataManager.loadSnomedData(prospectiveVersion,rf2FilesLoaded, tempFile);
+			releaseDataManager.loadSnomedDataIntoExistingDb(prospectiveVersion, rf2FilesLoaded, tempFile);
 		}
 		logger.info("Completed loading release version {}", prospectiveVersion);
 	}
@@ -273,7 +274,7 @@ public class ValidationVersionLoader {
 				final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into: [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
 				logger.info(startCombiningMsg);
 				reportService.writeProgress(startCombiningMsg, reportStorage);
-				final boolean isSuccess = releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
+				boolean isSuccess = releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion(), validationConfig.getPreviousExtVersion());
 				if (!isSuccess) {
 					String message = "Failed to combine known versions:" 
 							+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName;
@@ -295,7 +296,10 @@ public class ValidationVersionLoader {
 	private boolean combineCurrentReleases(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap, List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception{
 		String prospectiveVersion = validationConfig.getRunId().toString();
 		if (isExtension(validationConfig)) {
-			uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+			//copy extension dependency data into prospective version
+			releaseDataManager.combineKnownVersions(prospectiveVersion, validationConfig.getExtensionDependencyVersion());
+			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+		
 		} else if (validationConfig.isRf2DeltaOnly()) {
 			rf2FilesLoaded.addAll(loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig));
 		} else {		  			
