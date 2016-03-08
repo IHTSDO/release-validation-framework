@@ -24,7 +24,8 @@ public class AssertionGroupImporter {
 		SPANISH_EDITION ("SpanishEdition"),
 		INTERNATIONAL_EDITION ("InternationalEdition"),
 		SNAPSHOT_CONTENT_VALIDATION ("SnapshotContentValidation"),
-		FIRST_TIME_LOINC_VALIDATION ("firstTimeLOINCValidation");
+		FIRST_TIME_LOINC_VALIDATION ("firstTimeLOINCValidation"),
+		FIRST_TIME_INTERNATIONAL_RELEASE_VALIDATION("firstTimeInternationalReleaseValidation");
 		private String name;
 		private AssertionGroupName(String name) {
 			this.name = name;
@@ -118,10 +119,30 @@ public class AssertionGroupImporter {
 			case FIRST_TIME_LOINC_VALIDATION :
 				createLoincFirstTimeValidationGroup(allAssertions);
 				break;
+			case FIRST_TIME_INTERNATIONAL_RELEASE_VALIDATION :
+				createFirstTimeInternational(allAssertions);
+				break;
 			default :
 			  break;
 		}
 		
+	}
+
+	private void createFirstTimeInternational(List<Assertion> allAssertions) {
+		AssertionGroup group = new AssertionGroup();
+		group.setName(AssertionGroupName.FIRST_TIME_INTERNATIONAL_RELEASE_VALIDATION.getName());
+		group = assertionGroupDao.create(group);
+		int counter = 0;
+		for (Assertion assertion : allAssertions) {
+			if (!assertion.getKeywords().contains(RESOURCE)) {
+				String assertionText = assertion.getAssertionText();
+				if (!assertion.getKeywords().contains(LOINC) && !assertionText.contains("previous") && !assertionText.contains("New inactive states follow active states") ) {
+					assertionService.addAssertionToGroup(assertion, group);
+					counter++;
+				}
+			}
+		}
+		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
 	}
 
 	private void createLoincFirstTimeValidationGroup(List<Assertion> allAssertions) {
