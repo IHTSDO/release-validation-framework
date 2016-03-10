@@ -78,7 +78,7 @@ public class ValidationVersionLoader {
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		boolean isSucessful = false;
 		String reportStorage = validationConfig.getStorageLocation();
-		if (!isPublishedVersionsLoaded(validationConfig)) {
+		if (validationConfig.getExtensionDependencyVersion() != null && validationConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
 			//load published versions from s3 and load prospective file
 			isSucessful = prepareVersionsFromS3FilesForProspectvie(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
 		} else {
@@ -172,44 +172,69 @@ public class ValidationVersionLoader {
 		if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
 			return false;
 		}
-		if (validationConfig.getExtensionDependencyVersion() != null && validationConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
-			return false;
-		}
 		return true;
 	}
 	
 	
 	
+	
 	private boolean prepareVersionsFromS3FilesForPreviousVersion(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap,List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception {
 		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
-		if (validationConfig.getPrevIntReleaseVersion() != null) {
-			String previousPublished = INTERNATIONAL + SEPARATOR + validationConfig.getPrevIntReleaseVersion();
-			logger.debug("download published version from s3:" + previousPublished );
-			InputStream previousIntInput = s3PublishFileHelper.getFileStream(previousPublished);
-			File previousVersionTemp = File.createTempFile(validationConfig.getPrevIntReleaseVersion(), null);
-			IOUtils.copy(previousIntInput, new FileOutputStream(previousVersionTemp));
+		if (!validationConfig.isFirstTimeRelease() && validationConfig.getPrevIntReleaseVersion() != null) {
 			List<String> prevRf2FilesLoaded = new ArrayList<>();
-			if (isExtension(validationConfig) && !validationConfig.isFirstTimeRelease()) {
+			File previousVersionTemp = null;
+			if (validationConfig.getPrevIntReleaseVersion().endsWith(ZIP_FILE_EXTENSION)) {
+				String previousPublished = INTERNATIONAL + SEPARATOR + validationConfig.getPrevIntReleaseVersion();
+				logger.debug("download published version from s3:" + previousPublished );
+				InputStream previousIntInput = s3PublishFileHelper.getFileStream(previousPublished);
+				previousVersionTemp = File.createTempFile(validationConfig.getPrevIntReleaseVersion(), null);
+				IOUtils.copy(previousIntInput, new FileOutputStream(previousVersionTemp));
+			}
+			
+			File previousExtTemp = null;
+			if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
+				String previousExtZipFile = INTERNATIONAL + SEPARATOR + validationConfig.getPreviousExtVersion();
+				logger.debug("downloading published extension from s3:" + previousExtZipFile);
+				InputStream previousExtInput = s3PublishFileHelper.getFileStream(previousExtZipFile);
+				previousExtTemp = File.createTempFile(validationConfig.getPreviousExtVersion(), null);
+				IOUtils.copy(previousExtInput, new FileOutputStream(previousExtTemp));
+			}
+
+			if (isExtension(validationConfig)) {
 				String combinedVersionName = executionConfig.getPreviousVersion();
 				final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
 				logger.info(startCombiningMsg);
 				reportService.writeProgress(startCombiningMsg, reportStorage);
-				String previousExtZipFile = INTERNATIONAL + SEPARATOR + validationConfig.getPreviousExtVersion();
-				logger.debug("downloading published extension from s3:" + previousExtZipFile);
-				InputStream previousExtInput = s3PublishFileHelper.getFileStream(previousExtZipFile);
-				File previousExtTemp = File.createTempFile(validationConfig.getPreviousExtVersion(), null);
-				IOUtils.copy(previousExtInput, new FileOutputStream(previousExtTemp));
-
-				releaseDataManager.loadSnomedData(combinedVersionName, prevRf2FilesLoaded, previousVersionTemp,previousExtTemp);
-				String schemaName = releaseDataManager.getSchemaForRelease(executionConfig.getPreviousVersion());
-				if (schemaName == null) {
-					responseMap.put(FAILURE_MESSAGE, "Failed to load two versions:" 
-							+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + combinedVersionName);
-					reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
-					return false;
+				if (previousVersionTemp != null) {
+					if (previousExtTemp != null) {
+						releaseDataManager.loadSnomedData(combinedVersionName, prevRf2FilesLoaded, previousVersionTemp,previousExtTemp);
+					} else {
+						releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPreviousExtVersion());
+						releaseDataManager.loadSnomedDataIntoExistingDb(combinedVersionName, prevRf2FilesLoaded, previousVersionTemp);
+					}
+				} else {
+					if (previousExtTemp != null) {
+						releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion());
+						releaseDataManager.loadSnomedDataIntoExistingDb(combinedVersionName, prevRf2FilesLoaded, previousExtTemp);
+					}
 				}
 			} else {
 				releaseDataManager.loadSnomedData(executionConfig.getPreviousVersion(), prevRf2FilesLoaded, previousVersionTemp);
+			}
+
+			String schemaName = releaseDataManager.getSchemaForRelease(executionConfig.getPreviousVersion());
+			if (schemaName == null) {
+				String failureMsg = null;
+				if (isExtension(validationConfig)) {
+					failureMsg = "Failed to combine " 
+							+ validationConfig.getPrevIntReleaseVersion() + " and " + validationConfig.getPreviousExtVersion() + " into " + executionConfig.getPreviousVersion();
+				} else {
+					failureMsg =  "Failed to load previous version:" 
+							+ validationConfig.getPrevIntReleaseVersion() + " into " + executionConfig.getPreviousVersion();
+				}
+				responseMap.put(FAILURE_MESSAGE, failureMsg);
+				reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
+				return false;
 			}
 		} 
 		return true;
