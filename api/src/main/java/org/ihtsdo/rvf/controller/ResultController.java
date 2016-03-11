@@ -1,12 +1,18 @@
 package org.ihtsdo.rvf.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,14 +22,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wordnik.swagger.annotations.ApiOperation;
+
 @Controller
 @RequestMapping("/result")
 public class ResultController {
 	
 	private static final String MESSAGE = "Message";
-//	@Autowired
-//	private ResultExtractorService resultExtractor;
-	
 	@Autowired
 	private ValidationReportService reportService;
 
@@ -55,21 +60,18 @@ public class ResultController {
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}
 	
-//	@RequestMapping(value = "{runId}/{assertionUUID}", method = RequestMethod.GET)
-//	@ResponseBody
-//	public ResponseEntity<String> extractResults(@PathVariable final Long runId,
-//			@PathVariable(value="assertionUUID") final String assertionUUID) {
-//		 final HttpStatus returnStatus = HttpStatus.OK;
-//		String result = String.format("No results found for runId [%s] and assertion UUID [%s].",runId, assertionUUID);
-//		try {
-//			final String jsonResult = resultExtractor.extractResultToJson( runId, UUID.fromString(assertionUUID));
-//			if (jsonResult != null) {
-//				result = jsonResult;
-//			} 
-//		} catch (final BusinessServiceException e) {
-//			result = "Error message:" + e.getMessage();
-//		}
-//		return new ResponseEntity<>(result, returnStatus);
-//	}
-
+	@RequestMapping(value = "/structure/{runId}", method = RequestMethod.GET)
+	@ResponseBody
+	@ApiOperation( value = "Returns a report",
+		notes = "Returns a report as txt file for a valid report id " )
+	public FileSystemResource getStructureReport(@PathVariable final Long runId, 
+			@RequestParam(value = "storageLocation") final String storageLocation) throws IOException {
+		InputStream reportInputStream = reportService.getStructureReport(runId, storageLocation);
+		File tempReport = File.createTempFile("structure_validation_"+ runId.toString(), ".txt");
+		OutputStream outputSteam = new FileOutputStream(tempReport);
+		if ( reportInputStream != null ) {
+			IOUtils.copy(reportInputStream, outputSteam);
+		} 
+		return new FileSystemResource(tempReport);
+	}
 }

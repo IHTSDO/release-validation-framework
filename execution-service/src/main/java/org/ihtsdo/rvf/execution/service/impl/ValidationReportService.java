@@ -39,6 +39,7 @@ public class ValidationReportService {
 	private String stateFilePath;
 	private String resultsFilePath;
 	private String progressFilePath;
+	private String structureTestReportPath;
 	
 	private static final String UTF_8 = "UTF-8";
 	
@@ -52,9 +53,11 @@ public class ValidationReportService {
 	@PostConstruct
 	public void init() {
 		s3Helper = new FileHelper(bucketName, s3Client);
-		stateFilePath = File.separator + RVF + File.separator + "state.txt";
-		resultsFilePath =  File.separator + RVF + File.separator + "results.json";
-		progressFilePath =  File.separator + RVF + File.separator + "progress.txt";
+		String rvfRoot = File.separator + RVF + File.separator;
+		stateFilePath = rvfRoot + "state.txt";
+		resultsFilePath = rvfRoot + "results.json";
+		progressFilePath = rvfRoot + "progress.txt";
+		structureTestReportPath = rvfRoot + "structure_validation.txt";
 	}
 	
 	public void writeResults(final Map<String , Object> responseMap, final State state, String storageLocation) throws IOException, NoSuchAlgorithmException, DecoderException {
@@ -151,6 +154,12 @@ public class ValidationReportService {
 		}
 
 	public void putFileIntoS3(String reportStorage, File file) throws NoSuchAlgorithmException, IOException, DecoderException {
-			s3Helper.putFile(file, reportStorage + file.getName());
+			s3Helper.putFile(file, reportStorage + structureTestReportPath);
 		}
+	
+	 public InputStream getStructureReport( Long runId, String storageLocation) throws IOException {
+			String filePath = storageLocation + structureTestReportPath;
+			return s3Helper.getFileStream(filePath);
+		}
+	 
 }

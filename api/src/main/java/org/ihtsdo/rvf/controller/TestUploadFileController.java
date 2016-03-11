@@ -31,12 +31,10 @@ import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -252,9 +250,6 @@ public class TestUploadFileController {
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
 			//Queue incoming validation request
 			queueManager.queueValidationRequest( vrConfig, responseMap);
-			//create new instance to process 
-//			instanceManager.createInstance();
-			
 			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
 			responseMap.put("resultURL", urlToPoll);
 		} else {
@@ -320,31 +315,5 @@ public class TestUploadFileController {
 		} finally {
 			FileUtils.deleteQuietly(tempFile);
 		}
-	}
-
-	@RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
-	@ResponseBody
-	@ApiOperation( value = "Returns a report",
-		notes = "Returns a report as txt file for a valid report id " )
-	public FileSystemResource getFile(@PathVariable final String id) {
-		return new FileSystemResource(new File(validationRunner.getReportDataFolder(), id+".txt"));
-	}
-
-	private List<AssertionGroup> getAssertionGroups(final List<String> items) throws IOException{
-
-		final List<AssertionGroup> groups = new ArrayList<>();
-		for(final String item: items){
-			 if(item.matches("\\d+")){
-                 // treat as group id and retrieve associated group
-                 final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, Long.valueOf(item));
-                 if(group != null){
-                     groups.add(group);
-                 }
-             }
-             else{
-                 groups.add(objectMapper.readValue(item, AssertionGroup.class));
-             }
-		}
-		return groups;
 	}
 }
