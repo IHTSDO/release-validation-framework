@@ -321,9 +321,8 @@ public class ValidationVersionLoader {
 	private boolean combineCurrentReleases(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap, List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception{
 		String prospectiveVersion = validationConfig.getRunId().toString();
 		if (isExtension(validationConfig)) {
-			//copy extension dependency data into prospective version
-			releaseDataManager.combineKnownVersions(prospectiveVersion, validationConfig.getExtensionDependencyVersion());
-			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+			//combine extension dependency data into prospective version
+			uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		
 		} else if (validationConfig.isRf2DeltaOnly()) {
 			rf2FilesLoaded.addAll(loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig));
