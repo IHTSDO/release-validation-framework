@@ -276,8 +276,6 @@ public class ValidationVersionLoader {
 			} else {
 				throw new ConfigurationException("Can't find the cached release zip file for known version: " + versionDate);
 			}
-			releaseDataManager.loadSnomedDataIntoExistingDb(prospectiveVersion, rf2FilesLoaded, tempFile);
-			
 		} else {
 			logger.info("Start loading release version {} with release file {}", prospectiveVersion, tempFile.getName());
 			releaseDataManager.loadSnomedData(prospectiveVersion, rf2FilesLoaded, tempFile);
