@@ -18,8 +18,8 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		b.id,
-		concat('AssociationRefset id=',a.id, ' is active  but the target component is an inactive concept: ', b.id) 	
+		a.referencedcomponentid,
+		concat('AssociationRefset id=',a.id, ' is active but the target component is an inactive concept: ', b.id) 	
 	from curr_associationrefset_s a
 	inner join curr_concept_s b on a.targetcomponentid = b.id
 	left join v_limcons c on c.referencedcomponentid = a.referencedcomponentid 

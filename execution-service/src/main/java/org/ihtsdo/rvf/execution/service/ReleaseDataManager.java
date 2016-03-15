@@ -37,4 +37,6 @@ public interface ReleaseDataManager {
 	void copyTableData(String sourceVersion,String destinationVersion, String tableNamePattern);
 
 	void updateSnapshotTableWithDataFromDelta(String prospectiveVersion);
+	
+	String loadSnomedDataIntoExistingDb(String productVersion,List<String> rf2FilesLoaded,File ... zipDataFile) throws BusinessServiceException;
 }

@@ -27,11 +27,9 @@ public class RvfAssertionsDatabasePrimerService {
 			
 			LOGGER.info("Assertions imported");
 		}
-		if (assertionGroupImporter.isImportRequired()) {
-			//create assertion group
-			LOGGER.info("No groups exist and start importing assertion group ...");
-			assertionGroupImporter.importAssertionGroups();
-			LOGGER.info("Assertion group imported");
-		}
+		//create assertion group
+		LOGGER.info("Import assertion group if not being imported already");
+		assertionGroupImporter.importAssertionGroups();
+		LOGGER.info("Assertion group imported");
 	}
 }

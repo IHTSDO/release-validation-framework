@@ -368,13 +368,13 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Active historical association refset members have active concepts as targets.",
-    "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : 609452007,
-      "detail" : "AssociationRefset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is active  but the target component is an inactive concept: 609452007"
-    } ],
-    "totalFailed" : 1
+	    "assertionName" : "Active historical association refset members have active concepts as targets.",
+	    "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
+	    "firstNInstances" : [ {
+	      "conceptId" : 10123006,
+	      "detail" : "AssociationRefset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is active but the target component is an inactive concept: 609452007"
+	    } ],
+	    "totalFailed" : 1
   }, {
     "assertionName" : "CTV3 codes are unique in the CTV3 simple map refset",
     "assertionUuid" : "f14d521f-2472-4871-9c4e-356f0f075a3a",

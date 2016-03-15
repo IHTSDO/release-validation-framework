@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.ihtsdo.snomed.rvf</groupId>
         <artifactId>release-validation-framework</artifactId>
-        <version>0.1.42</version>
+        <version>0.1.43</version>
     </parent>
 
     <artifactId>validation-service</artifactId>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.ihtsdo.snomed.util</groupId>
             <artifactId>snomed-utilities</artifactId>
-            <version>1.0.7</version>
+            <version>${snomed.utilities.version}</version>
             <exclusions>
             	<exclusion>
 					<artifactId>spring-beans</artifactId>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
+            <version>3.2.2</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>

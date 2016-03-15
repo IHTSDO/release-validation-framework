@@ -24,6 +24,8 @@ import org.ihtsdo.snomed.util.rf2.schema.Field;
 import org.ihtsdo.snomed.util.rf2.schema.FileRecognitionException;
 import org.ihtsdo.snomed.util.rf2.schema.SchemaFactory;
 import org.ihtsdo.snomed.util.rf2.schema.TableSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ColumnPatternTester {
 
@@ -49,6 +51,8 @@ public class ColumnPatternTester {
 	private final ResourceProvider resourceManager;
 	private final TestReportable testReport;
 	private Map<ColumnType, PatternTest> columnTests;
+	
+	private Logger logger = LoggerFactory.getLogger(ColumnPatternTester.class.getName());
 
 	public ColumnPatternTester(final ValidationLog validationLog, final ResourceProvider resourceManager, final TestReportable testReport) {
 		this.validationLog = validationLog;
@@ -87,8 +91,7 @@ public class ColumnPatternTester {
 					linesTested += totalLines;
 				}
 			} catch (InterruptedException | ExecutionException e) {
-				//TODO
-				e.printStackTrace();
+				logger.error("Error occurred when executing column validations", e);
 			}
 		}
 		validationLog.info("{} files and {} lines tested in {} milliseconds.", filesTested, linesTested, (new Date().getTime() - startTime.getTime()));
@@ -187,7 +190,7 @@ public class ColumnPatternTester {
 		}
 		if (dataColumnCount != configColumnCount) {
 			validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
-			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Column Count Mismatch", COLUMN_COUNT_TEST_TYPE, "", "" + configColumnCount, "" + dataColumnCount);
+			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Column Count Mismatch", COLUMN_COUNT_TEST_TYPE, "", String.valueOf(dataColumnCount), String.valueOf(configColumnCount));
 			// cannot continue at this point as any validation will be off
 			return false;
 		}

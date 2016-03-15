@@ -110,17 +110,20 @@ public class ValidationRunner {
 		reportService.writeState(State.RUNNING, reportStorage);
 		
 		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(), 
-				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl());
+				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation());
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;
 		} 
 		//load previous published version
-		ExecutionConfig executionConfig = releaseVersionLoader.loadPreviousVersion(responseMap, validationConfig);
-		if (executionConfig == null) {
-			reportService.writeResults(responseMap, State.FAILED, reportStorage);
-			return;
+		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
+		if (!validationConfig.isFirstTimeRelease()) {
+			boolean isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+			if (!isLoaded) {
+				reportService.writeResults(responseMap, State.FAILED, reportStorage);
+				return;
+			}
 		}
 		//load prospective version
 		boolean isSuccessful = releaseVersionLoader.loadProspectiveVersion(executionConfig, responseMap, validationConfig);
@@ -138,7 +141,7 @@ public class ValidationRunner {
 		//house keeping prospective version and combined previous extension 
 		scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(executionConfig.getProspectiveVersion()));
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
-		if (executionConfig.isExtensionValidation()) {
+		if (executionConfig.isExtensionValidation() && !executionConfig.isFirstTimeRelease()) {
 			scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(executionConfig.getPreviousVersion()));
 			releaseDataManager.dropVersion(executionConfig.getPreviousVersion());
 		}

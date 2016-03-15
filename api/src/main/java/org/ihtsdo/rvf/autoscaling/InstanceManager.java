@@ -266,9 +266,9 @@ public class InstanceManager {
 		builder.append("#!/bin/sh\n");
 		builder.append("sudo apt-get update -o Dir::Etc::sourcelist=\"sources.list.d/maven_ihtsdotools_org_content_repositories_*\"" + "\n");
 		if (appVersion != null && !appVersion.isEmpty()) {
-			builder.append("sudo apt-get install rvf-api=" + appVersion + "\n" );
+			builder.append("sudo apt-get install --force-yes -y rvf-api=" + appVersion + "\n" );
 		} else {
-			builder.append("sudo apt-get install rvf-api \n" );
+			builder.append("sudo apt-get install --force-yes -y rvf-api \n" );
 		}
 		builder.append("sudo dpkg -s rvf-api\n");
 		String rvfConfig = System.getProperty(RVF_CONFIG_LOCATION);

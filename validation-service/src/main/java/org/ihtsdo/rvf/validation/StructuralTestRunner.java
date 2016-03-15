@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.validation.impl.CsvMetadataResultFormatter;
@@ -81,7 +80,7 @@ public class StructuralTestRunner implements InitializingBean{
 	}
 	
 	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final File manifestFile, 
-			final boolean writeSucceses, final String urlPrefix ) throws IOException {
+			final boolean writeSucceses, final String urlPrefix, String storageLocation ) throws IOException {
 		 boolean isFailed = false;
 		 final long timeStart = System.currentTimeMillis();
 		 logger.debug("Start verifying zip file structure of {} against manifest", tempFile.getName());
@@ -113,7 +112,7 @@ public class StructuralTestRunner implements InitializingBean{
 			// verify if manifest is valid
 			if(report.getNumErrors() > 0) {
 				validationReport.setTotalFailures(report.getNumErrors());
-				validationReport.setReportUrl(urlPrefix+"/reports/"+ FilenameUtils.removeExtension(structureTestReport.getName()));
+				validationReport.setReportUrl(urlPrefix + "/result/structure/" + runId + "?storageLocation=" + storageLocation);
 				logger.error("No Errors expected but got " + report.getNumErrors() + " errors");
 				logger.info("reportPhysicalUrl : " + structureTestReport.getAbsolutePath());
 				// pass file name without extension - we add this back when we retrieve using controller

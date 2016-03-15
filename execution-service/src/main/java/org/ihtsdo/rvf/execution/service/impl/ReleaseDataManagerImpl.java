@@ -166,7 +166,9 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		return result;
 	}
-
+	
+	
+	
 	/**
 	 * Method that loads given SNOMED CT data into a RF2 compliant database. For published release, use the
 	 * uploadPublishedReleaseData method since it stores the data and makes better reuse of existing databases. Use
@@ -180,6 +182,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 */
 	@Override
 	public String loadSnomedData(final String versionName, List<String> rf2FilesLoaded, final File... zipDataFile) throws BusinessServiceException {
+		return loadSnomedData(versionName, false, rf2FilesLoaded, zipDataFile);
+	}
+
+	private String loadSnomedData(final String versionName, boolean isAppendToVersion, List<String> rf2FilesLoaded, final File... zipDataFile) throws BusinessServiceException {
 		File outputFolder = null;
 		final String createdSchemaName = RVF_DB_PREFIX + versionName;
 		final long startTime = Calendar.getInstance().getTimeInMillis();
@@ -196,9 +202,11 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			for (final File zipFile : zipDataFile) {
 				ZipFileUtils.extractFilesFromZipToOneFolder(zipFile, outputFolder.getAbsolutePath());
 			}
-			try (Connection connection = snomedDataSource.getConnection()) {
-				connection.setAutoCommit(true);
-				createDBAndTables(createdSchemaName, connection);
+			if (!isAppendToVersion) {
+				try (Connection connection = snomedDataSource.getConnection()) {
+					connection.setAutoCommit(true);
+					createDBAndTables(createdSchemaName, connection);
+				}
 			}
 			
 			loadReleaseFilesToDB(outputFolder,rvfDynamicDataSource,rf2FilesLoaded, createdSchemaName);
@@ -219,9 +227,9 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	private void createDBAndTables(final String schemaName, final Connection connection) throws SQLException, IOException {
 		//clean and create database
-		final String dropStr = "drop database if exists " + schemaName + ";";
-		final String createDbStr = "create database if not exists "+ schemaName + ";";
-		final String  useStr = "use " + schemaName + ";";
+		String dropStr = "drop database if exists " + schemaName + ";";
+		String createDbStr = "create database if not exists "+ schemaName + ";";
+		String  useStr = "use " + schemaName + ";";
 		try(Statement statement = connection.createStatement()) {
 			statement.execute(dropStr);
 			statement.execute(createDbStr);
@@ -364,6 +372,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		return !isFailed;
 	}
 	
+	
 	private boolean copyTable(String tableName, String sourceSchema, String targetSchema) {
 		boolean isFailed = false;
 		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
@@ -447,5 +456,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			}
 		}
 		
+	}
+
+	@Override
+	public String loadSnomedDataIntoExistingDb(String productVersion, List<String> rf2FilesLoaded, File... zipDataFile) throws BusinessServiceException {
+		return loadSnomedData(productVersion, true, rf2FilesLoaded, zipDataFile);
 	}
 }
