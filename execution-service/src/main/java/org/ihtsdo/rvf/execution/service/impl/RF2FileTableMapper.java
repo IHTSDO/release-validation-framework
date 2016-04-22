@@ -22,9 +22,9 @@ public class RF2FileTableMapper {
 	private static final String EXPRESSION_ASSOCIATION_FILE_HEADER = "der2_sscccRefset_.*ExpressionAssociation";
 	private static final String MAP_CORRELATION_ORIGIN_FILE_HEADER = "der2_scccRefset_.*MapCorrelationOrigin";
 	private static final Map<String,String> tableNameMap = new HashMap<>();
-	private static final String DELTA = ".*Delta.*_INT_\\d{8}.txt";
-	private static final String SNAPSHOT = ".*Snapshot.*_INT_\\d{8}.txt";
-	private static final String FULL = ".*Full.*_INT_\\d{8}.txt";
+	private static final String DELTA = ".*Delta.*_*_\\d{8}.txt";
+	private static final String SNAPSHOT = ".*Snapshot.*_*_\\d{8}.txt";
+	private static final String FULL = ".*Full.*_*_\\d{8}.txt";
 	//list of file name regex expressions with RVF table names
 	static {
 		//Delta

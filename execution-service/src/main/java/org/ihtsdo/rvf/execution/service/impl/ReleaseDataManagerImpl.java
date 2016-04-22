@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
@@ -290,7 +291,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	/**
 	 * Returns the schema name that corresponds to  the given release.
-	 * @param releaseVersion the release date as a yyyymmdd string (e.g. 20140731)
+	 * @param releaseVersion the product name and release date as a yyyymmdd string (e.g. int_20140731)
 	 * @return the corresponding schema name
 	 */
 	@Override
@@ -300,7 +301,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	/**
 	 * Sets the schema name that corresponds to  the given release.
-	 * @param releaseVersion the release date as a yyyymmdd string (e.g. 20140731)
+	 * @param releaseVersion the product name and release date as a yyyymmdd string (e.g. int_20140731)
 	 * @param schemaName the corresponding schema name
 	 */
 	@Override
@@ -309,7 +310,8 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 
 	@Override
-	public File getZipFileForKnownRelease(final String knownVersion) {
+	public List<File> getZipFileForKnownRelease(final String knownVersion) {
+		List<File> filesFound = new ArrayList<>();
 		if (knownVersion != null ) {
 			final File [] zipFiles = sctDataFolder.listFiles( new FilenameFilter() {
 				@Override
@@ -322,17 +324,9 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 					return false;
 				}
 			});
-			
-			if( zipFiles != null && zipFiles.length > 0) {
-				if (zipFiles.length > 1) {
-					logger.warn("Found more than one zip files having version:" + knownVersion);
-				}
-				return zipFiles[0];
-			} else {
-				logger.warn("Failed to find zip file for {} in directory {}", knownVersion, sctDataFolder);
-			}
+			filesFound.addAll(Arrays.asList(zipFiles));
 		}
-		return null;
+		return filesFound;
 	}
 	
 	

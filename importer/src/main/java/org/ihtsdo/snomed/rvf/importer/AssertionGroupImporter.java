@@ -54,7 +54,10 @@ public class AssertionGroupImporter {
 			"77fc7550-79b9-11e1-b0c4-0800200c9a66",
 			"2e4fd620-7d08-11e1-b0c4-0800200c9a66",
 			"32b41aa0-7d08-11e1-b0c4-0800200c9a66",
-			"4572d730-7d08-11e1-b0c4-0800200c9a66"};
+			"4572d730-7d08-11e1-b0c4-0800200c9a66",
+			"411e9840-7d08-11e1-b0c4-0800200c9a66",
+			"36f43550-7d08-11e1-b0c4-0800200c9a66",
+			"3ab84230-7d08-11e1-b0c4-0800200c9a66"};
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(AssertionGroupImporter.class);
 	

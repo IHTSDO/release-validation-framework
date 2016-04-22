@@ -169,6 +169,16 @@ public class RF2FileTableMapperTest {
 	}
 	
 	@Test
+	public void testDenmarkFiles() {
+		String[] dkDeltas = {"sct2_Concept_Delta_DK1000005_20160215.txt"};
+		String[] expected ={"concept_d"};
+		int i=0;
+		for (final String fileName : dkDeltas) {
+			final String tableName = RF2FileTableMapper.getLegacyTableName(fileName);
+			Assert.assertEquals(expected[i++], tableName);
+		}
+	}
+	@Test
 	public void tetsTechPreviewFiles() {
 		Assert.assertTrue(INT_PREVIEW_DELTA_FILES.length == EXPECTED_INT_PREVIEW_DELTA.length);
 		int i=0;
