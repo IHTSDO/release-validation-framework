@@ -29,7 +29,7 @@ public class ManifestPatternTester {
 
 	public void runTests() {
 		final Date startTime = new Date();
-		if (manifestFile == null) {
+		if (manifestFile == null || manifestFile.getListing() == null) {
 			validationLog.assertionError("Manifest file expected but not found.");
 			report.addError("0", startTime, MANIFEST, MANIFEST, MANIFEST, MANIFEST_STRUCTURE_TEST, "", "No Manifest File Found", MANIFEST);
 		} else {

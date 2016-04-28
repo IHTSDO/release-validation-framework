@@ -59,11 +59,11 @@ public class AssertionExecutionServiceImplIT {
 		assertNotNull(releaseDataManager);
 
 		// register releases with release manager, since they will be used during SQL replacement
-		releaseDataManager.setSchemaForRelease("20140731", "rvf_int_20140731");
-		releaseDataManager.setSchemaForRelease("20140131", "rvf_int_20140131");
+		releaseDataManager.setSchemaForRelease("int_20140731", "rvf_int_20140731");
+		releaseDataManager.setSchemaForRelease("int_20140131", "rvf_int_20140131");
 		
-		config.setPreviousVersion("20140131");
-		config.setProspectiveVersion("20140731");
+		config.setPreviousVersion("int_20140131");
+		config.setProspectiveVersion("int_20140731");
 		config.setExecutionId(1L);
 
 		assertion = assertionService.create(new HashMap<String, String>());

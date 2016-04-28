@@ -268,8 +268,20 @@ public class ValidationVersionLoader {
 			if (knownVersion.length() > 8) {
 				versionDate = knownVersion.substring(knownVersion.length() - 8);
 			}
-			final File preLoadedZipFile = releaseDataManager.getZipFileForKnownRelease(versionDate);
-			if (preLoadedZipFile != null) {
+			final List<File> filesFound = releaseDataManager.getZipFileForKnownRelease(versionDate);
+			if (filesFound != null && !filesFound.isEmpty()) {
+				File preLoadedZipFile = filesFound.get(0);
+				if (filesFound.size() > 1) {
+					logger.info("Found more than release files with date:" + versionDate);
+					String[] splits = knownVersion.split("_");
+					logger.info("Release center short name:" + splits[0]);
+					for (File zipFile : filesFound ) {
+						if (zipFile.getName().contains(splits[0].toUpperCase())) {
+							preLoadedZipFile = zipFile;
+							break;
+						}
+					}
+				}
 				logger.info("Start loading release version {} with release file {} and baseline {}", 
 						prospectiveVersion, tempFile.getName(), preLoadedZipFile.getName());
 				releaseDataManager.loadSnomedData(prospectiveVersion,rf2FilesLoaded, tempFile, preLoadedZipFile);
