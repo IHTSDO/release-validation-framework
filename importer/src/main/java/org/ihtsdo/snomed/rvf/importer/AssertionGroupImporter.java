@@ -40,6 +40,7 @@ public class AssertionGroupImporter {
 	private static final String SIMPLE_MAP = "simple map";
 	private static final String RESOURCE = "resource";
 	private static final String LOINC = "LOINC";
+	private static final String ICD_9_COMPLEX_MAP ="ICD-9-CM";
 	@Autowired	
 	private AssertionService assertionService;
 	@Autowired
@@ -137,9 +138,10 @@ public class AssertionGroupImporter {
 		group = assertionGroupDao.create(group);
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
-			if (!assertion.getKeywords().contains(RESOURCE)) {
+			String keywords = assertion.getKeywords();
+			if (!keywords.contains(RESOURCE) && !keywords.contains(ICD_9_COMPLEX_MAP) && !keywords.contains(LOINC)) {
 				String assertionText = assertion.getAssertionText();
-				if (!assertion.getKeywords().contains(LOINC) && !assertionText.contains("previous") && !assertionText.contains("New inactive states follow active states") ) {
+				if ( !assertionText.contains("previous") && !assertionText.contains("New inactive states follow active states") ) {
 					assertionService.addAssertionToGroup(assertion, group);
 					counter++;
 				}
@@ -170,7 +172,8 @@ public class AssertionGroupImporter {
 		group.setName(AssertionGroupName.SPANISH_EDITION.getName());
 		group = assertionGroupDao.create(group);
 		for (Assertion assertion : allAssertions) {
-			if (!assertion.getKeywords().contains(RESOURCE) && !assertion.getKeywords().contains(LOINC)) {
+			String keyWords = assertion.getKeywords();
+			if (!keyWords.contains(RESOURCE) && !keyWords.contains(LOINC) && !keyWords.contains(ICD_9_COMPLEX_MAP)) {
 				if (!Arrays.asList(SPANISH_EDITION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 					assertionService.addAssertionToGroup(assertion, group);
 				}
@@ -185,7 +188,8 @@ public class AssertionGroupImporter {
 		//TODO we should create a SCA task level validation assertion group
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
-			if (!assertion.getKeywords().contains(RESOURCE) && !assertion.getKeywords().contains(AssertionGroupName.RELEASE_TYPE_VALIDATION.getName())) {
+			String keyWords = assertion.getKeywords();
+			if (!keyWords.contains(ICD_9_COMPLEX_MAP) && !keyWords.contains(RESOURCE) && !keyWords.contains(AssertionGroupName.RELEASE_TYPE_VALIDATION.getName())) {
 				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
 				if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 					continue;
@@ -208,7 +212,7 @@ public class AssertionGroupImporter {
 		internationalGroup = assertionGroupDao.create(internationalGroup);
 		for (Assertion assertion : allAssertions) {
 			String keywords = assertion.getKeywords();
-			if (!keywords.contains(RESOURCE) && !keywords.contains(LOINC)) {
+			if (!keywords.contains(RESOURCE) && !keywords.contains(LOINC) && !keywords.contains(ICD_9_COMPLEX_MAP)) {
 				assertionService.addAssertionToGroup(assertion, internationalGroup);
 			}
 		}
