@@ -23,7 +23,7 @@
 	and b.active = 1
 	and a.conceptid = b.id
 	and a.typeid ='900000000000003001'
-	and term REGEXP '[\\\t\r\n\Z\@$%#]';
+	and term REGEXP '[\\\t\r\n\Z\@$#]';
 	
 	
 	/* 	inserting exceptions in the result table for Synonym */

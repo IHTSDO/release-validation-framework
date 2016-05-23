@@ -84,12 +84,14 @@ public class InstanceManager {
 		List<String> ids = new ArrayList<>();
 		for (Instance instance : instances) {
 			String instanceId = instance.getInstanceId();
-			logger.info("RVF worker new instance created with id {} and launched at {}", instanceId, instance.getLaunchTime());
+			logger.info("RVF worker new instance created with id {}, public IP address {} and launched at {}", instanceId, instance.getPublicIpAddress(), instance.getLaunchTime());
 			CreateTagsRequest createTagsRequest = new CreateTagsRequest();
 			createTagsRequest.withResources(instanceId);
 			if ( instanceTagName != null) {
 				Tag typeTag =  new Tag(WORKER_TYPE, instanceTagName);
-				createTagsRequest.withTags(typeTag, new Tag( NAME, RVF_WORKER + instanceTagName + "_" + counter++));
+				Tag nameTag = new Tag( NAME, RVF_WORKER + instanceTagName + "_" + counter++);
+				createTagsRequest.withTags(typeTag, nameTag );
+				logger.info("Namge tag {} is created for instance id {}", nameTag, instanceId);
 			} else {
 				createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + imageId + "_" + counter++));
 			}
