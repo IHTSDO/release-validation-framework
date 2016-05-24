@@ -787,7 +787,7 @@
     "assertionName" : "The first letter of the active definition should be capitalized.",
     "assertionUuid" : "6138248d-8cc8-4bc2-8043-cd609fdd640c",
     "firstNInstances" : [ {
-      "conceptId" : 702411003,
+      "conceptId" : 703166003,
       "detail" : "TEXTDEFINITION: id=3008053018 contains a term that the first letter is not capitalized."
     } ],
     "totalFailed" : 1

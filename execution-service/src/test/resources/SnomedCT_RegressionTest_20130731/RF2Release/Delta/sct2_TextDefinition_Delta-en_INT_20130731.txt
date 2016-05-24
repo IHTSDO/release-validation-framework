@@ -1,5 +1,5 @@
 id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignificanceId
-3008053018	20140731	1	900000000000207008	703166003	en	900000000000550004	Formed by an abnormal connection between arteries within the dura mater and veins that normally drain the brain.	900000000000017005
+3008053018	20140731	1	900000000000207008	703166003	en	900000000000550004	formed by an abnormal connection between arteries within the dura mater and veins that normally drain the brain.	900000000000017005
 2989768014	20140731	1	900000000000207008	441774005	en	900000000000550004	Time when personnel begin setting up in the operating or procedure room the supplies and equipment for the next case.	900000000000017005
 3008054012	20140731	1	900000000000207008	703218000	en	900000000000550004	Characterized by severe headaches, with or without other acute neurological symptoms and diffuse segmental constriction of cerebral arteries.	900000000000017005
 2989691019	20140731	1	900000000000207008	700237005	en	900000000000550004	Occurs where a missing tooth or delayed replacement of lost teeth leads to extrusion of the opposing teeth into the edentulous space.	900000000000017005
