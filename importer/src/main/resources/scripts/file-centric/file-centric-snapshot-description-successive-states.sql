@@ -23,3 +23,18 @@
 	and a.moduleid =b.moduleid
 	and a.typeid = b.typeid
 	and a.casesignificanceid = b.casesignificanceid;
+	
+	
+	
+	insert into qa_result (runid, assertionuuid, concept_id, details)
+	select 
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		a.conceptid,
+		concat('DESCRIPTION: id=',a.id, ' should not have a new inactive state in the current release as no active state found in previous snapshot.') 	
+	from curr_description_s a left join prev_description_s b
+	on a.id=b.id
+	where a.active=0 and b.id is null;
+	
+	
+	

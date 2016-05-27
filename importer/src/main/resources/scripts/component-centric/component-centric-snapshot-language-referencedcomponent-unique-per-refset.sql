@@ -13,8 +13,19 @@
 	from 
 	(select distinct a.refsetid, a.referencedcomponentid from curr_langrefset_d a 
 	left join curr_langrefset_s b on a.refsetid =b.refsetid and a.referencedcomponentid=b.referencedcomponentid where a.id != b.id) as temp,
-	description_s b 
+	curr_description_s b 
 	where temp.referencedcomponentid =b.id;
 	
 	
+	insert into qa_result (runid, assertionuuid, concept_id, details)
+	select 
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		b.conceptid,
+		concat('Text definition: id=',temp.referencedcomponentid, ': has multiple language refset members for a given dialect.') 
+	from 
+	(select distinct a.refsetid, a.referencedcomponentid from curr_langrefset_d a 
+	left join curr_langrefset_s b on a.refsetid =b.refsetid and a.referencedcomponentid=b.referencedcomponentid where a.id != b.id) as temp,
+	curr_textdefinition_s b 
+	where temp.referencedcomponentid =b.id;
 	

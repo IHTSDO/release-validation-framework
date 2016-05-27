@@ -89,7 +89,7 @@ public class RvfAssertionTestHarness {
 	    	}
 	    	final Collection<Assertion> assertions = new ArrayList<>();
 	    	final Assertion single = new Assertion();
-	    	single.setId(97L);
+	    	single.setId(77L);
 	    	assertions.add(single);
 //	    	for (final AssertionGroup group: groups) {
 //	    		assertions.addAll(assertionDao.getAssertionsForGroup(group.getId()));

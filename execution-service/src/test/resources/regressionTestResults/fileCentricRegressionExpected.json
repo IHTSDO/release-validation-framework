@@ -192,7 +192,7 @@
     "assertionUuid" : "b88b9f46-4c33-4d8e-b9ab-ddb87aef3068",
     "firstNInstances" : [ {
       "conceptId" : 10171006,
-      "detail" : "ASSOC RS: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71:Invalid inactive states in the ASSOCIATION REFSET snapshot file."
+      "detail" : "ASSOC RS: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71: should not be inactive as it is inactive in the previous release already"
     } ],
     "totalFailed" : 1
   }, {
@@ -377,25 +377,25 @@
     } ],
     "totalFailed" : 3
   }, {
-	    "assertionName" : "All members refer to a description that is referenced in either the description table or the text definition table.",
-	    "assertionUuid" : "f5d9ae70-7856-11e1-b0c4-0800200c9a66",
-	    "firstNInstances" : [ {
-	        "conceptId" : 132462014,
-	        "detail" : "Language Refset: ReferencedComponentId =132462014 is neither in the description nor the definition snapshot file."
-	      }, {
-	        "conceptId" : 2731802019,
-	        "detail" : "Language Refset: ReferencedComponentId =2731802019 is neither in the description nor the definition snapshot file."
-	      }, {
-	        "conceptId" : 751600014,
-	        "detail" : "Language Refset: ReferencedComponentId =751600014 is neither in the description nor the definition snapshot file."
-	      }, {
-	        "conceptId" : 401837018,
-	        "detail" : "Language Refset: ReferencedComponentId =401837018 is neither in the description nor the definition snapshot file."
-	      }, {
-	        "conceptId" : 2794052013,
-	        "detail" : "Language Refset: ReferencedComponentId =2794052013 is neither in the description nor the definition snapshot file."
-	      } ],
-	      "totalFailed" : 5
+    "assertionName" : "All members refer to a description that is referenced in either the description table or the text definition table.",
+    "assertionUuid" : "f5d9ae70-7856-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 132462014,
+      "detail" : "Language Refset: ReferencedComponentId =132462014 is neither in the description nor the definition snapshot file."
+    }, {
+      "conceptId" : 2731802019,
+      "detail" : "Language Refset: ReferencedComponentId =2731802019 is neither in the description nor the definition snapshot file."
+    }, {
+      "conceptId" : 751600014,
+      "detail" : "Language Refset: ReferencedComponentId =751600014 is neither in the description nor the definition snapshot file."
+    }, {
+      "conceptId" : 401837018,
+      "detail" : "Language Refset: ReferencedComponentId =401837018 is neither in the description nor the definition snapshot file."
+    }, {
+      "conceptId" : 2794052013,
+      "detail" : "Language Refset: ReferencedComponentId =2794052013 is neither in the description nor the definition snapshot file."
+    } ],
+    "totalFailed" : 5
   }, {
     "assertionName" : "The current Language Refset snapshot file does not contain duplicate Member Ids.",
     "assertionUuid" : "fc24db60-7856-11e1-b0c4-0800200c9a66",
@@ -514,14 +514,17 @@
     "firstNInstances" : [ {
       "conceptId" : 699400005,
       "detail" : "DESCRIPTION: id=2984057019 should not have a new inactive state in the current release as it was already inactive in previous snapshot."
+    }, {
+      "conceptId" : 703860006,
+      "detail" : "DESCRIPTION: id=2984057023 should not have a new inactive state in the current release as no active state found in previous snapshot."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the ASSOCIATION REFSET snapshot file.",
     "assertionUuid" : "2ddc9a28-150d-47a4-9b0e-7dbff2efdd72",
     "firstNInstances" : [ {
       "conceptId" : 10171006,
-      "detail" : "ASSOC RF: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb73:Invalid keys in ASSOCIATION REFSET snapshot file."
+      "detail" : "ReferencedComponent: id=10171006 and targetComponentId:239777004 contains multiple association refset memember ids."
     } ],
     "totalFailed" : 1
   }, {
@@ -657,9 +660,18 @@
     "assertionUuid" : "5f1a51a3-6200-4463-8799-d75998165278",
     "firstNInstances" : [ {
       "conceptId" : 699765003,
-      "detail" : "CONCEPT: id=699765003:New inactive states follow active states in the CONCEPT snapshot."
+      "detail" : "CONCEPT: id=699765003:New inactive states does not follow active states in the concept snapshot."
+    }, {
+      "conceptId" : 703649004,
+      "detail" : "CONCEPT: id=703649004: is inactive but no active state found in the previous release."
+    }, {
+      "conceptId" : 700132008,
+      "detail" : "CONCEPT: id=700132008: is inactive but no active state found in the previous release."
+    }, {
+      "conceptId" : 609452007,
+      "detail" : "CONCEPT: id=609452007: is inactive but no active state found in the previous release."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 4
   }, {
     "assertionName" : "The current Inferred Relationship snapshot file does not contain duplicate Relationship Ids.",
     "assertionUuid" : "6336ec40-79b9-11e1-b0c4-0800200c9a66",
