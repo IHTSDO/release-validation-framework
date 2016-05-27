@@ -380,25 +380,22 @@
 	    "assertionName" : "All members refer to a description that is referenced in either the description table or the text definition table.",
 	    "assertionUuid" : "f5d9ae70-7856-11e1-b0c4-0800200c9a66",
 	    "firstNInstances" : [ {
-	      "conceptId" : 132462014,
-	      "detail" : "Language Refset: ReferencedComponentId =132462014 is neither in the description nor the definition snapshot file."
-	    }, {
-	      "conceptId" : 2731802019,
-	      "detail" : "Language Refset: ReferencedComponentId =2731802019 is neither in the description nor the definition snapshot file."
-	    }, {
-	      "conceptId" : 751600014,
-	      "detail" : "Language Refset: ReferencedComponentId =751600014 is neither in the description nor the definition snapshot file."
-	    }, {
-	      "conceptId" : 401837018,
-	      "detail" : "Language Refset: ReferencedComponentId =401837018 is neither in the description nor the definition snapshot file."
-	    }, {
-	      "conceptId" : 2794052013,
-	      "detail" : "Language Refset: ReferencedComponentId =2794052013 is neither in the description nor the definition snapshot file."
-	    }, {
-	      "conceptId" : 467510012,
-	      "detail" : "Language Refset: ReferencedComponentId =467510012 is neither in the description nor the definition snapshot file."
-	    } ],
-	    "totalFailed" : 6
+	        "conceptId" : 132462014,
+	        "detail" : "Language Refset: ReferencedComponentId =132462014 is neither in the description nor the definition snapshot file."
+	      }, {
+	        "conceptId" : 2731802019,
+	        "detail" : "Language Refset: ReferencedComponentId =2731802019 is neither in the description nor the definition snapshot file."
+	      }, {
+	        "conceptId" : 751600014,
+	        "detail" : "Language Refset: ReferencedComponentId =751600014 is neither in the description nor the definition snapshot file."
+	      }, {
+	        "conceptId" : 401837018,
+	        "detail" : "Language Refset: ReferencedComponentId =401837018 is neither in the description nor the definition snapshot file."
+	      }, {
+	        "conceptId" : 2794052013,
+	        "detail" : "Language Refset: ReferencedComponentId =2794052013 is neither in the description nor the definition snapshot file."
+	      } ],
+	      "totalFailed" : 5
   }, {
     "assertionName" : "The current Language Refset snapshot file does not contain duplicate Member Ids.",
     "assertionUuid" : "fc24db60-7856-11e1-b0c4-0800200c9a66",

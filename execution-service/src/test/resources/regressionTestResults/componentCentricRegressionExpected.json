@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 80,
-  "totalAssertionsFailed" : 80,
+  "totalAssertionsRun" : 81,
+  "totalAssertionsFailed" : 81,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -169,11 +169,11 @@
     "assertionName" : "The mapRule for active rule based extended maps should end with a default rule and not blank",
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f73",
     "firstNInstances" : [ {
-      "conceptId" : 127011,
-      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 does not end with default rule"
-    }, {
       "conceptId" : 140004,
       "detail" : "ExtendedMap: id=174a7931-88f1-5fc7-99fc-f0fc8f104f87 does not end with default rule"
+    }, {
+      "conceptId" : 127011,
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 does not end with default rule"
     } ],
     "totalFailed" : 2
   }, {
@@ -357,8 +357,11 @@
     "firstNInstances" : [ {
       "conceptId" : 702386002,
       "detail" : "CONCEPT: id=702386002: Concept has duplicate terms within a single language refset."
+    }, {
+      "conceptId" : 703860006,
+      "detail" : "CONCEPT: id=703860006: Concept has duplicate terms within a single language refset."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "No synonyms have semantic tags.",
     "assertionUuid" : "e95acdbd-0a20-4010-9e78-00e70491e800",
@@ -368,13 +371,13 @@
     } ],
     "totalFailed" : 1
   }, {
-	    "assertionName" : "Active historical association refset members have active concepts as targets.",
-	    "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
-	    "firstNInstances" : [ {
-	      "conceptId" : 10123006,
-	      "detail" : "AssociationRefset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is active but the target component is an inactive concept: 609452007"
-	    } ],
-	    "totalFailed" : 1
+    "assertionName" : "Active historical association refset members have active concepts as targets.",
+    "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : 10123006,
+      "detail" : "AssociationRefset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is active but the target component is an inactive concept: 609452007"
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "CTV3 codes are unique in the CTV3 simple map refset",
     "assertionUuid" : "f14d521f-2472-4871-9c4e-356f0f075a3a",
@@ -460,8 +463,8 @@
     "assertionName" : "For each active FSN there is a synonym that has the same text.",
     "assertionUuid" : "19423070-7118-45bd-98ba-6d0dc18bc619",
     "firstNInstances" : [ {
-      "conceptId" : 700132006,
-      "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
+      "conceptId" : 703860006,
+      "detail" : "703860006 |Toxic effect of antimony AND/OR its compounds (disorder)|"
     }, {
       "conceptId" : 702386002,
       "detail" : "702386002 |Epilepsy in mother complicating childbirth(disorder|"
@@ -469,8 +472,8 @@
       "conceptId" : 702386002,
       "detail" : "702386002 |Toxic effect of antimony and/or its compounds (disorder)|"
     }, {
-      "conceptId" : 703860006,
-      "detail" : "703860006 |Toxic effect of antimony AND/OR its compounds (disorder)|"
+      "conceptId" : 700132006,
+      "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
     } ],
     "totalFailed" : 4
   }, {
@@ -564,6 +567,14 @@
       "detail" : "Concept: id=704319004 referenced in the ExpressionAssociationRefset SNAPSHOT is unknown."
     } ],
     "totalFailed" : 50
+  }, {
+    "assertionName" : "There is only one member id per description per dialect in the language refset snapshot file.",
+    "assertionUuid" : "31f5e2c8-b0b9-42ee-a9bf-87d95edad83b",
+    "firstNInstances" : [ {
+      "conceptId" : 703860006,
+      "detail" : "Description: id=3008913022: has multiple language refset members for a given dialect."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "All FSNs have a space before the semantic tag.",
     "assertionUuid" : "32369add-8d9f-48de-a129-29b32c79a9d7",
