@@ -11,9 +11,10 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('ASSOC RF: id=',a.id, ':Invalid keys in ASSOCIATION REFSET snapshot file.') 	
+		concat('ReferencedComponent: id=',a.referencedcomponentid, ' and targetComponentId:',a.targetcomponentid,
+		' contains multiple association refset memember ids.') 	
 	from curr_associationrefset_s a 
-	group by a.id , a.refsetid , a.referencedcomponentid , a.targetcomponentid
-	having count(a.id) > 1 and count(a.refsetid) > 1 and count(a.referencedcomponentid ) > 1 and count(a.targetcomponentid) > 1;
+	group by a.refsetid , a.referencedcomponentid , a.targetcomponentid
+	having count(a.refsetid) > 1 and count(a.referencedcomponentid ) > 1 and count(a.targetcomponentid) > 1;
 	commit;
 	

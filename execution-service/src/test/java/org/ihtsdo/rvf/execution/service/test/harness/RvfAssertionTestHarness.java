@@ -62,8 +62,8 @@ public class RvfAssertionTestHarness {
 	        assertNotNull(entityService);
 	        assertNotNull(releaseDataManager);
 	        // register releases with release manager, since they will be used during SQL replacement
-	        releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_int_20140731");
-	        releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_dk_20150731");
+	        releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_regression_test_prospective");
+	        releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_regression_test_previous");
 
 	    }
 	    
@@ -88,12 +88,12 @@ public class RvfAssertionTestHarness {
 	    		groups.add(assertionDao.getAssertionGroupsByName(name));
 	    	}
 	    	final Collection<Assertion> assertions = new ArrayList<>();
-//	    	final Assertion single = new Assertion();
-//	    	single.setId(28L);
-//	    	assertions.add(single);
-	    	for (final AssertionGroup group: groups) {
-	    		assertions.addAll(assertionDao.getAssertionsForGroup(group.getId()));
-	    	}
+	    	final Assertion single = new Assertion();
+	    	single.setId(77L);
+	    	assertions.add(single);
+//	    	for (final AssertionGroup group: groups) {
+//	    		assertions.addAll(assertionDao.getAssertionsForGroup(group.getId()));
+//	    	}
 	    	
 	    	final List<AssertionTest> tests = new ArrayList<>();
 	    	final AssertionTest test = new AssertionTest();

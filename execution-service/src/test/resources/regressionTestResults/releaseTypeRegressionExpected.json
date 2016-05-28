@@ -61,37 +61,37 @@
     "assertionName" : "The current language refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "91e26b70-ea15-4057-8c31-a1bf91614654",
     "firstNInstances" : [ {
-      "conceptId" : 758399015,
-      "detail" : "LANGUAGE REFSET: id=00000692-31c5-5aac-81a8-2e54b488c824 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 132462014,
-      "detail" : "LANGUAGE REFSET: id=0000097d-42b2-500d-88bb-46066baa9bad is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 2731802019,
-      "detail" : "LANGUAGE REFSET: id=00000b14-886f-5d9f-bba5-64e03752cbbc is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 751600014,
-      "detail" : "LANGUAGE REFSET: id=00000fa8-54c4-5611-a39b-946ae76fd2f6 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 401837018,
-      "detail" : "LANGUAGE REFSET: id=00001558-7a36-5f18-94f3-6c2d9d22a428 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 2794052013,
-      "detail" : "LANGUAGE REFSET: id=00001828-bc61-59f0-811d-56732d1a8507 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 712835011,
-      "detail" : "LANGUAGE REFSET: id=00001f12-ad7d-54d9-9bef-89f5d2ef6b2b is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 467510012,
-      "detail" : "LANGUAGE REFSET: id=000026dd-7c22-5d1f-870f-30a64f5bef55 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 713135019,
-      "detail" : "LANGUAGE REFSET: id=00002fb2-d982-5fbd-822f-045c938480c6 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 713135019,
-      "detail" : "LANGUAGE REFSET: id=00002fb2-d982-5fbd-822f-045c938480c7 is in SNAPSHOT file, but not in FULL file."
-    } ],
-    "totalFailed" : 25
+        "conceptId" : 758399015,
+        "detail" : "LANGUAGE REFSET: id=00000692-31c5-5aac-81a8-2e54b488c824 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : 132462014,
+        "detail" : "LANGUAGE REFSET: id=0000097d-42b2-500d-88bb-46066baa9bad is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : 2731802019,
+        "detail" : "LANGUAGE REFSET: id=00000b14-886f-5d9f-bba5-64e03752cbbc is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : 751600014,
+        "detail" : "LANGUAGE REFSET: id=00000fa8-54c4-5611-a39b-946ae76fd2f6 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : 401837018,
+        "detail" : "LANGUAGE REFSET: id=00001558-7a36-5f18-94f3-6c2d9d22a428 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : 2794052013,
+        "detail" : "LANGUAGE REFSET: id=00001828-bc61-59f0-811d-56732d1a8507 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : 712835011,
+        "detail" : "LANGUAGE REFSET: id=00001f12-ad7d-54d9-9bef-89f5d2ef6b2b is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : 3008913022,
+        "detail" : "LANGUAGE REFSET: id=000026dd-7c22-5d1f-870f-30a64f5bef55 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : 713135019,
+        "detail" : "LANGUAGE REFSET: id=00002fb2-d982-5fbd-822f-045c938480c6 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : 713135019,
+        "detail" : "LANGUAGE REFSET: id=00002fb2-d982-5fbd-822f-045c938480c7 is in SNAPSHOT file, but not in FULL file."
+      } ],
+    "totalFailed" : 26
   }, {
     "assertionName" : "The current data in the SimpleMap refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "959e11e7-9ff9-40b9-b833-387495e320d0",
@@ -229,34 +229,37 @@
     "assertionName" : "The current language refset delta file is an accurate derivative of the current full file",
     "assertionUuid" : "b87c6dfe-c109-4c8d-91f2-a15a17631ad2",
     "firstNInstances" : [ {
-      "conceptId" : 2989495017,
-      "detail" : "LANGUAGE REFSET: id=0001081b-f3a3-5115-960e-aa1b35ea3e59 is in DELTA file, but not in FULL file."
-    }, {
-      "conceptId" : 2990499015,
-      "detail" : "LANGUAGE REFSET: id=000507b6-49d9-51f4-a27f-84f80fab208e is in DELTA file, but not in FULL file."
-    }, {
-      "conceptId" : 3010212010,
-      "detail" : "LANGUAGE REFSET: id=0008f7ac-8144-5699-8513-d1084e719b5f is in DELTA file, but not in FULL file."
-    }, {
-      "conceptId" : 3007593011,
-      "detail" : "LANGUAGE REFSET: id=000917e5-a73d-575d-82a4-5b488a6c071f is in DELTA file, but not in FULL file."
-    }, {
-      "conceptId" : 3005766014,
-      "detail" : "LANGUAGE REFSET: id=00168a48-cb48-5231-b3d3-f5b90528f7a5 is in DELTA file, but not in FULL file."
-    }, {
-      "conceptId" : 285204019,
-      "detail" : "LANGUAGE REFSET: id=001a76cb-25d4-5448-978d-8acf63c0125d is in DELTA file, but not in FULL file."
-    }, {
-      "conceptId" : 3008142014,
-      "detail" : "LANGUAGE REFSET: id=001bf726-0491-59ee-bd42-a5a3265f1aea is in DELTA file, but not in FULL file."
-    }, {
-      "conceptId" : 3008249010,
-      "detail" : "LANGUAGE REFSET: id=002266d4-937d-50fa-9db8-daab8aba8ba9 is in DELTA file, but not in FULL file."
-    }, {
-      "conceptId" : 1233328012,
-      "detail" : "LANGUAGE REFSET: id=00227b5b-bb17-5c5d-9f71-0f306063f8e1 is in DELTA file, but not in FULL file."
-    } ],
-    "totalFailed" : 9
+        "conceptId" : 2989495017,
+        "detail" : "LANGUAGE REFSET: id=0001081b-f3a3-5115-960e-aa1b35ea3e59 is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 2990499015,
+        "detail" : "LANGUAGE REFSET: id=000507b6-49d9-51f4-a27f-84f80fab208e is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 3010212010,
+        "detail" : "LANGUAGE REFSET: id=0008f7ac-8144-5699-8513-d1084e719b5f is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 3007593011,
+        "detail" : "LANGUAGE REFSET: id=000917e5-a73d-575d-82a4-5b488a6c071f is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 3005766014,
+        "detail" : "LANGUAGE REFSET: id=00168a48-cb48-5231-b3d3-f5b90528f7a5 is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 285204019,
+        "detail" : "LANGUAGE REFSET: id=001a76cb-25d4-5448-978d-8acf63c0125d is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 3008142014,
+        "detail" : "LANGUAGE REFSET: id=001bf726-0491-59ee-bd42-a5a3265f1aea is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 3008249010,
+        "detail" : "LANGUAGE REFSET: id=002266d4-937d-50fa-9db8-daab8aba8ba9 is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 1233328012,
+        "detail" : "LANGUAGE REFSET: id=00227b5b-bb17-5c5d-9f71-0f306063f8e1 is in DELTA file, but not in FULL file."
+      }, {
+        "conceptId" : 3008913022,
+        "detail" : "LANGUAGE REFSET: id=000026dd-7c22-5d1f-870f-30a64f5bef12 is in DELTA file, but not in FULL file."
+      } ],
+      "totalFailed" : 10
   }, {
     "assertionName" : "The current full concept file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "bbfbeae4-4b58-465a-9c16-1e8c4454384c",
