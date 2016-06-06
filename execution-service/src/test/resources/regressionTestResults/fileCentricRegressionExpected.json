@@ -1,21 +1,30 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 53,
-  "totalAssertionsFailed" : 53,
+  "totalAssertionsRun" : 55,
+  "totalAssertionsFailed" : 55,
   "results" : [ {
     "assertionName" : "New inactive states follow active states in the SIMPLE MAP REFSET snapshot.",
     "assertionUuid" : "88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
     "firstNInstances" : [ {
       "conceptId" : 699820000,
-      "detail" : "SM RS: id=0314672a-f4e5-548d-bb84-f82eac418b99:Invalid inactive states in the SIMPLE MAP REFSET snapshot."
+      "detail" : "SimpleMap Refset: id=0314672a-f4e5-548d-bb84-f82eac418b99 should not have a new inactive state as it was inactive previously."
+    }, {
+      "conceptId" : 703568007,
+      "detail" : "SimpleMap Refset: id=cff7ca5c-286c-52b3-9322-e489c65c8ab5 is inactive but no active state found in the previous snapshot."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "SimpleMap Refset: id=82f3de7e-e15a-56c2-80a7-8ba824b9bd79 is inactive but no active state found in the previous snapshot."
+    }, {
+      "conceptId" : 700132006,
+      "detail" : "SimpleMap Refset: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249623 is inactive but no active state found in the previous snapshot."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 4
   }, {
     "assertionName" : "All stated relationships inactivated in current release must have been active in the previous release.",
     "assertionUuid" : "89ceaf00-79b9-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : 698449007,
-      "detail" : "4768117023"
+      "detail" : "Stated relationship: id=4768117023 should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
   }, {
@@ -45,7 +54,7 @@
     "assertionUuid" : "9190473a-29f7-40fc-b879-9ae0d038b681",
     "firstNInstances" : [ {
       "conceptId" : 702386002,
-      "detail" : "Simple Refset: id=74d0e838-34eb-5a9a-8f02-5584487d55db should not have a new invalid inactive state in the SIMPLE REFSET snapshot."
+      "detail" : "Simple Refset: id=74d0e838-34eb-5a9a-8f02-5584487d55db should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
   }, {
@@ -192,7 +201,7 @@
     "assertionUuid" : "b88b9f46-4c33-4d8e-b9ab-ddb87aef3068",
     "firstNInstances" : [ {
       "conceptId" : 10171006,
-      "detail" : "ASSOC RS: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71: should not be inactive as it is inactive in the previous release already"
+      "detail" : "ASSOC RS: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71 should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
   }, {
@@ -351,7 +360,7 @@
     "assertionUuid" : "e6082dc4-c6f4-48c6-afa3-233182336a5c",
     "firstNInstances" : [ {
       "conceptId" : 699220008,
-      "detail" : "TEXTDEF: id=2983208019:New inactive states follow active states in the DEFINITION snapshot."
+      "detail" : "TextDefinition: id=2983208019  should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
   }, {
@@ -367,13 +376,13 @@
     "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : 713135019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 should not have a new inactive state in the current release as it was inactive already in the previvous SNAPSHOT."
+      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 should not have a new inactive state as it was inactive previously."
     }, {
       "conceptId" : 713135019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7 should not have a new inactive state in the current snapshot as no active state found in previous release"
+      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7  is inactive but no active state found in previous release."
     }, {
       "conceptId" : 3008913019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c9 should not have a new inactive state in the current snapshot as no active state found in previous release"
+      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c9  is inactive but no active state found in previous release."
     } ],
     "totalFailed" : 3
   }, {
@@ -490,6 +499,17 @@
     } ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "The characteristic type id must be Stated in the stated relationship snapshot file",
+    "assertionUuid" : "1b21ec4b-b6db-42fe-ae7e-f79e24e25b7f",
+    "firstNInstances" : [ {
+      "conceptId" : 702386002,
+      "detail" : "Stated relationship: id=4768117024 contains invalid characteristic type id:900000000000011006"
+    }, {
+      "conceptId" : 702386002,
+      "detail" : "Stated relationship: id=4768117024 contains invalid characteristic type id:900000000000011006"
+    } ],
+    "totalFailed" : 2
+  }, {
     "assertionName" : "ID is unique in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "1cd8b7f9-5730-4db9-b508-13575825b28f",
     "firstNInstances" : [ {
@@ -505,7 +525,7 @@
     "assertionUuid" : "2aa0bea1-b1fa-4543-b277-b4392a6f864d",
     "firstNInstances" : [ {
       "conceptId" : 527806011,
-      "detail" : "AttributeRefsetId=0001d24b-d872-5077-8955-b9c7e055b015 should not have a new inactive state in the snapshot file as was inactive previously."
+      "detail" : "AttributeRefsetId=0001d24b-d872-5077-8955-b9c7e055b015 should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
   }, {
@@ -513,10 +533,10 @@
     "assertionUuid" : "2b193a88-8dab-4d19-b995-b556ed59398d",
     "firstNInstances" : [ {
       "conceptId" : 699400005,
-      "detail" : "DESCRIPTION: id=2984057019 should not have a new inactive state in the current release as it was already inactive in previous snapshot."
+      "detail" : "DESCRIPTION: id=2984057019 should not have a new inactive state as it was inactive previously."
     }, {
       "conceptId" : 703860006,
-      "detail" : "DESCRIPTION: id=2984057023 should not have a new inactive state in the current release as no active state found in previous snapshot."
+      "detail" : "DESCRIPTION: id=2984057023 is inactive but no active state found in the previous snapshot."
     } ],
     "totalFailed" : 2
   }, {
@@ -622,6 +642,14 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "There are no active additional relationships added in the current release.",
+    "assertionUuid" : "4dda9849-d0ac-4960-a36d-6fbfdd84cd58",
+    "firstNInstances" : [ {
+      "conceptId" : 267216000,
+      "detail" : "Relationship: id=1002334021 is an active additional relationship."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DEFINITION snapshot.",
     "assertionUuid" : "5a83783e-3366-48bd-a50d-8f3a53812174",
     "firstNInstances" : [ {
@@ -651,8 +679,8 @@
     "assertionName" : "All relationships inactivated in current release must have been active in the previous release.",
     "assertionUuid" : "5c6b6bc0-79b9-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
-      "conceptId" : 1000004028,
-      "detail" : "RELATIONSHIP: id=1000004028: Inferred Relationship Id is inactived in current release, yet was already inactive in previous release."
+      "conceptId" : 10041001,
+      "detail" : "Relationship: id=1000004028 should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
   }, {
@@ -660,7 +688,7 @@
     "assertionUuid" : "5f1a51a3-6200-4463-8799-d75998165278",
     "firstNInstances" : [ {
       "conceptId" : 699765003,
-      "detail" : "CONCEPT: id=699765003:New inactive states does not follow active states in the concept snapshot."
+      "detail" : "CONCEPT: id=699765003 should not have a new inactive state as it was inactive previously."
     }, {
       "conceptId" : 703649004,
       "detail" : "CONCEPT: id=703649004: is inactive but no active state found in the previous release."

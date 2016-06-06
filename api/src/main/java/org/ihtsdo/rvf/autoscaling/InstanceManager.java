@@ -84,7 +84,7 @@ public class InstanceManager {
 		List<String> ids = new ArrayList<>();
 		for (Instance instance : instances) {
 			String instanceId = instance.getInstanceId();
-			logger.info("RVF worker new instance created with id {}, public IP address {} and launched at {}", instanceId, instance.getPublicIpAddress(), instance.getLaunchTime());
+			logger.info("RVF worker new instance created with id {} and launched at {}", instanceId, instance.getLaunchTime());
 			CreateTagsRequest createTagsRequest = new CreateTagsRequest();
 			createTagsRequest.withResources(instanceId);
 			if ( instanceTagName != null) {
@@ -149,6 +149,7 @@ public class InstanceManager {
 				InstanceState state = instance.getState();
 				if (PENDING.equalsIgnoreCase(state.getName()) || RUNNING.equalsIgnoreCase(state.getName())) {
 					activeInstances.add(instance.getInstanceId());
+					logger.info("Active instance {} with public address {}", instance.getInstanceId(), instance.getPublicIpAddress());
 				}
 			}
 			logger.info("Current total active instances:" + activeInstances.size());

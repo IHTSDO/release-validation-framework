@@ -12,11 +12,22 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		b.id,
-		concat('RELATIONSHIP: id=',a.id, ': Inferred Relationship Id is inactived in current release, yet was already inactive in previous release.') 
+		a.sourceid,
+		concat('Relationship: id=',a.id, ' should not have a new inactive state as it was inactive previously.') 
 	from curr_relationship_s a
 	inner join prev_relationship_s b on a.id = b.id 
 	where a.active = '0' 
 	and b.active = '0' 
 	and a.effectivetime != b.effectivetime;
 	
+	
+	insert into qa_result (runid, assertionuuid, concept_id, details)
+	select 
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		a.sourceid,
+		concat('Relationship: id=',a.id, ' is inactive but no active state found in previous release.') 
+	from curr_relationship_s a
+	left join prev_relationship_s b on a.id = b.id 
+	where a.active = '0' 
+	and b.id is null;

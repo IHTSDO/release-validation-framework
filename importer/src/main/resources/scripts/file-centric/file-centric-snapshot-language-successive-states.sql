@@ -13,12 +13,10 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Language Refset: id=',a.id, ' should not have a new inactive state in the current release as it was inactive already in the previvous SNAPSHOT.') 
+		concat('Language Refset: id=',a.id, ' should not have a new inactive state as it was inactive previously.') 
 	from curr_langrefset_s a
 	join prev_langrefset_s b
-	where cast(a.effectivetime as datetime) >
-				(select max(cast(effectivetime as datetime)) 
-				 from prev_langrefset_s)
+	where a.effectivetime != b.effectivetime
 	and a.active = 0
 	and a.id = b.id
 	and a.active = b.active;
@@ -29,7 +27,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Language Refset: id=',a.id, ' should not have a new inactive state in the current snapshot as no active state found in previous release') 
+		concat('Language Refset: id=',a.id, '  is inactive but no active state found in previous release.') 
 	from curr_langrefset_s a
 	left join prev_langrefset_s b
 	on a.id = b.id
