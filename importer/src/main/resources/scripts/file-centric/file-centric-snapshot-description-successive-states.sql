@@ -12,11 +12,9 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('DESCRIPTION: id=',a.id, ' should not have a new inactive state in the current release as it was already inactive in previous snapshot.') 	
+		concat('DESCRIPTION: id=',a.id, ' should not have a new inactive state as it was inactive previously.') 	
 	from curr_description_s a , prev_description_s b	
-	where cast(a.effectivetime as datetime) >
-				(select max(cast(effectivetime as datetime)) 
-				 from prev_description_s)
+	where a.effectivetime != b.effectivetime
 	and a.active = '0'
 	and b.active = '0'
 	and a.id = b.id
@@ -31,7 +29,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('DESCRIPTION: id=',a.id, ' should not have a new inactive state in the current release as no active state found in previous snapshot.') 	
+		concat('DESCRIPTION: id=',a.id, ' is inactive but no active state found in the previous snapshot.') 	
 	from curr_description_s a left join prev_description_s b
 	on a.id=b.id
 	where a.active=0 and b.id is null;

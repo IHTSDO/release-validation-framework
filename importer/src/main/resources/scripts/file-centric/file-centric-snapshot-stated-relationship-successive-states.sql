@@ -15,14 +15,12 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceid,
-		a.id
+		concat('Stated relationship: id=',a.id, ' should not have a new inactive state as it was inactive previously.') 
 	from curr_stated_relationship_s a
 	inner join prev_stated_relationship_s b on a.id = b.id 
 	where a.active = '0' 
 	and b.active = '0' 
-	and cast(a.effectivetime as datetime) >
-				(select max(cast(effectivetime as datetime))
-				 from prev_stated_relationship_s)
+	and a.effectivetime != b.effectivetime
 	and a.moduleid = b.moduleid
 	and a.sourceid = b.sourceid
 	and a.relationshipgroup = b.relationshipgroup
@@ -31,3 +29,14 @@
 	and a.characteristictypeid = b.characteristictypeid
 	and a.modifierid = b.modifierid;
 	
+	
+insert into qa_result (runid, assertionuuid, concept_id, details)
+	select 
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		a.sourceid,
+		concat('Stated relationship: id=',a.id, ' is inactive in the current release but no active state found in the previous snapshot.') 	
+	from curr_stated_relationship_s  a left join prev_stated_relationship_s b
+	on a.id=b.id
+	where a.active=0 
+	and b.id is null;

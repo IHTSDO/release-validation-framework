@@ -50,6 +50,7 @@ public class AutoScalingManager {
 							int current = getQueueSize();
 							if (current != lastPolledQueueSize) {
 								logger.info("Total messages in queue:" + current);
+								activeInstances = instanceManager.checkActiveInstances(activeInstances);
 							}
 							if ((current > lastPolledQueueSize) || (current > activeInstances.size())) {
 								//will add logic later in terms how many instances need to create for certain size
@@ -57,7 +58,6 @@ public class AutoScalingManager {
 								if (current > lastPolledQueueSize) {
 									logger.info("Messages have been increased by:" + (current - lastPolledQueueSize) + " since last poll.");
 								}
-								activeInstances = instanceManager.checkActiveInstances(activeInstances);
 								int totalToCreate = getTotalInstancesToCreate(current, activeInstances.size(), maxRunningInstance);
 								if (totalToCreate != 0) {
 									logger.info("Start creating " + totalToCreate + " new worker instance");
