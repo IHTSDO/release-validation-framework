@@ -172,6 +172,7 @@ public class InstanceManager {
 			InstanceState state = instance.getState();
 			if (PENDING.equalsIgnoreCase(state.getName()) || RUNNING.equalsIgnoreCase(state.getName())) {
 				activeInstances.add(instance.getInstanceId());
+				logger.info("Active instance {} with public address {}", instance.getInstanceId(), instance.getPublicIpAddress());
 			}
 		}
 		logger.info("Total active instances found:" + activeInstances.size());
