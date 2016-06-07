@@ -50,8 +50,8 @@ public class AutoScalingManager {
 							int current = getQueueSize();
 							if (current != lastPolledQueueSize) {
 								logger.info("Total messages in queue:" + current);
+								activeInstances = instanceManager.checkActiveInstances(activeInstances);
 							}
-							activeInstances = instanceManager.checkActiveInstances(activeInstances);
 							if ((current > lastPolledQueueSize) || (current > activeInstances.size())) {
 								//will add logic later in terms how many instances need to create for certain size
 								// the current approach is to create one instance per message.
