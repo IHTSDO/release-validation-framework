@@ -38,5 +38,8 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
 		concat('Stated relationship: id=',a.id, ' is inactive in the current release but no active state found in the previous snapshot.') 	
 	from curr_stated_relationship_s  a left join prev_stated_relationship_s b
 	on a.id=b.id
+	and a.sourceid=b.sourceid
+	and a.destinationid=b.destinationid
+	and a.typeid=b.typeid
 	where a.active=0 
 	and b.id is null;
