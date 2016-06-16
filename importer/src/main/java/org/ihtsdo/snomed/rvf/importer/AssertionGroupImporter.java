@@ -54,7 +54,8 @@ public class AssertionGroupImporter {
 		"411e9840-7d08-11e1-b0c4-0800200c9a66",
 		"36f43550-7d08-11e1-b0c4-0800200c9a66",
 		"3ab84230-7d08-11e1-b0c4-0800200c9a66",
-		"5c6b6bc0-79b9-11e1-b0c4-0800200c9a66"};
+		"5c6b6bc0-79b9-11e1-b0c4-0800200c9a66",
+		"88315a11-4e71-49d2-977f-a5d5ac2a4dc4"};
 	
 /* the following were included but feel that they should be validated for project level as well.
 	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
