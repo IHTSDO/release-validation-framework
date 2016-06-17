@@ -681,8 +681,14 @@
     "firstNInstances" : [ {
       "conceptId" : 10041001,
       "detail" : "Relationship: id=1000004028 should not have a new inactive state as it was inactive previously."
+    }, {
+      "conceptId" : 702411003,
+      "detail" : "Relationship: id=1000000021 is inactive but no active state found in previous release."
+    }, {
+      "conceptId" : 10041001,
+      "detail" : "Relationship: id=1000005027 is inactive but no active state found in previous release."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 3
   }, {
     "assertionName" : "New inactive states follow active states in the CONCEPT snapshot.",
     "assertionUuid" : "5f1a51a3-6200-4463-8799-d75998165278",

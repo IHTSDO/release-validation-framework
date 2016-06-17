@@ -164,7 +164,26 @@
 		</script>
 		<script uuid="0988de1d-29dd-4668-bcbf-032d38692492" category="release-type-validation" sqlFile="release-type-snapshot-validation-simple-refset.sql" text="The current simple refset snapshot file is an accurate derivative of the current full file"  >
 			<keywords></keywords>
-		</script>			
+		</script>	
+		
+		<!--  release type for current delta comparing with previous snapshot -->	
+		
+		<script uuid="35680574-3ac6-4b68-9efe-de88b677eb35" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-association-refset.sql" text="There must be actual changes made to previously published association refset components in order for them to appear in the current delta." />
+		<script uuid="11735994-4b7f-4e61-9bde-059b7e085031" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-attributevalue-refset.sql" text="There must be actual changes made to previously published attribute value refset components in order for them to appear in the current delta." />
+		<script uuid="80463c76-d84e-4a1a-8abb-c5b4d12b5da4" category="release-type-validation,ICD-9-CM" sqlFile="release-type-delta-previous-snapshot-validation-complexmap-refset.sql" text="There must be actual changes made to previously published complex map refset components in order for them to appear in the current delta." />
+		<script uuid="4478a896-2724-4417-8bce-8986ecc53c4e" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-concept.sql" text="There must be actual changes made to previously published concepts in order for them to appear in the current delta." />
+		<script uuid="372e59d5-d6f3-4708-93d0-6cb92da69006" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-definition.sql" text="There must be actual changes made to previously published definitions in order for them to appear in the current delta." />
+		<script uuid="0cc708af-6816-4370-91be-dba8da99d227" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-description.sql" text=" There must be actual changes made to previously published descriptions in order for them to appear in the current delta." />
+		<script uuid="8592c910-f2b1-4573-a9da-3c8931e759b2" category="release-type-validation,LOINC" sqlFile="release-type-delta-previous-snapshot-validation-expression-association-refset.sql" text="There must be actual changes made to previously published expression association refset components in order for them to appear in the current delta" />
+		<script uuid="7a961c22-3f51-4f72-9b5e-1dc99c298719" category="release-type-validation,ICD-MAP" sqlFile="release-type-delta-previous-snapshot-validation-extendedmap-refset.sql" text="There must be actual changes made to previously published extended map refset components in order for them to appear in the current delta." />
+		<script uuid="44916964-5b78-4842-81d8-e8293ee93bea" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-inferred-relationship.sql" text="There must be actual changes made to previously published inferred relationships in order for them to appear in the current delta." />
+		<script uuid="a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-language-refset.sql" text="There must be actual changes made to previously published language refset components in order for them to appear in the current delta." />
+		<script uuid="e77a45db-d2d7-4d48-9420-0b97579582fc" category="release-type-validation,LOINC" sqlFile="release-type-delta-previous-snapshot-validation-mapCorrelationOrigin-refset.sql" text="There must be actual changes made to previously published mapcorrelationOriginRefset components in order for them to appear in the current delta." />
+		<script uuid="9912342f-5010-40fd-9bea-301b737973a1" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-simple-refset.sql" text="There must be actual changes made to previously published simple refset components in order for them to appear in the current delta." />
+		<script uuid="bc055a18-f93e-42fd-8bb2-347f2b2b8976" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-simplemap-refset.sql" text="There must be actual changes made to previously published simple map refset components in order for them to appear in the current delta." />
+		<script uuid="cab60a2f-4239-4933-91d6-dc910a8ac08b" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-stated-relationship.sql" text="There must be actual changes made to previously published stated relatioships in order for them to appear in the current delta." />
+		
+			
 		<!--  release type for complex and extended maps-->
 		
 		<script uuid="5e203a1f-2b6d-462a-a6f9-93cbc3893611" category="release-type-validation,ICD-MAP" sqlFile="release-type-delta-validation-extendedmap-refset.sql" text="Changes from the the current extended map delta file must be in the current full file" />
@@ -190,6 +209,7 @@
 		<script uuid="7c37bee7-62ad-41f9-93e3-12eb4803e618" category="release-type-validation,LOINC" sqlFile="release-type-full-validation-mapCorrelationOrigin-refset.sql" text="The current MapCorrelationOriginRefset full file contains all previously published data unchanged"/>
 		<script uuid="7c37bee7-62ad-41f9-93e3-12eb4803e619" category="release-type-validation,LOINC" sqlFile="release-type-snapshot-delta-validation-mapCorrelationOrigin-refset.sql" text="The current MapCorrelationOriginRefset snapshot file contains all the data from current delta file"/>
 		<script uuid="4BDB1E4D-0EE9-4B5B-A486-CF8C561A3BC1" category="release-type-validation,LOINC" sqlFile="release-type-snapshot-validation-mapCorrelationOrigin-refset.sql" text="The current MapCorrelationOriginRefset snapshot file is an accurate derivative of the current full file"/>
+		
 		
 		
 		<!-- file-centric-snapshot-concept -->

@@ -160,6 +160,11 @@ public class RVFAssertionsRegressionIT {
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
+//		File tempResult = File.createTempFile("tempResult_"+ type, ".txt");
+//		FileWriter writer = new FileWriter(tempResult);
+//		mapper.writeValue(writer,actualReport);
+//		System.out.println("Please see result in file:" + tempResult.getAbsolutePath());
+
 		System.out.println("Test result");
 		System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport));
 		final Gson gson = new Gson();

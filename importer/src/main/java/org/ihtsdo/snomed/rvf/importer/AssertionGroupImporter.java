@@ -49,16 +49,22 @@ public class AssertionGroupImporter {
 	private static final String[] SPANISH_EDITION_EXCLUDE_LIST = {"dd0d0406-7481-444a-9f04-b6fc7db49039","cc9c5340-84f0-11e1-b0c4-0800200c9a66","c3249e80-84f0-11e1-b0c4-0800200c9a66"};
 	
 	private static final String[] SNAPSHOT_EXCLUDE_LIST = {"4dbfed80-79b9-11e1-b0c4-0800200c9a66",
-			"6336ec40-79b9-11e1-b0c4-0800200c9a66",
-			"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
-			"72184790-79b9-11e1-b0c4-0800200c9a66",
-			"77fc7550-79b9-11e1-b0c4-0800200c9a66",
-			"2e4fd620-7d08-11e1-b0c4-0800200c9a66",
-			"32b41aa0-7d08-11e1-b0c4-0800200c9a66",
-			"4572d730-7d08-11e1-b0c4-0800200c9a66",
-			"411e9840-7d08-11e1-b0c4-0800200c9a66",
-			"36f43550-7d08-11e1-b0c4-0800200c9a66",
-			"3ab84230-7d08-11e1-b0c4-0800200c9a66"};
+		"6336ec40-79b9-11e1-b0c4-0800200c9a66",
+		"4572d730-7d08-11e1-b0c4-0800200c9a66",
+		"411e9840-7d08-11e1-b0c4-0800200c9a66",
+		"36f43550-7d08-11e1-b0c4-0800200c9a66",
+		"3ab84230-7d08-11e1-b0c4-0800200c9a66",
+		"5c6b6bc0-79b9-11e1-b0c4-0800200c9a66",
+		"88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
+		"2e4fd620-7d08-11e1-b0c4-0800200c9a66"};
+	
+/* the following were included but feel that they should be validated for project level as well.
+	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
+	"72184790-79b9-11e1-b0c4-0800200c9a66",
+	"77fc7550-79b9-11e1-b0c4-0800200c9a66",
+	"32b41aa0-7d08-11e1-b0c4-0800200c9a66",
+*/
+	
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(AssertionGroupImporter.class);
 	
