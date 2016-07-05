@@ -38,7 +38,7 @@ public interface AssertionDao extends EntityDao<Assertion> {
 
     List<Assertion> getAssertionsForGroup(Long groupId);
 
-	List<Assertion> getAssertionsByContainingKeyword(String keyName);
+	List<Assertion> getAssertionsByKeyWord(String keyName, boolean isFullyMatched);
 	
 	AssertionGroup getAssertionGroupsByName(String groupName);
 

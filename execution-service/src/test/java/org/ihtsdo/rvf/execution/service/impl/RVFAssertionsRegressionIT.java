@@ -105,7 +105,7 @@ public class RVFAssertionsRegressionIT {
         releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_" + PREVIOUS_RELEASE);
         releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_"+ PROSPECTIVE_RELEASE);
         resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
-        final List<Assertion> assertions = assertionDao.getAssertionsByContainingKeyword("resource");
+        final List<Assertion> assertions = assertionDao.getAssertionsByKeyWord("resource",true);
 		config = new ExecutionConfig(System.currentTimeMillis());
 		config.setPreviousVersion(PREVIOUS_RELEASE);
 		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
@@ -129,7 +129,7 @@ public class RVFAssertionsRegressionIT {
 	}
 	 
 	private void runAssertionsTest(final String groupName, final String expectedJsonFile) throws Exception {
-		 final List<Assertion> assertions= assertionDao.getAssertionsByContainingKeyword(groupName);
+		 final List<Assertion> assertions= assertionDao.getAssertionsByKeyWord(groupName, false);
 		 System.out.println("found total assertions:" + assertions.size());
 		 long timeStart = System.currentTimeMillis();
 			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
@@ -139,6 +139,25 @@ public class RVFAssertionsRegressionIT {
 			System.out.println("Time taken:" +(timeEnd-timeStart));
 			assertTestResult(groupName, expectedJsonFile, runItems);
 	 }
+	
+	
+	@Test
+	public void testSpecificAssertion() throws Exception {
+		runAssertionsTest("ffe6c560-7856-11e1-b0c4-0800200c9a66");
+	}
+	
+	private void runAssertionsTest(String assertionUUID) throws Exception {
+		 final List<Assertion> assertions= new ArrayList<>();
+		 assertions.add(assertionDao.getAssertionByUUID(assertionUUID));
+		 System.out.println("found total assertions:" + assertions.size());
+		 long timeStart = System.currentTimeMillis();
+			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
+//		 final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
+			
+			long timeEnd = System.currentTimeMillis();
+			System.out.println("Time taken:" +(timeEnd-timeStart));
+	 }
+	
 	private void assertTestResult(final String type, final String expectedJsonFileName,final Collection<TestRunItem> runItems) throws Exception {
 		final List<RVFTestResult> results = new ArrayList<>();
 		int failureCounter = 0;
@@ -190,14 +209,18 @@ public class RVFAssertionsRegressionIT {
 			final RVFTestResult actualResult = actualResultByNameMap.get(uuid);
 			assertEquals("Assertion name is not the same" + " for assertion uuid:" + uuid, expectedResult.getAssertionName(),actualResult.getAssertionName());
 			assertEquals("Total failures count doesn't match"  + " for assertion uuid:" + uuid, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
-			assertTrue("First N instances not matching" + " for assertion uuid:" + uuid, expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()));
+			if (expectedResult.getTotalFailed() >0) {
+				assertTrue("First N instances not matching" + " for assertion uuid:" + uuid, expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()));
+			}
 		}
 		Collections.sort(expected);
 		Collections.sort(actual);
 		for(int i=0;i < expected.size();i++) {
 			assertEquals(expected.get(i), actual.get(i));
-			for (FailureDetail detail : actual.get(i).getFirstNInstances()) {
-				assertTrue("ConceptId should not be null", detail.getConceptId() != null); 
+			if (expected.get(i).getTotalFailed() > 0) {
+				for (FailureDetail detail : actual.get(i).getFirstNInstances()) {
+					assertTrue("ConceptId should not be null", detail.getConceptId() != null); 
+				}
 			}
 		}
 	}
