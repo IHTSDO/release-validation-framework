@@ -1,5 +1,10 @@
 package org.ihtsdo.snomed.rvf.importer;
 
+import static org.ihtsdo.snomed.rvf.importer.AssertionGroupImporter.AssertionGroupName.COMPONENT_CENTRIC_VALIDATION;
+import static org.ihtsdo.snomed.rvf.importer.AssertionGroupImporter.AssertionGroupName.FILE_CENTRIC_VALIDATION;
+import static org.ihtsdo.snomed.rvf.importer.AssertionGroupImporter.AssertionGroupName.RELEASE_TYPE_VALIDATION;
+import static org.ihtsdo.snomed.rvf.importer.AssertionGroupImporter.AssertionGroupName.SNAPSHOT_CONTENT_VALIDAITON;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,22 +22,39 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AssertionGroupImporter {
 	
-	 enum AssertionGroupName {
-		FILE_CENTRIC_VALIDATION ("file-centric-validation"),
-		COMPONENT_CENTRIC_VALIDATION ("component-centric-validation"),
-		RELEASE_TYPE_VALIDATION ("release-type-validation"),
-		SPANISH_EDITION ("SpanishEdition"),
-		INTERNATIONAL_EDITION ("InternationalEdition"),
-		SNAPSHOT_CONTENT_VALIDATION ("SnapshotContentValidation"),
-		FIRST_TIME_LOINC_VALIDATION ("firstTimeLOINCValidation"),
-		FIRST_TIME_INTERNATIONAL_RELEASE_VALIDATION("firstTimeInternationalReleaseValidation");
+	 private static final String PREVIOUS = "previous";
+	private static final String NEW_INACTIVE_STATES_FOLLOW_ACTIVE_STATES = "New inactive states follow active states";
+
+	enum AssertionGroupName {
+		FILE_CENTRIC_VALIDATION ("COMMON", "file-centric-validation"),
+		COMPONENT_CENTRIC_VALIDATION ("COMMON","component-centric-validation"),
+		RELEASE_TYPE_VALIDATION ("COMMON","release-type-validation"),
+		SPANISH_EDITION ("ES","SpanishEdition"),
+		INTERNATIONAL_EDITION ("INT","InternationalEdition"),
+		COMMON_SNAPSHOT_VALIDATION ("COMMON","CommonSnapshotValidation"),
+		INT_SNAPSHOT_VALIDATION ("INT","IntSnapshotValidation"),
+		DK_SNAPSHOT_VALIDATION ("DK","DkSnapshotValidation"),
+		SE_SNAPSHOT_VALIDATION ("SE","SeSnapshotValidation"),
+		FIRST_TIME_LOINC_VALIDATION ("LOINC","firstTimeLOINCValidation"),
+		FIRST_TIME_INTERNATIONAL_RELEASE_VALIDATION("INT","firstTimeInternationalReleaseValidation"),
+		FIRST_TIME_COMMON_SNAPSHOT_VALIDATION ("COMMON","FirstTimeCommonSnapshotValidation"),
+		LOINC_EDITION ("LOINC","LoincEdition"),
+		DANISH_EDITION("DK","DanishEdition"),
+		SWEDISH_EDITION("SE","SwedishEdition"),
+		//Remove this when the orchestration service has been updated.
+		SNAPSHOT_CONTENT_VALIDAITON("INT","SnapshotContentValidation");
 		private String name;
-		private AssertionGroupName(String name) {
+		private String releaseCenter;
+		private AssertionGroupName(String releaseCenter, String name) {
+			this.releaseCenter = releaseCenter;
 			this.name = name;
 		}
 		
 		public String getName() {
 			return this.name;
+		}
+		public String getReleaseCenter() {
+			return this.releaseCenter;
 		}
 		
 	};
@@ -46,7 +68,7 @@ public class AssertionGroupImporter {
 	@Autowired
 	private AssertionGroupDao assertionGroupDao;
 	
-	private static final String[] SPANISH_EDITION_EXCLUDE_LIST = {"dd0d0406-7481-444a-9f04-b6fc7db49039","cc9c5340-84f0-11e1-b0c4-0800200c9a66","c3249e80-84f0-11e1-b0c4-0800200c9a66"};
+	private static final String[] SPANISH_EXTENSION_EXCLUDE_LIST = {"dd0d0406-7481-444a-9f04-b6fc7db49039","c3249e80-84f0-11e1-b0c4-0800200c9a66"};
 	
 	private static final String[] SNAPSHOT_EXCLUDE_LIST = {"4dbfed80-79b9-11e1-b0c4-0800200c9a66",
 		"6336ec40-79b9-11e1-b0c4-0800200c9a66",
@@ -108,7 +130,6 @@ public class AssertionGroupImporter {
 	}
 
 
-
 	private void createAssertionGroup(AssertionGroupName groupName, List<Assertion> allAssertions) {
 		
 		switch (groupName) {
@@ -117,20 +138,28 @@ public class AssertionGroupImporter {
 			case COMPONENT_CENTRIC_VALIDATION :
 				createAssertionGroupByKeyWord(allAssertions, groupName.getName());
 				break;
+			case LOINC_EDITION :
 			case SPANISH_EDITION :
-				createSpanishEditionAssertionGroup(allAssertions);
-				break;
+			case DANISH_EDITION	:
+			case SWEDISH_EDITION :
 			case INTERNATIONAL_EDITION :
-				createInternationalAssertionGroup(allAssertions);
+				createReleaseAssertionGroup(allAssertions, groupName);
 				break;
-			case SNAPSHOT_CONTENT_VALIDATION :
-				createSnapshotContentAssertionGroup(allAssertions);
+			case COMMON_SNAPSHOT_VALIDATION :
+				createCommonSnapshotAssertionGroup(allAssertions);
+				break;
+			case INT_SNAPSHOT_VALIDATION :
+			case DK_SNAPSHOT_VALIDATION :
+			case SE_SNAPSHOT_VALIDATION :
+				createSnapshotAssertionGroup(groupName);
+				break;
+			case SNAPSHOT_CONTENT_VALIDAITON:
+				createLegacySnapshotContentValidation(allAssertions);
 				break;
 			case FIRST_TIME_LOINC_VALIDATION :
-				createLoincFirstTimeValidationGroup(allAssertions);
-				break;
 			case FIRST_TIME_INTERNATIONAL_RELEASE_VALIDATION :
-				createFirstTimeInternational(allAssertions);
+			case FIRST_TIME_COMMON_SNAPSHOT_VALIDATION :
+				createFirstTimeReleaseGroup(allAssertions, groupName);
 				break;
 			default :
 			  break;
@@ -138,70 +167,76 @@ public class AssertionGroupImporter {
 		
 	}
 
-	private void createFirstTimeInternational(List<Assertion> allAssertions) {
+	
+	private void createLegacySnapshotContentValidation(List<Assertion> allAssertions) {
 		AssertionGroup group = new AssertionGroup();
-		group.setName(AssertionGroupName.FIRST_TIME_INTERNATIONAL_RELEASE_VALIDATION.getName());
+		group.setName(SNAPSHOT_CONTENT_VALIDAITON.getName());
 		group = assertionGroupDao.create(group);
-		int counter = 0;
-		for (Assertion assertion : allAssertions) {
-			String keywords = assertion.getKeywords();
-			if (!keywords.contains(RESOURCE) && !keywords.contains(ICD_9_COMPLEX_MAP) && !keywords.contains(LOINC)) {
-				String assertionText = assertion.getAssertionText();
-				if ( !assertionText.contains("previous") && !assertionText.contains("New inactive states follow active states") ) {
-					assertionService.addAssertionToGroup(assertion, group);
-					counter++;
-				}
-			}
-		}
-		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
-	}
-
-	private void createLoincFirstTimeValidationGroup(List<Assertion> allAssertions) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(AssertionGroupName.FIRST_TIME_LOINC_VALIDATION.getName());
-		group = assertionGroupDao.create(group);
-		int counter = 0;
-		for (Assertion assertion : allAssertions) {
-			if (!assertion.getKeywords().contains(RESOURCE) && !assertion.getKeywords().contains(AssertionGroupName.RELEASE_TYPE_VALIDATION.getName())) {
-				if (assertion.getKeywords().contains(LOINC)) {
-					assertionService.addAssertionToGroup(assertion, group);
-					counter++;
-				}
-			}
-		}
-		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
-		
-	}
-
-	private void createSpanishEditionAssertionGroup(List<Assertion> allAssertions) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(AssertionGroupName.SPANISH_EDITION.getName());
-		group = assertionGroupDao.create(group);
-		for (Assertion assertion : allAssertions) {
-			String keyWords = assertion.getKeywords();
-			if (!keyWords.contains(RESOURCE) && !keyWords.contains(LOINC) && !keyWords.contains(ICD_9_COMPLEX_MAP)) {
-				if (!Arrays.asList(SPANISH_EDITION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
-					assertionService.addAssertionToGroup(assertion, group);
-				}
-			}
-		}
-	}
-
-	private void createSnapshotContentAssertionGroup(List<Assertion> allAssertions) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(AssertionGroupName.SNAPSHOT_CONTENT_VALIDATION.getName());
-		group = assertionGroupDao.create(group);
-		//TODO we should create a SCA task level validation assertion group
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
 			String keyWords = assertion.getKeywords();
-			if (!keyWords.contains(ICD_9_COMPLEX_MAP) && !keyWords.contains(RESOURCE) && !keyWords.contains(AssertionGroupName.RELEASE_TYPE_VALIDATION.getName())) {
+			if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
+				continue;
+			}
+			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords) 
+					|| keyWords.contains(SNAPSHOT_CONTENT_VALIDAITON.getReleaseCenter())) {
 				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
 				if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 					continue;
 				}
 				//exclude simple map file checking as term server extracts don't contain these
-				if (assertion.getKeywords().contains(AssertionGroupName.COMPONENT_CENTRIC_VALIDATION.getName() ) && assertion.getAssertionText().contains(SIMPLE_MAP)) {
+				if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
+					continue;
+				}
+				assertionService.addAssertionToGroup(assertion, group);
+				counter++;
+			}
+		}
+		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
+
+		
+	}
+
+	private void createFirstTimeReleaseGroup(List<Assertion> allAssertions, AssertionGroupName groupName) {
+		AssertionGroup group = new AssertionGroup();
+		group.setName(groupName.getName());
+		group = assertionGroupDao.create(group);
+		int counter = 0;
+		String keyWords;
+		for (Assertion assertion : allAssertions) {
+			keyWords=assertion.getKeywords();
+			if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
+				continue;
+			} 
+			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)
+					|| keyWords.contains("," + groupName.getReleaseCenter())) {
+				String assertionText = assertion.getAssertionText();
+				if ( !assertionText.contains(PREVIOUS) && !assertionText.contains(NEW_INACTIVE_STATES_FOLLOW_ACTIVE_STATES) ) {
+					assertionService.addAssertionToGroup(assertion, group);
+					counter++;
+				}
+			}
+		}
+		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
+	}
+	
+	private void createCommonSnapshotAssertionGroup(List<Assertion> allAssertions) {
+		AssertionGroup group = new AssertionGroup();
+		group.setName(AssertionGroupName.COMMON_SNAPSHOT_VALIDATION.getName());
+		group = assertionGroupDao.create(group);
+		int counter = 0;
+		for (Assertion assertion : allAssertions) {
+			String keyWords = assertion.getKeywords();
+			 if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
+				 continue;
+			 }
+			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)) {
+				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
+				if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+					continue;
+				}
+				//exclude simple map file checking as term server extracts don't contain these
+				if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
 					continue;
 				}
 				assertionService.addAssertionToGroup(assertion, group);
@@ -210,18 +245,64 @@ public class AssertionGroupImporter {
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
 	}
+	
 
-	private void createInternationalAssertionGroup(List<Assertion> allAssertions) {
-		//create international assertion group
-		AssertionGroup internationalGroup = new AssertionGroup();
-		internationalGroup.setName(AssertionGroupName.INTERNATIONAL_EDITION.getName());
-		internationalGroup = assertionGroupDao.create(internationalGroup);
+	private void createSnapshotAssertionGroup( AssertionGroupName groupName) {
+		AssertionGroup group = new AssertionGroup();
+		group.setName(groupName.getName());
+		group = assertionGroupDao.create(group);
+		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWord("," + groupName.getReleaseCenter(), false);
 		for (Assertion assertion : allAssertions) {
-			String keywords = assertion.getKeywords();
-			if (!keywords.contains(RESOURCE) && !keywords.contains(LOINC) && !keywords.contains(ICD_9_COMPLEX_MAP)) {
-				assertionService.addAssertionToGroup(assertion, internationalGroup);
+				if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
+					assertionService.addAssertionToGroup(assertion, group);
+				}
+		}
+		LOGGER.info("Total assertions added {} for assertion group {}", allAssertions.size(), group.getName() );
+	}
+
+	
+	private List<Assertion> getCommonReleaseAssertions(List<Assertion> allAssertions) {
+		List<Assertion> result = new ArrayList<>();
+		String keywords;
+		for (Assertion assertion : allAssertions) {
+			 keywords = assertion.getKeywords();
+			if (FILE_CENTRIC_VALIDATION.getName().equals(keywords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keywords)
+					|| RELEASE_TYPE_VALIDATION.getName().equals(keywords)) {
+				result.add(assertion);
 			}
 		}
+		LOGGER.info("Total common release assertions:" + result.size());
+		return result;
+	}
+	
+	private List<Assertion> getReleaseAssertionsByCenter(List<Assertion> allAssertions, String releaseCenter) {
+		List<Assertion> result = new ArrayList<>();
+		for (Assertion assertion : allAssertions) {
+			String keywords = assertion.getKeywords();
+			if (keywords.contains("," + releaseCenter)) {
+				result.add(assertion);
+			}
+		}
+		LOGGER.info("Total release assertions found :{} for center:{}", result.size(), releaseCenter);
+		return result;
+	}
+	
+	private void createReleaseAssertionGroup(List<Assertion> allAssertions, AssertionGroupName groupName) {
+		//create international assertion group
+		AssertionGroup assertionGroup = new AssertionGroup();
+		assertionGroup.setName(groupName.getName());
+		assertionGroup = assertionGroupDao.create(assertionGroup);
+		List<Assertion> assertionsToBeAdded = getCommonReleaseAssertions(allAssertions);
+		assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()));
+		
+		for (Assertion assertion : assertionsToBeAdded) {
+			
+			if ( AssertionGroupName.SPANISH_EDITION.equals(groupName) && Arrays.asList(SPANISH_EXTENSION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+				continue;
+			}
+			assertionService.addAssertionToGroup(assertion, assertionGroup);
+		}
+		LOGGER.info("Total assertions added {} for assertion group {}", assertionsToBeAdded.size(), groupName.getName() );
 	}
 	
 	private void createAssertionGroupByKeyWord(List<Assertion> allAssertions, String assertionGroupName) {
@@ -229,7 +310,7 @@ public class AssertionGroupImporter {
 		group.setName(assertionGroupName);
 		group = assertionGroupDao.create(group);
 		for (Assertion assertion : allAssertions) {
-			if (assertion.getKeywords().contains(assertionGroupName)) {
+			if (assertion.getKeywords().equals(assertionGroupName)) {
 				assertionService.addAssertionToGroup(assertion, group);
 			}
 		}

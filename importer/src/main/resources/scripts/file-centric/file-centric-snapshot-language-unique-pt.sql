@@ -25,7 +25,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('CONCEPT: id=',a.conceptid, ': Concept has multiple active preferred terms.') 
+		concat('Concept: id=',a.conceptid, ' has multiple active preferred terms.') 
 	from description_tmp a
 	join curr_langrefset_s b
 		on a.id = b.referencedcomponentid
@@ -45,46 +45,35 @@
 	where b.active = 1
 	and b.acceptabilityid = '900000000000548007'; /* preferred */
 
-/*  make a list of active concepts that have been edited this release cycle */
-	create table if not exists tmp_edited_concept as
-	select a.*
-	from res_concepts_edited a
-	join curr_concept_s b 
-		on a.conceptid = b.id
-	where b.active = 1;	
 
-/*  identify concepts that have been edited this cycle, for which there is no 
+	insert into qa_result (runid, assertionuuid, concept_id, details)
+	select  	
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		a.id,
+		concat('Concept: id=',a.id, ' has no active preferred terms in any language refset') 
+	from res_edited_active_concepts a
+	left join tmp_pt b
+		on a.id = b.conceptid
+	where b.conceptid is null;
+	
+	/*  identify concepts that have been edited this cycle, for which there is no 
 	US preferred term */
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.conceptid,
-		concat('CONCEPT: id=',a.conceptid, ': Concept has no active preferred term.') 
-	from tmp_edited_concept a
-	left join tmp_pt b
-		on a.conceptid = b.conceptid
-	where b.conceptid is null
-	and b.refsetid = '900000000000509007'; /* US lang refset */
-
-/*  identify concepts that have been edited this cycle, for which there is no 
-	GB preferred term */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
-	select  	
-		<RUNID>,
-		'<ASSERTIONUUID>',
-		a.conceptid,
-		concat('CONCEPT: id=',a.conceptid, ': Concept has no active preferred term.') 
-	from tmp_edited_concept a
-	left join tmp_pt b
-		on a.conceptid = b.conceptid
-	where b.conceptid is null
-	and b.refsetid = '900000000000508004'; /* GB lang refset */
-
-
+		a.id,
+		concat('Concept: id=',a.id, ' has no active preferred terms in the US language refset') 
+	from res_edited_active_concepts a
+	left join 
+	(select b.* from tmp_pt b
+	where b.refsetid = '900000000000509007') as tmp_us_pt
+	on a.id = tmp_us_pt.conceptid
+	where tmp_us_pt.conceptid is null;
+	
 	drop table if exists description_tmp;
 	drop table if exists tmp_pt;
-	drop table if exists tmp_edited_concept;
 	
 	commit;
 	

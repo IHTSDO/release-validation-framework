@@ -19,8 +19,8 @@
     union 
         select sourceid from curr_stated_relationship_d
     union
-        select a.conceptid from curr_description_d a 
-        join curr_langrefset_d b on a.id = b.referencedcomponentid
+        select b.conceptid from curr_langrefset_d a 
+        left join curr_description_s b on a.referencedcomponentid=b.id
     union 
         select referencedcomponentid from curr_attributevaluerefset_d
         where refsetid = '900000000000489007'
