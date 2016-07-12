@@ -175,6 +175,9 @@ public class AssertionGroupImporter {
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
 			String keyWords = assertion.getKeywords();
+			if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
+				continue;
+			}
 			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords) 
 					|| keyWords.contains(SNAPSHOT_CONTENT_VALIDAITON.getReleaseCenter())) {
 				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
@@ -224,6 +227,9 @@ public class AssertionGroupImporter {
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
 			String keyWords = assertion.getKeywords();
+			 if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
+				 continue;
+			 }
 			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)) {
 				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
 				if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
@@ -247,7 +253,9 @@ public class AssertionGroupImporter {
 		group = assertionGroupDao.create(group);
 		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWord("," + groupName.getReleaseCenter(), false);
 		for (Assertion assertion : allAssertions) {
-				assertionService.addAssertionToGroup(assertion, group);
+				if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
+					assertionService.addAssertionToGroup(assertion, group);
+				}
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", allAssertions.size(), group.getName() );
 	}
