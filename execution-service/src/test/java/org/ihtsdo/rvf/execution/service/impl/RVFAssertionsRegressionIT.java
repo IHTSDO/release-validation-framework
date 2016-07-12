@@ -143,7 +143,7 @@ public class RVFAssertionsRegressionIT {
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("ffe6c560-7856-11e1-b0c4-0800200c9a66");
+		runAssertionsTest("d5c80582-ad32-4f26-a729-a91fe04a06b2");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {

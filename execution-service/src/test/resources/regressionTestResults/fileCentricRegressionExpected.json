@@ -296,36 +296,36 @@
     "assertionName" : "Referencedcomponentid refers to valid concepts in the ATTRIBUTEVALUE snapshot file.",
     "assertionUuid" : "d5c80582-ad32-4f26-a729-a91fe04a06b2",
     "firstNInstances" : [ {
-      "conceptId" : 118747013,
-      "detail" : "ATT RS: id=118747013:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    }, {
-      "conceptId" : 187427009,
-      "detail" : "ATT RS: id=187427009:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    }, {
-      "conceptId" : 197095003,
-      "detail" : "ATT RS: id=197095003:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    }, {
-      "conceptId" : 200345007,
-      "detail" : "ATT RS: id=200345007:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    }, {
-      "conceptId" : 282210013,
-      "detail" : "ATT RS: id=282210013:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    }, {
-      "conceptId" : 527806011,
-      "detail" : "ATT RS: id=527806011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    }, {
-      "conceptId" : 527806011,
-      "detail" : "ATT RS: id=527806011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    }, {
-      "conceptId" : 568143011,
-      "detail" : "ATT RS: id=568143011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    }, {
-      "conceptId" : 2608473011,
-      "detail" : "ATT RS: id=2608473011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    }, {
-      "conceptId" : 2608473011,
-      "detail" : "ATT RS: id=2608473011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-    } ],
+        "conceptId" : 187427009,
+        "detail" : "ATT RS: id=187427009:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      }, {
+        "conceptId" : 197095003,
+        "detail" : "ATT RS: id=197095003:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      }, {
+        "conceptId" : 200345007,
+        "detail" : "ATT RS: id=200345007:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      }, {
+        "conceptId" : 2608473011,
+        "detail" : "ATT RS: id=2608473011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      }, {
+        "conceptId" : 2712245011,
+        "detail" : "ATT RS: id=2712245011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      }, {
+        "conceptId" : 118747013,
+        "detail" : "ATT RS: id=118747013:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      }, {
+        "conceptId" : 282210013,
+        "detail" : "ATT RS: id=282210013:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      }, {
+        "conceptId" : 568143011,
+        "detail" : "ATT RS: id=568143011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      }, {
+        "conceptId" : 527806011,
+        "detail" : "ATT RS: id=527806011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      }, {
+        "conceptId" : 2608473011,
+        "detail" : "ATT RS: id=2608473011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+      } ],
     "totalFailed" : 12
   }, {
     "assertionName" : "ValueId refers to valid concepts in the ATTRIBUTE VALUE snapshot.",
