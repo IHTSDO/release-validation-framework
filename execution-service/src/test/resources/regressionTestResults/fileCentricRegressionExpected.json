@@ -884,37 +884,19 @@
     "assertionName" : "Referencedcomponentid refers to valid concepts in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "6a407415-8415-4870-a6ef-b5bc22f73c1f",
     "firstNInstances" : [ {
-      "conceptId" : 1000004,
-      "detail" : "Simple RS: id=1000004:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    }, {
-      "conceptId" : 10086003,
-      "detail" : "Simple RS: id=10086003:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    }, {
-      "conceptId" : 10086003,
-      "detail" : "Simple RS: id=10086003:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    }, {
-      "conceptId" : 10123006,
-      "detail" : "Simple RS: id=10123006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    }, {
-      "conceptId" : 10123006,
-      "detail" : "Simple RS: id=10123006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    }, {
-      "conceptId" : 10171006,
-      "detail" : "Simple RS: id=10171006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    }, {
-      "conceptId" : 10171006,
-      "detail" : "Simple RS: id=10171006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    }, {
-      "conceptId" : 10171006,
-      "detail" : "Simple RS: id=10171006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    }, {
-      "conceptId" : 128534003,
-      "detail" : "Simple RS: id=128534003:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    }, {
-      "conceptId" : 700241009,
-      "detail" : "Simple RS: id=700241009:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
-    } ],
-    "totalFailed" : 10
+        "conceptId" : 1016002,
+        "detail" : "Simple RefSet:1016002:Invalid Referencedcomponentid in Simple Refset snapshot."
+      }, {
+        "conceptId" : 10144006,
+        "detail" : "Simple RefSet:10144006:Invalid Referencedcomponentid in Simple Refset snapshot."
+      }, {
+        "conceptId" : 10166004,
+        "detail" : "Simple RefSet:10166004:Invalid Referencedcomponentid in Simple Refset snapshot."
+      }, {
+        "conceptId" : 10169006,
+        "detail" : "Simple RefSet:10169006:Invalid Referencedcomponentid in Simple Refset snapshot."
+      } ],
+      "totalFailed" : 4
   }, {
     "assertionName" : "All destination ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "6b34ab30-79b9-11e1-b0c4-0800200c9a66",

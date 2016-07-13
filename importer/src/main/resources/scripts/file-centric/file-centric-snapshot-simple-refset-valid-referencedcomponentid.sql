@@ -1,9 +1,9 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-association-valid-referencedcomponentid
+	file-centric-snapshot-simple-refset-valid-referencedcomponentid.sql
 
 	Assertion:
-	Referencedcomponentid refers to valid concepts in the ASSOCIATION REFSET snapshot file.
+	Referencedcomponentid refers to valid concepts in the Simple Refset snapshot file.
 
 ********************************************************************************/
 
@@ -12,8 +12,8 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Simple RS: id=',a.referencedcomponentid, ':Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot.') 	
-	from curr_associationrefset_s a
+		concat('Simple RefSet:',a.referencedcomponentid, ':Invalid Referencedcomponentid in Simple Refset snapshot.') 	
+	from curr_simplerefset_s a
 	left join curr_concept_s b
 	on a.referencedcomponentid = b.id
 	where b.id is null and not exists ( select id from curr_description_s where id=a.referencedcomponentid);
