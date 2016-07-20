@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 61,
-  "totalAssertionsFailed" : 59,
+  "totalAssertionsRun" : 63,
+  "totalAssertionsFailed" : 61,
   "results" : [ {
     "assertionName" : "New inactive states follow active states in the SIMPLE MAP REFSET snapshot.",
     "assertionUuid" : "88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
@@ -296,36 +296,36 @@
     "assertionName" : "Referencedcomponentid refers to valid concepts in the ATTRIBUTEVALUE snapshot file.",
     "assertionUuid" : "d5c80582-ad32-4f26-a729-a91fe04a06b2",
     "firstNInstances" : [ {
-        "conceptId" : 187427009,
-        "detail" : "ATT RS: id=187427009:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      }, {
-        "conceptId" : 197095003,
-        "detail" : "ATT RS: id=197095003:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      }, {
-        "conceptId" : 200345007,
-        "detail" : "ATT RS: id=200345007:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      }, {
-        "conceptId" : 2608473011,
-        "detail" : "ATT RS: id=2608473011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      }, {
-        "conceptId" : 2712245011,
-        "detail" : "ATT RS: id=2712245011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      }, {
-        "conceptId" : 118747013,
-        "detail" : "ATT RS: id=118747013:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      }, {
-        "conceptId" : 282210013,
-        "detail" : "ATT RS: id=282210013:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      }, {
-        "conceptId" : 568143011,
-        "detail" : "ATT RS: id=568143011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      }, {
-        "conceptId" : 527806011,
-        "detail" : "ATT RS: id=527806011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      }, {
-        "conceptId" : 2608473011,
-        "detail" : "ATT RS: id=2608473011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
-      } ],
+      "conceptId" : 187427009,
+      "detail" : "ATT RS: id=187427009:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    }, {
+      "conceptId" : 197095003,
+      "detail" : "ATT RS: id=197095003:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    }, {
+      "conceptId" : 200345007,
+      "detail" : "ATT RS: id=200345007:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    }, {
+      "conceptId" : 2608473011,
+      "detail" : "ATT RS: id=2608473011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    }, {
+      "conceptId" : 2712245011,
+      "detail" : "ATT RS: id=2712245011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    }, {
+      "conceptId" : 118747013,
+      "detail" : "ATT RS: id=118747013:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    }, {
+      "conceptId" : 282210013,
+      "detail" : "ATT RS: id=282210013:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    }, {
+      "conceptId" : 568143011,
+      "detail" : "ATT RS: id=568143011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    }, {
+      "conceptId" : 527806011,
+      "detail" : "ATT RS: id=527806011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    }, {
+      "conceptId" : 2608473011,
+      "detail" : "ATT RS: id=2608473011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
+    } ],
     "totalFailed" : 12
   }, {
     "assertionName" : "ValueId refers to valid concepts in the ATTRIBUTE VALUE snapshot.",
@@ -810,6 +810,14 @@
     } ],
     "totalFailed" : 9
   }, {
+    "assertionName" : "Descripiton and text definiiton ids should be unique.",
+    "assertionUuid" : "560e6d0c-64e8-4726-9516-ae7a7606b0b3",
+    "firstNInstances" : [ {
+      "conceptId" : 703860006,
+      "detail" : "Description: id=3008913022 is duplicated in the description and text definition snapshot."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DEFINITION snapshot.",
     "assertionUuid" : "5a83783e-3366-48bd-a50d-8f3a53812174",
     "firstNInstances" : [ {
@@ -884,19 +892,19 @@
     "assertionName" : "Referencedcomponentid refers to valid concepts in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "6a407415-8415-4870-a6ef-b5bc22f73c1f",
     "firstNInstances" : [ {
-        "conceptId" : 1016002,
-        "detail" : "Simple RefSet:1016002:Invalid Referencedcomponentid in Simple Refset snapshot."
-      }, {
-        "conceptId" : 10144006,
-        "detail" : "Simple RefSet:10144006:Invalid Referencedcomponentid in Simple Refset snapshot."
-      }, {
-        "conceptId" : 10166004,
-        "detail" : "Simple RefSet:10166004:Invalid Referencedcomponentid in Simple Refset snapshot."
-      }, {
-        "conceptId" : 10169006,
-        "detail" : "Simple RefSet:10169006:Invalid Referencedcomponentid in Simple Refset snapshot."
-      } ],
-      "totalFailed" : 4
+      "conceptId" : 1016002,
+      "detail" : "Simple RefSet:1016002:Invalid Referencedcomponentid in Simple Refset snapshot."
+    }, {
+      "conceptId" : 10144006,
+      "detail" : "Simple RefSet:10144006:Invalid Referencedcomponentid in Simple Refset snapshot."
+    }, {
+      "conceptId" : 10166004,
+      "detail" : "Simple RefSet:10166004:Invalid Referencedcomponentid in Simple Refset snapshot."
+    }, {
+      "conceptId" : 10169006,
+      "detail" : "Simple RefSet:10169006:Invalid Referencedcomponentid in Simple Refset snapshot."
+    } ],
+    "totalFailed" : 4
   }, {
     "assertionName" : "All destination ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "6b34ab30-79b9-11e1-b0c4-0800200c9a66",
@@ -931,7 +939,15 @@
       "conceptId" : 703649004,
       "detail" : "RELATIONSHIP: id=1000006026: Inferred Relationship contains a destination id that does not exist in the Concept snapshot file."
     } ],
-    "totalFailed" : 13
+    "totalFailed" : 14
+  }, {
+    "assertionName" : "Active stated and inferred relationship ids should be unique.",
+    "assertionUuid" : "6dbaed71-f031-4290-b74f-f35561c2e283",
+    "firstNInstances" : [ {
+      "conceptId" : 702451000,
+      "detail" : "Relationship: id=4969199027 is duplicated in the stated and inferred relationships"
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "ComplexMap refset id is unique in the snapshot file",
     "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e41b57",
@@ -986,8 +1002,11 @@
     }, {
       "conceptId" : 129304002,
       "detail" : "RELATIONSHIP: id=1000002029: Inferred Relationship contains source id that does not exist in the Concept snapshot file."
+    }, {
+      "conceptId" : 91241007,
+      "detail" : "RELATIONSHIP: id=4969199027: Inferred Relationship contains source id that does not exist in the Concept snapshot file."
     } ],
-    "totalFailed" : 9
+    "totalFailed" : 10
   }, {
     "assertionName" : "Every active concept defined in the Danish extension has a preferred FSN in the US language refset.",
     "assertionUuid" : "759a1eb8-2ca6-4405-80ba-16fd7540c1d0",
@@ -1027,7 +1046,7 @@
       "conceptId" : 703649004,
       "detail" : "RELATIONSHIP: id=1000006026: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
     } ],
-    "totalFailed" : 13
+    "totalFailed" : 14
   }, {
     "assertionName" : "There is a 1-to-1 relationship between the id and the immutable values in STATED RELATIONSHIP snapshot.",
     "assertionUuid" : "7e453140-79b9-11e1-b0c4-0800200c9a66",
