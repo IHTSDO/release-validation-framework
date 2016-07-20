@@ -941,7 +941,7 @@
     } ],
     "totalFailed" : 14
   }, {
-    "assertionName" : "Active stated and inferred relationship ids should be unique.",
+    "assertionName" : "Stated and inferred relationship ids should be unique.",
     "assertionUuid" : "6dbaed71-f031-4290-b74f-f35561c2e283",
     "firstNInstances" : [ {
       "conceptId" : 702451000,
