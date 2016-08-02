@@ -326,8 +326,8 @@
 		<script uuid="3b2c1824-8445-410e-8ae2-d943be01c33f" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-unique-terms.sql" text="There are no duplicate Definition terms in the DEFINITION snapshot file." />
 		<script uuid="6e70ea3e-c4dd-4ae3-8b75-f0567e41b57" category="file-centric-validation,ICD-9-CM" sqlFile="file-centric-snapshot-complexmap-unique-id.sql" text="ComplexMap refset id is unique in the snapshot file" />
 	  	<script uuid="6e70ea3e-c4dd-4ae3-8b75-f0567e42c62" category="file-centric-validation,ICD-MAP,INT" sqlFile="file-centric-snapshot-extendedmap-unique-id.sql" text="Extendedmap refset id must be unique in the snapshot file" />
-		<script uuid="560e6d0c-64e8-4726-9516-ae7a7606b0b3" category="file-centric-validation" sqlFile="file-centric-snapshot-unique-description-definition-id.sql" text="Descripiton and text definiiton ids should be unique." />
-		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="file-centric-validation" sqlFile="file-centric-snapshot-unique-relationship-id.sql" text="Stated and inferred relationship ids should be unique." />
+		<script uuid="560e6d0c-64e8-4726-9516-ae7a7606b0b3" category="file-centric-validation" sqlFile="file-centric-snapshot-unique-description-definition-id.sql" text="The ids should be unique across the description and text definition snapshot files." />
+		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="file-centric-validation" sqlFile="file-centric-snapshot-unique-relationship-id.sql" text="The ids should be unique across the stated and inferred relationship snapshot files." />
 		
 	
 		<!-- LOINC <script uuid="" category="file-centric-validation" sqlFile="" text="" />-->

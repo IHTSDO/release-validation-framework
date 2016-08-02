@@ -3,7 +3,7 @@
 	file-centric-snapshot-unique-relationship-id.sql
 
 	Assertion:
-	Stated and inferred relationship ids should be unique.
+	The ids should be unique across the stated and inferred relationship snapshot files.
 
 ********************************************************************************/
 	insert into qa_result (runid, assertionuuid, concept_id, details)

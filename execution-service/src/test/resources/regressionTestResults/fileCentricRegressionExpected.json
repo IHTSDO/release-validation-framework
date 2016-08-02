@@ -810,7 +810,7 @@
     } ],
     "totalFailed" : 9
   }, {
-    "assertionName" : "Descripiton and text definiiton ids should be unique.",
+    "assertionName" : "The ids should be unique across the description and text definition snapshot files.",
     "assertionUuid" : "560e6d0c-64e8-4726-9516-ae7a7606b0b3",
     "firstNInstances" : [ {
       "conceptId" : 703860006,
@@ -941,7 +941,7 @@
     } ],
     "totalFailed" : 14
   }, {
-    "assertionName" : "Stated and inferred relationship ids should be unique.",
+    "assertionName" : "The ids should be unique across the stated and inferred relationship snapshot files.",
     "assertionUuid" : "6dbaed71-f031-4290-b74f-f35561c2e283",
     "firstNInstances" : [ {
       "conceptId" : 702451000,

@@ -54,7 +54,6 @@ public class RVFAssertionsRegressionIT {
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
 	private static final String PROSPECTIVE_RELEASE = "regression_test_prospective";
 	
-	
 	private static final String PREVIOUS_RELEASE = "regression_test_previous";
 	@Autowired
     private AssertionExecutionService assertionExecutionService;

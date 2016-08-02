@@ -3,7 +3,7 @@
 	file-centric-snapshot-unique-description-definition-id.sql
 
 	Assertion:
-	Descripiton and text definiiton ids should be unique.
+	The ids should be unique across the description and text definition snapshot files.
 
 ********************************************************************************/
 	insert into qa_result (runid, assertionuuid, concept_id, details)
