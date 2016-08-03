@@ -54,7 +54,6 @@ public class RVFAssertionsRegressionIT {
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
 	private static final String PROSPECTIVE_RELEASE = "regression_test_prospective";
 	
-	
 	private static final String PREVIOUS_RELEASE = "regression_test_previous";
 	@Autowired
     private AssertionExecutionService assertionExecutionService;
@@ -143,7 +142,7 @@ public class RVFAssertionsRegressionIT {
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("d5c80582-ad32-4f26-a729-a91fe04a06b2");
+		runAssertionsTest("335b2810-8cbb-43bf-807e-092dacb20f6a");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {

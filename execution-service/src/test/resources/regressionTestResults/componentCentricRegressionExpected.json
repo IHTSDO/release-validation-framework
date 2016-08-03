@@ -573,8 +573,11 @@
     "firstNInstances" : [ {
       "conceptId" : 703860006,
       "detail" : "Description: id=3008913022: has multiple language refset members for a given dialect."
+    }, {
+      "conceptId" : 703672002,
+      "detail" : "Text definition: id=3008913022: has multiple language refset members for a given dialect."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "All FSNs have a space before the semantic tag.",
     "assertionUuid" : "32369add-8d9f-48de-a129-29b32c79a9d7",
@@ -649,13 +652,16 @@
       "conceptId" : 10002003,
       "detail" : "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member."
     }, {
+      "conceptId" : 10041001,
+      "detail" : "RELATIONSHIP: id=4969199027: Relationship is in a relationship group with a single active inferred member."
+    }, {
       "conceptId" : 255135009,
       "detail" : "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member."
     }, {
       "conceptId" : 280844000,
       "detail" : "RELATIONSHIP: id=100000028: Relationship is in a relationship group with a single active inferred member."
     } ],
-    "totalFailed" : 3
+    "totalFailed" : 4
   }, {
     "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
     "assertionUuid" : "4572d730-7d08-11e1-b0c4-0800200c9a66",
