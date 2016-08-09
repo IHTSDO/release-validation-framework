@@ -31,10 +31,10 @@ public class AssertionGroupImporter {
 		RELEASE_TYPE_VALIDATION ("COMMON","release-type-validation"),
 		SPANISH_EDITION ("ES","SpanishEdition"),
 		INTERNATIONAL_EDITION ("INT","InternationalEdition"),
-		COMMON_SNAPSHOT_VALIDATION ("COMMON","CommonSnapshotValidation"),
-		INT_SNAPSHOT_VALIDATION ("INT","IntSnapshotValidation"),
-		DK_SNAPSHOT_VALIDATION ("DK","DkSnapshotValidation"),
-		SE_SNAPSHOT_VALIDATION ("SE","SeSnapshotValidation"),
+		COMMON_AUTHORING ("COMMON","common-authoring"),
+		INT_AUTHORING ("INT","int-authoring"),
+		DK_AUTHORING("DK","dk-authoring"),
+		SE_AUTHORING ("SE","se-authoring"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC","firstTimeLOINCValidation"),
 		FIRST_TIME_INTERNATIONAL_RELEASE_VALIDATION("INT","firstTimeInternationalReleaseValidation"),
 		FIRST_TIME_COMMON_SNAPSHOT_VALIDATION ("COMMON","FirstTimeCommonSnapshotValidation"),
@@ -146,12 +146,12 @@ public class AssertionGroupImporter {
 			case INTERNATIONAL_EDITION :
 				createReleaseAssertionGroup(allAssertions, groupName);
 				break;
-			case COMMON_SNAPSHOT_VALIDATION :
+			case COMMON_AUTHORING :
 				createCommonSnapshotAssertionGroup(allAssertions);
 				break;
-			case INT_SNAPSHOT_VALIDATION :
-			case DK_SNAPSHOT_VALIDATION :
-			case SE_SNAPSHOT_VALIDATION :
+			case INT_AUTHORING :
+			case DK_AUTHORING :
+			case SE_AUTHORING :
 				createSnapshotAssertionGroup(groupName);
 				break;
 			case SNAPSHOT_CONTENT_VALIDAITON:
@@ -223,7 +223,7 @@ public class AssertionGroupImporter {
 	
 	private void createCommonSnapshotAssertionGroup(List<Assertion> allAssertions) {
 		AssertionGroup group = new AssertionGroup();
-		group.setName(AssertionGroupName.COMMON_SNAPSHOT_VALIDATION.getName());
+		group.setName(AssertionGroupName.COMMON_AUTHORING.getName());
 		group = assertionGroupDao.create(group);
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
