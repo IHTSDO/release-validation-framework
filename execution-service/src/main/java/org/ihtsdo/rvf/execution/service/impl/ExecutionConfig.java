@@ -11,6 +11,7 @@ public class ExecutionConfig {
 	private int failureExportMax = 10;
 	private boolean firstTimeRelease;
 	private boolean extensionValidation;
+	private boolean isReleaseValidation;
 
 	public ExecutionConfig(final Long runId) {
 		this(runId,false);
@@ -76,5 +77,13 @@ public class ExecutionConfig {
 	
 	public boolean isExtensionValidation() {
 		return this.extensionValidation;
+	}
+	
+	public void setReleaseValidation(boolean isReleaseValidation) {
+		this.isReleaseValidation = isReleaseValidation;
+	}
+
+	public boolean isReleaseValidation() {
+		return this.isReleaseValidation;
 	}
 }

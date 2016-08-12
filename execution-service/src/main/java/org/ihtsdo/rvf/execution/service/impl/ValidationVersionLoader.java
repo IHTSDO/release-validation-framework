@@ -108,6 +108,7 @@ public class ValidationVersionLoader {
 		if (validationConfig.getFailureExportMax() != null) {
 			executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
 		}
+		executionConfig.setReleaseValidation(!validationConfig.isRf2DeltaOnly());
 		return executionConfig;
 		
 	}
@@ -116,12 +117,20 @@ public class ValidationVersionLoader {
 		List<String> filesLoaded = new ArrayList<>();
 		if (validationConfig.isRf2DeltaOnly()) {
 			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, validationConfig.getLocalProspectiveFile());
-			//copy snapshot from previous release
-			releaseDataManager.copyTableData(validationConfig.getPrevIntReleaseVersion(), prospectiveVersion,SNAPSHOT_TABLE);
+			if (isExtension(validationConfig)) {
+				releaseDataManager.copyTableData(validationConfig.getExtensionDependencyVersion(), prospectiveVersion,SNAPSHOT_TABLE,false);
+				if (!validationConfig.isFirstTimeRelease()) {
+					releaseDataManager.copyTableData(validationConfig.getPreviousExtVersion(), prospectiveVersion,SNAPSHOT_TABLE, true);
+				}
+			} else {
+				//copy snapshot from previous release
+				releaseDataManager.copyTableData(validationConfig.getPrevIntReleaseVersion(), prospectiveVersion,SNAPSHOT_TABLE,false);
+			}
 			releaseDataManager.updateSnapshotTableWithDataFromDelta(prospectiveVersion);
 		}
 		return filesLoaded;
 	}
+	
 
 	public void downloadProspectiveVersion(ValidationRunConfig validationConfig) throws Exception {
 		if (validationConfig.isProspectiveFilesInS3()) {
@@ -302,7 +311,7 @@ public class ValidationVersionLoader {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return false;
 		}
-		if (isExtension(validationConfig) && !validationConfig.isFirstTimeRelease()) {
+		if (isExtension(validationConfig) && !validationConfig.isFirstTimeRelease() && !validationConfig.isRf2DeltaOnly()) {
 			//SnomedCT_Release-es_INT_20140430.zip
 			//SnomedCT_SpanishRelease_INT_20141031.zip
 			if (validationConfig.getPrevIntReleaseVersion() != null) {
@@ -331,14 +340,16 @@ public class ValidationVersionLoader {
 	
 	private boolean combineCurrentReleases(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap, List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception{
 		String prospectiveVersion = validationConfig.getRunId().toString();
-		if (isExtension(validationConfig)) {
-			//combine extension dependency data into prospective version
-			uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
-		
-		} else if (validationConfig.isRf2DeltaOnly()) {
+		 if (validationConfig.isRf2DeltaOnly()) {
 			rf2FilesLoaded.addAll(loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig));
-		} else {		  			
-			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+		} else {
+			if (isExtension(validationConfig)) {
+				//combine extension dependency data into prospective version
+				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+			
+			} else {
+				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+			}
 		}
 		return true;
 	}

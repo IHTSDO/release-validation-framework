@@ -1,6 +1,6 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-simple-map-successive-states
+	release-type-snapshot-simple-map-successive-states
 
 	Assertion:	
 	New inactive states follow active states in the SIMPLE MAP REFSET snapshot.

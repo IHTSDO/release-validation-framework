@@ -355,7 +355,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			logger.info("Adding known version {} to schema {}", known, combinedVersionName);
 			for (final String tableName : getValidTableNamesFromSchema(knownSchema, null)) {
 				
-				isFailed = copyTable(tableName, knownSchema, schemaName);
+				isFailed = copyTable(tableName, knownSchema, schemaName, false);
 				if (isFailed) {
 					break;
 				}
@@ -367,15 +367,23 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 	
 	
-	private boolean copyTable(String tableName, String sourceSchema, String targetSchema) {
+	private boolean copyTable(String tableName, String sourceSchema, String targetSchema, boolean replaceOldWithNew) {
 		boolean isFailed = false;
 		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
 		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
+		String deleteSql = null;
+		if (replaceOldWithNew) {
+			deleteSql = "delete a.* from " + targetSchema + "." + tableName + " a where exists ( select b.id from " + sourceSchema + "." + tableName 
+					+ " b where a.id=b.id and cast(a.effectivetime as datetime) < cast(b.effectivetime as datetime))";
+		}
 		final String sql = "insert into " + targetSchema + "." + tableName  + " select * from " + sourceSchema + "." + tableName;
 		logger.debug("Copying table {}", tableName);
 		try (Connection connection = snomedDataSource.getConnection();
 				Statement statement = connection.createStatement() ) {
 			statement.execute(disableIndex);
+			if (replaceOldWithNew) {
+				statement.execute(deleteSql);
+			}
 			statement.execute(sql);
 			statement.execute(enableIndex);
 		} catch (final SQLException e) {
@@ -418,12 +426,12 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 
 	@Override
-	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern) {
+	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern, boolean replaceOldWithNew) {
 		final long startTime = System.currentTimeMillis();
 		String sourceSchema = releaseSchemaNameLookup.get(sourceVersion);
 		String destinationSchema = releaseSchemaNameLookup.get(destinationVersion);
 		for (final String tableName : getValidTableNamesFromSchema(sourceSchema, tableNamePattern)) {
-			if (copyTable(tableName, sourceSchema, destinationSchema)) {
+			if (copyTable(tableName, sourceSchema, destinationSchema,replaceOldWithNew)) {
 				break;
 			}
 		}

@@ -183,7 +183,6 @@ public class TestUploadFileController {
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
 				.addUrl(urlPrefix)
-				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion))
 				.addProspectiveFilesInS3(false);
 		
 		
@@ -238,7 +237,6 @@ public class TestUploadFileController {
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
 				.addUrl(urlPrefix)
-				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion))
 				.addProspectiveFilesInS3(true);
 		
 		

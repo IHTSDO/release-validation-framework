@@ -37,8 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RvfAssertionTestHarness {
 	
-	 private static final String PROSPECTIVE_RELEASE = "20150731";
-	private static final String PREVIOUS_RELEASE = "20150131";
+	 private static final String PROSPECTIVE_RELEASE = "prospective";
+	private static final String PREVIOUS_RELEASE = "previous";
 	@Autowired
 	    private AssertionExecutionService assertionExecutionService;
 	    @Resource(name = "dataSource")
@@ -62,8 +62,11 @@ public class RvfAssertionTestHarness {
 	        assertNotNull(entityService);
 	        assertNotNull(releaseDataManager);
 	        // register releases with release manager, since they will be used during SQL replacement
-	        releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_regression_test_prospective");
-	        releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_regression_test_previous");
+//	        releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_regression_test_prospective");
+//	        releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_regression_test_previous");
+	        
+	        releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_dk_20160215");
+	        releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_20160812115243");
 
 	    }
 	    
@@ -111,20 +114,21 @@ public class RvfAssertionTestHarness {
 	    
 	    @Test
 	    public void testProspectiveVersion() throws BusinessServiceException, SQLException, IOException {
-	    	
-	    	 resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
+	    	resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
 	        final List<Assertion> resources = assertionDao.getAssertionsByKeyWord("resource",true);
 	        final Long runId =201503130928L;
 			final ExecutionConfig config = new ExecutionConfig(runId);
-			config.setPreviousVersion(PREVIOUS_RELEASE);
+			config.setPreviousVersion("dk_20160215");
 			config.setProspectiveVersion(PROSPECTIVE_RELEASE);
+			config.setPreviousVersion(PREVIOUS_RELEASE);
+			config.setReleaseValidation(false);
 			assertionExecutionService.executeAssertions(resources, config);
 	    	//Assertion 111 and assertion test 107
 	    	//36L
 	    	//150L
 	    	//"release-type-validation", "component-centric-validation","file-centric-validation"
 			//complexAndExtendedMapRefsetValidation
-	    	final List<String> groupNames = Arrays.asList("SnapshotContentValidation");
+	    	final List<String> groupNames = Arrays.asList("common-authoring","dk-authoring");
 	    	final List<AssertionGroup> groups = new ArrayList<>();
 	    	for (final String name : groupNames) {
 	    		groups.add(assertionDao.getAssertionGroupsByName(name));
@@ -148,4 +152,5 @@ public class RvfAssertionTestHarness {
 	        final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionTests(tests, config);
 	        System.out.println("TOTAL of assertions run:" + runItems.size());
 	    }
+	    
 }

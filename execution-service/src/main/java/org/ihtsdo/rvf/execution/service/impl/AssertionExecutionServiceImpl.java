@@ -301,7 +301,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			throw new ConfigurationException ("Failed to determine a prospective schema for release " + prospectiveRelease);
 		}
 		
-		if (!config.isFirstTimeRelease() && previousReleaseSchema == null) {
+		if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
 			throw new ConfigurationException ("Failed to determine a schema for previous release " + previousRelease);
 		}
 		for( String part : parts) {

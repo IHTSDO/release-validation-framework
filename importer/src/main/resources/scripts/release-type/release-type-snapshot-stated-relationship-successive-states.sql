@@ -1,9 +1,11 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-inferred-relationship-successive-states
+	release-type-snapshot-stated-relationship-successive-states
 
 	Assertion:
 	All relationships inactivated in current release must have been active in the previous release
+
+	rtu 20130512: inactivation sould be the only edit. 
 
 ********************************************************************************/
 	
@@ -13,9 +15,9 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceid,
-		concat('Relationship: id=',a.id, ' should not have a new inactive state as it was inactive previously.') 
-	from curr_relationship_s a
-	inner join prev_relationship_s b on a.id = b.id 
+		concat('Stated relationship: id=',a.id, ' should not have a new inactive state as it was inactive previously.') 
+	from curr_stated_relationship_s a
+	inner join prev_stated_relationship_s b on a.id = b.id 
 	where a.active = '0' 
 	and b.active = '0' 
 	and a.effectivetime != b.effectivetime
@@ -28,14 +30,13 @@
 	and a.modifierid = b.modifierid;
 	
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceid,
-		concat('Relationship: id=',a.id, ' is inactive but no active state found in previous release.') 
-	from curr_relationship_s a
-	left join prev_relationship_s b
+		concat('Stated relationship: id=',a.id, ' is inactive in the current release but no active state found in the previous snapshot.') 	
+	from curr_stated_relationship_s  a left join prev_stated_relationship_s b
 	on a.id=b.id
 	and a.sourceid=b.sourceid
 	and a.destinationid=b.destinationid

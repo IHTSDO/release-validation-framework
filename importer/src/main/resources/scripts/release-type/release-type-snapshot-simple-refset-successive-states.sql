@@ -1,6 +1,6 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-simple-refset-successive-states
+	release-type-snapshot-simple-refset-successive-states
 
 	Assertion:	
 	New inactive states for existing components must have active states in the previous SIMPLE REFSET snapshot

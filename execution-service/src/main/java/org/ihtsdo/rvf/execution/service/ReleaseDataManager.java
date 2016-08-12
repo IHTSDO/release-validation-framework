@@ -34,7 +34,7 @@ public interface ReleaseDataManager {
 	
 	void dropVersion(String version);
 
-	void copyTableData(String sourceVersion,String destinationVersion, String tableNamePattern);
+	void copyTableData(String sourceVersion,String destinationVersion, String tableNamePattern, boolean replaceOldWithNew);
 
 	void updateSnapshotTableWithDataFromDelta(String prospectiveVersion);
 	
