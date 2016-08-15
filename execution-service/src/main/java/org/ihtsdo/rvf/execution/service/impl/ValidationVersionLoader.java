@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ValidationVersionLoader {
 
+	private static final String EXTENSIONS = "extensions";
 	private static final String SNAPSHOT_TABLE = "%_s";
 	private static final String SEPARATOR = "/";
 
@@ -56,7 +57,7 @@ public class ValidationVersionLoader {
 		String prevReleaseVersion = resolvePreviousVersion(validationConfig.getPrevIntReleaseVersion());
 		final boolean isExtension = isExtension(validationConfig);
 		if (isExtension) {
-			prevReleaseVersion = "previous_" + validationConfig.getRunId();
+			prevReleaseVersion = resolvePreviousVersion(validationConfig.getPreviousExtVersion());
 		}
 		executionConfig.setPreviousVersion(prevReleaseVersion.toLowerCase());
 		List<String> rf2FilesLoaded = new ArrayList<>();
@@ -66,9 +67,7 @@ public class ValidationVersionLoader {
 			//load published versions from s3 
 			isSucessful = prepareVersionsFromS3FilesForPreviousVersion(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
 
-		} else {
-			isSucessful = combineKnownReleases(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
-		}
+		} 
 		return isSucessful;
 		}
 		
@@ -76,16 +75,11 @@ public class ValidationVersionLoader {
 		String prospectiveVersion = executionConfig.getExecutionId().toString();
 		executionConfig.setProspectiveVersion(prospectiveVersion);
 		List<String> rf2FilesLoaded = new ArrayList<>();
-		boolean isSucessful = false;
 		String reportStorage = validationConfig.getStorageLocation();
-		if (validationConfig.getExtensionDependencyVersion() != null && validationConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
-			//load published versions from s3 and load prospective file
-			isSucessful = prepareVersionsFromS3FilesForProspectvie(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
+		if (validationConfig.isRf2DeltaOnly()) {
+			rf2FilesLoaded.addAll(loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig));
 		} else {
-			isSucessful = combineCurrentReleases(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
-		}
-		if (!isSucessful) {
-			return false;
+			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		}
 		responseMap.put("totalRF2FilesLoaded", rf2FilesLoaded.size());
 		Collections.sort(rf2FilesLoaded);
@@ -110,7 +104,6 @@ public class ValidationVersionLoader {
 		}
 		executionConfig.setReleaseValidation(!validationConfig.isRf2DeltaOnly());
 		return executionConfig;
-		
 	}
 
 	public List<String> loadProspectiveDeltaWithPreviousSnapshotIntoDB(String prospectiveVersion, ValidationRunConfig validationConfig) throws BusinessServiceException {
@@ -189,46 +182,25 @@ public class ValidationVersionLoader {
 	
 	private boolean prepareVersionsFromS3FilesForPreviousVersion(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap,List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception {
 		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
-		if (!validationConfig.isFirstTimeRelease() && validationConfig.getPrevIntReleaseVersion() != null) {
+		if (!validationConfig.isFirstTimeRelease()) {
 			List<String> prevRf2FilesLoaded = new ArrayList<>();
-			File previousVersionTemp = null;
-			if (validationConfig.getPrevIntReleaseVersion().endsWith(ZIP_FILE_EXTENSION)) {
+			if (validationConfig.getPrevIntReleaseVersion() != null && validationConfig.getPrevIntReleaseVersion().endsWith(ZIP_FILE_EXTENSION)) {
 				String previousPublished = INTERNATIONAL + SEPARATOR + validationConfig.getPrevIntReleaseVersion();
 				logger.debug("download published version from s3:" + previousPublished );
 				InputStream previousIntInput = s3PublishFileHelper.getFileStream(previousPublished);
-				previousVersionTemp = File.createTempFile(validationConfig.getPrevIntReleaseVersion(), null);
+				File previousVersionTemp = File.createTempFile(validationConfig.getPrevIntReleaseVersion(), null);
 				IOUtils.copy(previousIntInput, new FileOutputStream(previousVersionTemp));
-			}
-			
-			File previousExtTemp = null;
-			if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
-				String previousExtZipFile = INTERNATIONAL + SEPARATOR + validationConfig.getPreviousExtVersion();
+				releaseDataManager.loadSnomedData(executionConfig.getPreviousVersion(), prevRf2FilesLoaded, previousVersionTemp);
+			} else if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
+				//SnomedCT_RF2Release_DK_20160215.zip
+				String[] splits = validationConfig.getPreviousExtVersion().split("_");
+				logger.debug( "extension release file short name:" + splits[2]);
+				String previousExtZipFile = EXTENSIONS + SEPARATOR + splits[2] +validationConfig.getPreviousExtVersion();
 				logger.debug("downloading published extension from s3:" + previousExtZipFile);
 				InputStream previousExtInput = s3PublishFileHelper.getFileStream(previousExtZipFile);
-				previousExtTemp = File.createTempFile(validationConfig.getPreviousExtVersion(), null);
+				File previousExtTemp = File.createTempFile(validationConfig.getPreviousExtVersion(), null);
 				IOUtils.copy(previousExtInput, new FileOutputStream(previousExtTemp));
-			}
-
-			if (isExtension(validationConfig)) {
-				String combinedVersionName = executionConfig.getPreviousVersion();
-				final String startCombiningMsg = String.format("Combining previous releases:[%s],[%s] into [%s]", validationConfig.getPrevIntReleaseVersion() , validationConfig.getPreviousExtVersion(), combinedVersionName);
-				logger.info(startCombiningMsg);
-				reportService.writeProgress(startCombiningMsg, reportStorage);
-				if (previousVersionTemp != null) {
-					if (previousExtTemp != null) {
-						releaseDataManager.loadSnomedData(combinedVersionName, prevRf2FilesLoaded, previousVersionTemp,previousExtTemp);
-					} else {
-						releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPreviousExtVersion());
-						releaseDataManager.loadSnomedDataIntoExistingDb(combinedVersionName, prevRf2FilesLoaded, previousVersionTemp);
-					}
-				} else {
-					if (previousExtTemp != null) {
-						releaseDataManager.combineKnownVersions(combinedVersionName, validationConfig.getPrevIntReleaseVersion());
-						releaseDataManager.loadSnomedDataIntoExistingDb(combinedVersionName, prevRf2FilesLoaded, previousExtTemp);
-					}
-				}
-			} else {
-				releaseDataManager.loadSnomedData(executionConfig.getPreviousVersion(), prevRf2FilesLoaded, previousVersionTemp);
+				releaseDataManager.loadSnomedData(executionConfig.getPreviousVersion(), prevRf2FilesLoaded,previousExtTemp);
 			}
 
 			String schemaName = releaseDataManager.getSchemaForRelease(executionConfig.getPreviousVersion());
@@ -253,13 +225,14 @@ public class ValidationVersionLoader {
 	
 	private boolean prepareVersionsFromS3FilesForProspectvie(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap,List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception {
 		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
-		String prospectiveVersion = validationConfig.getRunId().toString();
+		String prospectiveVersion = executionConfig.getProspectiveVersion();
 		if (isExtension(validationConfig)) {
 			String extensionDependency = INTERNATIONAL + SEPARATOR + validationConfig.getExtensionDependencyVersion();
 			logger.debug("download published  extension dependency version from s3:" +  extensionDependency);
 			InputStream extensionDependencyInput = s3PublishFileHelper.getFileStream(extensionDependency);
 			File extensionDependencyTemp = File.createTempFile(validationConfig.getExtensionDependencyVersion(), null);
 			IOUtils.copy(extensionDependencyInput, new FileOutputStream(extensionDependencyTemp));
+			
 			releaseDataManager.loadSnomedData(prospectiveVersion, rf2FilesLoaded, validationConfig.getLocalProspectiveFile(),extensionDependencyTemp);
 		} else {
 			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
@@ -338,23 +311,6 @@ public class ValidationVersionLoader {
 	}
 	
 	
-	private boolean combineCurrentReleases(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap, List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception{
-		String prospectiveVersion = validationConfig.getRunId().toString();
-		 if (validationConfig.isRf2DeltaOnly()) {
-			rf2FilesLoaded.addAll(loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig));
-		} else {
-			if (isExtension(validationConfig)) {
-				//combine extension dependency data into prospective version
-				uploadProspectiveVersion(prospectiveVersion, validationConfig.getExtensionDependencyVersion(), validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
-			
-			} else {
-				uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
-			}
-		}
-		return true;
-	}
-	
-	
 	private boolean checkKnownVersion(ValidationRunConfig validationConfig, Map<String, Object> responseMap) {
 		logger.debug("Checking known versions...");
 		String previousExtVersion =validationConfig.getPreviousExtVersion();
@@ -400,6 +356,14 @@ public class ValidationVersionLoader {
 			}
 		}
 		return version;
+	}
+
+	public boolean combineCurrenExtensionWithDependencySnapshot(ExecutionConfig executionConfig, Map<String, Object> responseMap,ValidationRunConfig validationConfig) {
+		String prospectiveVersion = executionConfig.getProspectiveVersion();
+		if (isExtension(validationConfig)) {
+			releaseDataManager.copyTableData(validationConfig.getExtensionDependencyVersion(), prospectiveVersion,SNAPSHOT_TABLE,true);
+		} 
+		return true;
 	}
 	
 	/*private void combineKnownVersions(final String combinedVersion, final String firstKnown, final String secondKnown) {

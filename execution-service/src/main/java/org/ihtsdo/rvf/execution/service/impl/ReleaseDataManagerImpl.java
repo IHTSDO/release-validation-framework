@@ -367,6 +367,37 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 	
 	
+	
+	
+	
+	
+
+	private boolean copyData(String tableName, String sourceSchema, String targetSchema, boolean copyLatestData) {
+		boolean isFailed = false;
+		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
+		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
+		String selectSql = " select * from " + sourceSchema + "." + tableName;
+		if (copyLatestData) {
+			selectSql = "select a.* from " + sourceSchema + "." + tableName + " a where exists ( select b.id from " + targetSchema + "." + tableName 
+					+ " b where a.id=b.id and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime)) or not exists ( select c.id from " + targetSchema + "." 
+					+ tableName + " c where a.id=c.id)";
+		} 
+		final String sql = "insert into " + targetSchema + "." + tableName  + selectSql;
+		logger.debug("Copying table {}", tableName);
+		try (Connection connection = snomedDataSource.getConnection();
+				Statement statement = connection.createStatement() ) {
+			statement.execute(disableIndex);
+			statement.execute(sql);
+			statement.execute(enableIndex);
+		} catch (final SQLException e) {
+			isFailed = true;
+			logger.error("Failed to insert data to table: " + tableName +" due to " + e.fillInStackTrace());
+		}
+		return isFailed;
+	}
+	
+	
+	
 	private boolean copyTable(String tableName, String sourceSchema, String targetSchema, boolean replaceOldWithNew) {
 		boolean isFailed = false;
 		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";

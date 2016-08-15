@@ -7,7 +7,7 @@ import java.util.UUID;
 /**
  * A class that records metrics about execution of an {@link org.ihtsdo.rvf.entity.Test}.
  */
-public class TestRunItem {
+public class TestRunItem implements Comparable<TestRunItem>{
 
 	private String testCategory;
 	private UUID assertionUuid;
@@ -117,6 +117,97 @@ public class TestRunItem {
 
 	public void setExtractResultInMillis(Long extractResultInMillis) {
 		this.extractResultInMillis = extractResultInMillis;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((assertionText == null) ? 0 : assertionText.hashCode());
+		result = prime * result
+				+ ((assertionUuid == null) ? 0 : assertionUuid.hashCode());
+		result = prime * result
+				+ ((executionId == null) ? 0 : executionId.hashCode());
+		result = prime
+				* result
+				+ ((extractResultInMillis == null) ? 0 : extractResultInMillis
+						.hashCode());
+		result = prime * result
+				+ ((failureCount == null) ? 0 : failureCount.hashCode());
+		result = prime * result
+				+ ((failureMessage == null) ? 0 : failureMessage.hashCode());
+		result = prime * result
+				+ ((firstNInstances == null) ? 0 : firstNInstances.hashCode());
+		result = prime
+				* result
+				+ ((queryInMilliSeconds == null) ? 0 : queryInMilliSeconds
+						.hashCode());
+		result = prime * result
+				+ ((testCategory == null) ? 0 : testCategory.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TestRunItem other = (TestRunItem) obj;
+		if (assertionText == null) {
+			if (other.assertionText != null)
+				return false;
+		} else if (!assertionText.equals(other.assertionText))
+			return false;
+		if (assertionUuid == null) {
+			if (other.assertionUuid != null)
+				return false;
+		} else if (!assertionUuid.equals(other.assertionUuid))
+			return false;
+		if (executionId == null) {
+			if (other.executionId != null)
+				return false;
+		} else if (!executionId.equals(other.executionId))
+			return false;
+		if (extractResultInMillis == null) {
+			if (other.extractResultInMillis != null)
+				return false;
+		} else if (!extractResultInMillis.equals(other.extractResultInMillis))
+			return false;
+		if (failureCount == null) {
+			if (other.failureCount != null)
+				return false;
+		} else if (!failureCount.equals(other.failureCount))
+			return false;
+		if (failureMessage == null) {
+			if (other.failureMessage != null)
+				return false;
+		} else if (!failureMessage.equals(other.failureMessage))
+			return false;
+		if (firstNInstances == null) {
+			if (other.firstNInstances != null)
+				return false;
+		} else if (!firstNInstances.equals(other.firstNInstances))
+			return false;
+		if (queryInMilliSeconds == null) {
+			if (other.queryInMilliSeconds != null)
+				return false;
+		} else if (!queryInMilliSeconds.equals(other.queryInMilliSeconds))
+			return false;
+		if (testCategory == null) {
+			if (other.testCategory != null)
+				return false;
+		} else if (!testCategory.equals(other.testCategory))
+			return false;
+		return true;
+	}
+
+	@Override
+	public int compareTo(TestRunItem other) {
+		return this.assertionUuid.compareTo(other.getAssertionUuid());
 	}
 	
 }
