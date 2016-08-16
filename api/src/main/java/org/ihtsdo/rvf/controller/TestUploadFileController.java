@@ -272,11 +272,6 @@ public class TestUploadFileController {
 		return true;
 	}
 
-	private boolean isFirstTimeRelease(String prevIntReleaseVersion) {
-		
-		 return prevIntReleaseVersion == null || prevIntReleaseVersion.isEmpty() ? true: false;
-	}
-
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiOperation( value = "Upload test files",

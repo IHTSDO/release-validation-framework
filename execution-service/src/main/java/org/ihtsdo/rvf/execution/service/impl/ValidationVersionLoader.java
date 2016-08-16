@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,8 @@ public class ValidationVersionLoader {
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		String reportStorage = validationConfig.getStorageLocation();
 		if (validationConfig.isRf2DeltaOnly()) {
-			rf2FilesLoaded.addAll(loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig));
+			List<String> excludeTables = Arrays.asList("relationship_s");
+			rf2FilesLoaded.addAll(loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,excludeTables));
 		} else {
 			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		}
@@ -106,18 +108,21 @@ public class ValidationVersionLoader {
 		return executionConfig;
 	}
 
-	public List<String> loadProspectiveDeltaWithPreviousSnapshotIntoDB(String prospectiveVersion, ValidationRunConfig validationConfig) throws BusinessServiceException {
+	public List<String> loadProspectiveDeltaWithPreviousSnapshotIntoDB(String prospectiveVersion, ValidationRunConfig validationConfig, List<String> excludeTableNames) throws BusinessServiceException {
 		List<String> filesLoaded = new ArrayList<>();
 		if (validationConfig.isRf2DeltaOnly()) {
 			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, validationConfig.getLocalProspectiveFile());
 			if (isExtension(validationConfig)) {
-				releaseDataManager.copyTableData(validationConfig.getExtensionDependencyVersion(), prospectiveVersion,SNAPSHOT_TABLE,false);
+				
+				releaseDataManager.copyTableData(validationConfig.getExtensionDependencyVersion(), prospectiveVersion,SNAPSHOT_TABLE,false, excludeTableNames);
 				if (!validationConfig.isFirstTimeRelease()) {
-					releaseDataManager.copyTableData(validationConfig.getPreviousExtVersion(), prospectiveVersion,SNAPSHOT_TABLE, true);
+					releaseDataManager.copyTableData(validationConfig.getPreviousExtVersion(), prospectiveVersion,SNAPSHOT_TABLE, true, excludeTableNames);
 				}
 			} else {
 				//copy snapshot from previous release
-				releaseDataManager.copyTableData(validationConfig.getPrevIntReleaseVersion(), prospectiveVersion,SNAPSHOT_TABLE,false);
+				if (!validationConfig.isFirstTimeRelease()) {
+					releaseDataManager.copyTableData(validationConfig.getPrevIntReleaseVersion(), prospectiveVersion,SNAPSHOT_TABLE,false, excludeTableNames);
+				}
 			}
 			releaseDataManager.updateSnapshotTableWithDataFromDelta(prospectiveVersion);
 		}
@@ -361,7 +366,16 @@ public class ValidationVersionLoader {
 	public boolean combineCurrenExtensionWithDependencySnapshot(ExecutionConfig executionConfig, Map<String, Object> responseMap,ValidationRunConfig validationConfig) {
 		String prospectiveVersion = executionConfig.getProspectiveVersion();
 		if (isExtension(validationConfig)) {
-			releaseDataManager.copyTableData(validationConfig.getExtensionDependencyVersion(), prospectiveVersion,SNAPSHOT_TABLE,true);
+			try {
+				releaseDataManager.copyTableData(validationConfig.getExtensionDependencyVersion(), prospectiveVersion,SNAPSHOT_TABLE,true, null);
+			} catch (BusinessServiceException e) {
+				String errorMsg = e.getMessage();
+				if (errorMsg == null) {
+					errorMsg = "Failed to combine current extension with the dependency version:" + validationConfig.getExtensionDependencyVersion();
+				}
+				responseMap.put(FAILURE_MESSAGE, errorMsg);
+				return false;
+			}
 		} 
 		return true;
 	}

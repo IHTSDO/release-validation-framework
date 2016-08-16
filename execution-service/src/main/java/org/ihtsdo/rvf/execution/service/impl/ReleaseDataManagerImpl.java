@@ -457,11 +457,25 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 
 	@Override
-	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern, boolean replaceOldWithNew) {
+	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern, boolean replaceOldWithNew, List<String> excludeTableNames) throws BusinessServiceException {
 		final long startTime = System.currentTimeMillis();
 		String sourceSchema = releaseSchemaNameLookup.get(sourceVersion);
 		String destinationSchema = releaseSchemaNameLookup.get(destinationVersion);
+		if (sourceSchema == null || destinationSchema == null) {
+			StringBuilder errorMsg = new StringBuilder();
+			if (sourceSchema == null) {
+				errorMsg.append("No version found in the db for " + sourceVersion); 
+			}
+			if (destinationSchema == null) {
+				errorMsg.append("No version found in the db for " + destinationVersion); 
+			}
+			throw new BusinessServiceException(errorMsg.toString());
+		}
 		for (final String tableName : getValidTableNamesFromSchema(sourceSchema, tableNamePattern)) {
+			if (excludeTableNames == null | excludeTableNames.contains(tableName)) 
+			{
+				continue;
+			}
 			if (copyTable(tableName, sourceSchema, destinationSchema,replaceOldWithNew)) {
 				break;
 			}

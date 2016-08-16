@@ -34,7 +34,7 @@ public interface ReleaseDataManager {
 	
 	void dropVersion(String version);
 
-	void copyTableData(String sourceVersion,String destinationVersion, String tableNamePattern, boolean copyLatestData);
+	void copyTableData(String sourceVersion,String destinationVersion, String tableNamePattern, boolean copyLatestData, List<String> excludeTableNames) throws BusinessServiceException;
 
 	void updateSnapshotTableWithDataFromDelta(String prospectiveVersion);
 	
