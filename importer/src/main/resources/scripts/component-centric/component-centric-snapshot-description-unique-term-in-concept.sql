@@ -21,7 +21,7 @@
 		join curr_description_s c
 			on c.conceptid = a.conceptid
 			and c.active = 1
-	group by c.conceptid,  binary c.term
+	group by c.conceptid, c.languagecode, binary c.term
 	having count(c.conceptid) > 1
 	and binary count(c.term) > 1;
 			

@@ -154,10 +154,7 @@ public class ValidationRunConfig {
 				+ previousExtVersion + ", extensionDependency="
 				+ extensionDependency + ", runId=" + runId + ", url=" + url + "]";
 	}
-	public ValidationRunConfig addFirstTimeRelease(boolean firstTimeRelease) {
-		this.firstTimeRelease = firstTimeRelease;
-		return this;
-	}
+	
 	public String getManifestFileFullPath() {
 		return this.manifestFileFullPath;
 	}
@@ -165,7 +162,7 @@ public class ValidationRunConfig {
 		this.manifestFileFullPath = manifestFileFullPath;
 	}
 	public boolean isFirstTimeRelease() {
-		return firstTimeRelease;
+		return prevIntReleaseVersion == null && previousExtVersion == null;
 	}
 	public ValidationRunConfig addProspectiveFileFullPath(String s3File) {
 		this.prospectiveFileFullPath = s3File;

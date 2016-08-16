@@ -355,7 +355,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			logger.info("Adding known version {} to schema {}", known, combinedVersionName);
 			for (final String tableName : getValidTableNamesFromSchema(knownSchema, null)) {
 				
-				isFailed = copyTable(tableName, knownSchema, schemaName);
+				isFailed = copyTable(tableName, knownSchema, schemaName, false);
 				if (isFailed) {
 					break;
 				}
@@ -367,15 +367,54 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 	
 	
-	private boolean copyTable(String tableName, String sourceSchema, String targetSchema) {
+	
+	
+	
+	
+
+	private boolean copyData(String tableName, String sourceSchema, String targetSchema, boolean copyLatestData) {
 		boolean isFailed = false;
 		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
 		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
+		String selectSql = " select * from " + sourceSchema + "." + tableName;
+		if (copyLatestData) {
+			selectSql = "select a.* from " + sourceSchema + "." + tableName + " a where exists ( select b.id from " + targetSchema + "." + tableName 
+					+ " b where a.id=b.id and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime)) or not exists ( select c.id from " + targetSchema + "." 
+					+ tableName + " c where a.id=c.id)";
+		} 
+		final String sql = "insert into " + targetSchema + "." + tableName  + selectSql;
+		logger.debug("Copying table {}", tableName);
+		try (Connection connection = snomedDataSource.getConnection();
+				Statement statement = connection.createStatement() ) {
+			statement.execute(disableIndex);
+			statement.execute(sql);
+			statement.execute(enableIndex);
+		} catch (final SQLException e) {
+			isFailed = true;
+			logger.error("Failed to insert data to table: " + tableName +" due to " + e.fillInStackTrace());
+		}
+		return isFailed;
+	}
+	
+	
+	
+	private boolean copyTable(String tableName, String sourceSchema, String targetSchema, boolean replaceOldWithNew) {
+		boolean isFailed = false;
+		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
+		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
+		String deleteSql = null;
+		if (replaceOldWithNew) {
+			deleteSql = "delete a.* from " + targetSchema + "." + tableName + " a where exists ( select b.id from " + sourceSchema + "." + tableName 
+					+ " b where a.id=b.id and cast(a.effectivetime as datetime) < cast(b.effectivetime as datetime))";
+		}
 		final String sql = "insert into " + targetSchema + "." + tableName  + " select * from " + sourceSchema + "." + tableName;
 		logger.debug("Copying table {}", tableName);
 		try (Connection connection = snomedDataSource.getConnection();
 				Statement statement = connection.createStatement() ) {
 			statement.execute(disableIndex);
+			if (replaceOldWithNew) {
+				statement.execute(deleteSql);
+			}
 			statement.execute(sql);
 			statement.execute(enableIndex);
 		} catch (final SQLException e) {
@@ -418,12 +457,25 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 
 	@Override
-	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern) {
+	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern, boolean replaceOldWithNew, List<String> excludeTableNames) throws BusinessServiceException {
 		final long startTime = System.currentTimeMillis();
 		String sourceSchema = releaseSchemaNameLookup.get(sourceVersion);
 		String destinationSchema = releaseSchemaNameLookup.get(destinationVersion);
+		if (sourceSchema == null || destinationSchema == null) {
+			StringBuilder errorMsg = new StringBuilder();
+			if (sourceSchema == null) {
+				errorMsg.append("No version found in the db for " + sourceVersion); 
+			}
+			if (destinationSchema == null) {
+				errorMsg.append("No version found in the db for " + destinationVersion); 
+			}
+			throw new BusinessServiceException(errorMsg.toString());
+		}
 		for (final String tableName : getValidTableNamesFromSchema(sourceSchema, tableNamePattern)) {
-			if (copyTable(tableName, sourceSchema, destinationSchema)) {
+			if (excludeTableNames != null && excludeTableNames.contains(tableName)) {
+				continue;
+			}
+			if (copyTable(tableName, sourceSchema, destinationSchema,replaceOldWithNew)) {
 				break;
 			}
 		}

@@ -1,6 +1,6 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-description-successive-states
+	release-type-snapshot-description-successive-states
 
 	Assertion:	
 	New inactive states must follow active states in the DESCRIPTION snapshot.

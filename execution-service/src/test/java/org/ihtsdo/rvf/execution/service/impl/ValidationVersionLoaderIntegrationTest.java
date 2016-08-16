@@ -50,11 +50,25 @@ public class ValidationVersionLoaderIntegrationTest {
 	}
 	
 	@Test
-	public void testConstructProspectiveVersionWithRF2DeltaOnly() throws BusinessServiceException {
+	public void testConstructIntProspectiveVersionWithRF2DeltaOnly() throws BusinessServiceException {
 		validationConfig.setRf2DeltaOnly(true);
 		prospectiveVersion = validationConfig.getRunId().toString();
-		List<String> filesLoaded = dataLoader.loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig);
+		List<String> filesLoaded = dataLoader.loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,null);
 		Assert.assertEquals(1, filesLoaded.size());
+		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
+	}
+	
+	
+	@Test
+	public void testConstructExtensionProspectiveVersionWithRF2DeltaOnly() throws Exception {
+		prospectiveVersion = validationConfig.getRunId().toString();
+		validationConfig.addExtensionDependencyVersion("int_20160131");
+		validationConfig.addPreviousExtVersion("dk_20160215");
+		validationConfig.setRf2DeltaOnly(true);
+		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		Map<String, Object> responseMap = new HashMap<>();
+		boolean isLoaded = dataLoader.loadProspectiveVersion(executionConfig, responseMap, validationConfig);
+		Assert.assertEquals(true, isLoaded);
 		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
 	}
 	
@@ -75,7 +89,9 @@ public class ValidationVersionLoaderIntegrationTest {
 	public void testProspectiveVersionWithExtension() throws Exception {
 		prospectiveVersion = validationConfig.getRunId().toString();
 		validationConfig.addExtensionDependencyVersion("int_20160131");
+		validationConfig.addPreviousExtVersion("dk_20160215");
 		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		executionConfig.setReleaseValidation(false);
 		Map<String, Object> responseMap = new HashMap<>();
 		boolean isLoaded = dataLoader.loadProspectiveVersion(executionConfig, responseMap, validationConfig);
 		Assert.assertEquals(true, isLoaded);
@@ -106,6 +122,7 @@ public class ValidationVersionLoaderIntegrationTest {
 			scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(previousVersion));
 			releaseDataManager.dropVersion(previousVersion);
 		}
+		validationConfig = null;
 		
 	}
 }

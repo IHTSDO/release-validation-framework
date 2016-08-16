@@ -183,7 +183,6 @@ public class TestUploadFileController {
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
 				.addUrl(urlPrefix)
-				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion))
 				.addProspectiveFilesInS3(false);
 		
 		
@@ -238,7 +237,6 @@ public class TestUploadFileController {
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
 				.addUrl(urlPrefix)
-				.addFirstTimeRelease( isFirstTimeRelease(prevIntReleaseVersion))
 				.addProspectiveFilesInS3(true);
 		
 		
@@ -272,11 +270,6 @@ public class TestUploadFileController {
 			return false;
 		}
 		return true;
-	}
-
-	private boolean isFirstTimeRelease(String prevIntReleaseVersion) {
-		
-		 return prevIntReleaseVersion == null || prevIntReleaseVersion.isEmpty() ? true: false;
 	}
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)

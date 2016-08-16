@@ -1,33 +1,8 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 63,
-  "totalAssertionsFailed" : 61,
+  "totalAssertionsRun" : 53,
+  "totalAssertionsFailed" : 51,
   "results" : [ {
-    "assertionName" : "New inactive states follow active states in the SIMPLE MAP REFSET snapshot.",
-    "assertionUuid" : "88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
-    "firstNInstances" : [ {
-      "conceptId" : 699820000,
-      "detail" : "SimpleMap Refset: id=0314672a-f4e5-548d-bb84-f82eac418b99 should not have a new inactive state as it was inactive previously."
-    }, {
-      "conceptId" : 703568007,
-      "detail" : "SimpleMap Refset: id=cff7ca5c-286c-52b3-9322-e489c65c8ab5 is inactive but no active state found in the previous snapshot."
-    }, {
-      "conceptId" : 700132006,
-      "detail" : "SimpleMap Refset: id=82f3de7e-e15a-56c2-80a7-8ba824b9bd79 is inactive but no active state found in the previous snapshot."
-    }, {
-      "conceptId" : 700132006,
-      "detail" : "SimpleMap Refset: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249623 is inactive but no active state found in the previous snapshot."
-    } ],
-    "totalFailed" : 4
-  }, {
-    "assertionName" : "All stated relationships inactivated in current release must have been active in the previous release.",
-    "assertionUuid" : "89ceaf00-79b9-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : 698449007,
-      "detail" : "Stated relationship: id=4768117023 should not have a new inactive state as it was inactive previously."
-    } ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot.",
     "assertionUuid" : "8ea2e5d9-5c35-4436-b67d-c5268b5da06c",
     "firstNInstances" : [ {
@@ -49,14 +24,6 @@
       "detail" : "RELATIONSHIP: id=4994338024 is repeated in the Stated Relationship snapshot file."
     } ],
     "totalFailed" : 2
-  }, {
-    "assertionName" : "New inactive states for existing components must have active states in the previous SIMPLE REFSET snapshot.",
-    "assertionUuid" : "9190473a-29f7-40fc-b879-9ae0d038b681",
-    "firstNInstances" : [ {
-      "conceptId" : 702386002,
-      "detail" : "Simple Refset: id=74d0e838-34eb-5a9a-8f02-5584487d55db should not have a new inactive state as it was inactive previously."
-    } ],
-    "totalFailed" : 1
   }, {
     "assertionName" : "All destination ids found in the Stated Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "994b5ff0-79b9-11e1-b0c4-0800200c9a66",
@@ -233,14 +200,6 @@
       "detail" : "Concept: id=700132006: has no active preferred term in the GB language refset"
     } ],
     "totalFailed" : 9
-  }, {
-    "assertionName" : "New inactive states follow active states in the ASSOCIATION REFSET snapshot file.",
-    "assertionUuid" : "b88b9f46-4c33-4d8e-b9ab-ddb87aef3068",
-    "firstNInstances" : [ {
-      "conceptId" : 10171006,
-      "detail" : "ASSOC RS: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71 should not have a new inactive state as it was inactive previously."
-    } ],
-    "totalFailed" : 1
   }, {
     "assertionName" : "ID is unique in the LOINC ExpressionAssociationRefset snapshot.",
     "assertionUuid" : "b9b535f0-5b68-4192-81f6-115dea2f49c0",
@@ -425,14 +384,6 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "New inactive states follow active states in the DEFINITION snapshot file.",
-    "assertionUuid" : "e6082dc4-c6f4-48c6-afa3-233182336a5c",
-    "firstNInstances" : [ {
-      "conceptId" : 699220008,
-      "detail" : "TextDefinition: id=2983208019  should not have a new inactive state as it was inactive previously."
-    } ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "Reference componentId and valueId pair is unique in the ATTRIBUTE VALUE snapshot.",
     "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a60",
     "firstNInstances" : [ {
@@ -440,20 +391,6 @@
       "detail" : "Reference component id:2608473011 valueid=900000000000495008 pair is not unique in the Attribute Value snapshot"
     } ],
     "totalFailed" : 1
-  }, {
-    "assertionName" : "All language refset members inactivated in current snapshot must have been active in the previous release.",
-    "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : 713135019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 should not have a new inactive state as it was inactive previously."
-    }, {
-      "conceptId" : 713135019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7  is inactive but no active state found in previous release."
-    }, {
-      "conceptId" : 3008913019,
-      "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c9  is inactive but no active state found in previous release."
-    } ],
-    "totalFailed" : 3
   }, {
     "assertionName" : "All members refer to a description that is referenced in either the description table or the text definition table.",
     "assertionUuid" : "f5d9ae70-7856-11e1-b0c4-0800200c9a66",
@@ -649,25 +586,6 @@
     } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "New inactive states follow active states in the ATTRIBUTEVALUE snapshot.",
-    "assertionUuid" : "2aa0bea1-b1fa-4543-b277-b4392a6f864d",
-    "firstNInstances" : [ {
-      "conceptId" : 527806011,
-      "detail" : "AttributeRefsetId=0001d24b-d872-5077-8955-b9c7e055b015 should not have a new inactive state as it was inactive previously."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "New inactive states follow active states in the DESCRIPTION snapshot.",
-    "assertionUuid" : "2b193a88-8dab-4d19-b995-b556ed59398d",
-    "firstNInstances" : [ {
-      "conceptId" : 699400005,
-      "detail" : "DESCRIPTION: id=2984057019 should not have a new inactive state as it was inactive previously."
-    }, {
-      "conceptId" : 703860006,
-      "detail" : "DESCRIPTION: id=2984057023 is inactive but no active state found in the previous snapshot."
-    } ],
-    "totalFailed" : 2
-  }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the ASSOCIATION REFSET snapshot file.",
     "assertionUuid" : "2ddc9a28-150d-47a4-9b0e-7dbff2efdd72",
     "firstNInstances" : [ {
@@ -843,37 +761,6 @@
       "detail" : "DEFINITION: id=2983208019 refers to an invalid concept id in the Text Definition snapshot."
     } ],
     "totalFailed" : 7
-  }, {
-    "assertionName" : "All relationships inactivated in current release must have been active in the previous release.",
-    "assertionUuid" : "5c6b6bc0-79b9-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : 10041001,
-      "detail" : "Relationship: id=1000004028 should not have a new inactive state as it was inactive previously."
-    }, {
-      "conceptId" : 702411003,
-      "detail" : "Relationship: id=1000000021 is inactive but no active state found in previous release."
-    }, {
-      "conceptId" : 10041001,
-      "detail" : "Relationship: id=1000005027 is inactive but no active state found in previous release."
-    } ],
-    "totalFailed" : 3
-  }, {
-    "assertionName" : "New inactive states follow active states in the CONCEPT snapshot.",
-    "assertionUuid" : "5f1a51a3-6200-4463-8799-d75998165278",
-    "firstNInstances" : [ {
-      "conceptId" : 699765003,
-      "detail" : "CONCEPT: id=699765003 should not have a new inactive state as it was inactive previously."
-    }, {
-      "conceptId" : 703649004,
-      "detail" : "CONCEPT: id=703649004: is inactive but no active state found in the previous release."
-    }, {
-      "conceptId" : 700132008,
-      "detail" : "CONCEPT: id=700132008: is inactive but no active state found in the previous release."
-    }, {
-      "conceptId" : 609452007,
-      "detail" : "CONCEPT: id=609452007: is inactive but no active state found in the previous release."
-    } ],
-    "totalFailed" : 4
   }, {
     "assertionName" : "The current Inferred Relationship snapshot file does not contain duplicate Relationship Ids.",
     "assertionUuid" : "6336ec40-79b9-11e1-b0c4-0800200c9a66",
