@@ -472,8 +472,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			throw new BusinessServiceException(errorMsg.toString());
 		}
 		for (final String tableName : getValidTableNamesFromSchema(sourceSchema, tableNamePattern)) {
-			if (excludeTableNames == null | excludeTableNames.contains(tableName)) 
-			{
+			if (excludeTableNames != null && excludeTableNames.contains(tableName)) {
 				continue;
 			}
 			if (copyTable(tableName, sourceSchema, destinationSchema,replaceOldWithNew)) {

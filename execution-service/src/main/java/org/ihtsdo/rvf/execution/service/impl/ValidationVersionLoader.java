@@ -62,7 +62,7 @@ public class ValidationVersionLoader {
 		}
 		executionConfig.setPreviousVersion(prevReleaseVersion.toLowerCase());
 		List<String> rf2FilesLoaded = new ArrayList<>();
-		boolean isSucessful = false;
+		boolean isSucessful = true;
 		String reportStorage = validationConfig.getStorageLocation();
 		if (!isPublishedVersionsLoaded(validationConfig)) {
 			//load published versions from s3 

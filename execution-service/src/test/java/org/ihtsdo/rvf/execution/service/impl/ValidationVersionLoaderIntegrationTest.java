@@ -53,7 +53,7 @@ public class ValidationVersionLoaderIntegrationTest {
 	public void testConstructIntProspectiveVersionWithRF2DeltaOnly() throws BusinessServiceException {
 		validationConfig.setRf2DeltaOnly(true);
 		prospectiveVersion = validationConfig.getRunId().toString();
-		List<String> filesLoaded = dataLoader.loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,Arrays.asList("relationship_s"));
+		List<String> filesLoaded = dataLoader.loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,null);
 		Assert.assertEquals(1, filesLoaded.size());
 		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
 	}
