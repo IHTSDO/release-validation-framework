@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 public class ZipFileUtils {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileUtils.class);
+	private static final String UTF_8 = "UTF-8";
 	/**
 	 * Utility method for extracting a zip file to a given folder and remove the prefix "x" from file name if present.
 	 * @param file the zip file to be extracted
@@ -35,7 +37,7 @@ public class ZipFileUtils {
 				final ZipEntry entry = entries.nextElement();
 				if (!entry.isDirectory()) {
 					InputStream in = null;
-					OutputStream out = null;
+					Writer writer = null;
 					try {
 							in = zipFile.getInputStream(entry);
 							String fileName = Paths.get(entry.getName()).getFileName().toString();
@@ -43,11 +45,11 @@ public class ZipFileUtils {
 								fileName = fileName.substring(1);
 							}
 							final File entryDestination = new File(outputDir,fileName);
-							out = new FileOutputStream(entryDestination);
-							IOUtils.copy(in, out);
+							writer = new FileWriter(entryDestination);
+							IOUtils.copy(in, writer, UTF_8);
 						} finally {
 							IOUtils.closeQuietly(in);
-							IOUtils.closeQuietly(out);
+							IOUtils.closeQuietly(writer);
 						}
 				}
 			}
@@ -74,14 +76,14 @@ public class ZipFileUtils {
 					entryDestination.mkdirs();
 				} else {
 					InputStream in = null;
-					OutputStream out = null;
+					Writer writer = null;
 					try {
 						in = zipFile.getInputStream(entry);
-						out = new FileOutputStream(entryDestination);
-						IOUtils.copy(in, out);
+						writer = new FileWriter(entryDestination);
+						IOUtils.copy(in, writer, UTF_8);
 						} finally {
 							IOUtils.closeQuietly(in);
-							IOUtils.closeQuietly(out);
+							IOUtils.closeQuietly(writer);
 						}
 				}
 			}

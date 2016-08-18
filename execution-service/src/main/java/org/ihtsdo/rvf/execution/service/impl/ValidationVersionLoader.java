@@ -1,8 +1,9 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,6 +45,8 @@ public class ValidationVersionLoader {
 	
 	@Autowired
 	private RvfDbScheduledEventGenerator scheduleEventGenerator;
+	
+	private static final String UTF_8 = "UTF-8";
 	
 	@Resource
 	private S3Client s3Client;
@@ -137,12 +140,12 @@ public class ValidationVersionLoader {
 			FileHelper s3Helper = new FileHelper(validationConfig.getS3ExecutionBucketName(), s3Client);
 			InputStream input = s3Helper.getFileStream(validationConfig.getProspectiveFileFullPath());
 			File prospectiveFile = File.createTempFile(validationConfig.getRunId() + "_" + validationConfig.getTestFileName(), null);
-			IOUtils.copy(input, new FileOutputStream(prospectiveFile));
+			IOUtils.copy(input, new FileWriter(prospectiveFile), UTF_8);
 			validationConfig.setLocalProspectiveFile(prospectiveFile);
 			if (validationConfig.getManifestFileFullPath() != null) {
 				InputStream manifestInput = s3Helper.getFileStream(validationConfig.getManifestFileFullPath());
 				File manifestFile = File.createTempFile("manifest.xml_" + validationConfig.getRunId(), null);
-				IOUtils.copy(manifestInput, new FileOutputStream(manifestFile));
+				IOUtils.copy(manifestInput, new FileWriter(manifestFile), UTF_8);
 				validationConfig.setLocalManifestFile(manifestFile);
 			}
 			logger.info("Time taken {} seconds to download files {} from s3", (System.currentTimeMillis()-s3StreamingStart)/1000 , validationConfig.getProspectiveFileFullPath());
@@ -194,17 +197,27 @@ public class ValidationVersionLoader {
 				logger.debug("download published version from s3:" + previousPublished );
 				InputStream previousIntInput = s3PublishFileHelper.getFileStream(previousPublished);
 				File previousVersionTemp = File.createTempFile(validationConfig.getPrevIntReleaseVersion(), null);
-				IOUtils.copy(previousIntInput, new FileOutputStream(previousVersionTemp));
+				Writer writer = new FileWriter(previousVersionTemp);
+				IOUtils.copy(previousIntInput,writer, UTF_8);
 				releaseDataManager.loadSnomedData(executionConfig.getPreviousVersion(), prevRf2FilesLoaded, previousVersionTemp);
 			} else if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
 				//SnomedCT_RF2Release_DK_20160215.zip
 				String[] splits = validationConfig.getPreviousExtVersion().split("_");
-				logger.debug( "extension release file short name:" + splits[2]);
-				String previousExtZipFile = EXTENSIONS + SEPARATOR + splits[2] +validationConfig.getPreviousExtVersion();
+				int index = splits.length-2;
+				logger.debug( "extension release file short name:" + splits[index]);
+				String previousExtZipFile = null;
+				if (splits[index].equalsIgnoreCase("INT")) {
+					//derivative products released by the international release but during RVF testing using the same logic as extension.
+					previousExtZipFile = INTERNATIONAL + SEPARATOR + validationConfig.getPreviousExtVersion();
+				} else {
+					previousExtZipFile = EXTENSIONS + SEPARATOR + splits[index] + validationConfig.getPreviousExtVersion();
+				}
+				
 				logger.debug("downloading published extension from s3:" + previousExtZipFile);
 				InputStream previousExtInput = s3PublishFileHelper.getFileStream(previousExtZipFile);
 				File previousExtTemp = File.createTempFile(validationConfig.getPreviousExtVersion(), null);
-				IOUtils.copy(previousExtInput, new FileOutputStream(previousExtTemp));
+				Writer writer = new FileWriter(previousExtTemp);
+				IOUtils.copy(previousExtInput, writer, UTF_8);
 				releaseDataManager.loadSnomedData(executionConfig.getPreviousVersion(), prevRf2FilesLoaded,previousExtTemp);
 			}
 
@@ -236,8 +249,8 @@ public class ValidationVersionLoader {
 			logger.debug("download published  extension dependency version from s3:" +  extensionDependency);
 			InputStream extensionDependencyInput = s3PublishFileHelper.getFileStream(extensionDependency);
 			File extensionDependencyTemp = File.createTempFile(validationConfig.getExtensionDependencyVersion(), null);
-			IOUtils.copy(extensionDependencyInput, new FileOutputStream(extensionDependencyTemp));
-			
+			Writer writer = new FileWriter(extensionDependencyTemp);
+			IOUtils.copy(extensionDependencyInput, writer, UTF_8);
 			releaseDataManager.loadSnomedData(prospectiveVersion, rf2FilesLoaded, validationConfig.getLocalProspectiveFile(),extensionDependencyTemp);
 		} else {
 			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);

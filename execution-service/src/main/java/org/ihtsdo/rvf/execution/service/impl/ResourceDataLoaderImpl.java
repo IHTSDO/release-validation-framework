@@ -3,11 +3,11 @@ package org.ihtsdo.rvf.execution.service.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 @Service
 public class ResourceDataLoaderImpl implements ResourceDataLoader {
+	private static final String UTF_8 = "UTF-8";
 	@Autowired
 	RvfDynamicDataSource rvfDynamicDataSource;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResourceDataLoaderImpl.class);
@@ -47,7 +48,7 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 						for (String line : IOUtils.readLines(input)) {
 							// process line and add to output file
 							line = line.replaceAll("<data_location>", tempDataFolder.getPath());
-							FileUtils.writeStringToFile(temp, line + "\n", true);
+							FileUtils.writeStringToFile(temp, line + "\n",UTF_8, true);
 						}
 					}
 					try (final InputStreamReader reader = new InputStreamReader(new FileInputStream(temp))) {
@@ -68,8 +69,8 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 	private void copyDataFiles(final String[] resourceFileNames, final File tempDataFolder ) throws IOException, FileNotFoundException {
 		for( final String fileName : resourceFileNames) {
 			try (final InputStream txtInput = getClass().getResourceAsStream("/datafiles/" + fileName);
-					final OutputStream output = new FileOutputStream(new File(tempDataFolder, fileName));) {
-					IOUtils.copy(txtInput,output);
+					final Writer writer = new FileWriter(new File(tempDataFolder, fileName));) {
+					IOUtils.copy(txtInput,writer,UTF_8);
 			}
 		}
 			
