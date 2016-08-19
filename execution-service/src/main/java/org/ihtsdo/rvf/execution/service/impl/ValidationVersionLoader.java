@@ -62,15 +62,23 @@ public class ValidationVersionLoader {
 	
 	
 	public boolean loadPreviousVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
-		String priviousVersion = PREVIOUS + executionConfig.getExecutionId();
-		executionConfig.setPreviousVersion(priviousVersion);
+		
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		boolean isSucessful = true;
 		String reportStorage = validationConfig.getStorageLocation();
 		if (!isPublishedVersionsLoaded(validationConfig)) {
 			//load published versions from s3 
+			String priviousVersion = PREVIOUS + executionConfig.getExecutionId();
+			executionConfig.setPreviousVersion(priviousVersion);
 			isSucessful = prepareVersionsFromS3FilesForPreviousVersion(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
-		} 
+		}  else {
+			if (isExtension(validationConfig)) {
+				executionConfig.setPreviousVersion(validationConfig.getPreviousExtVersion());
+			} else {
+				executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
+			}
+		}
+		
 		return isSucessful;
 		}
 		

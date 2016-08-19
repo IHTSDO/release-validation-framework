@@ -105,7 +105,9 @@ public class ValidationRunner {
 	private void runValidation(final Map<String , Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
 		final Calendar startTime = Calendar.getInstance();
 		//download prospective version
-		releaseVersionLoader.downloadProspectiveVersion(validationConfig);
+		if (validationConfig.isProspectiveFilesInS3()) {
+			releaseVersionLoader.downloadProspectiveVersion(validationConfig);
+		}
 		logger.info(String.format("Started execution with runId [%1s] : ", validationConfig.getRunId()));
 		// load the filename
 		final String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
@@ -176,12 +178,14 @@ public class ValidationRunner {
 		final long timeStart = System.currentTimeMillis();
 		//run release-type validations
 		List<Assertion> assertions = getAssertions(executionConfig.getGroupNames());
+		logger.debug("Total assertions found:" + assertions.size());
 		List<Assertion> releaseTypeAssertions = new ArrayList<>();
 		for (Assertion assertion : assertions) {
 			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION)) {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
+		logger.debug("Running release-type validations:" + releaseTypeAssertions.size());
 		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage,false);
 		//loading international snapshot
 		isSuccessful = releaseVersionLoader.combineCurrenExtensionWithDependencySnapshot(executionConfig, responseMap, validationConfig);
@@ -202,9 +206,7 @@ public class ValidationRunner {
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(groupNames);
 		final Set<Assertion> assertions = new HashSet<>();
 		for (final AssertionGroup group : groups) {
-			for (final Assertion assertion : assertionService.getAssertionsForGroup(group)) {
-				assertions.add(assertion);
-			}
+			assertions.addAll(assertionService.getAssertionsForGroup(group));
 		}
 		return new ArrayList<Assertion>(assertions);
 	}
