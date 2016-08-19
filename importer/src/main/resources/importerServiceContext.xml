@@ -15,6 +15,6 @@
 	<!-- <bean id="rvfRestClient" class="org.ihtsdo.snomed.rvf.importer.helper.RvfRestClient"/> -->
 	<bean id="assertionsDatabaseImporter" class="org.ihtsdo.snomed.rvf.importer.AssertionsDatabaseImporter"/>
 	<bean id="assertionGroupImporter" class="org.ihtsdo.snomed.rvf.importer.AssertionGroupImporter"/>
-	<bean class="org.ihtsdo.snomed.rvf.importer.RvfAssertionsDatabasePrimerService" init-method="importAssertionsAndGroups"/>
+	<bean id="assertionsDatabasePrimerService" class="org.ihtsdo.snomed.rvf.importer.RvfAssertionsDatabasePrimerService" init-method="importAssertionsAndGroups"/>
 	<import resource="applicationContext.xml"/>
 </beans>

@@ -32,4 +32,5 @@ public class RvfAssertionsDatabasePrimerService {
 		assertionGroupImporter.importAssertionGroups();
 		LOGGER.info("Assertion group imported");
 	}
+
 }
