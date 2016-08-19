@@ -1,6 +1,10 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,8 +14,11 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.validation.resource.ResourceProvider;
+import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,6 +35,8 @@ public class ValidationVersionLoaderIntegrationTest {
 	private DataSource snomedDataSource;
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
+	
+	private static final String FAILURE_MESSAGE = "failureMessage";
 	
 	@Autowired
 	ValidationVersionLoader dataLoader;
@@ -100,29 +109,69 @@ public class ValidationVersionLoaderIntegrationTest {
 	
 	@Test
 	public void testLoadPreviousVersion() throws Exception {
-		validationConfig.setFirstTimeRelease(false);
 		validationConfig.setPrevIntReleaseVersion("SnomedCT_RF2Release_INT_20130131.zip");
 		validationConfig.setS3PublishBucketName("local.publish.bucket");
 		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		Map<String, Object> responseMap = new HashMap<>();
 		boolean isLoaded = dataLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
-		Assert.assertEquals(true, isLoaded);
-		previousVersion = executionConfig.getPreviousVersion();
-		Assert.assertTrue(releaseDataManager.isKnownRelease(previousVersion));
+		Assert.assertEquals(false, isLoaded);
+		System.out.println(responseMap.get(FAILURE_MESSAGE));
+		Assert.assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
 		
 	}
+	
+	@Test
+	public void testLoadPreviousIntDerivativeVersion() throws Exception {
+		
+		validationConfig.setExtensionDependency("int_20160131");
+		validationConfig.setPreviousExtVersion("SnomedCT_GPFPICPC2_Production_INT_20160731.zip");
+		validationConfig.setS3PublishBucketName("local.publish.bucket");
+		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		Map<String, Object> responseMap = new HashMap<>();
+		boolean isLoaded = dataLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+		Assert.assertEquals(false, isLoaded);
+		System.out.println(responseMap.get(FAILURE_MESSAGE));
+		Assert.assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
+	}
+	
+	
+	@Test
+	public void testLoadPreviousExtensionVersion() throws Exception {
+		validationConfig.setExtensionDependency("int_20160131");
+		validationConfig.setPreviousExtVersion("SnomedCT_RF2Release_SE1000052_20160531.zip");
+		validationConfig.setS3PublishBucketName("local.publish.bucket");
+		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		Map<String, Object> responseMap = new HashMap<>();
+		boolean isLoaded = dataLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+		Assert.assertEquals(false, isLoaded);
+		System.out.println(responseMap.get(FAILURE_MESSAGE));
+		Assert.assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
+	}
+	
 	@After
 	public void tearDown() throws SQLException {
 		if (prospectiveVersion != null) {
 			scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(prospectiveVersion));
 			releaseDataManager.dropVersion(prospectiveVersion);
 		}
-		
 		if (previousVersion != null) {
 			scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(previousVersion));
 			releaseDataManager.dropVersion(previousVersion);
 		}
 		validationConfig = null;
+	}
+	
+	@Test
+	public void testCopyFile() throws IOException {
+		File prospectiveFile = File.createTempFile(validationConfig.getRunId() + "_" + validationConfig.getTestFileName(), ".zip");
+		FileOutputStream out = new FileOutputStream(prospectiveFile);
+		InputStream input = new FileInputStream(ClassLoader.getSystemResource("Daily_Export_Delta.zip").getFile());
+		IOUtils.copy(input,out);
+		IOUtils.closeQuietly(input);
+		IOUtils.closeQuietly(out);
+		Assert.assertTrue(prospectiveFile.isFile());
+		ResourceProvider resourceManager = new ZipFileResourceProvider(prospectiveFile);
+		Assert.assertTrue(!resourceManager.getFileNames().isEmpty());
 		
 	}
 }

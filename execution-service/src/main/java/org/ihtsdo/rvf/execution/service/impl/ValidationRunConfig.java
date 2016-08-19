@@ -18,7 +18,6 @@ public class ValidationRunConfig {
 	private String storageLocation;
 	private String url;
 	private Integer failureExportMax;
-	private boolean firstTimeRelease;
 	private String manifestFileFullPath;
 	private String s3ExecutionBucketName;
 	private String prospectiveFileFullPath;
@@ -69,9 +68,6 @@ public class ValidationRunConfig {
 		this.previousExtVersion = previousExtVersion;
 		return this;
 	}
-	public String getExtensionDependencyVersion() {
-		return extensionDependency;
-	}
 	public ValidationRunConfig addExtensionDependencyVersion(final String extensionDependency) {
 		this.extensionDependency = extensionDependency;
 		return this;
@@ -117,13 +113,6 @@ public class ValidationRunConfig {
 		return testFileName;
 	}
 	
-	public boolean getFirstTimeRelease() {
-		return firstTimeRelease;
-	}
-	public void setFirstTimeRelease(boolean firstTimeRelease) {
-		this.firstTimeRelease = firstTimeRelease;
-	}
-	
 	public void setRunId(Long runId) {
 		this.runId = runId;
 	}
@@ -162,7 +151,15 @@ public class ValidationRunConfig {
 		this.manifestFileFullPath = manifestFileFullPath;
 	}
 	public boolean isFirstTimeRelease() {
-		return prevIntReleaseVersion == null && previousExtVersion == null;
+		if (prevIntReleaseVersion == null && previousExtVersion == null) {
+			return true;
+		}
+		if (prevIntReleaseVersion != null && prevIntReleaseVersion.trim().isEmpty()
+				&& previousExtVersion != null && previousExtVersion.trim().isEmpty()) {
+			return true;
+		}
+		return false;
+			
 	}
 	public ValidationRunConfig addProspectiveFileFullPath(String s3File) {
 		this.prospectiveFileFullPath = s3File;
@@ -229,5 +226,11 @@ public class ValidationRunConfig {
 	}
 	public void setRf2DeltaOnly(boolean isRf2DeltaOnly) {
 		this.isRf2DeltaOnly = isRf2DeltaOnly;
+	}
+	public String getExtensionDependency() {
+		return extensionDependency;
+	}
+	public void setExtensionDependency(String extensionDependency) {
+		this.extensionDependency = extensionDependency;
 	}
 }

@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -46,6 +47,9 @@ public class ZipFileUtils {
 							}
 							final File entryDestination = new File(outputDir,fileName);
 							writer = new FileWriter(entryDestination);
+							//debug for investigating encoding issue
+							LOGGER.debug("deafult file.encoding:" + System.getProperty("file.encoding"));
+							LOGGER.debug("default charset:" + Charset.defaultCharset());
 							IOUtils.copy(in, writer, UTF_8);
 						} finally {
 							IOUtils.closeQuietly(in);

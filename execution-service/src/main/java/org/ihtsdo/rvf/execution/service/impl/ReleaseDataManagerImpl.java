@@ -3,11 +3,12 @@ package org.ihtsdo.rvf.execution.service.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -116,10 +117,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		// copy release pack zip to data location
 		logger.info("Receiving release data - " + fileName);
 		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
-		FileWriter writer = null;
+		OutputStream out = null;
 		try {
-			writer = new FileWriter(fileDestination);
-			IOUtils.copy(inputStream, writer, "UTF-8");
+			out = new FileOutputStream(fileDestination);
+			IOUtils.copy(inputStream, out);
 			logger.info("Release file copied to : " + fileDestination.getAbsolutePath());
 		} catch (final IOException e) {
 			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
@@ -127,7 +128,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			
 		} finally {
 			IOUtils.closeQuietly(inputStream);
-			IOUtils.closeQuietly(writer);
+			IOUtils.closeQuietly(out);
 		}
 		// if we are here then release date is a valid date format
 		// now call loadSnomedData method passing release zip, if there is no matching database

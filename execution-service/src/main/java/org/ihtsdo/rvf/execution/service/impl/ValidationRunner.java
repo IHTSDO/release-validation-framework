@@ -121,8 +121,15 @@ public class ValidationRunner {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;
 		} 
+
 		//load previous published version
 		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
+		//check dependency version is loaded
+		if (executionConfig.isExtensionValidation()) {
+			if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
+				return;
+			}
+		}
 		if (executionConfig.isReleaseValidation() && !executionConfig.isFirstTimeRelease()) {
 			boolean isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
 			if (!isLoaded) {
@@ -130,7 +137,7 @@ public class ValidationRunner {
 				return;
 			}
 		}
-		
+		//check version are loaded
 		//load prospective version
 		boolean isSuccessful = releaseVersionLoader.loadProspectiveVersion(executionConfig, responseMap, validationConfig);
 		if (!isSuccessful) {
