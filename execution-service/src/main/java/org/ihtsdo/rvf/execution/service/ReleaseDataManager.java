@@ -40,4 +40,6 @@ public interface ReleaseDataManager {
 	void updateSnapshotTableWithDataFromDelta(String prospectiveVersion);
 	
 	String loadSnomedDataIntoExistingDb(String productVersion,List<String> rf2FilesLoaded,File ... zipDataFile) throws BusinessServiceException;
+
+	void createSchema(String schemaName);
 }

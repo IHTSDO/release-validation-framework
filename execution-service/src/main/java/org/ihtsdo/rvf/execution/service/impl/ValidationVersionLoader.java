@@ -303,12 +303,15 @@ public class ValidationVersionLoader {
 	 * @return
 	 */
 	public boolean combineCurrenExtensionWithDependencySnapshot(ExecutionConfig executionConfig, Map<String, Object> responseMap,ValidationRunConfig validationConfig) {
+		String extensionVersion = executionConfig.getProspectiveVersion();
 		String combinedVersion = executionConfig.getProspectiveVersion() + "_combined";
 		executionConfig.setProspectiveVersion(combinedVersion);
+		logger.debug("Combined version:" + combinedVersion);
+		releaseDataManager.createSchema(combinedVersion);
 		if (isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
 			if (isExtension(validationConfig)) {
 				try {
-					releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),executionConfig.getProspectiveVersion(), combinedVersion,SNAPSHOT_TABLE, null);
+					releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),extensionVersion, combinedVersion,SNAPSHOT_TABLE, null);
 				} catch (BusinessServiceException e) {
 					String errorMsg = e.getMessage();
 					if (errorMsg == null) {

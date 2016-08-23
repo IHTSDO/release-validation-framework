@@ -539,4 +539,15 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		final long endTime = System.currentTimeMillis();
 		logger.info("Copy data with table name like {} from {} {} into {} completed in seconds {} ", tableNamePattern, sourceSchemaA, sourceSchemaB, destinationSchema, (endTime-startTime)/1000);
 	}
+
+	@Override
+	public void createSchema(String version) {
+		try (Connection connection = snomedDataSource.getConnection()) {
+			final String schemaName = RVF_DB_PREFIX + version;
+			createDBAndTables(schemaName, connection);
+			releaseSchemaNameLookup.put(version, schemaName);
+		} catch (SQLException | IOException e) {
+			logger.error("Failed to create db schema and tables for:" + version  + " due to " + e.fillInStackTrace());
+		}
+	}
 }

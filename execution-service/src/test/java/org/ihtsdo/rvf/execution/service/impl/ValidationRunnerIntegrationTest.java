@@ -18,7 +18,7 @@ ValidationRunner runner;
 	@Test
 	public void testExtensionReleaseValidation () {
 		ValidationRunConfig validationConfig = new ValidationRunConfig();
-		validationConfig.setGroupsList(Arrays.asList("InternationalEdition"));
+		validationConfig.setGroupsList(Arrays.asList("dk_authoring"));
 		validationConfig.setExtensionDependency("int_20160131");
 		validationConfig.setPreviousExtVersion("dk_20160215");
 		validationConfig.setProspectiveFilesInS3(false);
