@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.dao.AssertionDao;
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
@@ -139,6 +140,21 @@ public class RVFAssertionsRegressionIT {
 			assertTestResult(groupName, expectedJsonFile, runItems);
 	 }
 	
+	
+	@Test
+	public void testGetAssertionsByGroup() {
+		AssertionGroup group = assertionService.getAssertionGroupByName("InternationalEdition");
+		
+		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
+		List<Assertion> releaseTypeAssertions = new ArrayList<>();
+		for (Assertion assertion : assertions) {
+			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION)) {
+				releaseTypeAssertions.add(assertion);
+			}
+		}
+		assertEquals(191, assertions.size());
+		assertEquals(76, releaseTypeAssertions.size());
+	}
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {

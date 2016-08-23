@@ -8,6 +8,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,10 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -53,7 +54,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	private BasicDataSource snomedDataSource;
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
-	private final Map<String, String> releaseSchemaNameLookup = new HashMap<>();
+	private final Map<String, String> releaseSchemaNameLookup = new ConcurrentHashMap<>();
 	/**
 	 * No args constructor for IOC. Always call 'init' method after creation
 	 */
@@ -116,10 +117,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		// copy release pack zip to data location
 		logger.info("Receiving release data - " + fileName);
 		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
-		FileOutputStream output = null;
+		OutputStream out = null;
 		try {
-			output = new FileOutputStream(fileDestination);
-			IOUtils.copy(inputStream, output);
+			out = new FileOutputStream(fileDestination);
+			IOUtils.copy(inputStream, out);
 			logger.info("Release file copied to : " + fileDestination.getAbsolutePath());
 		} catch (final IOException e) {
 			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
@@ -127,7 +128,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			
 		} finally {
 			IOUtils.closeQuietly(inputStream);
-			IOUtils.closeQuietly(output);
+			IOUtils.closeQuietly(out);
 		}
 		// if we are here then release date is a valid date format
 		// now call loadSnomedData method passing release zip, if there is no matching database
@@ -296,7 +297,11 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 */
 	@Override
 	public String getSchemaForRelease(final String releaseVersion) {
-		return releaseSchemaNameLookup.get(releaseVersion);
+		if (releaseVersion != null) {
+			return releaseSchemaNameLookup.get(releaseVersion);
+		}
+		return null;
+		
 	}
 
 	/**
@@ -354,10 +359,11 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			}
 			logger.info("Adding known version {} to schema {}", known, combinedVersionName);
 			for (final String tableName : getValidTableNamesFromSchema(knownSchema, null)) {
-				
-				isFailed = copyTable(tableName, knownSchema, schemaName, false);
-				if (isFailed) {
-					break;
+				try {
+					copyData(tableName, knownSchema, schemaName);
+				} catch (BusinessServiceException e) {
+					logger.error(" Copy data failed.", e);
+					isFailed = true;
 				}
 			}
 		}
@@ -366,63 +372,64 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		return !isFailed;
 	}
 	
-	
-	
-	
-	
-	
 
-	private boolean copyData(String tableName, String sourceSchema, String targetSchema, boolean copyLatestData) {
-		boolean isFailed = false;
+	/** Combine data from source schema A and B into target schema. Choose the most recent when both source schema A and B share the same ids.
+	 * @param tableName the table name to copy from source to target schema
+	 * @param sourceSchemaA 
+	 * @param sourceSchemaB
+	 * @param targetSchema
+	 * @throws BusinessServiceException
+	 */
+	private void copyData(String tableName, String sourceSchemaA, String sourceSchemaB, String targetSchema) throws BusinessServiceException {
 		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
 		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
-		String selectSql = " select * from " + sourceSchema + "." + tableName;
-		if (copyLatestData) {
-			selectSql = "select a.* from " + sourceSchema + "." + tableName + " a where exists ( select b.id from " + targetSchema + "." + tableName 
-					+ " b where a.id=b.id and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime)) or not exists ( select c.id from " + targetSchema + "." 
-					+ tableName + " c where a.id=c.id)";
-		} 
-		final String sql = "insert into " + targetSchema + "." + tableName  + selectSql;
+		String selectDataFromASql = "select a.* from " + sourceSchemaA + "." + tableName + " a where not exists ( select c.id from " + sourceSchemaB + "." 
+				+ tableName + " c where a.id=c.id)";
+		String latestDataFromASelectSql = "select a.* from " + sourceSchemaA + "." + tableName + " a where exists ( select b.id from " + sourceSchemaB + "." + tableName 
+					+ " b where a.id=b.id and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime))";
+		
+		String selectDataFromBSql = "select a.* from " + sourceSchemaB + "." + tableName + " a where not exists ( select c.id from " + sourceSchemaA + "." 
+				+ tableName + " c where a.id=c.id)";
+		String latestDataFromBSelectSql = "select a.* from " + sourceSchemaB + "." + tableName + " a where exists ( select b.id from " + sourceSchemaA + "." + tableName 
+					+ " b where a.id=b.id and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime))";
+		
+		final String insertSql = "insert into " + targetSchema + "." + tableName  + " ";
 		logger.debug("Copying table {}", tableName);
 		try (Connection connection = snomedDataSource.getConnection();
-				Statement statement = connection.createStatement() ) {
+			Statement statement = connection.createStatement() ) {
 			statement.execute(disableIndex);
-			statement.execute(sql);
+			statement.execute(insertSql + selectDataFromASql);
+			statement.execute(insertSql + selectDataFromBSql);
+			statement.execute(insertSql + latestDataFromASelectSql);
+			statement.execute(insertSql + latestDataFromBSelectSql);
 			statement.execute(enableIndex);
 		} catch (final SQLException e) {
-			isFailed = true;
-			logger.error("Failed to insert data to table: " + tableName +" due to " + e.fillInStackTrace());
+			String msg = "Failed to insert data to table: " + tableName;
+			logger.error(msg + " due to " + e.fillInStackTrace());
+			throw new BusinessServiceException(msg, e);
 		}
-		return isFailed;
 	}
 	
 	
 	
-	private boolean copyTable(String tableName, String sourceSchema, String targetSchema, boolean replaceOldWithNew) {
-		boolean isFailed = false;
+	
+	private void copyData(String tableName, String sourceSchema, String targetSchema) throws BusinessServiceException {
 		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
 		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
-		String deleteSql = null;
-		if (replaceOldWithNew) {
-			deleteSql = "delete a.* from " + targetSchema + "." + tableName + " a where exists ( select b.id from " + sourceSchema + "." + tableName 
-					+ " b where a.id=b.id and cast(a.effectivetime as datetime) < cast(b.effectivetime as datetime))";
-		}
 		final String sql = "insert into " + targetSchema + "." + tableName  + " select * from " + sourceSchema + "." + tableName;
-		logger.debug("Copying table {}", tableName);
+		logger.debug("Copying table {} with sql {} ", tableName, sql);
 		try (Connection connection = snomedDataSource.getConnection();
-				Statement statement = connection.createStatement() ) {
+			Statement statement = connection.createStatement() ) {
 			statement.execute(disableIndex);
-			if (replaceOldWithNew) {
-				statement.execute(deleteSql);
-			}
 			statement.execute(sql);
 			statement.execute(enableIndex);
 		} catch (final SQLException e) {
-			isFailed = true;
-			logger.error("Failed to insert data to table: " + tableName +" due to " + e.fillInStackTrace());
-		}
-		return isFailed;
+			String msg = "Failed to insert data to table: " + tableName;
+			logger.error(msg + " due to " + e.fillInStackTrace());
+			throw new BusinessServiceException(msg, e);
+		}		
 	}
+	
 	
 	
 	private List<String> getValidTableNamesFromSchema(String schemaName, String tableNamePattern) {
@@ -457,7 +464,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 
 	@Override
-	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern, boolean replaceOldWithNew, List<String> excludeTableNames) throws BusinessServiceException {
+	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern, List<String> excludeTableNames) throws BusinessServiceException {
 		final long startTime = System.currentTimeMillis();
 		String sourceSchema = releaseSchemaNameLookup.get(sourceVersion);
 		String destinationSchema = releaseSchemaNameLookup.get(destinationVersion);
@@ -475,9 +482,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			if (excludeTableNames != null && excludeTableNames.contains(tableName)) {
 				continue;
 			}
-			if (copyTable(tableName, sourceSchema, destinationSchema,replaceOldWithNew)) {
-				break;
-			}
+			copyData(tableName, sourceSchema, destinationSchema);
 		}
 		final long endTime = System.currentTimeMillis();
 		logger.info("Copy data with table name like {} from {} into {} completed in seconds {} ", tableNamePattern, sourceSchema, destinationSchema, (endTime-startTime)/1000);
@@ -507,5 +512,48 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	@Override
 	public String loadSnomedDataIntoExistingDb(String productVersion, List<String> rf2FilesLoaded, File... zipDataFile) throws BusinessServiceException {
 		return loadSnomedData(productVersion, true, rf2FilesLoaded, zipDataFile);
+	}
+
+	@Override
+	public void copyTableData(String sourceVersionA, String sourceVersionB, String destinationVersion, String tableNamePattern,
+			List<String> excludeTableNames) throws BusinessServiceException {
+		final long startTime = System.currentTimeMillis();
+		String sourceSchemaA = releaseSchemaNameLookup.get(sourceVersionA);
+		String sourceSchemaB = releaseSchemaNameLookup.get(sourceVersionB);
+		String destinationSchema = releaseSchemaNameLookup.get(destinationVersion);
+		if (sourceSchemaA == null || destinationSchema == null || sourceSchemaB ==null) {
+			StringBuilder errorMsg = new StringBuilder();
+			if (sourceSchemaA == null) {
+				errorMsg.append("No version found in the db for " + sourceVersionA); 
+			}
+			if (sourceSchemaA == null) {
+				errorMsg.append("No version found in the db for " + sourceVersionB); 
+			}
+			if (destinationSchema == null) {
+				errorMsg.append("No version found in the db for " + destinationVersion); 
+			}
+			throw new BusinessServiceException(errorMsg.toString());
+		}
+		for (final String tableName : getValidTableNamesFromSchema(sourceSchemaA, tableNamePattern)) {
+			if (excludeTableNames != null && excludeTableNames.contains(tableName)) {
+				continue;
+			}
+			copyData(tableName, sourceSchemaA, sourceSchemaB, destinationSchema);
+		}
+		final long endTime = System.currentTimeMillis();
+		logger.info("Copy data with table name like {} from {} {} into {} completed in seconds {} ", tableNamePattern, sourceSchemaA, sourceSchemaB, destinationSchema, (endTime-startTime)/1000);
+	}
+
+	@Override
+	public String createSchema(String version) {
+		String schemaName = RVF_DB_PREFIX + version;;
+		try (Connection connection = snomedDataSource.getConnection()) {
+			createDBAndTables(schemaName, connection);
+			releaseSchemaNameLookup.put(version, schemaName);
+		} catch (SQLException | IOException e) {
+			logger.error("Failed to create db schema and tables for:" + version  + " due to " + e.fillInStackTrace());
+			schemaName = null;
+		}
+		return schemaName;
 	}
 }

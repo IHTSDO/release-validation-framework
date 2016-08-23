@@ -83,7 +83,9 @@ public class StructuralTestRunner implements InitializingBean{
 			final boolean writeSucceses, final String urlPrefix, String storageLocation ) throws IOException {
 		 boolean isFailed = false;
 		 final long timeStart = System.currentTimeMillis();
-		 logger.debug("Start verifying zip file structure of {} against manifest", tempFile.getName());
+		 if (tempFile != null) {
+			 logger.debug("Start verifying zip file structure of {} against manifest", tempFile.getAbsolutePath());
+		 }
 		 final ValidationReport validationReport = new ValidationReport(TestType.ARCHIVE_STRUCTURAL);
 		 validationReport.setExecutionId(runId);
 		// convert groups which is passed as string to assertion groups

@@ -2,7 +2,7 @@
 	<parent>
 		<artifactId>release-validation-framework</artifactId>
 		<groupId>org.ihtsdo.snomed.rvf</groupId>
-		<version>0.1.55</version>
+		<version>0.1.56</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -29,6 +29,11 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>validation-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>importer</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -12,6 +12,7 @@ public class ExecutionConfig {
 	private boolean firstTimeRelease;
 	private boolean extensionValidation;
 	private boolean isReleaseValidation;
+	private String extensionDependencyVersion;
 
 	public ExecutionConfig(final Long runId) {
 		this(runId,false);
@@ -86,4 +87,13 @@ public class ExecutionConfig {
 	public boolean isReleaseValidation() {
 		return this.isReleaseValidation;
 	}
+
+	public String getExtensionDependencyVersion() {
+		return extensionDependencyVersion;
+	}
+
+	public void setExtensionDependencyVersion(String extensionDependencyVersion) {
+		this.extensionDependencyVersion = extensionDependencyVersion;
+	}
+	
 }

@@ -74,7 +74,7 @@
 	</bean>
 	<bean id="resourceDataLoader" class="org.ihtsdo.rvf.execution.service.impl.ResourceDataLoaderImpl"/>
 	
-	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner">
+	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner" depends-on="assertionsDatabasePrimerService">
 		<constructor-arg value="${rvf.assertion.execution.BatchSize}"/>
 	</bean>
 	<bean id="versionLoader" class =" org.ihtsdo.rvf.execution.service.impl.ValidationVersionLoader"/>
@@ -88,5 +88,6 @@
 	<constructor-arg value="${rvf.qa.data.maxKeepTime}"/>
 	</bean>
 	<import resource="applicationContext.xml"/>
+	<import resource="importerServiceContext.xml"/>
 
 </beans>
