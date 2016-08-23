@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -54,7 +54,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	private BasicDataSource snomedDataSource;
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
-	private final Map<String, String> releaseSchemaNameLookup = new HashMap<>();
+	private final Map<String, String> releaseSchemaNameLookup = new ConcurrentHashMap<>();
 	/**
 	 * No args constructor for IOC. Always call 'init' method after creation
 	 */
@@ -541,13 +541,15 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 
 	@Override
-	public void createSchema(String version) {
+	public String createSchema(String version) {
+		String schemaName = RVF_DB_PREFIX + version;;
 		try (Connection connection = snomedDataSource.getConnection()) {
-			final String schemaName = RVF_DB_PREFIX + version;
 			createDBAndTables(schemaName, connection);
 			releaseSchemaNameLookup.put(version, schemaName);
 		} catch (SQLException | IOException e) {
 			logger.error("Failed to create db schema and tables for:" + version  + " due to " + e.fillInStackTrace());
+			schemaName = null;
 		}
+		return schemaName;
 	}
 }

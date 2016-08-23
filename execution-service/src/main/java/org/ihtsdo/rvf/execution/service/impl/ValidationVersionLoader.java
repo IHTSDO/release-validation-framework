@@ -3,9 +3,11 @@ package org.ihtsdo.rvf.execution.service.impl;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ValidationVersionLoader {
 
+	private static final String COMBINED = "_combined";
 	private static final String RELATIONSHIP_SNAPSHOT_TABLE = "relationship_s";
 	private static final String PREVIOUS = "previous_";
 	private static final String EXTENSIONS = "extensions";
@@ -301,29 +304,31 @@ public class ValidationVersionLoader {
 	 * @param responseMap
 	 * @param validationConfig
 	 * @return
+	 * @throws BusinessServiceException 
+	 * @throws IOException 
+	 * @throws SQLException 
 	 */
-	public boolean combineCurrenExtensionWithDependencySnapshot(ExecutionConfig executionConfig, Map<String, Object> responseMap,ValidationRunConfig validationConfig) {
+	public void combineCurrenExtensionWithDependencySnapshot(ExecutionConfig executionConfig, Map<String, Object> responseMap,ValidationRunConfig validationConfig) throws BusinessServiceException {
 		String extensionVersion = executionConfig.getProspectiveVersion();
-		String combinedVersion = executionConfig.getProspectiveVersion() + "_combined";
+		String combinedVersion = executionConfig.getProspectiveVersion() + COMBINED;
 		executionConfig.setProspectiveVersion(combinedVersion);
 		logger.debug("Combined version:" + combinedVersion);
-		releaseDataManager.createSchema(combinedVersion);
-		if (isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
-			if (isExtension(validationConfig)) {
-				try {
-					releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),extensionVersion, combinedVersion,SNAPSHOT_TABLE, null);
-				} catch (BusinessServiceException e) {
-					String errorMsg = e.getMessage();
-					if (errorMsg == null) {
-						errorMsg = "Failed to combine current extension with the dependency version:" + executionConfig.getExtensionDependencyVersion();
-					}
-					responseMap.put(FAILURE_MESSAGE, errorMsg);
-					return false;
-				}
-			} 
-			return true;
-		} else {
-			return false;
+		String combinedSchema = releaseDataManager.createSchema(combinedVersion);
+		if (!isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
+			throw new BusinessServiceException("Extension dependency version is not found in DB:" + executionConfig.getExtensionDependencyVersion());
 		}
+		if (isExtension(validationConfig)) {
+			try {
+				releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),extensionVersion, combinedVersion,SNAPSHOT_TABLE, null);
+				resourceLoader.loadResourceData(combinedSchema);
+			} catch (Exception e) {
+				String errorMsg = e.getMessage();
+				if (errorMsg == null) {
+					errorMsg = "Failed to combine current extension with the dependency version:" + executionConfig.getExtensionDependencyVersion();
+				}
+				responseMap.put(FAILURE_MESSAGE, errorMsg);
+				throw new BusinessServiceException(errorMsg, e);
+			}
+		} 
 	}
 }

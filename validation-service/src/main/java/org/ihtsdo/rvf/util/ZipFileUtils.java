@@ -32,6 +32,9 @@ public class ZipFileUtils {
 	 * @throws IOException 
 	 */
 	public static void extractFilesFromZipToOneFolder(final File file, final String outputDir) throws IOException {
+		//debug for investigating encoding issue
+		LOGGER.debug("deafult file.encoding:" + System.getProperty("file.encoding"));
+		LOGGER.debug("default charset:" + Charset.defaultCharset());
 		try (ZipFile zipFile = new ZipFile(file)){
 			final Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			while (entries.hasMoreElements()) {
@@ -47,9 +50,6 @@ public class ZipFileUtils {
 							}
 							final File entryDestination = new File(outputDir,fileName);
 							writer = new FileWriter(entryDestination);
-							//debug for investigating encoding issue
-							LOGGER.debug("deafult file.encoding:" + System.getProperty("file.encoding"));
-							LOGGER.debug("default charset:" + Charset.defaultCharset());
 							IOUtils.copy(in, writer, UTF_8);
 						} finally {
 							IOUtils.closeQuietly(in);

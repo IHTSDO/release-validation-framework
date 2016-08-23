@@ -23,6 +23,7 @@ ValidationRunner runner;
 		validationConfig.setPreviousExtVersion("dk_20160215");
 		validationConfig.setProspectiveFilesInS3(false);
 		validationConfig.setProspectiveFileFullPath("SnomedCT_Release_DK1000005_20160731-DeltaOnly.zip");
+		//local file will be deleted after test
 		File localFile = new File("/Volumes/MacintoshHD2/Releases/SnomedCT_Release_DK1000005_20160731-DeltaOnly.zip");
 		validationConfig.setLocalProspectiveFile(localFile);
 		validationConfig.setRf2DeltaOnly(false);

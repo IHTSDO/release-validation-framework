@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -22,6 +23,7 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.TestRunItem;
@@ -160,21 +162,16 @@ public class ValidationRunner {
 		responseMap.put("startTime", startTime.getTime());
 		responseMap.put("endTime", endTime.getTime());
 		reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
-		//house keeping prospective version and combined previous extension 
+		//house keeping prospective version 
 		scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(executionConfig.getProspectiveVersion()));
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
-		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation() && !executionConfig.isFirstTimeRelease()) {
-			scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(executionConfig.getPreviousVersion()));
-			releaseDataManager.dropVersion(executionConfig.getPreviousVersion());
-		}
 		// house keeping qa_result for the given run id
 		scheduleEventGenerator.createQaResultDeleteEvent(executionConfig.getExecutionId());
 	}
 
 	private void runExtensionReleaseValidation(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
 			ExecutionConfig executionConfig) throws IOException,
-			NoSuchAlgorithmException, DecoderException {
-		boolean isSuccessful;
+			NoSuchAlgorithmException, DecoderException, BusinessServiceException, SQLException {
 		final long timeStart = System.currentTimeMillis();
 		//run release-type validations
 		List<Assertion> assertions = getAssertions(executionConfig.getGroupNames());
@@ -187,12 +184,11 @@ public class ValidationRunner {
 		}
 		logger.debug("Running release-type validations:" + releaseTypeAssertions.size());
 		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage,false);
+		String prospectiveExtensionVersion = executionConfig.getProspectiveVersion();
 		//loading international snapshot
-		isSuccessful = releaseVersionLoader.combineCurrenExtensionWithDependencySnapshot(executionConfig, responseMap, validationConfig);
-		if (!isSuccessful) {
-			reportService.writeResults(responseMap, State.FAILED, reportStorage);
-			return;
-		}
+		releaseVersionLoader.combineCurrenExtensionWithDependencySnapshot(executionConfig, responseMap, validationConfig);
+		scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(prospectiveExtensionVersion));
+		releaseDataManager.dropVersion(prospectiveExtensionVersion);
 		//run remaining component-centric and file-centric validaitons
 		assertions.removeAll(releaseTypeAssertions);
 		testItems.addAll(runAssertionTests(executionConfig, assertions, reportStorage, true));
