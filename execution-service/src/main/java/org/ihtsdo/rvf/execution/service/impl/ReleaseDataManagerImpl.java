@@ -297,7 +297,11 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 */
 	@Override
 	public String getSchemaForRelease(final String releaseVersion) {
-		return releaseSchemaNameLookup.get(releaseVersion);
+		if (releaseVersion != null) {
+			return releaseSchemaNameLookup.get(releaseVersion);
+		}
+		return null;
+		
 	}
 
 	/**

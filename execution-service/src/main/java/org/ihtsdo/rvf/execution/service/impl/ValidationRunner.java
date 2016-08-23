@@ -107,9 +107,7 @@ public class ValidationRunner {
 	private void runValidation(final Map<String , Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
 		final Calendar startTime = Calendar.getInstance();
 		//download prospective version
-		if (validationConfig.isProspectiveFilesInS3()) {
-			releaseVersionLoader.downloadProspectiveVersion(validationConfig);
-		}
+		releaseVersionLoader.downloadProspectiveVersion(validationConfig);
 		logger.info(String.format("Started execution with runId [%1s] : ", validationConfig.getRunId()));
 		// load the filename
 		final String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
@@ -117,6 +115,14 @@ public class ValidationRunner {
 		String reportStorage = validationConfig.getStorageLocation();
 		reportService.writeProgress(structureTestStartMsg, reportStorage);
 		reportService.writeState(State.RUNNING, reportStorage);
+	
+		if (validationConfig.getLocalProspectiveFile() == null) {
+			reportService.writeResults(responseMap, State.FAILED, reportStorage);
+			String errorMsg ="Prospective file can't be null" + validationConfig.getLocalProspectiveFile();
+			logger.error(errorMsg);
+			responseMap.put(FAILURE_MESSAGE, errorMsg);
+			throw new BusinessServiceException(errorMsg);
+		}
 		
 		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(), 
 				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation());
@@ -151,6 +157,7 @@ public class ValidationRunner {
 		// for extension release validation we need to test the release-type validations first using previous extension against current extension
 		// first then loading the international snapshot for the file-centric and component-centric validations.
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
+			logger.info("Run extension release validation with runId:" +  executionConfig.getExecutionId());
 			runExtensionReleaseValidation(responseMap, validationConfig,reportStorage, executionConfig);
 		} else {
 			runAssertionTests(executionConfig,responseMap, reportStorage);

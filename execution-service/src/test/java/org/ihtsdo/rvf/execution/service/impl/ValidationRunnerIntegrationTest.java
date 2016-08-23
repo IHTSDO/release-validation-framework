@@ -26,7 +26,7 @@ ValidationRunner runner;
 		//local file will be deleted after test
 		File localFile = new File("/Volumes/MacintoshHD2/Releases/SnomedCT_Release_DK1000005_20160731-DeltaOnly.zip");
 		validationConfig.setLocalProspectiveFile(localFile);
-		validationConfig.setRf2DeltaOnly(false);
+		validationConfig.setRf2DeltaOnly(true);
 		validationConfig.setRunId(System.currentTimeMillis());
 		runner.run(validationConfig);
 	}
