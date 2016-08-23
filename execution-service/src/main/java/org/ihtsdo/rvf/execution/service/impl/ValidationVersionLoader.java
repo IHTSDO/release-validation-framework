@@ -126,14 +126,16 @@ public class ValidationVersionLoader {
 		if (validationConfig.isRf2DeltaOnly()) {
 			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, validationConfig.getLocalProspectiveFile());
 			if (isExtension(validationConfig)) {
-				releaseDataManager.copyTableData(validationConfig.getExtensionDependency(), prospectiveVersion,SNAPSHOT_TABLE,false, excludeTableNames);
 				if (!validationConfig.isFirstTimeRelease()) {
-					releaseDataManager.copyTableData(validationConfig.getPreviousExtVersion(), prospectiveVersion,SNAPSHOT_TABLE, true, excludeTableNames);
+					releaseDataManager.copyTableData(validationConfig.getPreviousExtVersion(),validationConfig.getExtensionDependency(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
+				} else {
+					releaseDataManager.copyTableData(validationConfig.getExtensionDependency(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				}
+				
 			} else {
 				//copy snapshot from previous release
 				if (!validationConfig.isFirstTimeRelease()) {
-					releaseDataManager.copyTableData(validationConfig.getPrevIntReleaseVersion(), prospectiveVersion,SNAPSHOT_TABLE,false, excludeTableNames);
+					releaseDataManager.copyTableData(validationConfig.getPrevIntReleaseVersion(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				}
 			}
 			releaseDataManager.updateSnapshotTableWithDataFromDelta(prospectiveVersion);
@@ -293,25 +295,20 @@ public class ValidationVersionLoader {
 	}
 
 	
-	
-	private String resolvePreviousVersion(String releasePkgName) {
-		String version = releasePkgName;
-		if (releasePkgName.endsWith(ZIP_FILE_EXTENSION)) {
-			version = releasePkgName.replace(ZIP_FILE_EXTENSION, "");
-			String [] splits = version.split("_");
-			if (splits.length >=4) {
-				version = splits[2] + "_" + splits[3];
-			}
-		}
-		return version;
-	}
 
+	/**Current extension is already loaded into the prospective version
+	 * @param executionConfig
+	 * @param responseMap
+	 * @param validationConfig
+	 * @return
+	 */
 	public boolean combineCurrenExtensionWithDependencySnapshot(ExecutionConfig executionConfig, Map<String, Object> responseMap,ValidationRunConfig validationConfig) {
-		String prospectiveVersion = executionConfig.getProspectiveVersion();
+		String combinedVersion = executionConfig.getProspectiveVersion() + "_combined";
+		executionConfig.setProspectiveVersion(combinedVersion);
 		if (isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
 			if (isExtension(validationConfig)) {
 				try {
-					releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(), prospectiveVersion,SNAPSHOT_TABLE,true, null);
+					releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),executionConfig.getProspectiveVersion(), combinedVersion,SNAPSHOT_TABLE, null);
 				} catch (BusinessServiceException e) {
 					String errorMsg = e.getMessage();
 					if (errorMsg == null) {
