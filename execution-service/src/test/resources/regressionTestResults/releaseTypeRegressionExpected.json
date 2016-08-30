@@ -1,7 +1,7 @@
 {
   "assertionType" : "release-type-validation",
-  "totalAssertionsRun" : 94,
-  "totalAssertionsFailed" : 94,
+  "totalAssertionsRun" : 96,
+  "totalAssertionsFailed" : 96,
   "results" : [ {
     "assertionName" : "There must be actual changes made to previously published complex map refset components in order for them to appear in the current delta.",
     "assertionUuid" : "80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
@@ -1247,6 +1247,14 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "The ids should be unique across the description and text definition snapshot files.",
+    "assertionUuid" : "560e6d0c-64e8-4726-9516-ae7a7606b0b3",
+    "firstNInstances" : [ {
+      "conceptId" : 703860006,
+      "detail" : "Description: id=3008913022 is duplicated in the description and text definition snapshot."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "The current full extended map file consists of the previously published full file and the current delta file",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e612",
     "firstNInstances" : [ {
@@ -1743,6 +1751,14 @@
       "detail" : "ExpressionAssociationRefset: id=C48A6D89-BF40-449D-8DB2-3B8EE0B8C57D is in FULL file, but not in SNAPSHOT file."
     } ],
     "totalFailed" : 5
+  }, {
+    "assertionName" : "The ids should be unique across the stated and inferred relationship snapshot files.",
+    "assertionUuid" : "6dbaed71-f031-4290-b74f-f35561c2e283",
+    "firstNInstances" : [ {
+      "conceptId" : 702451000,
+      "detail" : "Relationship: id=4969199027 is duplicated in the stated and inferred relationships"
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "Changes from the the current ExpressionAssociationRefset delta file must be in the current full file",
     "assertionUuid" : "6e203a1f-2b6d-462a-a6f9-93cbc3893616",
