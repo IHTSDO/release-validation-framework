@@ -254,9 +254,19 @@ public class AssertionGroupImporter {
 		group = assertionGroupDao.create(group);
 		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWord("," + groupName.getReleaseCenter(), false);
 		for (Assertion assertion : allAssertions) {
-				if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
-					assertionService.addAssertionToGroup(assertion, group);
-				}
+			//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
+			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+				continue;
+			}
+			//exclude simple map file checking as term server extracts don't contain these
+			if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
+				continue;
+			}
+			
+			if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
+				assertionService.addAssertionToGroup(assertion, group);
+			}
+			
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", allAssertions.size(), group.getName() );
 	}
