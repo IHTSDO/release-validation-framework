@@ -157,6 +157,23 @@ public class RVFAssertionsRegressionIT {
 	}
 	
 	@Test
+	public void testGetAssertionsForIntAuthoring() {
+		AssertionGroup group = assertionService.getAssertionGroupByName("int-authoring");
+		
+		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
+		assertEquals(21, assertions.size());
+	}
+	
+	
+	@Test
+	public void testGetAssertionsForCommonAuthoring() {
+		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
+		
+		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
+		assertEquals(77, assertions.size());
+	}
+	
+	@Test
 	public void testSpecificAssertion() throws Exception {
 		runAssertionsTest("335b2810-8cbb-43bf-807e-092dacb20f6a");
 	}
