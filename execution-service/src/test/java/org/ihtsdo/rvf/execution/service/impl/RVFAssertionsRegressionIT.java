@@ -153,7 +153,7 @@ public class RVFAssertionsRegressionIT {
 			}
 		}
 		assertEquals(191, assertions.size());
-		assertEquals(76, releaseTypeAssertions.size());
+		assertEquals(78, releaseTypeAssertions.size());
 	}
 	
 	@Test

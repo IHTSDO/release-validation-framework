@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 53,
-  "totalAssertionsFailed" : 51,
+  "totalAssertionsRun" : 51,
+  "totalAssertionsFailed" : 49,
   "results" : [ {
     "assertionName" : "Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot.",
     "assertionUuid" : "8ea2e5d9-5c35-4436-b67d-c5268b5da06c",
@@ -728,14 +728,6 @@
     } ],
     "totalFailed" : 9
   }, {
-    "assertionName" : "The ids should be unique across the description and text definition snapshot files.",
-    "assertionUuid" : "560e6d0c-64e8-4726-9516-ae7a7606b0b3",
-    "firstNInstances" : [ {
-      "conceptId" : 703860006,
-      "detail" : "Description: id=3008913022 is duplicated in the description and text definition snapshot."
-    } ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DEFINITION snapshot.",
     "assertionUuid" : "5a83783e-3366-48bd-a50d-8f3a53812174",
     "firstNInstances" : [ {
@@ -827,14 +819,6 @@
       "detail" : "RELATIONSHIP: id=1000006026: Inferred Relationship contains a destination id that does not exist in the Concept snapshot file."
     } ],
     "totalFailed" : 14
-  }, {
-    "assertionName" : "The ids should be unique across the stated and inferred relationship snapshot files.",
-    "assertionUuid" : "6dbaed71-f031-4290-b74f-f35561c2e283",
-    "firstNInstances" : [ {
-      "conceptId" : 702451000,
-      "detail" : "Relationship: id=4969199027 is duplicated in the stated and inferred relationships"
-    } ],
-    "totalFailed" : 1
   }, {
     "assertionName" : "ComplexMap refset id is unique in the snapshot file",
     "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e41b57",

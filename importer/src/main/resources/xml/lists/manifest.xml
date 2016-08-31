@@ -194,7 +194,10 @@
 		<script uuid="eff30fb0-7856-11e1-b0c4-0800200c9a66" category="release-type-validation" sqlFile="release-type-snapshot-language-successive-states.sql" text="All language refset members inactivated in current snapshot must have been active in the previous release."/>
 		<script uuid="89ceaf00-79b9-11e1-b0c4-0800200c9a66" category="release-type-validation" sqlFile="release-type-snapshot-stated-relationship-successive-states.sql" text="All stated relationships inactivated in current release must have been active in the previous release."/>
 		<script uuid="5c6b6bc0-79b9-11e1-b0c4-0800200c9a66" category="release-type-validation" sqlFile="release-type-snapshot-inferred-relationship-successive-states.sql" text="All relationships inactivated in current release must have been active in the previous release."/>
-		
+		<!-- across multiple files in Current snapshot-->
+		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="release-type-validation" sqlFile="release-type-snapshot-unique-relationship-id.sql" text="The ids should be unique across the stated and inferred relationship snapshot files." />
+		<script uuid="560e6d0c-64e8-4726-9516-ae7a7606b0b3" category="release-type-validation" sqlFile="release-type-snapshot-unique-description-definition-id.sql" text="The ids should be unique across the description and text definition snapshot files." />
+	
 			
 		<!--  release type for complex and extended maps-->
 		
@@ -316,10 +319,7 @@
 		<script uuid="3b2c1824-8445-410e-8ae2-d943be01c33f" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-unique-terms.sql" text="There are no duplicate Definition terms in the DEFINITION snapshot file." />
 		<script uuid="6e70ea3e-c4dd-4ae3-8b75-f0567e41b57" category="file-centric-validation,ICD-9-CM" sqlFile="file-centric-snapshot-complexmap-unique-id.sql" text="ComplexMap refset id is unique in the snapshot file" />
 	  	<script uuid="6e70ea3e-c4dd-4ae3-8b75-f0567e42c62" category="file-centric-validation,ICD-MAP,INT" sqlFile="file-centric-snapshot-extendedmap-unique-id.sql" text="Extendedmap refset id must be unique in the snapshot file" />
-		<script uuid="560e6d0c-64e8-4726-9516-ae7a7606b0b3" category="file-centric-validation" sqlFile="file-centric-snapshot-unique-description-definition-id.sql" text="The ids should be unique across the description and text definition snapshot files." />
-		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="file-centric-validation" sqlFile="file-centric-snapshot-unique-relationship-id.sql" text="The ids should be unique across the stated and inferred relationship snapshot files." />
 		
-	
 		<!-- LOINC <script uuid="" category="file-centric-validation" sqlFile="" text="" />-->
 		<script uuid="E33922C3-5200-458B-B8F3-2CD08252234E" category="file-centric-validation,LOINC" sqlFile="file-centric-snapshot-association-expression-valid-referencecomponentid.sql" text="ReferenceComponentIds refers to valid concepts in the LOINC ExpressionAssociationRefset snapshot file." />
 		<script uuid="B9B535F0-5B68-4192-81F6-115DEA2F49C0" category="file-centric-validation,LOINC" sqlFile="file-centric-snapshot-association-expression-unique-id.sql" text="ID is unique in the LOINC ExpressionAssociationRefset snapshot." />
@@ -378,17 +378,17 @@
 		<script uuid="f636b7b0-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-active-members.sql" text="Members are active for active descriptions in the language refset snapshot file." />
 		<script uuid="00e87310-7e9b-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-unique-description.sql" text="There is only zero or one active Definition per concept per dialect in the snapshot file." />
 		<script uuid="695cea40-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-snomed-rt-active.sql" text="SNOMED RT identifier simple map refset refers to active components." />
-		<script uuid="730720b0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-snomed-rt-ratio.sql" text="There is one and only one SNOMED RT simple map refset member per concept." />
-		<script uuid="83638340-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-snomed-rt-unique.sql" text="SNOMED RT identifier simple map refset members are unique." />
+		<script uuid="730720b0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-snomed-rt-ratio.sql" text="There is one and only one SNOMED RT simple map refset member per concept." />
+		<script uuid="83638340-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-snomed-rt-unique.sql" text="SNOMED RT identifier simple map refset members are unique." />
 		<!--script uuid="9cc8fa40-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-icdo-active.sql" text="Active ICD-O simple map refset refers to active components." /-->
-		<script uuid="a2e01ee0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-ctv3-unique.sql" text="CTV3 simple map refset members are unique." />
-		<script uuid="bab42070-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-ctv3-ratio.sql" text="There is one and only one CTV3 simple map refset member per concept." />
-		<script uuid="c0869af0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-ctv3-active.sql" text="CTV3 simple map refset members are always active." />
+		<script uuid="a2e01ee0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-ctv3-unique.sql" text="CTV3 simple map refset members are unique." />
+		<script uuid="bab42070-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-ctv3-ratio.sql" text="There is one and only one CTV3 simple map refset member per concept." />
+		<script uuid="c0869af0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-ctv3-active.sql" text="CTV3 simple map refset members are always active." />
 		<!-- script uuid="d2abcd74-de24-4cbc-ab53-43f7abaa3028" category="component-centric-validation" sqlFile="component-centric-snapshot-vtm-inactive.sql" text="Inactive VTM simple refset members refer to inactive components." /-->
-		<script uuid="9715b1dd-7de5-4f80-ad28-f97ab52b9359" category="component-centric-validation" sqlFile="component-centric-snapshot-vtm-active.sql" text="Active VTM simple refset members refer to active components." />
+		<script uuid="9715b1dd-7de5-4f80-ad28-f97ab52b9359" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-vtm-active.sql" text="Active VTM simple refset members refer to active components." />
 		<!--script uuid="e7ae783e-71cd-4f17-a8b6-455d65271c24" category="component-centric-validation" sqlFile="component-centric-snapshot-vmp-inactive.sql" text="Inactive VMP simple refset members refer to inactive components." /-->
-		<script uuid="f5092a2b-8874-4290-ae96-a04bf568b1ab" category="component-centric-validation" sqlFile="component-centric-snapshot-vmp-active.sql" text="Active VMP simple refset members refer to active components." />
-		<script uuid="8479317e-8459-4362-bee8-628b8220f1e4" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-active.sql" text="Active Non-human refset members refer to active components." />
+		<script uuid="f5092a2b-8874-4290-ae96-a04bf568b1ab" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-vmp-active.sql" text="Active VMP simple refset members refer to active components." />
+		<script uuid="8479317e-8459-4362-bee8-628b8220f1e4" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-nonhuman-active.sql" text="Active Non-human refset members refer to active components." />
 		<script uuid="c3249e80-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-us-call-proc.sql" text="Calling procedure testing that terms that contain EN-US language-specific words are in the same US language refset." />
 		<script uuid="cc9c5340-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation,INT" sqlFile="component-centric-delta-language-lang-specific-words-gb-call-proc.sql" text="Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset." />
 		<!-- Exclude these assertion for the time being 
@@ -397,8 +397,8 @@
 		-->
 		<script uuid="c82246b1-a137-40c5-8653-554c9ce82c6b" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-terms.sql" text="Terms are unique in Description hierarchy." />
 		<script uuid="5c0186f3-0b72-4685-8aad-eff15a7f8880" category="component-centric-validation" sqlFile="component-centric-snapshot-description-consistent-semantic-tag.sql" text="All active FSNs for a given concept have the same semantic tag."/>
-		<script uuid="f14d521f-2472-4871-9c4e-356f0f075a3a" category="component-centric-validation" sqlFile="component-centric-snapshot-ctv3-code-unique.sql" text="CTV3 codes are unique in the CTV3 simple map refset" />
-	  	<script uuid="5e80ea3e-c4dd-4ae3-8b75-f0567e42b962" category="component-centric-validation" sqlFile="component-centric-snapshot-snomed-rt-code-unique.sql" text="SNOMED RT codes are unique in the SNOMED RT simple map refset" />
+		<script uuid="f14d521f-2472-4871-9c4e-356f0f075a3a" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-ctv3-code-unique.sql" text="CTV3 codes are unique in the CTV3 simple map refset" />
+	  	<script uuid="5e80ea3e-c4dd-4ae3-8b75-f0567e42b962" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-snomed-rt-code-unique.sql" text="SNOMED RT codes are unique in the SNOMED RT simple map refset" />
 	  	<!-- Complex map assertions-->
 	  	<script uuid="7e70ea3e-c4dd-4ae3-8b75-f0567e42b58" category="component-centric-validation,ICD-9-CM" sqlFile="component-centric-snapshot-complexmap-group.sql" text="Rule based complex MapGroup must be in sequential order and not blank" />
 	  	<script uuid="6e70ea3e-c4dd-4ae3-8b75-f0567e43b59" category="component-centric-validation,ICD-9-CM" sqlFile="component-centric-snapshot-complexmap-priority.sql" text="MapPriority must be in sequential order" />

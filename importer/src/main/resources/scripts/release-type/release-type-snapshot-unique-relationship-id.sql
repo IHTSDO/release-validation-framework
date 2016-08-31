@@ -1,6 +1,6 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-unique-relationship-id.sql
+	release-type-snapshot-unique-relationship-id.sql
 
 	Assertion:
 	The ids should be unique across the stated and inferred relationship snapshot files.

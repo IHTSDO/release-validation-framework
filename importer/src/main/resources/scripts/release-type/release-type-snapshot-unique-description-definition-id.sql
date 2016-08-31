@@ -1,6 +1,6 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-unique-description-definition-id.sql
+	release-type-snapshot-unique-description-definition-id.sql
 
 	Assertion:
 	The ids should be unique across the description and text definition snapshot files.
