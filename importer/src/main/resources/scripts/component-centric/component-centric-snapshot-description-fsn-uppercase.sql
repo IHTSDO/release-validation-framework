@@ -24,5 +24,5 @@
 	where a.active = 1
 	and a.typeid = '900000000000003001'
 	and a.casesignificanceid != '900000000000017005'
-	and binary left(a.term,1) not REGEXP '[0-9]|[A-Z]';
+	and binary left(a.term,1) != binary upper(left(a.term,1));
 	commit;
