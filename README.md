@@ -34,7 +34,18 @@ validation-service.properties | Settings to configure structural tests report lo
 
 Sample files for configuring the services can be see found in the config folder.
 
+### Upload a Published Release
+The release endpoint of the REST API can be used to list releases and to upload a published release.
+Find the endpoint at **http://localhost:8080/api/v1/releases**
+
+Example upload
+```bash
+curl -X POST -F 'file=@SnomedCT_RF2Release_SE1000052_20160531.zip' http://localhost:8080/api/v1/releases/se/20160531
+```
+
 ### Data Folder
+N.B. This doesn't seem to be working.
+
 The RVF provides a convenient feature that allows published releases to be uploaded and stored to a designated 'sct data' 
 folder. During startup, the RVF unzips any published release in this folder and loads it into a database as a known release. 
 The following conventions are used by this feature:
