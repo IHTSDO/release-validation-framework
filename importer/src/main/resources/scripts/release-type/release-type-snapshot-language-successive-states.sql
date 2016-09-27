@@ -19,6 +19,7 @@
 	where a.effectivetime != b.effectivetime
 	and a.active = 0
 	and a.id = b.id
+	and a.acceptabilityid=b.acceptabilityid
 	and a.active = b.active;
 	commit;
 	
