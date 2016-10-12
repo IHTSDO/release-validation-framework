@@ -55,6 +55,7 @@ public class ValidationVersionLoader {
 	
 	private static final String UTF_8 = "UTF-8";
 	private static final String DELTA_TABLE = "%_d";
+	private static final String FULL_TABLE = "%_f";
 	
 	@Resource
 	private S3Client s3Client;
@@ -321,6 +322,7 @@ public class ValidationVersionLoader {
 		if (isExtension(validationConfig)) {
 			try {
 				releaseDataManager.copyTableData(extensionVersion, combinedVersion,DELTA_TABLE, null);
+				releaseDataManager.copyTableData(extensionVersion, combinedVersion,FULL_TABLE, null);
 				releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),extensionVersion, combinedVersion,SNAPSHOT_TABLE, null);
 				resourceLoader.loadResourceData(combinedSchema);
 			} catch (Exception e) {
