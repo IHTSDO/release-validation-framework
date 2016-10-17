@@ -465,7 +465,7 @@
     "assertionUuid" : "03cf9850-7857-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : 702386002,
-      "detail" : "Concept: id=702386002 has multiple active preferred terms."
+      "detail" : "Concept: id=702386002 has duplicate language refsets for descrioption id=3006276018"
     }, {
       "conceptId" : 700132006,
       "detail" : "Concept: id=700132006 has no active preferred terms in any language refset"
@@ -488,13 +488,13 @@
       "conceptId" : 703860006,
       "detail" : "Concept: id=703860006 has no active preferred terms in any language refset"
     }, {
-      "conceptId" : 700132006,
-      "detail" : "Concept: id=700132006 has no active preferred terms in the US language refset"
+      "conceptId" : 702386002,
+      "detail" : "Concept: id=702386002 has multiple active preferred terms in language refset=900000000000509007"
     }, {
       "conceptId" : 700132006,
       "detail" : "Concept: id=700132006 has no active preferred terms in the US language refset"
     } ],
-    "totalFailed" : 15
+    "totalFailed" : 16
   }, {
     "assertionName" : "Every active concept has a preferred FSN in the GB language refset.",
     "assertionUuid" : "0dde2aec-14c0-428b-ba1c-15e483aaa155",

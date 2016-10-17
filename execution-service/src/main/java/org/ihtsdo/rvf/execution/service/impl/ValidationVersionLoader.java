@@ -131,6 +131,7 @@ public class ValidationVersionLoader {
 		if (validationConfig.isRf2DeltaOnly()) {
 			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, validationConfig.getLocalProspectiveFile());
 			if (isExtension(validationConfig)) {
+				releaseDataManager.copyTableData(validationConfig.getExtensionDependency(), prospectiveVersion,DELTA_TABLE, excludeTableNames);
 				if (!validationConfig.isFirstTimeRelease()) {
 					releaseDataManager.copyTableData(validationConfig.getPreviousExtVersion(),validationConfig.getExtensionDependency(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				} else {
@@ -321,7 +322,7 @@ public class ValidationVersionLoader {
 		}
 		if (isExtension(validationConfig)) {
 			try {
-				releaseDataManager.copyTableData(extensionVersion, combinedVersion,DELTA_TABLE, null);
+				releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),extensionVersion, combinedVersion, DELTA_TABLE, null);
 				releaseDataManager.copyTableData(extensionVersion, combinedVersion,FULL_TABLE, null);
 				releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),extensionVersion, combinedVersion,SNAPSHOT_TABLE, null);
 				resourceLoader.loadResourceData(combinedSchema);
