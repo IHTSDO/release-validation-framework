@@ -332,6 +332,8 @@
 		<script uuid="e2651cd2-cbb1-427e-a444-f9d9ee446b3a" category="file-centric-validation,DK" sqlFile="file-centric-snapshot-language-unique-pt-dk.sql" text="Every active concept has one active preferred term in the Danish language refset" />
 		<script uuid="b7a09892-7124-4a06-b150-7d86b3a75ce4" category="file-centric-validation,INT" sqlFile="file-centric-snapshot-language-unique-pt-gb.sql" text="Every active concept has one active preferred term in the GB language refset." />
 		<script uuid="4ea5e02b-9364-4326-9082-816edb950dbf" category="file-centric-validation,SE" sqlFile="file-centric-snapshot-language-unique-pt-se.sql" text="Every active concept has one active preferred term in the Swedish language refset." />
+		<script uuid="dbb49e0c-e5b0-4676-a815-70fb9f3b468e" category="file-centric-validation,SE" sqlFile="file-centric-snapshot-se-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Swedish language refset." />
+		<script uuid="1cfef22e-da2c-43fd-acdf-0e0ec6ca214c" category="file-centric-validation,DK" sqlFile="file-centric-snapshot-dk-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Danish language refset." />
 		
 		<script uuid="eb940ee0-7cd6-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-active-target.sql" text="Active historical association refset members have active concepts as targets." />
 		<script uuid="90bcb7f0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-refers-to-parent.sql" text="No active Historical Association member associates an inactive concept with its parent." />
