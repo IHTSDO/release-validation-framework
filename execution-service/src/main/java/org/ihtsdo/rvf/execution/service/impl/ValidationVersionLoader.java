@@ -94,7 +94,7 @@ public class ValidationVersionLoader {
 		String reportStorage = validationConfig.getStorageLocation();
 		if (validationConfig.isRf2DeltaOnly()) {
 			List<String> excludeTables = Arrays.asList(RELATIONSHIP_SNAPSHOT_TABLE);
-			rf2FilesLoaded.addAll(loadProspectiveDeltaWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,excludeTables));
+			rf2FilesLoaded.addAll(loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,excludeTables));
 		} else {
 			//load prospective version alone now as used to combine with dependency for extension testing
 			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
@@ -126,12 +126,11 @@ public class ValidationVersionLoader {
 		return executionConfig;
 	}
 
-	public List<String> loadProspectiveDeltaWithPreviousSnapshotIntoDB(String prospectiveVersion, ValidationRunConfig validationConfig, List<String> excludeTableNames) throws BusinessServiceException {
+	public List<String> loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(String prospectiveVersion, ValidationRunConfig validationConfig, List<String> excludeTableNames) throws BusinessServiceException {
 		List<String> filesLoaded = new ArrayList<>();
 		if (validationConfig.isRf2DeltaOnly()) {
 			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, validationConfig.getLocalProspectiveFile());
 			if (isExtension(validationConfig)) {
-				releaseDataManager.copyTableData(validationConfig.getExtensionDependency(), prospectiveVersion,DELTA_TABLE, excludeTableNames);
 				if (!validationConfig.isFirstTimeRelease()) {
 					releaseDataManager.copyTableData(validationConfig.getPreviousExtVersion(),validationConfig.getExtensionDependency(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				} else {
@@ -322,7 +321,7 @@ public class ValidationVersionLoader {
 		}
 		if (isExtension(validationConfig)) {
 			try {
-				releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),extensionVersion, combinedVersion, DELTA_TABLE, null);
+				releaseDataManager.copyTableData(extensionVersion, combinedVersion, DELTA_TABLE, null);
 				releaseDataManager.copyTableData(extensionVersion, combinedVersion,FULL_TABLE, null);
 				releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),extensionVersion, combinedVersion,SNAPSHOT_TABLE, null);
 				resourceLoader.loadResourceData(combinedSchema);
