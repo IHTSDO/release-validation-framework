@@ -6,7 +6,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('ExtendedMap: id=',a.id, ' is in the detla file, but no acutal changes made since the previous release.') 	
+		concat('ExtendedMap: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.') 	
 	from curr_extendedmaprefset_d a
 	left join prev_extendedmaprefset_s b
 	on a.id = b.id

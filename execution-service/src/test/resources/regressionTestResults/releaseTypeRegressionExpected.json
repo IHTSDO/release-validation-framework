@@ -7,7 +7,7 @@
     "assertionUuid" : "80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
     "firstNInstances" : [ {
       "conceptId" : 144008,
-      "detail" : "ComplexMap: id=1ef4b939-b726-571a-aa3f-9230aadb9f06 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "ComplexMap: id=1ef4b939-b726-571a-aa3f-9230aadb9f06 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -35,7 +35,7 @@
     "assertionUuid" : "8592c910-f2b1-4573-a9da-3c8931e759b2",
     "firstNInstances" : [ {
       "conceptId" : 705114005,
-      "detail" : "ExpressionAssociation: id=1ca0b461-66a6-45c8-b01e-5a227c1fc27a is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "ExpressionAssociation: id=1ca0b461-66a6-45c8-b01e-5a227c1fc27a is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -157,7 +157,7 @@
     "assertionUuid" : "9912342f-5010-40fd-9bea-301b737973a1",
     "firstNInstances" : [ {
       "conceptId" : 102456001,
-      "detail" : "SimpleRefsetId=22934c1b-b7dd-537c-b2cc-caa9ca5ae6f3 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "SimpleRefsetId=22934c1b-b7dd-537c-b2cc-caa9ca5ae6f3 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -165,7 +165,7 @@
     "assertionUuid" : "a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5",
     "firstNInstances" : [ {
       "conceptId" : 713135019,
-      "detail" : "Language refset id=00002fb2-d982-5fbd-822f-045c938480c6 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Language refset id=00002fb2-d982-5fbd-822f-045c938480c6 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -361,7 +361,7 @@
     "assertionUuid" : "bc055a18-f93e-42fd-8bb2-347f2b2b8976",
     "firstNInstances" : [ {
       "conceptId" : 10024003,
-      "detail" : "SimpleMapRefset: id=9ec10eaa-224b-50e0-9639-e43c3a87fac0 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "SimpleMapRefset: id=9ec10eaa-224b-50e0-9639-e43c3a87fac0 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -462,10 +462,10 @@
     "assertionUuid" : "cab60a2f-4239-4933-91d6-dc910a8ac08b",
     "firstNInstances" : [ {
       "conceptId" : 698412001,
-      "detail" : "Stated relationship: id=4795108028 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Stated relationship: id=4795108028 is in the detla file, but no actual changes made since the previous release."
     }, {
       "conceptId" : 698449007,
-      "detail" : "Stated relationship: id=4768117023 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Stated relationship: id=4768117023 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 2
   }, {
@@ -550,7 +550,7 @@
     "assertionUuid" : "e77a45db-d2d7-4d48-9420-0b97579582fc",
     "firstNInstances" : [ {
       "conceptId" : 703064003,
-      "detail" : "mapcorrelationOriginRefset: id=f40c3232-dd2a-4626-b5b0-f29418195a88 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "mapcorrelationOriginRefset: id=f40c3232-dd2a-4626-b5b0-f29418195a88 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -756,7 +756,7 @@
     "assertionUuid" : "0cc708af-6816-4370-91be-dba8da99d227",
     "firstNInstances" : [ {
       "conceptId" : 698906002,
-      "detail" : "Description: id=2981505010 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Description: id=2981505010 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -764,7 +764,7 @@
     "assertionUuid" : "11735994-4b7f-4e61-9bde-059b7e085031",
     "firstNInstances" : [ {
       "conceptId" : 2608473011,
-      "detail" : "Attribute value refset id=00000629-2697-5041-9438-3845fb99fe92 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Attribute value refset id=00000629-2697-5041-9438-3845fb99fe92 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -1073,7 +1073,7 @@
     "assertionUuid" : "35680574-3ac6-4b68-9efe-de88b677eb35",
     "firstNInstances" : [ {
       "conceptId" : 1000004,
-      "detail" : "Association refset id=499c1966-65d3-5384-aafb-28f4a20e34eb is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Association refset id=499c1966-65d3-5384-aafb-28f4a20e34eb is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -1092,10 +1092,10 @@
     "assertionUuid" : "372e59d5-d6f3-4708-93d0-6cb92da69006",
     "firstNInstances" : [ {
       "conceptId" : 699683004,
-      "detail" : "Definition: id=2988954017 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Definition: id=2988954017 is in the detla file, but no actual changes made since the previous release."
     }, {
       "conceptId" : 699220008,
-      "detail" : "Definition: id=2983208019 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Definition: id=2983208019 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 2
   }, {
@@ -1167,7 +1167,7 @@
     "assertionUuid" : "4478a896-2724-4417-8bce-8986ecc53c4e",
     "firstNInstances" : [ {
       "conceptId" : 699765003,
-      "detail" : "Concept: id=699765003 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Concept: id=699765003 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
@@ -1175,10 +1175,10 @@
     "assertionUuid" : "44916964-5b78-4842-81d8-e8293ee93bea",
     "firstNInstances" : [ {
       "conceptId" : 699754008,
-      "detail" : "Inferred relationship: id=1000005027 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Inferred relationship: id=1000005027 is in the detla file, but no actual changes made since the previous release."
     }, {
       "conceptId" : 699754008,
-      "detail" : "Inferred relationship: id=1000005027 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "Inferred relationship: id=1000005027 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 2
   }, {
@@ -1807,7 +1807,7 @@
     "assertionUuid" : "7a961c22-3f51-4f72-9b5e-1dc99c298719",
     "firstNInstances" : [ {
       "conceptId" : 127009,
-      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f081 is in the detla file, but no acutal changes made since the previous release."
+      "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f081 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
   }, {
