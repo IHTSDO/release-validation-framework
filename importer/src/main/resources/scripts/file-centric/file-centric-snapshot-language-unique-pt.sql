@@ -18,21 +18,21 @@
 		and b.active = c.active
 		and c.typeid = '900000000000013009' /* synonym */
 	where b.active = 1;		
-
-/*  descriptions in the temp table having duplicate preferred language refset members */	
+	
+	/*  descriptions in the temp table having duplicate language refset members for a given language refset */	
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Concept: id=',a.conceptid, ' has multiple active preferred terms.') 
+		concat('Concept: id=',a.conceptid, ' has duplicate language refsets for descrioption id=',a.id) 
 	from description_tmp a
 	join curr_langrefset_s b
 		on a.id = b.referencedcomponentid
-		and b.acceptabilityid = '900000000000548007' /* preferred */
 	where a.active = '1'
 	group by b.refsetid, b.referencedcomponentid
-	having (count(b.refsetid) > 1 and count(b.referencedcomponentid) >1);
+	having count(b.referencedcomponentid) >1;
+
 
 /* 	testing for the absence of preferred terms
 	make a list of active preferred terms for the active concepts that changed
@@ -56,6 +56,18 @@
 	left join tmp_pt b
 		on a.id = b.conceptid
 	where b.conceptid is null;
+	
+	
+	/*  descriptions in the temp table having duplicate preferred language refset members */	
+	insert into qa_result (runid, assertionuuid, concept_id, details)
+	select  	
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		a.conceptid,
+		concat('Concept: id=',a.conceptid, ' has multiple active preferred terms in language refset=',a.refsetid) 
+	from tmp_pt a
+	group by a.refsetid, a.conceptid
+	having count(a.id) >1;
 	
 	/*  identify concepts that have been edited this cycle, for which there is no 
 	US preferred term */

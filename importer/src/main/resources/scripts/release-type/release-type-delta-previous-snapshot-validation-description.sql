@@ -7,7 +7,7 @@
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.conceptid,
-	concat('Description: id=',a.id, ' is in the detla file, but no acutal changes made since the previous release.') 	
+	concat('Description: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.') 	
 	from curr_description_d a
 	left join prev_description_s b
 	on a.id = b.id

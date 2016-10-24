@@ -6,7 +6,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceid,
-		concat('Stated relationship: id=',a.id, ' is in the detla file, but no acutal changes made since the previous release.') 	
+		concat('Stated relationship: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.') 	
 	from curr_stated_relationship_d a
 	left join prev_stated_relationship_s b
 		on a.id = b.id

@@ -6,7 +6,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Attribute value refset id=',a.id, ' is in the detla file, but no acutal changes made since the previous release.')
+		concat('Attribute value refset id=',a.id, ' is in the detla file, but no actual changes made since the previous release.')
 	from curr_attributevaluerefset_d a
 	left join prev_attributevaluerefset_s b
 	on a.id = b.id
