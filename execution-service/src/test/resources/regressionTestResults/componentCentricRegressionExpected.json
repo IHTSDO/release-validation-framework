@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 81,
-  "totalAssertionsFailed" : 81,
+  "totalAssertionsRun" : 83,
+  "totalAssertionsFailed" : 83,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -247,6 +247,14 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "Active concepts do not have active inactivation indicators",
+    "assertionUuid" : "b72bc5f4-7afb-4a2e-ac3a-e0f4373b03e6",
+    "firstNInstances" : [ {
+      "conceptId" : 702850005,
+      "detail" : "Active concept 702850005 has inactivation reason 900000000000484002"
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "There is one and only one CTV3 simple map refset member per concept.",
     "assertionUuid" : "bab42070-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -349,6 +357,14 @@
     "firstNInstances" : [ {
       "conceptId" : 702386002,
       "detail" : "DESC: id=3004397016:First letter of the active FSN of active concept not capitalized."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Active descriptions do not have active inactivation indicators",
+    "assertionUuid" : "e2aa5b09-5754-484f-9eb8-bb18732617ef",
+    "firstNInstances" : [ {
+      "conceptId" : 702411003,
+      "detail" : "Active description 2990804014 has inactivation reason 900000000000494007"
     } ],
     "totalFailed" : 1
   }, {

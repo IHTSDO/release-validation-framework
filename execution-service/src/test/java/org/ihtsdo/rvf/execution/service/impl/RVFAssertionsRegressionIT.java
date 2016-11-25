@@ -152,7 +152,7 @@ public class RVFAssertionsRegressionIT {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
-		assertEquals(191, assertions.size());
+		assertEquals(193, assertions.size());
 		assertEquals(78, releaseTypeAssertions.size());
 	}
 	
@@ -170,7 +170,7 @@ public class RVFAssertionsRegressionIT {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
 		
 		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(77, assertions.size());
+		assertEquals(79, assertions.size());
 	}
 	
 	@Test
