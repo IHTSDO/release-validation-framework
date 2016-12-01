@@ -343,7 +343,7 @@
       "conceptId" : 2608473011,
       "detail" : "ATT RF: id=900000000000495008:Invalid valueId."
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 20
   }, {
     "assertionName" : "There is at most one active definition per concept per language per dialect in the DEFINITION snapshot.",
     "assertionUuid" : "de0c4d6c-6297-41be-9979-fb1c93717baa",

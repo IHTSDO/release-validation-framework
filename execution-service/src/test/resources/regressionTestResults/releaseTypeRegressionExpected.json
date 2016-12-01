@@ -655,7 +655,7 @@
       "conceptId" : 2608473011,
       "detail" : "ATTRIBUTE VALUE REFSET: id=00000629-2697-5041-9438-3845fb99fe93 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 21
+    "totalFailed" : 29
   }, {
     "assertionName" : "The current Stated Relationship full file contains all previously published data unchanged.",
     "assertionUuid" : "fd8ed390-94e9-4fd9-9e20-902a24273dca",
