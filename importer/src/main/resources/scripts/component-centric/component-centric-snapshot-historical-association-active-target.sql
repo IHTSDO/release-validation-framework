@@ -22,7 +22,7 @@
 		concat('AssociationRefset id=',a.id, ' is active but the target component is an inactive concept: ', b.id) 	
 	from curr_associationrefset_s a
 	inner join curr_concept_s b on a.targetcomponentid = b.id
-	left join v_limcons c on c.referencedcomponentid = a.referencedcomponentid 
+	left join v_limcons c on c.referencedcomponentid = a.targetcomponentid
 	where a.active = '1'
 	and a.refsetid !='900000000000531004'
 	and b.active = '0' 
