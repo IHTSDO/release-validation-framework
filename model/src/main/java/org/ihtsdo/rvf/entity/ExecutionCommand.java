@@ -16,6 +16,7 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.wordnik.swagger.annotations.ApiModel;
 
 /**
  * A class that encapsulate the logic/code that is used to run a {@link org.ihtsdo.rvf.entity.Test}.
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 //@Embeddable
 @Entity(name = "command")
 @Table(name = "execution_command")
+@ApiModel(description="Assertion test SQL statements")
 public class ExecutionCommand {
 
     @Id

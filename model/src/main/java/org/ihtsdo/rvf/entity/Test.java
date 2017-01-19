@@ -10,9 +10,11 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.wordnik.swagger.annotations.ApiModel;
 
 @Entity
 @Table(name = "test")
+@ApiModel( description="Test")
 public class Test {
 
 	@Id

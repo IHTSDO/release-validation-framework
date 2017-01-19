@@ -137,6 +137,7 @@ public class ValidationRunner {
 		//check dependency version is loaded
 		if (executionConfig.isExtensionValidation()) {
 			if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
+				reportService.writeResults(responseMap, State.FAILED, reportStorage);
 				return;
 			}
 		}

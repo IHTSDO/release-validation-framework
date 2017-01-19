@@ -13,7 +13,7 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.helper.MissingEntityException;
+import org.ihtsdo.rvf.helper.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +26,8 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 	private AssertionDao assertionDao;
 	@Autowired
 	private AssertionGroupDao assertionGroupDao;
+	
+	@SuppressWarnings("rawtypes")
 	@Autowired
 	private EntityService entityService;
 
@@ -81,7 +83,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 			return assertion;
 		}
 		else{
-			throw new MissingEntityException(id);
+			throw new EntityNotFoundException(id);
 		}
 	}
 	
@@ -147,7 +149,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 		{
 			assertionTest = new AssertionTest();
 			// verify if assertion has been saved - otherwise save it
-			if(assertion.getId() == null){
+			if(assertion.getAssertionId() == null){
 				assertionDao.save(assertion);
 			}
 			// verify if test has been saved - otherwise save first

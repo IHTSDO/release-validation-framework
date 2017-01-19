@@ -29,7 +29,8 @@ public class EntityDaoImpl<T> implements EntityDao<T> {
 
 	@Override
 	public T save(final T entity) {
-		return (T) getCurrentSession().save(entity);
+		getCurrentSession().save(entity);
+		return entity;
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package org.ihtsdo.rvf.helper;
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
-import org.ihtsdo.rvf.entity.ReleaseCenter;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.service.EntityService;
@@ -22,7 +21,6 @@ public class TestDataBootStrap {
     @Autowired
     private EntityService entityService;
     private Assertion assertion;
-    private ReleaseCenter releaseCenter;
 
     public TestDataBootStrap() {
     }
@@ -33,9 +31,6 @@ public class TestDataBootStrap {
     }
 
     public void setUpBaseEntities() {
-
-        releaseCenter = (ReleaseCenter) entityService.create(entityService.getIhtsdo());
-        assert releaseCenter.getId() != null;
         assert assertionService != null;
         assertion = new Assertion();
         assertion.setShortName("Assertion Name");

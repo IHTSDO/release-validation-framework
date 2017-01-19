@@ -50,7 +50,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  * The controller that handles uploaded files for the validation to run
  */
 @Controller
-@Api(value = "Test Files")
+@Api(position=4,value = "Upload test files for validationss")
 public class TestUploadFileController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestUploadFileController.class);

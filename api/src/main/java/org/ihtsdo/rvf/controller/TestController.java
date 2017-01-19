@@ -16,7 +16,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/tests")
-@Api(value = "Tests")
+@Api(position=2, value = "Assertion tests")
 public class TestController {
 
     @Autowired
@@ -76,17 +76,4 @@ public class TestController {
     public Long countTests() {
         return entityService.count(Test.class);
     }
-
-/*
- *  PGW: I don't think it's valid to execute a test without it being linked to an assertion.   Tests need to know what 
- *  assertion they belong to in order to report what rule is being broken.  
-    @RequestMapping(value = "/{id}/run", method = RequestMethod.GET)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public TestRunItem executeTest(@PathVariable Long id,
-                                   @RequestParam Long runId, @RequestParam String prospectiveReleaseVersion,
-                                   @RequestParam String previousReleaseVersion) {
-        Test test1 = (Test) entityService.find(Test.class, id);
-        return assertionExecutionService.executeTest(test1, runId, prospectiveReleaseVersion, previousReleaseVersion);
-    } */
 }

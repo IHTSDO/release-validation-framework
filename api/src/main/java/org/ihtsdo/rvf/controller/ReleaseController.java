@@ -29,8 +29,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @Controller
 @RequestMapping("/releases")
-@Api(value = "Releases")
-@ApiIgnore //this is being marked as ignore as these services are already provided by SRS
+@Api(position=7, value = "Manage published releases")
 public class ReleaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReleaseController.class);
@@ -39,7 +38,7 @@ public class ReleaseController {
 
     @RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
     @ResponseBody
-	@ApiOperation( value = "TBD", notes = "?" )
+	@ApiOperation( value = "Upload published release version for a given product", notes = "Upload published release for a given product" )
     public ResponseEntity uploadRelease(@RequestParam(value = "file") final MultipartFile file,
     							 @PathVariable final String product,
                                  @PathVariable final String version) {
@@ -55,7 +54,8 @@ public class ReleaseController {
 
     @RequestMapping(value = "{version}", method = RequestMethod.GET)
     @ResponseBody
-	@ApiOperation( value = "TBD", notes = "?" )
+	@ApiOperation( value = "Check a given release is loaded already", 
+	notes = "Check the version is already loaded. The version format is product_releaseDate e.g int_20170131" )
     public ResponseEntity getRelease(@PathVariable final String version) {
 
         if(releaseDataManager.isKnownRelease(version)){
@@ -69,7 +69,7 @@ public class ReleaseController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-	@ApiOperation( value = "TBD", notes = "?" )
+	@ApiOperation( value = "Get all versions that have been loaded in the database", notes = "Return all published versions that have been loaded already." )
     public java.util.Set<String> getAllKnownReleases() {
 
         return releaseDataManager.getAllKnownReleases();

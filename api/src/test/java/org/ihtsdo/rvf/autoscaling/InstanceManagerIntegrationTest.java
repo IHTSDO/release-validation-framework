@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class InstanceManagerIntegrationTest {
 	InstanceManager instanceManager;
 	
 	@Test
+	@Ignore
 	public void testCreateEc2Instance() {
 		List<String> instance = instanceManager.createInstance(1);
 		Assert.assertNotNull(instance);
@@ -34,6 +36,7 @@ public class InstanceManagerIntegrationTest {
 	
 	
 	@Test
+	@Ignore
 	public void testGetInstanceStatus() {
 		List<String> instanceIds = new ArrayList<>();
 		instanceIds.add("i-8720390c");

@@ -13,7 +13,6 @@ import java.util.UUID;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
-import org.ihtsdo.rvf.entity.ReleaseCenter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,14 +33,13 @@ public class AssertionServiceImplTest {
     @Autowired
     private EntityService entityService;
     private Assertion assertion;
-    private ReleaseCenter releaseCenter;
     private AssertionTest assertionTest;
     private org.ihtsdo.rvf.entity.Test test;
 
     @Test
 	@Rollback
 	public void testCreate() throws Exception {
-		assertNotNull("id should be set", assertion.getId());
+		assertNotNull("id should be set", assertion.getAssertionId());
 	}
 
 	@Test
@@ -62,13 +60,12 @@ public class AssertionServiceImplTest {
         // ensure database is clean
         assert entityService.count(org.ihtsdo.rvf.entity.Test.class) == 0;
         assert entityService.count(AssertionTest.class) == 0;
-        assert entityService.count(ReleaseCenter.class) == 0;
         assert entityService.count(Assertion.class) == 0;
 
         assertion = new Assertion();
         assertion.setAssertionText("Test assertion");
         assertion = assertionService.create(assertion);
-        assertNotNull(assertion.getId());
+        assertNotNull(assertion.getAssertionId());
         assertNotNull(assertion.getUuid());
 
         // create test
@@ -79,19 +76,10 @@ public class AssertionServiceImplTest {
         assert test.getId() != null;
         assert entityService.count(org.ihtsdo.rvf.entity.Test.class) > 0;
 
-        // create release centre
-        releaseCenter = new ReleaseCenter();
-        releaseCenter.setName("Test release centre 1");
-        releaseCenter = (ReleaseCenter) entityService.create(releaseCenter);
-        assert releaseCenter != null;
-        assert releaseCenter.getId() != null;
-        assert entityService.count(releaseCenter.getClass()) > 0;
-
         //create assertion test
         assertionTest = new AssertionTest();
         assertionTest.setAssertion(assertion);
         assertionTest.setTest(test);
-//        assertionTest.setCenter(releaseCenter);
         assertionTest = (AssertionTest) entityService.create(assertionTest);
         assert assertionTest != null;
         assert assertionTest.getId() != null;
@@ -102,8 +90,7 @@ public class AssertionServiceImplTest {
     public void testFindEntitiesById() throws Exception {
         assertNotNull("Test object must not be null", entityService.find(test.getClass(), test.getId()));
         assertNotNull("AssertionTest object must not be null", entityService.find(assertionTest.getClass(), assertionTest.getId()));
-        assertNotNull("ReleaseCentre object must not be null", entityService.find(releaseCenter.getClass(), releaseCenter.getId()));
-        assertNotNull("Assertion object must not be null", assertionService.find(assertion.getId()));
+        assertNotNull("Assertion object must not be null", assertionService.find(assertion.getAssertionId()));
         assertNotNull("Assertion object must not be null", assertionService.find(assertion.getUuid()));
     }
 
@@ -134,7 +121,7 @@ public class AssertionServiceImplTest {
     public void testFindAssertionTestsByIds() throws Exception {
 
         // use service to find assertion tests associated with assertion
-        final List<AssertionTest> assertionTests = assertionService.getAssertionTests(assertion.getId());
+        final List<AssertionTest> assertionTests = assertionService.getAssertionTests(assertion.getAssertionId());
         assert  assertionTests != null;
         assert assertionTests.size() > 0;
         assert assertionTests.contains(assertionTest);
@@ -145,7 +132,7 @@ public class AssertionServiceImplTest {
     public void testFindTestsByIds() throws Exception {
 
         // use service to find tests associated with assertion
-        final List<org.ihtsdo.rvf.entity.Test> tests = assertionService.getTests(assertion.getId());
+        final List<org.ihtsdo.rvf.entity.Test> tests = assertionService.getTests(assertion.getAssertionId());
         assert  tests != null;
         assert tests.size() > 0;
         assert tests.contains(test);
@@ -303,14 +290,14 @@ public class AssertionServiceImplTest {
         assertion2.setAssertionText("Second assertion in group");
         // save assertion2
         assertion2 = assertionService.create(assertion2);
-        assertNotNull(assertion2.getId());
+        assertNotNull(assertion2.getAssertionId());
 
 
         Assertion assertion3 = new Assertion();
         assertion3.setAssertionText("Third assertion in group");
         // save assertion3
         assertion3 = assertionService.create(assertion3);
-        assertNotNull(assertion3.getId());
+        assertNotNull(assertion3.getAssertionId());
 
         final Set<Assertion> assertions = new HashSet<>();
         assertions.add(assertion);
@@ -323,7 +310,7 @@ public class AssertionServiceImplTest {
         group = (AssertionGroup) entityService.create(group);
         assertNotNull(group.getId());
 
-        final Assertion retrievedAssertion = assertionService.find(assertion2.getId());
+        final Assertion retrievedAssertion = assertionService.find(assertion2.getAssertionId());
         System.out.println("retrievedAssertion = " + retrievedAssertion);
         List<Assertion> retrievedAssertions = assertionService.getAssertionsForGroup(group);
         System.out.println("retrievedAssertions.size() = " + retrievedAssertions.size());
@@ -342,7 +329,7 @@ public class AssertionServiceImplTest {
         System.out.println("retrievedAssertions.size() = " + retrievedAssertions.size());
         assertTrue("updatedGroup must contain 3 assertions", 3 == retrievedAssertions.size());
         for(final Assertion a : retrievedAssertions){
-            System.out.println("a.getId() = " + a.getId());
+            System.out.println("a.getId() = " + a.getAssertionId());
             System.out.println("a.getAssertionText() = " + a.getAssertionText());
         }
         assertTrue("updatedGroup must contain assertion", retrievedAssertions.contains(assertion));
@@ -354,7 +341,7 @@ public class AssertionServiceImplTest {
         retrievedAssertions = assertionService.getAssertionsForGroup(updatedGroup);
         System.out.println("retrievedAssertions.size() = " + retrievedAssertions.size());
         for(final Assertion a : retrievedAssertions){
-            System.out.println("a.getId() = " + a.getId());
+            System.out.println("a.getId() = " + a.getAssertionId());
             System.out.println("a.getAssertionText() = " + a.getAssertionText());
         }
         assertTrue("updatedGroup must contain 2 assertions", 2 == retrievedAssertions.size());
@@ -370,8 +357,6 @@ public class AssertionServiceImplTest {
         assertionService.delete(assertion);
         assert entityService != null;
         entityService.delete(test);
-        entityService.delete(releaseCenter);
         entityService.delete(assertionTest);
-        entityService.delete(entityService.getIhtsdo());
     }
 }

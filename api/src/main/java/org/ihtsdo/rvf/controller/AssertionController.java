@@ -27,13 +27,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.*;
 
 @Controller
 @RequestMapping("/assertions")
-@Api(value = "Assertions")
+@Api(position=1, value = "Assertions")
 public class AssertionController {
 
 	@Autowired
@@ -46,21 +47,22 @@ public class AssertionController {
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation( value = "Get all assertions",
-		notes = "Retrieves currently available assertions in the system" )
+	@ApiOperation(value = "Get all assertions",
+		notes = "Retrieves all assertions available in the system" )
 	public List<Assertion> getAssertions() {
 		return assertionService.findAll();
 	}
-
+	
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
+	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid ID supplied"),
+		      @ApiResponse(code = 404, message = "Assertion tests not found") })
 	@ApiOperation( value = "Retrieves all tests for an assertion",
-		notes = "Retrieves all test which belongs to a given assertion id" )
+		notes = "Retrieves all tests which belongs to a given assertion id" )
 	public List<Test> getTestsForAssertion(@PathVariable final String id) {
-
 		final Assertion assertion = find(id);
-		return assertionService.getTests(assertion.getId());
+		return assertionService.getTests(assertion.getAssertionId());
 	}
 
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.POST)
@@ -69,7 +71,7 @@ public class AssertionController {
 	@ApiOperation( value = "Add tests to an assertion",
 		notes = "Add one or more test to an assertion identified with provided assertion id."
 				+ "And returns that assertion " )
-	public Assertion setTestsForAssertion(@PathVariable final String id, @RequestBody(required = false) final List<Test> tests) {
+	public Assertion addTestsForAssertion(@PathVariable final String id, @RequestBody(required = false) final List<Test> tests) {
 
 		final Assertion assertion = find(id);
 		if (assertion == null) {
@@ -90,14 +92,19 @@ public class AssertionController {
 		assertionService.deleteTests(assertion, tests);
 		return assertion;
 	}
-
+	
 	@RequestMapping(value = "{id}", method = RequestMethod.GET)
-	@ResponseBody
-	@ResponseStatus(HttpStatus.OK)
+	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid ID supplied"),
+		      @ApiResponse(code = 404, message = "Assertion not found") })
 	@ApiOperation( value = "Get an assertion",
 		notes = "Retrieves an assertion identified with given assertion id" )
-	public ResponseEntity<Assertion> getAssertion(@PathVariable final String id) {
-		Assertion assertion = find(id);
+	public ResponseEntity<Assertion> getAssertion(@ApiParam( value= "assertion id or uuid", required =true) @PathVariable final String id) {
+		Assertion assertion = null;
+		try { 
+			assertion = find(id);
+		} catch (IllegalArgumentException e) {
+			return new ResponseEntity<Assertion>((Assertion)null, HttpStatus.BAD_REQUEST);
+		}
 		if (assertion == null) {
 			return new ResponseEntity<Assertion>((Assertion)null, HttpStatus.NOT_FOUND);
 		}
@@ -119,10 +126,14 @@ public class AssertionController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation( value = "Create an assertion",
-		notes = "Create an assertion with input supplied and returns it popluated with an assertion id" )
+		notes = "Create an assertion with values provided. Assertion id is not required as it will be auto generated." )
 	public ResponseEntity<Assertion> createAssertion(@RequestBody final Assertion assertion) {
 		//Firstly, the assertion must have a UUID (otherwise malformed request)
-		if (assertion.getUuid() == null) {
+		try {
+			if (assertion.getUuid() == null) {
+				return new ResponseEntity<Assertion>((Assertion)null, HttpStatus.BAD_REQUEST);
+			}
+		} catch (IllegalArgumentException e) {
 			return new ResponseEntity<Assertion>((Assertion)null, HttpStatus.BAD_REQUEST);
 		}
 		
@@ -140,11 +151,14 @@ public class AssertionController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Update an assertion",
-		notes = "Update an assertion and returns this updated assertion" )
-	public Assertion updateAssertion(@PathVariable final String id,
-			@RequestBody(required = false) final Assertion assertion) {
-		final Assertion assertion1 = find(id);
-		assertion.setId(assertion1.getId());
+		notes = "Update an existing assertion's assertion text,keywords or uuid property." )
+	public Assertion updateAssertion(@ApiParam(value =" assertion id or uuid") @PathVariable final String id,
+			@RequestBody(required = true) final Assertion assertion) {
+		final Assertion existing = find(id);
+		if (existing == null) {
+			throw new EntityNotFoundException("No assertion found with id:" + id);
+		}
+		assertion.setAssertionId(existing.getAssertionId());
 		return assertionService.update(assertion);
 	}
 
@@ -195,16 +209,22 @@ public class AssertionController {
 	 */
 	private Assertion find(String id) {
 		if (id == null || id.isEmpty()) {
-			return null;
-		} else if (id.contains("-")) {
-			UUID uuid = UUID.fromString(id);
-			return assertionService.find(uuid);
-		} else {
-			Long longId = new Long(id);
-			return assertionService.find(longId);
+			throw new InvalidFormatException("Id can't be null or empty");
 		}
-		
+		if (id.contains("-")) {
+			try {
+				UUID uuid = UUID.fromString(id);
+				return assertionService.find(uuid);
+			} catch (IllegalArgumentException e) {
+				throw new InvalidFormatException("Id is not a valid uuid:" + id);
+			}
+		} else {
+			try {
+				Long longId = new Long(id);
+				return assertionService.find(longId);
+			} catch (IllegalArgumentException e) {
+				throw new InvalidFormatException("Id is not a valid assertion id:" + id);
+			}
+		}
 	}
-	
-
 }

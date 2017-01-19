@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.helper;
 
+import org.ihtsdo.rvf.controller.InvalidFormatException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,9 +14,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * A custom exception handler that handles missing entities.
  */
 @ControllerAdvice
-public class MissingEntityRestExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = { MissingEntityException.class })
+    @ExceptionHandler(value = { EntityNotFoundException.class })
     protected ResponseEntity<Object> handleMissingEntity(
             final RuntimeException exception, final WebRequest request) {
 
@@ -28,4 +29,15 @@ public class MissingEntityRestExceptionHandler extends ResponseEntityExceptionHa
                 HttpStatus.NOT_FOUND, request);
     }
 
+    
+    
+    @ExceptionHandler(value = { InvalidFormatException.class })
+    protected ResponseEntity<Object> handleFormatNotValidException(
+            final RuntimeException exception, final WebRequest request) {
+        final String bodyOfResponse = exception.getMessage();
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
+        return handleExceptionInternal(exception, bodyOfResponse, headers,
+                HttpStatus.BAD_REQUEST, request);
+    }    
 }

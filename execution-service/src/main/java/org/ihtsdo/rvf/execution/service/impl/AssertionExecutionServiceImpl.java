@@ -263,7 +263,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 								while(execResult.next())
 								{
 									insertStatement.setLong(1, executionId);
-									insertStatement.setLong(2, assertion.getId());
+									insertStatement.setLong(2, assertion.getAssertionId());
 									insertStatement.setString(3, execResult.getString(3));
 									insertStatement.addBatch();
 								}
@@ -311,7 +311,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = commentPattern.matcher(part).replaceAll("");
 			// replace all substitutions for exec
 			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
-			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getId()));
+			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
 			// watch out for any 's that users might have introduced
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
 			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
@@ -343,7 +343,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			long counter = 0;
 			try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
 				// select results that match execution
-				preparedStatement.setLong(1, assertion.getId());
+				preparedStatement.setLong(1, assertion.getAssertionId());
 				preparedStatement.setLong(2, config.getExecutionId());
 				if( config.getFailureExportMax() > 0) {
 					preparedStatement.setLong(3, config.getFailureExportMax());
@@ -368,7 +368,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				String totalSQL = "select count(*) total from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
 				try (PreparedStatement preparedStatement = connection.prepareStatement(totalSQL)) {
 					// select results that match execution
-					preparedStatement.setLong(1, assertion.getId());
+					preparedStatement.setLong(1, assertion.getAssertionId());
 					preparedStatement.setLong(2, config.getExecutionId());
 					try (ResultSet resultSet = preparedStatement.executeQuery()) {
 						if (resultSet.next()) {

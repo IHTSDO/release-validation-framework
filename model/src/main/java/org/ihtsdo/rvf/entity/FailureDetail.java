@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.entity;
 
+import com.wordnik.swagger.annotations.ApiModel;
+
 public class FailureDetail {
 
 	Long conceptId;

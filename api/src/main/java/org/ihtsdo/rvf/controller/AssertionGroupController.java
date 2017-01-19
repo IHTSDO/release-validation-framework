@@ -36,7 +36,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping("/groups")
-@Api(value = "Assertions Groups")
+@Api(position=3, value = "Assertions Groups")
 public class AssertionGroupController {
 
 	@Autowired

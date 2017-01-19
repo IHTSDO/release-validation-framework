@@ -20,7 +20,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping("/version")
-@Api(value = "Release Versions")
+@Api(position=6,value = "Release Versions")
 public class VersionController {
 
 	public static final String VERSION_FILE_PATH = "/opt/rvf-api/data/version.txt";

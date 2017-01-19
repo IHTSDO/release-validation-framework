@@ -151,7 +151,7 @@ public class AssertionGroupControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("Test assertion"))).andDo(print());
+                .andExpect(jsonPath("$[0].assertionText", is("Test assertion"))).andDo(print());
     }
 
     @Test
@@ -159,8 +159,8 @@ public class AssertionGroupControllerIntegrationTest {
         final Long id = group.getId();
         // create and add some assertions
         final List<Long> assertions = new ArrayList<>();
-        assertions.add(getRandomAssertion().getId());
-        assertions.add(getRandomAssertion().getId());
+        assertions.add(getRandomAssertion().getAssertionId());
+        assertions.add(getRandomAssertion().getAssertionId());
 
         final String paramsString = objectMapper.writeValueAsString(assertions);
         System.out.println("paramsString = " + paramsString);
@@ -173,7 +173,7 @@ public class AssertionGroupControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("Test assertion")));
+                .andExpect(jsonPath("$[0].assertionText", is("Test assertion")));
     }
 
     @Test
@@ -209,7 +209,7 @@ public class AssertionGroupControllerIntegrationTest {
         assertion.setAssertionText("Test assertion");
         // save assertion
         assertion = assertionService.addTest(assertion, test);
-        assertNotNull(assertion.getId());
+        assertNotNull(assertion.getAssertionId());
 
         return assertion;
     }

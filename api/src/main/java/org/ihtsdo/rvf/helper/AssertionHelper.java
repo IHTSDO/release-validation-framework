@@ -35,7 +35,7 @@ public class AssertionHelper {
 					item.setExecutionId(config.getExecutionId().toString());
 					allTestRunItems.add(item);
 				}
-			} catch (final MissingEntityException e) {
+			} catch (final EntityNotFoundException e) {
 				failedAssertionCount++;
 			}
 		}
