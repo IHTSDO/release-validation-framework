@@ -292,7 +292,7 @@
     "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : 700132006,
-      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word has en-gb spelling: tumour"
+      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word that has en-gb spelling: tumour"
     } ],
     "totalFailed" : 1
   }, {
@@ -326,7 +326,7 @@
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : 700132006,
-      "detail" : "DESCRIPTION: id=3005197021: Synonym is prefered in the GB Language refset but refers to a word has en-us spelling: tumor"
+      "detail" : "DESCRIPTION: id=3005197021: Synonym is prefered in the GB Language refset but refers to a word that has en-us spelling: tumor"
     } ],
     "totalFailed" : 1
   }, {
