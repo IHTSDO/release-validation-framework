@@ -314,14 +314,14 @@ public class RVFAssertionsRegressionIT {
 		}
 
 		@Override
-		public boolean equals(final Object obj) {
+		public boolean equals(Object obj) {
 			if (this == obj)
 				return true;
 			if (obj == null)
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			final TestReport other = (TestReport) obj;
+			TestReport other = (TestReport) obj;
 			if (assertionType == null) {
 				if (other.assertionType != null)
 					return false;
@@ -384,14 +384,7 @@ public class RVFAssertionsRegressionIT {
 			this.assertionName = assertionName;
 		}
 		
-
-		@Override
-		public String toString() {
-			return "RVFTestResult [assertionName=" + assertionName
-					+ ", assertionUuid=" + assertionUuid + ", firstNInstances="
-					+ firstNInstances + ", totalFailed=" + totalFailed + "]";
-		}
-
+		
 		@Override
 		public int hashCode() {
 			final int prime = 31;
@@ -400,20 +393,24 @@ public class RVFAssertionsRegressionIT {
 					+ ((assertionName == null) ? 0 : assertionName.hashCode());
 			result = prime * result
 					+ ((assertionUuid == null) ? 0 : assertionUuid.hashCode());
+			result = prime
+					* result
+					+ ((firstNInstances == null) ? 0 : firstNInstances
+							.hashCode());
 			result = prime * result
 					+ (int) (totalFailed ^ (totalFailed >>> 32));
 			return result;
 		}
 
 		@Override
-		public boolean equals(final Object obj) {
+		public boolean equals(Object obj) {
 			if (this == obj)
 				return true;
 			if (obj == null)
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
-			final RVFTestResult other = (RVFTestResult) obj;
+			RVFTestResult other = (RVFTestResult) obj;
 			if (assertionName == null) {
 				if (other.assertionName != null)
 					return false;
@@ -427,7 +424,7 @@ public class RVFAssertionsRegressionIT {
 			if (firstNInstances == null) {
 				if (other.firstNInstances != null)
 					return false;
-			} else if (!firstNInstances.containsAll(other.firstNInstances))
+			} else if (!firstNInstances.equals(other.firstNInstances))
 				return false;
 			if (totalFailed != other.totalFailed)
 				return false;
@@ -437,7 +434,6 @@ public class RVFAssertionsRegressionIT {
 		@Override
 		public int compareTo(final RVFTestResult o) {
 			return this.assertionUuid.compareTo(o.getAssertionUuid());
-//			return new Long(this.getTotalFailed()).compareTo(o.getTotalFailed());
 		}
 	}
 }
