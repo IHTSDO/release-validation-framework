@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 @Service
@@ -127,8 +129,8 @@ public class ValidationReportService {
 			if (is == null) {
 				logger.warn("Failed to find results file {}, in bucket {}", filePath, bucketName);
 			} else {
-				final Gson gson = new Gson();
-				jsonResults = gson.fromJson(new InputStreamReader(is,Charset.forName(UTF_8)), Map.class);
+				ObjectMapper mapper = new ObjectMapper();
+				jsonResults  = mapper.readValue(new InputStreamReader(is, Charset.forName(UTF_8)), Map.class);
 			}
 			if (jsonResults == null) {
 				jsonResults = new String("Failed to recover results in " + filePath);
