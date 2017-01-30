@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -177,11 +178,9 @@ public class AssertionControllerIntegrationTest {
 
         final String paramsString = objectMapper.writeValueAsString(tests);
         System.out.println("paramsString = " + paramsString);
-        mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
-        mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8));
-
         // getting tests for assertion should now contain response with text Random Test
         mockMvc.perform(get("/assertions/{id}/tests", id).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -200,11 +199,9 @@ public class AssertionControllerIntegrationTest {
         final org.ihtsdo.rvf.entity.Test test2 = getRandomTest();
         assertNotNull(test2.getId());
         tests.add(test2);
-
         final String paramsString = objectMapper.writeValueAsString(tests);
         System.out.println("paramsString = " + paramsString);
-        mockMvc.perform(post("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON)).andDo(print());
-        mockMvc.perform(delete("/assertions/{id}/tests", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(delete("/assertions/{id}/tests", id).param("testIds", test1.getId().toString()).contentType(MediaType.APPLICATION_JSON)).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8));
     }

@@ -30,9 +30,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 @Controller
 @RequestMapping("/groups")
@@ -117,13 +118,15 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Delete assertion from a group",
 		notes = "Removes supplied assertions from a given assertion group" )
-	public AssertionGroup removeAssertionsFromGroup(@PathVariable final Long id, @RequestBody(required = false) final List<Assertion> assertions) {
-
-		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
-		for(final Assertion assertion : assertions){
-			assertionService.removeAssertionFromGroup(assertion, group);
+	public AssertionGroup removeAssertionsFromGroup(@PathVariable final Long id, @ApiParam(value="Only assertion id is required") @RequestBody final List<Assertion> assertions) {
+			AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		List<Assertion> toRemove = new ArrayList<>();
+		for (Assertion assertion : assertions) {
+			toRemove.add((Assertion)entityService.find(Assertion.class, assertion.getAssertionId()));
 		}
-
+		for (final Assertion assertion : toRemove){
+			group = assertionService.removeAssertionFromGroup(assertion, group);
+		}
 		return group;
 	}
 
@@ -157,6 +160,7 @@ public class AssertionGroupController {
 		notes = "Delete an assertion group from the system" )
 	public AssertionGroup deleteAssertionGroup(@PathVariable final Long id) {
 		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
+		group.removeAllAssertionsFromGroup();
 		entityService.delete(group);
 		return group;
 	}
@@ -199,6 +203,7 @@ public class AssertionGroupController {
 		final ExecutionConfig config = new ExecutionConfig(runId);
 		config.setPreviousVersion(previousReleaseVersion);
 		config.setProspectiveVersion(prospectiveReleaseVersion);
+		config.setFailureExportMax(-1);
 		return assertionHelper.assertAssertions(assertionService.getAssertionsForGroup(group), config);
 	}
 

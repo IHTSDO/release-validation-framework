@@ -61,16 +61,16 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(run_id BIGINT, assertion_id BIGINT, concept_id BIGINT, " + 
-				"details VARCHAR(500)) engine=innodb default charset=utf8";
-		try (Connection connection = dataSource.getConnection()) {
-			try (Statement statement = connection.createStatement()) {
-				statement.execute(createSQLString);
-			}
-		}
-		catch (final SQLException e) {
-			logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
-		}
+//		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(run_id BIGINT, assertion_id BIGINT, concept_id BIGINT, " + 
+//				"details VARCHAR(500)) engine=innodb default charset=utf8";
+//		try (Connection connection = dataSource.getConnection()) {
+//			try (Statement statement = connection.createStatement()) {
+//				statement.execute(createSQLString);
+//			}
+//		}
+//		catch (final SQLException e) {
+//			logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
+//		}
 	}
 
 	@Override
@@ -214,17 +214,6 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		logger.info(runItem.toString());
 		return runItem;
 	}
-/*
-	@Override
-	public Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId,
-												String prospectiveReleaseVersion, String previousReleaseVersion) {
-		Collection<TestRunItem> items = new ArrayList<>();
-		for(Test test: tests){
-			items.add(executeTest(test, executionId, prospectiveReleaseVersion, previousReleaseVersion));
-		}
-
-		return items;
-	}*/
 
 	private void executeCommand(final Assertion assertion, final ExecutionConfig config,
 			final ExecutionCommand command, final Connection connection)
@@ -233,9 +222,10 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		if (command.getStatements().size() == 0)
 		{
 			final String sql = command.getTemplate();
-			parts = sql.split(";");
-		}
-		else {
+			if (sql != null) {
+				parts = sql.split(";");
+			}
+		}else {
 			parts = command.getStatements().toArray(new String[command.getStatements().size()]);
 		}
 		// parse sql to get select statement

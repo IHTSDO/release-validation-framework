@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
@@ -14,17 +15,22 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "qa_result")
 public class QAResult implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
 
-	@Column(name = "run_id")
-    @Id
-	private Long runId;
+	private static final long serialVersionUID = 1L;
 	
+	@Id
+	@GeneratedValue
+	private Long id;
+	
+	@Column(name = "run_id")
+	private Long runId;
+
 	@JoinColumn(name ="assertion_id")
 	@ManyToOne
-	@Id
 	private Assertion assertion;
+	
+	@Column(name = "concept_id")
+	private Long conceptId;
 	
 	@Lob
 	@Column(name ="details")
@@ -53,4 +59,13 @@ public class QAResult implements Serializable {
 	public void setAssertion(final Assertion assertion) {
 		this.assertion = assertion;
 	}
+
+	public Long getConceptId() {
+		return conceptId;
+	}
+
+	public void setConceptId(Long conceptId) {
+		this.conceptId = conceptId;
+	}
+	
 }

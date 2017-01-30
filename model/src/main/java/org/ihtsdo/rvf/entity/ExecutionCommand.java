@@ -17,6 +17,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
  * A class that encapsulate the logic/code that is used to run a {@link org.ihtsdo.rvf.entity.Test}.
@@ -30,7 +31,9 @@ public class ExecutionCommand {
     @Id
     @GeneratedValue
     Long id;
+    
     @Column(columnDefinition = "text")
+    @ApiModelProperty(required=false)
     String template = null;
     @JsonBackReference
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "command")

@@ -46,7 +46,6 @@ public class AssertionGroup {
 			joinColumns = @JoinColumn( name="group_id"),
 			inverseJoinColumns = @JoinColumn( name="assertion_id")
 	)
-	
 	@JsonIgnore
 	private Set<Assertion> assertions = new HashSet<>();
 	
@@ -99,8 +98,12 @@ public class AssertionGroup {
 	 * @param assertion the assertion to be removed
 	 */
 	@Transient
-	public void removeAssertion(final Assertion assertion){
+	public void removeAssertion(final Assertion assertion) {
 		this.getAssertions().remove(assertion);
+	}
+	
+	public void removeAllAssertionsFromGroup() {
+		assertions.clear();
 	}
 
 	@Override

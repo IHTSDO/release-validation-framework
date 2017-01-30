@@ -21,5 +21,4 @@ public class AssertionGroupDaoImpl extends EntityDaoImpl<AssertionGroup> impleme
 		save(group);
 		return group;
 	}
-
 }

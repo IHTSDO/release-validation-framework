@@ -349,6 +349,13 @@ public class AssertionServiceImplTest {
         assertTrue("updatedGroup must contain assertion2", retrievedAssertions.contains(assertion2));
         assertTrue("updatedGroup must contain assertion3", ! retrievedAssertions.contains(assertion3));
 
+        //test deleting
+        AssertionGroup toDelete = new AssertionGroup();
+        toDelete.setName("To be deleted");
+        toDelete.setAssertions(assertions);
+        entityService.create(toDelete);
+        toDelete.removeAllAssertionsFromGroup();
+        entityService.delete(toDelete);
     }
 
     @After

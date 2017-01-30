@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.controller;
 
+import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -16,7 +18,9 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/tests")
+@ApiIgnore
 @Api(position=2, value = "Assertion tests")
+@Deprecated
 public class TestController {
 
     @Autowired
@@ -44,6 +48,7 @@ public class TestController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Delete a specific test", notes = "Delete a specific test identified with this id" )
+    @ApiIgnore
     public Test deleteTest(@PathVariable Long id) {
         Test test = (Test) entityService.find(Test.class, id);
         entityService.delete(test);
@@ -54,6 +59,7 @@ public class TestController {
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation( value = "Add a test", notes = "Add a test and returns the same populated with an id" )
+    @ApiIgnore
     public Test createTest(@RequestBody Test test) {
         return (Test) entityService.create(test);
     }

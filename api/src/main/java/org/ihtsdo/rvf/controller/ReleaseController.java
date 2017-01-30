@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 /**
  * A controller that handles API calls for uploading and checking status of previously published releases.
@@ -38,10 +39,10 @@ public class ReleaseController {
 
     @RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
     @ResponseBody
-	@ApiOperation( value = "Upload published release version for a given product", notes = "Upload published release for a given product" )
-    public ResponseEntity uploadRelease(@RequestParam(value = "file") final MultipartFile file,
-    							 @PathVariable final String product,
-                                 @PathVariable final String version) {
+	@ApiOperation( value = "Upload a published release version", notes = "Upload a published release for a given product." )
+    public ResponseEntity uploadRelease(@ApiParam(value="published RF2 zip package")@RequestParam(value = "file") final MultipartFile file,
+    							 @ApiParam(value="short product name e.g int for international RF2 release")@PathVariable final String product,
+                                 @ApiParam(value="release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
         try {
             final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), product, version);
             return new ResponseEntity<>(result, HttpStatus.OK);
@@ -55,8 +56,8 @@ public class ReleaseController {
     @RequestMapping(value = "{version}", method = RequestMethod.GET)
     @ResponseBody
 	@ApiOperation( value = "Check a given release is loaded already", 
-	notes = "Check the version is already loaded. The version format is product_releaseDate e.g int_20170131" )
-    public ResponseEntity getRelease(@PathVariable final String version) {
+	notes = "Check the version is already loaded. The version format is {product}_{releaseDate} e.g int_20170131" )
+    public ResponseEntity getRelease(@ApiParam(value="published version loaded in RVF")@PathVariable final String version) {
 
         if(releaseDataManager.isKnownRelease(version)){
             return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
@@ -69,7 +70,7 @@ public class ReleaseController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-	@ApiOperation( value = "Get all versions that have been loaded in the database", notes = "Return all published versions that have been loaded already." )
+	@ApiOperation( value = "Get all versions that are loaded in the RVF database already", notes = "Return all published versions that have been loaded already." )
     public java.util.Set<String> getAllKnownReleases() {
 
         return releaseDataManager.getAllKnownReleases();

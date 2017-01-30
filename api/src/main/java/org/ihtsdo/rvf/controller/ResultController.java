@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,12 +23,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 @Controller
 @RequestMapping("/result")
-@Api(position=5, value="RVF results")
+@Api(position=5, value="Validation results")
 public class ResultController {
 	
 	private static final String MESSAGE = "Message";
@@ -35,7 +38,7 @@ public class ResultController {
 	private ValidationReportService reportService;
 
 	@RequestMapping(value = "{runId}", method = RequestMethod.GET)
-	@ResponseBody
+	@ApiOperation(value ="Retrieve the validation report for a given run id and storage location.")
 	public ResponseEntity<Map<String,Object>> getResult(@PathVariable final Long runId, 
 			@RequestParam(value = "storageLocation") final String storageLocation) throws IOException {
 		//Can we find an rvf status file at that location?  Return 404 if not.
@@ -47,6 +50,7 @@ public class ResultController {
 		} else {
 			responseMap.put("status", state.toString());
 			switch (state) {
+				case READY : 
 				case QUEUED : 	responseMap.put(MESSAGE, "Validation hasn't started running yet!");
 								break;
 				case RUNNING :  final String progress = reportService.recoverProgress(storageLocation);
@@ -64,24 +68,21 @@ public class ResultController {
 	
 	@RequestMapping(value = "/structure/{runId}", method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation( value = "Returns a report",
-		notes = "Returns a report as txt file for a valid report id " )
+	@ApiOperation( value = "Returns a structure test report",
+		notes = "Retrieves the structure test report as txt file for a given run id and storage location." )
+	@ApiIgnore
 	public FileSystemResource getStructureReport(@PathVariable final Long runId, 
 			@RequestParam(value = "storageLocation") final String storageLocation) throws IOException {
-		InputStream reportInputStream = null;
-		Writer writer = null;
-		try {
-			reportInputStream = reportService.getStructureReport(runId, storageLocation);
-			File tempReport = File.createTempFile("structure_validation_"+ runId.toString(), ".txt");
+		File tempReport = File.createTempFile("structure_validation_"+ runId.toString(), ".txt");
+		try ( Writer writer = new FileWriter(tempReport);
+			InputStream reportInputStream = reportService.getStructureReport(runId, storageLocation)) {
 			if ( reportInputStream != null ) {
-				writer = new FileWriter(tempReport);
 				IOUtils.copy(reportInputStream, writer, "UTF-8");
-			} 
+			} else {
+				String msg = "No structure report found for runId:" + runId + " at " + storageLocation;
+				writer.append(msg);
+			}
 			return new FileSystemResource(tempReport);
-		}  finally {
-			IOUtils.closeQuietly(reportInputStream);
-			IOUtils.closeQuietly(writer);
-		}
-		
+		} 
 	}
 }

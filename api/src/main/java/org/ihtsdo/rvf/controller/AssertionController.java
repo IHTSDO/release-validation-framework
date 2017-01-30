@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -10,8 +11,10 @@ import java.util.UUID;
 import javax.persistence.EntityNotFoundException;
 
 import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
 import org.ihtsdo.rvf.helper.AssertionHelper;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -27,9 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.*;
 
 @Controller
@@ -43,6 +43,8 @@ public class AssertionController {
 	private AssertionExecutionService assertionExecutionService;
 	@Autowired
 	private AssertionHelper assertionHelper;
+	@Autowired
+	private ReleaseDataManager releaseDataManager;
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
@@ -85,11 +87,21 @@ public class AssertionController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Delete tests from an assertion",
-		notes = "Delete tests from an assertion and returns an assertion from which tests was deleted" )
-	public Assertion deleteTestsForAssertion(@PathVariable final String id, @RequestBody(required = false) final List<Test> tests) {
-
+		notes = "Delete tests for a given assertion. Note: It doesn't delete the assertion." )
+	public Assertion deleteTestsForAssertion(@ApiParam(value="Assertion id or uuid") @PathVariable final String id, @RequestParam List<Long> testIds) {
 		final Assertion assertion = find(id);
-		assertionService.deleteTests(assertion, tests);
+		Collection<Test> tests = assertionService.getTests(assertion);
+		List<Test> toDelete = new ArrayList<Test>();
+		for (Long testId : testIds) {
+			for (Test test : tests) {
+				if (test.getId().equals(testId)) {
+					toDelete.add(test);
+				}
+			}
+		}
+		if (!toDelete.isEmpty()) {
+			assertionService.deleteTests(assertion, toDelete);
+		}
 		return assertion;
 	}
 	
@@ -112,21 +124,25 @@ public class AssertionController {
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
-	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Delete an assertion",
 		notes = "Delete an assertion identified by given assertion id and returns deleted assertion" )
-	public Assertion deleteAssertion(@PathVariable final String id) {
+	public ResponseEntity<Assertion> deleteAssertion(@PathVariable final String id) {
 		final Assertion assertion = find(id);
+		List<AssertionGroup> groups = assertionService.getGroupsForAssertion(assertion);
+		if (groups!= null && !groups.isEmpty()) {
+			return new ResponseEntity<Assertion>(assertion, HttpStatus.CONFLICT);
+		}
 		assertionService.delete(assertion);
-		return assertion;
+		return new ResponseEntity<Assertion>(assertion, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation( value = "Create an assertion",
-		notes = "Create an assertion with values provided. Assertion id is not required as it will be auto generated." )
+		notes = "Create an assertion with values provided. Assertion id is not required as it will be auto generated. "
+				+ "uuid is optional and will be assigned to a randome uuid when not set." )
 	public ResponseEntity<Assertion> createAssertion(@RequestBody final Assertion assertion) {
 		//Firstly, the assertion must have a UUID (otherwise malformed request)
 		try {
@@ -162,16 +178,32 @@ public class AssertionController {
 		return assertionService.update(assertion);
 	}
 
+
+	@RequestMapping(value = "{id}/tests", method = RequestMethod.PUT)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation( value = "Update a specific test for a given assertion", notes = "Update a specific test for a given assertion" )
+	public Assertion updateTest(@ApiParam(value =" assertion id or uuid")  @PathVariable String id,
+			@RequestBody(required = true) Test test) {
+		final Assertion existing = find(id);
+		if (existing == null) {
+			throw new EntityNotFoundException("No assertion found with id:" + id);
+		}
+		assertionService.addTest(existing,test );
+		return existing;
+	}
+	 
+	
 	@RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation( value = "Execute tests of an assertion",
-		notes = "Execute all tests under an assertion with provided runid ( a user supplied identifier), "
+		notes = "Execute tests for a given an assertion specified either by assertion id or uuid.You need also provide a unique runid, "
 				+ " prospective release version and previous release version."
-				+ "Run id later used to retrieve assertion " )
-	public ResponseEntity<Map<String, Object>> executeTest(@PathVariable final String id,
-										   @RequestParam final Long runId, @RequestParam final String prospectiveReleaseVersion,
-										   @RequestParam final String previousReleaseVersion) {
+				+ "Run id later is used to retrieve the validation results." )
+	public ResponseEntity<Map<String, Object>> executeTest(@ApiParam("Assertion id or uuid") @PathVariable final String id,
+										   @RequestParam final Long runId, @ApiParam("The prospective version to be validated without rvf prefix") @RequestParam final String prospectiveReleaseVersion,
+										   @ApiParam("The previous version to be validated against without rvf prefix. Leave it null if there is no previous release.") @RequestParam(required=false) final String previousReleaseVersion) {
 
 		final Assertion assertion = find(id);
 		if (assertion == null) {
@@ -179,27 +211,23 @@ public class AssertionController {
 		}
 		//Creating a list of 1 here so we can use the same code and receive the same json as response
 		final Collection<Assertion> assertions = new ArrayList<Assertion>(Arrays.asList(assertion));
+	
 		final ExecutionConfig config = new ExecutionConfig(runId);
+		Map<String,Object> failures = new HashMap<String, Object>();
+		if (prospectiveReleaseVersion != null && !releaseDataManager.isKnownRelease(prospectiveReleaseVersion) ) {
+			failures.put("failureMessage","Release version not found:" + prospectiveReleaseVersion);
+			return new ResponseEntity<Map<String, Object>>(failures, HttpStatus.NOT_FOUND);
+		}
 		config.setProspectiveVersion(prospectiveReleaseVersion);
 		config.setPreviousVersion(previousReleaseVersion);
+		if (previousReleaseVersion != null && !releaseDataManager.isKnownRelease(previousReleaseVersion) ) {
+			failures.put("failureMessage","Release version not found:" + previousReleaseVersion);
+			return new ResponseEntity<Map<String, Object>>(failures, HttpStatus.NOT_FOUND);
+		}
+		if (previousReleaseVersion == null) {
+			config.setFirstTimeRelease(true);
+		}
 		return new ResponseEntity<Map<String, Object>> (assertionHelper.assertAssertions(assertions, config), HttpStatus.OK);
-	}
-
-	@RequestMapping(value = "/run", method = RequestMethod.POST)
-	@ResponseBody
-	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation( value = "Execute tests of required assertions",
-		notes = "Execute tests belongs to required assertions identified by their ids. "
-				+ " This excution requires an user supplied run id to identify this run, "
-				+ " previous release version and prospective release version" )
-	public Map<String, Object> executeTest(@PathVariable final List<Long> ids,
-										   @RequestParam final Long runId, @RequestParam final String prospectiveReleaseVersion,
-										   @RequestParam final String previousReleaseVersion) {
-
-		final ExecutionConfig config = new ExecutionConfig(runId);
-		config.setProspectiveVersion(prospectiveReleaseVersion);
-		config.setPreviousVersion(previousReleaseVersion);
-		return assertionHelper.assertAssertions(assertionService.find(ids), config);
 	}
 	
 	/**
