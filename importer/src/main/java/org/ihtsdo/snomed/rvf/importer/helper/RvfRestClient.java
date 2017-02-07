@@ -21,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 public class RvfRestClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(RvfRestClient.class);
-	//private final static String defaultServerUrl = "https://dev-rvf.ihtsdotools.org/api/v1/";
 	private final static String defaultServerUrl = "http://localhost:8080/api/v1/";
 	private String serverUrl;
 	private final RestTemplate restTemplate;

@@ -286,10 +286,6 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		sctDataLocation = sctDataLocationX;
 	}
 
-	public void setSnomedDataSource(final BasicDataSource snomedDataSourceX) {
-		snomedDataSource = snomedDataSourceX;
-	}
-
 	/**
 	 * Returns the schema name that corresponds to  the given release.
 	 * @param releaseVersion the product name and release date as a yyyymmdd string (e.g. int_20140731)

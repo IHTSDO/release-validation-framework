@@ -25,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReleaseFilesDataLoaderTestHarness {
 	
-	 @Resource(name = "snomedDataSource")
-	    private DataSource snomedDataSource;
+	 @Resource(name = "dataSource")
+	    private DataSource dataSource;
 	    @Autowired
 	    private ReleaseDataManager releaseDataManager;
 	    private final String intFilePath = "/Users/mchu/SNOMED_Releases/SnomedCT_RF2Release_INT_20150131.zip";
@@ -37,7 +37,7 @@ public class ReleaseFilesDataLoaderTestHarness {
 
 	    @Test
 	    public void testLoadSctData() throws Exception {
-	        assert snomedDataSource != null;
+	        assert dataSource != null;
 
 	        final File intFile = new File(intFilePath);
 	        final File extentionFile = new File(extentionFilePath);
@@ -48,7 +48,7 @@ public class ReleaseFilesDataLoaderTestHarness {
 	        releaseDataManager.loadSnomedData(versionName,rf2FilesLoaded, intFile, extentionFile);
 //	        releaseDataManager.combineKnownVersions(versionName, "20150131", "20141031");
 	        try (
-	        		Connection connection = snomedDataSource.getConnection();
+	        		Connection connection = dataSource.getConnection();
 	        		ResultSet catalogs = connection.getMetaData().getCatalogs(); ) {
 	        	boolean exists = false;
 	            while (catalogs.next()) {

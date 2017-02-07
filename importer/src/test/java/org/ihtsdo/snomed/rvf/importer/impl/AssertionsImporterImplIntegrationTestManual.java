@@ -21,7 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testImporterServiceContext.xml"})
-public class AssertionsImporterImplIntegrationTest {
+public class AssertionsImporterImplIntegrationTestManual {
 	
 	public static final String scriptsDir = "/scripts";
 	public static final String hierarchyTermModellingDir = "hierarchy-term-modelling";
@@ -38,9 +38,9 @@ public class AssertionsImporterImplIntegrationTest {
 	public void testImportAssertionsFromFile() throws Exception {
 		//"/xml/lists/manifest.xml"
 		//"/testManifest.xml"
-		final URL manifestUrl = AssertionsImporterImplIntegrationTest.class.getResource("/xml/lists/manifest.xml");
+		final URL manifestUrl = AssertionsImporterImplIntegrationTestManual.class.getResource("/xml/lists/manifest.xml");
 		assertNotNull("manifestUrl must not be null", manifestUrl);
-		final URL scriptsFolderUrl = AssertionsImporterImplIntegrationTest.class.getResource(scriptsDir);
+		final URL scriptsFolderUrl = AssertionsImporterImplIntegrationTestManual.class.getResource(scriptsDir);
 		assertNotNull("scriptsFolderUrl must not be null", scriptsFolderUrl);
 
 		// import content
@@ -50,7 +50,7 @@ public class AssertionsImporterImplIntegrationTest {
 	@Test
 	public void testImportAssertionsFromDirectory() throws Exception {
 		String targetDirName = scriptsDir + "/" + hierarchyTermModellingDir;
-		final URL targetDirUrl = AssertionsImporterImplIntegrationTest.class.getResource(targetDirName);
+		final URL targetDirUrl = AssertionsImporterImplIntegrationTestManual.class.getResource(targetDirName);
 		assertNotNull(targetDirName + " directory not found", targetDirUrl);
 		assertionsImporter.importAssertionsFromDirectory(new File(targetDirUrl.toURI()), hierarchyTermModellingDir);
 	}
@@ -59,6 +59,6 @@ public class AssertionsImporterImplIntegrationTest {
 	@Ignore
 	public void testAddSqlScript() throws IOException {
 		final AssertionsImporter importer = new AssertionsImporter();
-		importer.addSqlTestToAssertion(new Assertion(), IOUtils.toString(AssertionsImporterImplIntegrationTest.class.getResource("/scripts/release-type/release-type-full-validation-concept.sql")));
+		importer.addSqlTestToAssertion(new Assertion(), IOUtils.toString(AssertionsImporterImplIntegrationTestManual.class.getResource("/scripts/release-type/release-type-full-validation-concept.sql")));
 	}
 }

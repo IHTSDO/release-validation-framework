@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"/testDispatcherServletContext.xml"})
 @WebAppConfiguration
 @Transactional
-public class InstanceManagerIntegrationTest {
+public class InstanceManagerIntegrationTestManual {
 	@Autowired
 	InstanceManager instanceManager;
 	

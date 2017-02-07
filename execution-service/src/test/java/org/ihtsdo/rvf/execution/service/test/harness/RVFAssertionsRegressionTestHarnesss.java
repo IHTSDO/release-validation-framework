@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service.test.harness;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,6 +31,7 @@ import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
+import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.After;
@@ -45,10 +46,19 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+/**
+ * To run this test harness successfully with clean data you need to first 
+ * 1. drop the rvf_master database and create rvf_master database
+ * 2. run the rvf application to load existing assertions and assertion group
+ * 3. run test harness
+ * Note: if you have changed the regression test data you need drop the corresponding schema as well.
+ * SnomedCT_RegressionTest_20130131 and SnomedCT_RegressionTest_20130731 are made up data for testing purpose.
+ *
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
 @Transactional
-public class RVFAssertionsRegressionIT {
+public class RVFAssertionsRegressionTestHarnesss {
 
 	private static final String FILE_CENTRIC_VALIDATION = "file-centric-validation";
 	private static final String COMPONENT_CENTRIC_VALIDATION = "component-centric-validation";
@@ -60,8 +70,6 @@ public class RVFAssertionsRegressionIT {
     private AssertionExecutionService assertionExecutionService;
     @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Resource(name = "snomedDataSource")
-    private DataSource snomedDataSource;
     @Autowired
     private AssertionService assertionService;
     @Autowired
@@ -82,25 +90,25 @@ public class RVFAssertionsRegressionIT {
 		//load previous and prospective versions if not loaded already
         assertNotNull(releaseDataManager);
         if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
-        	final URL previousReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130131");
+        	final URL previousReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130131");
             assertNotNull("Must not be null", previousReleaseUrl);
 			final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
 			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
         }
         if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
-        	final URL prospectiveReleaseUrl = RVFAssertionsRegressionIT.class.getResource("/SnomedCT_RegressionTest_20130731");
+        	final URL prospectiveReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130731");
             assertNotNull("Must not be null", prospectiveReleaseUrl);
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
         	releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE,rf2FilesLoaded, prospectiveFile);
         }
         
-        releaseTypeExpectedResults = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
+        releaseTypeExpectedResults = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
         assertNotNull("Must not be null", releaseTypeExpectedResults);
-        componentCentrilExpected = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/componentCentricRegressionExpected.json");
+        componentCentrilExpected = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/componentCentricRegressionExpected.json");
         assertNotNull("Must not be null", componentCentrilExpected);
-        fileCentricExpected = RVFAssertionsRegressionIT.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
+        fileCentricExpected = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
         assertNotNull("Must not be null", fileCentricExpected);
         releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_" + PREVIOUS_RELEASE);
         releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_"+ PROSPECTIVE_RELEASE);

@@ -43,8 +43,6 @@ public class RvfAssertionTestHarness {
 	    private AssertionExecutionService assertionExecutionService;
 	    @Resource(name = "dataSource")
 	    private DataSource dataSource;
-	    @Resource(name = "snomedDataSource")
-	    private DataSource snomedDataSource;
 	    @Autowired
 	    private EntityService entityService;
 	    @Autowired

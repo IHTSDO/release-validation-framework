@@ -19,7 +19,7 @@ public class RvfDynamicDataSource {
 
     private String url;
     @Resource(name = "snomedDataSource")
-    BasicDataSource basicDataSource;
+    private BasicDataSource basicDataSource;
     private ConcurrentHashMap<String, BasicDataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
     
 	private final Logger LOGGER = LoggerFactory.getLogger(RvfDynamicDataSource.class);

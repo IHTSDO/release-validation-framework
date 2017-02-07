@@ -34,38 +34,31 @@ validation-service.properties | Settings to configure structural tests report lo
 
 Sample files for configuring the services can be see found in the config folder.
 
+Run standalone application
+------------------
+Start the application using the standalone executable jar which includes an embedded tomcat:
+
+`java -jar api/target/validation-api.jar`
+
 ### Upload a Published Release
 The release endpoint of the REST API can be used to list releases and to upload a published release.
 Find the endpoint at **http://localhost:8080/api/v1/releases**
 
 Example upload
 ```bash
-curl -X POST -F 'file=@SnomedCT_RF2Release_SE1000052_20160531.zip' http://localhost:8080/api/v1/releases/se/20160531
+curl -X POST -F 'file=@SnomedCT_RF2Release_INT_20160731.zip' http://localhost:8080/api/v1/releases/int/20160731
 ```
-
-### Data Folder
-N.B. This doesn't seem to be working.
-
-The RVF provides a convenient feature that allows published releases to be uploaded and stored to a designated 'sct data' 
-folder. During startup, the RVF unzips any published release in this folder and loads it into a database as a known release. 
-The following conventions are used by this feature:
-
-|File name | Schema name generated | Comment |
-|:------------- |:-------------:|:-----|
-SnomedCT\_Release\_INT\_20140731.zip | rvf\_int\_20140731 | Created if database named rvf\_int\_20140731 does not exist |
-SnomedCT\_Release\_INT\_20140731.txt | Not processed | Only zip files are processed |
-
 How to use the API
 --------------------
-While more comprehensive documentation is being prepared, you can find examples of how use the API in the test cases 
-included in the API module. If you are not a Java developer and want to access the API from a non Java environment, 
-then refer to the curl tests/examples in the API-Demo module.
+Please find more information about API via the Swagger UI:
+
+http://localhost:8080/api/v1/api-doc.html
 
 Testing Instructions
 --------------------
 To run unit tests use: 
 ```
-mvn clean test
+mvn clean test -DrvfConfigLocation=/tmp
 ```
 
 ### Integration Testing
@@ -82,9 +75,6 @@ Spring context file for tests that do not require MySQL access.
 Importing Assertions
 --------------------
 Assertions can currently be imported from copies of the legacy implementation (RAT) configuration files included in this project.
-To import these assertions, start the API listening locally on port 8080 and type:
-```
-cd importer
-mvn clean integration-test -Dskip.integration.tests=false
+
 ```
 

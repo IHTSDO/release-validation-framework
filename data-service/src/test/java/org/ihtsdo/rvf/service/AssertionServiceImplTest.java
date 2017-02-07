@@ -57,11 +57,6 @@ public class AssertionServiceImplTest {
     public void setUp() {
         assert entityService != null;
         assert assertionService != null;
-        // ensure database is clean
-        assert entityService.count(org.ihtsdo.rvf.entity.Test.class) == 0;
-        assert entityService.count(AssertionTest.class) == 0;
-        assert entityService.count(Assertion.class) == 0;
-
         assertion = new Assertion();
         assertion.setAssertionText("Test assertion");
         assertion = assertionService.create(assertion);

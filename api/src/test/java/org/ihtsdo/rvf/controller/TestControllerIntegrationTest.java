@@ -61,11 +61,9 @@ public class TestControllerIntegrationTest {
         test.setDescription("Example Test Description");
         test.setCommand(new ExecutionCommand());
         assert entityService != null;
-        assert entityService.count(org.ihtsdo.rvf.entity.Test.class) == 0;
         test = (org.ihtsdo.rvf.entity.Test) entityService.create(test);
         assert test != null;
         assert test.getId() != null;
-        assert entityService.count(org.ihtsdo.rvf.entity.Test.class) > 0;
     }
 
     @Test

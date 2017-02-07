@@ -22,14 +22,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
 public class ReleaseDataManagerImplIntegrationTest {
-    @Resource(name = "snomedDataSource")
-    private DataSource snomedDataSource;
+    @Resource(name = "dataSource")
+    private DataSource dataSource;
     @Autowired
     private ReleaseDataManager releaseDataManager;
 
     @Test
     public void testLoadSctData() throws Exception {
-        assert snomedDataSource != null;
+        assert dataSource != null;
 
         final File inputFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
         assertNotNull(inputFile);
@@ -37,7 +37,7 @@ public class ReleaseDataManagerImplIntegrationTest {
         List<String> rf2FilesLoaded = new ArrayList<>();
         final String schemaName = releaseDataManager.loadSnomedData(versionName, rf2FilesLoaded, inputFile);
         try (
-        		Connection connection = snomedDataSource.getConnection();
+        		Connection connection = dataSource.getConnection();
         		ResultSet catalogs = connection.getMetaData().getCatalogs(); ) {
         	boolean exists = false;
             while (catalogs.next()) {
@@ -54,7 +54,7 @@ public class ReleaseDataManagerImplIntegrationTest {
 
     @Test
     public void testUploadSctData() throws Exception {
-        assert snomedDataSource != null;
+        assert dataSource != null;
 
         final File inputFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
         assertNotNull(inputFile);
