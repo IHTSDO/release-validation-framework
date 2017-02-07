@@ -8,10 +8,11 @@ import java.io.IOException;
 
 public class ApiRootRedirectServlet extends HttpServlet {
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-        response.setHeader("Location", "v1/");
-    }
+	@Override
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+		response.setHeader("Location", "v1/");
+	}
 
 }

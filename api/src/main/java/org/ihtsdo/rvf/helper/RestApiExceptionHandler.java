@@ -16,28 +16,26 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = { EntityNotFoundException.class })
-    protected ResponseEntity<Object> handleMissingEntity(
-            final RuntimeException exception, final WebRequest request) {
+	@ExceptionHandler(value = { EntityNotFoundException.class })
+	protected ResponseEntity<Object> handleMissingEntity(
+			final RuntimeException exception, final WebRequest request) {
 
-        final String bodyOfResponse = exception.getMessage();
+		final String bodyOfResponse = exception.getMessage();
 
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_PLAIN);
+		final HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
 
-        return handleExceptionInternal(exception, bodyOfResponse, headers,
-                HttpStatus.NOT_FOUND, request);
-    }
+		return handleExceptionInternal(exception, bodyOfResponse, headers,
+				HttpStatus.NOT_FOUND, request);
+	}
 
-    
-    
-    @ExceptionHandler(value = { InvalidFormatException.class })
-    protected ResponseEntity<Object> handleFormatNotValidException(
-            final RuntimeException exception, final WebRequest request) {
-        final String bodyOfResponse = exception.getMessage();
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_PLAIN);
-        return handleExceptionInternal(exception, bodyOfResponse, headers,
-                HttpStatus.BAD_REQUEST, request);
-    }    
+	@ExceptionHandler(value = { InvalidFormatException.class })
+	protected ResponseEntity<Object> handleFormatNotValidException(
+			final RuntimeException exception, final WebRequest request) {
+		final String bodyOfResponse = exception.getMessage();
+		final HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
+		return handleExceptionInternal(exception, bodyOfResponse, headers,
+				HttpStatus.BAD_REQUEST, request);
+	}
 }

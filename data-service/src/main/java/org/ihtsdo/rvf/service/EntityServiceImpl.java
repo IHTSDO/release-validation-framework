@@ -31,7 +31,7 @@ public class EntityServiceImpl<T> implements EntityService<T> {
 
     @Override
     public T create(T entity) {
-       return (T) dao.save(entity);
+       return dao.save(entity);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class EntityServiceImpl<T> implements EntityService<T> {
 
     @Override
     public T find(Class clazz, Long id){
-        T t = (T) dao.load(clazz, id);
+        T t = dao.load(clazz, id);
         if (t == null){
             throw new EntityNotFoundException(id);
         }
@@ -52,7 +52,7 @@ public class EntityServiceImpl<T> implements EntityService<T> {
 
     @Override
     public T find(Class clazz, UUID uuid){
-        T t = (T) dao.findByUuid(clazz, uuid);
+        T t = dao.findByUuid(clazz, uuid);
         if (t == null){
             throw new EntityNotFoundException(uuid);
         }

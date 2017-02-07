@@ -49,7 +49,7 @@ public class ReleaseFilesDataLoaderTestHarness {
 //	        releaseDataManager.combineKnownVersions(versionName, "20150131", "20141031");
 	        try (
 	        		Connection connection = dataSource.getConnection();
-	        		ResultSet catalogs = connection.getMetaData().getCatalogs(); ) {
+	        		ResultSet catalogs = connection.getMetaData().getCatalogs()) {
 	        	boolean exists = false;
 	            while (catalogs.next()) {
 	                final String catalogName = catalogs.getString(1);

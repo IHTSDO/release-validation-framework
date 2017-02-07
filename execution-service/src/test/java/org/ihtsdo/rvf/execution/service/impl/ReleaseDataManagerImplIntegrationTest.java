@@ -38,7 +38,7 @@ public class ReleaseDataManagerImplIntegrationTest {
         final String schemaName = releaseDataManager.loadSnomedData(versionName, rf2FilesLoaded, inputFile);
         try (
         		Connection connection = dataSource.getConnection();
-        		ResultSet catalogs = connection.getMetaData().getCatalogs(); ) {
+        		ResultSet catalogs = connection.getMetaData().getCatalogs()) {
         	boolean exists = false;
             while (catalogs.next()) {
                 final String catalogName = catalogs.getString(1);

@@ -30,7 +30,7 @@ public class RvfDbScheduledEventGenerator implements InitializingBean{
 		try (Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchema)) {
 			String dropSchemaSQL = "drop database "  + prospectiveSchema;
 			String createDropEvent = "create event if not exists " + "drop_" + prospectiveSchema + " on schedule at now() + INTERVAL " + maxKeepTimeInHour + " HOUR" + " DO " + dropSchemaSQL + ";";
-			try( PreparedStatement statement = connection.prepareStatement(createDropEvent);) {
+			try( PreparedStatement statement = connection.prepareStatement(createDropEvent)) {
 				statement.execute();
 			}
 		} finally {
@@ -42,7 +42,7 @@ public class RvfDbScheduledEventGenerator implements InitializingBean{
 		try (Connection connection = dataSource.getConnection()) {
 			String deleteQaResultSQL = " delete from qa_result where run_id = " + runId;
 			String createDeleteEvent = "create event if not exists " + "delete_qaResultForRunId_" + runId  + " on schedule at now() + INTERVAL " + maxKeepTimeInHour + " HOUR" + " DO " + deleteQaResultSQL + ";";
-			try (PreparedStatement statement = connection.prepareStatement(createDeleteEvent);) {
+			try (PreparedStatement statement = connection.prepareStatement(createDeleteEvent)) {
 				statement.execute();
 			}
 		}
@@ -51,7 +51,7 @@ public class RvfDbScheduledEventGenerator implements InitializingBean{
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		try (Connection connection = dataSource.getConnection();
-			Statement statement = connection.createStatement();) {
+			Statement statement = connection.createStatement()) {
 			String turnOnSchedulerSql = "SET GLOBAL event_scheduler = ON";
 			statement.execute(turnOnSchedulerSql);
 			String createQaResultTruncateEvent = "create event if not exists truncateQaResultTableWeeklyOnSunday " + "on schedule every 1 week starts CONCAT(DATE(NOW() + INTERVAL 6 - WEEKDAY(CURRENT_DATE) DAY ), ' 05:00:00') " +

@@ -55,8 +55,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 	@Override
 	public void delete(final Assertion assertion) {
 		// first get all associated AssertionTests and delete them
-		for(final AssertionTest assertionTest : getAssertionTests(assertion))
-		{
+		for(final AssertionTest assertionTest : getAssertionTests(assertion)) {
 			entityService.delete(assertionTest);
 		}
 
@@ -260,7 +259,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 		for (AssertionGroup grp : assertionGroups) {
 			if (grp.getId().equals(group.getId())) {
 				grp.removeAssertion(assertion);
-				return (AssertionGroup) assertionGroupDao.update(grp);
+				return assertionGroupDao.update(grp);
 			}
 		}
 		return group;

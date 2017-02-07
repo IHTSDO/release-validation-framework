@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class AutoScalingManager {
-	
+
 	private boolean shutDown;
 	private Logger logger = Logger.getLogger(AutoScalingManager.class);
 	@Autowired
@@ -25,20 +25,22 @@ public class AutoScalingManager {
 	private ConnectionFactory connectionFactory;
 	private String queueName;
 	private static int lastPolledQueueSize;
-	
+
 	private int maxRunningInstance;
-	
+
 	private static List<String> activeInstances;
-	
+
 	private boolean isFirstTime = true;
-	
-	public AutoScalingManager(Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
+
+	public AutoScalingManager(Boolean isAutoScalling,
+			String destinationQueueName, Integer maxRunningInstance) {
 		this.isAutoScalling = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
 		activeInstances = new ArrayList<>();
 		this.maxRunningInstance = maxRunningInstance;
-		
+
 	}
+
 	public void startUp() throws Exception {
 		logger.info("isAutoScalingEnabled:" + isAutoScalling);
 		if (isAutoScalling) {
@@ -49,33 +51,50 @@ public class AutoScalingManager {
 						if (!isFirstTime) {
 							int current = getQueueSize();
 							if (current != lastPolledQueueSize) {
-								logger.info("Total messages in queue:" + current);
-								activeInstances = instanceManager.checkActiveInstances(activeInstances);
+								logger.info("Total messages in queue:"
+										+ current);
+								activeInstances = instanceManager
+										.checkActiveInstances(activeInstances);
 							}
-							if ((current > lastPolledQueueSize) || (current > activeInstances.size())) {
-								//will add logic later in terms how many instances need to create for certain size
-								// the current approach is to create one instance per message.
+							if ((current > lastPolledQueueSize)
+									|| (current > activeInstances.size())) {
+								// will add logic later in terms how many
+								// instances need to create for certain size
+								// the current approach is to create one
+								// instance per message.
 								if (current > lastPolledQueueSize) {
-									logger.info("Messages have been increased by:" + (current - lastPolledQueueSize) + " since last poll.");
+									logger.info("Messages have been increased by:"
+											+ (current - lastPolledQueueSize)
+											+ " since last poll.");
 								}
-								int totalToCreate = getTotalInstancesToCreate(current, activeInstances.size(), maxRunningInstance);
+								int totalToCreate = getTotalInstancesToCreate(
+										current, activeInstances.size(),
+										maxRunningInstance);
 								if (totalToCreate != 0) {
-									logger.info("Start creating " + totalToCreate + " new worker instance");
+									logger.info("Start creating "
+											+ totalToCreate
+											+ " new worker instance");
 									long start = System.currentTimeMillis();
-									activeInstances.addAll(instanceManager.createInstance(totalToCreate));
-									logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start) / 1000);
+									activeInstances.addAll(instanceManager
+											.createInstance(totalToCreate));
+									logger.info("Time taken to create new intance in seconds:"
+											+ (System.currentTimeMillis() - start)
+											/ 1000);
 								}
-							} 
+							}
 							lastPolledQueueSize = current;
 							try {
 								Thread.sleep(30 * 1000);
 							} catch (InterruptedException e) {
-								logger.error("AutoScalingManager delay is interrupted.", e);
+								logger.error(
+										"AutoScalingManager delay is interrupted.",
+										e);
 							}
 						} else {
 							isFirstTime = false;
 							// check any running instances
-							activeInstances.addAll(instanceManager.getActiveInstances());
+							activeInstances.addAll(instanceManager
+									.getActiveInstances());
 						}
 					}
 				}
@@ -83,12 +102,14 @@ public class AutoScalingManager {
 			thread.start();
 		}
 	}
-	
-	private int getTotalInstancesToCreate(int currentMsgSize, int currentActiveInstances, int maxRunningInstance) {
+
+	private int getTotalInstancesToCreate(int currentMsgSize,
+			int currentActiveInstances, int maxRunningInstance) {
 		int result = 0;
 		if (currentActiveInstances < maxRunningInstance) {
 			if (currentMsgSize <= currentActiveInstances) {
-				logger.info("No new instance will be created as message size is:" + currentMsgSize);
+				logger.info("No new instance will be created as message size is:"
+						+ currentMsgSize);
 			} else {
 				if (currentMsgSize <= maxRunningInstance) {
 					result = currentMsgSize - currentActiveInstances;
@@ -97,18 +118,22 @@ public class AutoScalingManager {
 				}
 			}
 		} else {
-			logger.info("No new instance will be created as total running instances:" + currentActiveInstances + " has reached max:" + maxRunningInstance);
+			logger.info("No new instance will be created as total running instances:"
+					+ currentActiveInstances
+					+ " has reached max:"
+					+ maxRunningInstance);
 		}
 		return result;
 	}
-	
+
 	private int getQueueSize() {
 		int counter = 0;
 		Connection connection = null;
 		try {
 			connection = connectionFactory.createConnection();
 			connection.start();
-			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			Session session = connection.createSession(false,
+					Session.AUTO_ACKNOWLEDGE);
 			Queue tempQueue = session.createQueue(queueName);
 			QueueBrowser browser = session.createBrowser(tempQueue);
 			Enumeration<?> enumerator = browser.getEnumeration();
@@ -117,7 +142,8 @@ public class AutoScalingManager {
 				counter++;
 			}
 		} catch (JMSException e) {
-			logger.error("Error when checking message size in queue:" + queueName, e);
+			logger.error("Error when checking message size in queue:"
+					+ queueName, e);
 		} finally {
 			if (connection != null) {
 				try {
@@ -129,9 +155,9 @@ public class AutoScalingManager {
 		}
 		return counter;
 	}
-	
+
 	public void shutDown() {
 		this.shutDown = true;
 	}
-	
+
 }

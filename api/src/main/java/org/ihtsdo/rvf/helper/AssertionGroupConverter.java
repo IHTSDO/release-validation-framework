@@ -10,11 +10,12 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 /**
- * A custom {@link org.springframework.core.convert.converter.Converter} for handling
- * {@link org.ihtsdo.rvf.entity.AssertionGroup}s.
+ * A custom {@link org.springframework.core.convert.converter.Converter} for
+ * handling {@link org.ihtsdo.rvf.entity.AssertionGroup}s.
  */
 @Component
-public class AssertionGroupConverter implements Converter<String, AssertionGroup>{
+public class AssertionGroupConverter implements
+		Converter<String, AssertionGroup> {
 
 	@Autowired
 	EntityService entityService;
@@ -24,10 +25,10 @@ public class AssertionGroupConverter implements Converter<String, AssertionGroup
 	public AssertionGroup convert(String s) {
 		try {
 			return mapper.readValue(s, AssertionGroup.class);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-			throw new IllegalArgumentException("String version passed can not be null.");
+			throw new IllegalArgumentException(
+					"String version passed can not be null.");
 		}
 	}
 }

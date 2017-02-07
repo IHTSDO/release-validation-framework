@@ -182,8 +182,8 @@ public class ValidationVersionLoader {
 	}
 	
 	private boolean isExtension(final ValidationRunConfig runConfig) {
-		return (runConfig.getExtensionDependency() != null 
-				&& !runConfig.getExtensionDependency().trim().isEmpty()) ? true : false;
+		return (runConfig.getExtensionDependency() != null
+                && !runConfig.getExtensionDependency().trim().isEmpty());
 	}
 
 	public boolean isKnownVersion(final String vertionToCheck, final Map<String, Object> responseMap) {
@@ -205,11 +205,8 @@ public class ValidationVersionLoader {
 		if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
 			return false;
 		}
-		if (validationConfig.getExtensionDependency() != null && validationConfig.getExtensionDependency().endsWith(ZIP_FILE_EXTENSION)) {
-			return false;
-		}
-		return true;
-	}
+        return !(validationConfig.getExtensionDependency() != null && validationConfig.getExtensionDependency().endsWith(ZIP_FILE_EXTENSION));
+    }
 	
 	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
 		String[] splits = publishedReleaseFilename.split("_");

@@ -86,7 +86,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private  List<String> rf2FilesLoaded = new ArrayList<>();
 	
 	@Before
-	public void setUp() throws FileNotFoundException, IOException, SQLException, BusinessServiceException {
+	public void setUp() throws IOException, SQLException, BusinessServiceException {
 		//load previous and prospective versions if not loaded already
         assertNotNull(releaseDataManager);
         if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
@@ -215,7 +215,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		}
 		Collections.sort(results);
 		final TestReport actualReport = new TestReport();
-		actualReport.setAssertionType(type);;
+		actualReport.setAssertionType(type);
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
@@ -342,9 +342,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 				return false;
 			if (totalAssertionsFailed != other.totalAssertionsFailed)
 				return false;
-			if (totalAssertionsRun != other.totalAssertionsRun)
-				return false;
-			return true;
+			return totalAssertionsRun == other.totalAssertionsRun;
 		}
 		
 	}
@@ -434,9 +432,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 					return false;
 			} else if (!firstNInstances.equals(other.firstNInstances))
 				return false;
-			if (totalFailed != other.totalFailed)
-				return false;
-			return true;
+			return totalFailed == other.totalFailed;
 		}
 
 		@Override

@@ -102,7 +102,7 @@ public class ZipFileUtils {
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
      */
-    public static void zip(final String sourceFileDir, final String zipFile) throws FileNotFoundException, IOException {
+    public static void zip(final String sourceFileDir, final String zipFile) throws IOException {
      final byte[] buffer = new byte[1024];
      try ( final FileOutputStream fos = new FileOutputStream(zipFile);
     	 final ZipOutputStream zos = new ZipOutputStream(fos) ) {
