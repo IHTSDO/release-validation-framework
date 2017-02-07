@@ -52,6 +52,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	private File sctDataFolder;
 	@Resource(name = "snomedDataSource")
 	private BasicDataSource snomedDataSource;
+	
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	private final Map<String, String> releaseSchemaNameLookup = new ConcurrentHashMap<>();

@@ -32,7 +32,7 @@ public class AutoScalingManager {
 	
 	private boolean isFirstTime = true;
 	
-	public AutoScalingManager( Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
+	public AutoScalingManager(Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
 		this.isAutoScalling = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
 		activeInstances = new ArrayList<>();
@@ -84,20 +84,20 @@ public class AutoScalingManager {
 		}
 	}
 	
-	private int getTotalInstancesToCreate(int currentMsgSize, int activeInstances, int maxRunningInstance) {
+	private int getTotalInstancesToCreate(int currentMsgSize, int currentActiveInstances, int maxRunningInstance) {
 		int result = 0;
-		if (activeInstances < maxRunningInstance) {
-			if (currentMsgSize <= activeInstances) {
+		if (currentActiveInstances < maxRunningInstance) {
+			if (currentMsgSize <= currentActiveInstances) {
 				logger.info("No new instance will be created as message size is:" + currentMsgSize);
 			} else {
 				if (currentMsgSize <= maxRunningInstance) {
-					result = currentMsgSize - activeInstances;
+					result = currentMsgSize - currentActiveInstances;
 				} else {
-					result = maxRunningInstance - activeInstances;
+					result = maxRunningInstance - currentActiveInstances;
 				}
 			}
 		} else {
-			logger.info("No new instance will be created as total running instances:" + activeInstances + " has reached max:" + maxRunningInstance);
+			logger.info("No new instance will be created as total running instances:" + currentActiveInstances + " has reached max:" + maxRunningInstance);
 		}
 		return result;
 	}
