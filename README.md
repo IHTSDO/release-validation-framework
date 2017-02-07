@@ -7,7 +7,7 @@ Build Instructions
 ```
 git clone https://github.com/IHTSDO/release-validation-framework.git
 // -- see note below about config folder
-mvn clean install -DrvfConfigLocation=/tmp
+mvn clean install
 ```
 
 Database Setup
@@ -58,13 +58,13 @@ Testing Instructions
 --------------------
 To run unit tests use: 
 ```
-mvn clean test -DrvfConfigLocation=/tmp
+mvn clean test
 ```
 
 ### Integration Testing
 Integration tests expect an actual MySQL SNOMED CT database that contains SNOMED CT data. To run integration tests use: 
 ```
-mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation=/tmp
+mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation={config_dir}
 ```
 
 Note that all tests in the API that deal with controllers are currently marked as Integration tests. The spring context
