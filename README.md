@@ -41,6 +41,7 @@ Start the application using the standalone executable jar which includes an embe
 `java -jar api/target/validation-api.jar`
 
 ### Upload a Published Release
+Option 1:
 The release endpoint of the REST API can be used to list releases and to upload a published release.
 Find the endpoint at **http://localhost:8080/api/v1/releases**
 
@@ -48,11 +49,11 @@ Example upload
 ```bash
 curl -X POST -F 'file=@SnomedCT_RF2Release_INT_20160731.zip' http://localhost:8080/api/v1/releases/int/20160731
 ```
-How to use the API
---------------------
-Please find more information about API via the Swagger UI:
+Option 2: Using Swagger api as shown below. See Manage published releases section for detail information.
 
-http://localhost:8080/api/v1/api-doc.html
+Swagger API URL
+--------------------
+Find more information about API via Swagger. http://localhost:8080/api/v1/api-doc.html
 
 Testing Instructions
 --------------------
@@ -74,7 +75,6 @@ Spring context file for tests that do not require MySQL access.
 
 Importing Assertions
 --------------------
-Assertions can currently be imported from copies of the legacy implementation (RAT) configuration files included in this project.
-
+Assertions are currently imported from copies of the legacy implementation (RAT) configuration files included in this project.
 ```
 
