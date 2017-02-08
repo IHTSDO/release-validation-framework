@@ -1,5 +1,5 @@
-Release Validation Framework
-============================
+Release Validation Framework ("RVF")
+====================================
 A framework for testing the validity of SNOMED CT releases.
 
 Build Instructions
