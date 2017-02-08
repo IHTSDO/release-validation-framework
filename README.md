@@ -9,7 +9,7 @@ These instructions will provide guidance in getting the RVF running on your loca
 ### Prerequisites
 You will need:
 - [Git Client](https://git-scm.com/) to clone the project
-- JDK 1.7 or above
+- [JDK 1.7](http://www.oracle.com/technetwork/java/javase/downloads) or above 
 - [Maven](https://maven.apache.org/) to build
 
 
@@ -85,6 +85,4 @@ mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation={c
 Importing Assertions
 --------------------
 Assertions are imported automatically during RVF application startup. The list of assertions is documented in the manifest.xml file under importer/src/main/resources/xml/lists/ folder. Actual assertion SQL files can be found in the importer/src/main/resources/scripts folder.
-
-```
 
