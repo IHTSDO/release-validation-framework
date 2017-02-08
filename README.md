@@ -1,12 +1,22 @@
-Release Validation Framework ("RVF")
+Release Validation Framework (RVF)
 ====================================
 A framework for testing the validity of SNOMED CT releases.
 
+Getting started
+---------------
+These instructions will provide guidence in getting the RVF running on your local machine for development and testing.
+
+### Prerequisites
+You will need:
+- [Git Client](https://git-scm.com/) to clone the project
+- JDK 1.7 or above
+- [Maven](https://maven.apache.org/) to build
+
+
 Build Instructions
 ------------------
+Clone the project then use maven to build it:
 ```
-git clone https://github.com/IHTSDO/release-validation-framework.git
-// -- see note below about config folder
 mvn clean install
 ```
 
