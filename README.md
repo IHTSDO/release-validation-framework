@@ -4,7 +4,7 @@ A framework for testing the validity of SNOMED CT releases.
 
 Getting started
 ---------------
-These instructions will provide guidence in getting the RVF running on your local machine for development and testing.
+These instructions will provide guidance in getting the RVF running on your local machine for development and testing.
 
 ### Prerequisites
 You will need:
@@ -36,7 +36,7 @@ Be sure to include details of the connection in the execution-service.properties
 The privileges of the user 'rvf_user' should not be restricted to the 'rvf_master' database because additional databases will be generated for each SNOMED release.
 
 ### Configuration
-There are various services that can be configured. There are default values but these can be overriden using properties files.
+There are various services that can be configured. There are default values but these can be overridden using properties files.
 The following is a list of property files that can be used to configure services:
 
 |File name | Description | RVF deployment location |
@@ -49,9 +49,13 @@ Sample files for configuring the services can be see found in the config folder.
 
 Starting The Application
 ------------------
-Start the standalone web application using the executable jar:
+Start the stand-alone web application using the executable jar after replacing "{config_dir}"
 
-`java -jar api/target/validation-api.jar`
+`java -jar api/target/validation-api.jar -DrvfConfigLocation={config_dir}`
+
+API Documentation
+--------------------
+The RVF API is documented using Swagger http://localhost:8080/api/v1/api-doc.html
 
 ### Upload a Published Release
 Option 1:
@@ -62,11 +66,7 @@ Example upload
 ```bash
 curl -X POST -F 'file=@SnomedCT_RF2Release_INT_20160731.zip' http://localhost:8080/api/v1/releases/int/20160731
 ```
-Option 2: Using Swagger API as shown below. See Manage published releases section for detailed information.
-
-API Documentation
---------------------
-The RVF API is documented using Swagger http://localhost:8080/api/v1/api-doc.html
+Option 2: Using Swagger API as shown above. See Manage published releases section for detailed information.
 
 Testing Instructions
 --------------------
@@ -79,11 +79,12 @@ mvn clean test
 Integration tests require a MySQL database containing SNOMED CT data. To run integration tests once this is in place, use: 
 ```
 mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation={config_dir}
+
 ```
-API controllers are currently tested in this way using integration tests which use MySQL.
 
 Importing Assertions
 --------------------
-Assertions are currently imported from copies of the legacy implementation (RAT) configuration files included in this project.
+Assertions are imported automatically during RVF application startup. The list of assertions is documented in the manifest.xml file under importer/src/main/resources/xml/lists/ folder. Actual assertion SQL files can be found in the importer/src/main/resources/scripts folder.
+
 ```
 
