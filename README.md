@@ -12,18 +12,21 @@ mvn clean install
 
 Database Setup
 ------------------
-The RVF currently requires a local database to be available as per the settings defined in execution-service.properties below.
-Setting up this database and user can be done using the following mysql code:
+The RVF currently requires a local MySQL database to be available.
+Setting up this database and user can be done using the following:
 ```
+CREATE DATABASE rvf_master;
+
 CREATE USER 'rvf_user'@'localhost' 
-// alternatively more secure: CREATE USER 'rvf_user'@'localhost' IDENTIFIED BY 'password_here';
+// Alternatively give a password: CREATE USER 'rvf_user'@'localhost' IDENTIFIED BY 'password_here';
 
 GRANT ALL PRIVILEGES ON *.* TO 'rvf_user'@'localhost';
 ```
-The rvf_user should not be restricted to the rvf_master database schema, as it will be required to generate new databases for each release (both existing and prospective) that it receives.
-### Configuration Folder
-The services in the RVF can be configured using property files. Default values for the services are included in the jar 
-files. However, it is possible to override the default values by providing property files for each of the services. 
+Be sure to include details of the connection in the execution-service.properties file mentioned below.
+The privileges of the user 'rvf_user' should not be restricted to the 'rvf_master' database because additional databases will be generated for each SNOMED release.
+
+### Configuration
+There are various services that can be configured. There are default values but these can be overriden using properties files.
 The following is a list of property files that can be used to configure services:
 
 |File name | Description | RVF deployment location |
@@ -34,9 +37,9 @@ validation-service.properties | Settings to configure structural tests report lo
 
 Sample files for configuring the services can be see found in the config folder.
 
-Run standalone application
+Starting The Application
 ------------------
-Start the application using the standalone executable jar which includes an embedded tomcat:
+Start the standalone web application using the executable jar:
 
 `java -jar api/target/validation-api.jar`
 
@@ -51,9 +54,9 @@ curl -X POST -F 'file=@SnomedCT_RF2Release_INT_20160731.zip' http://localhost:80
 ```
 Option 2: Using Swagger API as shown below. See Manage published releases section for detailed information.
 
-Swagger API URL
+API Documentation
 --------------------
-Find more information about API via Swagger. http://localhost:8080/api/v1/api-doc.html
+The RVF API is documented using Swagger http://localhost:8080/api/v1/api-doc.html
 
 Testing Instructions
 --------------------
@@ -63,15 +66,11 @@ mvn clean test
 ```
 
 ### Integration Testing
-Integration tests expect an actual MySQL SNOMED CT database that contains SNOMED CT data to have already been setup and configured. To run integration tests once this is in place, use: 
+Integration tests require a MySQL database containing SNOMED CT data. To run integration tests once this is in place, use: 
 ```
 mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation={config_dir}
 ```
-
-Note that all tests in the API that deal with controllers are currently marked as Integration tests. The Spring context
-used by the api-module tries to connect to a MySQL server, which will be missing in Jenkins. So to prevent needless test
-failure on Jenkins, all these tests have been marked as IntegrationTests. This should be skipped by setting a separate 
-Spring context file for tests that do not require MySQL access.
+API controllers are currently tested in this way using integration tests which use MySQL.
 
 Importing Assertions
 --------------------
