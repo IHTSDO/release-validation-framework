@@ -49,7 +49,7 @@ Example upload
 ```bash
 curl -X POST -F 'file=@SnomedCT_RF2Release_INT_20160731.zip' http://localhost:8080/api/v1/releases/int/20160731
 ```
-Option 2: Using Swagger api as shown below. See Manage published releases section for detail information.
+Option 2: Using Swagger API as shown below. See Manage published releases section for detailed information.
 
 Swagger API URL
 --------------------
@@ -63,12 +63,12 @@ mvn clean test
 ```
 
 ### Integration Testing
-Integration tests expect an actual MySQL SNOMED CT database that contains SNOMED CT data. To run integration tests use: 
+Integration tests expect an actual MySQL SNOMED CT database that contains SNOMED CT data to have already been setup and configured. To run integration tests once this is in place, use: 
 ```
 mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation={config_dir}
 ```
 
-Note that all tests in the API that deal with controllers are currently marked as Integration tests. The spring context
+Note that all tests in the API that deal with controllers are currently marked as Integration tests. The Spring context
 used by the api-module tries to connect to a MySQL server, which will be missing in Jenkins. So to prevent needless test
 failure on Jenkins, all these tests have been marked as IntegrationTests. This should be skipped by setting a separate 
 Spring context file for tests that do not require MySQL access.
