@@ -34,9 +34,10 @@ import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.amazonaws.services.ec2.model.TerminateInstancesResult;
+
 @Service
 public class InstanceManager {
-	
+
 	private static final String TAG = "tag:";
 	private static final String WORKER_TYPE = "workerType";
 	private static final String PROPERTIES = ".properties";
@@ -46,9 +47,9 @@ public class InstanceManager {
 	private static final String PENDING = "pending";
 	private static final String RVF_WORKER = "RVF_Worker_";
 	private static final String NAME = "Name";
-	private static final long TIME_TO_DELTE = 56*60*1000;
+	private static final long TIME_TO_DELTE = 56 * 60 * 1000;
 	private Logger logger = LoggerFactory.getLogger(InstanceManager.class);
-	private  AmazonEC2Client amazonEC2Client;
+	private AmazonEC2Client amazonEC2Client;
 	private static int counter;
 	@Autowired
 	private String imageId;
@@ -61,46 +62,51 @@ public class InstanceManager {
 	@Autowired
 	private String instanceTagName;
 	private String ec2InstanceStartupScript;
-	
-	public InstanceManager(AWSCredentials credentials, String ec2Endpoint ) {
+
+	public InstanceManager(AWSCredentials credentials, String ec2Endpoint) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
 		amazonEC2Client.setEndpoint(ec2Endpoint);
-		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
+		ec2InstanceStartupScript = Base64
+				.encodeBase64String(constructStartUpScript().getBytes());
 	}
-	
+
 	public List<String> createInstance(int totalToCreate) {
 		RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
-		runInstancesRequest.withImageId(imageId)
-			.withInstanceType(instanceType)
-			.withMinCount(1)
-			.withMaxCount(totalToCreate)
-			.withKeyName(keyName)
-			.withInstanceInitiatedShutdownBehavior(TERMINATE)
-			.withSecurityGroupIds(securityGroupId)
-			.withUserData(ec2InstanceStartupScript);
-		RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);
+		runInstancesRequest.withImageId(imageId).withInstanceType(instanceType)
+				.withMinCount(1).withMaxCount(totalToCreate)
+				.withKeyName(keyName)
+				.withInstanceInitiatedShutdownBehavior(TERMINATE)
+				.withSecurityGroupIds(securityGroupId)
+				.withUserData(ec2InstanceStartupScript);
+		RunInstancesResult runInstancesResult = amazonEC2Client
+				.runInstances(runInstancesRequest);
 
-		List<Instance> instances = runInstancesResult.getReservation().getInstances();
+		List<Instance> instances = runInstancesResult.getReservation()
+				.getInstances();
 		List<String> ids = new ArrayList<>();
 		for (Instance instance : instances) {
 			String instanceId = instance.getInstanceId();
-			logger.info("RVF worker new instance created with id {} and launched at {}", instanceId, instance.getLaunchTime());
+			logger.info(
+					"RVF worker new instance created with id {} and launched at {}",
+					instanceId, instance.getLaunchTime());
 			CreateTagsRequest createTagsRequest = new CreateTagsRequest();
 			createTagsRequest.withResources(instanceId);
-			if ( instanceTagName != null) {
-				Tag typeTag =  new Tag(WORKER_TYPE, instanceTagName);
-				Tag nameTag = new Tag( NAME, RVF_WORKER + instanceTagName + "_" + counter++);
-				createTagsRequest.withTags(typeTag, nameTag );
-				logger.info("Namge tag {} is created for instance id {}", nameTag, instanceId);
+			if (instanceTagName != null) {
+				Tag typeTag = new Tag(WORKER_TYPE, instanceTagName);
+				Tag nameTag = new Tag(NAME, RVF_WORKER + instanceTagName + "_"
+						+ counter++);
+				createTagsRequest.withTags(typeTag, nameTag);
+				logger.info("Namge tag {} is created for instance id {}",
+						nameTag, instanceId);
 			} else {
-				createTagsRequest.withTags(new Tag( NAME, RVF_WORKER + imageId + "_" + counter++));
+				createTagsRequest.withTags(new Tag(NAME, RVF_WORKER + imageId
+						+ "_" + counter++));
 			}
 			amazonEC2Client.createTags(createTagsRequest);
 			ids.add(instanceId);
 		}
 		return ids;
 	}
-	
 
 	public String getImageId() {
 		return imageId;
@@ -133,13 +139,14 @@ public class InstanceManager {
 	public void setSecurityGroupId(String securityGroupId) {
 		this.securityGroupId = securityGroupId;
 	}
-	
+
 	public List<String> checkActiveInstances(List<String> instanceIds) {
 		List<String> activeInstances = new ArrayList<>();
 		if (instanceIds != null && !instanceIds.isEmpty()) {
 			DescribeInstancesRequest request = new DescribeInstancesRequest();
 			request.withInstanceIds(instanceIds);
-			DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+			DescribeInstancesResult result = amazonEC2Client
+					.describeInstances(request);
 			List<Reservation> reservations = result.getReservations();
 			List<Instance> instances = new ArrayList<>();
 			for (Reservation reserv : reservations) {
@@ -147,90 +154,101 @@ public class InstanceManager {
 			}
 			for (Instance instance : instances) {
 				InstanceState state = instance.getState();
-				if (PENDING.equalsIgnoreCase(state.getName()) || RUNNING.equalsIgnoreCase(state.getName())) {
+				if (PENDING.equalsIgnoreCase(state.getName())
+						|| RUNNING.equalsIgnoreCase(state.getName())) {
 					activeInstances.add(instance.getInstanceId());
-					logger.info("Active instance {} with public ip address {}", instance.getInstanceId(), instance.getPublicIpAddress());
+					logger.info("Active instance {} with public ip address {}",
+							instance.getInstanceId(),
+							instance.getPublicIpAddress());
 				}
 			}
-			logger.info("Current total active instances:" + activeInstances.size());
+			logger.info("Current total active instances:"
+					+ activeInstances.size());
 		}
 		return activeInstances;
 	}
-	
+
 	public List<String> getActiveInstances() {
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
-		request.withFilters(new Filter(TAG + WORKER_TYPE, Arrays.asList(instanceTagName)));
-		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+		request.withFilters(new Filter(TAG + WORKER_TYPE, Arrays
+				.asList(instanceTagName)));
+		DescribeInstancesResult result = amazonEC2Client
+				.describeInstances(request);
 		List<Reservation> reservations = result.getReservations();
 		List<Instance> instances = new ArrayList<>();
 		for (Reservation reserv : reservations) {
 			instances.addAll(reserv.getInstances());
 		}
-		logger.info("Total instances {} found with filter {}", instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
+		logger.info("Total instances {} found with filter {}",
+				instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
 		List<String> activeInstances = new ArrayList<>();
 		for (Instance instance : instances) {
 			InstanceState state = instance.getState();
-			if (PENDING.equalsIgnoreCase(state.getName()) || RUNNING.equalsIgnoreCase(state.getName())) {
+			if (PENDING.equalsIgnoreCase(state.getName())
+					|| RUNNING.equalsIgnoreCase(state.getName())) {
 				activeInstances.add(instance.getInstanceId());
-				logger.info("Active instance {} with public address {}", instance.getInstanceId(), instance.getPublicIpAddress());
+				logger.info("Active instance {} with public address {}",
+						instance.getInstanceId(), instance.getPublicIpAddress());
 			}
 		}
 		logger.info("Total active instances found:" + activeInstances.size());
 		return activeInstances;
 	}
-	
-	
+
 	public void checkAndTerminateInstances(List<Instance> instancesToCheck) {
-		  List<Instance> instancesToTerminate = new ArrayList<>();
-		  for (Instance instance : instancesToCheck) {
-			  if ( System.currentTimeMillis() >= (instance.getLaunchTime().getTime() + TIME_TO_DELTE)) {
-				  logger.info("Instance id {} was lanched at {} and will be terminated", instance.getInstanceId(),instance.getLaunchTime());
-				  instancesToTerminate.add(instance);
-			  }
-		  }
-		  if (!instancesToTerminate.isEmpty()) {
-			  List<String> instanceIds = new ArrayList<>();
-			  for (Instance instance : instancesToTerminate) {
-				  instanceIds.add(instance.getInstanceId());
-			  }
-			  TerminateInstancesRequest deleteRequest = new TerminateInstancesRequest();
-			  deleteRequest.withInstanceIds(instanceIds);
-			  TerminateInstancesResult result = amazonEC2Client.terminateInstances(deleteRequest);
-			  for (InstanceStateChange state :  result.getTerminatingInstances()) {
-				  logger.info("Instance id {} current state {}", state.getInstanceId(), state.getCurrentState().getName());
-			  }
-			  instancesToCheck.removeAll(instancesToTerminate);
-		  }
+		List<Instance> instancesToTerminate = new ArrayList<>();
+		for (Instance instance : instancesToCheck) {
+			if (System.currentTimeMillis() >= (instance.getLaunchTime()
+					.getTime() + TIME_TO_DELTE)) {
+				logger.info(
+						"Instance id {} was lanched at {} and will be terminated",
+						instance.getInstanceId(), instance.getLaunchTime());
+				instancesToTerminate.add(instance);
+			}
+		}
+		if (!instancesToTerminate.isEmpty()) {
+			List<String> instanceIds = new ArrayList<>();
+			for (Instance instance : instancesToTerminate) {
+				instanceIds.add(instance.getInstanceId());
+			}
+			TerminateInstancesRequest deleteRequest = new TerminateInstancesRequest();
+			deleteRequest.withInstanceIds(instanceIds);
+			TerminateInstancesResult result = amazonEC2Client
+					.terminateInstances(deleteRequest);
+			for (InstanceStateChange state : result.getTerminatingInstances()) {
+				logger.info("Instance id {} current state {}", state
+						.getInstanceId(), state.getCurrentState().getName());
+			}
+			instancesToCheck.removeAll(instancesToTerminate);
+		}
 	}
-	
+
 	public Instance getInstanceById(String instanceId) {
 		if (instanceId == null) {
 			logger.warn("instanceId is null");
 			return null;
-		} 
+		}
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		request.withInstanceIds(instanceId);
-		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+		DescribeInstancesResult result = amazonEC2Client
+				.describeInstances(request);
 		return result.getReservations().get(0).getInstances().get(0);
 	}
 
 	public TerminateInstancesResult terminate(List<String> instancesToTerminate) {
 		TerminateInstancesRequest deleteRequest = new TerminateInstancesRequest();
-		 deleteRequest.withInstanceIds(instancesToTerminate);
-		 return amazonEC2Client.terminateInstances(deleteRequest);
+		deleteRequest.withInstanceIds(instancesToTerminate);
+		return amazonEC2Client.terminateInstances(deleteRequest);
 	}
-	
+
 	private Map<String, String> getProperties(String rvfConfig) {
 		File configDir = new File(rvfConfig);
-		String [] propertyFiles = null;
+		String[] propertyFiles = null;
 		if (configDir.isDirectory()) {
-			propertyFiles = configDir.list( new FilenameFilter() {
+			propertyFiles = configDir.list(new FilenameFilter() {
 				@Override
 				public boolean accept(File dir, String name) {
-					if (name.endsWith(PROPERTIES)) {
-						return true;
-					}
-					return false;
+					return name.endsWith(PROPERTIES);
 				}
 			});
 		}
@@ -239,17 +257,19 @@ public class InstanceManager {
 			for (String fileName : propertyFiles) {
 				List<String> lines = new ArrayList<>();
 				try {
-					lines.addAll(IOUtils.readLines(new FileReader(new File(configDir, fileName))));
+					lines.addAll(IOUtils.readLines(new FileReader(new File(
+							configDir, fileName))));
 				} catch (IOException e) {
-					logger.error("Error when reading proerty file:" + fileName , e);
+					logger.error("Error when reading proerty file:" + fileName,
+							e);
 				}
 				StringBuilder result = new StringBuilder();
 				for (String line : lines) {
-					//set ec2 instance worker properties
+					// set ec2 instance worker properties
 					if (line.startsWith("rvf.execution.isWorker")) {
 						result.append("rvf.execution.isWorker=true");
-					}
-					else if (line.startsWith("rvf.execution.isAutoScalingEnabled")) {
+					} else if (line
+							.startsWith("rvf.execution.isAutoScalingEnabled")) {
 						result.append("rvf.execution.isAutoScalingEnabled=false");
 					} else if (line.startsWith("rvf.autoscaling.isEc2Instance")) {
 						result.append("rvf.autoscaling.isEc2Instance=true");
@@ -263,38 +283,42 @@ public class InstanceManager {
 		}
 		return propertiesByFileName;
 	}
-	
+
 	private String constructStartUpScript() {
 		String appVersion = getAppVersion();
 		StringBuilder builder = new StringBuilder();
 		builder.append("#!/bin/sh\n");
-		builder.append("sudo apt-get update -o Dir::Etc::sourcelist=\"sources.list.d/maven_ihtsdotools_org_content_repositories_*\"" + "\n");
+		builder.append("sudo apt-get update -o Dir::Etc::sourcelist=\"sources.list.d/maven_ihtsdotools_org_content_repositories_*\""
+				+ "\n");
 		if (appVersion != null && !appVersion.isEmpty()) {
-			builder.append("sudo apt-get install --force-yes -y rvf-api=" + appVersion + "\n" );
+			builder.append("sudo apt-get install --force-yes -y rvf-api="
+					+ appVersion + "\n");
 		} else {
-			builder.append("sudo apt-get install --force-yes -y rvf-api \n" );
+			builder.append("sudo apt-get install --force-yes -y rvf-api \n");
 		}
 		builder.append("sudo dpkg -s rvf-api\n");
 		String rvfConfig = System.getProperty(RVF_CONFIG_LOCATION);
-		Map<String,String> propertyStrByFilename = getProperties(rvfConfig);
+		Map<String, String> propertyStrByFilename = getProperties(rvfConfig);
 		for (String filename : propertyStrByFilename.keySet()) {
-			builder.append("sudo echo \"" + propertyStrByFilename.get(filename) + "\" > " + rvfConfig + "/" + filename + "\n");
+			builder.append("sudo echo \"" + propertyStrByFilename.get(filename)
+					+ "\" > " + rvfConfig + "/" + filename + "\n");
 		}
 		builder.append("sudo supervisorctl start rvf-api" + "\n");
 		builder.append("exit 0");
 		return builder.toString();
 	}
-	
+
 	private String getAppVersion() {
 		String version = null;
 		File file = new File(VersionController.VERSION_FILE_PATH);
 		if (file.isFile()) {
-			try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+			try (BufferedReader bufferedReader = new BufferedReader(
+					new FileReader(file))) {
 				version = bufferedReader.readLine();
 			} catch (IOException e) {
 				logger.error("Error to read the version number from file.", e);
 			}
-		} 
+		}
 		return version;
 	}
 }

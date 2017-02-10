@@ -60,7 +60,7 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 	@Override
 	public AssertionTest getAssertionTests(final Assertion assertion, final Test test) {
 		final List<AssertionTest> list = getCurrentSession().createQuery("from AssertionTest as at where at.assertion.id = :assertionId and at.test.id = :testId")
-				.setParameter("assertionId", assertion.getId())
+				.setParameter("assertionId", assertion.getAssertionId())
 				.setParameter("testId", test.getId()).list();
 
 		return validateAndGetFirstEntry(list);
@@ -69,7 +69,7 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 	@Override
 	public List<AssertionTest> getAssertionTests(final Assertion assertion) {
 		return getCurrentSession().createQuery("from AssertionTest as at where at.assertion.id = :assertionId")
-				.setParameter("assertionId", assertion.getId()).list();
+				.setParameter("assertionId", assertion.getAssertionId()).list();
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class AssertionDaoImpl extends EntityDaoImpl<Assertion> implements Assert
 //		return getCurrentSession().createQuery("from AssertionGroup as g where g.assertions.id in :assertion")
 //				.setParameter("assertion", assertion).list();
 		return getCurrentSession().createQuery("select g from AssertionGroup g inner join g.assertions a where a.id = :assertionId")
-				.setParameter("assertionId", assertion.getId()).list();
+				.setParameter("assertionId", assertion.getAssertionId()).list();
 	}
 
 	@Override

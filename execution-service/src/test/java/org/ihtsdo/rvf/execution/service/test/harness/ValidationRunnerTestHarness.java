@@ -1,8 +1,10 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service.test.harness;
 
 import java.io.File;
 import java.util.Arrays;
 
+import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
+import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
-public class ValidationRunnerIntegrationTest {
+public class ValidationRunnerTestHarness {
 @Autowired
 ValidationRunner runner;
 	
@@ -24,7 +26,7 @@ ValidationRunner runner;
 		validationConfig.setProspectiveFilesInS3(false);
 		validationConfig.setProspectiveFileFullPath("SnomedCT_Release_DK1000005_20160731-DeltaOnly.zip");
 		//local file will be deleted after test
-		File localFile = new File("/Volumes/MacintoshHD2/Releases/SnomedCT_Release_DK1000005_20160731-DeltaOnly.zip");
+		File localFile = new File("/Users/Releases/SnomedCT_Release_DK1000005_20160731-DeltaOnly.zip");
 		validationConfig.setLocalProspectiveFile(localFile);
 		validationConfig.setRf2DeltaOnly(true);
 		validationConfig.setRunId(System.currentTimeMillis());

@@ -43,23 +43,28 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 /**
  * The controller that handles uploaded files for the validation to run
  */
 @Controller
-@Api(value = "Test Files")
+@Api(position = 4, value = "Validate release files")
 public class TestUploadFileController {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(TestUploadFileController.class);
+	private static final String ZIP = ".zip";
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(TestUploadFileController.class);
 
 	@Autowired
-	private StructuralTestRunner validationRunner;
+	private StructuralTestRunner structureTestRunner;
 	@Autowired
 	private AssertionService assertionService;
-    @Autowired
+	@Autowired
 	private EntityService entityService;
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
@@ -75,69 +80,81 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation( value = "Upload test files",
-		notes = "Uploaded files should be in RF2 format files. Service can accept zip file or txt file. " )
-	public ResponseEntity uploadTestPackage(@RequestParam(value = "file") final MultipartFile file,
+	@ApiOperation(value = "Structure tests", notes = "Uploaded files should be in RF2 format. Service can accept zip file or txt file. ")
+	@ApiIgnore
+	public ResponseEntity uploadTestPackage(
+			@RequestParam(value = "file") final MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
 			final HttpServletResponse response) throws IOException {
 		// load the filename
 		final String filename = file.getOriginalFilename();
 		// must be a zip
-		if (filename.endsWith(".zip")) {
-			return uploadPostTestPackage(file, writeSucceses, manifestFile, response);
+		if (filename.endsWith(ZIP)) {
+			return uploadPostTestPackage(file, writeSucceses, manifestFile,
+					response);
 
 		} else if (filename.endsWith(".txt")) {
 			return uploadPreTestPackage(file, writeSucceses, response);
 		} else {
-			throw new IllegalArgumentException("File should be pre or post and either a .txt or .zip is expected");
+			throw new IllegalArgumentException(
+					"File should be pre or post and either a .txt or .zip is expected");
 		}
 	}
 
 	@RequestMapping(value = "/test-post", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation( value = "Upload test files",
-			notes = "? - TBD" )
-	public ResponseEntity uploadPostTestPackage(@RequestParam(value = "file") final MultipartFile file,
-			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
-			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
+	@ApiOperation(position = 2, value = "Structure tests for RF2 release files", notes = "Structure tests for RF2 release files in zip file format. The manifest file is optional.")
+	public ResponseEntity uploadPostTestPackage(
+			@ApiParam(value="RF2 release file in zip format")@RequestParam(value = "file") final MultipartFile file,
+			@ApiParam(required = false, value = "Defaults to false when not provided") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			@ApiParam(required = false, value = "manifest.xml file") @RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
 			final HttpServletResponse response) throws IOException {
 		// load the filename
 		final String filename = file.getOriginalFilename();
-	
-		if (!filename.endsWith(".zip")) {
-			throw new IllegalArgumentException("Post condition test package has to be zipped up");
+
+		if (!filename.endsWith(ZIP)) {
+			throw new IllegalArgumentException(
+					"Post condition test package has to be zipped up");
 		}
 		File tempFile = null;
 		File tempManifestFile = null;
 		try {
-			tempFile = File.createTempFile(filename, ".zip");
+			tempFile = File.createTempFile(filename, ZIP);
 			// set up the response in order to strean directly to the response
 			response.setContentType("text/csv;charset=utf-8");
-			response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
+			response.setHeader("Content-Disposition",
+					"attachment; filename=\"report_" + filename + "_"
+							+ new Date() + "\"");
 			try (PrintWriter writer = response.getWriter()) {
 				// must be a zip
 				file.transferTo(tempFile);
-				final ResourceProvider resourceManager = new ZipFileResourceProvider(tempFile);
+				final ResourceProvider resourceManager = new ZipFileResourceProvider(
+						tempFile);
 
 				TestReportable report;
 
 				if (manifestFile == null) {
-					report = validationRunner.execute(resourceManager, writer, writeSucceses);
+					report = structureTestRunner.execute(resourceManager,
+							writer, writeSucceses);
 				} else {
-					final String originalFilename = manifestFile.getOriginalFilename();
-					tempManifestFile = File.createTempFile(originalFilename, ".xml");
+					final String originalFilename = manifestFile
+							.getOriginalFilename();
+					tempManifestFile = File.createTempFile(originalFilename,
+							".xml");
 					manifestFile.transferTo(tempManifestFile);
 					final ManifestFile mf = new ManifestFile(tempManifestFile);
-					report = validationRunner.execute(resourceManager, writer, writeSucceses, mf);
+					report = structureTestRunner.execute(resourceManager,
+							writer, writeSucceses, mf);
 				}
 				// store the report to disk for now with a timestamp
 				if (report.getNumErrors() > 0) {
-					LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+					LOGGER.error("No Errors expected but got "
+							+ report.getNumErrors() + " errors");
 				}
-			} 
-		}finally {
-			
+			}
+		} finally {
+
 			if (tempFile != null) {
 				tempFile.delete();
 			}
@@ -151,122 +168,121 @@ public class TestUploadFileController {
 	@RequestMapping(value = "/run-post", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation( value = "Upload test files",
-			notes = "? - TBD" )
-	public ResponseEntity runPostTestPackage(
-			@RequestParam(value = "file") final MultipartFile file,
-			@RequestParam(value = "rf2DeltaOnly", required = false) final boolean isRf2DeltaOnly,
-			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
-			@RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
-			@RequestParam(value = "groups") final List<String> groupsList,
-			@RequestParam(value = "previousIntReleaseVersion" ,required = false) final String prevIntReleaseVersion,
-			@RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
-			@RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
-			@RequestParam(value = "runId") final Long runId,
-			@RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
-			@RequestParam(value = "storageLocation") final String storageLocation,
-            final HttpServletRequest request) throws IOException {
+	@ApiOperation(position = 3, value = "Run validations for a RF2 release file package.", notes = "It runs structure tests and assertion validations specified by the assertion groups. You can specify mutilple assertion group names separated by a comma. e.g common-authoring,int-authoring")
+	public ResponseEntity<Map<String, String>> runPostTestPackage(
+			@ApiParam(value = "RF2 release package in zip file") @RequestParam(value = "file") final MultipartFile file,
+			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = "rf2DeltaOnly", required = false) final boolean isRf2DeltaOnly,
+			@ApiParam(value = "Default to false to reduce the size of report file") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			@ApiParam(value = "manifest.xml file") @RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
+			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = "groups") final List<String> groupsList,
+			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = "previousIntReleaseVersion", required = false) final String prevIntReleaseVersion,
+			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
+			@ApiParam(value = "Required for extension release testing") @RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
+			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = "runId") final Long runId,
+			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
+			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
-		final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
+		final String urlPrefix = requestUrl.substring(0,
+				requestUrl.lastIndexOf(request.getPathInfo()));
 
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
-		vrConfig.addFile(file)
-				.addRF2DeltaOnly(isRf2DeltaOnly)
-				.addWriteSucceses(writeSucceses)
-				.addGroupsList(groupsList)
+		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
+				.addWriteSucceses(writeSucceses).addGroupsList(groupsList)
 				.addManifestFile(manifestFile)
 				.addPrevIntReleaseVersion(prevIntReleaseVersion)
 				.addPreviousExtVersion(previousExtVersion)
 				.addExtensionDependencyVersion(extensionDependency)
-				.addRunId(runId)
-				.addStorageLocation(storageLocation)
-				.addFailureExportMax(exportMax)
-				.addUrl(urlPrefix)
+				.addRunId(runId).addStorageLocation(storageLocation)
+				.addFailureExportMax(exportMax).addUrl(urlPrefix)
 				.addProspectiveFilesInS3(false);
-		
-		
-		//Before we start running, ensure that we've made our mark in the storage location
-		//Init will fail if we can't write the "running" state to storage
-		final Map <String, String> responseMap = new HashMap<>();
-		HttpStatus returnStatus =  HttpStatus.OK;
-		
+
+		// Before we start running, ensure that we've made our mark in the
+		// storage location
+		// Init will fail if we can't write the "running" state to storage
+		final Map<String, String> responseMap = new HashMap<>();
+		HttpStatus returnStatus = HttpStatus.OK;
+
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
-			//Queue incoming validation request
-			queueManager.queueValidationRequest( vrConfig, responseMap);
-			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
+			// Queue incoming validation request
+			queueManager.queueValidationRequest(vrConfig, responseMap);
+			final String urlToPoll = urlPrefix + "/result/" + runId
+					+ "?storageLocation=" + storageLocation;
 			responseMap.put("resultURL", urlToPoll);
 		} else {
 			returnStatus = HttpStatus.PRECONDITION_FAILED;
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/run-post-via-s3", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation( value = "Upload test file from S3",
-			notes = "This api is for testing release files stored in S3" )
-	public ResponseEntity runPostTestPackageViaS3(
-			@RequestParam(value = "releaseFileS3Path") final String releaseFileS3Path,
-			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
-			@RequestParam(value = "manifestFileS3Path", required = false) final String manifestFileS3Path,
-			@RequestParam(value = "groups") final List<String> groupsList,
-			@RequestParam(value = "previousIntReleaseVersion" ,required = false) final String prevIntReleaseVersion,
-			@RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
-			@RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
-			@RequestParam(value = "runId") final Long runId,
-			@RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
-			@RequestParam(value = "storageLocation") final String storageLocation,
-            final HttpServletRequest request) throws IOException {
+	@ApiOperation(position = 4, value = "Run validations for the release files stored in AWS S3", notes = "This api is mainly used by the RVF autoscalling instances to validate release files stored in AWS S3.")
+	public ResponseEntity<Map<String, String>> runPostTestPackageViaS3(
+			@ApiParam(value = "Release zip file path in AWS S3 bucket") @RequestParam(value = "releaseFileS3Path") final String releaseFileS3Path,
+			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = "rf2DeltaOnly", required = false) final boolean isRf2DeltaOnly,
+			@ApiParam(value = "Defaults to false to reduce the size of report file") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			@ApiParam(value = "manifest.xml file path in AWS S3") @RequestParam(value = "manifestFileS3Path", required = false) final String manifestFileS3Path,
+			@ApiParam(value = "Assertion group names") @RequestParam(value = "groups") final List<String> groupsList,
+			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = "previousIntReleaseVersion", required = false) final String prevIntReleaseVersion,
+			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
+			@ApiParam(value = "Required for extension release testing") @RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
+			@ApiParam(value = "Unique run id e.g Timestamp") @RequestParam(value = "runId") final Long runId,
+			@ApiParam(value = "Defaults to 10") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
+			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
-		final String urlPrefix = requestUrl.substring(0, requestUrl.lastIndexOf(request.getPathInfo()));
+		final String urlPrefix = requestUrl.substring(0,
+				requestUrl.lastIndexOf(request.getPathInfo()));
 
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
 		vrConfig.addProspectiveFileFullPath(releaseFileS3Path)
-				.addWriteSucceses(writeSucceses)
-				.addGroupsList(groupsList)
+				.addWriteSucceses(writeSucceses).addGroupsList(groupsList)
 				.addManifestFileFullPath(manifestFileS3Path)
 				.addPrevIntReleaseVersion(prevIntReleaseVersion)
 				.addPreviousExtVersion(previousExtVersion)
 				.addExtensionDependencyVersion(extensionDependency)
-				.addRunId(runId)
-				.addStorageLocation(storageLocation)
-				.addFailureExportMax(exportMax)
-				.addUrl(urlPrefix)
+				.addRunId(runId).addStorageLocation(storageLocation)
+				.addFailureExportMax(exportMax).addUrl(urlPrefix)
 				.addProspectiveFilesInS3(true);
-		
-		
-		//Before we start running, ensure that we've made our mark in the storage location
-		//Init will fail if we can't write the "running" state to storage
-		final Map <String, String> responseMap = new HashMap<>();
-		HttpStatus returnStatus =  HttpStatus.OK;
-		
+
+		// Before we start running, ensure that we've made our mark in the
+		// storage location
+		// Init will fail if we can't write the "running" state to storage
+		final Map<String, String> responseMap = new HashMap<>();
+		HttpStatus returnStatus = HttpStatus.OK;
+
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
-			//Queue incoming validation request
-			queueManager.queueValidationRequest( vrConfig, responseMap);
-			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
+			// Queue incoming validation request
+			queueManager.queueValidationRequest(vrConfig, responseMap);
+			final String urlToPoll = urlPrefix + "/result/" + runId
+					+ "?storageLocation=" + storageLocation;
 			responseMap.put("resultURL", urlToPoll);
 		} else {
 			returnStatus = HttpStatus.PRECONDITION_FAILED;
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}
-	
-	private boolean isAssertionGroupsValid(List<String> validationGroups, Map<String,String> responseMap) {
-		//check assertion groups
-		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(validationGroups);
+
+	private boolean isAssertionGroupsValid(List<String> validationGroups,
+			Map<String, String> responseMap) {
+		// check assertion groups
+		final List<AssertionGroup> groups = assertionService
+				.getAssertionGroupsByNames(validationGroups);
 		if (groups.size() != validationGroups.size()) {
 			final List<String> found = new ArrayList<>();
 			for (final AssertionGroup group : groups) {
 				found.add(group.getName());
 			}
-			final String groupNotFoundMsg = String.format("Assertion groups requested: %s but found in RVF: %s",validationGroups, found);
+			final String groupNotFoundMsg = String.format(
+					"Assertion groups requested: %s but found in RVF: %s",
+					validationGroups, found);
 			responseMap.put("failureMessage", groupNotFoundMsg);
-			LOGGER.warn("Invalid assertion groups requested." + groupNotFoundMsg);
+			LOGGER.warn("Invalid assertion groups requested."
+					+ groupNotFoundMsg);
 			return false;
 		}
 		return true;
@@ -274,9 +290,9 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation( value = "Upload test files",
-		notes = "? - TBD" )
-	public ResponseEntity uploadPreTestPackage(@RequestParam(value = "file") final MultipartFile file,
+	@ApiOperation(position = 1, value = "Structure testing for release input files.", notes = "This API is for structure testing the RF2 text files used as inputs for release builds. These RF2 files are prefixed with rel2 e.g rel2_Concept_Delta_INT_20160731.txt")
+	public ResponseEntity uploadPreTestPackage(
+			@ApiParam(value = "RF2 input file prefixed with rel2", required = true) @RequestParam(value = "file") final MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			final HttpServletResponse response) throws IOException {
 		// load the filename
@@ -290,18 +306,24 @@ public class TestUploadFileController {
 		final File tempFile = File.createTempFile(filename, ".txt");
 		try {
 			if (!filename.endsWith(".txt")) {
-				throw new IllegalArgumentException("Pre condition file should always be a .txt file");
+				throw new IllegalArgumentException(
+						"Pre condition file should always be a .txt file");
 			}
 			response.setContentType("text/csv;charset=utf-8");
-			response.setHeader("Content-Disposition", "attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
-			
+			response.setHeader("Content-Disposition",
+					"attachment; filename=\"report_" + filename + "_"
+							+ new Date() + "\"");
+
 			try (PrintWriter writer = response.getWriter()) {
 				file.transferTo(tempFile);
-				final ResourceProvider resourceManager = new TextFileResourceProvider(tempFile, filename);
-				final TestReportable report = validationRunner.execute(resourceManager, writer, writeSucceses,null);
+				final ResourceProvider resourceManager = new TextFileResourceProvider(
+						tempFile, filename);
+				final TestReportable report = structureTestRunner.execute(
+						resourceManager, writer, writeSucceses, null);
 				// store the report to disk for now with a timestamp
 				if (report.getNumErrors() > 0) {
-					LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
+					LOGGER.error("No Errors expected but got "
+							+ report.getNumErrors() + " errors");
 				}
 			}
 			return null;

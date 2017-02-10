@@ -48,9 +48,9 @@ public class ReleaseControllerIntegrationTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
         assertNotNull(releaseDataManager);
         releaseDataManager.uploadPublishedReleaseData(getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip") ,
-                "SnomedCT_Release_INT_20140131.zip", "INT","20140131");
-        assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));
-        assertTrue("Release 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("20140131"));
+                "SnomedCT_Release_INT_20140131.zip", "int","20140131");
+        assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("int_20140131"));
+        assertTrue("Release 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("int_20140131"));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ReleaseControllerIntegrationTest {
     @Test
     public void testGetRelease() throws Exception {
 
-        mockMvc.perform(get("/releases/{version}", "20140131").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/releases/{version}", "int_20140131").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8));
     }

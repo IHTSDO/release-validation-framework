@@ -130,8 +130,8 @@ public class TestUploadFileControllerIntegrationTest {
 
         final Assertion assertion2 = objectMapper.readValue(returnedResponse.getResponse().getContentAsString(), Assertion.class);
         assertNotNull("Returned assertion must not be null", assertion2);
-        assertNotNull("Returned assertion must have an id", assertion2.getId());
-        final Long assertionId = assertion2.getId();
+        assertNotNull("Returned assertion must have an id", assertion2.getAssertionId());
+        final Long assertionId = assertion2.getAssertionId();
 
         // set configuration
         final String template = "" +

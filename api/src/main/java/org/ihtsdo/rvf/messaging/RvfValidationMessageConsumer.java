@@ -28,13 +28,14 @@ import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
 @Service
 public class RvfValidationMessageConsumer {
 	private static final String CONSUMER_PREFETCH_SIZE = "?consumer.prefetchSize=1";
 	private static final String EC2_INSTANCE_ID_URL = "http://169.254.169.254/latest/meta-data/instance-id";
-	private static final long FITY_NINE_MINUTES = 59*60*1000;
-	private static final long HOUR_IN_MILLIS = 60*60*1000;
-	private static final long ONE_MINUTE_IN_MILLIS = 60*1000;
+	private static final long FITY_NINE_MINUTES = 59 * 60 * 1000;
+	private static final long HOUR_IN_MILLIS = 60 * 60 * 1000;
+	private static final long ONE_MINUTE_IN_MILLIS = 60 * 1000;
 	private String queueName;
 	@Autowired
 	private ValidationRunner runner;
@@ -47,35 +48,38 @@ public class RvfValidationMessageConsumer {
 	private boolean isEc2Instance;
 	private Instance instance;
 	private boolean isValidationRunning = false;
-	
-	public RvfValidationMessageConsumer( String queueName,Boolean isRvfWorker, Boolean ec2Instance) {
+
+	public RvfValidationMessageConsumer(String queueName, Boolean isRvfWorker,
+			Boolean ec2Instance) {
 		isWorker = isRvfWorker.booleanValue();
 		this.queueName = queueName;
 		this.isEc2Instance = ec2Instance.booleanValue();
 	}
-	
+
 	public void start() {
 		logger.info("isRvfWorker instance:" + isWorker);
 		if (isWorker) {
-			Thread thread = new Thread (new Runnable() {
-				
+			Thread thread = new Thread(new Runnable() {
+
 				@Override
 				public void run() {
 					consumeMessage();
 				}
 			});
 			thread.start();
-			logger.info("RvfWorker instance started at:" + Calendar.getInstance().getTime());
+			logger.info("RvfWorker instance started at:"
+					+ Calendar.getInstance().getTime());
 		}
 	}
-	
+
 	private void consumeMessage() {
 		Connection connection = null;
 		MessageConsumer consumer = null;
-		Destination destination = new ActiveMQQueue(queueName + CONSUMER_PREFETCH_SIZE);
+		Destination destination = new ActiveMQQueue(queueName
+				+ CONSUMER_PREFETCH_SIZE);
 		Session session = null;
 		try {
-			connection =  connectionFactory.createConnection();
+			connection = connectionFactory.createConnection();
 			connection.start();
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			consumer = session.createConsumer(destination);
@@ -84,11 +88,11 @@ public class RvfValidationMessageConsumer {
 				@Override
 				public void onMessage(Message message) {
 					if (message instanceof TextMessage) {
-						runValidation((TextMessage)message);
+						runValidation((TextMessage) message);
 					}
 				}
 			});
-			
+
 			while (!shutDown()) {
 				try {
 					Thread.sleep(30000);
@@ -96,7 +100,7 @@ public class RvfValidationMessageConsumer {
 					logger.error("Consumer thread is interupted", e);
 				}
 			}
-			
+
 		} catch (JMSException e) {
 			logger.error("Error when consuming RVF validaiton message.", e);
 		} finally {
@@ -104,7 +108,8 @@ public class RvfValidationMessageConsumer {
 				try {
 					connection.close();
 				} catch (JMSException e) {
-					logger.error("Error when closing message queue connection.", e);
+					logger.error(
+							"Error when closing message queue connection.", e);
 				}
 			}
 			if (consumer != null) {
@@ -123,7 +128,7 @@ public class RvfValidationMessageConsumer {
 			}
 		}
 	}
-	
+
 	public boolean shutDown() {
 		if (!isEc2Instance) {
 			return false;
@@ -132,18 +137,26 @@ public class RvfValidationMessageConsumer {
 				instance = instanceManager.getInstanceById(getInstanceId());
 			}
 			if (!isValidationRunning) {
-				//only shutdown when no message to process and close to the hourly mark
-				long timeTaken = Calendar.getInstance().getTimeInMillis() - instance.getLaunchTime().getTime();
-				if ((timeTaken % HOUR_IN_MILLIS) >= FITY_NINE_MINUTES ) {
+				// only shutdown when no message to process and close to the
+				// hourly mark
+				long timeTaken = Calendar.getInstance().getTimeInMillis()
+						- instance.getLaunchTime().getTime();
+				if ((timeTaken % HOUR_IN_MILLIS) >= FITY_NINE_MINUTES) {
 					logger.info("Shut down instance message consumer as no messages left to process in queue and it is approaching to hourly mark.");
-					logger.info("Instance total running time in minutes:" + (timeTaken/ONE_MINUTE_IN_MILLIS));
-					logger.info("Instance will be terminated with id:" + instance.getInstanceId());
+					logger.info("Instance total running time in minutes:"
+							+ (timeTaken / ONE_MINUTE_IN_MILLIS));
+					logger.info("Instance will be terminated with id:"
+							+ instance.getInstanceId());
 					boolean isTerminated = false;
-					int counter =0;
+					int counter = 0;
 					while (!isTerminated && counter++ < 3) {
 						try {
-							TerminateInstancesResult result = instanceManager.terminate(Arrays.asList(instance.getInstanceId()));
-							InstanceState state = result.getTerminatingInstances().get(0).getCurrentState();
+							TerminateInstancesResult result = instanceManager
+									.terminate(Arrays.asList(instance
+											.getInstanceId()));
+							InstanceState state = result
+									.getTerminatingInstances().get(0)
+									.getCurrentState();
 							if ("running".equals(state.getName())) {
 								logger.error("Instance has not been shutdown yet");
 								isTerminated = false;
@@ -162,34 +175,36 @@ public class RvfValidationMessageConsumer {
 			return false;
 		}
 	}
-	
-	
+
 	private String getInstanceId() {
 		String instanceId = null;
 		try {
 			RestTemplate restTemplate = new RestTemplate();
-			instanceId = restTemplate.getForObject(EC2_INSTANCE_ID_URL, String.class);
+			instanceId = restTemplate.getForObject(EC2_INSTANCE_ID_URL,
+					String.class);
 			logger.info("Current instance id is:" + instanceId);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			logger.error("Failed to get instance id", e);
 		}
 		return instanceId;
 	}
-	
+
 	private void runValidation(final TextMessage incomingMessage) {
 		isValidationRunning = true;
 		Gson gson = new Gson();
 		ValidationRunConfig config = null;
 		try {
-			config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
+			config = gson.fromJson(incomingMessage.getText(),
+					ValidationRunConfig.class);
 			logger.info("validation config:" + config);
 		} catch (JsonSyntaxException | JMSException e) {
 			logger.error("JMS message listener error:", e);
 		}
-		if ( config != null) {
+		if (config != null) {
 			runner.run(config);
 		} else {
-			logger.error("Null validation config found for message:" + incomingMessage);
+			logger.error("Null validation config found for message:"
+					+ incomingMessage);
 		}
 		isValidationRunning = false;
 	}

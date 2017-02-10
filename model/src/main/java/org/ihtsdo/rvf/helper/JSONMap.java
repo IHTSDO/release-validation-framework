@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,6 +86,7 @@ public class JSONMap implements Map<String, Object> {
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<String> keySet() {
 		return jsonObject.keySet();

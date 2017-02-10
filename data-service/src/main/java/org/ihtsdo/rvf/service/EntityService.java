@@ -1,7 +1,5 @@
 package org.ihtsdo.rvf.service;
 
-import org.ihtsdo.rvf.entity.ReleaseCenter;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +18,4 @@ public interface EntityService<T> {
     T find(Class clazz, UUID uuid);
 
     Long count(Class clazz);
-
-    ReleaseCenter getIhtsdo();
 }

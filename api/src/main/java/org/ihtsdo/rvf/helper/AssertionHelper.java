@@ -20,14 +20,17 @@ public class AssertionHelper {
 	private AssertionService assertionService;
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
-	
-	public Map<String, Object> assertAssertions(final Collection<Assertion> assertions, final ExecutionConfig config) {
+
+	public Map<String, Object> assertAssertions(
+			final Collection<Assertion> assertions, final ExecutionConfig config) {
 		final Collection<TestRunItem> allTestRunItems = new ArrayList<>();
-		final Map<String , Object> responseMap = new LinkedHashMap<>();
+		final Map<String, Object> responseMap = new LinkedHashMap<>();
 		int failedAssertionCount = 0;
-		for (final Assertion assertion: assertions) {
+		for (final Assertion assertion : assertions) {
 			try {
-				final List<TestRunItem> items = new ArrayList<>(assertionExecutionService.executeAssertion(assertion, config));
+				final List<TestRunItem> items = new ArrayList<>(
+						assertionExecutionService.executeAssertion(assertion,
+								config));
 				for (final TestRunItem item : items) {
 					if (item.getFailureCount() != 0) {
 						failedAssertionCount++;
@@ -35,7 +38,7 @@ public class AssertionHelper {
 					item.setExecutionId(config.getExecutionId().toString());
 					allTestRunItems.add(item);
 				}
-			} catch (final MissingEntityException e) {
+			} catch (final EntityNotFoundException e) {
 				failedAssertionCount++;
 			}
 		}

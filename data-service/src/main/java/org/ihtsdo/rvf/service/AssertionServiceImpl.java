@@ -13,7 +13,7 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.helper.MissingEntityException;
+import org.ihtsdo.rvf.helper.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +26,8 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 	private AssertionDao assertionDao;
 	@Autowired
 	private AssertionGroupDao assertionGroupDao;
+	
+	@SuppressWarnings("rawtypes")
 	@Autowired
 	private EntityService entityService;
 
@@ -53,8 +55,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 	@Override
 	public void delete(final Assertion assertion) {
 		// first get all associated AssertionTests and delete them
-		for(final AssertionTest assertionTest : getAssertionTests(assertion))
-		{
+		for(final AssertionTest assertionTest : getAssertionTests(assertion)) {
 			entityService.delete(assertionTest);
 		}
 
@@ -81,7 +82,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 			return assertion;
 		}
 		else{
-			throw new MissingEntityException(id);
+			throw new EntityNotFoundException(id);
 		}
 	}
 	
@@ -147,7 +148,7 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 		{
 			assertionTest = new AssertionTest();
 			// verify if assertion has been saved - otherwise save it
-			if(assertion.getId() == null){
+			if(assertion.getAssertionId() == null){
 				assertionDao.save(assertion);
 			}
 			// verify if test has been saved - otherwise save first
@@ -187,7 +188,6 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 		if (assertionTest != null) {
 			entityService.delete(assertionTest);
 		}
-
 		return assertion;
 	}
 
@@ -252,16 +252,17 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 	public AssertionGroup removeAssertionFromGroup(final Assertion assertion, final AssertionGroup group){
 		/*
 			see if group already exists. We get groups for assertion, instead of assertions for group since getting
-			assertions is likely to return a large number of entites. It is likely that a group might have a large
+			assertions is likely to return a large number of entities. It is likely that a group might have a large
 			number of assertions
 		  */
-
 		final List<AssertionGroup> assertionGroups = getGroupsForAssertion(assertion);
-		if(assertionGroups.contains(group))
-		{
-			group.getAssertions().remove(assertion);
+		for (AssertionGroup grp : assertionGroups) {
+			if (grp.getId().equals(group.getId())) {
+				grp.removeAssertion(assertion);
+				return assertionGroupDao.update(grp);
+			}
 		}
-		return (AssertionGroup) entityService.update(group);
+		return group;
 	}
 
 	@Override

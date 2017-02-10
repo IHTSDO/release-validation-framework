@@ -79,7 +79,7 @@ public class AssertionsImporter {
 						try
 						{
 							assertion = objectMapper.readValue(responseEntity.getBody().toString(), Assertion.class);
-							 logger.info("Created assertion id : " + assertion.getId());
+							 logger.info("Created assertion id : " + assertion.getAssertionId());
 							assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
 							// get Sql file name from element and use it to add SQL test
 							final String sqlFileName = element.getAttributeValue("sqlFile");

@@ -14,26 +14,35 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.hibernate.annotations.Index;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
  * An Assertion represents a truth in snomed, it consists of a number of tests to verify
  * that assertion.
  */
+
 @Entity
 @XmlRootElement(name = "assertion")
 @Table(name = "assertion",
 	uniqueConstraints = @UniqueConstraint(columnNames={"uuid"}))
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = Assertion.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@ApiModel( value = "Assertion", description = "Assertion resource representation" )
 public class Assertion {
 
 	@Id
 	@GeneratedValue
 	@Column(name = "assertion_id")
-	private Long id;
+	private Long assertionId;
 	
 	@Column(name = "assertion_text")
 	private String assertionText;
+	
+	private String keywords;
+	
+	@Index(name="assertion_uuid_idx",columnNames={"uuid"})
+	private String uuid = UUID.randomUUID().toString();
 	
 	@Column(name = "short_name")
 	private String shortName;
@@ -41,29 +50,27 @@ public class Assertion {
 	@Column(name = "doc_ref")
 	private String docRef;
 	
-	private String keywords;
-	
-	@Index(name="assertion_uuid_idx",columnNames={"uuid"})
-	private String uuid = UUID.randomUUID().toString();
 
 	public Assertion() {
 	}
 
 	public Assertion(final Long id, final String assertionText) {
 		this.assertionText = assertionText;
-		this.id = id;
+		this.assertionId = id;
 	}
 
 	@XmlElement
-	public Long getId() {
-		return id;
+	@ApiModelProperty( position=1, value="Auto generated Assertion Id") 
+	public Long getAssertionId() {
+		return assertionId;
 	}
 
-	public void setId(final Long id) {
-		this.id = id;
+	public void setAssertionId(final Long assertionId) {
+		this.assertionId = assertionId;
 	}
 
 	@XmlElement
+	@ApiModelProperty( position=2, value="Assertion text", required=true)
 	public String getAssertionText() {
 		return assertionText;
 	}
@@ -72,6 +79,7 @@ public class Assertion {
 		this.assertionText = assertionText;
 	}
 
+	@ApiModelProperty(position=3, value ="type of assertion", required=true)
 	public String getKeywords() {
 		return keywords;
 	}
@@ -81,6 +89,7 @@ public class Assertion {
 	}
 
 	@XmlElement
+	@ApiModelProperty( position=4, value="UUID", required=true ) 
 	public UUID getUuid() {
 		return UUID.fromString(uuid);
 	}
@@ -92,7 +101,7 @@ public class Assertion {
 	@Override
 	public String toString() {
 		return "Assertion{" +
-				"id=" + id +
+				"id=" + assertionId +
 				", name='" + assertionText + '\'' +
 				'}';
 	}
@@ -101,7 +110,7 @@ public class Assertion {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((assertionId == null) ? 0 : assertionId.hashCode());
 		result = prime * result
 				+ ((keywords == null) ? 0 : keywords.hashCode());
 		result = prime * result + ((assertionText == null) ? 0 : assertionText.hashCode());
@@ -118,10 +127,10 @@ public class Assertion {
 		if (getClass() != obj.getClass())
 			return false;
 		final Assertion other = (Assertion) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (assertionId == null) {
+			if (other.assertionId != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!assertionId.equals(other.assertionId))
 			return false;
 		if (keywords == null) {
 			if (other.keywords != null)
@@ -141,6 +150,7 @@ public class Assertion {
 		return true;
 	}
 
+	@ApiModelProperty(hidden=true)
 	public String getShortName() {
 		return shortName;
 	}
@@ -149,6 +159,7 @@ public class Assertion {
 		this.shortName = shortName;
 	}
 
+	@ApiModelProperty(hidden=true)
 	public String getDocRef() {
 		return docRef;
 	}

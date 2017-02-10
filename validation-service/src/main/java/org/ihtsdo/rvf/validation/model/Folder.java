@@ -85,10 +85,8 @@ public class Folder {
 		if (files != null ? !files.equals(folder.files) : folder.files != null) return false;
 		if (!folderName.equals(folder.folderName)) return false;
 		if (folders != null ? !folders.equals(folder.folders) : folder.folders != null) return false;
-		if (parent != null ? !parent.equals(folder.parent) : folder.parent != null) return false;
-
-		return true;
-	}
+        return parent != null ? parent.equals(folder.parent) : folder.parent == null;
+    }
 
 	@Override
 	public int hashCode() {

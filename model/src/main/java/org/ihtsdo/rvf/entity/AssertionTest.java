@@ -6,6 +6,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+
+import com.wordnik.swagger.annotations.ApiModel;
+
 /**
  * Class represents the association between an assertion and a test, here we determine whether the test is active
  * for the given assertion without inactivating the test, just for the given assertion for the given releaseCenter,
@@ -15,6 +18,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "assertion_test")
+@ApiModel(description="AssertionTest model")
 public class AssertionTest {
 
 	@Id

@@ -18,6 +18,8 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
  * An entity that reprsents a collection of {@link org.ihtsdo.rvf.entity.Assertion}s. Note that this is deliberately not
@@ -26,13 +28,16 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 @Entity
 @Table(name = "assertion_group")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = AssertionGroup.class)
+@ApiModel(description="Assertion group model")
 public class AssertionGroup {
 
 	@Id
 	@GeneratedValue
 	@Column(name = "group_id")
+	@ApiModelProperty(value="Auto generated id")
 	private Long id;
 	
+	@ApiModelProperty(value="Assertion group name", required=true)
 	private String name;
 	
 	@ManyToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -41,11 +46,11 @@ public class AssertionGroup {
 			joinColumns = @JoinColumn( name="group_id"),
 			inverseJoinColumns = @JoinColumn( name="assertion_id")
 	)
-	
 	@JsonIgnore
 	private Set<Assertion> assertions = new HashSet<>();
 	
 	@Transient
+	@ApiModelProperty(value="Total assertions")
 	private final int total = 0;
 	
 	
@@ -93,8 +98,12 @@ public class AssertionGroup {
 	 * @param assertion the assertion to be removed
 	 */
 	@Transient
-	public void removeAssertion(final Assertion assertion){
+	public void removeAssertion(final Assertion assertion) {
 		this.getAssertions().remove(assertion);
+	}
+	
+	public void removeAllAssertionsFromGroup() {
+		assertions.clear();
 	}
 
 	@Override

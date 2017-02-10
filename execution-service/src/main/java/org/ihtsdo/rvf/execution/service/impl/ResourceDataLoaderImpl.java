@@ -66,10 +66,10 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 		}
 	}
 
-	private void copyDataFiles(final String[] resourceFileNames, final File tempDataFolder ) throws IOException, FileNotFoundException {
+	private void copyDataFiles(final String[] resourceFileNames, final File tempDataFolder ) throws IOException {
 		for( final String fileName : resourceFileNames) {
 			try (final InputStream txtInput = getClass().getResourceAsStream("/datafiles/" + fileName);
-					final Writer writer = new FileWriter(new File(tempDataFolder, fileName));) {
+					final Writer writer = new FileWriter(new File(tempDataFolder, fileName))) {
 					IOUtils.copy(txtInput,writer,UTF_8);
 			}
 		}

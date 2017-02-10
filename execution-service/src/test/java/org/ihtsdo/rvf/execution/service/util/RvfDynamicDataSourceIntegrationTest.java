@@ -21,10 +21,10 @@ public class RvfDynamicDataSourceIntegrationTest {
     public void testGettingLargeNumberOfConnections() throws Exception {
         assertNotNull(rvfDynamicDataSource);
 
-        // try and 5000 connections
-        for(int i=0; i<5000; i++){
+        // try and 10 connections
+        for(int i=0; i<10; i++){
             System.out.print("Connection : " + i + ",");
-            Connection connection = rvfDynamicDataSource.getConnection("rvf_int_20140731");
+            Connection connection = rvfDynamicDataSource.getConnection("rvf_master");
             assertNotNull(connection);
             connection.close();
         }

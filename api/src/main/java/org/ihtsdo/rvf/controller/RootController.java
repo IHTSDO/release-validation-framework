@@ -22,16 +22,19 @@ import java.util.Map;
 @ApiIgnore
 public class RootController {
 
-    @Autowired
-    private HypermediaGenerator hypermediaGenerator;
+	@Autowired
+	private HypermediaGenerator hypermediaGenerator;
 
-    private static final String[] ROOT_LINK = {"assertions", "tests", "groups", "releases", "version"};
+	private static final String[] ROOT_LINK = { "assertions", "tests",
+			"groups", "releases", "version" };
 
-    @RequestMapping
-    @ResponseBody
-    public Map<String, Object> getRoot(HttpServletRequest request) {
-        boolean currentResource = true;
-        return hypermediaGenerator.getEntityHypermedia(new HashMap<String, String>(), currentResource, request, ROOT_LINK);
-    }
+	@RequestMapping
+	@ResponseBody
+	public Map<String, Object> getRoot(HttpServletRequest request) {
+		boolean currentResource = true;
+		return hypermediaGenerator.getEntityHypermedia(
+				new HashMap<String, String>(), currentResource, request,
+				ROOT_LINK);
+	}
 
 }

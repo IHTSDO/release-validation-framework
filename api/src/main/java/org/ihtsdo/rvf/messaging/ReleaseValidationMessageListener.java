@@ -22,20 +22,20 @@ public class ReleaseValidationMessageListener {
 	@Autowired
 	private ValidationRunner runner;
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	//Using runner as prototype scope or using executor to process message asynchronously
+	// Using runner as prototype scope or using executor to process message
+	// asynchronously
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
 
 	@JmsListener(containerFactory = "jmsListenerContainerFactory", destination = "${rvf.validation.queue.name}")
 	public void triggerValidation(final TextMessage incomingMessage) {
 		logger.info("Received message {}", incomingMessage);
-//		runValidationAsynchronously(incomingMessage);
+		// runValidationAsynchronously(incomingMessage);
 		runValidation(incomingMessage);
 	}
 
-	
 	private void runValidationAsynchronously(final TextMessage incomingMessage) {
-		executor.submit( new Runnable() {
-			
+		executor.submit(new Runnable() {
+
 			@Override
 			public void run() {
 				runValidation(incomingMessage);
@@ -47,15 +47,17 @@ public class ReleaseValidationMessageListener {
 		Gson gson = new Gson();
 		ValidationRunConfig config = null;
 		try {
-			config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
+			config = gson.fromJson(incomingMessage.getText(),
+					ValidationRunConfig.class);
 			logger.info("validation config from queue:" + config);
 		} catch (JsonSyntaxException | JMSException e) {
 			logger.error("JMS message listener error:", e);
 		}
-		if ( config != null) {
+		if (config != null) {
 			runner.run(config);
 		} else {
-			logger.error("Null validation config found for message:" + incomingMessage);
+			logger.error("Null validation config found for message:"
+					+ incomingMessage);
 		}
 	}
 }

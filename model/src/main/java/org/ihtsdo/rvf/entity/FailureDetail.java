@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.entity;
 
+
 public class FailureDetail {
 
 	String conceptId;

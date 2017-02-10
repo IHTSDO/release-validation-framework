@@ -10,13 +10,17 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
 		">
 
+	<import resource="applicationContext.xml"/>
+	<import resource="importerServiceContext.xml"/>
+	<import resource="validationContext.xml"/>
+	
 	<context:annotation-config/>
 	<tx:annotation-driven/>
-
-	<context:property-placeholder location="file://${rvfConfigLocation}/execution-service.properties" order="-1"
+	
+	<context:property-placeholder location="file://${rvfConfigLocation:/tmp}/execution-service.properties" order="-1"
 								  ignore-unresolvable="true" ignore-resource-not-found="true" />
 	<context:property-placeholder location="classpath*:execution-service-defaults.properties" />
-
+    
 	<!-- Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing-->
 	<bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${rvf.snomed.jdbc.driverClassName}"/>
@@ -31,7 +35,7 @@
 		<property name="testWhileIdle" value="true"/>
 		<property name="validationQuery" value="SELECT 1"/>
 		<property name="numTestsPerEvictionRun" value="3"/>
-	</bean>
+	</bean> 
 	
 	<bean factory-bean="s3ClientFactory" factory-method="getClient">
 		<constructor-arg value="${offlineMode}" />
@@ -59,7 +63,7 @@
 
 	<!-- service beans will go here -->
 	<bean id="rvfDynamicDataSource" class="org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource">
-		<property name="url" value="${rvf.snomed.jdbc.url}"/>
+		<property name="url" value="${rvf.jdbc.url}"/>
 	</bean>
 	<bean id="assertionExecutionService" class="org.ihtsdo.rvf.execution.service.impl.AssertionExecutionServiceImpl">
 		<property name="qaResulTableName" value="${rvf.qa.result.table.name}"/>
@@ -69,7 +73,6 @@
 	</bean>
 
 	<bean id="releaseDataManager" class="org.ihtsdo.rvf.execution.service.impl.ReleaseDataManagerImpl">
-		<property name="snomedDataSource" ref="snomedDataSource"/>
 		<property name="sctDataLocation" value="${rvf.data.folder.location}"/>
 	</bean>
 	<bean id="resourceDataLoader" class="org.ihtsdo.rvf.execution.service.impl.ResourceDataLoaderImpl"/>
@@ -87,7 +90,4 @@
 	<bean id="scheduleEventGenerator" class ="org.ihtsdo.rvf.execution.service.impl.RvfDbScheduledEventGenerator">
 	<constructor-arg value="${rvf.qa.data.maxKeepTime}"/>
 	</bean>
-	<import resource="applicationContext.xml"/>
-	<import resource="importerServiceContext.xml"/>
-
 </beans>

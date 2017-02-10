@@ -78,7 +78,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 						if(assertion != null){
 							try
 							{
-								 logger.info("Created assertion id : " + assertion.getId());
+								 logger.info("Created assertion id : " + assertion.getAssertionId());
 								assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
 								// get Sql file name from element and use it to add SQL test
 								final String sqlFileName = element.getAttributeValue("sqlFile");
@@ -227,7 +227,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 			if( assertionService.find(assertion.getUuid()) == null ) {
 				assertion = assertionService.create(assertion);
 			}
-			logger.debug("Adding tests for assertion id" + assertion.getId());
+			logger.debug("Adding tests for assertion id" + assertion.getAssertionId());
 			assertionService.addTests(assertion, tests);
 				
 		}
@@ -353,7 +353,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		private void createOrUpdateAssertion(SimpleAssertion simpleAssertion) throws JsonProcessingException {
 			Assertion assertion = simpleAssertion.toAssertion();
 			//Do we need to create that assertion or does it already exist?
-			if ( assertionService.find(assertion.getId()) != null) {
+			if ( assertionService.find(assertion.getAssertionId()) != null) {
 				assertionService.delete(assertion);
 			}
 			assertion = assertionService.create(assertion);

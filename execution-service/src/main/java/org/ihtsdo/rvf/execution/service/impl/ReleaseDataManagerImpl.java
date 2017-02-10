@@ -52,6 +52,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	private File sctDataFolder;
 	@Resource(name = "snomedDataSource")
 	private BasicDataSource snomedDataSource;
+	
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	private final Map<String, String> releaseSchemaNameLookup = new ConcurrentHashMap<>();
@@ -249,12 +250,8 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 				
 				@Override
 				public boolean accept(final File dir, final String name) {
-					if ( name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2")))
-					{
-						return true;
-					}
-					return false;
-				}
+                    return name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2"));
+                }
 			});
 			final ReleaseFileDataLoader dataLoader = new ReleaseFileDataLoader(dataSource, schemaName, new MySqlDataTypeConverter());
 			dataLoader.loadFilesIntoDB(rf2TextFilesDir.getAbsolutePath(), rf2Files, rf2FilesLoaded);
@@ -284,10 +281,6 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	public void setSctDataLocation(final String sctDataLocationX) {
 		sctDataLocation = sctDataLocationX;
-	}
-
-	public void setSnomedDataSource(final BasicDataSource snomedDataSourceX) {
-		snomedDataSource = snomedDataSourceX;
 	}
 
 	/**
@@ -323,11 +316,8 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 				public boolean accept(final File dir, final String name) {
 					final String[] tokens = name.split("_");
 					final String lastToken = tokens[tokens.length -1];
-					if (lastToken.endsWith(".zip") && lastToken.contains(knownVersion)) {
-						return true;
-					}
-					return false;
-				}
+                    return lastToken.endsWith(".zip") && lastToken.contains(knownVersion);
+                }
 			});
 			filesFound.addAll(Arrays.asList(zipFiles));
 		}
@@ -546,8 +536,8 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	@Override
 	public String createSchema(String version) {
-		String schemaName = RVF_DB_PREFIX + version;;
-		try (Connection connection = snomedDataSource.getConnection()) {
+		String schemaName = RVF_DB_PREFIX + version;
+        try (Connection connection = snomedDataSource.getConnection()) {
 			createDBAndTables(schemaName, connection);
 			releaseSchemaNameLookup.put(version, schemaName);
 		} catch (SQLException | IOException e) {

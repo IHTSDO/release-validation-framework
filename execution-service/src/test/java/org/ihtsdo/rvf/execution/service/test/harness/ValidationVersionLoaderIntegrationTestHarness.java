@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service.test.harness;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +17,10 @@ import javax.sql.DataSource;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.impl.RvfDbScheduledEventGenerator;
+import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
+import org.ihtsdo.rvf.execution.service.impl.ValidationVersionLoader;
 import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.junit.After;
@@ -30,9 +34,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
-public class ValidationVersionLoaderIntegrationTest {
-	@Resource(name = "snomedDataSource")
-	private DataSource snomedDataSource;
+public class ValidationVersionLoaderIntegrationTestHarness {
+	@Resource(name = "dataSource")
+	private DataSource dataSource;
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 	

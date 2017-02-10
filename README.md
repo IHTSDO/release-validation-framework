@@ -1,29 +1,42 @@
-Release Validation Framework
-============================
+Release Validation Framework (RVF)
+====================================
 A framework for testing the validity of SNOMED CT releases.
+
+Getting started
+---------------
+These instructions will provide guidance in getting the RVF running on your local machine for development and testing.
+
+### Prerequisites
+You will need:
+- [Git Client](https://git-scm.com/) to clone the project
+- [JDK 1.7](http://www.oracle.com/technetwork/java/javase/downloads) or above 
+- [Maven](https://maven.apache.org/) to build
+
 
 Build Instructions
 ------------------
+Clone the project then use maven to build it:
 ```
-git clone https://github.com/IHTSDO/release-validation-framework.git
-// -- see note below about config folder
-mvn clean install -DrvfConfigLocation=/tmp
+mvn clean install
 ```
 
 Database Setup
 ------------------
-The RVF currently requires a local database to be available as per the settings defined in execution-service.properties below.
-Setting up this database and user can be done using the following mysql code:
+The RVF currently requires a local MySQL database to be available.
+Setting up this database and user can be done using the following:
 ```
+CREATE DATABASE rvf_master;
+
 CREATE USER 'rvf_user'@'localhost' 
-// alternatively more secure: CREATE USER 'rvf_user'@'localhost' IDENTIFIED BY 'password_here';
+// Alternatively give a password: CREATE USER 'rvf_user'@'localhost' IDENTIFIED BY 'password_here';
 
 GRANT ALL PRIVILEGES ON *.* TO 'rvf_user'@'localhost';
 ```
-The rvf_user should not be restricted to the rvf_master database schema, as it will be required to generate new databases for each release (both existing and prospective) that it receives.
-### Configuration Folder
-The services in the RVF can be configured using property files. Default values for the services are included in the jar 
-files. However, it is possible to override the default values by providing property files for each of the services. 
+Be sure to include details of the connection in the execution-service.properties file mentioned below.
+The privileges of the user 'rvf_user' should not be restricted to the 'rvf_master' database because additional databases will be generated for each SNOMED release.
+
+### Configuration
+There are various services that can be configured. There are default values but these can be overridden using properties files.
 The following is a list of property files that can be used to configure services:
 
 |File name | Description | RVF deployment location |
@@ -34,32 +47,26 @@ validation-service.properties | Settings to configure structural tests report lo
 
 Sample files for configuring the services can be see found in the config folder.
 
+Starting The Application
+------------------
+Start the stand-alone web application using the executable jar after replacing "{config_dir}"
+
+`java -jar api/target/validation-api.jar -DrvfConfigLocation={config_dir}`
+
+API Documentation
+--------------------
+The RVF API is documented using Swagger http://localhost:8080/api/v1/api-doc.html
+
 ### Upload a Published Release
+Option 1:
 The release endpoint of the REST API can be used to list releases and to upload a published release.
 Find the endpoint at **http://localhost:8080/api/v1/releases**
 
 Example upload
 ```bash
-curl -X POST -F 'file=@SnomedCT_RF2Release_SE1000052_20160531.zip' http://localhost:8080/api/v1/releases/se/20160531
+curl -X POST -F 'file=@SnomedCT_RF2Release_INT_20160731.zip' http://localhost:8080/api/v1/releases/int/20160731
 ```
-
-### Data Folder
-N.B. This doesn't seem to be working.
-
-The RVF provides a convenient feature that allows published releases to be uploaded and stored to a designated 'sct data' 
-folder. During startup, the RVF unzips any published release in this folder and loads it into a database as a known release. 
-The following conventions are used by this feature:
-
-|File name | Schema name generated | Comment |
-|:------------- |:-------------:|:-----|
-SnomedCT\_Release\_INT\_20140731.zip | rvf\_int\_20140731 | Created if database named rvf\_int\_20140731 does not exist |
-SnomedCT\_Release\_INT\_20140731.txt | Not processed | Only zip files are processed |
-
-How to use the API
---------------------
-While more comprehensive documentation is being prepared, you can find examples of how use the API in the test cases 
-included in the API module. If you are not a Java developer and want to access the API from a non Java environment, 
-then refer to the curl tests/examples in the API-Demo module.
+Option 2: Using Swagger API as shown above. See Manage published releases section for detailed information.
 
 Testing Instructions
 --------------------
@@ -69,22 +76,13 @@ mvn clean test
 ```
 
 ### Integration Testing
-Integration tests expect an actual MySQL SNOMED CT database that contains SNOMED CT data. To run integration tests use: 
+Integration tests require a MySQL database containing SNOMED CT data. To run integration tests once this is in place, use: 
 ```
-mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation=/tmp
-```
+mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation={config_dir}
 
-Note that all tests in the API that deal with controllers are currently marked as Integration tests. The spring context
-used by the api-module tries to connect to a MySQL server, which will be missing in Jenkins. So to prevent needless test
-failure on Jenkins, all these tests have been marked as IntegrationTests. This should be skipped by setting a separate 
-Spring context file for tests that do not require MySQL access.
+```
 
 Importing Assertions
 --------------------
-Assertions can currently be imported from copies of the legacy implementation (RAT) configuration files included in this project.
-To import these assertions, start the API listening locally on port 8080 and type:
-```
-cd importer
-mvn clean integration-test -Dskip.integration.tests=false
-```
+Assertions are imported automatically during RVF application startup. The list of assertions is documented in the manifest.xml file under importer/src/main/resources/xml/lists/ folder. Actual assertion SQL files can be found in the importer/src/main/resources/scripts folder.
 

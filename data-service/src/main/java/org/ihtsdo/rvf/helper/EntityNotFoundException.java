@@ -6,12 +6,13 @@ import java.util.UUID;
  * A custom Exception for reporting missing entities.
  *
  */
-public class MissingEntityException extends RuntimeException{
+public class EntityNotFoundException extends RuntimeException{
+	private static final long serialVersionUID = 1L;
 
-    public MissingEntityException(final Long id) {
+	public EntityNotFoundException(final Long id) {
         super("No entity found with given id " + id);
     }
-    public MissingEntityException(final UUID uuid) {
+    public EntityNotFoundException(final UUID uuid) {
         super("No entity found with given uuid " + uuid);
     }
 }

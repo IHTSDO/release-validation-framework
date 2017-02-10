@@ -11,17 +11,21 @@ import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.snomed.rvf.importer.AssertionsDatabaseImporter;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.amazonaws.services.simpleworkflow.flow.annotations.SkipTypeRegistration;
+
 /**
  * A test class for {@link org.ihtsdo.snomed.rvf.importer.AssertionsImporter}
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testImporterServiceContext.xml"})
+@Ignore
 public class AssertionDbImporterIntegrationTest {
 	
 	public static final String scriptsDir = "/scripts";
@@ -39,7 +43,7 @@ public class AssertionDbImporterIntegrationTest {
 	public void testImportAssertionsFromFile() throws Exception {
 		//"/xml/lists/manifest.xml"
 		//"/testManifest.xml"
-		final InputStream manifestInputStream = AssertionsImporterImplIntegrationTest.class.getResourceAsStream("/xml/lists/manifest.xml");
+		final InputStream manifestInputStream = AssertionsImporterImplIntegrationTestManual.class.getResourceAsStream("/xml/lists/manifest.xml");
 		assertNotNull("manifestUrl must not be null", manifestInputStream);
 
 		// import content
@@ -49,13 +53,13 @@ public class AssertionDbImporterIntegrationTest {
 	@Test
 	public void testImportAssertionsFromDirectory() throws Exception {
 		String targetDirName = scriptsDir + "/" + hierarchyTermModellingDir;
-		final URL targetDirUrl = AssertionsImporterImplIntegrationTest.class.getResource(targetDirName);
+		final URL targetDirUrl = AssertionsImporterImplIntegrationTestManual.class.getResource(targetDirName);
 		assertNotNull(targetDirName + " directory not found", targetDirUrl);
 		assertionsImporter.importAssertionsFromDirectory(new File(targetDirUrl.toURI()), hierarchyTermModellingDir);
 	}
 	
 	@Test
 	public void testAddSqlScript() throws IOException {
-		assertionsImporter.addSqlTestToAssertion(new Assertion(), IOUtils.toString(AssertionsImporterImplIntegrationTest.class.getResource("/scripts/release-type/release-type-full-validation-concept.sql")));
+		assertionsImporter.addSqlTestToAssertion(new Assertion(), IOUtils.toString(AssertionsImporterImplIntegrationTestManual.class.getResource("/scripts/release-type/release-type-full-validation-concept.sql")));
 	}
 }

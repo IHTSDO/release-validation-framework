@@ -61,16 +61,16 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(run_id BIGINT, assertion_id BIGINT, concept_id BIGINT, " + 
-				"details VARCHAR(500)) engine=innodb default charset=utf8";
-		try (Connection connection = dataSource.getConnection()) {
-			try (Statement statement = connection.createStatement()) {
-				statement.execute(createSQLString);
-			}
-		}
-		catch (final SQLException e) {
-			logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
-		}
+//		final String createSQLString = "CREATE TABLE IF NOT EXISTS " + qaResulTableName + "(run_id BIGINT, assertion_id BIGINT, concept_id BIGINT, " + 
+//				"details VARCHAR(500)) engine=innodb default charset=utf8";
+//		try (Connection connection = dataSource.getConnection()) {
+//			try (Statement statement = connection.createStatement()) {
+//				statement.execute(createSQLString);
+//			}
+//		}
+//		catch (final SQLException e) {
+//			logger.error("Error initialising Results table. Nested exception is : " + e.fillInStackTrace());
+//		}
 	}
 
 	@Override
@@ -214,17 +214,6 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		logger.info(runItem.toString());
 		return runItem;
 	}
-/*
-	@Override
-	public Collection<TestRunItem> executeTests(Collection<Test> tests, Long executionId,
-												String prospectiveReleaseVersion, String previousReleaseVersion) {
-		Collection<TestRunItem> items = new ArrayList<>();
-		for(Test test: tests){
-			items.add(executeTest(test, executionId, prospectiveReleaseVersion, previousReleaseVersion));
-		}
-
-		return items;
-	}*/
 
 	private void executeCommand(final Assertion assertion, final ExecutionConfig config,
 			final ExecutionCommand command, final Connection connection)
@@ -233,9 +222,10 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		if (command.getStatements().size() == 0)
 		{
 			final String sql = command.getTemplate();
-			parts = sql.split(";");
-		}
-		else {
+			if (sql != null) {
+				parts = sql.split(";");
+			}
+		}else {
 			parts = command.getStatements().toArray(new String[command.getStatements().size()]);
 		}
 		// parse sql to get select statement
@@ -263,7 +253,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 								while(execResult.next())
 								{
 									insertStatement.setLong(1, executionId);
-									insertStatement.setLong(2, assertion.getId());
+									insertStatement.setLong(2, assertion.getAssertionId());
 									insertStatement.setString(3, execResult.getString(3));
 									insertStatement.addBatch();
 								}
@@ -311,7 +301,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = commentPattern.matcher(part).replaceAll("");
 			// replace all substitutions for exec
 			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
-			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getId()));
+			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
 			// watch out for any 's that users might have introduced
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
 			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
@@ -343,7 +333,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			long counter = 0;
 			try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
 				// select results that match execution
-				preparedStatement.setLong(1, assertion.getId());
+				preparedStatement.setLong(1, assertion.getAssertionId());
 				preparedStatement.setLong(2, config.getExecutionId());
 				if( config.getFailureExportMax() > 0) {
 					preparedStatement.setLong(3, config.getFailureExportMax());
@@ -368,7 +358,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				String totalSQL = "select count(*) total from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
 				try (PreparedStatement preparedStatement = connection.prepareStatement(totalSQL)) {
 					// select results that match execution
-					preparedStatement.setLong(1, assertion.getId());
+					preparedStatement.setLong(1, assertion.getAssertionId());
 					preparedStatement.setLong(2, config.getExecutionId());
 					try (ResultSet resultSet = preparedStatement.executeQuery()) {
 						if (resultSet.next()) {

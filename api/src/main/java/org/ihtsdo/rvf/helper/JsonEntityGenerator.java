@@ -16,7 +16,8 @@ public class JsonEntityGenerator {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	public List<Map<String, Object>> getEntityCollection(List<? extends Object> entities, HttpServletRequest request) {
+	public List<Map<String, Object>> getEntityCollection(
+			List<? extends Object> entities, HttpServletRequest request) {
 		List<Map<String, Object>> jsonEntities = new ArrayList<>();
 
 		for (Object entity : entities) {

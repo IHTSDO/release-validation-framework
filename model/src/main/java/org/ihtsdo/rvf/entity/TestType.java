@@ -12,11 +12,11 @@ public enum TestType {
     UNKNOWN("unknown");
     
     private String name;
-    private TestType(String name) {
+    TestType(String name) {
     	this.name = name;
     }
     public boolean equalsName(String otherName) {
-        return (otherName == null) ? false : name.equals(otherName);
+        return otherName != null && name.equals(otherName);
     }
 
     @Override
