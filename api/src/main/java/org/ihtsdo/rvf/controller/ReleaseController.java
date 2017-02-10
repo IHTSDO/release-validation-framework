@@ -41,11 +41,11 @@ public class ReleaseController {
 
 	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation(value = "Upload a published release version", notes = "Upload a published release for a given product.")
+	@ApiOperation(value = "Upload a published release version", notes = "Uploads a published release for a given product.")
 	public ResponseEntity uploadRelease(
-			@ApiParam(value = "published RF2 zip package") @RequestParam(value = "file") final MultipartFile file,
-			@ApiParam(value = "short product name e.g int for international RF2 release") @PathVariable final String product,
-			@ApiParam(value = "release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
+			@ApiParam(value = "The published RF2 zip package") @RequestParam(value = "file") final MultipartFile file,
+			@ApiParam(value = "The short product name e.g int for international RF2 release") @PathVariable final String product,
+			@ApiParam(value = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
 		try {
 			final boolean result = releaseDataManager
 					.uploadPublishedReleaseData(file.getInputStream(),
@@ -62,10 +62,9 @@ public class ReleaseController {
 
 	@RequestMapping(value = "{version}", method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "Check a given release is loaded already", notes = "Check the version is already loaded. The version format is {product}_{releaseDate} e.g int_20170131")
+	@ApiOperation(value = "Check a given release is loaded already", notes = "Checks whether a version is loaded or not. The version format is {product}_{releaseDate} e.g int_20170131")
 	public ResponseEntity getRelease(
-			@ApiParam(value = "published version loaded in RVF") @PathVariable final String version) {
-
+			@ApiParam(value = "The version name e.g int_20170131") @PathVariable final String version) {
 		if (releaseDataManager.isKnownRelease(version)) {
 			return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
 		} else {
@@ -76,9 +75,9 @@ public class ReleaseController {
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Get all versions that are loaded in the RVF database already", notes = "Return all published versions that have been loaded already.")
+	@ApiOperation(value = "Get all versions that are loaded in the RVF database", notes = "Gets all versions that are loaded in the RVF database. Published versions are loaded in the format of {product}_{releaseDate} e.g int_20170131.")
 	public java.util.Set<String> getAllKnownReleases() {
-
+		
 		return releaseDataManager.getAllKnownReleases();
 	}
 }

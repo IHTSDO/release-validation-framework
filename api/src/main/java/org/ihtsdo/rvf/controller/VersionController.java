@@ -28,7 +28,8 @@ public class VersionController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "Get version of deployed RVF service", notes = "Get version of deployed RVF service")
+	@ApiOperation(value = "Get the RVF api version", notes = "This api is used to get the deployed RVF version. "
+			+ "It looks for the version number stored in /opt/rvf-api/data/version.txt.")
 	public Map<String, String> getVersion(HttpServletRequest request)
 			throws IOException {
 		Map<String, String> entity = new HashMap<>();

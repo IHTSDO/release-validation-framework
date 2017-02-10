@@ -159,7 +159,7 @@ public class AssertionController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value = "Create an assertion", notes = "Create an assertion with values provided. The assertion id is not required as it will be auto generated. "
-			+ "The uuid field is optional as a randome uuid will be assigned when this is not set.")
+			+ "The uuid field is optional as a random uuid will be assigned when this is not set.")
 	public ResponseEntity<Assertion> createAssertion(
 			@RequestBody final Assertion assertion) {
 		// Firstly, the assertion must have a UUID (otherwise malformed request)
@@ -190,7 +190,7 @@ public class AssertionController {
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Update an assertion", notes = "Update the assertion text,keywords or uuid property for an existing assertion.")
+	@ApiOperation(value = "Update an assertion", notes = "Updates the assertion text,keywords and uuid property for the existing assertion identified by the assertion id or uuid.")
 	public Assertion updateAssertion(
 			@ApiParam(value = "Assertion id or uuid") @PathVariable final String id,
 			@RequestBody(required = true) final Assertion assertion) {
@@ -209,10 +209,10 @@ public class AssertionController {
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.PUT)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Update a specific test for a given assertion", notes = "Update a specific test for a given assertion.")
+	@ApiOperation(value = "Update a specific test for a given assertion", notes = "Updates a specific test for a given assertion.")
 	public Assertion updateTest(
 			@ApiParam(value = "Assertion id or uuid") @PathVariable String id,
-			@RequestBody(required = true) Test test) {
+			@ApiParam(value="Test to be updated") @RequestBody(required = true) Test test) {
 		final Assertion existing = find(id);
 
 		if (existing == null) {
@@ -225,12 +225,12 @@ public class AssertionController {
 	@RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Execute tests of an assertion", notes = "Execute tests for a given an assertion specified by the id.")
+	@ApiOperation(value = "Execute tests of an assertion", notes = "Executes tests for the assertion specified by the id (assertion id or uuid).")
 	public ResponseEntity<Map<String, Object>> executeTest(
 			@ApiParam("Assertion id or uuid") @PathVariable final String id,
 			@ApiParam("Unique number")@RequestParam final Long runId,
-			@ApiParam("The prospective version to be validated without rvf prefix") @RequestParam final String prospectiveReleaseVersion,
-			@ApiParam("The previous version to be validated against without rvf prefix. Leave it null if there is no previous release.") @RequestParam(required = false) final String previousReleaseVersion) {
+			@ApiParam("The prospective version to be validated.") @RequestParam final String prospectiveReleaseVersion,
+			@ApiParam("The previous release version. Not required when there is no previous release.") @RequestParam(required = false) final String previousReleaseVersion) {
 		final Assertion assertion = find(id);
 
 		if (assertion == null) {

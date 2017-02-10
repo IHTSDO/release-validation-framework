@@ -80,7 +80,7 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation(value = "Structure tests", notes = "Uploaded files should be in RF2 files. Service can accept zip file or txt file. ")
+	@ApiOperation(value = "Structure tests", notes = "Uploaded files should be in RF2 format. Service can accept zip file or txt file. ")
 	@ApiIgnore
 	public ResponseEntity uploadTestPackage(
 			@RequestParam(value = "file") final MultipartFile file,
@@ -104,10 +104,10 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-post", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation(position = 2, value = "RF2 release file structure tests only for post release build package", notes = "Structure tests for RF2 post release build file in zip file format. Manifest file is optional.")
+	@ApiOperation(position = 2, value = "Structure tests for RF2 release files", notes = "Structure tests for RF2 release files in zip file format. The manifest file is optional.")
 	public ResponseEntity uploadPostTestPackage(
-			@RequestParam(value = "file") final MultipartFile file,
-			@ApiParam(required = false, value = "Default to false. Set it to true for report successful instances.") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			@ApiParam(value="RF2 release file in zip format")@RequestParam(value = "file") final MultipartFile file,
+			@ApiParam(required = false, value = "Defaults to false when not provided") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@ApiParam(required = false, value = "manifest.xml file") @RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
 			final HttpServletResponse response) throws IOException {
 		// load the filename
@@ -168,19 +168,19 @@ public class TestUploadFileController {
 	@RequestMapping(value = "/run-post", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(position = 3, value = "Run validations for RF2 release file. ", notes = "It runs both structure tests and assertion validations specified by the assertion groups.")
+	@ApiOperation(position = 3, value = "Run validations for a RF2 release file package.", notes = "It runs structure tests and assertion validations specified by the assertion groups. You can specify mutilple assertion group names separated by a comma. e.g common-authoring,int-authoring")
 	public ResponseEntity<Map<String, String>> runPostTestPackage(
 			@ApiParam(value = "RF2 release package in zip file") @RequestParam(value = "file") final MultipartFile file,
-			@ApiParam(value = "True if the test file only contains RF2 delta files.Default to false") @RequestParam(value = "rf2DeltaOnly", required = false) final boolean isRf2DeltaOnly,
+			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = "rf2DeltaOnly", required = false) final boolean isRf2DeltaOnly,
 			@ApiParam(value = "Default to false to reduce the size of report file") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@ApiParam(value = "manifest.xml file") @RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
-			@ApiParam(value = "Assertion group names") @RequestParam(value = "groups") final List<String> groupsList,
-			@ApiParam(value = "Required for non first time international release testing") @RequestParam(value = "previousIntReleaseVersion", required = false) final String prevIntReleaseVersion,
-			@ApiParam(value = "Required for non first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
+			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = "groups") final List<String> groupsList,
+			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = "previousIntReleaseVersion", required = false) final String prevIntReleaseVersion,
+			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
 			@ApiParam(value = "Required for extension release testing") @RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
-			@ApiParam(value = "Unique run id e.g Timestamp") @RequestParam(value = "runId") final Long runId,
-			@ApiParam(value = "Default to 10") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
-			@ApiParam(value = "sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = "runId") final Long runId,
+			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
+			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
 			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
@@ -219,19 +219,19 @@ public class TestUploadFileController {
 	@RequestMapping(value = "/run-post-via-s3", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(position = 4, value = "Validate release files stored in S3", notes = "This api is added for RVF autoscalling and should only be used for testing release files stored in S3.")
+	@ApiOperation(position = 4, value = "Run validations for the release files stored in AWS S3", notes = "This api is mainly used by the RVF autoscalling instances to validate release files stored in AWS S3.")
 	public ResponseEntity<Map<String, String>> runPostTestPackageViaS3(
-			@ApiParam(value = "Release zip file path in S3 bucket") @RequestParam(value = "releaseFileS3Path") final String releaseFileS3Path,
-			@ApiParam(value = "True if the test file only contains RF2 delta files.Default to false") @RequestParam(value = "rf2DeltaOnly", required = false) final boolean isRf2DeltaOnly,
-			@ApiParam(value = "Default to false to reduce the size of report file") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
-			@ApiParam(value = "manifest.xml file path in S3") @RequestParam(value = "manifestFileS3Path", required = false) final String manifestFileS3Path,
+			@ApiParam(value = "Release zip file path in AWS S3 bucket") @RequestParam(value = "releaseFileS3Path") final String releaseFileS3Path,
+			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = "rf2DeltaOnly", required = false) final boolean isRf2DeltaOnly,
+			@ApiParam(value = "Defaults to false to reduce the size of report file") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
+			@ApiParam(value = "manifest.xml file path in AWS S3") @RequestParam(value = "manifestFileS3Path", required = false) final String manifestFileS3Path,
 			@ApiParam(value = "Assertion group names") @RequestParam(value = "groups") final List<String> groupsList,
-			@ApiParam(value = "Required for non first time international release testing") @RequestParam(value = "previousIntReleaseVersion", required = false) final String prevIntReleaseVersion,
-			@ApiParam(value = "Required for non first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
+			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = "previousIntReleaseVersion", required = false) final String prevIntReleaseVersion,
+			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
 			@ApiParam(value = "Required for extension release testing") @RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
 			@ApiParam(value = "Unique run id e.g Timestamp") @RequestParam(value = "runId") final Long runId,
-			@ApiParam(value = "Default to 10") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
-			@ApiParam(value = "sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			@ApiParam(value = "Defaults to 10") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
+			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
 			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
@@ -290,7 +290,7 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation(position = 1, value = "Release input files structure testing.", notes = "Structure testing for RF2 text files used as inputs for release builds which are prefixed with rel2 e.g rel2_Concept_Delta_INT_20160731.txt")
+	@ApiOperation(position = 1, value = "Structure testing for release input files.", notes = "This API is for structure testing the RF2 text files used as inputs for release builds. These RF2 files are prefixed with rel2 e.g rel2_Concept_Delta_INT_20160731.txt")
 	public ResponseEntity uploadPreTestPackage(
 			@ApiParam(value = "RF2 input file prefixed with rel2", required = true) @RequestParam(value = "file") final MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,

@@ -38,9 +38,9 @@ public class ResultController {
 	private ValidationReportService reportService;
 
 	@RequestMapping(value = "{runId}", method = RequestMethod.GET)
-	@ApiOperation(value = "Retrieve the validation report for a given run id and storage location.")
+	@ApiOperation(value = "Retrieve the validation report for a given run id and storage location.", notes = "Retrieves the validation report specified by the runId and storageLocation.")
 	public ResponseEntity<Map<String, Object>> getResult(
-			@PathVariable final Long runId,
+			@ApiParam(value="Unique number") @PathVariable final Long runId,
 			@RequestParam(value = "storageLocation") final String storageLocation)
 			throws IOException {
 		// Can we find an rvf status file at that location? Return 404 if not.
@@ -80,7 +80,7 @@ public class ResultController {
 
 	@RequestMapping(value = "/structure/{runId}", method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "Returns a structure test report", notes = "Retrieves the structure test report as txt file for a given run id and storage location.")
+	@ApiOperation(value = "Returns a structure test report", notes = "Retrieves the structure test report as txt file for the runId and storage location.")
 	@ApiIgnore
 	public FileSystemResource getStructureReport(
 			@PathVariable final Long runId,

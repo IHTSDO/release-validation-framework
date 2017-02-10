@@ -55,8 +55,7 @@ public class AssertionGroupController {
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Get all assertion groups", notes = "Retrieves all assertion groups defined in the system. "
-			+ "Assertion group is used to define group of similar type of assertions")
+	@ApiOperation(value = "Get all assertion groups", notes = "Retrieves all assertion groups defined in the system.")
 	public List<AssertionGroup> getGroups() {
 		List<AssertionGroup> result = assertionService.getAllAssertionGroups();
 		if (result == null) {
@@ -68,8 +67,8 @@ public class AssertionGroupController {
 	@RequestMapping(value = "{id}/assertions", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Get all assertions of a group", notes = "Retrieves all assertions from a specific assertion group")
-	public List<Assertion> getAssertionsForGroup(@PathVariable final Long id) {
+	@ApiOperation(value = "Get all assertions for a given assertion group", notes = "Retrieves all assertions for a given assertion group identified by the group id.")
+	public List<Assertion> getAssertionsForGroup(@ApiParam(value = "Assertion group id") @PathVariable final Long id) {
 
 		final AssertionGroup group = (AssertionGroup) entityService.find(
 				AssertionGroup.class, id);
@@ -78,7 +77,7 @@ public class AssertionGroupController {
 
 	@RequestMapping(value = "{id}/assertions", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation(value = "Add assertions to a group", notes = "Add assertions to an assertion group identified by given id")
+	@ApiOperation(value = "Add assertions to a group", notes = "Adds assertions to the assertion group identified by the group id.")
 	public AssertionGroup addAssertionsToGroup(@PathVariable final Long id,
 			@RequestBody(required = false) final List<String> assertionsList,
 			final HttpServletResponse response) {
@@ -103,14 +102,13 @@ public class AssertionGroupController {
 	@RequestMapping(value = "{id}/addAllAssertions", method = RequestMethod.PUT)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Add all assertions available in the system to a group", notes = "Add all assertions available in the system to a group."
+	@ApiOperation(value = "Add all assertions available in the system to a group", notes = "Adds all assertions available in the system to a group."
 			+ " This api may only be used when user desires to add all assertion found in the system to an assertion group"
 			+ " otherwise use {id}/assertions api as post call.")
 	public AssertionGroup addAllAssertions(@PathVariable final Long id) {
 		final AssertionGroup group = (AssertionGroup) entityService.find(
 				AssertionGroup.class, id);
-		final List<Assertion> assertionList = entityService
-				.findAll(Assertion.class);
+		final List<Assertion> assertionList = entityService.findAll(Assertion.class);
 		final Set<Assertion> assertionSet = new HashSet<>(assertionList);
 		group.setAssertions(assertionSet);
 		return (AssertionGroup) entityService.update(group);
@@ -119,7 +117,7 @@ public class AssertionGroupController {
 	@RequestMapping(value = "{id}/assertions", method = RequestMethod.DELETE)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Delete assertion from a group", notes = "Removes supplied assertions from a given assertion group")
+	@ApiOperation(value = "Delete assertions from a group", notes = "Removes supplied assertions from a given assertion group")
 	public AssertionGroup removeAssertionsFromGroup(
 			@PathVariable final Long id,
 			@ApiParam(value = "Only assertion id is required") @RequestBody final List<Assertion> assertions) {
@@ -162,8 +160,8 @@ public class AssertionGroupController {
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Delete an assertion group", notes = "Delete an assertion group from the system")
-	public AssertionGroup deleteAssertionGroup(@PathVariable final Long id) {
+	@ApiOperation(value = "Delete an assertion group", notes = "Deletes an assertion group from the system")
+	public AssertionGroup deleteAssertionGroup(@ApiParam(value="Assertion group id") @PathVariable final Long id) {
 		final AssertionGroup group = (AssertionGroup) entityService.find(
 				AssertionGroup.class, id);
 		group.removeAllAssertionsFromGroup();
@@ -174,7 +172,7 @@ public class AssertionGroupController {
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CREATED)
-	@ApiOperation(value = "Create an assertion group with specified name", notes = "Create an assertion group with specified name")
+	@ApiOperation(value = "Create an assertion group with specified name", notes = "Creates an assertion group with specified name")
 	public AssertionGroup createAssertionGroupWithName(
 			@RequestParam final String name) {
 		final AssertionGroup group = new AssertionGroup();
@@ -185,25 +183,22 @@ public class AssertionGroupController {
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Update an assertion group", notes = "Update an assertion group identified with an id and name")
+	@ApiOperation(value = "Update an assertion group", notes = "Updates the group name for the assertion group identified by the group id.")
 	public AssertionGroup updateAssertionGroup(@PathVariable final Long id,
-			@RequestParam final String name) {
-		final AssertionGroup group = (AssertionGroup) entityService.find(
-				AssertionGroup.class, id);
+			@ApiParam(value = "Assertion group name") @RequestParam final String name) {
+		final AssertionGroup group = (AssertionGroup) entityService.find(AssertionGroup.class, id);
 		group.setName(name);
 		return (AssertionGroup) entityService.update(group);
 	}
 
-	@RequestMapping(value = "/{id}/run", method = RequestMethod.GET)
+	@RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Execute all tests available in an assertion group", notes = "Execute all tests available in an assertion group identified by assertion group id. "
-			+ "User is required to supply a run id,"
-			+ " previous release version and prospective release version")
-	public Map<String, Object> executeAssertions(@PathVariable final Long id,
-			@RequestParam final Long runId,
-			@RequestParam final String prospectiveReleaseVersion,
-			@RequestParam final String previousReleaseVersion) {
+	@ApiOperation(value = "Execute all tests for a given assertion group", notes = "Executes all tests for the assertion group identified by the group id.")
+	public Map<String, Object> executeAssertions(@ApiParam(value="Assertion group id")@PathVariable final Long id,
+			@ApiParam(value="Unique number") @RequestParam final Long runId,
+			@ApiParam(value="Prospective version") @RequestParam final String prospectiveReleaseVersion,
+			@ApiParam(value="Previous release version") @RequestParam final String previousReleaseVersion) {
 
 		final AssertionGroup group = (AssertionGroup) entityService.find(
 				AssertionGroup.class, id);
