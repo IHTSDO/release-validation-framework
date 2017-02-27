@@ -81,6 +81,10 @@ public class AssertionGroupImporter {
 		"2e4fd620-7d08-11e1-b0c4-0800200c9a66",
 		"6dbaed71-f031-4290-b74f-f35561c2e283"};
 	
+	//SNOMED RT Identifier is deprecated from the international 20170731 release onwards.
+	private static final String[] SNOMED_RT_IDENTIFIER_ASSERTIONS = {"730720b0-7f25-11e1-b0c4-0800200c9a66","83638340-7f25-11e1-b0c4-0800200c9a66",
+		"5e80ea3e-c4dd-4ae3-8b75-f0567e42b962","695cea40-7f25-11e1-b0c4-0800200c9a66"};
+		
 /* the following were included but feel that they should be validated for project level as well.
 	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
 	"72184790-79b9-11e1-b0c4-0800200c9a66",
@@ -209,9 +213,14 @@ public class AssertionGroupImporter {
 			if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
 				continue;
 			} 
+			//exclude SNOMED RT assertions
+			if ( AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				continue;
+			}
 			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)
 					|| keyWords.contains("," + groupName.getReleaseCenter())) {
 				String assertionText = assertion.getAssertionText();
+				
 				if ( !assertionText.contains(PREVIOUS) && !assertionText.contains(NEW_INACTIVE_STATES_FOLLOW_ACTIVE_STATES) ) {
 					assertionService.addAssertionToGroup(assertion, group);
 					counter++;
@@ -309,6 +318,10 @@ public class AssertionGroupImporter {
 		for (Assertion assertion : assertionsToBeAdded) {
 			
 			if ( AssertionGroupName.SPANISH_EDITION.equals(groupName) && Arrays.asList(SPANISH_EXTENSION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+				continue;
+			}
+			//exclude SNOMED RT assertions
+			if ( AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;
 			}
 			assertionService.addAssertionToGroup(assertion, assertionGroup);

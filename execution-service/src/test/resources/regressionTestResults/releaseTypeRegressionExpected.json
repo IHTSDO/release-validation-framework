@@ -729,28 +729,34 @@
     "assertionName" : "The current simple refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "0988de1d-29dd-4668-bcbf-032d38692492",
     "firstNInstances" : [ {
-      "conceptId" : 703649004,
-      "detail" : "SIMPLE REFSET: id=f9732f68-2af3-555a-bc7a-fa4a852caca6 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 703672002,
-      "detail" : "SIMPLE REFSET: id=8321561e-3e21-5b90-87f8-83fcd65310ad is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 702386002,
-      "detail" : "SIMPLE REFSET: id=74d0e838-34eb-5a9a-8f02-5584487d55db is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 703649004,
-      "detail" : "SIMPLE REFSET: id=74d0e838-34eb-5a9a-8f02-5584487d55db is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 702850005,
-      "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 699765003,
-      "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : 699765003,
-      "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
-    } ],
-    "totalFailed" : 7
+        "conceptId" : "1016002",
+        "detail" : "SIMPLE REFSET: id=89e0cc2b-ba8d-55cd-bb02-6ba52dbc201f is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : "703649004",
+        "detail" : "SIMPLE REFSET: id=f9732f68-2af3-555a-bc7a-fa4a852caca6 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : "703672002",
+        "detail" : "SIMPLE REFSET: id=8321561e-3e21-5b90-87f8-83fcd65310ad is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : "702386002",
+        "detail" : "SIMPLE REFSET: id=74d0e838-34eb-5a9a-8f02-5584487d55db is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : "703649004",
+        "detail" : "SIMPLE REFSET: id=74d0e838-34eb-5a9a-8f02-5584487d55db is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : "702850005",
+        "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : "699765003",
+        "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : "699765003",
+        "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
+      }, {
+        "conceptId" : "1016002",
+        "detail" : "SIMPLE REFSET: id=89e0cc2b-ba8d-55cd-bb02-6ba52dbc201f is in FULL file, but not in SNAPSHOT file."
+      } ],
+      "totalFailed" : 9
   }, {
     "assertionName" : " There must be actual changes made to previously published descriptions in order for them to appear in the current delta.",
     "assertionUuid" : "0cc708af-6816-4370-91be-dba8da99d227",

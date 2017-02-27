@@ -16,4 +16,4 @@
 	from curr_simplerefset_s a
 	left join curr_concept_s b
 	on a.referencedcomponentid = b.id
-	where b.id is null and not exists ( select id from curr_description_s where id=a.referencedcomponentid);
+	where a.active=1 and b.id is null and not exists ( select id from curr_description_s where id=a.referencedcomponentid);
