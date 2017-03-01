@@ -96,8 +96,8 @@ public class InstanceManager {
 				Tag nameTag = new Tag(NAME, RVF_WORKER + instanceTagName + "_"
 						+ counter++);
 				createTagsRequest.withTags(typeTag, nameTag);
-				logger.info("Namge tag {} is created for instance id {}",
-						nameTag, instanceId);
+				logger.info("Name tag {} is created for instance id {} with public ip address {}",
+						nameTag, instanceId, instance.getPublicIpAddress());
 			} else {
 				createTagsRequest.withTags(new Tag(NAME, RVF_WORKER + imageId
 						+ "_" + counter++));
