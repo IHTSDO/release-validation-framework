@@ -32,6 +32,6 @@
 				a.conceptid,
 				concat('DESCRIPTION: id=',a.id, ': Synonym is prefered in the GB Language refset but refers to a word that has en-us spelling: ',usTerm) 
 			from v_curr_delta_gb a 	
-			where a.term REGEXP  concat('[[:<:]]', usTerm, '[[:>:]]');
+			where MATCH a.term AGAINST (usTerm);
 		end loop validate; 
 	end;

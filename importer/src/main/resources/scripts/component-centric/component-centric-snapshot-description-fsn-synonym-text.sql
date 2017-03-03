@@ -16,8 +16,9 @@
 	and a.active = 1;
 
 /* 	for edited concepts, list all FSNs, with and without semantic tags */
-	create table if not exists tmp_fsn as
-	select replace(a.term, concat('(',substring_index(a.term, '(', -1)), '') as termwithouttag,
+	create table if not exists tmp_fsn
+	(index idx_tmp_fsn_cid (conceptid), index idx_tmp_fsn_twt (termwithouttag))
+	as select replace(a.term, concat('(',substring_index(a.term, '(', -1)), '') as termwithouttag,
 	a.id , a.conceptid , a.term 
 	from curr_description_s a
 	join tmp_consedited b
@@ -35,8 +36,9 @@
 	where a.typeid !='900000000000003001';
 
 /* select the concepts that have synonyms that match the FSNs without semantic tags */
-	create table if not exists tmp_termsmatch as
-	select a.* 
+	create table if not exists tmp_termsmatch
+	(index idx_tmp_tm_cid (conceptid), index idx_tmp_tm_twt (termwithouttag))
+	as select a.* 
 	from tmp_fsn a
 	join tmp_allterms b
 	on a.conceptid = b.conceptid

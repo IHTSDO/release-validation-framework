@@ -28,7 +28,7 @@
 	and b.active = '1'
 	and a.active = '1'
 	and a.typeid = '900000000000003001'
-	GROUP BY b.referencedcomponentid, b.refsetid
+	GROUP BY c.id,b.referencedcomponentid, b.refsetid
 	having count(b.referencedcomponentid) > (select count(distinct(refsetid)) from curr_langrefset_s);
 	
 	
@@ -50,7 +50,7 @@
 	join tmp_descsedited b
 	on a.referencedcomponentid = b.id
 	and a.active = 1
-	group by refsetid, referencedcomponentid
+	group by b.conceptid, refsetid, referencedcomponentid
 	having count(referencedcomponentid) > (select count(distinct(refsetid)) from curr_langrefset_s);
 	
 	drop table if exists tmp_descsedited;

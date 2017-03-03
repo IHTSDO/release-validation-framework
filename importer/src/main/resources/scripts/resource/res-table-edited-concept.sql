@@ -44,8 +44,9 @@
     commit;
     
     drop table if exists res_edited_active_concepts;
-	create table if not exists res_edited_active_concepts as
-	select b.*
+	create table if not exists res_edited_active_concepts
+	(index idx_reac_id (id))
+	as select b.*
 	from res_concepts_edited a 
 		join curr_concept_s b
 			on a.conceptid = b.id

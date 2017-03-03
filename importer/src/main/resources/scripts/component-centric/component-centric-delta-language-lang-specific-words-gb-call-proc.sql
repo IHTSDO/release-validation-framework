@@ -19,6 +19,8 @@
 		and b.acceptabilityid ='900000000000548007'	
 		and b.refsetid = '900000000000508004' /* GB English */
 		and a.typeid = '900000000000013009';	/* synonym */	
+		
+	alter table v_curr_delta_gb add FULLTEXT index idx_vd_gb (term)	
 
 	call gbTerm_procedure(<RUNID>,'<ASSERTIONUUID>');
 	

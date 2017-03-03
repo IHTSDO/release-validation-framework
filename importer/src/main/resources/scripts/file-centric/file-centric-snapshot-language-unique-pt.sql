@@ -8,8 +8,9 @@
 ********************************************************************************/
 /* 	testing for multiple perferred terms */
 /* 	temp table: active sysonyms of active concepts edited in the current release cycle */ 	
-	create table if not exists description_tmp as
-	select c.*
+	create table if not exists description_tmp 
+	(index idx_desc_tmp_id(id), index idx_desc_tmp_cid(conceptid), index idx_desc_tmp_active(active))
+	as select c.*
 	from res_concepts_edited a
 	join curr_concept_s b 
 		on a.conceptid = b.id
@@ -30,15 +31,16 @@
 	join curr_langrefset_s b
 		on a.id = b.referencedcomponentid
 	where a.active = '1'
-	group by b.refsetid, b.referencedcomponentid
+	group by a.conceptid, b.refsetid, b.referencedcomponentid
 	having count(b.referencedcomponentid) >1;
 
 
 /* 	testing for the absence of preferred terms
 	make a list of active preferred terms for the active concepts that changed
 	in the current release cycle */
-	create table if not exists tmp_pt as
-	select a.id, a.conceptid, b.refsetid
+	create table if not exists tmp_pt 
+	(index idx_tmp_pt_cid(conceptid), index idx_tmp_pt_rid(refsetid))
+	as select a.id, a.conceptid, b.refsetid
 	from description_tmp a
 	join curr_langrefset_s b
 		on a.id = b.referencedcomponentid
