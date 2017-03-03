@@ -19,7 +19,7 @@
 		and b.refsetid = '900000000000509007' /* us language refset */
 		and a.typeid = '900000000000013009'; /* synonym */
 		
-	alter table v_curr_delta_us add FULLTEXT index idx_vd_us (term)
+	alter table v_curr_delta_us add FULLTEXT index idx_vd_us (term);
 
 	call  usTerm_procedure(<RUNID>,'<ASSERTIONUUID>');
 	
