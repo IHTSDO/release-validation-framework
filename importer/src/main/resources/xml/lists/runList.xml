@@ -183,8 +183,8 @@
 	<script uuid="c9c9cab6-cef8-4249-8358-35716eaf07ab" category="report" sqlFile="report-qa.sql" text="Final Report Creation." />
 	
 	<script uuid="ba8918f0-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-us-def-proc.sql" text="Defines procedure that tests that terms that contain EN-US language-specific words are in the same US language refset." />
-	
 	<script uuid="c81ee170-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-gb-def-proc.sql" text="Defines procedure that tests that terms that contain EN-GB language-specific words are in the same GB language refset." />
+	<script uuid="458cde1f-224a-49d7-a6ca-2fc666d96e7d" category="component-centric-validation" sqlFile="component-centric-snapshot-description-casesignificanceid-def-proc.sql" text="Defines procedure that tests that terms which contain case sensitive words have the correct case significance value assigned." />
 	
 	
 	

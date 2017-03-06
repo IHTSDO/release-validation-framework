@@ -35,3 +35,4 @@ create table res_casesensitiveTerm(
    casesensitiveTerm VARCHAR(255) not null
 )engine=myisam default charset=utf8;
 create index idx_casesensitiveTerm on res_casesensitiveTerm(casesensitiveTerm);
+
