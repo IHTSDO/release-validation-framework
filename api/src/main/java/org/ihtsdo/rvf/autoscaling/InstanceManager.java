@@ -61,6 +61,8 @@ public class InstanceManager {
 	private String keyName;
 	@Autowired
 	private String instanceTagName;
+	@Autowired
+	private String ec2SubnetId;
 	private String ec2InstanceStartupScript;
 
 	public InstanceManager(AWSCredentials credentials, String ec2Endpoint) {
@@ -77,7 +79,8 @@ public class InstanceManager {
 				.withKeyName(keyName)
 				.withInstanceInitiatedShutdownBehavior(TERMINATE)
 				.withSecurityGroupIds(securityGroupId)
-				.withUserData(ec2InstanceStartupScript);
+				.withUserData(ec2InstanceStartupScript)
+				.withSubnetId(ec2SubnetId);
 		RunInstancesResult runInstancesResult = amazonEC2Client
 				.runInstances(runInstancesRequest);
 
