@@ -235,6 +235,7 @@
                                         <path>/var/opt/${packageName}</path>
                                         <path>/var/opt/${packageName}/run</path>
                                         <path>/var/opt/${packageName}/logs</path>
+                                        <path>/opt/${packageName}/data</path>
                                     </paths>
                                     <mapper>
                                         <type>perm</type>
