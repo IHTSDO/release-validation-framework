@@ -8,7 +8,7 @@
 		<script uuid="A049F928-729C-4840-9029-FCA2322E56F0" category="resource" sqlFile="cleanExpressionFunction.sql" text="Create function to remove character symbols from Snomed CT expression"/>
 		<script uuid="c81ee170-84f0-11e1-b0c4-0800200c9a66" category="resource" sqlFile="component-centric-delta-language-lang-specific-words-gb-def-proc.sql" text="Defines procedure that tests that terms that contain EN-GB language-specific words are in the same GB language refset." />
 		<script uuid="ba8918f0-84f0-11e1-b0c4-0800200c9a66" category="resource" sqlFile="component-centric-delta-language-lang-specific-words-us-def-proc.sql" text="Defines procedure that tests that terms that contain EN-US language-specific words are in the same US language refset." />
-		<script uuid="458cde1f-224a-49d7-a6ca-2fc666d96e7d" category="component-centric-validation" sqlFile="component-centric-snapshot-description-casesignificanceid-def-proc.sql" text="Defines procedure that tests that terms which contain case sensitive words have the correct case significance value assigned." />
+		<script uuid="458cde1f-224a-49d7-a6ca-2fc666d96e7d" category="resource" sqlFile="component-centric-snapshot-description-casesignificanceid-def-proc.sql" text="Defines procedure that tests that terms which contain case sensitive words have the correct case significance value assigned." />
 		<script uuid="B4B5EE89-372F-4AE3-8C18-9C37CF4E932E" category="resource" sqlFile="component-centric-snomed-ct-expression-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the SNOMED CT expression for LOIC mapping." />
 		
 		<!-- release-type-full-validation -->
