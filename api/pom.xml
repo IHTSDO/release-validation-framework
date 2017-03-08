@@ -199,7 +199,7 @@
                                     <src>${basedir}/src/deb/supervisor.conf</src>
                                     <dst>/etc/supervisor/conf.d/${packageName}.conf</dst>
                                     <type>file</type>
-                                    <conffile>true</conffile>
+                                    <!--  <conffile>true</conffile> -->
                                 </data>
                                 <data>
                                     <src>${basedir}/src/deb/config.properties</src>
