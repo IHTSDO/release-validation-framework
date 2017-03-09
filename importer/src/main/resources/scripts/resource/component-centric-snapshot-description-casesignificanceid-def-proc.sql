@@ -12,7 +12,7 @@
 		declare no_more_rows INTEGER DEFAULT 0;
 		declare caseSensitiveTerm VARCHAR(255); 
 		declare cs_term_cursor cursor for 
-			select casesensitiveTerm from res_casesensitiveterm; 
+			select casesensitiveTerm from res_casesensitiveTerm; 
 
 		declare continue handler for not found set no_more_rows = 1;
 
