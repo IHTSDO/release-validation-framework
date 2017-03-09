@@ -10,7 +10,8 @@
 ********************************************************************************/
 
 	drop table if exists v_curr_delta_gb;
-	create table if not exists v_curr_delta_gb as
+	create table if not exists v_curr_delta_gb
+	ENGINE=MyISAM
 	select distinct a.id, a.term,a.conceptid
 		from curr_description_d a 
 		inner join curr_langrefset_s b on a.id = b.referencedComponentId
@@ -18,7 +19,7 @@
 		and b.active = '1'
 		and b.acceptabilityid ='900000000000548007'	
 		and b.refsetid = '900000000000508004' /* GB English */
-		and a.typeid = '900000000000013009';	/* synonym */	
+		and a.typeid = '900000000000013009';	/* synonym */
 		
 	alter table v_curr_delta_gb add FULLTEXT index idx_vd_gb (term);
 
