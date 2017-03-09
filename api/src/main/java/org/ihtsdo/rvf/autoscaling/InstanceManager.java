@@ -21,20 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.CreateTagsRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Filter;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.InstanceState;
-import com.amazonaws.services.ec2.model.InstanceStateChange;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.amazonaws.services.ec2.model.RunInstancesRequest;
-import com.amazonaws.services.ec2.model.RunInstancesResult;
-import com.amazonaws.services.ec2.model.Tag;
-import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
-import com.amazonaws.services.ec2.model.TerminateInstancesResult;
-
+import com.amazonaws.services.ec2.model.*;
 @Service
 public class InstanceManager {
 
@@ -99,8 +86,14 @@ public class InstanceManager {
 				Tag nameTag = new Tag(NAME, RVF_WORKER + instanceTagName + "_"
 						+ counter++);
 				createTagsRequest.withTags(typeTag, nameTag);
+				String newInstanceIpAddress = "IpUnknown";
+				try{
+					newInstanceIpAddress = getNewInstanceIpAddress(instance);
+				} catch (Exception e) {
+					logger.error ("Failed to recover public IP address of instance",e);
+				}
 				logger.info("Name tag {} is created for instance id {} with public ip address {}",
-						nameTag, instanceId, instance.getPublicIpAddress());
+						nameTag, instanceId, newInstanceIpAddress);
 			} else {
 				createTagsRequest.withTags(new Tag(NAME, RVF_WORKER + imageId
 						+ "_" + counter++));
@@ -109,6 +102,17 @@ public class InstanceManager {
 			ids.add(instanceId);
 		}
 		return ids;
+	}
+	
+	//See https://medium.com/@mertcal/getting-ips-of-newly-created-ec2-instances-6a7164392014#.siinju4g9
+	private String getNewInstanceIpAddress(Instance instance) {
+		DescribeInstancesRequest request = new DescribeInstancesRequest();
+		String instanceId = instance.getInstanceId();
+		request.setInstanceIds(new ArrayList<String>(Arrays.asList(instanceId)));
+
+		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+		List<Reservation> reservations = result.getReservations();
+		return reservations.get(0).getInstances().get(0).getPublicIpAddress();
 	}
 
 	public String getImageId() {
