@@ -86,14 +86,9 @@ public class InstanceManager {
 				Tag nameTag = new Tag(NAME, RVF_WORKER + instanceTagName + "_"
 						+ counter++);
 				createTagsRequest.withTags(typeTag, nameTag);
-				String newInstanceIpAddress = "IpUnknown";
-				try{
-					newInstanceIpAddress = getNewInstanceIpAddress(instance);
-				} catch (Exception e) {
-					logger.error ("Failed to recover public IP address of instance",e);
-				}
-				logger.info("Name tag {} is created for instance id {} with public ip address {}",
-						nameTag, instanceId, newInstanceIpAddress);
+				getNewInstanceIpAddress(instance);
+				logger.info("Name tag {} is created for instance id {}",
+						nameTag, instanceId);
 			} else {
 				createTagsRequest.withTags(new Tag(NAME, RVF_WORKER + imageId
 						+ "_" + counter++));
@@ -105,14 +100,26 @@ public class InstanceManager {
 	}
 	
 	//See https://medium.com/@mertcal/getting-ips-of-newly-created-ec2-instances-6a7164392014#.siinju4g9
-	private String getNewInstanceIpAddress(Instance instance) {
-		DescribeInstancesRequest request = new DescribeInstancesRequest();
-		String instanceId = instance.getInstanceId();
-		request.setInstanceIds(new ArrayList<String>(Arrays.asList(instanceId)));
+	private void getNewInstanceIpAddress(final Instance instance) {
+		Thread t = new Thread(new Runnable() {
+			public void run()
+			{
+				try {
+					Thread.sleep(30 * 1000);
+				} catch (InterruptedException e) {
+					logger.error("Failed to sleep for 30 seconds",e);
+				}
+				DescribeInstancesRequest request = new DescribeInstancesRequest();
+				String instanceId = instance.getInstanceId();
+				request.setInstanceIds(new ArrayList<String>(Arrays.asList(instanceId)));
 
-		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
-		List<Reservation> reservations = result.getReservations();
-		return reservations.get(0).getInstances().get(0).getPublicIpAddress();
+				DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+				List<Reservation> reservations = result.getReservations();
+				String publicIp = reservations.get(0).getInstances().get(0).getPublicIpAddress();
+				logger.info("Instance {} created with public IP address {}", instance.getInstanceId(), publicIp);
+			}
+		});
+		t.start();
 	}
 
 	public String getImageId() {
