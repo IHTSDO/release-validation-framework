@@ -7,7 +7,7 @@
 
 ********************************************************************************/
 
-	alter table curr_description_d add FULLTEXT index idx_desc_ft_idx(term);
+	alter table curr_description_d add FULLTEXT index (term);
 	
 	call caseSignificance_procedure(<RUNID>,'<ASSERTIONUUID>');
 

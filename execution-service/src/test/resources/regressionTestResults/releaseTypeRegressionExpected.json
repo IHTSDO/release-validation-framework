@@ -698,6 +698,9 @@
       "detail" : "DESCRIPTION: id=3006276018 is in delta file but not in snapshot file."
     }, {
       "conceptId" : 702386002,
+      "detail" : "DESCRIPTION: id=3004397016 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : 702386002,
       "detail" : "DESCRIPTION: id=2989194011 is in delta file but not in snapshot file."
     }, {
       "conceptId" : 700501004,
@@ -720,11 +723,8 @@
     }, {
       "conceptId" : 700132006,
       "detail" : "DESCRIPTION: id=2984057008 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 698906002,
-      "detail" : "DESCRIPTION: id=2981505010 is in delta file but not in snapshot file."
-    } ],
-    "totalFailed" : 10
+    }],
+    "totalFailed" : 11
   }, {
     "assertionName" : "The current simple refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "0988de1d-29dd-4668-bcbf-032d38692492",

@@ -326,7 +326,7 @@
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : 700132006,
-      "detail" : "DESCRIPTION: id=3005197021: Synonym is prefered in the GB Language refset but refers to a word that has en-us spelling: tumor"
+      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the GB Language refset but refers to a word that has en-us spelling: tumor"
     } ],
     "totalFailed" : 1
   }, {
@@ -497,7 +497,7 @@
     "assertionUuid" : "22a95293-3acb-4671-95f8-1ff13ba3202c",
     "firstNInstances" : [ {
       "conceptId" : 700132006,
-      "detail" : "DESC: id=2984057008:Case-sensitivity terms containing inappropriate caseSignificanceId."
+      "detail" : "DESC: id=2984057008:Case-sensitive term containing \"Ahlia\" has inappropriate caseSignificanceId."
     } ],
     "totalFailed" : 1
   }, {

@@ -10,15 +10,15 @@
 	create procedure caseSignificance_procedure(runid BIGINT, assertionid char(36)) 
 	begin 
 		declare no_more_rows INTEGER DEFAULT 0;
-		declare caseSensitiveTerm VARCHAR(255); 
+		declare thisTerm VARCHAR(255); 
 		declare cs_term_cursor cursor for 
-			select casesensitiveTerm from res_casesensitiveTerm; 
-
+			select concat('"',SUBSTRING_INDEX(casesensitiveTerm, ' ', 1),'"') from res_casesensitiveTerm; 
+		
 		declare continue handler for not found set no_more_rows = 1;
 
 		open cs_term_cursor; 
 
-		validate: loop fetch cs_term_cursor into caseSensitiveTerm; 
+		validate: loop fetch cs_term_cursor into thisTerm; 
 
 			if no_more_rows = 1 
 				then close cs_term_cursor; 
@@ -30,13 +30,13 @@
 				runid,
 				assertionid,
 				a.conceptid,
-				concat('DESC: id=',a.id, ':Case-sensitivity terms containing inappropriate caseSignificanceId.')
+				concat('DESC: id=',a.id, ':Case-sensitive term containing ', thisTerm, ' has inappropriate caseSignificanceId.')
 			from curr_description_d a , curr_concept_s b
 			where a.casesignificanceid != 900000000000017005
 			and a.active = 1
 			and b.active = 1
 			and a.conceptid = b.id
-			and MATCH a.term AGAINST (caseSensitiveTerm)
+			and MATCH a.term AGAINST (thisTerm IN BOOLEAN MODE)
 			group by a.conceptid, a.id;
 		end loop validate; 
 	end;
