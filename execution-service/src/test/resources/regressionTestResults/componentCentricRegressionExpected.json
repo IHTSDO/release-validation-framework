@@ -30,7 +30,7 @@
     } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "The FSN term should be uqniue in active content.",
+    "assertionName" : "The FSN term should be unique in active content.",
     "assertionUuid" : "8d6ab114-caca-4d99-9fec-bb8fd9cea518",
     "firstNInstances" : [ {
       "conceptId" : 703860006,
