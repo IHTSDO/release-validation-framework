@@ -281,20 +281,20 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private void explainDifference(UUID uuid, RVFTestResult left,
 			RVFTestResult right) {
 		if (!left.getAssertionUuid().equals(right.getAssertionUuid())) {
-			System.out.println ("Difference explained: Result UUID " + left.getAssertionUuid() + " does not match compared value " + right.getAssertionUuid());
+			System.out.println ("Difference explained: Result UUID " + left.getAssertionUuid() + " does not match actual compared value " + right.getAssertionUuid());
 		} else if (!left.getAssertionName().equals(right.getAssertionName())) {
-			System.out.println ("Difference explained: Result assertion name  " + left.getAssertionName() + " does not match compared value " + right.getAssertionName());
+			System.out.println ("Difference explained: Result assertion name  " + left.getAssertionName() + " does not match actual compared value " + right.getAssertionName());
 		} else if (left.getTotalFailed() != right.getTotalFailed()) {
-			System.out.println ("Difference explained: Result total failed  " + left.getTotalFailed() + " does not match compared valu e" + right.getTotalFailed());
+			System.out.println ("Difference explained: Result total failed  " + left.getTotalFailed() + " does not match actual compared value" + right.getTotalFailed());
 		} else if (left.getFirstNInstances().size() != right.getFirstNInstances().size()) {
-			System.out.println ("Difference explained: " + uuid + " Result firstN size  " + left.getFirstNInstances().size() + " does not match compared value " + right.getFirstNInstances().size());
+			System.out.println ("Difference explained: " + uuid + " Result firstN size  " + left.getFirstNInstances().size() + " does not match actual compared value " + right.getFirstNInstances().size());
 		}
 		
 		for (int i=0; i<left.getFirstNInstances().size(); i++) {
 			FailureDetail leftFd = left.getFirstNInstances().get(i);
 			FailureDetail rightFd = right.getFirstNInstances().get(i); 
 			if (!leftFd.equals(rightFd)) {
-				System.out.println ("Difference explained: " + uuid + " Failure Detail " + i + ": " + leftFd + " does not match compared value " + rightFd);
+				System.out.println ("Difference explained: " + uuid + " expected Failure Detail " + i + ": " + leftFd + " does not match actual compared value " + rightFd);
 				return;
 			}
 		}
