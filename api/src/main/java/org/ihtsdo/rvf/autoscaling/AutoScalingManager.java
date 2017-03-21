@@ -41,15 +41,18 @@ public class AutoScalingManager {
 
 	}
 
-	public void startUp() throws Exception {
+	public void startUp() {
 		logger.info("isAutoScalingEnabled:" + isAutoScalling);
-		try {
 			if (isAutoScalling) {
 				Thread thread = new Thread(new Runnable() {
 					@Override
 					public void run() {
 						while (!shutDown) {
-							if (!isFirstTime) {
+							if (isFirstTime) {
+								isFirstTime = false;
+								// check any running instances
+								activeInstances.addAll(instanceManager.getActiveInstances());
+							} else {
 								int current = getQueueSize();
 								if (current != lastPolledQueueSize) {
 									logger.info("Total messages in queue:"
@@ -87,26 +90,14 @@ public class AutoScalingManager {
 								try {
 									Thread.sleep(30 * 1000);
 								} catch (InterruptedException e) {
-									logger.error(
-											"AutoScalingManager delay is interrupted.",
-											e);
+									logger.error("AutoScalingManager delay is interrupted.", e);
 								}
-							} else {
-								isFirstTime = false;
-								// check any running instances
-								activeInstances.addAll(instanceManager
-										.getActiveInstances());
 							}
 						}
 					}
 				});
 				thread.start();
 			}
-		} catch (Throwable e) {
-			String errorMsg = "AutoScalingManager failed to start.";
-			logger.error(errorMsg, e);
-			throw new Exception(errorMsg,e);
-		}
 	}
 
 	private int getTotalInstancesToCreate(int currentMsgSize,

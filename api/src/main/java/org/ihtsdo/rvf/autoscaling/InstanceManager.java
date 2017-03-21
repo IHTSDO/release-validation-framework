@@ -189,17 +189,21 @@ public class InstanceManager {
 
 	public List<String> getActiveInstances() {
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
-		request.withFilters(new Filter(TAG + WORKER_TYPE, Arrays
-				.asList(instanceTagName)));
-		DescribeInstancesResult result = amazonEC2Client
-				.describeInstances(request);
-		List<Reservation> reservations = result.getReservations();
+		request.withFilters(new Filter(TAG + WORKER_TYPE, Arrays.asList(instanceTagName)));
 		List<Instance> instances = new ArrayList<>();
-		for (Reservation reserv : reservations) {
-			instances.addAll(reserv.getInstances());
+		try {
+			DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+			List<Reservation> reservations = result.getReservations();
+			for (Reservation reserv : reservations) {
+				instances.addAll(reserv.getInstances());
+			}
+			logger.info("Total instances {} found with filter {}", instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
+		} catch (Exception e) {
+			String msg = "Unexpected error encountered.";
+			logger.error(msg, e);
+			throw new RuntimeException(msg, e);
 		}
-		logger.info("Total instances {} found with filter {}",
-				instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
+	
 		List<String> activeInstances = new ArrayList<>();
 		for (Instance instance : instances) {
 			InstanceState state = instance.getState();
