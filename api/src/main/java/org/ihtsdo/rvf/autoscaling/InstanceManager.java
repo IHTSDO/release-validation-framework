@@ -68,33 +68,38 @@ public class InstanceManager {
 				.withSecurityGroupIds(securityGroupId)
 				.withUserData(ec2InstanceStartupScript)
 				.withSubnetId(ec2SubnetId);
-		RunInstancesResult runInstancesResult = amazonEC2Client
-				.runInstances(runInstancesRequest);
-
-		List<Instance> instances = runInstancesResult.getReservation()
-				.getInstances();
 		List<String> ids = new ArrayList<>();
-		for (Instance instance : instances) {
-			String instanceId = instance.getInstanceId();
-			logger.info(
-					"RVF worker new instance created with id {} and launched at {}",
-					instanceId, instance.getLaunchTime());
-			CreateTagsRequest createTagsRequest = new CreateTagsRequest();
-			createTagsRequest.withResources(instanceId);
-			if (instanceTagName != null) {
-				Tag typeTag = new Tag(WORKER_TYPE, instanceTagName);
-				Tag nameTag = new Tag(NAME, RVF_WORKER + instanceTagName + "_"
-						+ counter++);
-				createTagsRequest.withTags(typeTag, nameTag);
-				getNewInstanceIpAddress(instance);
-				logger.info("Name tag {} is created for instance id {}",
-						nameTag, instanceId);
-			} else {
-				createTagsRequest.withTags(new Tag(NAME, RVF_WORKER + imageId
-						+ "_" + counter++));
+		try {
+			RunInstancesResult runInstancesResult = amazonEC2Client
+					.runInstances(runInstancesRequest);
+
+			List<Instance> instances = runInstancesResult.getReservation()
+					.getInstances();
+		
+			for (Instance instance : instances) {
+				String instanceId = instance.getInstanceId();
+				logger.info(
+						"RVF worker new instance created with id {} and launched at {}",
+						instanceId, instance.getLaunchTime());
+				CreateTagsRequest createTagsRequest = new CreateTagsRequest();
+				createTagsRequest.withResources(instanceId);
+				if (instanceTagName != null) {
+					Tag typeTag = new Tag(WORKER_TYPE, instanceTagName);
+					Tag nameTag = new Tag(NAME, RVF_WORKER + instanceTagName + "_"
+							+ counter++);
+					createTagsRequest.withTags(typeTag, nameTag);
+					getNewInstanceIpAddress(instance);
+					logger.info("Name tag {} is created for instance id {}",
+							nameTag, instanceId);
+				} else {
+					createTagsRequest.withTags(new Tag(NAME, RVF_WORKER + imageId
+							+ "_" + counter++));
+				}
+				amazonEC2Client.createTags(createTagsRequest);
+				ids.add(instanceId);
 			}
-			amazonEC2Client.createTags(createTagsRequest);
-			ids.add(instanceId);
+		} catch (Exception e) {
+			logger.error("Failed to create RVF instance workers.", e);
 		}
 		return ids;
 	}
