@@ -32,7 +32,7 @@
 				a.conceptid,
 				concat('DESC: id=',a.id, ':Case-sensitive term containing ', thisTerm, ' has inappropriate caseSignificanceId.')
 			from curr_description_d a , curr_concept_s b
-			where a.casesignificanceid != 900000000000017005
+			where a.casesignificanceid NOT IN (900000000000017005, 900000000000020002)
 			and a.active = 1
 			and b.active = 1
 			and a.conceptid = b.id
