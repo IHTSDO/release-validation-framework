@@ -326,7 +326,7 @@
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : 700132006,
-      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the GB Language refset but refers to a word that has en-us spelling: tumor"
+      "detail" : "DESCRIPTION: id=3005197021: Synonym is prefered in the GB Language refset but refers to a word that has en-us spelling: analog"
     } ],
     "totalFailed" : 1
   }, {
