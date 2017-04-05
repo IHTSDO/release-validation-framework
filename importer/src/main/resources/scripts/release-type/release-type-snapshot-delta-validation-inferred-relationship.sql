@@ -14,30 +14,31 @@
 ********************************************************************************/
 
 	insert into qa_result (runid, assertionuuid, concept_id, details)
-	select 
+	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
-		concat('Relationship: id=',a.id, ' is in delta, but not in snapshot file.') 	
-	from curr_relationship_d a
+		c.sourceid,
+		concat('Relationship: id=',c.id, ' is in delta, but not in snapshot file.') 	
+	from (select a.* from curr_relationship_d a inner join (select id, MAX(effectivetime) as effectivetime from curr_relationship_d group by id) mostRecent 
+	on a.id = mostRecent.id and a.effectivetime=mostRecent.effectivetime) c 
 	left join curr_relationship_s b
-		on a.id = b.id
-		and a.effectivetime = b.effectivetime
-		and a.active = b.active
-		and a.moduleid = b.moduleid
-		and a.sourceid = b.sourceid
-		and a.destinationid = b.destinationid
-		and a.relationshipgroup = b.relationshipgroup
-		and a.typeid = b.typeid
-		and a.characteristictypeid = b.characteristictypeid
-		and a.modifierid = b.modifierid	
+		on c.id = b.id
+		and c.effectivetime = b.effectivetime
+		and c.active = b.active
+		and c.moduleid = b.moduleid
+		and c.sourceid = b.sourceid
+		and c.destinationid = b.destinationid
+		and c.relationshipgroup = b.relationshipgroup
+		and c.typeid = b.typeid
+		and c.characteristictypeid = b.characteristictypeid
+		and c.modifierid = b.modifierid	
 	where b.id is null
 	or b.effectivetime is null
 	or b.active is null
 	or b.moduleid is null
-	or a.sourceid is null
-	or a.destinationid is null
-	or a.relationshipgroup is null
-	or a.typeid is null
-	or a.characteristictypeid is null
-	or a.modifierid is null;
+	or b.sourceid is null
+	or b.destinationid is null
+	or b.relationshipgroup is null
+	or b.typeid is null
+	or b.characteristictypeid is null
+	or b.modifierid is null;
