@@ -60,6 +60,10 @@
 	<bean class="java.lang.String" id="instanceTagName">
 		<constructor-arg value="${rvf.autoscaling.tagName}"/>
 	</bean>
+	
+	<bean class="java.lang.String" id="ec2SubnetId">
+		<constructor-arg value="${rvf.autoscaling.ec2SubnetId}"/>
+	</bean>
     
     <bean id="instanceManager" class ="org.ihtsdo.rvf.autoscaling.InstanceManager">
     	<constructor-arg>

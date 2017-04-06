@@ -2,9 +2,13 @@
 /*	
 	creates a resource table of concept SCITDs of all concepts for which any component has been 
 	editied in the current release 
-*/ 
+*/
+
+	SET tmp_table_size = 1024 * 1024 * 1024 * 2;
+	SET max_heap_table_size = 1024 * 1024 * 1024 * 2;
+
 	drop table if exists res_concepts_edited;
-	create table if not exists res_concepts_edited(conceptid varchar(36), key idx_conceptid (conceptid));
+	create table if not exists res_concepts_edited(conceptid varchar(36), key idx_conceptid (conceptid)) ENGINE = MEMORY;
 	truncate table res_concepts_edited;
     
 	insert into res_concepts_edited
@@ -44,8 +48,9 @@
     commit;
     
     drop table if exists res_edited_active_concepts;
-	create table if not exists res_edited_active_concepts as
-	select b.*
+	create table if not exists res_edited_active_concepts
+	(index idx_reac_id (id))
+	as select b.*
 	from res_concepts_edited a 
 		join curr_concept_s b
 			on a.conceptid = b.id

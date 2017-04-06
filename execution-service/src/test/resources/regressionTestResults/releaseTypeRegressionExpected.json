@@ -516,7 +516,7 @@
       "conceptId" : 699754008,
       "detail" : "Inferred relationship: id=1000005027 is in delta file, but not in FULL file."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 11
   }, {
     "assertionName" : "The current data in the Concept snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "e2d4a6be-cd76-4e03-afe8-5c7783aaa2c7",
@@ -694,37 +694,37 @@
     "assertionName" : "The current data in the Description snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "073832f4-6dc5-4781-9e56-9c3bc45d01bd",
     "firstNInstances" : [ {
-      "conceptId" : 702386002,
-      "detail" : "DESCRIPTION: id=3006276018 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 702386002,
-      "detail" : "DESCRIPTION: id=2989194011 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 700501004,
-      "detail" : "DESCRIPTION: id=2990804014 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 700244001,
-      "detail" : "DESCRIPTION: id=3006191013 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 45477008,
-      "detail" : "DESCRIPTION: id=2989790014 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 703860006,
-      "detail" : "DESCRIPTION: id=3008366010 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 700132006,
-      "detail" : "DESCRIPTION: id=3005197021 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 700132006,
-      "detail" : "DESCRIPTION: id=2984057019 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 700132006,
-      "detail" : "DESCRIPTION: id=2984057008 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : 698906002,
-      "detail" : "DESCRIPTION: id=2981505010 is in delta file but not in snapshot file."
-    } ],
-    "totalFailed" : 10
+        "conceptId" : "702386002",
+        "detail" : "DESCRIPTION: id=3006276018 is in delta file but not in snapshot file."
+      }, {
+        "conceptId" : "702386002",
+        "detail" : "DESCRIPTION: id=2989194011 is in delta file but not in snapshot file."
+      }, {
+        "conceptId" : "700501004",
+        "detail" : "DESCRIPTION: id=2990804014 is in delta file but not in snapshot file."
+      }, {
+        "conceptId" : "700244001",
+        "detail" : "DESCRIPTION: id=3006191013 is in delta file but not in snapshot file."
+      }, {
+        "conceptId" : "45477008",
+        "detail" : "DESCRIPTION: id=2989790014 is in delta file but not in snapshot file."
+      }, {
+        "conceptId" : "703860006",
+        "detail" : "DESCRIPTION: id=3008366010 is in delta file but not in snapshot file."
+      }, {
+        "conceptId" : "700132006",
+        "detail" : "DESCRIPTION: id=3005197021 is in delta file but not in snapshot file."
+      }, {
+        "conceptId" : "700132006",
+        "detail" : "DESCRIPTION: id=2984057019 is in delta file but not in snapshot file."
+      }, {
+        "conceptId" : "700132006",
+        "detail" : "DESCRIPTION: id=2984057008 is in delta file but not in snapshot file."
+      }, {
+        "conceptId" : "698906002",
+        "detail" : "DESCRIPTION: id=2981505010 is in delta file but not in snapshot file."
+      } ],
+      "totalFailed" : 10
   }, {
     "assertionName" : "The current simple refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "0988de1d-29dd-4668-bcbf-032d38692492",
@@ -1762,7 +1762,7 @@
     "assertionUuid" : "6dbaed71-f031-4290-b74f-f35561c2e283",
     "firstNInstances" : [ {
       "conceptId" : 702451000,
-      "detail" : "Relationship: id=4969199027 is duplicated in the stated and inferred relationships"
+      "detail" : "Stated Relationship: id=4969199027 is duplicated in the inferred relationship snapshot"
     } ],
     "totalFailed" : 1
   }, {

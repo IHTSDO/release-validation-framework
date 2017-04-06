@@ -10,7 +10,18 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
-		concat('Relationship: id=',a.id, ' is duplicated in the stated and inferred relationships') 	
-	from curr_stated_relationship_s a, curr_relationship_s b
-	where a.id=b.id;
+		duplicateRel.sourceid,
+		concat('Stated Relationship: id=', duplicateRel.id, ' is duplicated in the inferred relationship snapshot') 	
+	from (select distinct a.id,a.sourceid from curr_stated_relationship_s a, curr_relationship_s b, curr_stated_relationship_d c
+	where a.id=c.id
+	and a.id=b.id ) duplicateRel;
+	
+	select 
+		<RUNID>,
+		'<ASSERTIONUUID>',
+		duplicateRel.sourceid,
+		concat('Relationship: id=', duplicateRel.id, ' is duplicated in the stated relationship snapshot') 	
+	from 
+	(select distinct a.id,a.sourceid from curr_relationship_s a, curr_stated_relationship_s b, curr_relationship_d c
+	where a.id=c.id
+	and a.id=b.id ) duplicateRel;

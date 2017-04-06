@@ -35,12 +35,14 @@ public class AssertionGroupImporter {
 		INT_AUTHORING ("INT","int-authoring"),
 		DK_AUTHORING("DK","dk-authoring"),
 		SE_AUTHORING ("SE","se-authoring"),
+		US_AUTHORING ("US","us-authoring"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC","firstTimeLOINCValidation"),
 		FIRST_TIME_INTERNATIONAL_RELEASE_VALIDATION("INT","firstTimeInternationalReleaseValidation"),
 		FIRST_TIME_COMMON_SNAPSHOT_VALIDATION ("COMMON","FirstTimeCommonSnapshotValidation"),
 		LOINC_EDITION ("LOINC","LoincEdition"),
 		DANISH_EDITION("DK","DanishEdition"),
 		SWEDISH_EDITION("SE","SwedishEdition"),
+		US_EDITION("US","USEdition"),
 		//Remove this when the orchestration service has been updated.
 		SNAPSHOT_CONTENT_VALIDAITON("INT","SnapshotContentValidation");
 		private String name;
@@ -148,6 +150,7 @@ public class AssertionGroupImporter {
 			case DANISH_EDITION	:
 			case SWEDISH_EDITION :
 			case INTERNATIONAL_EDITION :
+			case US_EDITION :
 				createReleaseAssertionGroup(allAssertions, groupName);
 				break;
 			case COMMON_AUTHORING :
@@ -156,6 +159,7 @@ public class AssertionGroupImporter {
 			case INT_AUTHORING :
 			case DK_AUTHORING :
 			case SE_AUTHORING :
+			case US_AUTHORING :
 				createSnapshotAssertionGroup(groupName);
 				break;
 			case SNAPSHOT_CONTENT_VALIDAITON:

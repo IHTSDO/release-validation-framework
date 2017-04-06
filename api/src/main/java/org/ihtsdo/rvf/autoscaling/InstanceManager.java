@@ -21,20 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.CreateTagsRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Filter;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.InstanceState;
-import com.amazonaws.services.ec2.model.InstanceStateChange;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.amazonaws.services.ec2.model.RunInstancesRequest;
-import com.amazonaws.services.ec2.model.RunInstancesResult;
-import com.amazonaws.services.ec2.model.Tag;
-import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
-import com.amazonaws.services.ec2.model.TerminateInstancesResult;
-
+import com.amazonaws.services.ec2.model.*;
 @Service
 public class InstanceManager {
 
@@ -61,6 +48,8 @@ public class InstanceManager {
 	private String keyName;
 	@Autowired
 	private String instanceTagName;
+	@Autowired
+	private String ec2SubnetId;
 	private String ec2InstanceStartupScript;
 
 	public InstanceManager(AWSCredentials credentials, String ec2Endpoint) {
@@ -77,35 +66,65 @@ public class InstanceManager {
 				.withKeyName(keyName)
 				.withInstanceInitiatedShutdownBehavior(TERMINATE)
 				.withSecurityGroupIds(securityGroupId)
-				.withUserData(ec2InstanceStartupScript);
-		RunInstancesResult runInstancesResult = amazonEC2Client
-				.runInstances(runInstancesRequest);
-
-		List<Instance> instances = runInstancesResult.getReservation()
-				.getInstances();
+				.withUserData(ec2InstanceStartupScript)
+				.withSubnetId(ec2SubnetId);
 		List<String> ids = new ArrayList<>();
-		for (Instance instance : instances) {
-			String instanceId = instance.getInstanceId();
-			logger.info(
-					"RVF worker new instance created with id {} and launched at {}",
-					instanceId, instance.getLaunchTime());
-			CreateTagsRequest createTagsRequest = new CreateTagsRequest();
-			createTagsRequest.withResources(instanceId);
-			if (instanceTagName != null) {
-				Tag typeTag = new Tag(WORKER_TYPE, instanceTagName);
-				Tag nameTag = new Tag(NAME, RVF_WORKER + instanceTagName + "_"
-						+ counter++);
-				createTagsRequest.withTags(typeTag, nameTag);
-				logger.info("Namge tag {} is created for instance id {}",
-						nameTag, instanceId);
-			} else {
-				createTagsRequest.withTags(new Tag(NAME, RVF_WORKER + imageId
-						+ "_" + counter++));
+		try {
+			RunInstancesResult runInstancesResult = amazonEC2Client
+					.runInstances(runInstancesRequest);
+
+			List<Instance> instances = runInstancesResult.getReservation()
+					.getInstances();
+		
+			for (Instance instance : instances) {
+				String instanceId = instance.getInstanceId();
+				logger.info(
+						"RVF worker new instance created with id {} and launched at {}",
+						instanceId, instance.getLaunchTime());
+				CreateTagsRequest createTagsRequest = new CreateTagsRequest();
+				createTagsRequest.withResources(instanceId);
+				if (instanceTagName != null) {
+					Tag typeTag = new Tag(WORKER_TYPE, instanceTagName);
+					Tag nameTag = new Tag(NAME, RVF_WORKER + instanceTagName + "_"
+							+ counter++);
+					createTagsRequest.withTags(typeTag, nameTag);
+					getNewInstanceIpAddress(instance);
+					logger.info("Name tag {} is created for instance id {}",
+							nameTag, instanceId);
+				} else {
+					createTagsRequest.withTags(new Tag(NAME, RVF_WORKER + imageId
+							+ "_" + counter++));
+				}
+				amazonEC2Client.createTags(createTagsRequest);
+				ids.add(instanceId);
 			}
-			amazonEC2Client.createTags(createTagsRequest);
-			ids.add(instanceId);
+		} catch (Exception e) {
+			logger.error("Failed to create RVF instance workers.", e);
 		}
 		return ids;
+	}
+	
+	//See https://medium.com/@mertcal/getting-ips-of-newly-created-ec2-instances-6a7164392014#.siinju4g9
+	private void getNewInstanceIpAddress(final Instance instance) {
+		Thread t = new Thread(new Runnable() {
+			public void run()
+			{
+				try {
+					Thread.sleep(30 * 1000);
+				} catch (InterruptedException e) {
+					logger.error("Failed to sleep for 30 seconds",e);
+				}
+				DescribeInstancesRequest request = new DescribeInstancesRequest();
+				String instanceId = instance.getInstanceId();
+				request.setInstanceIds(new ArrayList<String>(Arrays.asList(instanceId)));
+
+				DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+				List<Reservation> reservations = result.getReservations();
+				String publicIp = reservations.get(0).getInstances().get(0).getPublicIpAddress();
+				logger.info("Instance {} created with public IP address {}", instance.getInstanceId(), publicIp);
+			}
+		});
+		t.start();
 	}
 
 	public String getImageId() {
@@ -170,17 +189,21 @@ public class InstanceManager {
 
 	public List<String> getActiveInstances() {
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
-		request.withFilters(new Filter(TAG + WORKER_TYPE, Arrays
-				.asList(instanceTagName)));
-		DescribeInstancesResult result = amazonEC2Client
-				.describeInstances(request);
-		List<Reservation> reservations = result.getReservations();
+		request.withFilters(new Filter(TAG + WORKER_TYPE, Arrays.asList(instanceTagName)));
 		List<Instance> instances = new ArrayList<>();
-		for (Reservation reserv : reservations) {
-			instances.addAll(reserv.getInstances());
+		try {
+			DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
+			List<Reservation> reservations = result.getReservations();
+			for (Reservation reserv : reservations) {
+				instances.addAll(reserv.getInstances());
+			}
+			logger.info("Total instances {} found with filter {}", instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
+		} catch (Exception e) {
+			String msg = "Unexpected error encountered.";
+			logger.error(msg, e);
+			throw new RuntimeException(msg, e);
 		}
-		logger.info("Total instances {} found with filter {}",
-				instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
+	
 		List<String> activeInstances = new ArrayList<>();
 		for (Instance instance : instances) {
 			InstanceState state = instance.getState();

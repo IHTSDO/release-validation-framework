@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.entity;
 
 
-public class FailureDetail {
+public class FailureDetail implements Comparable<FailureDetail>{
 
 	String conceptId;
 	String detail;
@@ -56,5 +56,9 @@ public class FailureDetail {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public int compareTo(FailureDetail other) {
+		return ((Integer)hashCode()).compareTo((Integer)other.hashCode());
+	}
 }

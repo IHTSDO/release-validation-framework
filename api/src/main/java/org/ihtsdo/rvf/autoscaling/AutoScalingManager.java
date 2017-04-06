@@ -41,66 +41,63 @@ public class AutoScalingManager {
 
 	}
 
-	public void startUp() throws Exception {
+	public void startUp() {
 		logger.info("isAutoScalingEnabled:" + isAutoScalling);
-		if (isAutoScalling) {
-			Thread thread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					while (!shutDown) {
-						if (!isFirstTime) {
-							int current = getQueueSize();
-							if (current != lastPolledQueueSize) {
-								logger.info("Total messages in queue:"
-										+ current);
-								activeInstances = instanceManager
-										.checkActiveInstances(activeInstances);
-							}
-							if ((current > lastPolledQueueSize)
-									|| (current > activeInstances.size())) {
-								// will add logic later in terms how many
-								// instances need to create for certain size
-								// the current approach is to create one
-								// instance per message.
-								if (current > lastPolledQueueSize) {
-									logger.info("Messages have been increased by:"
-											+ (current - lastPolledQueueSize)
-											+ " since last poll.");
+			if (isAutoScalling) {
+				Thread thread = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						while (!shutDown) {
+							if (isFirstTime) {
+								isFirstTime = false;
+								// check any running instances
+								activeInstances.addAll(instanceManager.getActiveInstances());
+							} else {
+								int current = getQueueSize();
+								if (current != lastPolledQueueSize) {
+									logger.info("Total messages in queue:"
+											+ current);
+									activeInstances = instanceManager
+											.checkActiveInstances(activeInstances);
 								}
-								int totalToCreate = getTotalInstancesToCreate(
-										current, activeInstances.size(),
-										maxRunningInstance);
-								if (totalToCreate != 0) {
-									logger.info("Start creating "
-											+ totalToCreate
-											+ " new worker instance");
-									long start = System.currentTimeMillis();
-									activeInstances.addAll(instanceManager
-											.createInstance(totalToCreate));
-									logger.info("Time taken to create new intance in seconds:"
-											+ (System.currentTimeMillis() - start)
-											/ 1000);
+								if ((current > lastPolledQueueSize)
+										|| (current > activeInstances.size())) {
+									// will add logic later in terms how many
+									// instances need to create for certain size
+									// the current approach is to create one
+									// instance per message.
+									if (current > lastPolledQueueSize) {
+										logger.info("Messages have been increased by:"
+												+ (current - lastPolledQueueSize)
+												+ " since last poll.");
+									}
+									int totalToCreate = getTotalInstancesToCreate(
+											current, activeInstances.size(),
+											maxRunningInstance);
+									if (totalToCreate != 0) {
+										logger.info("Start creating "
+												+ totalToCreate
+												+ " new worker instance");
+										long start = System.currentTimeMillis();
+										activeInstances.addAll(instanceManager
+												.createInstance(totalToCreate));
+										logger.info("Time taken to create new intance in seconds:"
+												+ (System.currentTimeMillis() - start)
+												/ 1000);
+									}
+								}
+								lastPolledQueueSize = current;
+								try {
+									Thread.sleep(30 * 1000);
+								} catch (InterruptedException e) {
+									logger.error("AutoScalingManager delay is interrupted.", e);
 								}
 							}
-							lastPolledQueueSize = current;
-							try {
-								Thread.sleep(30 * 1000);
-							} catch (InterruptedException e) {
-								logger.error(
-										"AutoScalingManager delay is interrupted.",
-										e);
-							}
-						} else {
-							isFirstTime = false;
-							// check any running instances
-							activeInstances.addAll(instanceManager
-									.getActiveInstances());
 						}
 					}
-				}
-			});
-			thread.start();
-		}
+				});
+				thread.start();
+			}
 	}
 
 	private int getTotalInstancesToCreate(int currentMsgSize,
