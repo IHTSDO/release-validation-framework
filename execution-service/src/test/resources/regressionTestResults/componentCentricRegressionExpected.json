@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 84,
-  "totalAssertionsFailed" : 84,
+  "totalAssertionsRun" : 85,
+  "totalAssertionsFailed" : 85,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -220,6 +220,14 @@
     "firstNInstances" : [ {
       "conceptId" : "700132006",
       "detail" : "MEMBER: id=82f3de7e-e15a-56c2-80a7-8ba824b9bd8e: CTV3 member key (referencedcomponentid, maptarget) is not unique."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "No new active term matches that of an inactive Description.",
+    "assertionUuid" : "a49fabee-0d72-41b0-957d-32983c79f26c",
+    "firstNInstances" : [ {
+      "conceptId" : "703860006",
+      "detail" : "Active description id = 3008366010 and inactive description id = 2984057023 share the same term"
     } ],
     "totalFailed" : 1
   }, {
