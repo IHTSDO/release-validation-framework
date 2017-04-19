@@ -95,6 +95,11 @@ public class ValidationVersionLoader {
 		if (validationConfig.isRf2DeltaOnly()) {
 			List<String> excludeTables = Arrays.asList(RELATIONSHIP_SNAPSHOT_TABLE);
 			rf2FilesLoaded.addAll(loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,excludeTables));
+			if (isExtension(validationConfig)) {
+				executionConfig.setPreviousVersion(validationConfig.getPreviousExtVersion());
+			} else {
+				executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
+			}
 		} else {
 			//load prospective version alone now as used to combine with dependency for extension testing
 			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
