@@ -35,6 +35,9 @@
 		<property name="testWhileIdle" value="true"/>
 		<property name="validationQuery" value="SELECT 1"/>
 		<property name="numTestsPerEvictionRun" value="3"/>
+		<!-- READ_COMMITTED -->
+		<property name="defaultTransactionIsolation" value="2"/>
+		
 	</bean> 
 	
 	<bean factory-bean="s3ClientFactory" factory-method="getClient">

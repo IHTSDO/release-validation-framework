@@ -81,7 +81,10 @@ public class AssertionGroupImporter {
 		"5c6b6bc0-79b9-11e1-b0c4-0800200c9a66",
 		"88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
 		"2e4fd620-7d08-11e1-b0c4-0800200c9a66",
-		"6dbaed71-f031-4290-b74f-f35561c2e283"};
+		"6dbaed71-f031-4290-b74f-f35561c2e283",
+		"c2975dd5-3869-4bf7-ac75-53fd53b90144"};
+	
+	private static final String[] COMMON_AUTHORING_ONLY_LIST = {"a49fabee-0d72-41b0-957d-32983c79f26c"};
 	
 	//SNOMED RT Identifier is deprecated from the international 20170731 release onwards.
 	private static final String[] SNOMED_RT_IDENTIFIER_ASSERTIONS = {"730720b0-7f25-11e1-b0c4-0800200c9a66","83638340-7f25-11e1-b0c4-0800200c9a66",
@@ -213,6 +216,9 @@ public class AssertionGroupImporter {
 		int counter = 0;
 		String keyWords;
 		for (Assertion assertion : allAssertions) {
+			if (Arrays.asList(COMMON_AUTHORING_ONLY_LIST).contains(assertion.getUuid().toString())) {
+				continue;
+			}
 			keyWords=assertion.getKeywords();
 			if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
 				continue;

@@ -1,6 +1,6 @@
 
 /******************************************************************************** 
-	component-centric-snapshot-description-active-inactive-term-match
+	component-centric-snapshot-description-active-inactive-term-match-authoring
 
 	Assertion:
 	No active term associated with active concept matches that of an inactive 
@@ -13,7 +13,7 @@
 	no term of an active description of a concept of which a description was edited 
 	matches that of an inactive description within the same concept
 
-	Note: NOT case sensitive.
+	Note: NOT case sensitive. This is for authoring validaiton only.
 
 ********************************************************************************/
 
@@ -34,7 +34,7 @@
 	create table if not exists tmp_active_desc as
 	select a.*
 	from curr_description_d a 
-	where a.active=1 and not exists (select count(*) as total from curr_description_f b where a.id=b.id having total > 1);
+	where a.active=1 and not exists (select count(*) as total from prev_description_s b where a.id=b.id having total >= 1);
 	commit;
 	
 	alter table tmp_active_desc add index idx_tmp_ad_cid(conceptid);
