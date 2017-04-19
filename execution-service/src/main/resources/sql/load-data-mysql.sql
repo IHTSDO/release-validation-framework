@@ -237,26 +237,4 @@ load data local
 	columns terminated by '\t' 
 	lines terminated by '\r\n' 
 	ignore 1 lines;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	
