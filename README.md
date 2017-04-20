@@ -27,7 +27,7 @@ Setting up this database and user can be done using the following:
 ```
 CREATE DATABASE rvf_master;
 
-CREATE USER 'rvf_user'@'localhost' 
+CREATE USER 'rvf_user'@'localhost';
 // Alternatively give a password: CREATE USER 'rvf_user'@'localhost' IDENTIFIED BY 'password_here';
 
 GRANT ALL PRIVILEGES ON *.* TO 'rvf_user'@'localhost';
