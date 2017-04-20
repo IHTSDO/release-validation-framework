@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 85,
-  "totalAssertionsFailed" : 85,
+  "totalAssertionsRun" : 84,
+  "totalAssertionsFailed" : 84,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -503,14 +503,6 @@
       "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
     } ],
     "totalFailed" : 4
-  }, {
-    "assertionName" : "Case-sensitive terms have appropriate caseSignificanceId.",
-    "assertionUuid" : "22a95293-3acb-4671-95f8-1ff13ba3202c",
-    "firstNInstances" : [ {
-      "conceptId" : "700132006",
-      "detail" : "DESC: id=2984057008:Case-sensitive term containing \"Ahlia\" has inappropriate caseSignificanceId."
-    } ],
-    "totalFailed" : 1
   }, {
     "assertionName" : "No active Terms contain double spaces.",
     "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
