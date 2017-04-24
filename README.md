@@ -45,7 +45,7 @@ data-service.properties | Settings to configure the data store for RVF domain en
 execution-service.properties | Settings to configure the location of SNOMED CT data used by RVF | /etc/opt/rvf-api/ |
 validation-service.properties | Settings to configure structural tests report location and threshold |  /etc/opt/rvf-api/ |
 
-Sample files for configuring the services can be see found in the config folder.
+Sample files for configuring the services can be found in the config folder.
 
 Starting The Application
 ------------------
