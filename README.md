@@ -51,7 +51,7 @@ Starting The Application
 ------------------
 Start the stand-alone web application using the executable jar after replacing "{config_dir}"
 
-`java -jar api/target/validation-api.jar -DrvfConfigLocation={config_dir}`
+`java -jar api/target/validation-api.jar -DrvfConfigLocation={config_dir} (-httpPort=8080)`
 
 API Documentation
 --------------------
