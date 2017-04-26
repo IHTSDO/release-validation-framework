@@ -49,9 +49,9 @@ Sample files for configuring the services can be see found in the config folder.
 
 Starting The Application
 ------------------
-Start the stand-alone web application using the executable jar after replacing "{config_dir}"
+Start the stand-alone web application using the executable jar, replacing "{config_dir}" with an absolute path.
 
-`java -jar api/target/validation-api.jar -DrvfConfigLocation={config_dir} (-httpPort=8080)`
+`java -Xms512m -Xmx4g -DrvfConfigLocation={config_dir} -jar api/target/dependency/webapp-runner.jar api/target/api.war --port 8081`
 
 API Documentation
 --------------------
