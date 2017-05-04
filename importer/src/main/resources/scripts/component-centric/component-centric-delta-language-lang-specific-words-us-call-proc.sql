@@ -9,12 +9,7 @@
 ********************************************************************************/
 
 	drop table if exists v_curr_delta_us;
-	create table if not exists v_curr_delta_us
-	(	id varchar(36),
-		term varchar(255),
-		conceptid varchar(255)
-	) ENGINE=MyISAM;
-	
+	create table v_curr_delta_us (id varchar(36),term varchar(255),conceptid varchar(255)) default charset=utf8;
 	insert into v_curr_delta_us
 	select distinct a.id, a.term,a.conceptid
 		from curr_description_d a 
