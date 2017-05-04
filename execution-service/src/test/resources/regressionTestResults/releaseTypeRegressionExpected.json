@@ -6,7 +6,7 @@
     "assertionName" : "There must be actual changes made to previously published complex map refset components in order for them to appear in the current delta.",
     "assertionUuid" : "80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
     "firstNInstances" : [ {
-      "conceptId" : 144008,
+      "conceptId" : "144008",
       "detail" : "ComplexMap: id=1ef4b939-b726-571a-aa3f-9230aadb9f06 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -14,19 +14,19 @@
     "assertionName" : "The current Concept full file contains all previously published data unchanged.",
     "assertionUuid" : "84f5edda-1249-4d79-87da-e248e61f06a6",
     "firstNInstances" : [ {
-      "conceptId" : 100000000,
+      "conceptId" : "100000000",
       "detail" : "CONCEPT: id=100000000 is in previous full but not in current full."
     }, {
-      "conceptId" : 100000000,
+      "conceptId" : "100000000",
       "detail" : "CONCEPT: id=100000000 is in previous full but not in current full."
     }, {
-      "conceptId" : 10000006,
+      "conceptId" : "10000006",
       "detail" : "CONCEPT: id=10000006 is in previous full but not in current full."
     }, {
-      "conceptId" : 1000004,
+      "conceptId" : "1000004",
       "detail" : "CONCEPT: id=1000004 is in previous full but not in current full."
     }, {
-      "conceptId" : 1000004,
+      "conceptId" : "1000004",
       "detail" : "CONCEPT: id=1000004 is in previous full but not in current full."
     } ],
     "totalFailed" : 5
@@ -34,7 +34,7 @@
     "assertionName" : "There must be actual changes made to previously published expression association refset components in order for them to appear in the current delta",
     "assertionUuid" : "8592c910-f2b1-4573-a9da-3c8931e759b2",
     "firstNInstances" : [ {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociation: id=1ca0b461-66a6-45c8-b01e-5a227c1fc27a is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -42,16 +42,16 @@
     "assertionName" : "New inactive states follow active states in the SIMPLE MAP REFSET snapshot.",
     "assertionUuid" : "88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
     "firstNInstances" : [ {
-      "conceptId" : 699820000,
+      "conceptId" : "699820000",
       "detail" : "SimpleMap Refset: id=0314672a-f4e5-548d-bb84-f82eac418b99 should not have a new inactive state as it was inactive previously."
     }, {
-      "conceptId" : 703568007,
+      "conceptId" : "703568007",
       "detail" : "SimpleMap Refset: id=cff7ca5c-286c-52b3-9322-e489c65c8ab5 is inactive but no active state found in the previous snapshot."
     }, {
-      "conceptId" : 700132006,
+      "conceptId" : "700132006",
       "detail" : "SimpleMap Refset: id=82f3de7e-e15a-56c2-80a7-8ba824b9bd79 is inactive but no active state found in the previous snapshot."
     }, {
-      "conceptId" : 700132006,
+      "conceptId" : "700132006",
       "detail" : "SimpleMap Refset: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249623 is inactive but no active state found in the previous snapshot."
     } ],
     "totalFailed" : 4
@@ -59,7 +59,7 @@
     "assertionName" : "All stated relationships inactivated in current release must have been active in the previous release.",
     "assertionUuid" : "89ceaf00-79b9-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
-      "conceptId" : 698449007,
+      "conceptId" : "698449007",
       "detail" : "Stated relationship: id=4768117023 should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
@@ -67,42 +67,42 @@
     "assertionName" : "The current description snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "8f2a12df-6088-433a-85a5-866410314fe6",
     "firstNInstances" : [ {
-      "conceptId" : 703860006,
+      "conceptId" : "703860006",
       "detail" : "Description: id=2984057023 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703860006,
+      "conceptId" : "703860006",
       "detail" : "Description: id=2984057025 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 702386002,
+      "conceptId" : "702386002",
       "detail" : "Description: id=3004397016 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 702386002,
+      "conceptId" : "702386002",
       "detail" : "Description: id=3006276018 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 702386002,
+      "conceptId" : "702386002",
       "detail" : "Description: id=2989194011 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 702411003,
+      "conceptId" : "702411003",
       "detail" : "Description: id=2990804014 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 700244001,
+      "conceptId" : "700244001",
       "detail" : "Description: id=3006191013 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703215002,
+      "conceptId" : "703215002",
       "detail" : "Description: id=3007330011 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703860006,
+      "conceptId" : "703860006",
       "detail" : "Description: id=2989790014 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703860006,
+      "conceptId" : "703860006",
       "detail" : "Description: id=2989790014 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 29
+    "totalFailed" : 31
   }, {
     "assertionName" : "New inactive states for existing components must have active states in the previous SIMPLE REFSET snapshot.",
     "assertionUuid" : "9190473a-29f7-40fc-b879-9ae0d038b681",
     "firstNInstances" : [ {
-      "conceptId" : 702386002,
+      "conceptId" : "702386002",
       "detail" : "Simple Refset: id=74d0e838-34eb-5a9a-8f02-5584487d55db should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
@@ -110,34 +110,34 @@
     "assertionName" : "The current language refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "91e26b70-ea15-4057-8c31-a1bf91614654",
     "firstNInstances" : [ {
-      "conceptId" : 758399015,
+      "conceptId" : "758399015",
       "detail" : "LANGUAGE REFSET: id=00000692-31c5-5aac-81a8-2e54b488c824 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 132462014,
+      "conceptId" : "132462014",
       "detail" : "LANGUAGE REFSET: id=0000097d-42b2-500d-88bb-46066baa9bad is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 2731802019,
+      "conceptId" : "2731802019",
       "detail" : "LANGUAGE REFSET: id=00000b14-886f-5d9f-bba5-64e03752cbbc is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 751600014,
+      "conceptId" : "751600014",
       "detail" : "LANGUAGE REFSET: id=00000fa8-54c4-5611-a39b-946ae76fd2f6 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 401837018,
+      "conceptId" : "401837018",
       "detail" : "LANGUAGE REFSET: id=00001558-7a36-5f18-94f3-6c2d9d22a428 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 2794052013,
+      "conceptId" : "2794052013",
       "detail" : "LANGUAGE REFSET: id=00001828-bc61-59f0-811d-56732d1a8507 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 712835011,
+      "conceptId" : "712835011",
       "detail" : "LANGUAGE REFSET: id=00001f12-ad7d-54d9-9bef-89f5d2ef6b2b is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 3008913022,
+      "conceptId" : "3008913022",
       "detail" : "LANGUAGE REFSET: id=000026dd-7c22-5d1f-870f-30a64f5bef55 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 713135019,
+      "conceptId" : "713135019",
       "detail" : "LANGUAGE REFSET: id=00002fb2-d982-5fbd-822f-045c938480c6 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 713135019,
+      "conceptId" : "713135019",
       "detail" : "LANGUAGE REFSET: id=00002fb2-d982-5fbd-822f-045c938480c7 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 26
@@ -145,10 +145,10 @@
     "assertionName" : "The current data in the SimpleMap refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "959e11e7-9ff9-40b9-b833-387495e320d0",
     "firstNInstances" : [ {
-      "conceptId" : 703607009,
+      "conceptId" : "703607009",
       "detail" : "SimpleMapRefset: id=44e48b38-b6fc-5929-96bb-87330b833af2 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 10024003,
+      "conceptId" : "10024003",
       "detail" : "SimpleMapRefset: id=9ec10eaa-224b-50e0-9639-e43c3a87fac0 is in delta but not in snapshot file."
     } ],
     "totalFailed" : 2
@@ -156,7 +156,7 @@
     "assertionName" : "There must be actual changes made to previously published simple refset components in order for them to appear in the current delta.",
     "assertionUuid" : "9912342f-5010-40fd-9bea-301b737973a1",
     "firstNInstances" : [ {
-      "conceptId" : 102456001,
+      "conceptId" : "102456001",
       "detail" : "SimpleRefsetId=22934c1b-b7dd-537c-b2cc-caa9ca5ae6f3 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -164,7 +164,7 @@
     "assertionName" : "There must be actual changes made to previously published language refset components in order for them to appear in the current delta.",
     "assertionUuid" : "a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5",
     "firstNInstances" : [ {
-      "conceptId" : 713135019,
+      "conceptId" : "713135019",
       "detail" : "Language refset id=00002fb2-d982-5fbd-822f-045c938480c6 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -172,10 +172,10 @@
     "assertionName" : "The current association refset delta file is an accurate derivative of the current full file",
     "assertionUuid" : "a5efb25c-d3d9-4150-8ad9-c8101b2c8df0",
     "firstNInstances" : [ {
-      "conceptId" : 129459004,
+      "conceptId" : "129459004",
       "detail" : "ASSOCIATION REFSET: id=4d2876dc-20fb-571f-8170-5fb859567c8e is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 1000004,
+      "conceptId" : "1000004",
       "detail" : "ASSOCIATION REFSET: id=499c1966-65d3-5384-aafb-28f4a20e34eb is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 2
@@ -183,7 +183,7 @@
     "assertionName" : "The current full text definition file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "b0ce145b-323b-484c-9cdc-25ea021e179d",
     "firstNInstances" : [ {
-      "conceptId" : 699220008,
+      "conceptId" : "699220008",
       "detail" : "Definition: id=2983208030 is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 1
@@ -191,13 +191,13 @@
     "assertionName" : "The current full stated relationship file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "b1d75e1c-ea12-4567-a8b9-f69923a57cdf",
     "firstNInstances" : [ {
-      "conceptId" : 425630003,
+      "conceptId" : "425630003",
       "detail" : "Stated relationship: id=3187444026 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 425630003,
+      "conceptId" : "425630003",
       "detail" : "Stated relationship: id=3192499027 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 425630003,
+      "conceptId" : "425630003",
       "detail" : "Stated relationship: id=3574321020 is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 3
@@ -205,10 +205,10 @@
     "assertionName" : "The current Inferred Relationship full file contains all previously published data unchanged.",
     "assertionUuid" : "b46ec8df-1bfd-4825-be49-f09ed8a0076b",
     "firstNInstances" : [ {
-      "conceptId" : 10002003,
+      "conceptId" : "10002003",
       "detail" : "Inferred relationship: id=1000002029 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 10002003,
+      "conceptId" : "10002003",
       "detail" : "Inferred relationship: id=1000002029 is in previous full file but not in current full file."
     } ],
     "totalFailed" : 2
@@ -216,16 +216,16 @@
     "assertionName" : "The current full simple refset file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "b6926fdf-e24a-49ae-a50a-c7c972944804",
     "firstNInstances" : [ {
-      "conceptId" : 10144006,
+      "conceptId" : "10144006",
       "detail" : "SimpleRefsetId=2fe779a4-b2d1-5e0a-9fc4-90d45faf7f47 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 1016002,
+      "conceptId" : "1016002",
       "detail" : "SimpleRefsetId=89e0cc2b-ba8d-55cd-bb02-6ba52dbc201f is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 10166004,
+      "conceptId" : "10166004",
       "detail" : "SimpleRefsetId=da47ca01-f76c-5f22-8b48-76dd75b8b4bc is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 10169006,
+      "conceptId" : "10169006",
       "detail" : "SimpleRefsetId=e143e2d3-1975-5898-88d9-7f8a0dbd41c8 is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 4
@@ -233,34 +233,34 @@
     "assertionName" : "The current association refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "b7597328-a11d-4910-b677-91aef3bd3aea",
     "firstNInstances" : [ {
-      "conceptId" : 702411003,
+      "conceptId" : "702411003",
       "detail" : "ASSOCIATION REFSET: id=499c1966-65d3-5384-aafb-28f4a20e34eb is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703649004,
+      "conceptId" : "703649004",
       "detail" : "ASSOCIATION REFSET: id=d16b9071-731c-5286-96ca-4f5aaddc0de1 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10086003,
+      "conceptId" : "10086003",
       "detail" : "ASSOCIATION REFSET: id=ee9f28d3-de6c-58ec-b886-d86d30b01a56 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10086003,
+      "conceptId" : "10086003",
       "detail" : "ASSOCIATION REFSET: id=8392696f-bf07-571b-9409-350513604516 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 128534003,
+      "conceptId" : "128534003",
       "detail" : "ASSOCIATION REFSET: id=f6f31db7-4cb8-5747-9728-7f5349fcfd94 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 700241009,
+      "conceptId" : "700241009",
       "detail" : "ASSOCIATION REFSET: id=e46f167f-5de0-5c43-89bd-5983edb2da17 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10123006,
+      "conceptId" : "10123006",
       "detail" : "ASSOCIATION REFSET: id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10123006,
+      "conceptId" : "10123006",
       "detail" : "ASSOCIATION REFSET: id=c379d5d1-9c77-5a03-a403-a07fc9b151d7 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 699765003,
+      "conceptId" : "699765003",
       "detail" : "ASSOCIATION REFSET: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 1000004,
+      "conceptId" : "1000004",
       "detail" : "ASSOCIATION REFSET: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 22
@@ -268,34 +268,34 @@
     "assertionName" : "The current data in the Association refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "b808204b-5608-4865-b334-50a6d113b36b",
     "firstNInstances" : [ {
-      "conceptId" : 109501002,
+      "conceptId" : "109501002",
       "detail" : "ASSOCIATION REFSET: id=9b5a8541-555d-5b12-9f25-cc143226c9bf is in delta but not in snapshot file."
     }, {
-      "conceptId" : 109501002,
+      "conceptId" : "109501002",
       "detail" : "ASSOCIATION REFSET: id=f1c2664c-ac69-5ede-a427-a3b7c371764b is in delta but not in snapshot file."
     }, {
-      "conceptId" : 109797006,
+      "conceptId" : "109797006",
       "detail" : "ASSOCIATION REFSET: id=c6d637c1-24cb-567b-860d-83f981855a08 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 112635002,
+      "conceptId" : "112635002",
       "detail" : "ASSOCIATION REFSET: id=918bfaca-d6b3-5594-8bfc-252cf6a14e91 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 1178005,
+      "conceptId" : "1178005",
       "detail" : "ASSOCIATION REFSET: id=6ca1088e-bb27-560d-9d36-876e2dcf5f28 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 123653002,
+      "conceptId" : "123653002",
       "detail" : "ASSOCIATION REFSET: id=e2552c51-23fb-5f36-8029-7772e3a937cb is in delta but not in snapshot file."
     }, {
-      "conceptId" : 12793000,
+      "conceptId" : "12793000",
       "detail" : "ASSOCIATION REFSET: id=f4af39cb-3f17-5390-b2a6-911955ab57f9 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 128202008,
+      "conceptId" : "128202008",
       "detail" : "ASSOCIATION REFSET: id=24fe29e9-bacb-537a-bdc0-6fb66e8982ba is in delta but not in snapshot file."
     }, {
-      "conceptId" : 129459004,
+      "conceptId" : "129459004",
       "detail" : "ASSOCIATION REFSET: id=4d2876dc-20fb-571f-8170-5fb859567c8e is in delta but not in snapshot file."
     }, {
-      "conceptId" : 1000004,
+      "conceptId" : "1000004",
       "detail" : "ASSOCIATION REFSET: id=499c1966-65d3-5384-aafb-28f4a20e34eb is in delta but not in snapshot file."
     } ],
     "totalFailed" : 10
@@ -303,34 +303,34 @@
     "assertionName" : "The current language refset delta file is an accurate derivative of the current full file",
     "assertionUuid" : "b87c6dfe-c109-4c8d-91f2-a15a17631ad2",
     "firstNInstances" : [ {
-      "conceptId" : 2989495017,
+      "conceptId" : "2989495017",
       "detail" : "LANGUAGE REFSET: id=0001081b-f3a3-5115-960e-aa1b35ea3e59 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 2990499015,
+      "conceptId" : "2990499015",
       "detail" : "LANGUAGE REFSET: id=000507b6-49d9-51f4-a27f-84f80fab208e is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 3010212010,
+      "conceptId" : "3010212010",
       "detail" : "LANGUAGE REFSET: id=0008f7ac-8144-5699-8513-d1084e719b5f is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 3007593011,
+      "conceptId" : "3007593011",
       "detail" : "LANGUAGE REFSET: id=000917e5-a73d-575d-82a4-5b488a6c071f is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 3005766014,
+      "conceptId" : "3005766014",
       "detail" : "LANGUAGE REFSET: id=00168a48-cb48-5231-b3d3-f5b90528f7a5 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 285204019,
+      "conceptId" : "285204019",
       "detail" : "LANGUAGE REFSET: id=001a76cb-25d4-5448-978d-8acf63c0125d is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 3008142014,
+      "conceptId" : "3008142014",
       "detail" : "LANGUAGE REFSET: id=001bf726-0491-59ee-bd42-a5a3265f1aea is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 3008249010,
+      "conceptId" : "3008249010",
       "detail" : "LANGUAGE REFSET: id=002266d4-937d-50fa-9db8-daab8aba8ba9 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 1233328012,
+      "conceptId" : "1233328012",
       "detail" : "LANGUAGE REFSET: id=00227b5b-bb17-5c5d-9f71-0f306063f8e1 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 3008913022,
+      "conceptId" : "3008913022",
       "detail" : "LANGUAGE REFSET: id=000026dd-7c22-5d1f-870f-30a64f5bef12 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 11
@@ -338,7 +338,7 @@
     "assertionName" : "New inactive states follow active states in the ASSOCIATION REFSET snapshot file.",
     "assertionUuid" : "b88b9f46-4c33-4d8e-b9ab-ddb87aef3068",
     "firstNInstances" : [ {
-      "conceptId" : 10171006,
+      "conceptId" : "10171006",
       "detail" : "ASSOC RS: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71 should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
@@ -346,13 +346,13 @@
     "assertionName" : "The current full concept file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "bbfbeae4-4b58-465a-9c16-1e8c4454384c",
     "firstNInstances" : [ {
-      "conceptId" : 603649004,
+      "conceptId" : "603649004",
       "detail" : "CONCEPT: id=603649004 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 803672002,
+      "conceptId" : "803672002",
       "detail" : "CONCEPT: id=803672002 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 902850009,
+      "conceptId" : "902850009",
       "detail" : "CONCEPT: id=902850009 is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 3
@@ -360,7 +360,7 @@
     "assertionName" : "There must be actual changes made to previously published simple map refset components in order for them to appear in the current delta.",
     "assertionUuid" : "bc055a18-f93e-42fd-8bb2-347f2b2b8976",
     "firstNInstances" : [ {
-      "conceptId" : 10024003,
+      "conceptId" : "10024003",
       "detail" : "SimpleMapRefset: id=9ec10eaa-224b-50e0-9639-e43c3a87fac0 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -368,34 +368,34 @@
     "assertionName" : "The current data in the Language refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "bd27d80a-42f1-4412-8111-fdf72fa32904",
     "firstNInstances" : [ {
-      "conceptId" : 2989495017,
+      "conceptId" : "2989495017",
       "detail" : "LANGUAGE REFSET: id=0001081b-f3a3-5115-960e-aa1b35ea3e59 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 2990499015,
+      "conceptId" : "2990499015",
       "detail" : "LANGUAGE REFSET: id=000507b6-49d9-51f4-a27f-84f80fab208e is in delta but not in snapshot file."
     }, {
-      "conceptId" : 3010212010,
+      "conceptId" : "3010212010",
       "detail" : "LANGUAGE REFSET: id=0008f7ac-8144-5699-8513-d1084e719b5f is in delta but not in snapshot file."
     }, {
-      "conceptId" : 3007593011,
+      "conceptId" : "3007593011",
       "detail" : "LANGUAGE REFSET: id=000917e5-a73d-575d-82a4-5b488a6c071f is in delta but not in snapshot file."
     }, {
-      "conceptId" : 3005766014,
+      "conceptId" : "3005766014",
       "detail" : "LANGUAGE REFSET: id=00168a48-cb48-5231-b3d3-f5b90528f7a5 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 285204019,
+      "conceptId" : "285204019",
       "detail" : "LANGUAGE REFSET: id=001a76cb-25d4-5448-978d-8acf63c0125d is in delta but not in snapshot file."
     }, {
-      "conceptId" : 3008142014,
+      "conceptId" : "3008142014",
       "detail" : "LANGUAGE REFSET: id=001bf726-0491-59ee-bd42-a5a3265f1aea is in delta but not in snapshot file."
     }, {
-      "conceptId" : 3008249010,
+      "conceptId" : "3008249010",
       "detail" : "LANGUAGE REFSET: id=002266d4-937d-50fa-9db8-daab8aba8ba9 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 1233328012,
+      "conceptId" : "1233328012",
       "detail" : "LANGUAGE REFSET: id=00227b5b-bb17-5c5d-9f71-0f306063f8e1 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 713135019,
+      "conceptId" : "713135019",
       "detail" : "LANGUAGE REFSET: id=00002fb2-d982-5fbd-822f-045c938480c6 is in delta but not in snapshot file."
     } ],
     "totalFailed" : 10
@@ -403,31 +403,31 @@
     "assertionName" : "The current SimpleMap refset full file contains all previously published data unchanged.",
     "assertionUuid" : "c19b9008-bbc9-4209-a3d7-896d414df565",
     "firstNInstances" : [ {
-      "conceptId" : 699820000,
+      "conceptId" : "699820000",
       "detail" : "SimpleMapRefset: id=0314672a-f4e5-548d-bb84-f82eac418b99 is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 699621004,
+      "conceptId" : "699621004",
       "detail" : "SimpleMapRefset: id=425999cc-49c2-5e22-9ccd-928963ab1b98 is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 699960000,
+      "conceptId" : "699960000",
       "detail" : "SimpleMapRefset: id=530928b4-1718-527a-bba0-3826eb9232b3 is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 699596009,
+      "conceptId" : "699596009",
       "detail" : "SimpleMapRefset: id=5c2aefac-5d12-5858-9f7e-f94848ad7287 is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 699644001,
+      "conceptId" : "699644001",
       "detail" : "SimpleMapRefset: id=fad3438f-deeb-5c21-b20e-4787f220882a is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 699601000,
+      "conceptId" : "699601000",
       "detail" : "SimpleMapRefset: id=8ba71fba-42c6-58a8-b558-d6de111a707d is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 699610008,
+      "conceptId" : "699610008",
       "detail" : "SimpleMapRefset: id=14a123e1-9903-5b32-8309-85e1a0a0b5b3 is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 10144006,
+      "conceptId" : "10144006",
       "detail" : "SimpleMapRefset: id=f4aaf4d6-e40d-5454-983e-5f7fd809497c is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 1016002,
+      "conceptId" : "1016002",
       "detail" : "SimpleMapRefset: id=310e09ab-f0e7-50b1-b1ba-e7ec9fc74446 is in prior full file, but not in current full file."
     } ],
     "totalFailed" : 9
@@ -435,25 +435,25 @@
     "assertionName" : "The current data in the Definition snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "c837a6f8-f06a-4599-944c-eaa3a6d68c18",
     "firstNInstances" : [ {
-      "conceptId" : 703166003,
+      "conceptId" : "703166003",
       "detail" : "DEFINITION: id=3008053018 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 441774005,
+      "conceptId" : "441774005",
       "detail" : "DEFINITION: id=2989768014 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 700237005,
+      "conceptId" : "700237005",
       "detail" : "DEFINITION: id=2989691019 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 112581000119104,
+      "conceptId" : "112581000119104",
       "detail" : "DEFINITION: id=3005197017 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 702561005,
+      "conceptId" : "702561005",
       "detail" : "DEFINITION: id=3005888018 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 699683004,
+      "conceptId" : "699683004",
       "detail" : "DEFINITION: id=2988954017 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 699220008,
+      "conceptId" : "699220008",
       "detail" : "DEFINITION: id=2983208019 is in delta but not in snapshot file."
     } ],
     "totalFailed" : 7
@@ -461,10 +461,10 @@
     "assertionName" : "There must be actual changes made to previously published stated relatioships in order for them to appear in the current delta.",
     "assertionUuid" : "cab60a2f-4239-4933-91d6-dc910a8ac08b",
     "firstNInstances" : [ {
-      "conceptId" : 698412001,
+      "conceptId" : "698412001",
       "detail" : "Stated relationship: id=4795108028 is in the detla file, but no actual changes made since the previous release."
     }, {
-      "conceptId" : 698449007,
+      "conceptId" : "698449007",
       "detail" : "Stated relationship: id=4768117023 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 2
@@ -472,13 +472,13 @@
     "assertionName" : "The current text definition delta file is an accurate derivative of the current full file",
     "assertionUuid" : "dc71ca52-f58e-45c7-8f31-c747206a391c",
     "firstNInstances" : [ {
-      "conceptId" : 278512001,
+      "conceptId" : "278512001",
       "detail" : "Definition: id=2995945017 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 699683004,
+      "conceptId" : "699683004",
       "detail" : "Definition: id=2988954017 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 699220008,
+      "conceptId" : "699220008",
       "detail" : "Definition: id=2983208019 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 3
@@ -486,34 +486,34 @@
     "assertionName" : "The current inferred relationship delta file is an accurate derivative of the current full file",
     "assertionUuid" : "dfbab5f4-8b72-4cd3-abe9-2cf5b5f76e5b",
     "firstNInstances" : [ {
-      "conceptId" : 266125005,
+      "conceptId" : "266125005",
       "detail" : "Inferred relationship: id=1001778028 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 266125005,
+      "conceptId" : "266125005",
       "detail" : "Inferred relationship: id=1001779020 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 266519001,
+      "conceptId" : "266519001",
       "detail" : "Inferred relationship: id=1001947020 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 266520007,
+      "conceptId" : "266520007",
       "detail" : "Inferred relationship: id=1001948026 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 267212003,
+      "conceptId" : "267212003",
       "detail" : "Inferred relationship: id=1002298020 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 267213008,
+      "conceptId" : "267213008",
       "detail" : "Inferred relationship: id=1002301024 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 267214002,
+      "conceptId" : "267214002",
       "detail" : "Inferred relationship: id=1002316022 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 267215001,
+      "conceptId" : "267215001",
       "detail" : "Inferred relationship: id=1002319026 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 267216000,
+      "conceptId" : "267216000",
       "detail" : "Inferred relationship: id=1002334021 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 699754008,
+      "conceptId" : "699754008",
       "detail" : "Inferred relationship: id=1000005027 is in delta file, but not in FULL file."
     } ],
     "totalFailed" : 11
@@ -521,19 +521,19 @@
     "assertionName" : "The current data in the Concept snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "e2d4a6be-cd76-4e03-afe8-5c7783aaa2c7",
     "firstNInstances" : [ {
-      "conceptId" : 700241009,
+      "conceptId" : "700241009",
       "detail" : "CONCEPT: id=700241009 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 703649004,
+      "conceptId" : "703649004",
       "detail" : "CONCEPT: id=703649004 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 702850009,
+      "conceptId" : "702850009",
       "detail" : "CONCEPT: id=702850009 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 700132008,
+      "conceptId" : "700132008",
       "detail" : "CONCEPT: id=700132008 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 699765003,
+      "conceptId" : "699765003",
       "detail" : "CONCEPT: id=699765003 is in delta but not in snapshot file."
     } ],
     "totalFailed" : 5
@@ -541,7 +541,7 @@
     "assertionName" : "New inactive states follow active states in the DEFINITION snapshot file.",
     "assertionUuid" : "e6082dc4-c6f4-48c6-afa3-233182336a5c",
     "firstNInstances" : [ {
-      "conceptId" : 699220008,
+      "conceptId" : "699220008",
       "detail" : "TextDefinition: id=2983208019  should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
@@ -549,7 +549,7 @@
     "assertionName" : "There must be actual changes made to previously published mapcorrelationOriginRefset components in order for them to appear in the current delta.",
     "assertionUuid" : "e77a45db-d2d7-4d48-9420-0b97579582fc",
     "firstNInstances" : [ {
-      "conceptId" : 703064003,
+      "conceptId" : "703064003",
       "detail" : "mapcorrelationOriginRefset: id=f40c3232-dd2a-4626-b5b0-f29418195a88 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -557,13 +557,13 @@
     "assertionName" : "All language refset members inactivated in current snapshot must have been active in the previous release.",
     "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
-      "conceptId" : 713135019,
+      "conceptId" : "713135019",
       "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c6 should not have a new inactive state as it was inactive previously."
     }, {
-      "conceptId" : 713135019,
+      "conceptId" : "713135019",
       "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c7  is inactive but no active state found in previous release."
     }, {
-      "conceptId" : 3008913019,
+      "conceptId" : "3008913019",
       "detail" : "Language Refset: id=00002fb2-d982-5fbd-822f-045c938480c9  is inactive but no active state found in previous release."
     } ],
     "totalFailed" : 3
@@ -571,31 +571,31 @@
     "assertionName" : "The current Language refset full file contains all previously published data unchanged.",
     "assertionUuid" : "f0b4c712-781a-4ca5-872e-883cf1949f12",
     "firstNInstances" : [ {
-      "conceptId" : 758399015,
+      "conceptId" : "758399015",
       "detail" : "LANGUAGE-REFSET: id=00000692-31c5-5aac-81a8-2e54b488c824 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 758399015,
+      "conceptId" : "758399015",
       "detail" : "LANGUAGE-REFSET: id=00000692-31c5-5aac-81a8-2e54b488c824 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 132462014,
+      "conceptId" : "132462014",
       "detail" : "LANGUAGE-REFSET: id=0000097d-42b2-500d-88bb-46066baa9bad is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 2731802019,
+      "conceptId" : "2731802019",
       "detail" : "LANGUAGE-REFSET: id=00000b14-886f-5d9f-bba5-64e03752cbbc is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 751600014,
+      "conceptId" : "751600014",
       "detail" : "LANGUAGE-REFSET: id=00000fa8-54c4-5611-a39b-946ae76fd2f6 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 401837018,
+      "conceptId" : "401837018",
       "detail" : "LANGUAGE-REFSET: id=00001558-7a36-5f18-94f3-6c2d9d22a428 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 2794052013,
+      "conceptId" : "2794052013",
       "detail" : "LANGUAGE-REFSET: id=00001828-bc61-59f0-811d-56732d1a8507 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 712835011,
+      "conceptId" : "712835011",
       "detail" : "LANGUAGE-REFSET: id=00001f12-ad7d-54d9-9bef-89f5d2ef6b2b is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 712835011,
+      "conceptId" : "712835011",
       "detail" : "LANGUAGE-REFSET: id=00001f12-ad7d-54d9-9bef-89f5d2ef6b2b is in previous full file, but not in current full file."
     } ],
     "totalFailed" : 9
@@ -603,13 +603,13 @@
     "assertionName" : "The current attribute-value refset delta file is an accurate derivative of the current full file",
     "assertionUuid" : "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
     "firstNInstances" : [ {
-      "conceptId" : 569651017,
+      "conceptId" : "569651017",
       "detail" : "ATTRIBUTE VALUE REFSET: id=000e70b1-5825-5abd-a4c3-5ced92f3f7ed is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 2608473011,
+      "conceptId" : "2608473011",
       "detail" : "ATTRIBUTE VALUE REFSET: id=00000629-2697-5041-9438-3845fb99fe93 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 2608473011,
+      "conceptId" : "2608473011",
       "detail" : "ATTRIBUTE VALUE REFSET: id=00000629-2697-5041-9438-3845fb99fe92 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 3
@@ -617,7 +617,7 @@
     "assertionName" : "The current full attribute value refset file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "f41f178e-0fe9-42c8-91f2-581c5ad09a5b",
     "firstNInstances" : [ {
-      "conceptId" : 569651017,
+      "conceptId" : "569651017",
       "detail" : "Attribute value refset: id=000e70b1-5825-5abd-a4c3-5ced92f3f8ed is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 1
@@ -625,34 +625,34 @@
     "assertionName" : "The current attribute-value refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "f4f24394-cb3e-48b2-8cd0-7ec6c8671947",
     "firstNInstances" : [ {
-      "conceptId" : 2608473011,
+      "conceptId" : "2608473011",
       "detail" : "ATTRIBUTE VALUE REFSET: id=00000629-2697-5041-9438-3845fb99fe92 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 2712245011,
+      "conceptId" : "2712245011",
       "detail" : "ATTRIBUTE VALUE REFSET: id=00001827-6f7f-5ecc-ae89-39c50d95cbf1 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 118747013,
+      "conceptId" : "118747013",
       "detail" : "ATTRIBUTE VALUE REFSET: id=0000c19f-5198-5edf-8ba3-8a5d210ab10b is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 282210013,
+      "conceptId" : "282210013",
       "detail" : "ATTRIBUTE VALUE REFSET: id=0000d2eb-3374-5d3f-84ec-2e6f12fba831 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 568143011,
+      "conceptId" : "568143011",
       "detail" : "ATTRIBUTE VALUE REFSET: id=00011b4a-a953-5fcd-b4e3-13c703ff981a is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 187427009,
+      "conceptId" : "187427009",
       "detail" : "ATTRIBUTE VALUE REFSET: id=00017996-be7b-5810-baa9-72dc9bce0db6 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 197095003,
+      "conceptId" : "197095003",
       "detail" : "ATTRIBUTE VALUE REFSET: id=00017ef3-2384-5c71-b548-7c528b43ccc5 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 200345007,
+      "conceptId" : "200345007",
       "detail" : "ATTRIBUTE VALUE REFSET: id=000181c4-b36b-5aed-b24c-6e7bde112c5b is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 527806011,
+      "conceptId" : "527806011",
       "detail" : "ATTRIBUTE VALUE REFSET: id=0001d24b-d872-5077-8955-b9c7e055b015 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 2608473011,
+      "conceptId" : "2608473011",
       "detail" : "ATTRIBUTE VALUE REFSET: id=00000629-2697-5041-9438-3845fb99fe93 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 29
@@ -660,13 +660,13 @@
     "assertionName" : "The current Stated Relationship full file contains all previously published data unchanged.",
     "assertionUuid" : "fd8ed390-94e9-4fd9-9e20-902a24273dca",
     "firstNInstances" : [ {
-      "conceptId" : 103144001,
+      "conceptId" : "103144001",
       "detail" : "stated relationship: id=3829439025 is in prior full file but not in current full file."
     }, {
-      "conceptId" : 103145000,
+      "conceptId" : "103145000",
       "detail" : "stated relationship: id=3829440028 is in prior full file but not in current full file."
     }, {
-      "conceptId" : 103176006,
+      "conceptId" : "103176006",
       "detail" : "stated relationship: id=3829442020 is in prior full file but not in current full file."
     } ],
     "totalFailed" : 3
@@ -674,19 +674,19 @@
     "assertionName" : "The current data in the Stated Relationship snapshot file are the same as the data in the current delta file. ",
     "assertionUuid" : "01ce3ac9-d168-4333-99d7-8d2f228f5ec9",
     "firstNInstances" : [ {
-      "conceptId" : 702411003,
+      "conceptId" : "702411003",
       "detail" : "StatedRelationship: id=4969198024 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 205627002,
+      "conceptId" : "205627002",
       "detail" : "StatedRelationship: id=5025315021 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 702496007,
+      "conceptId" : "702496007",
       "detail" : "StatedRelationship: id=4969200029 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 8837000,
+      "conceptId" : "8837000",
       "detail" : "StatedRelationship: id=5050147022 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 698412001,
+      "conceptId" : "698412001",
       "detail" : "StatedRelationship: id=4795108028 is in delta but not in snapshot file."
     } ],
     "totalFailed" : 5
@@ -694,74 +694,74 @@
     "assertionName" : "The current data in the Description snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "073832f4-6dc5-4781-9e56-9c3bc45d01bd",
     "firstNInstances" : [ {
-        "conceptId" : "702386002",
-        "detail" : "DESCRIPTION: id=3006276018 is in delta file but not in snapshot file."
-      }, {
-        "conceptId" : "702386002",
-        "detail" : "DESCRIPTION: id=2989194011 is in delta file but not in snapshot file."
-      }, {
-        "conceptId" : "700501004",
-        "detail" : "DESCRIPTION: id=2990804014 is in delta file but not in snapshot file."
-      }, {
-        "conceptId" : "700244001",
-        "detail" : "DESCRIPTION: id=3006191013 is in delta file but not in snapshot file."
-      }, {
-        "conceptId" : "45477008",
-        "detail" : "DESCRIPTION: id=2989790014 is in delta file but not in snapshot file."
-      }, {
-        "conceptId" : "703860006",
-        "detail" : "DESCRIPTION: id=3008366010 is in delta file but not in snapshot file."
-      }, {
-        "conceptId" : "700132006",
-        "detail" : "DESCRIPTION: id=3005197021 is in delta file but not in snapshot file."
-      }, {
-        "conceptId" : "700132006",
-        "detail" : "DESCRIPTION: id=2984057019 is in delta file but not in snapshot file."
-      }, {
-        "conceptId" : "700132006",
-        "detail" : "DESCRIPTION: id=2984057008 is in delta file but not in snapshot file."
-      }, {
-        "conceptId" : "698906002",
-        "detail" : "DESCRIPTION: id=2981505010 is in delta file but not in snapshot file."
-      } ],
-      "totalFailed" : 10
+      "conceptId" : "702386002",
+      "detail" : "DESCRIPTION: id=3004397016 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESCRIPTION: id=3006276018 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESCRIPTION: id=2989194011 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : "700501004",
+      "detail" : "DESCRIPTION: id=2990804014 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : "700244001",
+      "detail" : "DESCRIPTION: id=3006191013 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : "45477008",
+      "detail" : "DESCRIPTION: id=2989790014 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "DESCRIPTION: id=3008366010 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "DESCRIPTION: id=3008913020 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "DESCRIPTION: id=3005197021 is in delta file but not in snapshot file."
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "DESCRIPTION: id=2984057019 is in delta file but not in snapshot file."
+    } ],
+    "totalFailed" : 13
   }, {
     "assertionName" : "The current simple refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "0988de1d-29dd-4668-bcbf-032d38692492",
     "firstNInstances" : [ {
-        "conceptId" : "1016002",
-        "detail" : "SIMPLE REFSET: id=89e0cc2b-ba8d-55cd-bb02-6ba52dbc201f is in SNAPSHOT file, but not in FULL file."
-      }, {
-        "conceptId" : "703649004",
-        "detail" : "SIMPLE REFSET: id=f9732f68-2af3-555a-bc7a-fa4a852caca6 is in SNAPSHOT file, but not in FULL file."
-      }, {
-        "conceptId" : "703672002",
-        "detail" : "SIMPLE REFSET: id=8321561e-3e21-5b90-87f8-83fcd65310ad is in SNAPSHOT file, but not in FULL file."
-      }, {
-        "conceptId" : "702386002",
-        "detail" : "SIMPLE REFSET: id=74d0e838-34eb-5a9a-8f02-5584487d55db is in SNAPSHOT file, but not in FULL file."
-      }, {
-        "conceptId" : "703649004",
-        "detail" : "SIMPLE REFSET: id=74d0e838-34eb-5a9a-8f02-5584487d55db is in SNAPSHOT file, but not in FULL file."
-      }, {
-        "conceptId" : "702850005",
-        "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
-      }, {
-        "conceptId" : "699765003",
-        "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
-      }, {
-        "conceptId" : "699765003",
-        "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
-      }, {
-        "conceptId" : "1016002",
-        "detail" : "SIMPLE REFSET: id=89e0cc2b-ba8d-55cd-bb02-6ba52dbc201f is in FULL file, but not in SNAPSHOT file."
-      } ],
-      "totalFailed" : 9
+      "conceptId" : "1016002",
+      "detail" : "SIMPLE REFSET: id=89e0cc2b-ba8d-55cd-bb02-6ba52dbc201f is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "703649004",
+      "detail" : "SIMPLE REFSET: id=f9732f68-2af3-555a-bc7a-fa4a852caca6 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "SIMPLE REFSET: id=8321561e-3e21-5b90-87f8-83fcd65310ad is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "SIMPLE REFSET: id=74d0e838-34eb-5a9a-8f02-5584487d55db is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "703649004",
+      "detail" : "SIMPLE REFSET: id=74d0e838-34eb-5a9a-8f02-5584487d55db is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "702850005",
+      "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "699765003",
+      "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "699765003",
+      "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "1016002",
+      "detail" : "SIMPLE REFSET: id=89e0cc2b-ba8d-55cd-bb02-6ba52dbc201f is in FULL file, but not in SNAPSHOT file."
+    } ],
+    "totalFailed" : 9
   }, {
     "assertionName" : " There must be actual changes made to previously published descriptions in order for them to appear in the current delta.",
     "assertionUuid" : "0cc708af-6816-4370-91be-dba8da99d227",
     "firstNInstances" : [ {
-      "conceptId" : 698906002,
+      "conceptId" : "698906002",
       "detail" : "Description: id=2981505010 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -769,7 +769,7 @@
     "assertionName" : "There must be actual changes made to previously published attribute value refset components in order for them to appear in the current delta.",
     "assertionUuid" : "11735994-4b7f-4e61-9bde-059b7e085031",
     "firstNInstances" : [ {
-      "conceptId" : 2608473011,
+      "conceptId" : "2608473011",
       "detail" : "Attribute value refset id=00000629-2697-5041-9438-3845fb99fe92 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -777,31 +777,31 @@
     "assertionName" : "The current full simple map refset file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "13363e71-60ab-4d1b-975c-f38f7d87d106",
     "firstNInstances" : [ {
-      "conceptId" : 10013000,
+      "conceptId" : "10013000",
       "detail" : "SimpleMapRefset: id=16339215-f38d-5df4-a1b0-e82da29b42ae is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 10024003,
+      "conceptId" : "10024003",
       "detail" : "SimpleMapRefset: id=9ec10eaa-224b-50e0-9639-e43c3a87fac0 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 10025002,
+      "conceptId" : "10025002",
       "detail" : "SimpleMapRefset: id=7f8df69b-d812-5046-b90f-e19f3e78a31d is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 10026001,
+      "conceptId" : "10026001",
       "detail" : "SimpleMapRefset: id=dd96b855-96c0-5108-ae12-0e3d9d3c7e2f is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 10036009,
+      "conceptId" : "10036009",
       "detail" : "SimpleMapRefset: id=027006d2-7b27-5577-bac9-3dcc25dd09b1 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 10042008,
+      "conceptId" : "10042008",
       "detail" : "SimpleMapRefset: id=6a31dc48-d478-5882-a45d-93fe5af12c32 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 10047002,
+      "conceptId" : "10047002",
       "detail" : "SimpleMapRefset: id=41cabf19-1403-5522-9786-da42f98cfe55 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 1005009,
+      "conceptId" : "1005009",
       "detail" : "SimpleMapRefset: id=4adf6461-1b28-55a2-b8af-adc20f05b41e is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 10056005,
+      "conceptId" : "10056005",
       "detail" : "SimpleMapRefset: id=165ecdba-3630-5468-986e-56da6e845f2b is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 9
@@ -809,34 +809,34 @@
     "assertionName" : "The current text definition snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "13985234-923e-4d91-911b-b3262e353cfa",
     "firstNInstances" : [ {
-      "conceptId" : 702411003,
+      "conceptId" : "702411003",
       "detail" : "Definition: id=3008053018 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 702769005,
+      "conceptId" : "702769005",
       "detail" : "Definition: id=2989768014 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 700237005,
+      "conceptId" : "700237005",
       "detail" : "Definition: id=2989691019 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703672002,
+      "conceptId" : "703672002",
       "detail" : "Definition: id=3005197017 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 278512001,
+      "conceptId" : "278512001",
       "detail" : "Definition: id=2995945017 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 278512001,
+      "conceptId" : "278512001",
       "detail" : "Definition: id=2995945020 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703672002,
+      "conceptId" : "703672002",
       "detail" : "Definition: id=3005197021 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703672002,
+      "conceptId" : "703672002",
       "detail" : "Definition: id=3005197021 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 699220008,
+      "conceptId" : "699220008",
       "detail" : "Definition: id=2983208019 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703672002,
+      "conceptId" : "703672002",
       "detail" : "Definition: id=3008913022 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 17
@@ -844,45 +844,45 @@
     "assertionName" : "The current data in the Inferred Relationship snapshot file are the same as the data in the current delta file. ",
     "assertionUuid" : "177a7271-7986-433b-8506-fff39e6c1004",
     "firstNInstances" : [ {
-      "conceptId" : 266125005,
+      "conceptId" : "699754008",
+      "detail" : "Relationship: id=1000005027 is in delta, but not in snapshot file."
+    }, {
+      "conceptId" : "266125005",
       "detail" : "Relationship: id=1001778028 is in delta, but not in snapshot file."
     }, {
-      "conceptId" : 266125005,
+      "conceptId" : "266125005",
       "detail" : "Relationship: id=1001779020 is in delta, but not in snapshot file."
     }, {
-      "conceptId" : 266519001,
+      "conceptId" : "266519001",
       "detail" : "Relationship: id=1001947020 is in delta, but not in snapshot file."
     }, {
-      "conceptId" : 266520007,
+      "conceptId" : "266520007",
       "detail" : "Relationship: id=1001948026 is in delta, but not in snapshot file."
     }, {
-      "conceptId" : 267212003,
+      "conceptId" : "267212003",
       "detail" : "Relationship: id=1002298020 is in delta, but not in snapshot file."
     }, {
-      "conceptId" : 267213008,
+      "conceptId" : "267213008",
       "detail" : "Relationship: id=1002301024 is in delta, but not in snapshot file."
     }, {
-      "conceptId" : 267214002,
+      "conceptId" : "267214002",
       "detail" : "Relationship: id=1002316022 is in delta, but not in snapshot file."
     }, {
-      "conceptId" : 267215001,
+      "conceptId" : "267215001",
       "detail" : "Relationship: id=1002319026 is in delta, but not in snapshot file."
     }, {
-      "conceptId" : 267216000,
+      "conceptId" : "267216000",
       "detail" : "Relationship: id=1002334021 is in delta, but not in snapshot file."
-    }, {
-      "conceptId" : 699754008,
-      "detail" : "Relationship: id=1000005027 is in delta, but not in snapshot file."
     } ],
     "totalFailed" : 10
   }, {
     "assertionName" : "The current delta file is an accurate derivative of the current full file",
     "assertionUuid" : "1be975bb-2a1b-4c21-ae61-6e9fcd556718",
     "firstNInstances" : [ {
-      "conceptId" : 700132008,
+      "conceptId" : "700132008",
       "detail" : "CONCEPT: id=700132008 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 699765003,
+      "conceptId" : "699765003",
       "detail" : "CONCEPT: id=699765003 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 2
@@ -890,34 +890,34 @@
     "assertionName" : "The current simple map refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "1d38106d-495e-4d86-8936-33c7e5a12a8f",
     "firstNInstances" : [ {
-      "conceptId" : 703649004,
+      "conceptId" : "703649004",
       "detail" : "SIMPLE MAP REFSET: id=b977f180-396d-513b-a7e4-524645b4fecb is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703615007,
+      "conceptId" : "703615007",
       "detail" : "SIMPLE MAP REFSET: id=e855c4de-407c-56f7-865e-7423580dd95c is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703711007,
+      "conceptId" : "703711007",
       "detail" : "SIMPLE MAP REFSET: id=f4203391-3431-5822-bada-026ff1d45c33 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703815005,
+      "conceptId" : "703815005",
       "detail" : "SIMPLE MAP REFSET: id=dcfb5554-b50f-5ca0-8684-29b1b1b2ecd6 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703605001,
+      "conceptId" : "703605001",
       "detail" : "SIMPLE MAP REFSET: id=1cb64068-effb-5e1d-b9d4-a861f45a29d2 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703634007,
+      "conceptId" : "703634007",
       "detail" : "SIMPLE MAP REFSET: id=dc853820-0f73-539a-811a-e28db48e430f is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703828003,
+      "conceptId" : "703828003",
       "detail" : "SIMPLE MAP REFSET: id=f2e60ac2-6370-533d-921d-15ed46d0f22e is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703607009,
+      "conceptId" : "703607009",
       "detail" : "SIMPLE MAP REFSET: id=34e48b38-b6fc-5929-96bb-87330b833af1 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703568007,
+      "conceptId" : "703568007",
       "detail" : "SIMPLE MAP REFSET: id=cff7ca5c-286c-52b3-9322-e489c65c8de4 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703568007,
+      "conceptId" : "703568007",
       "detail" : "SIMPLE MAP REFSET: id=cff7ca5c-286c-52b3-9322-e489c65c8de4 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 26
@@ -925,31 +925,31 @@
     "assertionName" : "The current AttributeValue refset full file contains all previously published data unchanged.",
     "assertionUuid" : "1f6b5876-7714-4362-a065-3906d059a122",
     "firstNInstances" : [ {
-      "conceptId" : 148188012,
+      "conceptId" : "148188012",
       "detail" : "AtributeValue: id=00047856-81c0-5a8b-8fb2-806d90e26316 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 2150260011,
+      "conceptId" : "2150260011",
       "detail" : "AtributeValue: id=000d1d9a-1a1f-5961-b63c-f39ad2ee4969 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 797538017,
+      "conceptId" : "797538017",
       "detail" : "AtributeValue: id=0014a447-e984-5b90-be1d-29f057f4c032 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 1186527010,
+      "conceptId" : "1186527010",
       "detail" : "AtributeValue: id=00150623-7da1-5358-b946-484487a6a32c is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 1195950018,
+      "conceptId" : "1195950018",
       "detail" : "AtributeValue: id=0019c365-7563-50a4-8940-7490aa6ed125 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 370638006,
+      "conceptId" : "370638006",
       "detail" : "AtributeValue: id=00272529-c323-5f6d-935d-7f4017e56415 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 1195947016,
+      "conceptId" : "1195947016",
       "detail" : "AtributeValue: id=00288481-0d86-55ee-8871-b83fbf8cc56f is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 70820013,
+      "conceptId" : "70820013",
       "detail" : "AtributeValue: id=002a7167-9950-529d-884d-9d1b1e2de051 is in previous full file, but not in current full file."
     }, {
-      "conceptId" : 1193315019,
+      "conceptId" : "1193315019",
       "detail" : "AtributeValue: id=002c2656-cc9d-5a1f-a6b2-4b3e1182a4d6 is in previous full file, but not in current full file."
     } ],
     "totalFailed" : 9
@@ -957,34 +957,34 @@
     "assertionName" : "The current stated relationship snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "23f18cc4-d2d7-4759-96e3-c7d0f0b30a3a",
     "firstNInstances" : [ {
-      "conceptId" : 702411003,
+      "conceptId" : "702411003",
       "detail" : "Stated relationship: id=4969198024 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 128534003,
+      "conceptId" : "128534003",
       "detail" : "Stated relationship: id=4998022027 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 702451000,
+      "conceptId" : "702451000",
       "detail" : "Stated relationship: id=4969199027 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703426005,
+      "conceptId" : "703426005",
       "detail" : "Stated relationship: id=5042420023 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 109443007,
+      "conceptId" : "109443007",
       "detail" : "Stated relationship: id=4994338024 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 205627002,
+      "conceptId" : "205627002",
       "detail" : "Stated relationship: id=4994338024 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 253528005,
+      "conceptId" : "253528005",
       "detail" : "Stated relationship: id=5022653026 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703649004,
+      "conceptId" : "703649004",
       "detail" : "Stated relationship: id=4969200029 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 698449007,
+      "conceptId" : "698449007",
       "detail" : "Stated relationship: id=4768117023 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 702386002,
+      "conceptId" : "702386002",
       "detail" : "Stated relationship: id=4768117024 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 20
@@ -992,31 +992,31 @@
     "assertionName" : "The current full language refset file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "28c3a31d-7a9d-48f6-8eb9-18c25b6306fb",
     "firstNInstances" : [ {
-      "conceptId" : 301829010,
+      "conceptId" : "301829010",
       "detail" : "Language refset: id=ffffdbff-6035-53ec-89e2-dbf0524c6a99 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 356368019,
+      "conceptId" : "356368019",
       "detail" : "Language refset: id=ffffdf11-e33f-5ea5-8b04-c27602e0694e is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 247464017,
+      "conceptId" : "247464017",
       "detail" : "Language refset: id=ffffe99a-24ba-5253-bf74-8f60e21c52ca is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 389976017,
+      "conceptId" : "389976017",
       "detail" : "Language refset: id=ffffebe2-96b0-511d-8dcd-aea431382ced is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 801758010,
+      "conceptId" : "801758010",
       "detail" : "Language refset: id=ffffef35-16be-5c9d-8a99-b82f003a0126 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 589364015,
+      "conceptId" : "589364015",
       "detail" : "Language refset: id=ffffefc9-d5f4-5b7f-964c-e8c91acbfef2 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 589364015,
+      "conceptId" : "589364015",
       "detail" : "Language refset: id=ffffefc9-d5f4-5b7f-964c-e8c91acbfef2 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 82906017,
+      "conceptId" : "82906017",
       "detail" : "Language refset: id=fffff743-124f-5070-b391-66068769db4b is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 262258012,
+      "conceptId" : "262258012",
       "detail" : "Language refset: id=ffffff00-a5d5-5d34-934c-42129ee00493 is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 9
@@ -1024,34 +1024,34 @@
     "assertionName" : "The current stated relationship delta file is an accurate derivative of the current full file",
     "assertionUuid" : "2a938c7e-0803-44a1-8358-339daa87ee39",
     "firstNInstances" : [ {
-      "conceptId" : 702411003,
+      "conceptId" : "702411003",
       "detail" : "Stated relationship: id=4969198024 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 128534003,
+      "conceptId" : "128534003",
       "detail" : "Stated relationship: id=4998022027 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 702451000,
+      "conceptId" : "702451000",
       "detail" : "Stated relationship: id=4969199027 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 703426005,
+      "conceptId" : "703426005",
       "detail" : "Stated relationship: id=5042420023 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 109443007,
+      "conceptId" : "109443007",
       "detail" : "Stated relationship: id=4994338024 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 205627002,
+      "conceptId" : "205627002",
       "detail" : "Stated relationship: id=5025315021 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 253528005,
+      "conceptId" : "253528005",
       "detail" : "Stated relationship: id=5022653026 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 702496007,
+      "conceptId" : "702496007",
       "detail" : "Stated relationship: id=4969200029 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 8837000,
+      "conceptId" : "8837000",
       "detail" : "Stated relationship: id=5050147022 is in delta file, but not in FULL file."
     }, {
-      "conceptId" : 698412001,
+      "conceptId" : "698412001",
       "detail" : "Stated relationship: id=4795108028 is in delta file, but not in FULL file."
     } ],
     "totalFailed" : 11
@@ -1059,7 +1059,7 @@
     "assertionName" : "New inactive states follow active states in the ATTRIBUTEVALUE snapshot.",
     "assertionUuid" : "2aa0bea1-b1fa-4543-b277-b4392a6f864d",
     "firstNInstances" : [ {
-      "conceptId" : 527806011,
+      "conceptId" : "527806011",
       "detail" : "AttributeRefsetId=0001d24b-d872-5077-8955-b9c7e055b015 should not have a new inactive state as it was inactive previously."
     } ],
     "totalFailed" : 1
@@ -1067,10 +1067,10 @@
     "assertionName" : "New inactive states follow active states in the DESCRIPTION snapshot.",
     "assertionUuid" : "2b193a88-8dab-4d19-b995-b556ed59398d",
     "firstNInstances" : [ {
-      "conceptId" : 699400005,
+      "conceptId" : "699400005",
       "detail" : "DESCRIPTION: id=2984057019 should not have a new inactive state as it was inactive previously."
     }, {
-      "conceptId" : 703860006,
+      "conceptId" : "703860006",
       "detail" : "DESCRIPTION: id=2984057023 is inactive but no active state found in the previous snapshot."
     } ],
     "totalFailed" : 2
@@ -1078,7 +1078,7 @@
     "assertionName" : "There must be actual changes made to previously published association refset components in order for them to appear in the current delta.",
     "assertionUuid" : "35680574-3ac6-4b68-9efe-de88b677eb35",
     "firstNInstances" : [ {
-      "conceptId" : 1000004,
+      "conceptId" : "1000004",
       "detail" : "Association refset id=499c1966-65d3-5384-aafb-28f4a20e34eb is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -1086,10 +1086,10 @@
     "assertionName" : "The current data in the Simple refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "365b7d89-74d0-411e-93c6-4a3748736a3b",
     "firstNInstances" : [ {
-      "conceptId" : 699765003,
+      "conceptId" : "699765003",
       "detail" : "Simple refset: id=65f4359b-bf19-5d99-abc1-7139bbff5d68 is in delta file, but not in snapshot file."
     }, {
-      "conceptId" : 102456001,
+      "conceptId" : "102456001",
       "detail" : "Simple refset: id=22934c1b-b7dd-537c-b2cc-caa9ca5ae6f3 is in delta file, but not in snapshot file."
     } ],
     "totalFailed" : 2
@@ -1097,10 +1097,10 @@
     "assertionName" : "There must be actual changes made to previously published definitions in order for them to appear in the current delta.",
     "assertionUuid" : "372e59d5-d6f3-4708-93d0-6cb92da69006",
     "firstNInstances" : [ {
-      "conceptId" : 699683004,
+      "conceptId" : "699683004",
       "detail" : "Definition: id=2988954017 is in the detla file, but no actual changes made since the previous release."
     }, {
-      "conceptId" : 699220008,
+      "conceptId" : "699220008",
       "detail" : "Definition: id=2983208019 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 2
@@ -1108,63 +1108,63 @@
     "assertionName" : "The current description delta file is an accurate derivative of the current full file",
     "assertionUuid" : "3efbc7d7-3485-4f7f-8c07-f1a7c5a0fdf6",
     "firstNInstances" : [ {
-      "conceptId" : 702386002,
+      "conceptId" : "702386002",
       "detail" : "DESCRIPTION: id=3004397016 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 702386002,
+      "conceptId" : "702386002",
       "detail" : "DESCRIPTION: id=3006276018 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 702386002,
+      "conceptId" : "702386002",
       "detail" : "DESCRIPTION: id=2989194011 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 700501004,
+      "conceptId" : "700501004",
       "detail" : "DESCRIPTION: id=2990804014 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 700244001,
+      "conceptId" : "700244001",
       "detail" : "DESCRIPTION: id=3006191013 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703215002,
+      "conceptId" : "703215002",
       "detail" : "DESCRIPTION: id=3007330011 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 45477008,
+      "conceptId" : "45477008",
       "detail" : "DESCRIPTION: id=2989790014 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703860006,
+      "conceptId" : "703860006",
       "detail" : "DESCRIPTION: id=3008366010 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 700132006,
+      "conceptId" : "700132006",
       "detail" : "DESCRIPTION: id=3008862015 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 700132006,
-      "detail" : "DESCRIPTION: id=3008913019 is in DELTA file, but not in FULL file."
+      "conceptId" : "700132006",
+      "detail" : "DESCRIPTION: id=3008913020 is in DELTA file, but not in FULL file."
     } ],
-    "totalFailed" : 14
+    "totalFailed" : 16
   }, {
     "assertionName" : "The current Definition full file contains all previously published data unchanged.",
     "assertionUuid" : "433adc93-fdd5-462a-b1fa-11fb4045a9ec",
     "firstNInstances" : [ {
-      "conceptId" : 609406000,
+      "conceptId" : "609406000",
       "detail" : "DEFINITION: id=2988807015 is in the previous full file, but not in the current full file."
     }, {
-      "conceptId" : 699528002,
+      "conceptId" : "699528002",
       "detail" : "DEFINITION: id=2988808013 is in the previous full file, but not in the current full file."
     }, {
-      "conceptId" : 36813001,
+      "conceptId" : "36813001",
       "detail" : "DEFINITION: id=2987155015 is in the previous full file, but not in the current full file."
     }, {
-      "conceptId" : 699536006,
+      "conceptId" : "699536006",
       "detail" : "DEFINITION: id=2988809017 is in the previous full file, but not in the current full file."
     }, {
-      "conceptId" : 699666008,
+      "conceptId" : "699666008",
       "detail" : "DEFINITION: id=2985919011 is in the previous full file, but not in the current full file."
     }, {
-      "conceptId" : 698055008,
+      "conceptId" : "698055008",
       "detail" : "DEFINITION: id=2987064010 is in the previous full file, but not in the current full file."
     }, {
-      "conceptId" : 62950007,
+      "conceptId" : "62950007",
       "detail" : "DEFINITION: id=2973601010 is in the previous full file, but not in the current full file."
     }, {
-      "conceptId" : 699220008,
+      "conceptId" : "699220008",
       "detail" : "DEFINITION: id=2983208019 is in the previous full file, but not in the current full file."
     } ],
     "totalFailed" : 8
@@ -1172,7 +1172,7 @@
     "assertionName" : "There must be actual changes made to previously published concepts in order for them to appear in the current delta.",
     "assertionUuid" : "4478a896-2724-4417-8bce-8986ecc53c4e",
     "firstNInstances" : [ {
-      "conceptId" : 699765003,
+      "conceptId" : "699765003",
       "detail" : "Concept: id=699765003 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -1180,10 +1180,10 @@
     "assertionName" : "There must be actual changes made to previously published inferred relationships in order for them to appear in the current delta.",
     "assertionUuid" : "44916964-5b78-4842-81d8-e8293ee93bea",
     "firstNInstances" : [ {
-      "conceptId" : 699754008,
+      "conceptId" : "699754008",
       "detail" : "Inferred relationship: id=1000005027 is in the detla file, but no actual changes made since the previous release."
     }, {
-      "conceptId" : 699754008,
+      "conceptId" : "699754008",
       "detail" : "Inferred relationship: id=1000005027 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 2
@@ -1191,10 +1191,10 @@
     "assertionName" : "The current simple refset delta file is an accurate derivative of the current full file",
     "assertionUuid" : "4789c1f0-1776-448e-9ddf-8d1b9986a5cc",
     "firstNInstances" : [ {
-      "conceptId" : 699765003,
+      "conceptId" : "699765003",
       "detail" : "SIMPLE REFSET: id=65f4359b-bf19-5d99-abc1-7139bbff5d68 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 102456001,
+      "conceptId" : "102456001",
       "detail" : "SIMPLE REFSET: id=22934c1b-b7dd-537c-b2cc-caa9ca5ae6f3 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 2
@@ -1202,31 +1202,31 @@
     "assertionName" : "The current Description full file contains all previously published data unchanged.",
     "assertionUuid" : "492bacf0-7d88-45ba-ab26-974150ed9541",
     "firstNInstances" : [ {
-      "conceptId" : 697990000,
+      "conceptId" : "697990000",
       "detail" : "DESCRIPTION: id=2968407015 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 698642008,
+      "conceptId" : "698642008",
       "detail" : "DESCRIPTION: id=2974827019 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 118019001,
+      "conceptId" : "118019001",
       "detail" : "DESCRIPTION: id=2972874012 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 48003000,
+      "conceptId" : "48003000",
       "detail" : "DESCRIPTION: id=2981504014 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 124680001,
+      "conceptId" : "124680001",
       "detail" : "DESCRIPTION: id=2970811019 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 392485006,
+      "conceptId" : "392485006",
       "detail" : "DESCRIPTION: id=2968820011 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 698906002,
+      "conceptId" : "698906002",
       "detail" : "DESCRIPTION: id=2981505010 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 166855002,
+      "conceptId" : "166855002",
       "detail" : "DESCRIPTION: id=2972087017 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 699400005,
+      "conceptId" : "699400005",
       "detail" : "DESCRIPTION: id=2984057019 is in previous full file but not in current full file."
     } ],
     "totalFailed" : 9
@@ -1234,13 +1234,13 @@
     "assertionName" : "The current MapCorrelationOriginRefset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "4bdb1e4d-0ee9-4b5b-a486-cf8c561a3bc1",
     "firstNInstances" : [ {
-      "conceptId" : 707689009,
+      "conceptId" : "707689009",
       "detail" : "mapCorrelationOriginRefset: id=bba35386-acbe-4389-ab28-81d4ffe654a8 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 707685003,
+      "conceptId" : "707685003",
       "detail" : "mapCorrelationOriginRefset: id=bba35386-acbe-4389-ab28-81d4ffe654a8 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 707689009,
+      "conceptId" : "707689009",
       "detail" : "mapCorrelationOriginRefset: id=9918EE37-16A7-4A8D-9C89-281DE1A1E718 is in FULL file, but not in SNAPSHOT file."
     } ],
     "totalFailed" : 3
@@ -1248,7 +1248,7 @@
     "assertionName" : "The current full association refset file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "5491a181-02b0-48a8-bb17-f65c347e9b91",
     "firstNInstances" : [ {
-      "conceptId" : 128202008,
+      "conceptId" : "128202008",
       "detail" : "Association refset: id=24fe29e9-bacb-537a-bdc0-6fb66e8982bb is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 1
@@ -1256,7 +1256,7 @@
     "assertionName" : "The ids should be unique across the description and text definition snapshot files.",
     "assertionUuid" : "560e6d0c-64e8-4726-9516-ae7a7606b0b3",
     "firstNInstances" : [ {
-      "conceptId" : 703860006,
+      "conceptId" : "703860006",
       "detail" : "Description: id=3008913022 is duplicated in the description and text definition snapshot."
     } ],
     "totalFailed" : 1
@@ -1264,7 +1264,7 @@
     "assertionName" : "The current full extended map file consists of the previously published full file and the current delta file",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e612",
     "firstNInstances" : [ {
-      "conceptId" : 177007,
+      "conceptId" : "177007",
       "detail" : "ExtendedMap: id=9d7c45ee-5a0d-5a3c-95dd-30b8b4853550 is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 1
@@ -1272,7 +1272,7 @@
     "assertionName" : "The current extended map refset full file contains all previously published data unchanged",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e613",
     "firstNInstances" : [ {
-      "conceptId" : 181007,
+      "conceptId" : "181007",
       "detail" : "ExtendedMap: id=4586ab94-23ad-5e86-8f2c-e45fc765f3d7 is in prior full file but not in current full file."
     } ],
     "totalFailed" : 1
@@ -1280,31 +1280,31 @@
     "assertionName" : "The current extended map snapshot file contains all the data from current delta file",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e614",
     "firstNInstances" : [ {
-      "conceptId" : 188001,
+      "conceptId" : "188001",
       "detail" : "ExtendedMap: id=64d66e24-7bad-5f16-a3ae-82826c42141b is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 486006,
+      "conceptId" : "486006",
       "detail" : "ExtendedMap: id=f182895e-7db7-5290-88f1-f4b8c14dfa65 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 652005,
+      "conceptId" : "652005",
       "detail" : "ExtendedMap: id=c94195c7-f38c-5863-97de-6fc24cbd9b6a is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 652005,
+      "conceptId" : "652005",
       "detail" : "ExtendedMap: id=83de4b6e-9a2a-5d8c-b9f4-aacdc0e64e01 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 658009,
+      "conceptId" : "658009",
       "detail" : "ExtendedMap: id=3ae07309-e516-57c7-83c5-7a550ee74a7b is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 801006,
+      "conceptId" : "801006",
       "detail" : "ExtendedMap: id=f70f52e1-951e-58eb-a423-f5ab218d2de2 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 801006,
+      "conceptId" : "801006",
       "detail" : "ExtendedMap: id=684b30d0-7e42-50e7-8ae6-5830ea816ce7 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 801006,
+      "conceptId" : "801006",
       "detail" : "ExtendedMap: id=5ba7b2dd-e03b-5fe4-a656-0e8eb65ea05b is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 127009,
+      "conceptId" : "127009",
       "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f081 is in DELTA file, but not in SNAPSHOT file."
     } ],
     "totalFailed" : 9
@@ -1312,34 +1312,34 @@
     "assertionName" : "The current extended map snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e615",
     "firstNInstances" : [ {
-      "conceptId" : 140004,
+      "conceptId" : "140004",
       "detail" : "ExtendedMap: id=174a7931-88f1-5fc7-99fc-f0fc8f104f87 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 177007,
+      "conceptId" : "177007",
       "detail" : "ExtendedMap: id=9d7c45ee-5a0d-5a3c-95dd-30b8b4853550 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 140004,
+      "conceptId" : "140004",
       "detail" : "ExtendedMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b1 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 140004,
+      "conceptId" : "140004",
       "detail" : "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 127008,
+      "conceptId" : "127008",
       "detail" : "ExtendedMap: id=1d507f04-26a6-5a9d-8f3c-abb34b971a62 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 127008,
+      "conceptId" : "127008",
       "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f082 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 127009,
+      "conceptId" : "127009",
       "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f083 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 127010,
+      "conceptId" : "127010",
       "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f084 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 127010,
+      "conceptId" : "127010",
       "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f085 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 127011,
+      "conceptId" : "127011",
       "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f086 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 20
@@ -1347,13 +1347,13 @@
     "assertionName" : "The current full complex map file consists of the previously published full file and the current delta file",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e617",
     "firstNInstances" : [ {
-      "conceptId" : 140004,
+      "conceptId" : "140004",
       "detail" : "ComplexMap: id=222ff2ab-5291-5780-8bb4-0143c91cd90d is in current full file but not in prior full or current delta file"
     }, {
-      "conceptId" : 141000,
+      "conceptId" : "141000",
       "detail" : "ComplexMap: id=11fd666e-deff-54b8-95d4-6ed13566900f is in current full file but not in prior full or current delta file"
     }, {
-      "conceptId" : 141000,
+      "conceptId" : "141000",
       "detail" : "ComplexMap: id=11fd666e-deff-54b8-95d4-6ed135669013 is in current full file but not in prior full or current delta file"
     } ],
     "totalFailed" : 3
@@ -1361,10 +1361,10 @@
     "assertionName" : "The current complex map refset full file contains all previously published data unchanged",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e618",
     "firstNInstances" : [ {
-      "conceptId" : 140004,
+      "conceptId" : "140004",
       "detail" : "ComplexMap: id=222ff2ab-5291-5780-8bb4-0143c91cd90d is in prior full file but not in current full file."
     }, {
-      "conceptId" : 141000,
+      "conceptId" : "141000",
       "detail" : "ComplexMap: id=11fd666e-deff-54b8-95d4-6ed13566900f is in prior full file but not in current full file."
     } ],
     "totalFailed" : 2
@@ -1372,34 +1372,34 @@
     "assertionName" : "The current complex map snapshot file contains all the data from current delta file",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e619",
     "firstNInstances" : [ {
-      "conceptId" : 1178005,
+      "conceptId" : "1178005",
       "detail" : "ComplexMap: id=c110d029-bd46-5ccf-9390-07a8493ea420 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 1256005,
+      "conceptId" : "1256005",
       "detail" : "ComplexMap: id=ed1ca30a-8d92-5998-a3cc-3a1d1ca8b791 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 4141008,
+      "conceptId" : "4141008",
       "detail" : "ComplexMap: id=43c5e41e-bb0d-518b-833d-39fd9225839d is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 7637004,
+      "conceptId" : "7637004",
       "detail" : "ComplexMap: id=409479a6-afb1-5df2-b4a5-d463befd276a is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 8380000,
+      "conceptId" : "8380000",
       "detail" : "ComplexMap: id=4b065f9b-8b0f-5efa-babf-82b580b19955 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 8694007,
+      "conceptId" : "8694007",
       "detail" : "ComplexMap: id=12ba0533-7286-5d27-9b73-d28a27cffb00 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 8964003,
+      "conceptId" : "8964003",
       "detail" : "ComplexMap: id=6a510ec8-c366-591b-a8ff-72e5cef7309d is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 25301001,
+      "conceptId" : "25301001",
       "detail" : "ComplexMap: id=59a02b16-7299-5cb7-8abc-89358accda56 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 28168000,
+      "conceptId" : "28168000",
       "detail" : "ComplexMap: id=02861171-9454-5568-8874-87aafe787768 is in DELTA file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 144008,
+      "conceptId" : "144008",
       "detail" : "ComplexMap: id=1ef4b939-b726-571a-aa3f-9230aadb9f06 is in DELTA file, but not in SNAPSHOT file."
     } ],
     "totalFailed" : 10
@@ -1407,34 +1407,34 @@
     "assertionName" : "The current complex map snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e620",
     "firstNInstances" : [ {
-      "conceptId" : 122003,
+      "conceptId" : "122003",
       "detail" : "ComplexMap: id=433cf306-fbc0-50be-ba64-939089978794 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 122003,
+      "conceptId" : "122003",
       "detail" : "ComplexMap: id=433cf306-fbc0-50be-ba64-939089978795 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 140004,
+      "conceptId" : "140004",
       "detail" : "ComplexMap: id=222ff2ab-5291-5780-8bb4-0143c91cd90d is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 141000,
+      "conceptId" : "141000",
       "detail" : "ComplexMap: id=11fd666e-deff-54b8-95d4-6ed13566900f is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 144008,
+      "conceptId" : "144008",
       "detail" : "ComplexMap: id=1ef4b939-b726-571a-aa3f-9230aadb9f06 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 105000,
+      "conceptId" : "105000",
       "detail" : "ComplexMap: id=d2e6a1dd-6735-5f3c-878f-d28bb3260599 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 105000,
+      "conceptId" : "105000",
       "detail" : "ComplexMap: id=d2e6a1dd-6735-5f3c-878f-d28bb3260509 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 140004,
+      "conceptId" : "140004",
       "detail" : "ComplexMap: id=217a9bea-0b4e-5499-8a61-e4d661e722b2 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 140004,
+      "conceptId" : "140004",
       "detail" : "ComplexMap: id=69703317-411e-5d4d-b853-eef523f0109d is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 140005,
+      "conceptId" : "140005",
       "detail" : "ComplexMap: id=317a9bea-0b4e-5499-8a61-e4d661e722b3 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 15
@@ -1442,10 +1442,10 @@
     "assertionName" : "The current full inferred relationship file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "5c37bee7-62ad-41f9-93e3-12eb4803e626",
     "firstNInstances" : [ {
-      "conceptId" : 255116009,
+      "conceptId" : "255116009",
       "detail" : "Inferred relationship: id=1000000027 is in current full file, but not in prior full file."
     }, {
-      "conceptId" : 255116009,
+      "conceptId" : "255116009",
       "detail" : "Inferred relationship: id=1000000027 is in current FULL file, but not in delta file."
     } ],
     "totalFailed" : 2
@@ -1453,13 +1453,13 @@
     "assertionName" : "All relationships inactivated in current release must have been active in the previous release.",
     "assertionUuid" : "5c6b6bc0-79b9-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
-      "conceptId" : 10041001,
+      "conceptId" : "10041001",
       "detail" : "Relationship: id=1000004028 should not have a new inactive state as it was inactive previously."
     }, {
-      "conceptId" : 702411003,
+      "conceptId" : "702411003",
       "detail" : "Relationship: id=1000000021 is inactive but no active state found in previous release."
     }, {
-      "conceptId" : 10041001,
+      "conceptId" : "10041001",
       "detail" : "Relationship: id=1000005027 is inactive but no active state found in previous release."
     } ],
     "totalFailed" : 3
@@ -1467,31 +1467,31 @@
     "assertionName" : "Changes from the the current extended map delta file must be in the current full file",
     "assertionUuid" : "5e203a1f-2b6d-462a-a6f9-93cbc3893611",
     "firstNInstances" : [ {
-      "conceptId" : 188001,
+      "conceptId" : "188001",
       "detail" : "ExtendedMap: id=64d66e24-7bad-5f16-a3ae-82826c42141b is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 486006,
+      "conceptId" : "486006",
       "detail" : "ExtendedMap: id=f182895e-7db7-5290-88f1-f4b8c14dfa65 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 652005,
+      "conceptId" : "652005",
       "detail" : "ExtendedMap: id=c94195c7-f38c-5863-97de-6fc24cbd9b6a is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 652005,
+      "conceptId" : "652005",
       "detail" : "ExtendedMap: id=83de4b6e-9a2a-5d8c-b9f4-aacdc0e64e01 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 658009,
+      "conceptId" : "658009",
       "detail" : "ExtendedMap: id=3ae07309-e516-57c7-83c5-7a550ee74a7b is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 801006,
+      "conceptId" : "801006",
       "detail" : "ExtendedMap: id=f70f52e1-951e-58eb-a423-f5ab218d2de2 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 801006,
+      "conceptId" : "801006",
       "detail" : "ExtendedMap: id=684b30d0-7e42-50e7-8ae6-5830ea816ce7 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 801006,
+      "conceptId" : "801006",
       "detail" : "ExtendedMap: id=5ba7b2dd-e03b-5fe4-a656-0e8eb65ea05b is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 127009,
+      "conceptId" : "127009",
       "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f081 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 9
@@ -1499,34 +1499,34 @@
     "assertionName" : "Changes from the the current complex map delta file must be in the current full file",
     "assertionUuid" : "5e203a1f-2b6d-462a-a6f9-93cbc3893616",
     "firstNInstances" : [ {
-      "conceptId" : 1178005,
+      "conceptId" : "1178005",
       "detail" : "ComplexMap: id=c110d029-bd46-5ccf-9390-07a8493ea420 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 1256005,
+      "conceptId" : "1256005",
       "detail" : "ComplexMap: id=ed1ca30a-8d92-5998-a3cc-3a1d1ca8b791 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 4141008,
+      "conceptId" : "4141008",
       "detail" : "ComplexMap: id=43c5e41e-bb0d-518b-833d-39fd9225839d is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 7637004,
+      "conceptId" : "7637004",
       "detail" : "ComplexMap: id=409479a6-afb1-5df2-b4a5-d463befd276a is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 8380000,
+      "conceptId" : "8380000",
       "detail" : "ComplexMap: id=4b065f9b-8b0f-5efa-babf-82b580b19955 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 8694007,
+      "conceptId" : "8694007",
       "detail" : "ComplexMap: id=12ba0533-7286-5d27-9b73-d28a27cffb00 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 8964003,
+      "conceptId" : "8964003",
       "detail" : "ComplexMap: id=6a510ec8-c366-591b-a8ff-72e5cef7309d is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 25301001,
+      "conceptId" : "25301001",
       "detail" : "ComplexMap: id=59a02b16-7299-5cb7-8abc-89358accda56 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 28168000,
+      "conceptId" : "28168000",
       "detail" : "ComplexMap: id=02861171-9454-5568-8874-87aafe787768 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 144008,
+      "conceptId" : "144008",
       "detail" : "ComplexMap: id=1ef4b939-b726-571a-aa3f-9230aadb9f06 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 10
@@ -1534,16 +1534,16 @@
     "assertionName" : "New inactive states follow active states in the CONCEPT snapshot.",
     "assertionUuid" : "5f1a51a3-6200-4463-8799-d75998165278",
     "firstNInstances" : [ {
-      "conceptId" : 699765003,
+      "conceptId" : "699765003",
       "detail" : "CONCEPT: id=699765003 should not have a new inactive state as it was inactive previously."
     }, {
-      "conceptId" : 703649004,
+      "conceptId" : "703649004",
       "detail" : "CONCEPT: id=703649004: is inactive but no active state found in the previous release."
     }, {
-      "conceptId" : 700132008,
+      "conceptId" : "700132008",
       "detail" : "CONCEPT: id=700132008: is inactive but no active state found in the previous release."
     }, {
-      "conceptId" : 609452007,
+      "conceptId" : "609452007",
       "detail" : "CONCEPT: id=609452007: is inactive but no active state found in the previous release."
     } ],
     "totalFailed" : 4
@@ -1551,34 +1551,34 @@
     "assertionName" : "The current data in the AttributeValue refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "602a3d22-b3b0-48cc-8ebb-949f96580834",
     "firstNInstances" : [ {
-      "conceptId" : 253376014,
+      "conceptId" : "253376014",
       "detail" : "ATTRUBUTE VALUE REFSET: id=000354d6-71e6-52d0-b50d-80271f7fc0ff is in delta but not in snapshot file."
     }, {
-      "conceptId" : 303136015,
+      "conceptId" : "303136015",
       "detail" : "ATTRUBUTE VALUE REFSET: id=0003c669-30f9-51ee-8be4-b32e87941e3b is in delta but not in snapshot file."
     }, {
-      "conceptId" : 2659209014,
+      "conceptId" : "2659209014",
       "detail" : "ATTRUBUTE VALUE REFSET: id=00050513-4b8b-5c1e-a3b6-5e5ea80048a2 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 221150012,
+      "conceptId" : "221150012",
       "detail" : "ATTRUBUTE VALUE REFSET: id=00053190-351c-5c98-80a9-6e618d71d6c5 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 598526010,
+      "conceptId" : "598526010",
       "detail" : "ATTRUBUTE VALUE REFSET: id=00076c8d-5864-58b5-b0b1-579254c346f9 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 326941012,
+      "conceptId" : "326941012",
       "detail" : "ATTRUBUTE VALUE REFSET: id=0008e6d6-5c42-59f5-b02a-8466df0973f6 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 561352015,
+      "conceptId" : "561352015",
       "detail" : "ATTRUBUTE VALUE REFSET: id=000d57d6-efce-5dc5-aac7-f06e8d25cc52 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 250933017,
+      "conceptId" : "250933017",
       "detail" : "ATTRUBUTE VALUE REFSET: id=000dce0d-951a-5a02-84f0-efed3f8d6292 is in delta but not in snapshot file."
     }, {
-      "conceptId" : 569651017,
+      "conceptId" : "569651017",
       "detail" : "ATTRUBUTE VALUE REFSET: id=000e70b1-5825-5abd-a4c3-5ced92f3f7ed is in delta but not in snapshot file."
     }, {
-      "conceptId" : 2608473011,
+      "conceptId" : "2608473011",
       "detail" : "ATTRUBUTE VALUE REFSET: id=00000629-2697-5041-9438-3845fb99fe92 is in delta but not in snapshot file."
     } ],
     "totalFailed" : 10
@@ -1586,66 +1586,66 @@
     "assertionName" : "The current concept snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "645e3292-18d6-41df-b42a-58ba4d7240d5",
     "firstNInstances" : [ {
-      "conceptId" : 702411003,
+      "conceptId" : "702411003",
       "detail" : "CONCEPT: id=702411003 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703649004,
+      "conceptId" : "703649005",
+      "detail" : "CONCEPT: id=703649005 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "703649004",
       "detail" : "CONCEPT: id=703649004 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 702850005,
+      "conceptId" : "702850005",
       "detail" : "CONCEPT: id=702850005 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 700132006,
+      "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 700132006,
+      "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 700132008,
+      "conceptId" : "700132008",
       "detail" : "CONCEPT: id=700132008 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 699765003,
+      "conceptId" : "699765003",
       "detail" : "CONCEPT: id=699765003 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 609452007,
+      "conceptId" : "609452007",
       "detail" : "CONCEPT: id=609452007 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 100001001,
+      "conceptId" : "100001001",
       "detail" : "CONCEPT: id=100001001 is in FULL file, but not in SNAPSHOT file."
-    }, {
-      "conceptId" : 100002008,
-      "detail" : "CONCEPT: id=100002008 is in FULL file, but not in SNAPSHOT file."
     } ],
-    "totalFailed" : 16
+    "totalFailed" : 17
   }, {
     "assertionName" : "The current Association refset full file contains all previously published data unchanged.",
     "assertionUuid" : "653ce147-780e-4b3d-8afe-bd8d116c8c17",
     "firstNInstances" : [ {
-      "conceptId" : 102490005,
+      "conceptId" : "102490005",
       "detail" : "ASSOCIATION: id=30848315-ed11-569d-9dfb-14c02f617d58: refset member is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 102490005,
+      "conceptId" : "102490005",
       "detail" : "ASSOCIATION: id=5fcd3d2a-1084-546f-a25f-5ec6e78f3fc6: refset member is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 105592009,
+      "conceptId" : "105592009",
       "detail" : "ASSOCIATION: id=029f1f67-48b1-5773-b14c-1d6825f11797: refset member is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 10748004,
+      "conceptId" : "10748004",
       "detail" : "ASSOCIATION: id=0f28b04d-bac7-57b6-960f-12d81ff5ad33: refset member is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 10748004,
+      "conceptId" : "10748004",
       "detail" : "ASSOCIATION: id=2339cbc0-eb93-5aa2-abde-92a2081b09b9: refset member is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 111313001,
+      "conceptId" : "111313001",
       "detail" : "ASSOCIATION: id=8cc43e3f-fc2d-5cc0-a29f-7dafea796568: refset member is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 111313001,
+      "conceptId" : "111313001",
       "detail" : "ASSOCIATION: id=23105414-e6df-5bf8-8cca-94fb6cc5167f: refset member is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 111313001,
+      "conceptId" : "111313001",
       "detail" : "ASSOCIATION: id=a0bd193e-4c84-508c-bd9d-167e76d89ec5: refset member is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 111430000,
+      "conceptId" : "111430000",
       "detail" : "ASSOCIATION: id=f1930bdf-8c5f-52cd-a342-1e7b5267ebb1: refset member is in prior full file, but not in current full file."
     } ],
     "totalFailed" : 9
@@ -1653,34 +1653,34 @@
     "assertionName" : "The current simple map refset delta file is an accurate derivative of the current full file",
     "assertionUuid" : "659e5e7e-c84f-4c63-b95f-e5d4f26705b5",
     "firstNInstances" : [ {
-      "conceptId" : 703649004,
+      "conceptId" : "703649004",
       "detail" : "SIMPLE MAP REFSET: id=b977f180-396d-513b-a7e4-524645b4fecb is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703615007,
+      "conceptId" : "703615007",
       "detail" : "SIMPLE MAP REFSET: id=e855c4de-407c-56f7-865e-7423580dd95c is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703711007,
+      "conceptId" : "703711007",
       "detail" : "SIMPLE MAP REFSET: id=f4203391-3431-5822-bada-026ff1d45c33 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703815005,
+      "conceptId" : "703815005",
       "detail" : "SIMPLE MAP REFSET: id=dcfb5554-b50f-5ca0-8684-29b1b1b2ecd6 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703605001,
+      "conceptId" : "703605001",
       "detail" : "SIMPLE MAP REFSET: id=1cb64068-effb-5e1d-b9d4-a861f45a29d2 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703634007,
+      "conceptId" : "703634007",
       "detail" : "SIMPLE MAP REFSET: id=dc853820-0f73-539a-811a-e28db48e430f is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703828003,
+      "conceptId" : "703828003",
       "detail" : "SIMPLE MAP REFSET: id=f2e60ac2-6370-533d-921d-15ed46d0f22e is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703607009,
+      "conceptId" : "703607009",
       "detail" : "SIMPLE MAP REFSET: id=34e48b38-b6fc-5929-96bb-87330b833af1 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 703607009,
+      "conceptId" : "703607009",
       "detail" : "SIMPLE MAP REFSET: id=44e48b38-b6fc-5929-96bb-87330b833af2 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : 10024003,
+      "conceptId" : "10024003",
       "detail" : "SIMPLE MAP REFSET: id=9ec10eaa-224b-50e0-9639-e43c3a87fac0 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 10
@@ -1688,19 +1688,19 @@
     "assertionName" : "The current Simple refset full file contains all previously published data unchanged.",
     "assertionUuid" : "673cf38a-a913-4e0e-be32-356ac433ede8",
     "firstNInstances" : [ {
-      "conceptId" : 102272007,
+      "conceptId" : "102272007",
       "detail" : "Simple Refset: id=f9732f68-2af3-555a-bc7a-fa4a852caca6 is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 10230007,
+      "conceptId" : "10230007",
       "detail" : "Simple Refset: id=8321561e-3e21-5b90-87f8-83fcd65310ad is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 10232004,
+      "conceptId" : "10232004",
       "detail" : "Simple Refset: id=74d0e838-34eb-5a9a-8f02-5584487d55db is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 10242002,
+      "conceptId" : "10242002",
       "detail" : "Simple Refset: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 is in prior full file, but not in current full file."
     }, {
-      "conceptId" : 102456001,
+      "conceptId" : "102456001",
       "detail" : "Simple Refset: id=22934c1b-b7dd-537c-b2cc-caa9ca5ae6f3 is in prior full file, but not in current full file."
     } ],
     "totalFailed" : 5
@@ -1708,7 +1708,7 @@
     "assertionName" : "The current full ExpressionAssociationRefset file consists of the previously published full file and the current delta file",
     "assertionUuid" : "6c37bee7-62ad-41f9-93e3-12eb4803e617",
     "firstNInstances" : [ {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=C48A6D89-BF40-449D-8DB2-3B8EE0B8C57D is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 1
@@ -1716,13 +1716,13 @@
     "assertionName" : "The current ExpressionAssociationRefset full file contains all previously published data unchanged",
     "assertionUuid" : "6c37bee7-62ad-41f9-93e3-12eb4803e618",
     "firstNInstances" : [ {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=1ca0b461-66a6-45c8-b01e-5a227c1fc27b is in previous full file but not in current full file."
     }, {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=1ca0b461-66a6-45c8-b01e-5a227c1fc27a is in previous full file but not in current full file."
     }, {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=576ac8fc-2830-426b-9ae8-de3f36a23300 is in previous full file but not in current full file."
     } ],
     "totalFailed" : 3
@@ -1730,10 +1730,10 @@
     "assertionName" : "The current ExpressionAssociationRefset snapshot file contains all the data from current delta file",
     "assertionUuid" : "6c37bee7-62ad-41f9-93e3-12eb4803e619",
     "firstNInstances" : [ {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=a4f9d42e-eb98-468b-9024-e5aa236eb16f is in delta file but not in snapshot file."
     }, {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=B3BDAACB-E6EB-4FBC-8204-647BF0F64752 is in delta file but not in snapshot file."
     } ],
     "totalFailed" : 2
@@ -1741,19 +1741,19 @@
     "assertionName" : "The current ExpressionAssociationRefset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "6c37bee7-62ad-41f9-93e3-12eb4803e620",
     "firstNInstances" : [ {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=a4f9d42e-eb98-468b-9024-e5aa236eb16f is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=da1539dd-d763-4cd6-bc5c-4b52a840ae70 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=da1539dd-d763-4cd6-bc5c-4b52a840ae70 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=a4f9d42e-eb98-468b-9024-e5aa236eb16f is in FULL file, but not in SNAPSHOT file."
     }, {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociationRefset: id=C48A6D89-BF40-449D-8DB2-3B8EE0B8C57D is in FULL file, but not in SNAPSHOT file."
     } ],
     "totalFailed" : 5
@@ -1761,7 +1761,7 @@
     "assertionName" : "The ids should be unique across the stated and inferred relationship snapshot files.",
     "assertionUuid" : "6dbaed71-f031-4290-b74f-f35561c2e283",
     "firstNInstances" : [ {
-      "conceptId" : 702451000,
+      "conceptId" : "702451000",
       "detail" : "Stated Relationship: id=4969199027 is duplicated in the inferred relationship snapshot"
     } ],
     "totalFailed" : 1
@@ -1769,7 +1769,7 @@
     "assertionName" : "Changes from the the current ExpressionAssociationRefset delta file must be in the current full file",
     "assertionUuid" : "6e203a1f-2b6d-462a-a6f9-93cbc3893616",
     "firstNInstances" : [ {
-      "conceptId" : 705114005,
+      "conceptId" : "705114005",
       "detail" : "ExpressionAssociation: id=B3BDAACB-E6EB-4FBC-8204-647BF0F64752 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 1
@@ -1777,34 +1777,34 @@
     "assertionName" : "The current inferred relationship snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "79582950-bf7a-4f63-92cf-7809a29b5dc3",
     "firstNInstances" : [ {
-      "conceptId" : 702411003,
+      "conceptId" : "702411003",
       "detail" : "Inferred relationship: id=1000000021 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 280844000,
+      "conceptId" : "280844000",
       "detail" : "Inferred relationship: id=100000028 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10002003,
+      "conceptId" : "10002003",
       "detail" : "Inferred relationship: id=1000002029 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10002003,
+      "conceptId" : "10002003",
       "detail" : "Inferred relationship: id=1000002029 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10392004,
+      "conceptId" : "10392004",
       "detail" : "Inferred relationship: id=10000023 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10002003,
+      "conceptId" : "10002003",
       "detail" : "Inferred relationship: id=1000003023 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10041001,
+      "conceptId" : "10041001",
       "detail" : "Inferred relationship: id=1000004028 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 10041001,
+      "conceptId" : "10041001",
       "detail" : "Inferred relationship: id=1000005027 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703649004,
+      "conceptId" : "703649004",
       "detail" : "Inferred relationship: id=1000006026 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : 703649004,
+      "conceptId" : "703649004",
       "detail" : "Inferred relationship: id=1000006026 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 18
@@ -1812,7 +1812,7 @@
     "assertionName" : "There must be actual changes made to previously published extended map refset components in order for them to appear in the current delta.",
     "assertionUuid" : "7a961c22-3f51-4f72-9b5e-1dc99c298719",
     "firstNInstances" : [ {
-      "conceptId" : 127009,
+      "conceptId" : "127009",
       "detail" : "ExtendedMap: id=49361643-765b-54e7-8033-9b8f8426f081 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 1
@@ -1820,7 +1820,7 @@
     "assertionName" : "The current MapCorrelationOriginRefset file consists of the previously published full file and the current delta file",
     "assertionUuid" : "7c37bee7-62ad-41f9-93e3-12eb4803e617",
     "firstNInstances" : [ {
-      "conceptId" : 707689009,
+      "conceptId" : "707689009",
       "detail" : "mapcorrelationOriginRefset: id=9918EE37-16A7-4A8D-9C89-281DE1A1E718 is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 1
@@ -1828,13 +1828,13 @@
     "assertionName" : "The current MapCorrelationOriginRefset full file contains all previously published data unchanged",
     "assertionUuid" : "7c37bee7-62ad-41f9-93e3-12eb4803e618",
     "firstNInstances" : [ {
-      "conceptId" : 703064003,
+      "conceptId" : "703064003",
       "detail" : "mapCorrelationOriginRefset: id=f40c3232-dd2a-4626-b5b0-f29418195a89 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 703064003,
+      "conceptId" : "703064003",
       "detail" : "mapCorrelationOriginRefset: id=f40c3232-dd2a-4626-b5b0-f29418195a88 is in previous full file but not in current full file."
     }, {
-      "conceptId" : 415067009,
+      "conceptId" : "415067009",
       "detail" : "mapCorrelationOriginRefset: id=384af198-c0e9-46a9-a63c-52362b6c8c55 is in previous full file but not in current full file."
     } ],
     "totalFailed" : 3
@@ -1842,7 +1842,7 @@
     "assertionName" : "The current MapCorrelationOriginRefset snapshot file contains all the data from current delta file",
     "assertionUuid" : "7c37bee7-62ad-41f9-93e3-12eb4803e619",
     "firstNInstances" : [ {
-      "conceptId" : 707689009,
+      "conceptId" : "707689009",
       "detail" : "mapcorrelationOriginRefset: id=39761BDC-96AB-47AF-B10F-0A57B6C01278 is in delta file but not in snapshot file."
     } ],
     "totalFailed" : 1
@@ -1850,31 +1850,31 @@
     "assertionName" : "The current full description file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "7c4165b0-bff2-4b62-b70c-f68d5a147053",
     "firstNInstances" : [ {
-      "conceptId" : 60203004,
+      "conceptId" : "60203004",
       "detail" : "Description: id=100000016 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 5379004,
+      "conceptId" : "5379004",
       "detail" : "Description: id=10000010 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 60203004,
+      "conceptId" : "60203004",
       "detail" : "Description: id=100001017 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 60204005,
+      "conceptId" : "60204005",
       "detail" : "Description: id=100002012 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 60205006,
+      "conceptId" : "60205006",
       "detail" : "Description: id=100003019 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 60206007,
+      "conceptId" : "60206007",
       "detail" : "Description: id=100004013 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 60206007,
+      "conceptId" : "60206007",
       "detail" : "Description: id=100005014 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 60207003,
+      "conceptId" : "60207003",
       "detail" : "Description: id=100006010 is in current full file, but not in prior full or current delta file."
     }, {
-      "conceptId" : 60208008,
+      "conceptId" : "60208008",
       "detail" : "Description: id=100007018 is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 9
@@ -1882,7 +1882,7 @@
     "assertionName" : "Changes from the MapCorrelationOriginRefset delta file must be in the current full file",
     "assertionUuid" : "7e203a1f-2b6d-462a-a6f9-93cbc3893616",
     "firstNInstances" : [ {
-      "conceptId" : 707689009,
+      "conceptId" : "707689009",
       "detail" : "ExpressionAssociation: id=39761BDC-96AB-47AF-B10F-0A57B6C01278 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 1

@@ -3,8 +3,7 @@
 
 	Assertion:
 	The FSN term should be unique in active content.
-	Note: As there are lots of FSNs in the past release that don't apply to this rule therefore
-	this assertion is only to validate contents added for new concepts during each release.
+	Note: This assertion is to report any duplicate FSNs.(case sensitive)
 ********************************************************************************/
 
 	insert into qa_result (runid, assertionuuid, concept_id, details)
@@ -12,7 +11,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('FSN=',a.term, ' concept=',a.conceptid, ': FSN term is not unique in description snapshot')
+		concat('FSN=',a.term, ' descriptionid=',a.id, ': FSN term is not unique in description snapshot')
 		from curr_description_s a,
 		(select b.term, count(distinct b.id) as total from curr_description_s b, (select distinct c.term from curr_concept_d d join curr_description_s c
 		on c.conceptid=d.id where d.active=1 and c.active=1 and c.typeid ='900000000000003001') fsn,
