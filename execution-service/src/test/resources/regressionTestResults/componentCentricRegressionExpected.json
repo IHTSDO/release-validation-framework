@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 84,
-  "totalAssertionsFailed" : 84,
+  "totalAssertionsRun" : 85,
+  "totalAssertionsFailed" : 85,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -33,13 +33,22 @@
     "assertionName" : "The FSN term should be unique in active content.",
     "assertionUuid" : "8d6ab114-caca-4d99-9fec-bb8fd9cea518",
     "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "FSN=DoloTest profile(observable entity) descriptionid=2990804014: FSN term is not unique in description snapshot"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "FSN=DoloTest profile(observable entity) descriptionid=2990804019: FSN term is not unique in description snapshot"
+    }, {
+      "conceptId" : "703649004",
+      "detail" : "FSN=DoloTest profile(observable entity) descriptionid=2990804020: FSN term is not unique in description snapshot"
+    }, {
       "conceptId" : "702386002",
-      "detail" : "FSN=Toxic effect of antimony and/or its compounds (disorder) concept=702386002: FSN term is not unique in description snapshot"
+      "detail" : "FSN=Toxic effect of antimony and/or its compounds (disorder) descriptionid=3008913021: FSN term is not unique in description snapshot"
     }, {
       "conceptId" : "703860006",
-      "detail" : "FSN=Toxic effect of antimony AND/OR its compounds (disorder) concept=703860006: FSN term is not unique in description snapshot"
+      "detail" : "FSN=Toxic effect of antimony and/or its compounds (disorder) descriptionid=3008913022: FSN term is not unique in description snapshot"
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 5
   }, {
     "assertionName" : "Non empty mapTarget should be part of mapAdvice",
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f60",
@@ -239,8 +248,11 @@
     }, {
       "conceptId" : "702411003",
       "detail" : "DESC: Term=DoloTest profile(observable entity):Fully Specified Name without semantic tag."
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "DESC: Term=DoloTest profile(observable entity):Fully Specified Name without semantic tag."
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 3
   }, {
     "assertionName" : "The mapTarget in LOINC ExpressionAssociationRefset snapshot is unique.",
     "assertionUuid" : "a6f78382-91c4-4e0a-a9d6-6d47b1a16979",
@@ -316,6 +328,9 @@
       "conceptId" : "702386002",
       "detail" : "  Fracture clinic"
     }, {
+      "conceptId" : "702386002",
+      "detail" : "  Fracture clinic"
+    }, {
       "conceptId" : "703860006",
       "detail" : "Exposure to vibration  "
     }, {
@@ -330,8 +345,11 @@
     }, {
       "conceptId" : "702386002",
       "detail" : "Toenail abnormality (observable entity)"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Toenail abnormality (observable entity)"
     } ],
-    "totalFailed" : 7
+    "totalFailed" : 9
   }, {
     "assertionName" : "Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset.",
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
@@ -349,6 +367,17 @@
     }, {
       "conceptId" : "699400005",
       "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c4: Refset member is active for an inactive description."
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "The FSN term should be unique in active content when case sensitivity is ingored.",
+    "assertionUuid" : "d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e",
+    "firstNInstances" : [ {
+      "conceptId" : "702386002",
+      "detail" : "FSN=Blood group antibody i (substance) concept=702386002: FSN term is not unique in description snapshot"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "FSN=Toxic effect of antimony AND/OR its compounds (disorder) concept=703860006: FSN term is not unique in description snapshot"
     } ],
     "totalFailed" : 2
   }, {
@@ -491,7 +520,7 @@
     "assertionUuid" : "19423070-7118-45bd-98ba-6d0dc18bc619",
     "firstNInstances" : [ {
       "conceptId" : "703860006",
-      "detail" : "703860006 |Toxic effect of antimony AND/OR its compounds (disorder)|"
+      "detail" : "703860006 |Toxic effect of antimony and/or its compounds (disorder)|"
     }, {
       "conceptId" : "702386002",
       "detail" : "702386002 |Epilepsy in mother complicating childbirth(disorder|"
@@ -499,10 +528,13 @@
       "conceptId" : "702386002",
       "detail" : "702386002 |Toxic effect of antimony and/or its compounds (disorder)|"
     }, {
+      "conceptId" : "702386002",
+      "detail" : "702386002 |Blood group antibody i (substance)|"
+    }, {
       "conceptId" : "700132006",
       "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
     } ],
-    "totalFailed" : 4
+    "totalFailed" : 5
   }, {
     "assertionName" : "No active Terms contain double spaces.",
     "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
@@ -606,8 +638,11 @@
     }, {
       "conceptId" : "702411003",
       "detail" : "DESCRIPTION: id=2990804014 : The FSN has no space before the semantic tag."
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "DESCRIPTION: id=2990804019 : The FSN has no space before the semantic tag."
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 3
   }, {
     "assertionName" : "Inferred relationship modifier is always SOME.",
     "assertionUuid" : "32b41aa0-7d08-11e1-b0c4-0800200c9a66",
@@ -651,6 +686,9 @@
       "conceptId" : "702386002",
       "detail" : "CONCEPT: id=702386002: Concept does not have an inferred is-a relationship."
     }, {
+      "conceptId" : "703649005",
+      "detail" : "CONCEPT: id=703649005: Concept does not have an inferred is-a relationship."
+    }, {
       "conceptId" : "703672002",
       "detail" : "CONCEPT: id=703672002: Concept does not have an inferred is-a relationship."
     }, {
@@ -663,7 +701,7 @@
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship."
     } ],
-    "totalFailed" : 9
+    "totalFailed" : 10
   }, {
     "assertionName" : "Relationship groups contain at least 2 relationships.",
     "assertionUuid" : "411e9840-7d08-11e1-b0c4-0800200c9a66",
@@ -740,6 +778,9 @@
       "conceptId" : "702386002",
       "detail" : "CONCEPT: id=702386002: Concept does not have a stated is-a relationship."
     }, {
+      "conceptId" : "703649005",
+      "detail" : "CONCEPT: id=703649005: Concept does not have a stated is-a relationship."
+    }, {
       "conceptId" : "703672002",
       "detail" : "CONCEPT: id=703672002: Concept does not have a stated is-a relationship."
     }, {
@@ -752,7 +793,7 @@
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006: Concept does not have a stated is-a relationship."
     } ],
-    "totalFailed" : 8
+    "totalFailed" : 9
   }, {
     "assertionName" : "No active Terms contain leading or trailing spaces.",
     "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",
@@ -801,8 +842,17 @@
     }, {
       "conceptId" : "702386002",
       "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
     } ],
-    "totalFailed" : 3
+    "totalFailed" : 6
   }, {
     "assertionName" : "No Concept has 2 stated relationships with the same type, destination and group.",
     "assertionUuid" : "5d27df10-7d08-11e1-b0c4-0800200c9a66",

@@ -49,22 +49,22 @@ Sample files for configuring the services can be found in the config folder.
 
 Starting The Application
 ------------------
-Start the stand-alone web application using the executable jar after replacing "{config_dir}"
+Start the stand-alone web application using the executable jar, replacing "{config_dir}" with an absolute path.
 
-`java -jar api/target/validation-api.jar -DrvfConfigLocation={config_dir} (-httpPort=8080)`
+`java -Xms512m -Xmx4g -DrvfConfigLocation={config_dir} -jar api/target/dependency/webapp-runner.jar api/target/api.war --path /api --port 8081`
 
 API Documentation
 --------------------
-The RVF API is documented using Swagger http://localhost:8080/api/v1/api-doc.html
+The RVF API is documented using Swagger http://localhost:8081/api/v1/api-doc.html
 
 ### Upload a Published Release
 Option 1:
 The release endpoint of the REST API can be used to list releases and to upload a published release.
-Find the endpoint at **http://localhost:8080/api/v1/releases**
+Find the endpoint at **http://localhost:8081/api/v1/releases**
 
 Example upload
 ```bash
-curl -X POST -F 'file=@SnomedCT_RF2Release_INT_20160731.zip' http://localhost:8080/api/v1/releases/int/20160731
+curl -X POST -F 'file=@SnomedCT_RF2Release_INT_20160731.zip' http://localhost:8081/api/v1/releases/int/20160731
 ```
 Option 2: Using Swagger API as shown above. See Manage published releases section for detailed information.
 

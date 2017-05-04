@@ -27,6 +27,7 @@ public class RF2FileStructureTesterTest {
 	public void testFileWithLFOnlyAsLineTerminator() throws URISyntaxException {
 		executeRun("/der2_sRefset_SimpleMapDelta_INT_20140131.txt", false);
 		assertEquals("Total errors not matching", 2, testReport.getNumErrors());
+		System.out.println(testReport.getResult());
 	}
 
 	
