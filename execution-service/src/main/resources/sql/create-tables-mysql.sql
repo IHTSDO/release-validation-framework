@@ -841,8 +841,6 @@ create table mapCorrelationOriginRefset_s(
 	key idx_mapTarget(mapTarget)
 ) engine=myisam default charset=utf8;
 
-
-
 drop table if exists mapCorrelationOriginRefset_d;
 create table mapCorrelationOriginRefset_d(
 	id varchar(36) not null,
@@ -864,4 +862,93 @@ create table mapCorrelationOriginRefset_d(
 	key idx_mapTarget(mapTarget)
 ) engine=myisam default charset=utf8;
 
+drop table if exists mrcmAttributeDomainRefset_s;
+create table mrcmAttributeDomainRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	domainid bigint(20) not null,
+	grouped char(1) not null,
+	attributecardinality char(4) not null,
+	attributeingroupcardinality char(4) not null,
+	rulestrengthid bigint(20) not null,
+	contenttypeid bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_domainid(domainid),
+	key idx_grouped(grouped),
+	key idx_attributecardinality(attributecardinality),
+	key idx_attributeingroupcardinality(attributeingroupcardinality),
+	key idx_rulestrengthid(rulestrengthid),
+	key idx_contenttypeid(contenttypeid)
+) engine=myisam default charset=utf8;
 
+drop table if exists mrcmModuleScopeRefset_s;
+create table mrcmModuleScopeRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mrcmrulerefsetid bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_mrcmrulerefsetid(mrcmrulerefsetid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmAttributeRangeRefset_s;
+create table mrcmAttributeRangeRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	rangeconstraint varchar(1024) not null,
+	attributerule varchar(1024) not null,
+	rulestrengthid bigint(20) not null,
+	contenttypeid bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_rulestrengthid(rulestrengthid),
+	key idx_contenttypeid(contenttypeid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmDomainRefset_s;
+create table mrcmDomainRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	domainconstraint varchar(500) not null,
+	parentdomain varchar(500) not null,
+	proximalprimitiveconstraint varchar(500) not null,
+	proximalprimitiverefinement varchar(1024) not null,
+	domaintemplateforprecoordination varchar(1024) not null,
+	domaintemplateforpostcoordination varchar(1024) not null,
+	guideurl varchar(255) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
