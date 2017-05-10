@@ -47,8 +47,6 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 	private String prospectiveVersion;
 	private String previousVersion;
 	private ValidationRunConfig validationConfig;
-	@Autowired
-	private RvfDbScheduledEventGenerator scheduleEventGenerator;
 	
 	@Before
 	public void setUp() {
@@ -155,11 +153,9 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 	@After
 	public void tearDown() throws SQLException {
 		if (prospectiveVersion != null) {
-			scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(prospectiveVersion));
 			releaseDataManager.dropVersion(prospectiveVersion);
 		}
 		if (previousVersion != null) {
-			scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(previousVersion));
 			releaseDataManager.dropVersion(previousVersion);
 		}
 		validationConfig = null;

@@ -8,7 +8,7 @@
 	SET max_heap_table_size = 1024 * 1024 * 1024 * 2;
 
 	drop table if exists res_concepts_edited;
-	create table if not exists res_concepts_edited(conceptid varchar(36), key idx_conceptid (conceptid)) ENGINE = MEMORY;
+	create table if not exists res_concepts_edited(conceptid varchar(36), key idx_conceptid (conceptid)) ENGINE=MEMORY;
 	truncate table res_concepts_edited;
     
 	insert into res_concepts_edited
