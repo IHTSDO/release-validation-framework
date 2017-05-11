@@ -435,7 +435,47 @@
 		<script uuid="A6F78382-91C4-4E0A-A9D6-6D47B1A16979" category="component-centric-validation,LOINC" sqlFile="component-centric-snapshot-expression-association-unique-mapTarget.sql" text="The mapTarget in LOINC ExpressionAssociationRefset snapshot is unique."/>
 		<script uuid="18D36527-9247-406A-BD1F-D7D608B0663A" category="component-centric-validation,LOINC" sqlFile="component-centric-snapshot-expression-association-mapTarget-valid-loinc.sql" text="The mapTarget in LOINC ExpressionAssociationRefset snapshot is a valid LOINC code"/>
 		<script uuid="335B2810-8CBB-43BF-807E-092DACB20F6A" category="component-centric-validation,LOINC" sqlFile="component-centric-snapshot-map-correlation-origin-valid-loinc-parts.sql" text="The LOINC parts in MapCorrelationOriginRefset snapshot are in correct format" />
+
+		<!-- file-centric-snapshot-mrcm-refset -->
+         <script uuid="e968c5d1-e06b-4351-9e96-3f62208d27d4" category="file-centric-validation"
+                    sqlFile="file-centric-snapshot-concept-unique-id.sql" text="MRCM module scope refset has valid MRCM Rule Refset Id" >
+         <keywords>MRCM module scope refset has valid MRCM Rule Refset Id</keywords>
+         </script>
+
+		<!-- file-centric-snapshot-mrcm-refset-attribute-domain -->
+		<script uuid="e968c5d1-e06b-4351-9e96-3f62208d27d4" category="file-centric-validation"
+				  sqlFile="file-centric-snapshot-mrcm-refset-attribute-domain-valid-moduleid.sql" text="MRCM Attribute Domain Refset has valid module ID" >
+			<keywords>MRCM Attribute Domain Refset has valid module ID</keywords>
+		</script>
+
+		<script uuid="413c91cd-4b1a-47cf-a278-3141bea39fde" category="file-centric-validation"
+				  sqlFile="file-centric-snapshot-mrcm-refset-attribute-domain-valid-refsetid.sql" text="MRCM Attribute Domain Refset has valid refset ID" >
+			<keywords>MRCM Attribute Domain Refset has valid refset ID</keywords>
+		</script>
+
+		<script uuid="292b4427-0cce-493d-b63c-27cd249eafea" category="file-centric-validation"
+				  sqlFile="file-centric-snapshot-mrcm-refset-attribute-domain-valid-referencedcomponentid.sql" text="MRCM Attribute Domain Refset has valid referencedComponent ID" >
+			<keywords>MRCM Attribute Domain Refset has valid referencedComponent ID</keywords>
+		</script>
+
+		<!-- file-centric-snapshot-mrcm-refset-domain -->
+		<script uuid="32bc5dc7-192c-441f-9693-6710020a6442" category="file-centric-validation"
+				  sqlFile="file-centric-snapshot-mrcm-refset-domain-valid-moduleid.sql" text="MRCM Domain Refset has valid module ID" >
+			<keywords>MRCM Domain Refset has valid module ID</keywords>
+		</script>
+
+		<script uuid="14e30e46-1e7a-4655-b1ca-48254f8b7071" category="file-centric-validation"
+				  sqlFile="file-centric-snapshot-mrcm-refset-domain-valid-refsetid.sql" text="MRCM Domain Refset has valid refset ID" >
+			<keywords>MRCM Domain Refset has valid refset ID</keywords>
+		</script>
+
+		<script uuid="c3e6008a-2e9a-4b42-9a37-78ea6a4c7799" category="file-centric-validation"
+				  sqlFile="file-centric-snapshot-mrcm-refset-domain-valid-referencedcomponentid.sql" text="MRCM Domain Refset has valid referencedComponent ID" >
+			<keywords>MRCM Domain Refset has valid referencedComponent ID</keywords>
+		</script>
 		<!-- rt added this as a template... -->
 		<!--  <script uuid="" category="" sqlFile="" text=""  />-->
+
+
 	</useCase>
 </manifest>
