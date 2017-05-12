@@ -436,43 +436,100 @@
 		<script uuid="18D36527-9247-406A-BD1F-D7D608B0663A" category="component-centric-validation,LOINC" sqlFile="component-centric-snapshot-expression-association-mapTarget-valid-loinc.sql" text="The mapTarget in LOINC ExpressionAssociationRefset snapshot is a valid LOINC code"/>
 		<script uuid="335B2810-8CBB-43BF-807E-092DACB20F6A" category="component-centric-validation,LOINC" sqlFile="component-centric-snapshot-map-correlation-origin-valid-loinc-parts.sql" text="The LOINC parts in MapCorrelationOriginRefset snapshot are in correct format" />
 
-		<!-- file-centric-snapshot-mrcm-refset -->
-         <script uuid="e968c5d1-e06b-4351-9e96-3f62208d27d4" category="file-centric-validation"
-                    sqlFile="file-centric-snapshot-concept-unique-id.sql" text="MRCM module scope refset has valid MRCM Rule Refset Id" >
-         <keywords>MRCM module scope refset has valid MRCM Rule Refset Id</keywords>
-         </script>
-
 		<!-- file-centric-snapshot-mrcm-refset-attribute-domain -->
 		<script uuid="e968c5d1-e06b-4351-9e96-3f62208d27d4" category="file-centric-validation"
-				  sqlFile="file-centric-snapshot-mrcm-refset-attribute-domain-valid-moduleid.sql" text="MRCM Attribute Domain Refset has valid module ID" >
-			<keywords>MRCM Attribute Domain Refset has valid module ID</keywords>
+				  sqlFile="file-centric-snapshot-mrcm-refset-attribute-domain-valid-moduleid.sql" text="ModuleId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot" >
+			<keywords>ModuleId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot</keywords>
 		</script>
-
+		
 		<script uuid="413c91cd-4b1a-47cf-a278-3141bea39fde" category="file-centric-validation"
-				  sqlFile="file-centric-snapshot-mrcm-refset-attribute-domain-valid-refsetid.sql" text="MRCM Attribute Domain Refset has valid refset ID" >
-			<keywords>MRCM Attribute Domain Refset has valid refset ID</keywords>
+				  sqlFile="file-centric-snapshot-mrcm-refset-attribute-domain-valid-refsetid.sql" text="RefsetId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot" >
+			<keywords>RefsetId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot</keywords>
 		</script>
-
+		
 		<script uuid="292b4427-0cce-493d-b63c-27cd249eafea" category="file-centric-validation"
-				  sqlFile="file-centric-snapshot-mrcm-refset-attribute-domain-valid-referencedcomponentid.sql" text="MRCM Attribute Domain Refset has valid referencedComponent ID" >
-			<keywords>MRCM Attribute Domain Refset has valid referencedComponent ID</keywords>
+				  sqlFile="file-centric-snapshot-mrcm-refset-attribute-domain-valid-referencedcomponentid.sql" text="ReferencedComponentId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot" >
+			<keywords>ReferencedComponentId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot</keywords>
 		</script>
-
+		
+		<script uuid="0bd6a234-58f9-424f-84b4-0dc800e5a70b" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-attribute-domain-valid-domainid.sql" text="DomainId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot">
+			<keywords>DomainId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot</keywords>
+		</script>
+		
+		<script uuid="0e8e3549-e704-41a2-a853-fd91a60116ee" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-attribute-domain-valid-rulestrengthid.sql" text="RuleStrengthId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot">
+			<keywords>RuleStrengthId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot</keywords>  
+		</script>
+		
+		<script uuid="338c39ad-6f40-46dc-ad35-b7c697d66a63" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-attribute-domain-valid-contenttypeid.sql" text="ContentTypeId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot">
+			<keywords>ContentTypeId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot</keywords>	  
+		</script>
+		
 		<!-- file-centric-snapshot-mrcm-refset-domain -->
 		<script uuid="32bc5dc7-192c-441f-9693-6710020a6442" category="file-centric-validation"
-				  sqlFile="file-centric-snapshot-mrcm-refset-domain-valid-moduleid.sql" text="MRCM Domain Refset has valid module ID" >
-			<keywords>MRCM Domain Refset has valid module ID</keywords>
+				  sqlFile="file-centric-snapshot-mrcm-refset-domain-valid-moduleid.sql" text="ModuleId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot" >
+			<keywords>ModuleId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot</keywords>
 		</script>
-
+		
 		<script uuid="14e30e46-1e7a-4655-b1ca-48254f8b7071" category="file-centric-validation"
-				  sqlFile="file-centric-snapshot-mrcm-refset-domain-valid-refsetid.sql" text="MRCM Domain Refset has valid refset ID" >
-			<keywords>MRCM Domain Refset has valid refset ID</keywords>
+				  sqlFile="file-centric-snapshot-mrcm-refset-domain-valid-refsetid.sql" text="RefsetId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot" >
+			<keywords>RefsetId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot</keywords>
 		</script>
-
+		
 		<script uuid="c3e6008a-2e9a-4b42-9a37-78ea6a4c7799" category="file-centric-validation"
-				  sqlFile="file-centric-snapshot-mrcm-refset-domain-valid-referencedcomponentid.sql" text="MRCM Domain Refset has valid referencedComponent ID" >
-			<keywords>MRCM Domain Refset has valid referencedComponent ID</keywords>
+				  sqlFile="file-centric-snapshot-mrcm-refset-domain-valid-referencedcomponentid.sql" text="ReferencedComponentId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot" >
+			<keywords>ReferencedComponentId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot</keywords>
 		</script>
+		
+		<!-- file-centric-snapshot-mrcm-refset-attribute-range -->
+		<script uuid="bd129ddf-e7ea-49a4-9e9c-ad790b75331d" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-atribute-range-valid-moduleid.sql" text="ModuleId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot">
+			<keywords>ModuleId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot</keywords>
+		</script>
+		
+		<script uuid="40b0b1f3-7ed0-4074-ab0e-c5abd19f70b8" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-atribute-range-valid-refsetid.sql" text="RefsetId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot">
+			<keywords>RefsetId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot</keywords>
+		</script>
+		
+		<script uuid="907c11ad-5ad7-49ed-b3e8-1149b1e95716" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-atribute-range-valid-referencedcomponentid.sql" text="ReferencedComponentId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot">
+			<keywords>ReferencedComponentId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot</keywords>		  
+	    </script>
+	    
+	    <script uuid="618115ab-b5bc-4ed3-aaba-fec8536fe498" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-atribute-range-valid-rulestrengthid.sql" text="RuleStrengthId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot">
+			<keywords>RuleStrengthId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot</keywords>	  
+	    </script>
+		
+		<script uuid="b110b8de-53df-4387-b0ac-aecfbc01ed0d" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-atribute-range-valid-contenttypeid.sql" text="ContentTypeId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot">
+			<keywords>ContentTypeId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot</keywords>	  
+	    </script>
+		
+		<!-- file-centric-snapshot-mrcm-refset-module-scope -->
+		<script uuid="15a2289d-a160-4faa-b1ea-2f54980b5830" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-module-scope-valid-moduleid.sql" text="ModuleId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot">
+			<keywords>ModuleId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot</keywords> 
+		</script>
+		
+		<script uuid="844f4f15-ac5d-48a6-ba33-f11893cb7a20" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-module-scope-valid-refsetid.sql" text="RefsetId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot">
+			<keywords>RefsetId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot</keywords>	  
+	    </script>
+		
+		<script uuid="c4920cb7-7e7f-4f3f-ae87-f15b7c8fb1b6" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-module-scope-valid-referencedcomponentid.sql" text="ReferencedComponentId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot">
+			<keywords>ReferencedComponentId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot</keywords>	  
+		</script>		
+		
+		<script uuid="4fe314dd-6f65-4e9e-8ce1-a4c7db598c0d" category="file-centric-validation" 
+				  sqlFile="file-centric-snapshot-mrcm-module-scope-valid-mrcmrulerefsetid.sql" text="MrcmRuleRefsetId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot">
+			<keywords>MrcmRuleRefsetId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot</keywords>  
+	    </script>
+	    
 		<!-- rt added this as a template... -->
 		<!--  <script uuid="" category="" sqlFile="" text=""  />-->
 

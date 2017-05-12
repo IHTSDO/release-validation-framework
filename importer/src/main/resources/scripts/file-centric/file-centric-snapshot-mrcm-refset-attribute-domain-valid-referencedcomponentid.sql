@@ -9,7 +9,7 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MRCM Attribute Domain RefSet:referencedComponentId=',a.referencedcomponentid, ':referencedComponentId in MRCM Attribute Domain Refset snapshot does not exist in Concept snapshot.')
+		concat('MRCM ATTRIBUTE DOMAIN: id=',a.id,' : referencedComponentId=',a.referencedcomponentid,' MRCM Attribute Domain Refset contains a ReferencedComponentId that does not exist in the Concept snapshot.')
 	from curr_mrcmAttributeDomainRefset_s a
 	left join curr_concept_s b
 	on a.referencedcomponentid = b.id
