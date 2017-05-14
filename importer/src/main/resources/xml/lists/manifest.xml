@@ -198,6 +198,8 @@
 		<!-- across multiple files in Current snapshot-->
 		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="release-type-validation" sqlFile="release-type-snapshot-unique-relationship-id.sql" text="The ids should be unique across the stated and inferred relationship snapshot files." />
 		<script uuid="560e6d0c-64e8-4726-9516-ae7a7606b0b3" category="release-type-validation" sqlFile="release-type-snapshot-unique-description-definition-id.sql" text="The ids should be unique across the description and text definition snapshot files." />
+		<script uuid="1852b9d6-38cf-11e7-8b36-3c15c2c6e32e" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-association-refset_unique_checking.sql" text="Previously published historical association components should not be modified."/>
+		
 	
 			
 		<!--  release type for complex and extended maps-->
