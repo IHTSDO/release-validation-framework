@@ -159,8 +159,8 @@ public class RVFAssertionsRegressionTestHarnesss {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
-		assertEquals(191, assertions.size());
-		assertEquals(78, releaseTypeAssertions.size());
+		assertEquals(192, assertions.size());
+		assertEquals(79, releaseTypeAssertions.size());
 	}
 	
 	@Test

@@ -1,7 +1,7 @@
 {
   "assertionType" : "release-type-validation",
-  "totalAssertionsRun" : 96,
-  "totalAssertionsFailed" : 96,
+  "totalAssertionsRun" : 97,
+  "totalAssertionsFailed" : 97,
   "results" : [ {
     "assertionName" : "There must be actual changes made to previously published complex map refset components in order for them to appear in the current delta.",
     "assertionUuid" : "80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
@@ -177,8 +177,14 @@
     }, {
       "conceptId" : "1000004",
       "detail" : "ASSOCIATION REFSET: id=499c1966-65d3-5384-aafb-28f4a20e34eb is in DELTA file, but not in FULL file."
+    }, {
+      "conceptId" : "10171006",
+      "detail" : "ASSOCIATION REFSET: id=c379d5d1-9c77-5a03-a403-a07fc9b151d7 is in DELTA file, but not in FULL file."
+    }, {
+      "conceptId" : "10123006",
+      "detail" : "ASSOCIATION REFSET: id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is in DELTA file, but not in FULL file."
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 4
   }, {
     "assertionName" : "The current full text definition file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "b0ce145b-323b-484c-9cdc-25ea021e179d",
@@ -298,7 +304,7 @@
       "conceptId" : "1000004",
       "detail" : "ASSOCIATION REFSET: id=499c1966-65d3-5384-aafb-28f4a20e34eb is in delta but not in snapshot file."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 12
   }, {
     "assertionName" : "The current language refset delta file is an accurate derivative of the current full file",
     "assertionUuid" : "b87c6dfe-c109-4c8d-91f2-a15a17631ad2",
@@ -875,6 +881,17 @@
       "detail" : "Relationship: id=1002334021 is in delta, but not in snapshot file."
     } ],
     "totalFailed" : 10
+  }, {
+    "assertionName" : "Previously published historical association components should not be modified.",
+    "assertionUuid" : "1852b9d6-38cf-11e7-8b36-3c15c2c6e32e",
+    "firstNInstances" : [ {
+      "conceptId" : "10123006",
+      "detail" : "Association refset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba has historical association components changed since the previous release."
+    }, {
+      "conceptId" : "10171006",
+      "detail" : "Association refset id=c379d5d1-9c77-5a03-a403-a07fc9b151d7 has historical association components changed since the previous release."
+    } ],
+    "totalFailed" : 2
   }, {
     "assertionName" : "The current delta file is an accurate derivative of the current full file",
     "assertionUuid" : "1be975bb-2a1b-4c21-ae61-6e9fcd556718",
