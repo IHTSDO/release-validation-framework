@@ -10,24 +10,24 @@ begin
 
 declare no_more_rows integer default 0;
 declare populateConceptIdSql text;
-declare sql_cursor cursor for select insertSql from temp_expresions_concept_query;
+declare sql_cursor cursor for select insertSql from temp_expression_concept_query;
 declare continue handler for not found set no_more_rows = 1;
 
 
 drop table if exists temp_expression_concept_id;
 create table temp_expression_concept_id(id varchar(36), conceptId bigint(20));
 
-drop table if exists temp_expresions_split;
-create table temp_expresions_split(id varchar(36), split varchar(255));
+drop table if exists temp_expression_split;
+create table temp_expression_split(id varchar(36), split varchar(255));
 
-drop table if exists temp_expresions_concept_query;
-create table temp_expresions_concept_query(id varchar(36), insertSql text);
+drop table if exists temp_expression_concept_query;
+create table temp_expression_concept_query(id varchar(36), insertSql text);
 
-set @copyExpressionSql = concat("insert into temp_expresions_concept_query(id, insertSql) select id,", columnName, " from ", tableName);
+set @copyExpressionSql = concat("insert into temp_expression_concept_query(id, insertSql) select id,", columnName, " from ", tableName);
 prepare statement from @copyExpressionSql;
 execute statement;
 
-update temp_expresions_concept_query set insertSql = concat("insert into temp_expresions_split(split,id) values ('",replace((trim(insertSql))," ", concat("','",id,"'),('")),"','",id,"');");
+update temp_expression_concept_query set insertSql = concat("insert into temp_expression_split(split,id) values ('",replace((trim(insertSql))," ", concat("','",id,"'),('")),"','",id,"');");
 
 
 open sql_cursor;
@@ -41,8 +41,8 @@ set @runSql = populateConceptIdSql;
 prepare statement from @runSql;
 execute statement;
 
-delete from temp_expresions_split where split NOT REGEXP '^[0-9]{6,20}$';
-insert into temp_expression_concept_id(id, conceptId) select id, CAST(split as unsigned) from temp_expresions_split;
+delete from temp_expression_split where split NOT REGEXP '^[0-9]{6,20}$';
+insert into temp_expression_concept_id(id, conceptId) select id, CAST(split as unsigned) from temp_expression_split;
 
 end loop executeQueries;
 
@@ -56,4 +56,8 @@ select
     curr_concept_s b
     on a.conceptId = b.id where b.id is null or b.id = 0 group by a.id) as result;
 
+
+drop table temp_expression_concept_id;
+drop table temp_expression_split;
+drop table temp_expression_concept_query;
 end;
