@@ -49,6 +49,10 @@ public class RF2FileTableMapper {
 		tableNameMap.put(TEXT_DEFINITION_FILE_HEADER + DELTA, "textdefinition_d");
 		tableNameMap.put(EXPRESSION_ASSOCIATION_FILE_HEADER + DELTA, "expressionAssociationRefset_d");
 		tableNameMap.put(MAP_CORRELATION_ORIGIN_FILE_HEADER + DELTA, "mapCorrelationOriginRefset_d");
+		tableNameMap.put(MRCM_ATTRIBUTE_DOMAIN_FILE_HEADER + DELTA, "mrcmAttributeDomainRefset_d");
+		tableNameMap.put(MRCM_MODULE_SCOPE_FILE_HEADER + DELTA, "mrcmModuleScopeRefset_d");
+		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + DELTA, "mrcmAttributeRangeRefset_d");
+		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + DELTA, "mrcmDomainRefset_d");
 		
 		//Full
 		tableNameMap.put(CONCEPT_FILE_HEADER + FULL, "concept_f");
@@ -65,6 +69,11 @@ public class RF2FileTableMapper {
 		tableNameMap.put(TEXT_DEFINITION_FILE_HEADER + FULL, "textdefinition_f");
 		tableNameMap.put(EXPRESSION_ASSOCIATION_FILE_HEADER + FULL, "expressionAssociationRefset_f");
 		tableNameMap.put(MAP_CORRELATION_ORIGIN_FILE_HEADER + FULL, "mapCorrelationOriginRefset_f");
+		tableNameMap.put(MRCM_ATTRIBUTE_DOMAIN_FILE_HEADER + FULL, "mrcmAttributeDomainRefset_f");
+		tableNameMap.put(MRCM_MODULE_SCOPE_FILE_HEADER + FULL, "mrcmModuleScopeRefset_f");
+		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + FULL, "mrcmAttributeRangeRefset_f");
+		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + FULL, "mrcmDomainRefset_s");
+		
 		//Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
 		tableNameMap.put(DESCRIPTION_FILE_HEADER + SNAPSHOT, "description_s");
@@ -80,7 +89,6 @@ public class RF2FileTableMapper {
 		tableNameMap.put(TEXT_DEFINITION_FILE_HEADER + SNAPSHOT, "textdefinition_s");
 		tableNameMap.put(EXPRESSION_ASSOCIATION_FILE_HEADER + SNAPSHOT, "expressionAssociationRefset_s");
 		tableNameMap.put(MAP_CORRELATION_ORIGIN_FILE_HEADER + SNAPSHOT, "mapCorrelationOriginRefset_s");
-		
 		tableNameMap.put(MRCM_ATTRIBUTE_DOMAIN_FILE_HEADER + SNAPSHOT, "mrcmAttributeDomainRefset_s");
 		tableNameMap.put(MRCM_MODULE_SCOPE_FILE_HEADER + SNAPSHOT, "mrcmModuleScopeRefset_s");
 		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + SNAPSHOT, "mrcmAttributeRangeRefset_s");

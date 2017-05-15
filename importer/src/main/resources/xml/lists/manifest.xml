@@ -530,6 +530,47 @@
 			<keywords>MrcmRuleRefsetId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot</keywords>  
 	    </script>
 	    
+	    <!-- release-type-validation-mrcm -->
+	    <script uuid="87af4df0-c506-41ed-9089-6a359f16b34f" category="release-type-validation" 
+	    		  sqlFile="release-type-full-validation-mrcm-domain-refset.sql" text="The current MRCM Domain Refset full file contains all previously published data unchanged." >
+			<keywords>The current MRCM Domain Refset full file contains all previously published data unchanged.</keywords>
+		</script>
+		
+		<script uuid="4fdf8c6a-8b58-4bf7-a8b5-71176ede7ac0" category="release-type-validation" 
+	    		  sqlFile="release-type-full-validation-mrcm-attribute-domain-refset.sql" text="The current MRCM Attribute Domain Refset full file contains all previously published data unchanged." >
+			<keywords>The current MRCM Attribute Domain Refset full file contains all previously published data unchanged.</keywords>
+		</script>
+		
+		<script uuid="becfbeaa-5eab-4a4a-90ca-7c893b7495b2" category="release-type-validation" 
+	    		  sqlFile="release-type-full-validation-mrcm-attribute-range-refset.sql" text="The current MRCM Attribute Range Refset full file contains all previously published data unchanged." >
+			<keywords>The current MRCM Attribute Range Refset full file contains all previously published data unchanged.</keywords>
+		</script>
+		
+		<script uuid="0f7b6979-7a9d-45d4-956b-972d452f1638" category="release-type-validation" 
+	    		  sqlFile="release-type-full-validation-mrcm-module-scope-refset.sql" text="The current MRCM Module Scope Refset full file contains all previously published data unchanged." >
+			<keywords>The current MRCM Module Scope Refset full file contains all previously published data unchanged.</keywords>
+		</script>
+		
+		<script uuid="75afe90a-eb1c-4e86-9312-22bc742f5b49" category="release-type-validation" 
+				  sqlFile="release-type-snapshot-delta-validation-mrcm-domain-refset.sql" text="The current data in the MRCM Domain Refset snapshot file are the same as the data in the current delta file."  >
+			<keywords>The current data in the MRCM Domain Refset snapshot file are the same as the data in the current delta file</keywords>
+		</script>
+		
+		<script uuid="609ed083-737c-401a-9aa9-5666bbd2aff2" category="release-type-validation" 
+				  sqlFile="release-type-snapshot-delta-validation-mrcm-attribute-domain-refset.sql" text="The current data in the MRCM Attribute Domain Refset snapshot file are the same as the data in the current delta file."  >
+			<keywords>The current data in the MRCM Attribute Domain Refset snapshot file are the same as the data in the current delta file</keywords>
+		</script>
+		
+		<script uuid="56c6abd0-11c7-409e-b0ed-f9d0f08f2cd7" category="release-type-validation" 
+				  sqlFile="release-type-snapshot-delta-validation-mrcm-attribute-range-refset.sql" text="The current data in the MRCM Attribute Range Refset snapshot file are the same as the data in the current delta file."  >
+			<keywords>The current data in the MRCM Attribute Range Refset snapshot file are the same as the data in the current delta file</keywords>
+		</script>
+		
+		<script uuid="0999e34c-36b5-4d33-951a-8e949a66062e" category="release-type-validation" 
+				  sqlFile="release-type-snapshot-delta-validation-mrcm-module-scope-refset.sql" text="The current data in the MRCM Module Scope Refset snapshot file are the same as the data in the current delta file."  >
+			<keywords>The current data in the MRCM Module Scope Refset snapshot file are the same as the data in the current delta file</keywords>
+		</script>
+	    
 		<!-- rt added this as a template... -->
 		<!--  <script uuid="" category="" sqlFile="" text=""  />-->
 
