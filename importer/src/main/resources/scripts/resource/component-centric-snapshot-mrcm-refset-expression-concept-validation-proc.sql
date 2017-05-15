@@ -51,7 +51,7 @@ select
 	runId,
 	assertionId,
 	result.conceptId,
-	concat(refsetName,":id:",result.id,":ConceptId=",result.conceptId, " referenced in the column ", columnName ," in SNAPSHOT is invalid.")
+	concat(refsetName,":id=",result.id,":ConceptId=",result.conceptId, " referenced in the column ", columnName ," in SNAPSHOT is invalid.")
 	from  (select distinct(a.conceptId), a.id from temp_expression_concept_id a left join
     curr_concept_s b
     on a.conceptId = b.id where b.id is null or b.id = 0 group by a.id) as result;
