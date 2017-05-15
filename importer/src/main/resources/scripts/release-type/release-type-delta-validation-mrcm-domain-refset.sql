@@ -7,7 +7,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
+		a.referencedcomponentid,
 		concat('Mrcm Domain Refset: id=',a.id, ' is in delta file, but not in FULL file.')
 	from curr_mrcmdomainrefset_d a
 	left join curr_mrcmdomainrefset_f b

@@ -5,7 +5,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
+		a.referencedcomponentid,
 		concat('Mrcm Attribute Range Refset: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.')
 	from curr_mrcmattributerangerefset_d a
 	left join prev_mrcmattributerangerefset_s b

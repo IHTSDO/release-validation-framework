@@ -16,7 +16,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		null,
+		a.referencedcomponentid,
 		concat('MRCM ATTRIBUTE DOMAIN REFSET: id=',a.id, ' is in prior full file but not in current full file.') 	
 	from prev_mrcmattributedomainrefset_f a
 	left join curr_mrcmattributedomainrefset_f b

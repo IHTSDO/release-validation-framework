@@ -6,7 +6,7 @@
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
-	a.sourceid,
+	a.referencedcomponentid,
 	concat('Mrcm Attribute Range Refset: id=',a.id, ' is in current full file, but not in prior full or current delta file.')
 	from curr_mrcmattributerangerefset_f a
 	left join curr_mrcmattributerangerefset_d b

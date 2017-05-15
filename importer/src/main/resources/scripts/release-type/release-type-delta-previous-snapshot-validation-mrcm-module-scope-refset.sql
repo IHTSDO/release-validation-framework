@@ -5,7 +5,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
+		a.referencedcomponentid,
 		concat('Mrcm Module Scope Refset: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.')
 	from curr_mrcmmodulescoperefset_d a
 	left join prev_mrcmmodulescoperefset_s b

@@ -10,7 +10,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.conceptid,
+		a.referencedcomponentid,
 		concat('Mrcm Domain Refset: id=',a.id, '  should not have a new inactive state as it was inactive previously.')
 	from curr_mrcmdomainrefset_s a , prev_mrcmdomainrefset_s b
 	where a.effectivetime != b.effectivetime

@@ -10,7 +10,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.conceptid,
+		a.referencedcomponentid,
 		concat('Mrcm Module Scope Refset: id=',a.id, '  should not have a new inactive state as it was inactive previously.')
 	from curr_mrcmmodulescoperefset_s a , prev_mrcmmodulescoperefset_s b
 	where a.effectivetime != b.effectivetime

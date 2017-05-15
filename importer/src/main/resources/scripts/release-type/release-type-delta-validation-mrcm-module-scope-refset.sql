@@ -7,7 +7,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
+		a.referencedcomponentid,
 		concat('Mrcm Module Scope Refset: id=',a.id, ' is in delta file, but not in FULL file.')
 	from curr_mrcmmodulescoperefset_d a
 	left join curr_mrcmmodulescoperefset_f b
