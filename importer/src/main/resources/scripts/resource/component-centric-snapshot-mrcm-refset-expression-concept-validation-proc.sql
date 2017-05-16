@@ -7,12 +7,10 @@
 drop procedure if exists validateConceptIdsInMRCMRefsetExpression_procedure;
 create procedure validateConceptIdsInMRCMRefsetExpression_procedure(runId BIGINT, assertionId varchar(36), tableName varchar(255), columnName varchar(255), refsetName varchar(255))
 begin
-
 declare no_more_rows integer default 0;
 declare populateConceptIdSql text;
 declare sql_cursor cursor for select insertSql from temp_expression_concept_query;
 declare continue handler for not found set no_more_rows = 1;
-
 
 drop table if exists temp_expression_concept_id;
 create table temp_expression_concept_id(id varchar(36), conceptId bigint(20));
@@ -22,6 +20,7 @@ create table temp_expression_split(id varchar(36), split varchar(255));
 
 drop table if exists temp_expression_concept_query;
 create table temp_expression_concept_query(id varchar(36), insertSql text);
+
 
 set @copyExpressionSql = concat("insert into temp_expression_concept_query(id, insertSql) select id,", columnName, " from ", tableName);
 prepare statement from @copyExpressionSql;
@@ -56,7 +55,7 @@ select
     on a.conceptId = b.id where b.id is null or b.id = 0 group by a.id) as result;
 
 
-drop table temp_expression_concept_id;
-drop table temp_expression_split;
-drop table temp_expression_concept_query;
+drop table if exists temp_expression_concept_id;
+drop table if exists temp_expression_split;
+drop table if exists temp_expression_concept_query;
 end;
