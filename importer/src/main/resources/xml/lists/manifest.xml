@@ -10,7 +10,8 @@
 		<script uuid="ba8918f0-84f0-11e1-b0c4-0800200c9a66" category="resource" sqlFile="component-centric-delta-language-lang-specific-words-us-def-proc.sql" text="Defines procedure that tests that terms that contain EN-US language-specific words are in the same US language refset." />
 		<script uuid="458cde1f-224a-49d7-a6ca-2fc666d96e7d" category="resource" sqlFile="component-centric-snapshot-description-casesignificanceid-def-proc.sql" text="Defines procedure that tests that terms which contain case sensitive words have the correct case significance value assigned." />
 		<script uuid="B4B5EE89-372F-4AE3-8C18-9C37CF4E932E" category="resource" sqlFile="component-centric-snomed-ct-expression-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the SNOMED CT expression for LOIC mapping." />
-		<script uuid="dd124acf-52d3-45e6-b5b4-d40454ff1b5e" category="resource" sqlFile="component-centric-snapshot-mrcm-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Refsets." />
+		<script uuid="dd124acf-52d3-45e6-b5b4-d40454ff1b5e" category="resource" sqlFile="component-centric-snapshot-mrcm-attribute-range-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Domain Refsets." />
+		<script uuid="dd124acf-52d3-45e6-b5b4-d40454ff1b5e" category="resource" sqlFile="component-centric-snapshot-mrcm-domain-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Attribute Range Refsets." />
 		<script uuid="192d944e-7bd3-46e9-a411-c1ef41ac8945" category="resource" sqlFile="component-centric-snapshot-mrcm-refset-validate-concept-is-valid-descendant-proc.sql" text="Defines a procedure to validate whether a concept is a descendant of specified concepts in MRCM Refsets" />
 
 		<!-- release-type-full-validation -->
@@ -594,6 +595,102 @@
 			<keywords>Check that the value range is valid in MRCM Refsets
 			</keywords>
 		</script>
+		
+		<script uuid="f5945482-a4fb-4e92-bc20-6f6a3304aa16" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-domain-not-null-id.sql" text="ID is a not null in MRCM DOMAIN snapshot."  >
+			<keywords>ID is a not null in MRCM DOMAIN snapshot</keywords>
+		</script>
+		
+		<script uuid="9a7f6831-e681-4b90-8a47-f53a1b1ee5ba" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-attribute-domain-not-null-id.sql" text="ID is a not null in MRCM ATTRIBUTE DOMAIN snapshot."  >
+			<keywords>ID is a not null in MRCM ATTRIBUTE DOMAIN snapshot</keywords>
+		</script>
+		
+		<script uuid="3b2a786d-dabb-4488-a78f-8dbe06d884d7" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-attribute-range-not-null-id.sql" text="ID is a not null in MRCM ATTRIBUTE RANGE snapshot."  >
+			<keywords>ID is a not null in MRCM ATTRIBUTE RANGE snapshot</keywords>
+		</script>
+		
+		<script uuid="2acb4591-51cd-478d-ba21-525a1af70b3d" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-module-scope-not-null-id.sql" text="ID is a not null in MRCM MODULE SCOPE snapshot."  >
+			<keywords>ID is a not null in MRCM MODULE SCOPE snapshot</keywords>
+		</script>
+		
+		<script uuid="e0634fca-c88e-4d4b-95bf-eef0a6b17356" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-domain-valid-uuid-id.sql" text="ID is a valid UUID in MRCM DOMAIN snapshot."  >
+			<keywords>ID is a valid UUID in MRCM DOMAIN snapshot</keywords>
+		</script>
+		
+		<script uuid="d04d9054-6adb-4e6e-95b0-9a186e85e1a4" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-attribute-domain-valid-uuid-id.sql" text="ID is a valid UUID in MRCM ATTRIBUTE DOMAIN snapshot."  >
+			<keywords>ID is a valid UUID in MRCM ATTRIBUTE DOMAIN snapshot</keywords>
+		</script>
+		
+		<script uuid="81189eff-7801-4155-9ad1-6190c1283bb7" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-attribute-range-valid-uuid-id.sql" text="ID is a valid UUID in MRCM ATTRIBUTE RANGE snapshot."  >
+			<keywords>ID is a valid UUID in MRCM ATTRIBUTE RANGE snapshot</keywords>
+		</script>
+	    
+	    <script uuid="5a17b8b5-6055-4d37-8196-14359af7f11a" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-module-scope-valid-uuid-id.sql" text="ID is a valid UUID in MRCM MODULE SCOPE snapshot."  >
+			<keywords>ID is a valid UUID in MRCM MODULE SCOPE snapshot</keywords>
+		</script>
+		
+		<script uuid="e980e959-943b-4cdc-998b-f91e670a030b" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-domain-unique-id.sql" text="ID is unique in MRCM DOMAIN snapshot."  >
+			<keywords>ID is unique in MRCM DOMAIN snapshot</keywords>
+		</script>
+		
+		<script uuid="a48d78fe-8ab5-4705-bbc5-1286fb2a98a2" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-attribute-domain-unique-id.sql" text="ID is unique in MRCM ATTRIBUTE DOMAIN snapshot."  >
+			<keywords>ID is unique in MRCM ATTRIBUTE DOMAIN snapshot</keywords>
+		</script>
+		
+		<script uuid="d51966ed-e034-4a25-90ef-1eb489c0bd37" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-attribute-range-unique-id.sql" text="ID is unique in MRCM ATTRIBUTE RANGE snapshot."  >
+			<keywords>ID is unique in MRCM ATTRIBUTE RANGE snapshot</keywords>
+		</script>
+		
+		<script uuid="6f4aa58c-cc59-4a51-a630-fe4c69bac53b" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-module-scope-unique-id.sql" text="ID is unique in MRCM MODULE SCOPE snapshot."  >
+			<keywords>ID is unique in MRCM MODULE SCOPE snapshot</keywords>
+		</script>
+		
+		<script uuid="68103b8f-e98b-40f1-9d37-acfd1ffeff66" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-domain-valid-effectivetime.sql" text="EffectiveTime is valid date in MRCM DOMAIN snapshot."  >
+			<keywords>EffectiveTime is valid date in MRCM DOMAIN snapshot</keywords>
+		</script>
+		
+		<script uuid="47364305-3e7a-45c1-90c0-e122aff1acca" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-attribute-domain-valid-effectivetime.sql" text="EffectiveTime is valid date in MRCM ATTRIBUTE DOMAIN snapshot."  >
+			<keywords>EffectiveTime is valid date in MRCM ATTRIBUTE DOMAIN snapshot</keywords>
+		</script>
+		
+		<script uuid="c99fc5fa-56b5-4865-8abd-e229a3e08489" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-attribute-range-valid-effectivetime.sql" text="EffectiveTime is valid date in MRCM ATTRIBUTE RANGE snapshot."  >
+			<keywords>EffectiveTime is valid date in MRCM ATTRIBUTE RANGE snapshot</keywords>
+		</script>
+		
+		<script uuid="c49d8238-b08f-4be0-974e-22c0d4ce4cab" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-module-scope-valid-effectivetime.sql" text="EffectiveTime is valid date in MRCM MODULE SCOPE snapshot."  >
+			<keywords>EffectiveTime is valid date in MRCM MODULE SCOPE snapshot</keywords>
+		</script>
+		
+		<script uuid="f44bed30-7bdb-4763-ad3d-c23d2d159cae" category="component-centric-validation" 
+				  sqlFile="component-centric-snapshot-mrcm-domain-valid-guideurl.sql" text="GuideURL is a valid URL in MRCM DOMAIN snapshot."  >
+			<keywords>GuideURL is a valid URL in MRCM DOMAIN snapshot</keywords>
+		</script>		
+		
+		<script uuid="76513165-df7b-4185-8d14-492a48a85826" category="component-centric-validation" 
+				  sqlFile="component-centric-delta-mrcm-domain-valid-guideurl.sql" text="GuideURL is a valid URL in MRCM DOMAIN delta."  >
+			<keywords>GuideURL is a valid URL in MRCM DOMAIN delta</keywords>
+		</script>
+		
+		<script uuid="6af3c672-e564-4221-897d-e60007ab3498" category="component-centric-validation" 
+				  sqlFile="component-centric-full-mrcm-domain-valid-guideurl.sql" text="GuideURL is a valid URL in MRCM DOMAIN full."  >
+			<keywords>GuideURL is a valid URL in MRCM DOMAIN full</keywords>
+		</script>
+
 		<!-- rt added this as a template... -->
 		<!--  <script uuid="" category="" sqlFile="" text=""  />-->
 
