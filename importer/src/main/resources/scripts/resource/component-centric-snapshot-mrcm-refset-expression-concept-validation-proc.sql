@@ -1,5 +1,5 @@
 /********************************************************************************
-	component-centric-snapshot-mrcm-refset-expression-concept-validation-proc.sql
+	component-centric-snapshot-mrcm-refset-validate-concept-is-valid-descendant-proc.sql
 
 	Defines a procedure to test the validity of the concept ids in the SNOMED CT expression in MRCM Refsets
 
@@ -41,8 +41,7 @@ set @runSql = populateConceptIdSql;
 prepare statement from @runSql;
 execute statement;
 
-delete from temp_expression_split where split NOT REGEXP '^[0-9]{6,20}$';
-insert into temp_expression_concept_id(id, conceptId) select id, CAST(split as unsigned) from temp_expression_split;
+insert into temp_expression_concept_id(id, conceptId) select id, CAST(split as unsigned) from temp_expression_split where split REGEXP '^[0-9]{6,20}$';
 
 end loop executeQueries;
 
