@@ -1,5 +1,5 @@
 /******************************************************************************** 
-	release-type-snapshot-delta-validation-mrcm-DOMAIN-refset
+	release-type-snapshot-delta-validation-mrcm-domain-refset
 
 	Assertion:
 	The current data in the MRCM DOMAIN REFSET snapshot file are the same as the data in 
@@ -10,7 +10,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		null,
+		a.referencedcomponentid,
 		concat('MRCM DOMAIN REFSET: id=',a.id, ' is in delta file but not in snapshot file.') 	
 	from curr_mrcmdomainrefset_d a
 	left join curr_mrcmdomainrefset_s b

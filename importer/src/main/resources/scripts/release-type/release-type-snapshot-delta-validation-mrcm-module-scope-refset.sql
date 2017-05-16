@@ -1,8 +1,8 @@
 /******************************************************************************** 
-	release-type-snapshot-delta-validation-mrcm-DOMAIN-SCOPE-refset
+	release-type-snapshot-delta-validation-mrcm-module-scope-refset
 
 	Assertion:
-	The current data in the MRCM DOMAIN SCOPE REFSET snapshot file are the same as the data in 
+	The current data in the MRCM MODULE SCOPE REFSET snapshot file are the same as the data in
 	the current delta file. 
 ********************************************************************************/
 
@@ -10,10 +10,10 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		null,
-		concat('MRCM DOMAIN SCOPE REFSET: id=',a.id, ' is in delta file but not in snapshot file.') 	
-	from curr_mrcmattributedomainrefset_d a
-	left join curr_mrcmattributedomainrefset_s b
+		a.referencedcomponentid,
+		concat('MRCM MODULE SCOPE REFSET: id=',a.id, ' is in delta file but not in snapshot file.')
+	from curr_mrcmmodulescoperefset_d a
+	left join curr_mrcmmodulescoperefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

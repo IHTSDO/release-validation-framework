@@ -16,7 +16,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		null,
+		a.referencedcomponentid,
 		concat('MRCM MODULE SCOPE REFSET: id=',a.id, ' is in prior full file but not in current full file.') 	
 	from prev_mrcmmodulescoperefset_f a
 	left join curr_mrcmmodulescoperefset_f b

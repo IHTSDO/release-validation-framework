@@ -1,24 +1,15 @@
+/*  
+	The current stated relationship delta file is an accurate derivative of the current full file
+*/
 
-/******************************************************************************** 
-
-	release-type-full-validation-mrcm-domain-refset 
-
-	Assertion:	The current MRCM Domain Refset full file contains all 
-	previously published data unchanged.
-
-
-	The current full file is the same as the prior version of the same full 
-	file, except for the delta rows. Therefore, when the delta rows are excluded 
-	from the current file, it should be identical to the prior version.	
-********************************************************************************/
-	
+/* in the delta; not in the full */
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MRCM DOMAIN REFSET: id=',a.id, ' is in prior full file but not in current full file.') 	
-	from prev_mrcmdomainrefset_f a
+		concat('Mrcm Domain Refset: id=',a.id, ' is in delta file, but not in FULL file.')
+	from curr_mrcmdomainrefset_d a
 	left join curr_mrcmdomainrefset_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
@@ -29,7 +20,7 @@
 		and a.domainconstraint = b.domainconstraint
 		and a.parentdomain = b.parentdomain
 		and a.proximalprimitiveconstraint = b.proximalprimitiveconstraint
-		and a.proximalprimitiverefinement = b.proximalprimitiverefinement	
+		and a.proximalprimitiverefinement = b.proximalprimitiverefinement
 		and a.domaintemplateforprecoordination = b.domaintemplateforprecoordination
 		and a.domaintemplateforpostcoordination = b.domaintemplateforpostcoordination
 		and a.guideurl = b.guideurl
@@ -42,8 +33,8 @@
 		or b.domainconstraint is null
 		or b.parentdomain is null
 		or b.proximalprimitiveconstraint is null
-		or b.proximalprimitiverefinement is null	
+		or b.proximalprimitiverefinement is null
 		or b.domaintemplateforprecoordination is null
 		or b.domaintemplateforpostcoordination is null
 		or b.guideurl is null;
-	
+		
