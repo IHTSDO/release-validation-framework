@@ -23,6 +23,7 @@
 	</properties>
 
 	<modules>
+		<module>apg</module>
 		<module>model</module>
 		<module>data-service</module>
 		<module>validation-service</module>
@@ -30,7 +31,6 @@
 		<module>web</module>
 		<module>execution-service</module>
 		<module>importer</module>
-		<module>apg</module>
 	</modules>
 
 

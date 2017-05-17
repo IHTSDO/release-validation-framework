@@ -23,7 +23,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>apg-java</artifactId>
+			<artifactId>apg</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -124,10 +124,5 @@
 			<artifactId>snomed-utilities</artifactId>
 			<version>${snomed.utilities.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>org.ihtsdo.snomed.rvf</groupId>
-            <artifactId>apg-java</artifactId>
-            <version>1.0.10-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 </project>
