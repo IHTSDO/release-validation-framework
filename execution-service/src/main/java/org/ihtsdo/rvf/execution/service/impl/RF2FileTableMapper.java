@@ -72,7 +72,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_ATTRIBUTE_DOMAIN_FILE_HEADER + FULL, "mrcmAttributeDomainRefset_f");
 		tableNameMap.put(MRCM_MODULE_SCOPE_FILE_HEADER + FULL, "mrcmModuleScopeRefset_f");
 		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + FULL, "mrcmAttributeRangeRefset_f");
-		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + FULL, "mrcmDomainRefset_s");
+		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + FULL, "mrcmDomainRefset_f");
 		
 		//Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
