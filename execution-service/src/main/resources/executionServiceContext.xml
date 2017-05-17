@@ -17,7 +17,7 @@
 	<context:annotation-config/>
 	<tx:annotation-driven/>
 	
-	<context:property-placeholder location="file:/${rvfConfigLocation:/tmp}/execution-service.properties" order="-1"
+	<context:property-placeholder location="file://${rvfConfigLocation:/tmp}/execution-service.properties" order="-1"
 								  ignore-unresolvable="true" ignore-resource-not-found="true" />
 	<context:property-placeholder location="classpath*:execution-service-defaults.properties" />
     
