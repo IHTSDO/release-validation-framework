@@ -232,7 +232,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	private void validateDomainRefsetData() throws SQLException {
 		String selectDomainStatement = "select id, domainconstraint, parentdomain, proximalprimitiveconstraint, proximalprimitiverefinement, domaintemplateforprecoordination, domaintemplateforpostcoordination, referencedcomponentid " +
-				"from " + snomedDataSource.getDefaultCatalog() + "." + MRCM_DOMAIN_REFSET_TABLE + "_";
+				"from " + MRCM_DOMAIN_REFSET_TABLE + "_";
 		String insertQaResultStatement = "insert into qa_result (runid, assertionuuid, concept_id, details) values (<RUNID>, '<ASSERTIONUUID>', ?, concat('Mrcm Domain Refset: id=',?, ' is in the detla file, but no actual changes made since the previous release.')";
 		try(Connection connection = snomedDataSource.getConnection()){
 			String[] suffixed = new String[]{SNAPSHOT_SUFFIX, DELTA_SUFFIX, FULL_SUFFIX};
