@@ -30,6 +30,7 @@
 		<module>web</module>
 		<module>execution-service</module>
 		<module>importer</module>
+		<module>apg-java</module>
 	</modules>
 
 
