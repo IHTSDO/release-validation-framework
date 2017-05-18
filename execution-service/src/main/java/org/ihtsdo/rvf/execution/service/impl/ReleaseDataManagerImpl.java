@@ -254,7 +254,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
                 }
 			});
 			final ReleaseFileDataLoader dataLoader = new ReleaseFileDataLoader(dataSource, schemaName, new MySqlDataTypeConverter());
-			dataLoader.loadFilesIntoDB(rf2TextFilesDir.getAbsolutePath().replace("\\", "/"), rf2Files, rf2FilesLoaded);
+			dataLoader.loadFilesIntoDB(rf2TextFilesDir.getAbsolutePath(), rf2Files, rf2FilesLoaded);
 		}
 	}
 
