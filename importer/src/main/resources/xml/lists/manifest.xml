@@ -534,6 +534,27 @@
 	    </script>
 
 	    <!-- release-type-validation-mrcm -->
+		<script uuid="b1ebc4cb-6a86-498f-a3ea-aeef250b9399" category="release-type-validation"
+				sqlFile="release-type-delta-previous-snapshot-validation-mrcm-attribute-domain-refset.sql"
+				text="There must be actual changes made to previously published mrcm attribute domain refset components in order for them to appear in the current delta.">
+			<keywords>There must be actual changes made to previously published simple refset components in order for them to appear in the current delta.</keywords>
+		</script>
+		<script uuid="cec2a50e-c04b-4442-a979-e8ad8f83ff91" category="release-type-validation"
+				sqlFile="release-type-delta-previous-snapshot-validation-mrcm-attribute-range-refset.sql"
+				text="There must be actual changes made to previously published mrcm attribute range refset components in order for them to appear in the current delta.">
+			<keywords>There must be actual changes made to previously published mrcm attribute range refset components in order for them to appear in the current delta.</keywords>
+		</script>
+		<script uuid="8864db45-0f97-4eda-b7ba-414289dd3a99" category="release-type-validation"
+				sqlFile="release-type-delta-previous-snapshot-validation-mrcm-domain-refset.sql"
+				text="There must be actual changes made to previously published domain refset components in order for them to appear in the current delta.">
+			<keywords>There must be actual changes made to previously published domain refset components in order for them to appear in the current delta.</keywords>
+		</script>
+		<script uuid="d7e12c75-9979-4adb-9b5b-3b8a80ab4fbb" category="release-type-validation"
+				sqlFile="release-type-delta-previous-snapshot-validation-mrcm-module-scope-refset.sql"
+				text="There must be actual changes made to previously published module scope refset components in order for them to appear in the current delta.">
+			<keywords>There must be actual changes made to previously published module scope refset components in order for them to appear in the current delta.</keywords>
+		</script>
+
 	    <script uuid="87af4df0-c506-41ed-9089-6a359f16b34f" category="release-type-validation"
 	    		  sqlFile="release-type-full-validation-mrcm-domain-refset.sql" text="The current MRCM Domain Refset full file contains all previously published data unchanged." >
 			<keywords>The current MRCM Domain Refset full file contains all previously published data unchanged.</keywords>
@@ -572,6 +593,69 @@
 		<script uuid="0999e34c-36b5-4d33-951a-8e949a66062e" category="release-type-validation"
 				  sqlFile="release-type-snapshot-delta-validation-mrcm-module-scope-refset.sql" text="The current data in the MRCM Module Scope Refset snapshot file are the same as the data in the current delta file."  >
 			<keywords>The current data in the MRCM Module Scope Refset snapshot file are the same as the data in the current delta file</keywords>
+		</script>
+
+		<script uuid="501dc4c4-49d4-41d9-9751-271687d54820" category="release-type-validation"
+				sqlFile="release-type-full-validation-mrcm-attribute-domain-refset.sql"
+				text="The current MRCM Attribute Domain Refset full file contains all previously published data unchanged">
+			<keywords>The current MRCM Attribute Domain Refset full file contains all previously published data unchanged</keywords>
+		</script>
+		<script uuid="7c87a865-beb5-4e03-a489-2b05a40bd860" category="release-type-validation"
+				sqlFile="release-type-full-validation-mrcm-attribute-range-refset.sql"
+				text="The current MRCM Attribute Range Refset full file contains all previously published data unchanged">
+			<keywords>The current MRCM Attribute Range Refset full file contains all previously published data unchanged</keywords>
+		</script>
+		<script uuid="504d10af-deba-46f0-85d5-f792749b0d62" category="release-type-validation"
+				sqlFile="release-type-full-validation-mrcm-domain-refset.sql"
+				text="The current MRCM Domain Refset full file contains all previously published data unchanged">
+			<keywords>The current MRCM Domain Refset full file contains all previously published data unchanged</keywords>
+		</script>
+		<script uuid="388b2eff-f8b0-418c-9794-d35aaa4d748b" category="release-type-validation"
+				sqlFile="release-type-full-validation-mrcm-module-scope-refset.sql"
+				text="The current MRCM Module Scope Refset full file contains all previously published data unchanged">
+			<keywords>The current MRCM Module Scope Refset full file contains all previously published data unchanged</keywords>
+		</script>
+
+		<script uuid="7c3fe37c-6ad5-446e-bc82-7c2bc078042a" category="release-type-validation"
+				sqlFile="release-type-snapshot-delta-validation-mrcm-attribute-domain-refset.sql"
+				text="The current data in the MRCM ATTRIBUTE DOMAIN REFSET snapshot file are the same as the data in the current delta file.">
+			<keywords>The current data in the MRCM ATTRIBUTE DOMAIN REFSET snapshot file are the same as the data inthe current delta file.</keywords>
+		</script>
+		<script uuid="ad0f8978-c8a7-4d91-8e3e-a887e4830fec" category="release-type-validation"
+				sqlFile="release-type-snapshot-delta-validation-mrcm-attribute-range-refset.sql"
+				text="The current data in the MRCM ATTRIBUTE RANGE REFSET snapshot file are the same as the data in the current delta file.">
+			<keywords>The current data in the MRCM ATTRIBUTE RANGE REFSET snapshot file are the same as the data in the current delta file.</keywords>
+		</script>
+		<script uuid="43bdeea9-be7b-4235-b58e-8842a8e47793" category="release-type-validation"
+				sqlFile="release-type-snapshot-delta-validation-mrcm-domain-refset.sql"
+				text="The current data in the MRCM DOMAIN REFSET snapshot file are the same as the data in the current delta file.">
+			<keywords>The current data in the MRCM DOMAIN REFSET snapshot file are the same as the data in the current delta file.</keywords>
+		</script>
+		<script uuid="054bccb0-c678-4722-94dd-b664e0c6267e" category="release-type-validation"
+				sqlFile="release-type-snapshot-delta-validation-mrcm-module-scope-refset.sql"
+				text="The current data in the MRCM MODULE SCOPE REFSET snapshot file are the same as the data in the current delta file.">
+			<keywords>The current data in the MRCM MODULE SCOPE REFSET snapshot file are the same as the data in the current delta file.</keywords>
+		</script>
+
+		<script uuid="b205d819-2ef6-48e3-8fe1-1793e83a7b8a" category="release-type-validation"
+				sqlFile="release-type-snapshot-mrcm-attribute-domain-refset-successive-states.sql"
+				text="New inactive states follow active states in the MRCM ATTRIBUTE DOMAIN REFSET snapshot.">
+			<keywords>New inactive states follow active states in the MRCM ATTRIBUTE DOMAIN REFSET snapshot.</keywords>
+		</script>
+		<script uuid="d182e8d4-c8e1-4e5f-ae17-b2f786f55727" category="release-type-validation"
+				sqlFile="release-type-snapshot-mrcm-attribute-range-refset-successive-states.sql"
+				text="New inactive states follow active states in the MRCM ATTRIBUTE RANGE REFSET snapshot.">
+			<keywords>New inactive states follow active states in the MRCM ATTRIBUTE RANGE REFSET snapshot.</keywords>
+		</script>
+		<script uuid="23a71f2e-5c90-4090-af07-bcb3fa3d5673" category="release-type-validation"
+				sqlFile="release-type-snapshot-mrcm-domain-refset-successive-states.sql"
+				text="New inactive states follow active states in the MRCM DOMAIN REFSET snapshot.">
+			<keywords>New inactive states follow active states in the MRCM DOMAIN REFSET snapshot.</keywords>
+		</script>
+		<script uuid="ccd8f56e-45ec-40b7-9404-9b264881e64d" category="release-type-validation"
+				sqlFile="release-type-snapshot-mrcm-module-scope-refset-successive-states.sql"
+				text="New inactive states follow active states in the MRCM MODULE SCOPE REFSET snapshot.">
+			<keywords>New inactive states follow active states in the MRCM MODULE SCOPE REFSET snapshot.</keywords>
 		</script>
 
 		 <!-- component-centric-validation-mrcm -->
