@@ -1,6 +1,6 @@
 
 /*  
-	The current full stated relationship file consists of the previously published full file and the changes for the current release
+	The current full MRCM Attribute Domain Refset file consists of the previously published full file and the changes for the current release
 */
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 

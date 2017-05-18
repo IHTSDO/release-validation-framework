@@ -1,5 +1,5 @@
 /*  
-	The current stated relationship delta file is an accurate derivative of the current full file
+	The current MRCM Module Scope Refset delta file is an accurate derivative of the current full file
 */
 
 /* in the delta; not in the full */
