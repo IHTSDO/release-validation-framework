@@ -1,2 +1,0 @@
-decnum = *DIGIT
-DIGIT  = %d48-57
