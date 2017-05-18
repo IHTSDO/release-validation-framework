@@ -633,8 +633,8 @@
 		</script>
 		<script uuid="054bccb0-c678-4722-94dd-b664e0c6267e" category="release-type-validation"
 				sqlFile="release-type-full-delta-validation-mrcm-module-scope-refset.sql"
-				text="The current full MRCM Domain Refset file consists of the previously published full file and the changes for the current release.">
-			<keywords>The current full MRCM Domain Refset file consists of the previously published full file and the changes for the current release.</keywords>
+				text="The current full MRCM Module Scope Refset file consists of the previously published full file and the changes for the current release.">
+			<keywords>The current full MRCM Module Scope Refset file consists of the previously published full file and the changes for the current release.</keywords>
 		</script>
 
 		<script uuid="b205d819-2ef6-48e3-8fe1-1793e83a7b8a" category="release-type-validation"
