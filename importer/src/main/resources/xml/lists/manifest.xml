@@ -596,24 +596,24 @@
 		</script>
 
 		<script uuid="501dc4c4-49d4-41d9-9751-271687d54820" category="release-type-validation"
-				sqlFile="release-type-delta-validation-mrcm-attribute-domain-refset.sql"
-				text="The current MRCM Attribute Domain Refset delta file is an accurate derivative of the current full file">
-			<keywords>The current MRCM Attribute Domain Refset delta file is an accurate derivative of the current full file</keywords>
+				sqlFile="release-type-snapshot-validation-mrcm-attribute-domain-refset.sql"
+				text="The current MRCM Attribute Domain Refset snapshot file is an accurate derivative of the current full file">
+			<keywords>The current MRCM Attribute Domain Refset snapshot file is an accurate derivative of the current full file</keywords>
 		</script>
 		<script uuid="7c87a865-beb5-4e03-a489-2b05a40bd860" category="release-type-validation"
-				sqlFile="release-type-delta-validation-mrcm-attribute-range-refset.sql"
-				text="The current MRCM Attribute Range Refset delta file is an accurate derivative of the current full file">
-			<keywords>The current MRCM Attribute Range Refset delta file is an accurate derivative of the current full file</keywords>
+				sqlFile="release-type-snapshot-validation-mrcm-attribute-range-refset.sql"
+				text="The current MRCM Attribute Range Refset snapshot file is an accurate derivative of the current full file">
+			<keywords>The current MRCM Attribute Range Refset snapshot file is an accurate derivative of the current full file</keywords>
 		</script>
 		<script uuid="504d10af-deba-46f0-85d5-f792749b0d62" category="release-type-validation"
-				sqlFile="release-type-delta-validation-mrcm-domain-refset.sql"
-				text="The current MRCM Domain Refset delta file is an accurate derivative of the current full file">
-			<keywords>The current MRCM Domain Refset delta file is an accurate derivative of the current full file</keywords>
+				sqlFile="release-type-snapshot-validation-mrcm-domain-refset.sql"
+				text="The current MRCM Domain Refset snapshot file is an accurate derivative of the current full file">
+			<keywords>The current MRCM Domain Refset snapshot file is an accurate derivative of the current full file</keywords>
 		</script>
 		<script uuid="388b2eff-f8b0-418c-9794-d35aaa4d748b" category="release-type-validation"
-				sqlFile="release-type-delta-validation-mrcm-module-scope-refset.sql"
-				text="The current MRCM Module Scope Refset delta file is an accurate derivative of the current full file">
-			<keywords>The current MRCM Module Scope Refset delta file is an accurate derivative of the current full file</keywords>
+				sqlFile="release-type-snapshot-validation-mrcm-module-scope-refset.sql"
+				text="The current MRCM Module Scope Refset snapshot file is an accurate derivative of the current full file">
+			<keywords>The current MRCM Module Scope Refset snapshot file is an accurate derivative of the current full file</keywords>
 		</script>
 
 		<script uuid="7c3fe37c-6ad5-446e-bc82-7c2bc078042a" category="release-type-validation"
