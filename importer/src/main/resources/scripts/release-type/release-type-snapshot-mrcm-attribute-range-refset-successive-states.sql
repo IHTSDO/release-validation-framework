@@ -23,7 +23,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.conceptid,
+		a.referencedcomponentid,
 		concat('Mrcm Attribute Range Refset: id=',a.id, ' is inactive but no active state found in the previous snapshot.')
 	from curr_mrcmattributerangerefset_s a  left join prev_mrcmattributerangerefset_s b
 	on a.id = b.id
