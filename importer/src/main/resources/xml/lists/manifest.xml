@@ -596,45 +596,45 @@
 		</script>
 
 		<script uuid="501dc4c4-49d4-41d9-9751-271687d54820" category="release-type-validation"
-				sqlFile="release-type-full-validation-mrcm-attribute-domain-refset.sql"
-				text="The current MRCM Attribute Domain Refset full file contains all previously published data unchanged">
-			<keywords>The current MRCM Attribute Domain Refset full file contains all previously published data unchanged</keywords>
+				sqlFile="release-type-delta-validation-mrcm-attribute-domain-refset.sql"
+				text="The current MRCM Attribute Domain Refset delta file is an accurate derivative of the current full file">
+			<keywords>The current MRCM Attribute Domain Refset delta file is an accurate derivative of the current full file</keywords>
 		</script>
 		<script uuid="7c87a865-beb5-4e03-a489-2b05a40bd860" category="release-type-validation"
-				sqlFile="release-type-full-validation-mrcm-attribute-range-refset.sql"
-				text="The current MRCM Attribute Range Refset full file contains all previously published data unchanged">
-			<keywords>The current MRCM Attribute Range Refset full file contains all previously published data unchanged</keywords>
+				sqlFile="release-type-delta-validation-mrcm-attribute-range-refset.sql"
+				text="The current MRCM Attribute Range Refset delta file is an accurate derivative of the current full file">
+			<keywords>The current MRCM Attribute Range Refset delta file is an accurate derivative of the current full file</keywords>
 		</script>
 		<script uuid="504d10af-deba-46f0-85d5-f792749b0d62" category="release-type-validation"
-				sqlFile="release-type-full-validation-mrcm-domain-refset.sql"
-				text="The current MRCM Domain Refset full file contains all previously published data unchanged">
-			<keywords>The current MRCM Domain Refset full file contains all previously published data unchanged</keywords>
+				sqlFile="release-type-delta-validation-mrcm-domain-refset.sql"
+				text="The current MRCM Domain Refset delta file is an accurate derivative of the current full file">
+			<keywords>The current MRCM Domain Refset delta file is an accurate derivative of the current full file</keywords>
 		</script>
 		<script uuid="388b2eff-f8b0-418c-9794-d35aaa4d748b" category="release-type-validation"
-				sqlFile="release-type-full-validation-mrcm-module-scope-refset.sql"
-				text="The current MRCM Module Scope Refset full file contains all previously published data unchanged">
-			<keywords>The current MRCM Module Scope Refset full file contains all previously published data unchanged</keywords>
+				sqlFile="release-type-delta-validation-mrcm-module-scope-refset.sql"
+				text="The current MRCM Module Scope Refset delta file is an accurate derivative of the current full file">
+			<keywords>The current MRCM Module Scope Refset delta file is an accurate derivative of the current full file</keywords>
 		</script>
 
 		<script uuid="7c3fe37c-6ad5-446e-bc82-7c2bc078042a" category="release-type-validation"
-				sqlFile="release-type-snapshot-delta-validation-mrcm-attribute-domain-refset.sql"
-				text="The current data in the MRCM ATTRIBUTE DOMAIN REFSET snapshot file are the same as the data in the current delta file.">
-			<keywords>The current data in the MRCM ATTRIBUTE DOMAIN REFSET snapshot file are the same as the data inthe current delta file.</keywords>
+				sqlFile="release-type-full-delta-validation-mrcm-attribute-domain-refset.sql"
+				text="The current full MRCM Attribute Domain Refset file consists of the previously published full file and the changes for the current release.">
+			<keywords>The current full MRCM Attribute Domain Refset file consists of the previously published full file and the changes for the current release.</keywords>
 		</script>
 		<script uuid="ad0f8978-c8a7-4d91-8e3e-a887e4830fec" category="release-type-validation"
-				sqlFile="release-type-snapshot-delta-validation-mrcm-attribute-range-refset.sql"
-				text="The current data in the MRCM ATTRIBUTE RANGE REFSET snapshot file are the same as the data in the current delta file.">
-			<keywords>The current data in the MRCM ATTRIBUTE RANGE REFSET snapshot file are the same as the data in the current delta file.</keywords>
+				sqlFile="release-type-full-delta-validation-mrcm-attribute-range-refset.sql"
+				text="The current full MRCM Attribute Range Refset file consists of the previously published full file and the changes for the current release.">
+			<keywords>The current full MRCM Attribute Range Refset file consists of the previously published full file and the changes for the current release.</keywords>
 		</script>
 		<script uuid="43bdeea9-be7b-4235-b58e-8842a8e47793" category="release-type-validation"
-				sqlFile="release-type-snapshot-delta-validation-mrcm-domain-refset.sql"
-				text="The current data in the MRCM DOMAIN REFSET snapshot file are the same as the data in the current delta file.">
-			<keywords>The current data in the MRCM DOMAIN REFSET snapshot file are the same as the data in the current delta file.</keywords>
+				sqlFile="release-type-full-delta-validation-mrcm-domain-refset.sql"
+				text="The current full MRCM Domain Refset file consists of the previously published full file and the changes for the current release.">
+			<keywords>The current full MRCM Domain Refset file consists of the previously published full file and the changes for the current release.</keywords>
 		</script>
 		<script uuid="054bccb0-c678-4722-94dd-b664e0c6267e" category="release-type-validation"
-				sqlFile="release-type-snapshot-delta-validation-mrcm-module-scope-refset.sql"
-				text="The current data in the MRCM MODULE SCOPE REFSET snapshot file are the same as the data in the current delta file.">
-			<keywords>The current data in the MRCM MODULE SCOPE REFSET snapshot file are the same as the data in the current delta file.</keywords>
+				sqlFile="release-type-full-delta-validation-mrcm-module-scope-refset.sql"
+				text="The current full MRCM Domain Refset file consists of the previously published full file and the changes for the current release.">
+			<keywords>The current full MRCM Domain Refset file consists of the previously published full file and the changes for the current release.</keywords>
 		</script>
 
 		<script uuid="b205d819-2ef6-48e3-8fe1-1793e83a7b8a" category="release-type-validation"
