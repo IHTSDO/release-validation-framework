@@ -18,7 +18,7 @@
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
+		a.referencedcomponentid,
 		concat('MRCM Domain Refset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
 	from curr_mrcmdomainrefset_s a
 	left join temp_mrcmdomainrefset_v b
@@ -54,7 +54,7 @@
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
+		a.referencedcomponentid,
 		concat('MRCM Domain Refset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.')
 	from temp_mrcmdomainrefset_v a
 	left join curr_mrcmdomainrefset_s b

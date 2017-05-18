@@ -18,7 +18,7 @@
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
+		a.referencedcomponentid,
 		concat('MRCM Module Scope Refset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
 	from curr_mrcmmodulescoperefset_s a
 	left join temp_mrcmmodulescoperefset_v b
@@ -42,7 +42,7 @@
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.sourceid,
+		a.referencedcomponentid,
 		concat('MRCM Module Scope Refset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.')
 	from temp_mrcmmodulescoperefset_v a
 	left join curr_mrcmmodulescoperefset_s b
