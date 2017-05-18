@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -27,7 +30,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.util.ECLParserUtil;
 import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
@@ -46,10 +48,6 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManagerImpl.class);
 	private static final String RVF_DB_PREFIX = "rvf_";
-	public static final String MRCM_DOMAIN_REFSET_TABLE = "mrcmdomainrefset";
-	public static final String SNAPSHOT_SUFFIX = "s";
-	public static final String DELTA_SUFFIX = "d";
-	public static final String FULL_SUFFIX = "f";
 	private String sctDataLocation;
 	private File sctDataFolder;
 	@Resource(name = "snomedDataSource")
@@ -154,8 +152,8 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 * for uploading prospective releases since they do not need to be stored for later use.
 	 *
 	 * @param releasePackZip the release as a zip file
-	 * @param product if existing file has to over written
-	 * @param version if existing database must be recreated
+	 * @param overWriteExisting if existing file has to over written
+	 * @param purgeExistingDatabase if existing database must be recreated
 	 * @return result of the copy operation - false if there are errors.
 	 * @throws BusinessServiceException 
 	 * @throws IOException 
@@ -180,7 +178,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 * this method directly if prospective build data is to be loaded.
 	 *
 	 * @param versionName the version of the data as a yyyymmdd string (e.g. 20140731)
-	 * @param rf2FilesLoaded boolean that controls if existing database needs to be appended
+	 * @param isAppend boolean that controls if existing database needs to be appended
 	 * @param zipDataFile the zip file that contains the release data
 	 * @return the name of the schema to which the data has been loaded.
 	 * @throws BusinessServiceException 
@@ -215,7 +213,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			}
 			
 			loadReleaseFilesToDB(outputFolder,rvfDynamicDataSource,rf2FilesLoaded, createdSchemaName);
-			validateDomainRefsetData();
+			
 			// add schema name to look up map
 			releaseSchemaNameLookup.put(versionName, createdSchemaName);
 		} catch (final SQLException | IOException e) {
@@ -228,39 +226,6 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime) / 1000) + " seconds.");
 		return createdSchemaName;
-	}
-
-	private void validateDomainRefsetData() throws SQLException {
-		String selectDomainStatement = "select id, domainconstraint, parentdomain, proximalprimitiveconstraint, proximalprimitiverefinement, domaintemplateforprecoordination, domaintemplateforpostcoordination, referencedcomponentid " +
-				"from " + snomedDataSource.getDefaultCatalog() + "." + MRCM_DOMAIN_REFSET_TABLE + "_";
-		String insertQaResultStatement = "insert into qa_result (runid, assertionuuid, concept_id, details) values (<RUNID>, '<ASSERTIONUUID>', ?, concat('Mrcm Domain Refset: id=',?, ' is in the detla file, but no actual changes made since the previous release.')";
-		try(Connection connection = snomedDataSource.getConnection()){
-			String[] suffixed = new String[]{SNAPSHOT_SUFFIX, DELTA_SUFFIX, FULL_SUFFIX};
-			for (String suffix : suffixed){
-				try(PreparedStatement preparedStatement = connection.prepareStatement(selectDomainStatement + suffix)){
-					try(ResultSet resultSet = preparedStatement.executeQuery()){
-						try(PreparedStatement insertStatement = connection.prepareStatement(insertQaResultStatement)){
-							while (resultSet.next()){
-								String id = resultSet.getString(1);
-								String domainConstraint = resultSet.getString(2);
-								String parentDomain = resultSet.getString(3);
-								String proximalPrimitiveConstraint = resultSet.getString(4);
-								String domainTemplateForPrecoordination = resultSet.getString(5);
-								String domainTemplateForPostcoordination = resultSet.getString(6);
-								String referencedComponentId = resultSet.getString(7);
-								if(ECLParserUtil.validateECLStrings(domainConstraint, parentDomain, proximalPrimitiveConstraint, domainTemplateForPrecoordination, domainTemplateForPostcoordination)){
-									insertStatement.setString(1, referencedComponentId);
-									insertStatement.setString(2, id);
-									insertStatement.addBatch();
-								}
-							}
-							insertStatement.executeBatch();
-							logger.debug("insert qa_result successfully.");
-						}
-					}
-				}
-			}
-		}
 	}
 
 	private void createDBAndTables(final String schemaName, final Connection connection) throws SQLException, IOException {
