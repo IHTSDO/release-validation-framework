@@ -1,7 +1,7 @@
 /********************************************************************************
 	component-centric-delta-mrcm-refset-validate-concept-is-valid-descendant-proc.sql
 
-	Defines a procedure to validate whether a concept is a descendant of specified concepts in MRCM Refsets
+	Defines a procedure to validate whether a concept is a descendant of specified concepts in MRCM Refsets Delta
 
 ********************************************************************************/
 drop procedure if exists validateConceptIdIsValidDescendantsInMRCMRefsetDelta_procedure;
@@ -44,7 +44,7 @@ select
 	runId,
 	assertionId,
 	result.conceptId,
-	concat(refsetName,":id=",result.id,":ConceptId=",result.conceptId, " referenced in the column ", columnName ," in SNAPSHOT is not valid descendant of expression ", expression)
+	concat(refsetName,":id=",result.id,":ConceptId=",result.conceptId, " referenced in the column ", columnName ," in DELTA is not valid descendant of expression ", expression)
 	from  (select id, conceptId from temp_delta_refset_conceptid where conceptId not in (select conceptId from temp_delta_concept_hierachy_tree)) as result;
 
 drop table if exists temp_delta_concept_hierachy_tree;
