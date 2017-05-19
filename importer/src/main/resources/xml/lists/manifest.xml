@@ -591,8 +591,23 @@
 
 		<script uuid="a3e31a6c-0443-46a4-8b18-daad481247ed" category="component-centric-validation"
 				  sqlFile="component-centric-snapshot-mrcm-refset-validate-concept-is-valid-descendant.sql"
-				  text="Check that the value range is valid in MRCM Refsets"  >
-			<keywords>Check that the value range is valid in MRCM Refsets
+				  text="Check that the value range is valid in MRCM Refsets Snapshot"  >
+			<keywords>Check that the value range is valid in MRCM Refsets Snapshot
+			</keywords>
+		</script>
+
+		<script uuid="6ce65376-c701-4042-8eae-70c78be08476" category="component-centric-validation"
+				  sqlFile="component-centric-delta-mrcm-refset-validate-concept-is-valid-descendant.sql"
+				  text="Check that the value range is valid in MRCM Refsets Delta"  >
+			<keywords>Check that the value range is valid in MRCM Refsets Delta
+			</keywords>
+		</script>
+
+
+		<script uuid="7654d06e-4f9d-421c-91e5-842b0bddb6bc" category="component-centric-validation"
+				  sqlFile="component-centric-full-mrcm-refset-validate-concept-is-valid-descendant.sql"
+				  text="Check that the value range is valid in MRCM Refsets Full"  >
+			<keywords>Check that the value range is valid in MRCM Refsets Full
 			</keywords>
 		</script>
 		
