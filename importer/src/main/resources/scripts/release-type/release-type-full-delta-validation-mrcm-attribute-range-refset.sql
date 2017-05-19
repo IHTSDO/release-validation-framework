@@ -1,6 +1,6 @@
 
 /*
-	The current full stated relationship file consists of the previously published full file and the changes for the current release
+	The current full MRCM Attribute Range Refset file consists of the previously published full file and the changes for the current release
 */
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
@@ -21,7 +21,7 @@
 		and a.rulestrengthid = b.rulestrengthid
 		and a.contenttypeid = b.contenttypeid
 	left join prev_mrcmattributerangerefset_f c
-		on a.id = b.id
+		on a.id = c.id
 		and a.effectivetime = c.effectivetime
 		and a.active = c.active
 		and a.moduleid = c.moduleid

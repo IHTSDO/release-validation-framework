@@ -10,9 +10,9 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.moduleid,
-		concat('MRCM ATTRIBUTE DOMAIN: id=',a.id,' : moduleId=',a.moduleid,' MRCM Attribute Domain Refset contains a ModuleId that does not exist in the Concept snapshot.') 	
+		a.domainid,
+		concat('MRCM ATTRIBUTE DOMAIN: id=',a.id,' : DomainId=',a.domainid,' MRCM Attribute Domain Refset contains a DomainId that does not exist in the Concept snapshot.') 	
 	from curr_mrcmattributedomainrefset_s a
 	left join curr_concept_s b
-	on a.moduleid = b.id
+	on a.domainid = b.id
 	where a.active = 1 and (b.active=0 or b.id is null);

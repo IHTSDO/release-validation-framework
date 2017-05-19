@@ -12,8 +12,8 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('MRCM ATTRIBUTE RANGE REFSET: id=',a.id, ' is in delta file but not in snapshot file.') 	
-	from curr_mrcmattributedomainrefset_d a
-	left join curr_mrcmattributedomainrefset_s b
+	from curr_mrcmAttributeRangeRefset_d a
+	left join curr_mrcmAttributeRangeRefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -29,7 +29,7 @@
 	or b.active is null
 	or b.moduleid is null
 	or b.refsetid is null
-	or b.referencedcomponentid is null
+	or b.referencedcomponentid is null	
 	or b.rangeconstraint is null
 	or b.attributerule is null
 	or b.rulestrengthid is null

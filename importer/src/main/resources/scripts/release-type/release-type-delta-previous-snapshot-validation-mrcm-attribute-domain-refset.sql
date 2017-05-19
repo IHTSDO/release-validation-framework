@@ -1,5 +1,5 @@
 /*  
- * There must be actual changes made to previously published stated relatioships in order for them to appear in the current delta.
+ * There must be actual changes made to previously published MRCM Attribute Domain Refset in order for them to appear in the current delta.
 */
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 

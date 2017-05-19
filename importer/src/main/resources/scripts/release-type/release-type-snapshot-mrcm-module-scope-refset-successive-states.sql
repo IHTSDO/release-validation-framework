@@ -23,7 +23,7 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		a.conceptid,
+		a.referencedcomponentid,
 		concat('Mrcm Module Scope Refset: id=',a.id, ' is inactive but no active state found in the previous snapshot.')
 	from curr_mrcmmodulescoperefset_s a  left join prev_mrcmmodulescoperefset_s b
 	on a.id = b.id
