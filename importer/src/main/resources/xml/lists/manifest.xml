@@ -11,8 +11,10 @@
 		<script uuid="458cde1f-224a-49d7-a6ca-2fc666d96e7d" category="resource" sqlFile="component-centric-snapshot-description-casesignificanceid-def-proc.sql" text="Defines procedure that tests that terms which contain case sensitive words have the correct case significance value assigned." />
 		<script uuid="B4B5EE89-372F-4AE3-8C18-9C37CF4E932E" category="resource" sqlFile="component-centric-snomed-ct-expression-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the SNOMED CT expression for LOIC mapping." />
 		<script uuid="dd124acf-52d3-45e6-b5b4-d40454ff1b5e" category="resource" sqlFile="component-centric-snapshot-mrcm-attribute-range-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Domain Refsets." />
-		<script uuid="dd124acf-52d3-45e6-b5b4-d40454ff1b5e" category="resource" sqlFile="component-centric-snapshot-mrcm-domain-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Attribute Range Refsets." />
-		<script uuid="192d944e-7bd3-46e9-a411-c1ef41ac8945" category="resource" sqlFile="component-centric-snapshot-mrcm-refset-validate-concept-is-valid-descendant-proc.sql" text="Defines a procedure to validate whether a concept is a descendant of specified concepts in MRCM Refsets" />
+		<script uuid="646390b7-c4aa-4aab-92c0-0031cf2e45ae" category="resource" sqlFile="component-centric-snapshot-mrcm-domain-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Attribute Range Refsets." />
+		<script uuid="02181f89-2a4c-4d3e-87ca-ff04e44f678d" category="resource" sqlFile="component-centric-snapshot-mrcm-refset-validate-concept-is-valid-descendant-proc.sql" text="Defines a procedure to validate whether a concept is a descendant of specified concepts in MRCM Refsets Snapshot" />
+		<script uuid="e8d87ec5-bb55-42a2-8368-f2fabd5835ca" category="resource" sqlFile="component-delta-snapshot-mrcm-refset-validate-concept-is-valid-descendant-proc.sql" text="Defines a procedure to validate whether a concept is a descendant of specified concepts in MRCM Refsets Delta" />
+		<script uuid="8d25d6e7-e4c6-488d-b96b-df1665c968ad" category="resource" sqlFile="component-full-snapshot-mrcm-refset-validate-concept-is-valid-descendant-proc.sql" text="Defines a procedure to validate whether a concept is a descendant of specified concepts in MRCM Refsets Full" />
 
 		<!-- release-type-full-validation -->
 		<script uuid="84f5edda-1249-4d79-87da-e248e61f06a6" category="release-type-validation" sqlFile="release-type-full-validation-concept.sql" text="The current Concept full file contains all previously published data unchanged." >
@@ -675,8 +677,23 @@
 
 		<script uuid="a3e31a6c-0443-46a4-8b18-daad481247ed" category="component-centric-validation"
 				  sqlFile="component-centric-snapshot-mrcm-refset-validate-concept-is-valid-descendant.sql"
-				  text="Check that the value range is valid in MRCM Refsets"  >
-			<keywords>Check that the value range is valid in MRCM Refsets
+				  text="Check that the value range is valid in MRCM Refsets Snapshot"  >
+			<keywords>Check that the value range is valid in MRCM Refsets Snapshot
+			</keywords>
+		</script>
+
+		<script uuid="6ce65376-c701-4042-8eae-70c78be08476" category="component-centric-validation"
+				  sqlFile="component-centric-delta-mrcm-refset-validate-concept-is-valid-descendant.sql"
+				  text="Check that the value range is valid in MRCM Refsets Delta"  >
+			<keywords>Check that the value range is valid in MRCM Refsets Delta
+			</keywords>
+		</script>
+
+
+		<script uuid="7654d06e-4f9d-421c-91e5-842b0bddb6bc" category="component-centric-validation"
+				  sqlFile="component-centric-full-mrcm-refset-validate-concept-is-valid-descendant.sql"
+				  text="Check that the value range is valid in MRCM Refsets Full"  >
+			<keywords>Check that the value range is valid in MRCM Refsets Full
 			</keywords>
 		</script>
 		
