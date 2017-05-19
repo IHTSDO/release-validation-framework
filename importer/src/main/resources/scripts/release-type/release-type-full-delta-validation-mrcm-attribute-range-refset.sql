@@ -21,7 +21,7 @@
 		and a.rulestrengthid = b.rulestrengthid
 		and a.contenttypeid = b.contenttypeid
 	left join prev_mrcmattributerangerefset_f c
-		on a.id = b.id
+		on a.id = c.id
 		and a.effectivetime = c.effectivetime
 		and a.active = c.active
 		and a.moduleid = c.moduleid
