@@ -4,8 +4,8 @@
 	Defines a procedure to validate whether a concept is a descendant of specified concepts in MRCM Refsets Snapshot
 
 ********************************************************************************/
-drop procedure if exists validateConceptIdIsValidDescendantsInMRCMRefsetSnapshot_procedure;
-create procedure validateConceptIdIsValidDescendantsInMRCMRefsetSnapshot_procedure(runId bigint, assertionId varchar(36), tableName varchar(255), columnName varchar(255), refsetName varchar(255), rootConceptIds varchar(1024), expression varchar(4000))
+drop procedure if exists validateConceptIdIsValidDescendantsInMRCMRefsetSnap_proc;
+create procedure validateConceptIdIsValidDescendantsInMRCMRefsetSnap_proc(runId bigint, assertionId varchar(36), tableName varchar(255), columnName varchar(255), refsetName varchar(255), rootConceptIds varchar(1024), expression varchar(4000))
 begin
 declare currentDepth integer default 0;
 declare parentsCount integer;
