@@ -538,23 +538,23 @@
 	    <!-- release-type-validation-mrcm -->
 		<script uuid="b1ebc4cb-6a86-498f-a3ea-aeef250b9399" category="release-type-validation"
 				sqlFile="release-type-delta-previous-snapshot-validation-mrcm-attribute-domain-refset.sql"
-				text="There must be actual changes made to previously published mrcm attribute domain refset components in order for them to appear in the current delta.">
-			<keywords>There must be actual changes made to previously published simple refset components in order for them to appear in the current delta.</keywords>
+				text="There must be actual changes made to previously published MRCM Attribute Domain Refset components in order for them to appear in the current delta.">
+			<keywords>There must be actual changes made to previously published MRCM Attribute Domain Refset components in order for them to appear in the current delta.</keywords>
 		</script>
 		<script uuid="cec2a50e-c04b-4442-a979-e8ad8f83ff91" category="release-type-validation"
 				sqlFile="release-type-delta-previous-snapshot-validation-mrcm-attribute-range-refset.sql"
-				text="There must be actual changes made to previously published mrcm attribute range refset components in order for them to appear in the current delta.">
-			<keywords>There must be actual changes made to previously published mrcm attribute range refset components in order for them to appear in the current delta.</keywords>
+				text="There must be actual changes made to previously published MRCM Attribute Range Refset components in order for them to appear in the current delta.">
+			<keywords>There must be actual changes made to previously published MRCM Attribute Range Refset components in order for them to appear in the current delta.</keywords>
 		</script>
 		<script uuid="8864db45-0f97-4eda-b7ba-414289dd3a99" category="release-type-validation"
 				sqlFile="release-type-delta-previous-snapshot-validation-mrcm-domain-refset.sql"
-				text="There must be actual changes made to previously published domain refset components in order for them to appear in the current delta.">
-			<keywords>There must be actual changes made to previously published domain refset components in order for them to appear in the current delta.</keywords>
+				text="There must be actual changes made to previously published MRCM Domain Refset components in order for them to appear in the current delta.">
+			<keywords>There must be actual changes made to previously published MRCM Domain Refset components in order for them to appear in the current delta.</keywords>
 		</script>
 		<script uuid="d7e12c75-9979-4adb-9b5b-3b8a80ab4fbb" category="release-type-validation"
 				sqlFile="release-type-delta-previous-snapshot-validation-mrcm-module-scope-refset.sql"
-				text="There must be actual changes made to previously published module scope refset components in order for them to appear in the current delta.">
-			<keywords>There must be actual changes made to previously published module scope refset components in order for them to appear in the current delta.</keywords>
+				text="There must be actual changes made to previously published MRCM Module Scope Refset components in order for them to appear in the current delta.">
+			<keywords>There must be actual changes made to previously published MRCM Module Scope Refset components in order for them to appear in the current delta.</keywords>
 		</script>
 
 	    <script uuid="87af4df0-c506-41ed-9089-6a359f16b34f" category="release-type-validation"
