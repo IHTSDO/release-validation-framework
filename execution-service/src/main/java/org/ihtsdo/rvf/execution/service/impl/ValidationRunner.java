@@ -45,6 +45,8 @@ import org.springframework.stereotype.Service;
 public class ValidationRunner {
 	
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
+	
+	private static final String COMPONET_CENTRIC_VALIDATION = "component-centric-validation";
 
 	private static final String VALIDATION_CONFIG = "validationConfig";
 
@@ -253,8 +255,8 @@ public class ValidationRunner {
 		} else {
 			items.addAll(executeAssertionsConcurrently(executionConfig,assertions, batchSize, reportStorage));
 		}
-		constructTestReport(executionConfig, responseMap, timeStart, items);
 		
+		constructTestReport(executionConfig, responseMap, timeStart, items);
 	}
 
 	private void constructTestReport(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, final long timeStart, final List<TestRunItem> items) {
@@ -316,6 +318,17 @@ public class ValidationRunner {
 				logger.error("Thread interrupted while waiting for future result for run item:" + task , e);
 			}
 		}
+		
+		/*
+		 *  Only for MRCM Domain Refset
+		 *  This will validate for the following validations: 
+		 *  - DomainConstraint, ParentDomain, ProximalPrimitiveConstraint, ProximalPrimitiveRefinement are valid ECL string in all MRCM Domain refset file
+		 *  - DomainTemplateForPrecoordination, DomainTemplateForPostcoordination are valid Expression Template string in all MRCM Domain refset file
+		 * */
+		if(executionConfig.getGroupNames().contains(COMPONET_CENTRIC_VALIDATION)){
+			results.addAll(validateEclForMrcmDomainRefset(executionConfig,assertions, reportStorage));
+		}
+		
 		return results;
 	}
 
@@ -333,7 +346,14 @@ public class ValidationRunner {
 				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()), reportStorage);
 			}
 		}
+		
 		reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()), reportStorage);
+		return results;
+	}
+	
+	private List<TestRunItem> validateEclForMrcmDomainRefset(final ExecutionConfig executionConfig, final Collection<Assertion> assertions, String reportStorage){
+		final List<TestRunItem> results = new ArrayList<>();
+		results.addAll(assertionExecutionService.executeECLValidationForMRCMRefset(executionConfig));
 		return results;
 	}
 }

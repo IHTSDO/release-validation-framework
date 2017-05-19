@@ -26,5 +26,7 @@ public interface AssertionExecutionService {
 	TestRunItem executeTest(Assertion assertion, Test test, ExecutionConfig config);
 
 	Collection<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertions, ExecutionConfig config);
+	
+	Collection<TestRunItem> executeECLValidationForMRCMRefset(ExecutionConfig config);
 
 }
