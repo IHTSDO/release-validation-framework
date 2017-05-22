@@ -9,7 +9,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -29,9 +28,6 @@ import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.util.ECLParser;
-import org.ihtsdo.rvf.execution.service.util.ECLParserUtil;
-import org.ihtsdo.rvf.execution.service.util.ExpressionTemplateParser;
 import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
@@ -58,7 +54,6 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	private String deltaTableSuffix = "d";
 	private String snapshotTableSuffix = "s";
 	private String fullTableSuffix = "f";
-	private final String MRCM_DOMAIN_REFSET_TABLE = "mrcmdomainrefset";
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -389,103 +384,5 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 
 	public void setFullTableSuffix(final String fullTableSuffix) {
 		this.fullTableSuffix = fullTableSuffix;
-	}
-
-	@Override
-	public Collection<TestRunItem> executeECLValidationForMRCMRefset(ExecutionConfig config) {
-		final Collection<TestRunItem> runItems = new ArrayList<>();
-
-		String failedECLMsg = "MRCM DOMAIN REFSET: id=%s %s is not a valid ECL string in MRCM Domain refset %s file.";
-		String failedExpressionTemplateMsg = "MRCM DOMAIN REFSET: id=%s %s is not a valid Expression Template string in MRCM Domain refset %s file.";
-		
-		final String prospectiveSchemaName = releaseDataManager.getSchemaForRelease(config.getProspectiveVersion());
-		String selectDomainStatement = "select id, domainconstraint, parentdomain, proximalprimitiveconstraint, "
-											+ "proximalprimitiverefinement, domaintemplateforprecoordination, domaintemplateforpostcoordination, referencedcomponentid " +
-										"from " + prospectiveSchemaName + "." + MRCM_DOMAIN_REFSET_TABLE + "_";
-		//String insertQaResultStatement = "insert into qa_result (runid, assertionuuid, concept_id, details) values (<RUNID>, '<ASSERTIONUUID>', ?, concat('Mrcm Domain Refset: id=',?, ' is in the detla file, but no actual changes made since the previous release.')";
-		try(Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName)){
-			String[] suffixed = new String[]{deltaTableSuffix, snapshotTableSuffix, fullTableSuffix};
-			for (String suffix : suffixed){
-				try(PreparedStatement preparedStatement = connection.prepareStatement(selectDomainStatement + suffix)){
-					String publishType = deltaTableSuffix.equalsIgnoreCase(suffix) ? "delta" : (snapshotTableSuffix.equalsIgnoreCase(suffix) ? "snapshot" : "full");
-					
-					TestRunItem eclTestRunItem = new TestRunItem();
-					eclTestRunItem.setTestCategory("component-centric-validation");
-					eclTestRunItem.setAssertionText(String.format("DomainConstraint, ParentDomain, ProximalPrimitiveConstraint, ProximalPrimitiveRefinement are valid ECL string in MRCM Domain refset %s file", publishType));
-					eclTestRunItem.setAssertionUuid(UUID.randomUUID());
-					long failedECLCount = 0;
-					
-					TestRunItem expressionTemplateTestRunItem = new TestRunItem();
-					expressionTemplateTestRunItem.setTestCategory("component-centric-validation");
-					expressionTemplateTestRunItem.setAssertionText(String.format("DomainTemplateForPrecoordination, DomainTemplateForPostcoordination are valid Expression Template string in MRCM Domain refset %s file", publishType));
-					expressionTemplateTestRunItem.setAssertionUuid(UUID.randomUUID());
-					long failedExpressionTemplateCount = 0;
-					
-					long timeStart = System.currentTimeMillis();
-					try(ResultSet resultSet = preparedStatement.executeQuery()){
-						while (resultSet.next()){
-							String id = resultSet.getString(1);
-							String domainConstraint = resultSet.getString(2);
-							String parentDomain = resultSet.getString(3);
-							String proximalPrimitiveConstraint = resultSet.getString(4);
-							String proximalPrimitiveRefinement = resultSet.getString(5);
-							String domainTemplateForPrecoordination = resultSet.getString(6);
-							String domainTemplateForPostcoordination = resultSet.getString(7);
-							String referencedComponentId = resultSet.getString(8);
-							
-							/*validate ECL*/
-							if(!domainConstraint.isEmpty() &&
-								!ECLParserUtil.validateECLString(ECLParser.getInstance(),domainConstraint)){
-								FailureDetail detail = new FailureDetail(referencedComponentId, String.format(failedECLMsg, id, "DomainConstraint", publishType));
-								eclTestRunItem.addFirstNInstance(detail);
-								failedECLCount++;
-							}
-							if(!parentDomain.isEmpty() && 
-								!ECLParserUtil.validateECLString(ECLParser.getInstance(),parentDomain)){
-								FailureDetail detail = new FailureDetail(referencedComponentId, String.format(failedECLMsg, id, "ParentDomain", publishType));
-								eclTestRunItem.addFirstNInstance(detail);
-								failedECLCount++;
-							}
-							if(!proximalPrimitiveConstraint.isEmpty() &&
-								!ECLParserUtil.validateECLString(ECLParser.getInstance(),proximalPrimitiveConstraint)){
-								FailureDetail detail = new FailureDetail(referencedComponentId, String.format(failedECLMsg, id, "ProximalPrimitiveConstraint", publishType));
-								eclTestRunItem.addFirstNInstance(detail);
-								failedECLCount++;
-							}
-							if(!proximalPrimitiveRefinement.isEmpty() && 
-								!ECLParserUtil.validateECLString(ECLParser.getInstance(),proximalPrimitiveRefinement)){
-								FailureDetail detail = new FailureDetail(referencedComponentId, String.format(failedECLMsg, id, "ProximalPrimitiveRefinement", publishType));
-								eclTestRunItem.addFirstNInstance(detail);
-								failedECLCount++;
-							}
-							
-							/* validate Expression Template */
-							if(!domainTemplateForPrecoordination.isEmpty() && 
-								!ECLParserUtil.validateECLString(ExpressionTemplateParser.getInstance(),domainTemplateForPrecoordination)){
-								FailureDetail detail = new FailureDetail(referencedComponentId, String.format(failedExpressionTemplateMsg, id, "DomainTemplateForPrecoordination", publishType));
-								expressionTemplateTestRunItem.addFirstNInstance(detail);
-								failedExpressionTemplateCount++;
-							}
-							if(!domainTemplateForPostcoordination.isEmpty() && 
-								!ECLParserUtil.validateECLString(ExpressionTemplateParser.getInstance(),domainTemplateForPostcoordination)){
-								FailureDetail detail = new FailureDetail(referencedComponentId, String.format(failedExpressionTemplateMsg, id, "DomainTemplateForPostcoordination", publishType));
-								expressionTemplateTestRunItem.addFirstNInstance(detail);
-								failedExpressionTemplateCount++;
-							}
-						}						
-					}
-					long timeEnd = System.currentTimeMillis();
-					eclTestRunItem.setRunTime((timeEnd - timeStart));
-					eclTestRunItem.setFailureCount(failedECLCount);
-					expressionTemplateTestRunItem.setRunTime((timeEnd - timeStart));
-					expressionTemplateTestRunItem.setFailureCount(failedExpressionTemplateCount);
-					runItems.add(eclTestRunItem);
-					runItems.add(expressionTemplateTestRunItem);
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}	
-		return runItems;
 	}
 }

@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.util;
+package org.ihtsdo.rvf.util;
 
 import apg.Grammar;
 import java.io.PrintStream;
