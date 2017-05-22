@@ -718,26 +718,6 @@
 			<keywords>ID is a not null in MRCM MODULE SCOPE snapshot</keywords>
 		</script>
 		
-		<script uuid="e0634fca-c88e-4d4b-95bf-eef0a6b17356" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-domain-valid-uuid-id.sql" text="ID is a valid UUID in MRCM DOMAIN snapshot."  >
-			<keywords>ID is a valid UUID in MRCM DOMAIN snapshot</keywords>
-		</script>
-		
-		<script uuid="d04d9054-6adb-4e6e-95b0-9a186e85e1a4" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-attribute-domain-valid-uuid-id.sql" text="ID is a valid UUID in MRCM ATTRIBUTE DOMAIN snapshot."  >
-			<keywords>ID is a valid UUID in MRCM ATTRIBUTE DOMAIN snapshot</keywords>
-		</script>
-		
-		<script uuid="81189eff-7801-4155-9ad1-6190c1283bb7" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-attribute-range-valid-uuid-id.sql" text="ID is a valid UUID in MRCM ATTRIBUTE RANGE snapshot."  >
-			<keywords>ID is a valid UUID in MRCM ATTRIBUTE RANGE snapshot</keywords>
-		</script>
-	    
-	    <script uuid="5a17b8b5-6055-4d37-8196-14359af7f11a" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-module-scope-valid-uuid-id.sql" text="ID is a valid UUID in MRCM MODULE SCOPE snapshot."  >
-			<keywords>ID is a valid UUID in MRCM MODULE SCOPE snapshot</keywords>
-		</script>
-		
 		<script uuid="e980e959-943b-4cdc-998b-f91e670a030b" category="component-centric-validation" 
 				  sqlFile="component-centric-snapshot-mrcm-domain-unique-id.sql" text="ID is unique in MRCM DOMAIN snapshot."  >
 			<keywords>ID is unique in MRCM DOMAIN snapshot</keywords>
@@ -757,31 +737,6 @@
 				  sqlFile="component-centric-snapshot-mrcm-module-scope-unique-id.sql" text="ID is unique in MRCM MODULE SCOPE snapshot."  >
 			<keywords>ID is unique in MRCM MODULE SCOPE snapshot</keywords>
 		</script>
-		
-		<script uuid="68103b8f-e98b-40f1-9d37-acfd1ffeff66" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-domain-valid-effectivetime.sql" text="EffectiveTime is valid date in MRCM DOMAIN snapshot."  >
-			<keywords>EffectiveTime is valid date in MRCM DOMAIN snapshot</keywords>
-		</script>
-		
-		<script uuid="47364305-3e7a-45c1-90c0-e122aff1acca" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-attribute-domain-valid-effectivetime.sql" text="EffectiveTime is valid date in MRCM ATTRIBUTE DOMAIN snapshot."  >
-			<keywords>EffectiveTime is valid date in MRCM ATTRIBUTE DOMAIN snapshot</keywords>
-		</script>
-		
-		<script uuid="c99fc5fa-56b5-4865-8abd-e229a3e08489" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-attribute-range-valid-effectivetime.sql" text="EffectiveTime is valid date in MRCM ATTRIBUTE RANGE snapshot."  >
-			<keywords>EffectiveTime is valid date in MRCM ATTRIBUTE RANGE snapshot</keywords>
-		</script>
-		
-		<script uuid="c49d8238-b08f-4be0-974e-22c0d4ce4cab" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-module-scope-valid-effectivetime.sql" text="EffectiveTime is valid date in MRCM MODULE SCOPE snapshot."  >
-			<keywords>EffectiveTime is valid date in MRCM MODULE SCOPE snapshot</keywords>
-		</script>
-		
-		<script uuid="f44bed30-7bdb-4763-ad3d-c23d2d159cae" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-domain-valid-guideurl.sql" text="GuideURL is a valid URL in MRCM DOMAIN snapshot."  >
-			<keywords>GuideURL is a valid URL in MRCM DOMAIN snapshot</keywords>
-		</script>		
 		
 		<script uuid="76513165-df7b-4185-8d14-492a48a85826" category="component-centric-validation" 
 				  sqlFile="component-centric-delta-mrcm-domain-valid-guideurl.sql" text="GuideURL is a valid URL in MRCM DOMAIN delta."  >

@@ -16,6 +16,9 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ihtsdo.rvf.util.ECLParser;
+import org.ihtsdo.rvf.util.ECLParserUtil;
+import org.ihtsdo.rvf.util.ExpressionTemplateParser;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.model.ColumnType;
 import org.ihtsdo.rvf.validation.resource.ResourceProvider;
@@ -37,6 +40,7 @@ public class ColumnPatternTester {
 	private static final Pattern NON_ZERO_INTEGER_PATTERN = Pattern.compile("^[1-9][0-9]*$");
 	private static final Pattern BLANK = Pattern.compile("^$");
 	private static final Pattern NOT_BLANK = Pattern.compile("^(?=\\s*\\S).*$");
+	private static final Pattern URL_PATTERN = Pattern.compile("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 	private static final String UTF_8 = "UTF-8";
 	private static final String FILE_NAME_TEST_TYPE = "FileNameTest";
 	private static final String COLUMN_COUNT_TEST_TYPE = "ColumnCountTest";
@@ -214,7 +218,9 @@ public class ColumnPatternTester {
 		final PatternTest columnTest = columnTests.get(columnType);
 
 		if (columnTest != null) {
-			if (canBeBlank(value, column) || columnTest.validate(column, lineNumber, value)) {
+			if(isMRCMValidationCheckOnly(fileName,column)) {
+				validateMRCMRules(id,lineNumber,value,column,startTime,fileName,columnTest);
+			} else if (canBeBlank(value, column) || columnTest.validate(column, lineNumber, value)) {
 				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(), columnTest.getPatternString());
 			} else {
@@ -223,6 +229,55 @@ public class ColumnPatternTester {
 				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue());
 			}
+		}
+	}
+	
+	
+	private boolean isMRCMValidationCheckOnly(final String fileName, final Field column){
+		if(	fileName.contains("Refset_MRCMDomainSnapshot")	&& 
+				   (column.getName().equalsIgnoreCase("domainConstraint")
+				 || column.getName().equalsIgnoreCase("parentDomain")
+				 || column.getName().equalsIgnoreCase("proximalPrimitiveConstraint")
+				 || column.getName().equalsIgnoreCase("proximalPrimitiveRefinement")
+				 || column.getName().equalsIgnoreCase("domainTemplateForPrecoordination")
+				 || column.getName().equalsIgnoreCase("domainTemplateForPostcoordination")
+				 || column.getName().equalsIgnoreCase("guideURL")))
+			return true;
+		return false;
+	}
+	
+	/**
+	 * This specific method is used for checking some validations which will be applied for MRCM Domain SNAPSHOT only
+	 */
+	private void validateMRCMRules(final String id, final long lineNumber, final String value, final Field column, final Date startTime, final String fileName, final PatternTest columnTest){
+		if(column.getName().equalsIgnoreCase("domainConstraint")
+		 || column.getName().equalsIgnoreCase("parentDomain")
+		 || column.getName().equalsIgnoreCase("proximalPrimitiveConstraint")
+		 || column.getName().equalsIgnoreCase("proximalPrimitiveRefinement")) { // Expression Constrain Language validation
+			if(ECLParserUtil.validateECLString(ECLParser.getInstance(),value)){
+				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(),"");
+			} else {
+				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(), columnTest.getPatternString(), "Invalid ECL", column.getName() + " is a valid Expression Constrain Language string");
+			}			
+		} else if (column.getName().equalsIgnoreCase("domainTemplateForPrecoordination")
+				 || column.getName().equalsIgnoreCase("domainTemplateForPostcoordination")) { // Expression Template validation
+			if(ECLParserUtil.validateECLString(ExpressionTemplateParser.getInstance(),value)){
+				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(),"");
+			} else {
+				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(), columnTest.getPatternString(), "Invalid Expression Template",column.getName() + " is a valid Expression Template");
+			}
+		} else if (column.getName().equalsIgnoreCase("guideURL")){
+			if(URL_PATTERN.matcher(value).matches()){
+				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(),"");
+			} else {
+				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(), URL_PATTERN.pattern(), value, URL_PATTERN.pattern());
+			}			
 		}
 	}
 
