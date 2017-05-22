@@ -1,6 +1,6 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-language-unique-fsn-dk
+	file-centric-snapshot-language-unique-fsn-us
 
 	Assertion:
 	Every active FSN in the US module is referenced in the US lang refset
