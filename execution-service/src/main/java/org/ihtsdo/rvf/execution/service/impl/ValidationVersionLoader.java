@@ -50,9 +50,6 @@ public class ValidationVersionLoader {
 	@Autowired
 	private ValidationReportService reportService;
 	
-	@Autowired
-	private RvfDbScheduledEventGenerator scheduleEventGenerator;
-	
 	private static final String UTF_8 = "UTF-8";
 	private static final String DELTA_TABLE = "%_d";
 	private static final String FULL_TABLE = "%_f";

@@ -203,9 +203,9 @@
 		<!-- across multiple files in Current snapshot-->
 		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="release-type-validation" sqlFile="release-type-snapshot-unique-relationship-id.sql" text="The ids should be unique across the stated and inferred relationship snapshot files." />
 		<script uuid="560e6d0c-64e8-4726-9516-ae7a7606b0b3" category="release-type-validation" sqlFile="release-type-snapshot-unique-description-definition-id.sql" text="The ids should be unique across the description and text definition snapshot files." />
-
-
-		<!--  release type for complex and extended maps-->
+		<script uuid="1852b9d6-38cf-11e7-8b36-3c15c2c6e32e" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-association-refset_unique_checking.sql" text="Previously published historical association components should not be modified."/>
+    
+    <!--  release type for complex and extended maps-->
 
 		<script uuid="5e203a1f-2b6d-462a-a6f9-93cbc3893611" category="release-type-validation,ICD-MAP,INT" sqlFile="release-type-delta-validation-extendedmap-refset.sql" text="Changes from the the current extended map delta file must be in the current full file" />
 		<script uuid="5c37bee7-62ad-41f9-93e3-12eb4803e612" category="release-type-validation,ICD-MAP,INT" sqlFile="release-type-full-delta-validation-extendedmap-refset.sql" text="The current full extended map file consists of the previously published full file and the current delta file"/>
@@ -372,10 +372,10 @@
 		<script uuid="a49fabee-0d72-41b0-957d-32983c79f26c" category="component-centric-validation" sqlFile="component-centric-snapshot-description-active-inactive-term-match-authoring.sql" text="No new active term matches that of an inactive Description." />
 		<script uuid="50907ee7-ddf6-4cb5-ba8b-be150644430b" category="component-centric-validation" sqlFile="component-centric-snapshot-description-balanced parentheses.sql" text="Terms contains balanced parentheses." />
 		<script uuid="805ab37c-33fa-45aa-876b-f86365a828c8" category="component-centric-validation" sqlFile="component-centric-snapshot-description-case-word-match.sql" text="Case-sensitive terms that share initial words also share caseSignificanceId value." />
-		<!-- Disable this for now as it needs improvements script uuid="22a95293-3acb-4671-95f8-1ff13ba3202c" category="component-centric-validation" sqlFile="component-centric-snapshot-description-casesignificanceid.sql" text="Case-sensitive terms have appropriate caseSignificanceId." /> -->
-		<script uuid="6614ff12-fca2-42b7-a5da-ea26353979fe" category="component-centric-validation" sqlFile="component-centric-snapshot-description-valid-characters.sql" text="Active description of active concept consists of valid characters." />
-		<script uuid="8D6AB114-CACA-4D99-9FEC-BB8FD9CEA518" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-fsn.sql" text="The FSN term should be unique in active content." />
-		<script uuid="d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-fsn-case-insensitive-checking.sql" text="The FSN term should be unique in active content when case sensitivity is ingored." />
+	  <!-- Disable this for now as it needs improvements script uuid="22a95293-3acb-4671-95f8-1ff13ba3202c" category="component-centric-validation" sqlFile="component-centric-snapshot-description-casesignificanceid.sql" text="Case-sensitive terms have appropriate caseSignificanceId." /> -->	
+		<script uuid="6614ff12-fca2-42b7-a5da-ea26353979fe" category="component-centric-validation" sqlFile="component-centric-snapshot-description-valid-characters.sql" text="Active description of active concept consists of valid characters." />		
+		<script uuid="8D6AB114-CACA-4D99-9FEC-BB8FD9CEA518" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-fsn.sql" text="The FSN term should be unique in active content." />		
+		<script uuid="d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-fsn-case-insensitive-checking.sql" text="The FSN term should be unique in active content when case sensitivity is ignored." />		
 		<script uuid="b4930ea7-4078-4599-979c-2dde18164f01" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-case-sensitive.sql" text="All definitions are case sensitive." />
 		<script uuid="73e46e72-6fdb-407b-9d50-d86a36a3a862" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-preferred.sql" text="All active definitions are preferred." />
 		<script uuid="da3ae7c4-6144-4cd5-9530-2a7780c53c9a" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-trim.sql" text="No active definitions contain leading or trailing spaces." />

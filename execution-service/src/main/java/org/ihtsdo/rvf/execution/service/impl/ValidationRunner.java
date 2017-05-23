@@ -64,9 +64,6 @@ public class ValidationRunner {
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	
-	@Autowired
-	private RvfDbScheduledEventGenerator scheduleEventGenerator;
-	
 	private int batchSize = 0;
 
 	private ExecutorService executorService = Executors.newCachedThreadPool();
@@ -170,11 +167,7 @@ public class ValidationRunner {
 		responseMap.put("startTime", startTime.getTime());
 		responseMap.put("endTime", endTime.getTime());
 		reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
-		//house keeping prospective version 
-		scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(executionConfig.getProspectiveVersion()));
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
-		// house keeping qa_result for the given run id
-		scheduleEventGenerator.createQaResultDeleteEvent(executionConfig.getExecutionId());
 	}
 
 	private void runExtensionReleaseValidation(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
@@ -195,7 +188,6 @@ public class ValidationRunner {
 		String prospectiveExtensionVersion = executionConfig.getProspectiveVersion();
 		//loading international snapshot
 		releaseVersionLoader.combineCurrenExtensionWithDependencySnapshot(executionConfig, responseMap, validationConfig);
-		scheduleEventGenerator.createDropReleaseSchemaEvent(releaseDataManager.getSchemaForRelease(prospectiveExtensionVersion));
 		releaseDataManager.dropVersion(prospectiveExtensionVersion);
 		//run remaining component-centric and file-centric validaitons
 		assertions.removeAll(releaseTypeAssertions);
