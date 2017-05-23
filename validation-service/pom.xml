@@ -18,6 +18,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>apg</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+        <dependency>
             <groupId>org.ihtsdo.snomed.util</groupId>
             <artifactId>snomed-utilities</artifactId>
             <version>${snomed.utilities.version}</version>
