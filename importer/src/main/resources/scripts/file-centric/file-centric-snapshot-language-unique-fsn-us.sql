@@ -16,7 +16,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' does not have an FSN preferred in the US language refset.') 
+		concat('Concept: id=',a.id, ' in the US extension does not have an FSN preferred in the US language refset.')
 	from curr_concept_s a
 	where a.active = '1'
 	and a.moduleid in ('731000124108') /*US module*/
@@ -38,7 +38,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('FSN: id=',a.id, ' is not referenced in the US language refset.')
+		concat('FSN: id=',a.id, ' in the US extension is not referenced in the US language refset.')
     from curr_description_s a
     where a.active = '1' and a.moduleid = '731000124108' and a.typeid = '900000000000003001' /*FSN*/
     where not exists (select b.id
