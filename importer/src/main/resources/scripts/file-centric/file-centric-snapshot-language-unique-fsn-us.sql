@@ -41,7 +41,7 @@
 		concat('FSN: id=',a.id, ' in the US extension is not referenced in the US language refset.')
     from curr_description_s a
     where a.active = '1' and a.moduleid = '731000124108' and a.typeid = '900000000000003001' /*FSN*/
-    where not exists (select b.id
+    and not exists (select b.id
     from curr_langrefset_s b
     where b.referencedcomponentid = a.id
     and b.active = '1'
