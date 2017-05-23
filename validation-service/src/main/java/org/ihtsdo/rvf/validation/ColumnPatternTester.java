@@ -234,7 +234,7 @@ public class ColumnPatternTester {
 	
 	
 	private boolean isMRCMValidationCheckOnly(final String fileName, final Field column){
-		if(	fileName.contains("Refset_MRCMDomainSnapshot")	&& 
+		if(	fileName.contains("Refset_MRCMDomain")	&& 
 				   (column.getName().equalsIgnoreCase("domainConstraint")
 				 || column.getName().equalsIgnoreCase("parentDomain")
 				 || column.getName().equalsIgnoreCase("proximalPrimitiveConstraint")
@@ -247,7 +247,7 @@ public class ColumnPatternTester {
 	}
 	
 	/**
-	 * This specific method is used for checking some validations which will be applied for MRCM Domain SNAPSHOT only
+	 * This specific method is used for checking some validations which will be applied for MRCM Domain SNAPSHOT/FULL/DELTA only
 	 */
 	private void validateMRCMRules(final String id, final long lineNumber, final String value, final Field column, final Date startTime, final String fileName, final PatternTest columnTest){
 		if(column.getName().equalsIgnoreCase("domainConstraint")
