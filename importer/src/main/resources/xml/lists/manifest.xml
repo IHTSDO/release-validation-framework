@@ -698,26 +698,6 @@
 			</keywords>
 		</script>
 		
-		<script uuid="f5945482-a4fb-4e92-bc20-6f6a3304aa16" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-domain-not-null-id.sql" text="ID is a not null in MRCM DOMAIN snapshot."  >
-			<keywords>ID is a not null in MRCM DOMAIN snapshot</keywords>
-		</script>
-		
-		<script uuid="9a7f6831-e681-4b90-8a47-f53a1b1ee5ba" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-attribute-domain-not-null-id.sql" text="ID is a not null in MRCM ATTRIBUTE DOMAIN snapshot."  >
-			<keywords>ID is a not null in MRCM ATTRIBUTE DOMAIN snapshot</keywords>
-		</script>
-		
-		<script uuid="3b2a786d-dabb-4488-a78f-8dbe06d884d7" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-attribute-range-not-null-id.sql" text="ID is a not null in MRCM ATTRIBUTE RANGE snapshot."  >
-			<keywords>ID is a not null in MRCM ATTRIBUTE RANGE snapshot</keywords>
-		</script>
-		
-		<script uuid="2acb4591-51cd-478d-ba21-525a1af70b3d" category="component-centric-validation" 
-				  sqlFile="component-centric-snapshot-mrcm-module-scope-not-null-id.sql" text="ID is a not null in MRCM MODULE SCOPE snapshot."  >
-			<keywords>ID is a not null in MRCM MODULE SCOPE snapshot</keywords>
-		</script>
-		
 		<script uuid="e980e959-943b-4cdc-998b-f91e670a030b" category="component-centric-validation" 
 				  sqlFile="component-centric-snapshot-mrcm-domain-unique-id.sql" text="ID is unique in MRCM DOMAIN snapshot."  >
 			<keywords>ID is unique in MRCM DOMAIN snapshot</keywords>
@@ -736,16 +716,6 @@
 		<script uuid="6f4aa58c-cc59-4a51-a630-fe4c69bac53b" category="component-centric-validation" 
 				  sqlFile="component-centric-snapshot-mrcm-module-scope-unique-id.sql" text="ID is unique in MRCM MODULE SCOPE snapshot."  >
 			<keywords>ID is unique in MRCM MODULE SCOPE snapshot</keywords>
-		</script>
-		
-		<script uuid="76513165-df7b-4185-8d14-492a48a85826" category="component-centric-validation" 
-				  sqlFile="component-centric-delta-mrcm-domain-valid-guideurl.sql" text="GuideURL is a valid URL in MRCM DOMAIN delta."  >
-			<keywords>GuideURL is a valid URL in MRCM DOMAIN delta</keywords>
-		</script>
-		
-		<script uuid="6af3c672-e564-4221-897d-e60007ab3498" category="component-centric-validation" 
-				  sqlFile="component-centric-full-mrcm-domain-valid-guideurl.sql" text="GuideURL is a valid URL in MRCM DOMAIN full."  >
-			<keywords>GuideURL is a valid URL in MRCM DOMAIN full</keywords>
 		</script>
 		
 		<script uuid="bd3bb9ec-97ae-4c53-9686-9c8c63b8d67b" category="component-centric-validation" 
