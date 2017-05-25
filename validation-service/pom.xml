@@ -20,7 +20,7 @@
         <dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>apg</artifactId>
-			<version>${project.version}</version>
+			<version>1.0.10-SNAPSHOT</version>
 		</dependency>
         <dependency>
             <groupId>org.ihtsdo.snomed.util</groupId>
