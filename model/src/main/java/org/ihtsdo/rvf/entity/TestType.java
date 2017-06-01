@@ -9,7 +9,7 @@ public enum TestType {
     SEMANTIC("semantic"), 
     ARCHIVE_STRUCTURAL("archiveStructural"),
     MANIFEST("manifest"),
-    MRCM("MRCM"),
+    MRCM("mrcm"),
     UNKNOWN("unknown");
     
     private String name;
