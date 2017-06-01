@@ -16,8 +16,8 @@
       <intercept-url pattern="/**/api-docs/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
       <intercept-url pattern="/**/static/**" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
       <intercept-url pattern="/" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-      <intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-      <!--<intercept-url pattern="/**" access="ROLE_ihtsdo-sca-author" />-->
+      <!--<intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />-->
+      <intercept-url pattern="/**" access="ROLE_ihtsdo-sca-author" />
       <http-basic />
       <custom-filter ref="authenticationDecorator" after="BASIC_AUTH_FILTER" />
    </http>
