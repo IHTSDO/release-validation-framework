@@ -234,6 +234,10 @@
 
 
 		<!-- file-centric-snapshot-concept -->
+		<script uuid="369de68f-6d44-4137-9768-5e9afc6e95f0" category="file-centric-validation" sqlFile="file-centric-snapshot-concept-right-module.sql" text="Snapshot concepts assigned to the right module."  >
+			<keywords>Snapshot concepts assigned to the right module.</keywords>
+		</script>
+
 		<script uuid="309d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation" sqlFile="file-centric-snapshot-concept-unique-id.sql" text="ID is unique in CONCEPT snapshot."  >
 			<keywords>ID is unique in CONCEPT snapshot.</keywords>
 		</script>
