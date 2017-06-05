@@ -119,6 +119,12 @@
 			<groupId>org.ihtsdo.snomed.util</groupId>
 			<artifactId>snomed-utilities</artifactId>
 			<version>${snomed.utilities.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>log4j-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.snomed.quality</groupId>
