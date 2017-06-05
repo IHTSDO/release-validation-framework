@@ -119,17 +119,17 @@
 			<groupId>org.ihtsdo.snomed.util</groupId>
 			<artifactId>snomed-utilities</artifactId>
 			<version>${snomed.utilities.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.snomed.quality</groupId>
+			<artifactId>release-mrcm-validator</artifactId>
+			<version>1.0.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
 					<artifactId>log4j-over-slf4j</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.snomed.quality</groupId>
-			<artifactId>release-mrcm-validator</artifactId>
-			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.snomed.otf</groupId>
