@@ -374,7 +374,7 @@
     "assertionUuid" : "d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e",
     "firstNInstances" : [ {
       "conceptId" : "702769005",
-      "detail" : "FSN=Blood group antibody I (substance) concept=702769005: FSN term is not unique in description snapshot when case is ignored"
+      "detail" : "FSN=Blood Group Antibody I (substance) concept=702769005: FSN term is not unique in description snapshot when case is ignored"
     }, {
       "conceptId" : "702386002",
       "detail" : "FSN=Blood group antibody i (substance) concept=702386002: FSN term is not unique in description snapshot when case is ignored"
