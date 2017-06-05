@@ -15,6 +15,7 @@ public class StructuralTestRunItem {
 	private final boolean failure;
 	private String actualValue;
 	private String expectedValue;
+	private Long lineNr;
 
 	public StructuralTestRunItem(String executionId, Date testTime, String fileName, String filePath, String columnName,
 			String testType, String testPattern, boolean failure, String actualValue, String expectedValue) {
@@ -28,6 +29,21 @@ public class StructuralTestRunItem {
 		this.failure = failure;
 		this.actualValue = actualValue;
 		this.expectedValue = expectedValue;
+	}
+	
+	public StructuralTestRunItem(String executionId, Date testTime, String fileName, String filePath, String columnName,
+			String testType, String testPattern, boolean failure, String actualValue, String expectedValue, Long lineNr) {
+		this.executionId = executionId;
+		this.testTime = testTime;
+		this.fileName = fileName;
+		this.filePath = filePath;
+		this.columnName = columnName;
+		this.testType = testType;
+		this.testPattern = testPattern;
+		this.failure = failure;
+		this.actualValue = actualValue;
+		this.expectedValue = expectedValue;
+		this.lineNr = lineNr;
 	}
 
 	public boolean isFailure() {
@@ -92,6 +108,14 @@ public class StructuralTestRunItem {
 
 	public void setExpectedValue(String expectedValue) {
 		this.expectedValue = expectedValue;
+	}
+
+	public Long getLineNr() {
+		return lineNr;
+	}
+
+	public void setLineNr(Long lineNr) {
+		this.lineNr = lineNr;
 	}
 
 	@Override
