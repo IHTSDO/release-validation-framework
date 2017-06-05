@@ -123,6 +123,10 @@ public class StructuralTestRunner implements InitializingBean{
 				logger.info("report.getNumTestRuns() = " + report.getNumTestRuns());
 				final double threshold = report.getNumErrors() / report.getNumTestRuns();
 				logger.info("threshold = " + threshold);
+				
+				// Extract failed tests to report instead showing URL only which link to an physical test result
+				extractFailedTestsToReport(validationReport, report);
+				
 				// bail out only if number of test failures exceeds threshold
 				if(threshold > getFailureThreshold()){
 					isFailed = true;

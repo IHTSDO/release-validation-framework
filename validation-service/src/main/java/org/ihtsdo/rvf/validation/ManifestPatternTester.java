@@ -31,7 +31,7 @@ public class ManifestPatternTester {
 		final Date startTime = new Date();
 		if (manifestFile == null || manifestFile.getListing() == null) {
 			validationLog.assertionError("Manifest file expected but not found.");
-			report.addError("0", startTime, MANIFEST, MANIFEST, MANIFEST, MANIFEST_STRUCTURE_TEST, "", "No Manifest File Found", MANIFEST);
+			report.addError("0", startTime, MANIFEST, MANIFEST, MANIFEST, MANIFEST_STRUCTURE_TEST, "", "No Manifest File Found", MANIFEST,null);
 		} else {
 			final List<Folder> folders = manifestFile.getListing().getFolders();
 			final AtomicInteger folderCounter = new AtomicInteger(0);
@@ -49,7 +49,7 @@ public class ManifestPatternTester {
 			final boolean match = resourceManager.match(name);
 			if (!match) {
 				validationLog.assertionError("Invalid package structure expected directory at {} but found none", name);
-				report.addError(folderCounter + "-" + fileCounter, startTime, name, name, name, MANIFEST_STRUCTURE_TEST, "", "No Folder Found", name);
+				report.addError(folderCounter + "-" + fileCounter, startTime, name, name, name, MANIFEST_STRUCTURE_TEST, "", "No Folder Found", name,null);
 			} else {
 				report.addSuccess(folderCounter + "-" + fileCounter, startTime, name, name, "", MANIFEST_STRUCTURE_TEST, "");
 			}
@@ -59,7 +59,7 @@ public class ManifestPatternTester {
 				final String filename = file.getFileName();
 				if (!(resourceManager.match(filename))) {
 					validationLog.assertionError("Invalid package structure expected file at {} but found none", filename);
-					report.addError(folderCounter + "-" + fileCounter, startTime, filename, filename, filename, MANIFEST_STRUCTURE_TEST, "", "No File Found", filename);
+					report.addError(folderCounter + "-" + fileCounter, startTime, filename, filename, filename, MANIFEST_STRUCTURE_TEST, "", "No File Found", filename,null);
 				} else {
 					report.addSuccess(folderCounter + "-" + fileCounter, startTime, filename, filename, "", MANIFEST_STRUCTURE_TEST, "");
 				}
