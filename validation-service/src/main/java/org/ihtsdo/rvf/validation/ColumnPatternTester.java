@@ -109,7 +109,7 @@ public class ColumnPatternTester {
 			return linesTested;
 		}
 		if (!fileName.endsWith("txt")) {
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "Incorrect file extension, should end with a .txt");
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "Incorrect file extension, should end with a .txt",null);
 			return linesTested;
 		}
 
@@ -118,12 +118,12 @@ public class ColumnPatternTester {
 			tableSchema = schemaFactory.createSchemaBean(fileName);
 		} catch (final FileRecognitionException e) {
 			// log the problem and continue to the next file
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, e.getMessage());
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, e.getMessage(),null);
 			return linesTested;
 		}
 		if (tableSchema == null) {
 			// log the problem and continue to the next file
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "unexpected filename format.");
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "unexpected filename format.",null);
 			return linesTested;
 		}
 
@@ -166,12 +166,12 @@ public class ColumnPatternTester {
 				}
 			} catch (final IOException e) {
 				validationLog.executionError("Problem reading file {}", fileName, e);
-				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", fileName, "Unable to read the file");
+				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", fileName, "Unable to read the file",null);
 			}
 
 		} else {
 			validationLog.executionError("Invalid fileName {} does not match the expected pattern ", fileName);
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "", fileName, "valid release 2 filename");
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "", fileName, "valid release 2 filename",null);
 		}
 		return linesTested;
 		
@@ -189,12 +189,12 @@ public class ColumnPatternTester {
 	public boolean validateRow(final Date startTime, final String fileName, final String line, final long lineNumber, final int configColumnCount, final int dataColumnCount) {
 		if (StringUtils.isEmpty(line)) {
 			validationLog.assertionError("Empty line at line {}", lineNumber);
-			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Empty Row", EMPTY_ROW_TEST, "", line, "expected data");
+			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Empty Row", EMPTY_ROW_TEST, "", line, "expected data",lineNumber);
 			return false;
 		}
 		if (dataColumnCount != configColumnCount) {
 			validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
-			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Column Count Mismatch", COLUMN_COUNT_TEST_TYPE, "", String.valueOf(dataColumnCount), String.valueOf(configColumnCount));
+			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Column Count Mismatch", COLUMN_COUNT_TEST_TYPE, "", String.valueOf(dataColumnCount), String.valueOf(configColumnCount),lineNumber);
 			// cannot continue at this point as any validation will be off
 			return false;
 		}
@@ -203,7 +203,7 @@ public class ColumnPatternTester {
 		if (line.endsWith("\t") || line.endsWith(" ")) {
 			// extra spaces lets see if it is at the end, can still continue testing
 			validationLog.assertionError("Extra space at the end of line {}, expected {}, actual {}", lineNumber, line.trim(), line);
-			testReport.addError(lineNumber + "-" + dataColumnCount + 1, startTime, fileName, resourceManager.getFilePath(), "End of Row Space", ROW_SPACE_TEST_TYPE, "", line, line.trim());
+			testReport.addError(lineNumber + "-" + dataColumnCount + 1, startTime, fileName, resourceManager.getFilePath(), "End of Row Space", ROW_SPACE_TEST_TYPE, "", line, line.trim(),lineNumber);
 			// continue testing
 			return true;
 		}
@@ -227,7 +227,7 @@ public class ColumnPatternTester {
 				final String testedValue = StringUtils.isNoneEmpty(value) ? value : "No Value";
 				validationLog.assertionError(columnTest.getMessage(), columnTest.getErrorArgs());
 				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
-						columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue());
+						columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue(),lineNumber);
 			}
 		}
 	}
@@ -259,7 +259,7 @@ public class ColumnPatternTester {
 						columnTest.getTestType(),"");
 			} else {
 				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
-						columnTest.getTestType(), columnTest.getPatternString(), "Invalid ECL", column.getName() + " is a valid Expression Constrain Language string");
+						columnTest.getTestType(), columnTest.getPatternString(), "Invalid ECL", column.getName() + " is a valid Expression Constrain Language string",lineNumber);
 			}			
 		} else if (column.getName().equalsIgnoreCase("domainTemplateForPrecoordination")
 				 || column.getName().equalsIgnoreCase("domainTemplateForPostcoordination")) { // Expression Template validation
@@ -268,7 +268,7 @@ public class ColumnPatternTester {
 						columnTest.getTestType(),"");
 			} else {
 				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
-						columnTest.getTestType(), columnTest.getPatternString(), "Invalid Expression Template",column.getName() + " is a valid Expression Template");
+						columnTest.getTestType(), columnTest.getPatternString(), "Invalid Expression Template",column.getName() + " is a valid Expression Template",lineNumber);
 			}
 		} else if (column.getName().equalsIgnoreCase("guideURL")){
 			if(URL_PATTERN.matcher(value).matches()){
@@ -276,7 +276,7 @@ public class ColumnPatternTester {
 						columnTest.getTestType(),"");
 			} else {
 				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
-						columnTest.getTestType(), URL_PATTERN.pattern(), value, URL_PATTERN.pattern());
+						columnTest.getTestType(), URL_PATTERN.pattern(), value, URL_PATTERN.pattern(),lineNumber);
 			}			
 		}
 	}
@@ -312,7 +312,7 @@ public class ColumnPatternTester {
 			column.setName(value);
 		} else if (!expectedColumnName.equalsIgnoreCase(value)) {
 			validationLog.assertionError("Column name does not match expected value: expected '{}', actual '{}'", expectedColumnName, value);
-			testReport.addError("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "", value, expectedColumnName);
+			testReport.addError("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "", value, expectedColumnName,1l);
 		} else {
 			testReport.addSuccess("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "");
 		}

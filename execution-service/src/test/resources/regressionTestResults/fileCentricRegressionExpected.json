@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 72,
-  "totalAssertionsFailed" : 70,
+  "totalAssertionsRun" : 73,
+  "totalAssertionsFailed" : 71,
   "results" : [ {
     "assertionName" : "Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot.",
     "assertionUuid" : "8ea2e5d9-5c35-4436-b67d-c5268b5da06c",
@@ -1559,5 +1559,22 @@
       "detail" : "FSN: id=3425118017 in the US extension is not referenced in the US language refset."
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "Same terms but using different cases will be considered as duplicates in the DESCRIPTION snapshot .",
+    "assertionUuid" : "50e773f8-072c-4426-a8e3-50b0f942822c",
+    "firstNInstances" : [ {
+      "conceptId" : "702769005",
+      "detail" : "DESCRIPTION : ids =500891345, 600892343 : Duplicated terms in DESCRIPTION snapshot."
+    }, {
+      "conceptId" : "702411003",
+      "detail" : "DESCRIPTION : ids =2990804014, 2990804019, 2990804020 : Duplicated terms in DESCRIPTION snapshot."
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "DESCRIPTION : ids =2989790014, 2989790015, 2989790017 : Duplicated terms in DESCRIPTION snapshot."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESCRIPTION : ids =3008913021, 3008913022 : Duplicated terms in DESCRIPTION snapshot."
+    } ],
+    "totalFailed" : 4
   } ]
 }
