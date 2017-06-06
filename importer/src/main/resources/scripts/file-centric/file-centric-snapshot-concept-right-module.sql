@@ -25,5 +25,5 @@
     and r.destinationid = pc.id
     and r.typeid = '116680003' /* IS A */
     and pc.moduleid = '900000000000012004' /* Model Module */
-    and cc.moduleid = '900000000000207008' /* Core Module */
+    and cc.moduleid = '900000000000207008'; /* Core Module */
 	
