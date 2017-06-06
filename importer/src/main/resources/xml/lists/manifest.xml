@@ -255,6 +255,12 @@
 		<script uuid="48118153-d32a-4d1c-bfbc-23ed953e9991" category="file-centric-validation" sqlFile="file-centric-snapshot-description-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in  the DESCRIPTION snapshot."  >
 			<keywords>There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot.</keywords>
 		</script>
+		
+		<script uuid="50e773f8-072c-4426-a8e3-50b0f942822c" category="file-centric-validation" sqlFile="file-centric-snapshot-description-term-duplicated.sql" text="Same terms but using different cases will be considered as duplicates in the DESCRIPTION snapshot ."  >
+			<keywords>Same terms but using different cases will be considered as duplicates in the DESCRIPTION snapshot.</keywords>
+		</script>
+		
+		
 
 		<script uuid="4ba823ce-8ae4-4b2e-beb5-e119b822cfe2" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-unique-id.sql" text="ID is unique in the DEFINITION snapshot."  >
 			<keywords>ID is unique in the DEFINITION snapshot.</keywords>

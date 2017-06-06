@@ -374,7 +374,7 @@
     "assertionUuid" : "d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e",
     "firstNInstances" : [ {
       "conceptId" : "702769005",
-      "detail" : "FSN=Blood group antibody I (substance) concept=702769005: FSN term is not unique in description snapshot when case is ignored"
+      "detail" : "FSN=Blood Group Antibody I (substance) concept=702769005: FSN term is not unique in description snapshot when case is ignored"
     }, {
       "conceptId" : "702386002",
       "detail" : "FSN=Blood group antibody i (substance) concept=702386002: FSN term is not unique in description snapshot when case is ignored"
@@ -467,8 +467,32 @@
     }, {
       "conceptId" : "700132006",
       "detail" : "Active description id=3008913019 has no active langrefset member"
+    }, {
+      "conceptId" : "702411003",
+      "detail" : "Active description id=2990804014 has no langrefset member"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Active description id=600892343 has no langrefset member"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Active description id=2984057025 has no langrefset member"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Active description id=2989790014 has no langrefset member"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Active description id=2989790014 has no langrefset member"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Active description id=2989790015 has no langrefset member"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Active description id=3004397016 has no langrefset member"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Active description id=2989194011 has no langrefset member"
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 17
   }, {
     "assertionName" : "Active historical association refset members have inactive concepts as reference components.",
     "assertionUuid" : "f7117eb0-7cd6-11e1-b0c4-0800200c9a66",

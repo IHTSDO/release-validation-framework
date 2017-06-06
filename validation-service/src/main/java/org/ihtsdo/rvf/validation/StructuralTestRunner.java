@@ -3,9 +3,14 @@ package org.ihtsdo.rvf.validation;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.ihtsdo.rvf.entity.FailureDetail;
+import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.validation.impl.CsvMetadataResultFormatter;
@@ -122,6 +127,10 @@ public class StructuralTestRunner implements InitializingBean{
 				logger.info("report.getNumTestRuns() = " + report.getNumTestRuns());
 				final double threshold = report.getNumErrors() / report.getNumTestRuns();
 				logger.info("threshold = " + threshold);
+				
+				// Extract failed tests to report instead showing URL only which link to an physical test result
+				extractFailedTestsToReport(validationReport, report);
+				
 				// bail out only if number of test failures exceeds threshold
 				if(threshold > getFailureThreshold()){
 					isFailed = true;
@@ -133,6 +142,39 @@ public class StructuralTestRunner implements InitializingBean{
 		responseMap.put(TestType.ARCHIVE_STRUCTURAL.toString() + "TestResult", validationReport);
 		logger.debug("Finished verifying zip file structure of {} against manifest", tempFile.getName());		
 		return isFailed;
+	}
+
+	private void extractFailedTestsToReport(final ValidationReport validationReport, TestReportable report) {
+		List<StructuralTestRunItem> structuralTestFailItems = report.getFailedItems();
+		Map<String,List<FailureDetail>> structuralTestFailItemMap = new HashMap<>();
+		for(StructuralTestRunItem structuralTestRunItem : structuralTestFailItems){
+			List<FailureDetail> failDetailList;
+			if(structuralTestFailItemMap.containsKey(structuralTestRunItem.getFileName())){
+				failDetailList = (List<FailureDetail>) structuralTestFailItemMap.get(structuralTestRunItem.getFileName());
+			} else {
+				failDetailList = new ArrayList<>();
+			}
+			String failMsg = "Column: " + structuralTestRunItem.getColumnName() + 
+							" - Line: " + structuralTestRunItem.getLineNr() + 
+							" - Message :" + structuralTestRunItem.getActualExpectedValue();
+			FailureDetail testFailItem  = new FailureDetail("",failMsg);
+			failDetailList.add(testFailItem);
+			structuralTestFailItemMap.put(structuralTestRunItem.getFileName(), failDetailList);
+		}
+		
+		if(!structuralTestFailItemMap.isEmpty()){
+			List<TestRunItem> testRunFailItems = new ArrayList<>();
+			for(String key : structuralTestFailItemMap.keySet()){
+				List<FailureDetail> failItems = structuralTestFailItemMap.get(key);
+				
+				TestRunItem item = new TestRunItem();
+				item.setTestCategory(key);
+				item.setFirstNInstances(failItems.subList(0, failItems.size() > 10 ? 10 : failItems.size()));
+				item.setFailureCount((long) failItems.size());
+				testRunFailItems.add(item);
+			}
+			validationReport.setFailedAssertions(testRunFailItems);
+		}
 	}
 
 	/**
