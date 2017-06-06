@@ -50,6 +50,9 @@ public class Assertion {
 	@Column(name = "doc_ref")
 	private String docRef;
 	
+	@Column(name = "severity")
+	private String severity;
+	
 
 	public Assertion() {
 	}
@@ -96,6 +99,16 @@ public class Assertion {
 
 	public void setUuid(final UUID uuid) {
 		this.uuid = uuid.toString();
+	}
+	
+	@XmlElement
+	@ApiModelProperty( position=5, value="severity", required=false ) 
+	public String getSeverity() {
+		return severity;
+	}
+
+	public void setSeverity(String severity) {
+		this.severity = severity;
 	}
 
 	@Override

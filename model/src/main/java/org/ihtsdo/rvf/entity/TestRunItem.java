@@ -12,6 +12,7 @@ public class TestRunItem implements Comparable<TestRunItem>{
 	private String testCategory;
 	private UUID assertionUuid;
 	private String assertionText;
+	private String severity;
 	private String executionId;
 	private Long queryInMilliSeconds;
 	private Long failureCount;
@@ -101,6 +102,14 @@ public class TestRunItem implements Comparable<TestRunItem>{
 
 	public void setAssertionText(final String assertionText) {
 		this.assertionText = assertionText;
+	}
+
+	public String getSeverity() {
+		return severity;
+	}
+
+	public void setSeverity(String severity) {
+		this.severity = severity;
 	}
 
 	public UUID getAssertionUuid() {
