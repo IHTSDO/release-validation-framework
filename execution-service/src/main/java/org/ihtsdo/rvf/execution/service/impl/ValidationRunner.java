@@ -358,15 +358,17 @@ public class ValidationRunner {
 		report.setPassedAssertions(items);
 		responseMap.put(report.getTestType().toString() + "TestResult", report);
 		
-		Collections.sort(warningItems);
-		final ValidationReport warningReport = new ValidationReport(TestType.SQL);
-		warningReport.setExecutionId(executionConfig.getExecutionId());
-		warningReport.setTotalTestsRun(items.size());
-		warningReport.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
-		warningReport.setTotalFailures(warningItems.size());
-		warningReport.setFailedAssertions(warningItems);
-		report.setPassedAssertions(items);
-		responseMap.put(warningReport.getTestType().toString() + "WarningTestResult", warningReport);
+		if(!warningItems.isEmpty()) {
+			Collections.sort(warningItems);
+			final ValidationReport warningReport = new ValidationReport(TestType.SQL);
+			warningReport.setExecutionId(executionConfig.getExecutionId());
+			warningReport.setTotalTestsRun(items.size());
+			warningReport.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
+			warningReport.setTotalFailures(warningItems.size());
+			warningReport.setFailedAssertions(warningItems);
+			report.setPassedAssertions(items);
+			responseMap.put(warningReport.getTestType().toString() + "WarningTestResult", warningReport);
+		}
 	}
 
 	private List<TestRunItem> executeAssertionsConcurrently(final ExecutionConfig executionConfig, final Collection<Assertion> assertions, int batchSize, String reportStorage) {
