@@ -335,9 +335,13 @@ public class ValidationRunner {
 	private void constructTestReport(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, final long timeStart, final List<TestRunItem> items) {
 		//failed tests
 		final List<TestRunItem> failedItems = new ArrayList<>();
+		final List<TestRunItem> warningItems = new ArrayList<>();
 		for (final TestRunItem item : items) {
-			if (item.getFailureCount() != 0) {
+			if (item.getFailureCount() != 0 && !SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())) {
 				failedItems.add(item);
+			}
+			if(SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())){
+				warningItems.add(item);
 			}
 		}
 		Collections.sort(failedItems);
@@ -349,9 +353,20 @@ public class ValidationRunner {
 		report.setTotalFailures(failedItems.size());
 		report.setFailedAssertions(failedItems);
 		items.removeAll(failedItems);
+		items.removeAll(warningItems);
 		Collections.sort(items);
 		report.setPassedAssertions(items);
 		responseMap.put(report.getTestType().toString() + "TestResult", report);
+		
+		Collections.sort(warningItems);
+		final ValidationReport warningReport = new ValidationReport(TestType.SQL);
+		warningReport.setExecutionId(executionConfig.getExecutionId());
+		warningReport.setTotalTestsRun(items.size());
+		warningReport.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
+		warningReport.setTotalFailures(warningItems.size());
+		warningReport.setFailedAssertions(warningItems);
+		report.setPassedAssertions(items);
+		responseMap.put(warningReport.getTestType().toString() + "WarningTestResult", warningReport);
 	}
 
 	private List<TestRunItem> executeAssertionsConcurrently(final ExecutionConfig executionConfig, final Collection<Assertion> assertions, int batchSize, String reportStorage) {

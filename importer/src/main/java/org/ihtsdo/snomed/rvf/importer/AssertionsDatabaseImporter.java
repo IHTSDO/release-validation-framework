@@ -140,12 +140,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 			logger.info("text = " + text);
 			final String sqlFileName = element.getAttributeValue("sqlFile");
 			logger.info("sqlFileName = " + sqlFileName);
+			final String severity = element.getAttributeValue("severity");
+			logger.info("severity = " + severity);
 
 			// add entities using rest client
 			final Assertion assertion = new Assertion();
 			assertion.setUuid(UUID.fromString(uuid));
 			assertion.setAssertionText(text);
 			assertion.setKeywords(category);
+			assertion.setSeverity(severity);
 			Assertion assertionFromDb = assertionService.find(assertion.getUuid());
 			if (assertionFromDb == null) {
 				return assertionService.create(assertion);
