@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 73,
-  "totalAssertionsFailed" : 71,
+  "totalAssertionsRun" : 74,
+  "totalAssertionsFailed" : 70,
   "results" : [ {
     "assertionName" : "Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot.",
     "assertionUuid" : "8ea2e5d9-5c35-4436-b67d-c5268b5da06c",
@@ -17,7 +17,7 @@
     }, {
       "conceptId" : "702386002",
       "detail" : "DESC: Active FSN =Toxic effect of antimony and/or its compounds (disorder): is not unique in DESCRIPTION snapshot."
-    } ],
+    }],
     "totalFailed" : 4
   }, {
     "assertionName" : "The current Stated Relationship snapshot file does not contain duplicate Relationship Ids.",
@@ -208,7 +208,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the GB language refset"
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 12
   }, {
     "assertionName" : "ID is unique in the LOINC ExpressionAssociationRefset snapshot.",
     "assertionUuid" : "b9b535f0-5b68-4192-81f6-115dea2f49c0",
@@ -298,7 +298,7 @@
   }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Swedish language refset.",
     "assertionUuid" : "dbb49e0c-e5b0-4676-a815-70fb9f3b468e",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702411003",
       "detail" : "Concept: id=702411003: is added in recent international release but has no active preferred term in the Swedish language refset"
     }, {
@@ -412,7 +412,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Danish language refset"
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 12
   }, {
     "assertionName" : "ReferenceComponentIds refers to valid concepts in the LOINC ExpressionAssociationRefset snapshot file.",
     "assertionUuid" : "e33922c3-5200-458b-b8f3-2cd08252234e",
@@ -497,13 +497,16 @@
       "conceptId" : "703649005",
       "detail" : "Concept: id=703649005 does not have an active FSN in any refset."
     } ],
-    "totalFailed" : 23
+    "totalFailed" : 27
   }, {
     "assertionName" : "Preferred Term exists exactly once in each language refset for each concept.",
     "assertionUuid" : "03cf9850-7857-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
+    "firstNInstances" : [  {
       "conceptId" : "702386002",
       "detail" : "Concept: id=702386002 has duplicate language refsets for descrioption id=3006276018"
+    }, {
+      "conceptId" : "699765003",
+      "detail" : "Concept: id=699765003 has no active preferred terms in any language refset"
     }, {
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006 has no active preferred terms in any language refset"
@@ -528,15 +531,12 @@
     }, {
       "conceptId" : "702386002",
       "detail" : "Concept: id=702386002 has multiple active preferred terms in language refset=900000000000509007"
-    }, {
-      "conceptId" : "700132006",
-      "detail" : "Concept: id=700132006 has no active preferred terms in the US language refset"
-    } ],
-    "totalFailed" : 16
+    }  ],
+    "totalFailed" : 18
   }, {
     "assertionName" : "Every active concept has a preferred FSN in the GB language refset.",
     "assertionUuid" : "0dde2aec-14c0-428b-ba1c-15e483aaa155",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702411003",
       "detail" : "Concept: id=702411003 does not have an FSN preferred in the GB language refset."
     }, {
@@ -567,11 +567,11 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006 does not have an FSN preferred in the GB language refset."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 12
   }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DESCRIPTION snapshot.",
     "assertionUuid" : "1491f72c-cb00-42db-a97b-9c685f4e4cb0",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "700244001",
       "detail" : "DESCRIPTION: id=3006191013 refers to an invalid concept identifier in the DESCRIPTION snapshot."
     }, {
@@ -583,11 +583,8 @@
     }, {
       "conceptId" : "699400005",
       "detail" : "DESCRIPTION: id=2984057019 refers to an invalid concept identifier in the DESCRIPTION snapshot."
-    }, {
-      "conceptId" : "723563008",
-      "detail" : "DESCRIPTION: id=3425118017 refers to an invalid concept identifier in the DESCRIPTION snapshot."
-    } ],
-    "totalFailed" : 5
+    }  ],
+    "totalFailed" : 4
   }, {
     "assertionName" : "ID is unique in the LOINC MapCorrelationOriginRefset snapshot.",
     "assertionUuid" : "160a9eeb-883d-4e24-8b3f-556d5d517ef1",
@@ -632,7 +629,7 @@
   }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Danish language refset.",
     "assertionUuid" : "1cfef22e-da2c-43fd-acdf-0e0ec6ca214c",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702411003",
       "detail" : "Concept: id=702411003: is added recently in the international release but has no active preferred term in the Danish language refset"
     }, {
@@ -653,7 +650,7 @@
     }, {
       "conceptId" : "703672002",
       "detail" : "Concept: id=703672002: is added recently in the international release but has no active preferred term in the Danish language refset"
-    } ],
+    }],
     "totalFailed" : 7
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the ASSOCIATION REFSET snapshot file.",
@@ -666,7 +663,7 @@
   }, {
     "assertionName" : "ID is unique in CONCEPT snapshot.",
     "assertionUuid" : "309d0620-0a32-43a6-9d08-8e6bdefda3be",
-    "firstNInstances" : [ {
+    "firstNInstances" : [  {
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006:Non unique id in current release file."
     } ],
@@ -706,7 +703,15 @@
       "detail" : "ASSOC RS: Targetcomponentid=239777004:Invalid TargetComponentId."
     } ],
     "totalFailed" : 12
-  }, {
+  },{
+    "assertionName" : "Snapshot concepts assigned to the right module.",
+    "assertionUuid" : "369de68f-6d44-4137-9768-5e9afc6e95f0",
+    "firstNInstances" : [ {
+      "conceptId" : "609452007",
+      "detail" : "id=609452007:Core module concept has model module parent."
+    } ],
+    "totalFailed" : 1
+  },{
     "assertionName" : "There are no duplicate Definition terms in the DEFINITION snapshot file.",
     "assertionUuid" : "3b2c1824-8445-410e-8ae2-d943be01c33f",
     "firstNInstances" : [ {
@@ -717,7 +722,7 @@
   }, {
     "assertionName" : "ID is unique in DESCRIPTION snapshot.",
     "assertionUuid" : "3be8c763-a5bc-404b-af9f-a2cb681f6f3d",
-    "firstNInstances" : [ {
+    "firstNInstances" : [  {
       "conceptId" : "703860006",
       "detail" : "DESC: id=2989790014:Non unique id in description release file."
     } ],
@@ -752,11 +757,8 @@
   }, {
     "assertionName" : "There is a 1-to-1 relationship between the id and the immutable values in Inferred Relationship snapshot.",
     "assertionUuid" : "4dbfed80-79b9-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "CONCEPT: id=702386002 contains two or more version of the immutable values in Inferred Relationship Snapshot."
-    } ],
-    "totalFailed" : 1
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "There are no active additional relationships added in the current release.",
     "assertionUuid" : "4dda9849-d0ac-4960-a36d-6fbfdd84cd58",
@@ -768,7 +770,7 @@
   }, {
     "assertionName" : "Every active concept has one active preferred term in the Swedish language refset.",
     "assertionUuid" : "4ea5e02b-9364-4326-9082-816edb950dbf",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702411003",
       "detail" : "Concept: id=702411003: has no active preferred term in the Swedish language refset"
     }, {
@@ -798,8 +800,8 @@
     }, {
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Swedish language refset"
-    } ],
-    "totalFailed" : 10
+    }  ],
+    "totalFailed" : 12
   }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DEFINITION snapshot.",
     "assertionUuid" : "5a83783e-3366-48bd-a50d-8f3a53812174",
@@ -829,7 +831,7 @@
   }, {
     "assertionName" : "The current Inferred Relationship snapshot file does not contain duplicate Relationship Ids.",
     "assertionUuid" : "6336ec40-79b9-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "10002003",
       "detail" : "RELATIONSHIP : id=1000002029: Relationship Id is repeated in the Inferred Relationship snapshot file."
     }, {
@@ -854,7 +856,7 @@
   }, {
     "assertionName" : "All destination ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "6b34ab30-79b9-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702411003",
       "detail" : "RELATIONSHIP: id=1000000021: Inferred Relationship contains a destination id that does not exist in the Concept snapshot file."
     }, {
@@ -885,7 +887,7 @@
       "conceptId" : "703649004",
       "detail" : "RELATIONSHIP: id=1000006026: Inferred Relationship contains a destination id that does not exist in the Concept snapshot file."
     } ],
-    "totalFailed" : 14
+    "totalFailed" : 13
   }, {
     "assertionName" : "ComplexMap refset id is unique in the snapshot file",
     "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e41b57",
@@ -940,52 +942,49 @@
     }, {
       "conceptId" : "129304002",
       "detail" : "RELATIONSHIP: id=1000002029: Inferred Relationship contains source id that does not exist in the Concept snapshot file."
-    }, {
-      "conceptId" : "91241007",
-      "detail" : "RELATIONSHIP: id=4969199027: Inferred Relationship contains source id that does not exist in the Concept snapshot file."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 9
   }, {
     "assertionName" : "Every active concept defined in the Danish extension has a preferred FSN in the US language refset.",
     "assertionUuid" : "759a1eb8-2ca6-4405-80ba-16fd7540c1d0",
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "All type ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file.",
-    "assertionUuid" : "77fc7550-79b9-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "702411003",
-      "detail" : "RELATIONSHIP: id=1000000021: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      "assertionName" : "All type ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file.",
+      "assertionUuid" : "77fc7550-79b9-11e1-b0c4-0800200c9a66",
+      "firstNInstances" : [ {
+        "conceptId" : "702411003",
+        "detail" : "RELATIONSHIP: id=1000000021: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      }, {
+        "conceptId" : "280844000",
+        "detail" : "RELATIONSHIP: id=100000028: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      }, {
+        "conceptId" : "255135009",
+        "detail" : "RELATIONSHIP: id=1000001020: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      }, {
+        "conceptId" : "10002003",
+        "detail" : "RELATIONSHIP: id=1000002029: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      }, {
+        "conceptId" : "10002003",
+        "detail" : "RELATIONSHIP: id=1000002029: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      }, {
+        "conceptId" : "10392004",
+        "detail" : "RELATIONSHIP: id=10000023: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      }, {
+        "conceptId" : "10002003",
+        "detail" : "RELATIONSHIP: id=1000003023: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      }, {
+        "conceptId" : "10041001",
+        "detail" : "RELATIONSHIP: id=1000004028: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      }, {
+        "conceptId" : "10041001",
+        "detail" : "RELATIONSHIP: id=1000005027: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      }, {
+        "conceptId" : "703649004",
+        "detail" : "RELATIONSHIP: id=1000006026: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
+      } ],
+      "totalFailed" : 14
     }, {
-      "conceptId" : "280844000",
-      "detail" : "RELATIONSHIP: id=100000028: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
-    }, {
-      "conceptId" : "255135009",
-      "detail" : "RELATIONSHIP: id=1000001020: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
-    }, {
-      "conceptId" : "10002003",
-      "detail" : "RELATIONSHIP: id=1000002029: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
-    }, {
-      "conceptId" : "10002003",
-      "detail" : "RELATIONSHIP: id=1000002029: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
-    }, {
-      "conceptId" : "10392004",
-      "detail" : "RELATIONSHIP: id=10000023: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
-    }, {
-      "conceptId" : "10002003",
-      "detail" : "RELATIONSHIP: id=1000003023: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
-    }, {
-      "conceptId" : "10041001",
-      "detail" : "RELATIONSHIP: id=1000004028: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
-    }, {
-      "conceptId" : "10041001",
-      "detail" : "RELATIONSHIP: id=1000005027: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
-    }, {
-      "conceptId" : "703649004",
-      "detail" : "RELATIONSHIP: id=1000006026: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
-    } ],
-    "totalFailed" : 14
-  }, {
     "assertionName" : "There is a 1-to-1 relationship between the id and the immutable values in STATED RELATIONSHIP snapshot.",
     "assertionUuid" : "7e453140-79b9-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -1554,11 +1553,8 @@
   }, {
     "assertionName" : "Every active FSN in the US module is referenced in the US lang refset.",
     "assertionUuid" : "eba7fa2b-efb3-40fc-9ee0-caf9e914bac2",
-    "firstNInstances" : [ {
-      "conceptId" : "3425118017",
-      "detail" : "FSN: id=3425118017 in the US extension is not referenced in the US language refset."
-    } ],
-    "totalFailed" : 1
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "Same terms but using different cases will be considered as duplicates in the DESCRIPTION snapshot .",
     "assertionUuid" : "50e773f8-072c-4426-a8e3-50b0f942822c",
