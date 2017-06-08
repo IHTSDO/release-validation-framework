@@ -1,7 +1,6 @@
-Release Validation Framework (RVF)
+Release Validation Framework (RVF)  [![Join the chat at https://gitter.im/IHTSDO/release-validation-framework](https://badges.gitter.im/IHTSDO/release-validation-framework.svg)](https://gitter.im/IHTSDO/release-validation-framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ====================================
 
-[![Join the chat at https://gitter.im/IHTSDO/release-validation-framework](https://badges.gitter.im/IHTSDO/release-validation-framework.svg)](https://gitter.im/IHTSDO/release-validation-framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A framework for testing the validity of SNOMED CT releases.
 
 Getting started
