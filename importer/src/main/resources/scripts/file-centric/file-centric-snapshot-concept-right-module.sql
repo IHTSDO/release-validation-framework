@@ -10,7 +10,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		cc.id,
-		concat('id=',cc.id, ':Core module concept has model module parent.')
+		concat('Child concept id= ', cc.id, ' of core module has parent concept id= ', pc.id, ' of model module.')
 	from concept_s cc, concept_s pc, description_s cd, description_s pd, relationship_s r
     where cc.active = 1
     and pc.active = 1
