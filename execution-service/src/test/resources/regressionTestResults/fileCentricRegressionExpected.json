@@ -708,7 +708,7 @@
     "assertionUuid" : "369de68f-6d44-4137-9768-5e9afc6e95f0",
     "firstNInstances" : [ {
       "conceptId" : "609452007",
-      "detail" : "id=609452007:Core module concept has model module parent."
+      "detail" : "Child concept id= 609452007 of core module has parent concept id= 699765003 of model module."
     } ],
     "totalFailed" : 1
   },{
