@@ -28,7 +28,7 @@ public class ValidationReport {
 		totalTestsRun = numTestRuns;
 	}
 
-	public void setTotalFailures(final int numErrors) {
+	public void setTotalFailures(final Integer numErrors) {
 		totalFailures = numErrors;
 		
 	}
@@ -81,7 +81,7 @@ public class ValidationReport {
 		return totalTestsRun;
 	}
 
-	public int getTotalFailures() {
+	public Integer getTotalFailures() {
 		return totalFailures;
 	}
 
@@ -93,11 +93,11 @@ public class ValidationReport {
 		return timeTakenInSeconds;
 	}
 
-	public int getTotalWarnings() {
+	public Integer getTotalWarnings() {
 		return totalWarnings;
 	}
 
-	public void setTotalWarnings(int totalWarnings) {
+	public void setTotalWarnings(Integer totalWarnings) {
 		this.totalWarnings = totalWarnings;
 	}
 

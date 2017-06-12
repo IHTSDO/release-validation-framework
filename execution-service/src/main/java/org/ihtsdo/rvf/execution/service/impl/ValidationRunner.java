@@ -152,7 +152,7 @@ public class ValidationRunner {
 			runAssertionTests(executionConfig,responseMap, reportStorage);
 		}
 		//Run MRCM Validator
-//		runMRCMAssertionTests(responseMap, validationConfig, executionConfig);
+		runMRCMAssertionTests(responseMap, validationConfig, executionConfig);
 
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
@@ -378,10 +378,10 @@ public class ValidationRunner {
 		summary.setTotalWarnings(warningItems.size());
 		
 		responseMap.put("SQL Test result summary", summary);
-		if(failedReport.getTotalFailures() > 0) {
+		if(failedReport.getTotalFailures() != null && failedReport.getTotalFailures() > 0) {
 			responseMap.put(failedReport.getTestType().toString() + "FailedTestResult", failedReport);
 		}
-		if(warningReport.getTotalWarnings() > 0){
+		if(warningReport.getTotalWarnings() != null && warningReport.getTotalWarnings() > 0){
 			responseMap.put(warningReport.getTestType().toString() + "WarningTestResult", warningReport);
 		}
 	}
