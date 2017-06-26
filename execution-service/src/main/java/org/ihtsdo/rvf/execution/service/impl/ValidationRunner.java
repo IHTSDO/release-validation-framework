@@ -232,7 +232,7 @@ public class ValidationRunner {
 			testRunItem.setFailureCount(Long.valueOf(failureCount));
 			List<FailureDetail> failedDetails = new ArrayList(failureCount);
 			for (Long conceptId : assertion.getConceptIdsWithInvalidAttributeValue()){
-				failedDetails.add(new FailureDetail(String.valueOf(conceptId), assertion.getAssertionText()));
+				failedDetails.add(new FailureDetail(String.valueOf(conceptId), assertion.getAssertionText(), null));
 			}
 			testRunItem.setFirstNInstances(failedDetails);
 			failedAssertions.add(testRunItem);

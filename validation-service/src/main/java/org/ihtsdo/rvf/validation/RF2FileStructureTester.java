@@ -26,7 +26,7 @@ public class RF2FileStructureTester {
 	
 	private static final String EMPTY_FILE_CHECKING = " empty file checking";
 	private static final String RF2_LINE_SEPARATOR = "\r\n";
-	private static final String TEST_TYPE = "line terminator check";
+	public static final String TEST_TYPE = "line terminator check";
 	private final ValidationLog validationLog;
 	private final ResourceProvider resourceManager;
 	private final TestReportable testReport;

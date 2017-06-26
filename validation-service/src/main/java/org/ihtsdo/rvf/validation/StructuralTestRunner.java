@@ -13,6 +13,7 @@ import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
+import org.ihtsdo.rvf.validation.contanst.ErrorMessage;
 import org.ihtsdo.rvf.validation.impl.CsvMetadataResultFormatter;
 import org.ihtsdo.rvf.validation.impl.StreamTestReport;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
@@ -157,7 +158,7 @@ public class StructuralTestRunner implements InitializingBean{
 			String failMsg = "Column: " + structuralTestRunItem.getColumnName() + 
 							" - Line: " + structuralTestRunItem.getLineNr() + 
 							" - Message :" + structuralTestRunItem.getActualExpectedValue();
-			FailureDetail testFailItem  = new FailureDetail("",failMsg);
+			FailureDetail testFailItem  = new FailureDetail("",failMsg, ErrorMessage.getErrorDescription(structuralTestRunItem));
 			failDetailList.add(testFailItem);
 			structuralTestFailItemMap.put(structuralTestRunItem.getFileName(), failDetailList);
 		}
