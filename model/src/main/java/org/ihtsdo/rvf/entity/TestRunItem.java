@@ -19,6 +19,7 @@ public class TestRunItem implements Comparable<TestRunItem>{
 	private String failureMessage;
 	private List<FailureDetail> firstNInstances;
 	private Long extractResultInMillis;
+	private String jiraLink;
 
 	/**
 	 * Empty constructor for IOC
@@ -126,6 +127,14 @@ public class TestRunItem implements Comparable<TestRunItem>{
 
 	public void setExtractResultInMillis(Long extractResultInMillis) {
 		this.extractResultInMillis = extractResultInMillis;
+	}
+
+	public String getJiraLink() {
+		return jiraLink;
+	}
+
+	public void setJiraLink(String jiraLink) {
+		this.jiraLink = jiraLink;
 	}
 
 	@Override
