@@ -24,6 +24,8 @@ public interface JiraService {
 
     public List<Issue> getCurrentProductFailureTickets(String productName, String releaseDate, String currentReportingStage) throws JiraException;
 
+    public Issue createRVFFailureTicket(String summary, String description, String productName, String releaseDate, String reportingStage) throws JiraException;
+
 
 
 }

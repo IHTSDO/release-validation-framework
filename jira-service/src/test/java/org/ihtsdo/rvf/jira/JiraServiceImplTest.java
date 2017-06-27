@@ -34,13 +34,6 @@ public class JiraServiceImplTest {
         Assert.assertEquals(expectedJql, jql);
     }
 
-    @Test
-    public void testGetProductName() throws JiraException {
-        List<String> strings = jiraService.getProductNames();
-        for (String string : strings) {
-            System.out.println(string);
-        }
-    }
 
 
 }
