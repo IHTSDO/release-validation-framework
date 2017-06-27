@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.jira;
 
 import net.rcarz.jiraclient.CustomFieldOption;
+import net.rcarz.jiraclient.Field;
 import net.rcarz.jiraclient.Issue;
 import net.rcarz.jiraclient.JiraClient;
 import net.rcarz.jiraclient.JiraException;
@@ -31,6 +32,9 @@ public class JiraServiceImpl implements JiraService{
     @Value("${rvf.jira.field.releaseDate}")
     private String fieldReleaseDate;
 
+    @Value("${rvf.jira.field.id.releaseDate}")
+    private String fieldIdReleaseDate;
+
     @Value("${rvf.jira.field.reportingStage}")
     private String fieldReportStage;
 
@@ -42,6 +46,9 @@ public class JiraServiceImpl implements JiraService{
 
     @Value("${rvf.jira.value.resolvedStatus}")
     private String valueResolvedStatuses;
+
+    @Value("${rvf.jira.defaultAssignee}")
+    private String defaultAssignee;
 
 
     @Override
@@ -118,4 +125,21 @@ public class JiraServiceImpl implements JiraService{
         }
         return issues;
     }
+
+    @Override
+    public Issue createRVFFailureTicket(String summary, String description, String productName, String releaseDate, String reportingStage) throws JiraException {
+        JiraClient jiraClient = jiraClientFactory.getJiraClient();
+        if(summary.length() > 255) summary = summary.substring(0, 252) + "...";
+        Issue issue = jiraClient.createIssue(valueProjectKey, "Bug")
+                .field(Field.SUMMARY, summary)
+                .field(Field.DESCRIPTION, description)
+                .field(fieldIdProductName, productName)
+                .field(fieldIdReleaseDate, releaseDate)
+                .field(fieldIdReportStage, reportingStage)
+                .field(Field.ASSIGNEE, defaultAssignee)
+                .execute();
+        return issue;
+    }
+
+    
 }
