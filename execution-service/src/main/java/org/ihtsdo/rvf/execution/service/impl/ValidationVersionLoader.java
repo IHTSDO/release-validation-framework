@@ -73,6 +73,12 @@ public class ValidationVersionLoader {
 	@Value("${rvf.snomed.jdbc.password}")
 	private String password;
 
+	@Value("${rvf.mysql.command.mysqldump}")
+	private String mysqlDumpCommand;
+
+	@Value("${rvf.mysql.command.mysql}")
+	private String mysqlCommand;
+
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
 
 
@@ -261,6 +267,7 @@ public class ValidationVersionLoader {
 			final String previousMyISAMFullPath = storageLocation + File.separator + RVF + File.separator + backupMyISAMZipFile.getName();
 			s3PublishFileHelper.putFile(backupMyISAMZipFile, previousMyISAMFullPath);
 			FileUtils.deleteQuietly(backupMyISAMFile);
+			FileUtils.deleteQuietly(backupMyISAMZipFile);
 		} else {
 			logger.error("Previous release not found in the published bucket:" + publishedFileS3Path);
 		}
@@ -319,10 +326,11 @@ public class ValidationVersionLoader {
 
 	private void backupDatabase(String schemaName, File backupFile){
         String executeCommand;
+		String mySqlDumpStr = StringUtils.isEmpty(mysqlDumpCommand) ? MYSQLDUMP : mysqlDumpCommand;
         if(StringUtils.isEmpty(password)){
-        	executeCommand = String.format(MYSQL_COMMAND_NO_PASS_PATTERN, MYSQLDUMP, schemaName, username);
+        	executeCommand = String.format(MYSQL_COMMAND_NO_PASS_PATTERN, mySqlDumpStr, schemaName, username);
 		} else {
-        	executeCommand = String.format(MYSQL_COMMAND_PATTERN, MYSQLDUMP, schemaName, username, password);
+        	executeCommand = String.format(MYSQL_COMMAND_PATTERN, mySqlDumpStr, schemaName, username, password);
 		}
 		try {
 			Process runtimeProcess = Runtime.getRuntime().exec(executeCommand);
@@ -350,10 +358,11 @@ public class ValidationVersionLoader {
 
 	private void restoreDatabase(String schemaName, File backupFile){
 		String executeCommand;
+		String mySqlStr = StringUtils.isEmpty(mysqlCommand) ? MYSQL : mysqlCommand;
 		if(StringUtils.isEmpty(password)){
-			executeCommand = String.format(MYSQL_COMMAND_NO_PASS_PATTERN, MYSQL, schemaName, username);
+			executeCommand = String.format(MYSQL_COMMAND_NO_PASS_PATTERN, mySqlStr, schemaName, username);
 		} else {
-			executeCommand = String.format(MYSQL_COMMAND_PATTERN, MYSQL, schemaName, username, password);
+			executeCommand = String.format(MYSQL_COMMAND_PATTERN, mySqlStr, schemaName, username, password);
 		}
         try {
             InputStream backupStream  = new FileInputStream(backupFile);
