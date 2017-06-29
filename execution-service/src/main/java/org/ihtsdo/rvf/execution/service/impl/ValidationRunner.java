@@ -131,7 +131,7 @@ public class ValidationRunner {
 			}
 		}
 		if (executionConfig.isReleaseValidation() && !executionConfig.isFirstTimeRelease()) {
-			boolean isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+			boolean isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, validationConfig, responseMap);
 			if (!isLoaded) {
 				reportService.writeResults(responseMap, State.FAILED, reportStorage);
 				return;
