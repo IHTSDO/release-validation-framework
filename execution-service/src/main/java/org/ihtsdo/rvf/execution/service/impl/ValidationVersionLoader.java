@@ -82,16 +82,13 @@ public class ValidationVersionLoader {
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
 
 
-	public boolean loadPreviousVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
-
-		List<String> rf2FilesLoaded = new ArrayList<>();
-		boolean isSucessful = true;
-		String reportStorage = validationConfig.getStorageLocation();
+	public boolean loadPreviousVersion(ExecutionConfig executionConfig, ValidationRunConfig validationConfig, Map<String, Object> responseMap) throws Exception {
+		boolean isSuccessful = true;
 		if (!isPublishedVersionsLoaded(validationConfig)) {
 			//load published versions from s3
-			String priviousVersion = PREVIOUS + executionConfig.getExecutionId();
-			executionConfig.setPreviousVersion(priviousVersion);
-			isSucessful = prepareVersionsFromS3FilesForPreviousVersion(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
+			String previousVersion = PREVIOUS + executionConfig.getExecutionId();
+			executionConfig.setPreviousVersion(previousVersion);
+			isSuccessful = prepareVersionsFromS3FilesForPreviousVersion(validationConfig, executionConfig, responseMap);
 		}  else {
 			if (isExtension(validationConfig)) {
 				executionConfig.setPreviousVersion(validationConfig.getPreviousExtVersion());
@@ -99,8 +96,7 @@ public class ValidationVersionLoader {
 				executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
 			}
 		}
-
-		return isSucessful;
+		return isSuccessful;
 		}
 
 	public boolean loadProspectiveVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
@@ -229,7 +225,7 @@ public class ValidationVersionLoader {
         return !(validationConfig.getExtensionDependency() != null && validationConfig.getExtensionDependency().endsWith(ZIP_FILE_EXTENSION));
     }
 
-	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String storageLocation, String rvfVersion) throws Exception {
+	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String storageLocation, String rvfVersion, Map<String, Object> responseMap) throws Exception {
 		String[] splits = publishedReleaseFilename.split("_");
 		int index = splits.length-2;
 		logger.debug( "release file short name:" + splits[index]);
@@ -254,7 +250,12 @@ public class ValidationVersionLoader {
              */
 			File tempDir = FileUtils.getTempDirectory();
 			File backupMyISAMFile = new File(tempDir, rvfVersion + SQL_FILE_EXTENSION);
-            backupDatabase(createdSchemaName, backupMyISAMFile);
+            String backupErrorMessage = backupDatabase(createdSchemaName, backupMyISAMFile);
+            if(!StringUtils.isEmpty(backupErrorMessage)){
+            	responseMap.put(FAILURE_MESSAGE, backupErrorMessage);
+				FileUtils.deleteQuietly(backupMyISAMFile);
+            	return;
+			}
 			/**
 			 * Zip file
 			 */
@@ -299,32 +300,7 @@ public class ValidationVersionLoader {
 		}
 	}
 
-	private static boolean checkMySqlDumpCommand(){
-		final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
-		String executeCommand = "mysqldump1";
-		try {
-			Process runtimeProcess = Runtime.getRuntime().exec(executeCommand);
-			InputStream inputStream = runtimeProcess.getInputStream();
-			if(inputStream != null){
-				logger.info("Backup successful.");
-			}
-			InputStream  errorStream = runtimeProcess.getErrorStream();
-			if(errorStream != null){
-				byte[] buffer = new byte[errorStream.available()];
-				errorStream.read(buffer);
-				String str = new String(buffer);
-				if(str.contains("error")){
-					return false;
-				}
-			}
-		} catch (Exception e) {
-			logger.error("Error when backup database: " + e);
-			return false;
-		}
-		return true;
-	}
-
-	private void backupDatabase(String schemaName, File backupFile){
+	private String backupDatabase(String schemaName, File backupFile){
         String executeCommand;
 		String mySqlDumpStr = StringUtils.isEmpty(mysqlDumpCommand) ? MYSQLDUMP : mysqlDumpCommand;
         if(StringUtils.isEmpty(password)){
@@ -332,6 +308,7 @@ public class ValidationVersionLoader {
 		} else {
         	executeCommand = String.format(MYSQL_COMMAND_PATTERN, mySqlDumpStr, schemaName, username, password);
 		}
+		String backupErrorMessage = "";
 		try {
 			Process runtimeProcess = Runtime.getRuntime().exec(executeCommand);
 			InputStream inputStream = runtimeProcess.getInputStream();
@@ -352,12 +329,15 @@ public class ValidationVersionLoader {
 				logger.error("Backup error: " + str);
 			}
 		} catch (Exception e) {
+        	backupErrorMessage = "Could not backup database. Please either check MySQL Server installed in the machine or check value of property {rvf.mysql.command.mysqldump} in the config/execution-service.properties file to make sure it point to mysqldump.exe execution file. " + e;
 			logger.error("Error when backup database: " + e);
 		}
+		return backupErrorMessage;
 	}
 
-	private void restoreDatabase(String schemaName, File backupFile){
+	private String restoreDatabase(String schemaName, File backupFile){
 		String executeCommand;
+		String restoredErrorMessage = "";
 		String mySqlStr = StringUtils.isEmpty(mysqlCommand) ? MYSQL : mysqlCommand;
 		if(StringUtils.isEmpty(password)){
 			executeCommand = String.format(MYSQL_COMMAND_NO_PASS_PATTERN, mySqlStr, schemaName, username);
@@ -388,18 +368,20 @@ public class ValidationVersionLoader {
 
             IOUtils.closeQuietly(backupStream);
 		} catch (IOException e) {
+			restoredErrorMessage = "Could not backup database. Please either check MySQL Server installed in the machine or check value of property {rvf.mysql.command.mysql} in the config/execution-service.properties file to make sure it point to mysql.exe execution file. " + e;
 			logger.error("Error when restore database: " + e);
         }
+        return restoredErrorMessage;
     }
 
-	private boolean prepareVersionsFromS3FilesForPreviousVersion(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap,List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception {
+	private boolean prepareVersionsFromS3FilesForPreviousVersion(ValidationRunConfig validationConfig, ExecutionConfig executionConfig, Map<String, Object> responseMap) throws Exception {
 		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
 		if (!validationConfig.isFirstTimeRelease()) {
 			if (isExtension(validationConfig)) {
 				if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
 					if(!databaseExists(RVF + "_" + executionConfig.getPreviousVersion())){
-						if(!downloadMyISAMOnS3AndRestore(s3PublishFileHelper, validationConfig.getStorageLocation(), executionConfig.getPreviousVersion())) {
-							loadPublishedVersionIntoDB(s3PublishFileHelper, validationConfig.getPreviousExtVersion(), validationConfig.getStorageLocation(), executionConfig.getPreviousVersion());
+						if(!downloadMyISAMOnS3AndRestore(s3PublishFileHelper, validationConfig.getStorageLocation(), executionConfig.getPreviousVersion(), responseMap)) {
+							loadPublishedVersionIntoDB(s3PublishFileHelper, validationConfig.getPreviousExtVersion(), validationConfig.getStorageLocation(), executionConfig.getPreviousVersion(), responseMap);
 						}
 					}
 				}
@@ -407,15 +389,17 @@ public class ValidationVersionLoader {
 				if (validationConfig.getPrevIntReleaseVersion() != null && validationConfig.getPrevIntReleaseVersion().endsWith(ZIP_FILE_EXTENSION)) {
 					//check database exist or not
 					if(!databaseExists(RVF + "_" + executionConfig.getPreviousVersion())){
-						if(!downloadMyISAMOnS3AndRestore(s3PublishFileHelper, validationConfig.getStorageLocation(), executionConfig.getPreviousVersion())) {
-							loadPublishedVersionIntoDB(s3PublishFileHelper, validationConfig.getPrevIntReleaseVersion(), validationConfig.getStorageLocation(), executionConfig.getPreviousVersion());
+						if(!downloadMyISAMOnS3AndRestore(s3PublishFileHelper, validationConfig.getStorageLocation(), executionConfig.getPreviousVersion(), responseMap)) {
+							loadPublishedVersionIntoDB(s3PublishFileHelper, validationConfig.getPrevIntReleaseVersion(), validationConfig.getStorageLocation(), executionConfig.getPreviousVersion(), responseMap);
 						}
 					}
 				}
 			}
 		}
 
-		//this code to make sure that we have a database of previous published package
+		/**
+		 * this code to make sure that we have a database of previous published package
+		 */
 		if (!databaseExists(RVF + "_" + executionConfig.getPreviousVersion())) {
 			String failureMsg = "Failed to load previous version:" + (isExtension(validationConfig) ? validationConfig.getPreviousExtVersion(): validationConfig.getPrevIntReleaseVersion())
 					+ " into " + executionConfig.getPreviousVersion();
@@ -426,7 +410,7 @@ public class ValidationVersionLoader {
 		return true;
 	}
 
-	private boolean downloadMyISAMOnS3AndRestore(FileHelper s3PublishFileHelper, String storageLocation, String rvfVersion) throws Exception {
+	private boolean downloadMyISAMOnS3AndRestore(FileHelper s3PublishFileHelper, String storageLocation, String rvfVersion, Map<String, Object> responseMap) throws Exception {
 		String previousMyISAMS3Path = storageLocation + File.separator + RVF + File.separator + rvfVersion + ZIP_FILE_EXTENSION;
 		logger.debug("Downloading previous published MyISAM file from s3:" + previousMyISAMS3Path);
 		InputStream publishedFileInput = s3PublishFileHelper.getFileStream(previousMyISAMS3Path);
@@ -446,7 +430,15 @@ public class ValidationVersionLoader {
 			 */
 			String schemaName = RVF + "_" + rvfVersion;
 			createDbIfNotExists(schemaName);
-			restoreDatabase(schemaName, restoredZipFile);
+			/**
+			 * Restore database
+			 */
+			File restoredFile = new File(restoredZipFile.getParentFile().getAbsolutePath() + File.separator + rvfVersion + SQL_FILE_EXTENSION);
+			String restoredErrorMessage = restoreDatabase(schemaName, restoredFile);
+			if(!StringUtils.isEmpty(restoredErrorMessage)){
+				responseMap.put(FAILURE_MESSAGE, restoredErrorMessage);
+				return false;
+			}
 			return true;
 		}
 		logger.debug("Can not download previous published MyISAM file from S3:" + previousMyISAMS3Path);
