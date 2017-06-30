@@ -1,16 +1,17 @@
 package org.ihtsdo.rvf.jira;
 
-import net.rcarz.jiraclient.JiraException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.rcarz.jiraclient.Issue;
+import net.rcarz.jiraclient.JiraException;
 
 /**
  * User: huyle
@@ -24,7 +25,7 @@ public class JiraServiceImplTest {
     @Autowired
     private JiraService jiraService;
 
-    @Test
+    //@Test
     public void testBuildJQLString() throws JiraException {
         List<String> reportingStage = new ArrayList<>();
         reportingStage.add("Pre-Alpha");
@@ -33,7 +34,24 @@ public class JiraServiceImplTest {
         String expectedJql = "project = ISRS AND \"SNOMED CT Product\"=\"SNOMED CT International edition\" AND \"Product Release date\"=\"20170731\" AND \"Reporting Stage\" in (\"Pre-Alpha\",\"Alpha Feedback\") AND status not in (Closed,Resolved)";
         Assert.assertEquals(expectedJql, jql);
     }
-
-
-
+    
+    @Test
+    public void testGetProductNames() throws JiraException {
+    	List<String> prodNames = jiraService.getProductNames();
+    	Assert.assertTrue(prodNames.size() > 0);
+    }
+    
+    //@Test
+    public void testGetReportingStages() throws JiraException {
+    	List<String> prodNames = jiraService.getReportingStages();
+    	Assert.assertTrue(prodNames.size() > 0);
+    }
+    
+    //@Test
+    public void testCreatJiraTicket() throws JiraException {
+    	Issue newIssue = jiraService.createRVFFailureTicket("Quyen Ly testing 30", "description", "SNOMED CT International edition", "2017-07-31", "Pre-Alpha");
+    	Assert.assertTrue(!newIssue.getUrl().isEmpty());
+    }
+    
+    
 }

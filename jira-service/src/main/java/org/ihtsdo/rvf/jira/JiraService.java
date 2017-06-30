@@ -1,9 +1,11 @@
 package org.ihtsdo.rvf.jira;
 
+import java.util.List;
+
+import org.ihtsdo.rvf.entity.TestType;
+
 import net.rcarz.jiraclient.Issue;
 import net.rcarz.jiraclient.JiraException;
-
-import java.util.List;
 
 /**
  * User: huyle
@@ -26,6 +28,6 @@ public interface JiraService {
 
     public Issue createRVFFailureTicket(String summary, String description, String productName, String releaseDate, String reportingStage) throws JiraException;
 
-
+    public void addJiraTickets(String productName, String releaseDate, String currentReportingStage, Object failedItem, TestType testType) throws JiraException;
 
 }

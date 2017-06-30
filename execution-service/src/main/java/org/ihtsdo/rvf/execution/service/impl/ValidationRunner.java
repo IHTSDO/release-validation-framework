@@ -1,14 +1,43 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.sqs.service.exception.ServiceException;
-import org.ihtsdo.rvf.entity.*;
+import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
+import org.ihtsdo.rvf.entity.FailureDetail;
+import org.ihtsdo.rvf.entity.MrcmValidationReport;
+import org.ihtsdo.rvf.entity.SeverityLevel;
+import org.ihtsdo.rvf.entity.TestRunItem;
+import org.ihtsdo.rvf.entity.TestType;
+import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
+import org.ihtsdo.rvf.jira.JiraService;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
@@ -20,14 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.*;
+import net.rcarz.jiraclient.JiraException;
 
 @Service
 @Scope("prototype")
@@ -63,6 +85,9 @@ public class ValidationRunner {
 	
 	@Autowired
 	ValidationVersionLoader releaseVersionLoader;
+	
+	@Autowired
+	private JiraService jiraService;
 	
 	public ValidationRunner( int batchSize) {
 		this.batchSize = batchSize;
@@ -361,6 +386,17 @@ public class ValidationRunner {
 			failedReport.setExecutionId(executionConfig.getExecutionId());
 			failedReport.setTotalFailures(failedItems.size());
 			failedReport.setFailedAssertions(failedItems);
+			if(executionConfig.isJiraIssueCreationFlag()) {
+				// Add Jira ticket for each fail assertions
+				try {
+					String relaseYear = executionConfig.getReleaseDate().substring(0,4);
+					String relaseMonth = executionConfig.getReleaseDate().substring(4,6);
+					String dateMonth = executionConfig.getReleaseDate().substring(6,8);
+					jiraService.addJiraTickets(executionConfig.getProductName(),relaseYear + "-" + relaseMonth + "-"  +dateMonth,executionConfig.getReportingStage(),failedItems, TestType.SQL);
+				} catch (JiraException e) {
+					logger.error("Error while creating Jira Ticket for failed assertions. Message : " + e.getMessage());
+				}
+			}			
 		}
 		
 		if(!warningItems.isEmpty()) {
