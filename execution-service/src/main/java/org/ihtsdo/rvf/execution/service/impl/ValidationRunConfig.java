@@ -26,6 +26,10 @@ public class ValidationRunConfig {
 	private transient File localManifestFile;
 	private String s3PublishBucketName;
 	private boolean isRf2DeltaOnly;
+	private boolean jiraIssueCreationFlag;
+	private String productName;
+	private String reportingStage;
+	
 	public MultipartFile getFile() {
 		return file;
 	}
@@ -76,6 +80,22 @@ public class ValidationRunConfig {
 		this.failureExportMax = exportMax;
 		return this;
 	}
+	
+	public ValidationRunConfig addJiraIssueCreationFlag(final boolean jiraIssueCreationFlag) {
+		this.jiraIssueCreationFlag = jiraIssueCreationFlag;
+		return this;
+	}
+
+	public ValidationRunConfig addProductName(final String productName) {
+		this.productName = productName;
+		return this;
+	}
+
+	public ValidationRunConfig addReportingStage(final String reportingStage) {
+		this.reportingStage = reportingStage;
+		return this;
+	}
+	
 	public Integer getFailureExportMax() {
 		return failureExportMax;
 	}
@@ -115,6 +135,24 @@ public class ValidationRunConfig {
 	
 	public void setRunId(Long runId) {
 		this.runId = runId;
+	}
+	public boolean isJiraIssueCreationFlag() {
+		return jiraIssueCreationFlag;
+	}
+	public void setJiraIssueCreationFlag(boolean jiraIssueCreationFlag) {
+		this.jiraIssueCreationFlag = jiraIssueCreationFlag;
+	}
+	public String getProductName() {
+		return productName;
+	}
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+	public String getReportingStage() {
+		return reportingStage;
+	}
+	public void setReportingStage(String reportingStage) {
+		this.reportingStage = reportingStage;
 	}
 	public void setWriteSucceses(boolean writeSucceses) {
 		this.writeSucceses = writeSucceses;
