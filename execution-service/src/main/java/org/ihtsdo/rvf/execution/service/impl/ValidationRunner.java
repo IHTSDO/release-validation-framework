@@ -214,7 +214,7 @@ public class ValidationRunner {
 			Map.Entry pair = (Map.Entry)it.next();
 			AssertionDroolRule assertionDroolRule = new AssertionDroolRule();
 			List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
-			assertionDroolRule.setGroupRule((String)pair.getKey());
+			assertionDroolRule.setRule((String)pair.getKey());
 			assertionDroolRule.setTotalFails(invalidContentList.size());
 			assertionDroolRule.setContentItems(invalidContentList);
 			assertionDroolRules.add(assertionDroolRule);
