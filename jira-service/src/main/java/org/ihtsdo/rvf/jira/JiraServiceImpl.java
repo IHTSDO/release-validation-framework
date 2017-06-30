@@ -176,7 +176,7 @@ public class JiraServiceImpl implements JiraService{
 				for(Issue issue : issues) {
 					// If Issue was found, then return URL of issue
 					if(issue.getSummary().contains(item.getAssertionUuid().toString())
-						/*&& item.getFailureCount() == getIssueFailureCount(issue)*/) {
+						&& item.getFailureCount().longValue() == getIssueFailureCount(issue)) {
 						 String url = getBrowseURL(issue);
 						 item.setJiraLink(url);
 						 itemFound = true;
@@ -195,8 +195,9 @@ public class JiraServiceImpl implements JiraService{
 		String failureCountText = "failureCount";
 		int startPositionFailureCount = desc.indexOf(failureCountText);
 		if(startPositionFailureCount > 0) {
-			int endPositionFailureCount = desc.substring(startPositionFailureCount + failureCountText.length() + 3, startPositionFailureCount + failureCountText.length() + 20).indexOf(",");
-			return Long.parseLong(desc.substring(startPositionFailureCount + failureCountText.length() + 3 , startPositionFailureCount + failureCountText.length() + 3 + endPositionFailureCount));
+			startPositionFailureCount = startPositionFailureCount + failureCountText.length() + 4;
+			int endPositionFailureCount = desc.substring(startPositionFailureCount, startPositionFailureCount + 20).indexOf(",");
+			return Long.parseLong(desc.substring(startPositionFailureCount , startPositionFailureCount + endPositionFailureCount).trim());
 		}
 		return 0;
 	}
