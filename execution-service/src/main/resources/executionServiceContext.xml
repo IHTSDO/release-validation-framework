@@ -84,6 +84,7 @@
 	
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner" depends-on="assertionsDatabasePrimerService">
 		<constructor-arg value="${rvf.assertion.execution.BatchSize}"/>
+		<property name="droolRulesModuleName" value="${rvf.droolrule.module.name}"/>
 	</bean>
 	<bean id="versionLoader" class =" org.ihtsdo.rvf.execution.service.impl.ValidationVersionLoader"/>
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService">
