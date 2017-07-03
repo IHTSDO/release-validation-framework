@@ -248,10 +248,10 @@
       "conceptId" : "128534003",
       "detail" : "ASSOC RS: id=128534003:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
     }, {
-      "conceptId" : "700241009",
-      "detail" : "ASSOC RS: id=700241009:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
+      "conceptId" : "280164007",
+      "detail" : "ASSOC RS: id=280164007:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 11
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "c779d282-3c4d-4c16-a8a6-8d1a621b247d",
@@ -705,7 +705,7 @@
       "conceptId" : "10171006",
       "detail" : "ASSOC RS: Targetcomponentid=239777004:Invalid TargetComponentId."
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 13
   }, {
     "assertionName" : "There are no duplicate Definition terms in the DEFINITION snapshot file.",
     "assertionUuid" : "3b2c1824-8445-410e-8ae2-d943be01c33f",
