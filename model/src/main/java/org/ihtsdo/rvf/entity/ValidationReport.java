@@ -1,112 +1,133 @@
 package org.ihtsdo.rvf.entity;
 
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+/**
+ * Created by NamLe on 5/29/2017.
+ */
 public class ValidationReport {
+    private Long executionId;
+    private long timeTakenInSeconds;
+    private String reportUrl;
+    private int totalTestsRun;
+    private int totalSkips;
+    private int totalWarnings;
+    private int totalFailures;
+    private List<TestRunItem> assertionsSkipped;
+    private List<TestRunItem> assertionsWarning;
+    private List<TestRunItem> assertionsFailed;
+    private List<TestRunItem> assertionsPassed;
 
-	private TestType testType;
-	private Long executionId;
-	private Long timeTakenInSeconds;
-	private String reportUrl;
-	private Integer totalTestsRun;
-	private Integer totalFailures;
-	private Integer totalWarnings;
-	private List<TestRunItem> assertionsFailed;
-	private List<TestRunItem> assertionsWarning;
-	private List<TestRunItem> assertionsPassed;
+    public ValidationReport() {
+        assertionsSkipped = new ArrayList<>();
+        assertionsWarning = new ArrayList<>();
+        assertionsFailed = new ArrayList<>();
+        assertionsPassed = new ArrayList<>();
+        totalTestsRun = 0;
+        totalSkips = 0;
+        totalWarnings = 0;
+        totalFailures = 0;
+    }
 
-	public ValidationReport(final TestType testType) {
-		this.testType = testType;
-	}
+    public Long getExecutionId() {
+        return executionId;
+    }
 
-	public void setExecutionId(final Long runId) {
-		executionId = runId;
-		
-	}
+    public void setExecutionId(Long executionId) {
+        this.executionId = executionId;
+    }
 
-	public void setTotalTestsRun(final int numTestRuns) {
-		totalTestsRun = numTestRuns;
-	}
+    public long getTimeTakenInSeconds() {
+        return timeTakenInSeconds;
+    }
 
-	public void setTotalFailures(final Integer numErrors) {
-		totalFailures = numErrors;
-		
-	}
+    public String getReportUrl() {
+        return reportUrl;
+    }
 
-	public void setReportUrl(final String url) {
-		reportUrl = url;
-	}
+    public void setReportUrl(String reportUrl) {
+        this.reportUrl = reportUrl;
+    }
 
-	public void setTimeTakenInSeconds(final long timeTaken) {
-		timeTakenInSeconds = timeTaken;
-	}
+    public int getTotalTestsRun() {
+        return totalTestsRun;
+    }
 
-	public void setFailedAssertions(final List<TestRunItem> failedItems) {
-		assertionsFailed = failedItems;
-	}
+    public int getTotalSkips() {
+        return totalSkips;
+    }
 
-	public void setPassedAssertions(final List<TestRunItem> passedItems) {
-		assertionsPassed = passedItems;
-	}
+    public int getTotalFailures() {
+        return totalFailures;
+    }
 
-	public TestType getTestType() {
-		return testType;
-	}
+    public int getTotalWarnings() {
+        return totalWarnings;
+    }
 
-	public void setTestType(final TestType testType) {
-		this.testType = testType;
-	}
+    public List<TestRunItem> getAssertionsSkipped() {
+        return assertionsSkipped;
+    }
 
-	public List<TestRunItem> getAssertionsFailed() {
-		return assertionsFailed;
-	}
+    public List<TestRunItem> getAssertionsFailed() {
+        return assertionsFailed;
+    }
 
-	public void setAssertionsFailed(final List<TestRunItem> assertionsFailed) {
-		this.assertionsFailed = assertionsFailed;
-	}
+    public List<TestRunItem> getAssertionsPassed() {
+        return assertionsPassed;
+    }
 
-	public List<TestRunItem> getAssertionsPassed() {
-		return assertionsPassed;
-	}
+    public List<TestRunItem> getAssertionsWarning() {
+        return assertionsWarning;
+    }
 
-	public void setAssertionsPassed(final List<TestRunItem> assertionsPassed) {
-		this.assertionsPassed = assertionsPassed;
-	}
+    public void addSkippedAssertions(List<TestRunItem> skippedItems){
+        if(!CollectionUtils.isEmpty(skippedItems)) {
+            assertionsSkipped.addAll(skippedItems);
+            int noOfItems = skippedItems.size();
+            totalSkips += noOfItems;
+            totalTestsRun += noOfItems;
+        }
+    }
 
-	public Long getExecutionId() {
-		return executionId;
-	}
+    public void addWarningAssertions(List<TestRunItem> warningItems){
+        if(!CollectionUtils.isEmpty(warningItems)) {
+            assertionsWarning.addAll(warningItems);
+            int noOfItems = warningItems.size();
+            totalWarnings += noOfItems;
+            totalTestsRun += noOfItems;
+        }
+    }
 
-	public int getTotalTestsRun() {
-		return totalTestsRun;
-	}
+    public void addFailedAssertions(List<TestRunItem> failedItems){
+        if(!CollectionUtils.isEmpty(failedItems)) {
+            assertionsFailed.addAll(failedItems);
+            int noOfItems = failedItems.size();
+            totalFailures += noOfItems;
+            totalTestsRun += noOfItems;
+        }
+    }
 
-	public Integer getTotalFailures() {
-		return totalFailures;
-	}
+    public void addPassedAssertions(List<TestRunItem> passedItems){
+        if(!CollectionUtils.isEmpty(passedItems)) {
+            assertionsPassed.addAll(passedItems);
+            int noOfItems = passedItems.size();
+            totalTestsRun += noOfItems;
+        }
+    }
 
-	public String getReportUrl() {
-		return reportUrl;
-	}
+    public void addTimeTaken(long seconds){
+        timeTakenInSeconds += seconds;
+    }
 
-	public long getTimeTakenInSeconds() {
-		return timeTakenInSeconds;
-	}
-
-	public Integer getTotalWarnings() {
-		return totalWarnings;
-	}
-
-	public void setTotalWarnings(Integer totalWarnings) {
-		this.totalWarnings = totalWarnings;
-	}
-
-	public List<TestRunItem> getAssertionsWarning() {
-		return assertionsWarning;
-	}
-
-	public void setAssertionsWarning(List<TestRunItem> assertionsWarning) {
-		this.assertionsWarning = assertionsWarning;
-	}
-	
+    public void sortAssertionLists() {
+        Collections.sort(assertionsSkipped);
+        Collections.sort(assertionsFailed);
+        Collections.sort(assertionsWarning);
+        Collections.sort(assertionsPassed);
+    }
 }

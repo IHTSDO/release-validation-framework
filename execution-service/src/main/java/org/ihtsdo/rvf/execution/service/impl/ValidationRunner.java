@@ -1,39 +1,12 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
+import net.rcarz.jiraclient.JiraException;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.sqs.service.exception.ServiceException;
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.entity.FailureDetail;
-import org.ihtsdo.rvf.entity.MrcmValidationReport;
-import org.ihtsdo.rvf.entity.SeverityLevel;
-import org.ihtsdo.rvf.entity.TestRunItem;
-import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.entity.ValidationReport;
+import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
@@ -49,7 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import net.rcarz.jiraclient.JiraException;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.*;
 
 @Service
 @Scope("prototype")
@@ -136,8 +116,11 @@ public class ValidationRunner {
 			responseMap.put(FAILURE_MESSAGE, errorMsg);
 			throw new BusinessServiceException(errorMsg);
 		}
-		
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(), 
+
+		ValidationReport report = new ValidationReport();
+		report.setExecutionId(validationConfig.getRunId());
+
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(report, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(),
 				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation());
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
@@ -170,15 +153,18 @@ public class ValidationRunner {
 		}
 		// for extension release validation we need to test the release-type validations first using previous extension against current extension
 		// first then loading the international snapshot for the file-centric and component-centric validations.
+
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
 			logger.info("Run extension release validation with runId:" +  executionConfig.getExecutionId());
-			runExtensionReleaseValidation(responseMap, validationConfig,reportStorage, executionConfig);
+			runExtensionReleaseValidation(report, responseMap, validationConfig,reportStorage, executionConfig);
 		} else {
-			runAssertionTests(executionConfig,responseMap, reportStorage);
+			runAssertionTests(report, executionConfig, reportStorage);
 		}
 		//Run MRCM Validator
-		runMRCMAssertionTests(responseMap, validationConfig, executionConfig);
+		runMRCMAssertionTests(report, validationConfig, executionConfig);
 
+		report.sortAssertionLists();
+		responseMap.put("TestResult", report);
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
@@ -206,7 +192,7 @@ public class ValidationRunner {
 		}
 		return outputFolder;
 	}
-	private void runMRCMAssertionTests(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws IOException, ReleaseImportException, ServiceException {
+	private void runMRCMAssertionTests(final ValidationReport report, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws IOException, ReleaseImportException, ServiceException {
 		final long timeStart = System.currentTimeMillis();
 		ValidationService validationService = new ValidationService();
 		ValidationRun validationRun = new ValidationRun();
@@ -228,6 +214,7 @@ public class ValidationRunner {
 		for(org.snomed.quality.validator.mrcm.Assertion assertion : validationRun.getCompletedAssertions()){
 			testRunItem = new TestRunItem();
 			testRunItem.setTestCategory(MMRCM_TYPE_VALIDATION);
+			testRunItem.setTestType(TestType.MRCM);
 			testRunItem.setAssertionUuid(assertion.getUuid());
 			testRunItem.setAssertionText(assertion.getAssertionText());
 			testRunItem.setFailureCount(0L);
@@ -239,6 +226,7 @@ public class ValidationRunner {
 		for(org.snomed.quality.validator.mrcm.Assertion assertion : validationRun.getSkippedAssertions()){
 			testRunItem = new TestRunItem();
 			testRunItem.setTestCategory(MMRCM_TYPE_VALIDATION);
+			testRunItem.setTestType(TestType.MRCM);
 			testRunItem.setAssertionUuid(assertion.getUuid());
 			testRunItem.setAssertionText(assertion.getAssertionText());
 			testRunItem.setFailureCount(0L);
@@ -250,6 +238,7 @@ public class ValidationRunner {
 		for(org.snomed.quality.validator.mrcm.Assertion assertion : validationRun.getFailedAssertions()){
 			testRunItem = new TestRunItem();
 			testRunItem.setTestCategory(MMRCM_TYPE_VALIDATION);
+			testRunItem.setTestType(TestType.MRCM);
 			testRunItem.setAssertionUuid(assertion.getUuid());
 			testRunItem.setAssertionText(assertion.getAssertionText());
 			testRunItem.setExtractResultInMillis(0L);
@@ -266,20 +255,14 @@ public class ValidationRunner {
 		Collections.sort(passedAssertions);
 		Collections.sort(skippedAssertions);
 		Collections.sort(failedAssertions);
-		final MrcmValidationReport report = new MrcmValidationReport(TestType.MRCM);
-		report.setExecutionId(executionConfig.getExecutionId());
-		report.setTotalTestsRun(passedAssertions.size() + skippedAssertions.size() + failedAssertions.size());
-		report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-		report.setTotalSkips(skippedAssertions.size());
-		report.setTotalFailures(failedAssertions.size());
-		report.setAssertionsSkipped(skippedAssertions);
-		report.setAssertionsFailed(failedAssertions);
-		report.setAssertionsPassed(passedAssertions);
-		responseMap.put(report.getTestType().toString() + "TestResult", report);
+		report.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
+		report.addSkippedAssertions(skippedAssertions);
+		report.addFailedAssertions(failedAssertions);
+		report.addPassedAssertions(passedAssertions);
 	}
 
-	private void runExtensionReleaseValidation(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
-			ExecutionConfig executionConfig) throws IOException,
+	private void runExtensionReleaseValidation(final ValidationReport report, final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
+											   ExecutionConfig executionConfig) throws IOException,
 			NoSuchAlgorithmException, DecoderException, BusinessServiceException, SQLException {
 		final long timeStart = System.currentTimeMillis();
 		//run release-type validations
@@ -300,11 +283,8 @@ public class ValidationRunner {
 		//run remaining component-centric and file-centric validaitons
 		assertions.removeAll(releaseTypeAssertions);
 		testItems.addAll(runAssertionTests(executionConfig, assertions, reportStorage, true));
-		constructTestReport(executionConfig, responseMap, timeStart, testItems);
+		constructTestReport(report, executionConfig, timeStart, testItems);
 	}
-
-
-
 
 	private List<Assertion> getAssertions(List<String> groupNames) {
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(groupNames);
@@ -333,7 +313,7 @@ public class ValidationRunner {
 		return result;
 	}
 
-	private void runAssertionTests(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, String reportStorage) throws IOException {
+	private void runAssertionTests(final ValidationReport report, final ExecutionConfig executionConfig, String reportStorage) throws IOException {
 		final long timeStart = System.currentTimeMillis();
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
@@ -353,22 +333,13 @@ public class ValidationRunner {
 		} else {
 			items.addAll(executeAssertionsConcurrently(executionConfig,assertions, batchSize, reportStorage));
 		}
-		constructTestReport(executionConfig, responseMap, timeStart, items);
+		constructTestReport(report, executionConfig, timeStart, items);
 		
 	}
 
-	private void constructTestReport(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, final long timeStart, final List<TestRunItem> items) {
+	private void constructTestReport(final ValidationReport report, final ExecutionConfig executionConfig, final long timeStart, final List<TestRunItem> items) {
 		final long timeEnd = System.currentTimeMillis();
-		
-		//summary
-		final ValidationReport summary = new ValidationReport(TestType.SQL);
-		final ValidationReport failedReport = new ValidationReport(TestType.SQL);
-		final ValidationReport warningReport = new ValidationReport(TestType.SQL);
-		
-		summary.setExecutionId(executionConfig.getExecutionId());
-		summary.setTotalTestsRun(items.size());
-		summary.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
-		
+		report.addTimeTaken((timeEnd - timeStart) / 1000);
 		//failed tests
 		final List<TestRunItem> failedItems = new ArrayList<>();
 		final List<TestRunItem> warningItems = new ArrayList<>();
@@ -379,47 +350,28 @@ public class ValidationRunner {
 			if(SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())){
 				warningItems.add(item);
 			}
+			item.setTestType(TestType.SQL);
 		}
-		
-		if (!failedItems.isEmpty()) {
-			Collections.sort(failedItems);
-			failedReport.setExecutionId(executionConfig.getExecutionId());
-			failedReport.setTotalFailures(failedItems.size());
-			failedReport.setFailedAssertions(failedItems);
-			if(executionConfig.isJiraIssueCreationFlag()) {
-				// Add Jira ticket for each fail assertions
-				try {
-					String relaseYear = executionConfig.getReleaseDate().substring(0,4);
-					String relaseMonth = executionConfig.getReleaseDate().substring(4,6);
-					String dateMonth = executionConfig.getReleaseDate().substring(6,8);
-					jiraService.addJiraTickets(executionConfig.getProductName(),relaseYear + "-" + relaseMonth + "-"  +dateMonth,executionConfig.getReportingStage(),failedItems, TestType.SQL);
-				} catch (JiraException e) {
-					logger.error("Error while creating Jira Ticket for failed assertions. Message : " + e.getMessage());
-				}
-			}			
-		}
-		
-		if(!warningItems.isEmpty()) {
-			Collections.sort(warningItems);
-			warningReport.setExecutionId(executionConfig.getExecutionId());
-			warningReport.setTotalWarnings(warningItems.size());
-			warningReport.setAssertionsWarning(warningItems);			
+
+		report.addFailedAssertions(failedItems);
+		report.addWarningAssertions(warningItems);
+
+		if(executionConfig.isJiraIssueCreationFlag()) {
+			// Add Jira ticket for each fail assertions
+			try {
+				String relaseYear = executionConfig.getReleaseDate().substring(0,4);
+				String relaseMonth = executionConfig.getReleaseDate().substring(4,6);
+				String dateMonth = executionConfig.getReleaseDate().substring(6,8);
+				jiraService.addJiraTickets(executionConfig.getProductName(),relaseYear + "-" + relaseMonth + "-"  +dateMonth,executionConfig.getReportingStage(),failedItems, TestType.SQL);
+			} catch (JiraException e) {
+				logger.error("Error while creating Jira Ticket for failed assertions. Message : " + e.getMessage());
+			}
 		}
 		
 		items.removeAll(failedItems);
 		items.removeAll(warningItems);
-		Collections.sort(items);
-		summary.setPassedAssertions(items);
-		summary.setTotalFailures(failedItems.size());
-		summary.setTotalWarnings(warningItems.size());
-		
-		responseMap.put("SQL Test result summary", summary);
-		if(failedReport.getTotalFailures() != null && failedReport.getTotalFailures() > 0) {
-			responseMap.put(failedReport.getTestType().toString() + "FailedTestResult", failedReport);
-		}
-		if(warningReport.getTotalWarnings() != null && warningReport.getTotalWarnings() > 0){
-			responseMap.put(warningReport.getTestType().toString() + "WarningTestResult", warningReport);
-		}
+		report.addPassedAssertions(items);
+
 	}
 
 	private List<TestRunItem> executeAssertionsConcurrently(final ExecutionConfig executionConfig, final Collection<Assertion> assertions, int batchSize, String reportStorage) {
