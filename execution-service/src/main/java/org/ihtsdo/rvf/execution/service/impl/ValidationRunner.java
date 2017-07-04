@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import net.rcarz.jiraclient.JiraException;
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
@@ -161,7 +162,36 @@ public class ValidationRunner {
 			runAssertionTests(report, executionConfig, reportStorage);
 		}
 		//Run MRCM Validator
-		runMRCMAssertionTests(report, validationConfig, executionConfig);
+//		runMRCMAssertionTests(report, validationConfig, executionConfig);
+
+		for (TestRunItem failedAssertion : report.getAssertionsFailed()){
+			switch (failedAssertion.getTestType()){
+				case SQL:
+				case MRCM:
+					failedAssertion.setJiraDescription(failedAssertion.getAssertionText());
+					break;
+				case ARCHIVE_STRUCTURAL:
+					if(CollectionUtils.isNotEmpty(failedAssertion.getFirstNInstances())) {
+						String jiraDescription = "";
+						for (FailureDetail failItem : failedAssertion.getFirstNInstances()) {
+							jiraDescription += failItem.getDetail() + "\\r\\n";
+						}
+						failedAssertion.setJiraDescription(jiraDescription);
+					}
+			}
+		}
+
+		if(executionConfig.isJiraIssueCreationFlag()) {
+			// Add Jira ticket for each fail assertions
+			try {
+				String relaseYear = executionConfig.getReleaseDate().substring(0,4);
+				String relaseMonth = executionConfig.getReleaseDate().substring(4,6);
+				String dateMonth = executionConfig.getReleaseDate().substring(6,8);
+				jiraService.addJiraTickets(executionConfig.getProductName(),relaseYear + "-" + relaseMonth + "-"  +dateMonth,executionConfig.getReportingStage(), report.getAssertionsFailed());
+			} catch (JiraException e) {
+				logger.error("Error while creating Jira Ticket for failed assertions. Message : " + e.getMessage());
+			}
+		}
 
 		report.sortAssertionLists();
 		responseMap.put("TestResult", report);
@@ -252,9 +282,6 @@ public class ValidationRunner {
 			failedAssertions.add(testRunItem);
 		}
 
-		Collections.sort(passedAssertions);
-		Collections.sort(skippedAssertions);
-		Collections.sort(failedAssertions);
 		report.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
 		report.addSkippedAssertions(skippedAssertions);
 		report.addFailedAssertions(failedAssertions);
@@ -283,7 +310,7 @@ public class ValidationRunner {
 		//run remaining component-centric and file-centric validaitons
 		assertions.removeAll(releaseTypeAssertions);
 		testItems.addAll(runAssertionTests(executionConfig, assertions, reportStorage, true));
-		constructTestReport(report, executionConfig, timeStart, testItems);
+		constructTestReport(report, timeStart, testItems);
 	}
 
 	private List<Assertion> getAssertions(List<String> groupNames) {
@@ -333,11 +360,11 @@ public class ValidationRunner {
 		} else {
 			items.addAll(executeAssertionsConcurrently(executionConfig,assertions, batchSize, reportStorage));
 		}
-		constructTestReport(report, executionConfig, timeStart, items);
+		constructTestReport(report, timeStart, items);
 		
 	}
 
-	private void constructTestReport(final ValidationReport report, final ExecutionConfig executionConfig, final long timeStart, final List<TestRunItem> items) {
+	private void constructTestReport(final ValidationReport report, final long timeStart, final List<TestRunItem> items) {
 		final long timeEnd = System.currentTimeMillis();
 		report.addTimeTaken((timeEnd - timeStart) / 1000);
 		//failed tests
@@ -355,18 +382,6 @@ public class ValidationRunner {
 
 		report.addFailedAssertions(failedItems);
 		report.addWarningAssertions(warningItems);
-
-		if(executionConfig.isJiraIssueCreationFlag()) {
-			// Add Jira ticket for each fail assertions
-			try {
-				String relaseYear = executionConfig.getReleaseDate().substring(0,4);
-				String relaseMonth = executionConfig.getReleaseDate().substring(4,6);
-				String dateMonth = executionConfig.getReleaseDate().substring(6,8);
-				jiraService.addJiraTickets(executionConfig.getProductName(),relaseYear + "-" + relaseMonth + "-"  +dateMonth,executionConfig.getReportingStage(),failedItems, TestType.SQL);
-			} catch (JiraException e) {
-				logger.error("Error while creating Jira Ticket for failed assertions. Message : " + e.getMessage());
-			}
-		}
 		
 		items.removeAll(failedItems);
 		items.removeAll(warningItems);
@@ -382,7 +397,7 @@ public class ValidationRunner {
 		List<Assertion> batch = null;
 		for (final Assertion assertion: assertions) {
 			if (batch == null) {
-				batch = new ArrayList<Assertion>();
+				batch = new ArrayList();
 			}
 			batch.add(assertion);
 			if (counter % batchSize == 0 || counter == assertions.size()) {

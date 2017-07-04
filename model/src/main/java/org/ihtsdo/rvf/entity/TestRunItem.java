@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +23,8 @@ public class TestRunItem implements Comparable<TestRunItem>{
 	private List<FailureDetail> firstNInstances;
 	private Long extractResultInMillis;
 	private String jiraLink;
+	@JsonIgnore
+	private String jiraDescription;
 
 	/**
 	 * Empty constructor for IOC
@@ -146,6 +150,14 @@ public class TestRunItem implements Comparable<TestRunItem>{
 		this.jiraLink = jiraLink;
 	}
 
+	public String getJiraDescription() {
+		return jiraDescription;
+	}
+
+	public void setJiraDescription(String jiraDescription) {
+		this.jiraDescription = jiraDescription;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -241,6 +253,9 @@ public class TestRunItem implements Comparable<TestRunItem>{
 
 	@Override
 	public int compareTo(TestRunItem other) {
+		if(this.assertionUuid == null){
+			return -1;
+		}
 		return this.assertionUuid.compareTo(other.getAssertionUuid());
 	}
 	
