@@ -345,7 +345,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 					{
 						// only get first N failed results
 						if (config.getFailureExportMax() < 0 || counter < config.getFailureExportMax()) {
-							FailureDetail detail = new FailureDetail(resultSet.getString(1), resultSet.getString(2));
+							FailureDetail detail = new FailureDetail(resultSet.getString(1), resultSet.getString(2), null);
 							runItem.addFirstNInstance(detail);
 						}
 						counter++;
