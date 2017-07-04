@@ -1,26 +1,19 @@
 package org.ihtsdo.rvf.jira;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.ihtsdo.rvf.entity.TestRunItem;
-import org.ihtsdo.rvf.entity.TestType;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import net.rcarz.jiraclient.*;
+import org.ihtsdo.rvf.entity.TestRunItem;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-import net.rcarz.jiraclient.CustomFieldOption;
-import net.rcarz.jiraclient.Field;
-import net.rcarz.jiraclient.Issue;
-import net.rcarz.jiraclient.JiraClient;
-import net.rcarz.jiraclient.JiraException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: huyle
@@ -28,7 +21,7 @@ import net.rcarz.jiraclient.JiraException;
  * Time: 4:56 PM
  */
 @Service
-public class JiraServiceImpl implements JiraService{
+public class JiraServiceImpl implements JiraService {
 
     @Autowired
     private JiraClientFactory jiraClientFactory;
@@ -59,7 +52,7 @@ public class JiraServiceImpl implements JiraService{
 
     @Value("${rvf.jira.defaultAssignee}")
     private String defaultAssignee;
-    
+
     @Value("${rvf.jira.endpoint}")
     private String jiraEndpoint;
 
@@ -72,19 +65,19 @@ public class JiraServiceImpl implements JiraService{
 
     @Override
     public String buildJQLForAssertionsTickets(String productName, String releaseDate, List<String> prevReportingStages) throws JiraException {
-        StringBuilder jqlBuilder= new StringBuilder();
+        StringBuilder jqlBuilder = new StringBuilder();
         jqlBuilder.append("project = ").append(valueProjectKey).append(" AND ");
-        jqlBuilder.append("\"" + fieldProductName + "\"").append("=").append("\""+productName+"\"").append(" AND ");
-        jqlBuilder.append("\"" + fieldReleaseDate  + "\"").append("=").append("\""+ releaseDate + "\"").append(" AND ");
-        if(prevReportingStages != null && !prevReportingStages.isEmpty()) {
+        jqlBuilder.append("\"" + fieldProductName + "\"").append("=").append("\"" + productName + "\"").append(" AND ");
+        jqlBuilder.append("\"" + fieldReleaseDate + "\"").append("=").append("\"" + releaseDate + "\"").append(" AND ");
+        if (prevReportingStages != null && !prevReportingStages.isEmpty()) {
             StringBuilder reportingStagesBuilder = new StringBuilder();
             for (String stage : prevReportingStages) {
                 reportingStagesBuilder.append("\"" + stage + "\"").append(",");
             }
-            reportingStagesBuilder.deleteCharAt(reportingStagesBuilder.length()-1);
-            jqlBuilder.append("\"" + fieldReportStage  + "\"").append(" in (").append(reportingStagesBuilder.toString()).append(") AND ");
+            reportingStagesBuilder.deleteCharAt(reportingStagesBuilder.length() - 1);
+            jqlBuilder.append("\"" + fieldReportStage + "\"").append(" in (").append(reportingStagesBuilder.toString()).append(") AND ");
         }
-        jqlBuilder.append("status not in ").append("("+valueResolvedStatuses+")");
+        jqlBuilder.append("status not in ").append("(" + valueResolvedStatuses + ")");
         return jqlBuilder.toString();
     }
 
@@ -116,7 +109,7 @@ public class JiraServiceImpl implements JiraService{
         List<Issue> issues = null;
         List<String> productNames = getProductNames();
         for (String name : productNames) {
-            if(name.equalsIgnoreCase(productName)) {
+            if (name.equalsIgnoreCase(productName)) {
                 validProductName = true;
                 break;
             }
@@ -124,13 +117,13 @@ public class JiraServiceImpl implements JiraService{
         List<String> reportingStages = getReportingStages();
         List<String> previousReportingStages = new ArrayList<>();
         for (String name : reportingStages) {
-        	previousReportingStages.add(name);
-        	if(name.equalsIgnoreCase(currentReportingStage)) {
+            previousReportingStages.add(name);
+            if (name.equalsIgnoreCase(currentReportingStage)) {
                 validReportingStage = true;
                 break;
-            } 
+            }
         }
-        if(validProductName && validReportingStage) {
+        if (validProductName && validReportingStage) {
             String jql = buildJQLForAssertionsTickets(productName, releaseDate, previousReportingStages);
             issues = getTicketsByJQL(jql);
         }
@@ -140,7 +133,7 @@ public class JiraServiceImpl implements JiraService{
     @Override
     public Issue createRVFFailureTicket(String summary, String description, String productName, String releaseDate, String reportingStage) throws JiraException {
         JiraClient jiraClient = jiraClientFactory.getJiraClient();
-        if(summary.length() > 255) summary = summary.substring(0, 252) + "...";
+        if (summary.length() > 255) summary = summary.substring(0, 252) + "...";
         JSONObject productNameObj = new JSONObject();
         productNameObj.put("value", productName);
         JSONObject reportingStageObj = new JSONObject();
@@ -149,81 +142,81 @@ public class JiraServiceImpl implements JiraService{
                 .field(Field.SUMMARY, summary)
                 .field(Field.DESCRIPTION, description)
                 .field(fieldIdProductName, productNameObj)
-        		.field(fieldIdReportStage, reportingStageObj)
-        		.field(fieldIdReleaseDate, releaseDate)        		
+                .field(fieldIdReportStage, reportingStageObj)
+                .field(fieldIdReleaseDate, releaseDate)
                 .execute();
-        if(!defaultAssignee.isEmpty()) {
-        	issue.update()
-        		.field(Field.ASSIGNEE, defaultAssignee)
-        		.execute();
+        if (!defaultAssignee.isEmpty()) {
+            issue.update()
+                    .field(Field.ASSIGNEE, defaultAssignee)
+                    .execute();
         }
         return issue;
     }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void addJiraTickets(String productName, String releaseDate, String currentReportingStage,
-			Object failedItem, TestType testType) throws JiraException {
-		List<Issue> issues = getCurrentProductFailureTickets(productName, releaseDate, currentReportingStage);
-		List<TestRunItem> items = (List<TestRunItem>) failedItem;
-		if (issues == null || issues.isEmpty()) {
-			for(TestRunItem item : items) {
-				createJiraTicket(productName, releaseDate, currentReportingStage,item,testType);
-			}			
-		} else {
-			for(TestRunItem item : items) {
-				boolean itemFound = false;
-				for(Issue issue : issues) {
-					// If Issue was found, then return URL of issue
-					if(issue.getSummary().contains(item.getAssertionUuid().toString())
-						&& item.getFailureCount().longValue() == getIssueFailureCount(issue)) {
-						 String url = getBrowseURL(issue);
-						 item.setJiraLink(url);
-						 itemFound = true;
-						 break;
-					}					
-				}
-				if(!itemFound) {
-					createJiraTicket(productName, releaseDate, currentReportingStage,item,testType);
-				}			
-			}		 
-		}
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public void addJiraTickets(String productName, String releaseDate, String currentReportingStage,
+                               Object failedItem) throws JiraException {
+        List<Issue> issues = getCurrentProductFailureTickets(productName, releaseDate, currentReportingStage);
+        List<TestRunItem> items = (List<TestRunItem>) failedItem;
+        if (issues == null || issues.isEmpty()) {
+            for (TestRunItem item : items) {
+                createJiraTicket(productName, releaseDate, currentReportingStage, item);
+            }
+        } else {
+            for (TestRunItem item : items) {
+                boolean itemFound = false;
+                for (Issue issue : issues) {
+                    // If Issue was found, then return URL of issue
+                    if (issue.getSummary().contains(item.getAssertionUuid().toString())
+                            && item.getFailureCount().longValue() == getIssueFailureCount(issue)) {
+                        String url = getBrowseURL(issue);
+                        item.setJiraLink(url);
+                        itemFound = true;
+                        break;
+                    }
+                }
+                if (!itemFound) {
+                    createJiraTicket(productName, releaseDate, currentReportingStage, item);
+                }
+            }
+        }
+    }
 
-	private long getIssueFailureCount(Issue issue) {
-		String desc = issue.getDescription();
-		String failureCountText = "failureCount";
-		int startPositionFailureCount = desc.indexOf(failureCountText);
-		if(startPositionFailureCount > 0) {
-			startPositionFailureCount = startPositionFailureCount + failureCountText.length() + 4;
-			int endPositionFailureCount = desc.substring(startPositionFailureCount, startPositionFailureCount + 20).indexOf(",");
-			return Long.parseLong(desc.substring(startPositionFailureCount , startPositionFailureCount + endPositionFailureCount).trim());
-		}
-		return 0;
-	}
+    private long getIssueFailureCount(Issue issue) {
+        String desc = issue.getDescription();
+        String failureCountText = "failureCount";
+        int startPositionFailureCount = desc.indexOf(failureCountText);
+        if (startPositionFailureCount > 0) {
+            startPositionFailureCount = startPositionFailureCount + failureCountText.length() + 4;
+            int endPositionFailureCount = desc.substring(startPositionFailureCount, startPositionFailureCount + 20).indexOf(",");
+            return Long.parseLong(desc.substring(startPositionFailureCount, startPositionFailureCount + endPositionFailureCount).trim());
+        }
+        return 0;
+    }
 
-	private void createJiraTicket(String productName, String releaseDate, String currentReportingStage, TestRunItem item, TestType testType)
-			throws JiraException {
-		String summary= "[" + testType.toString().toUpperCase() + "] Failed assertion: " +item.getAssertionUuid().toString() + ". " + item.getAssertionText() ;		
-		String descJSON = "";
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-			objectMapper.setSerializationInclusion(Include.NON_NULL);
-			objectMapper.setSerializationInclusion(Include.NON_EMPTY);
-			ObjectWriter writer = objectMapper.writer();
-			
-			descJSON = writer.writeValueAsString(item);
-			descJSON = descJSON.substring(1, descJSON.length() - 1); // Remove first and end bracket
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}		
-		String description = descJSON.length() > 10000 ? descJSON.substring(0, 10000) + " ..." : descJSON;
-		Issue newIssue = createRVFFailureTicket(summary, description, productName, releaseDate, currentReportingStage);
-		item.setJiraLink(getBrowseURL(newIssue));
-	}
-	
-	private String getBrowseURL (Issue issue) {
-		return jiraEndpoint + "/browse/" + issue.getKey();
-	}
+    private void createJiraTicket(String productName, String releaseDate, String currentReportingStage, TestRunItem item)
+            throws JiraException {
+        String summary = "[" + item.getTestType().toString().toUpperCase() + "] Failed assertion: " + item.getAssertionUuid().toString() + ". " + item.getJiraDescription();
+        String descJSON = "";
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            objectMapper.setSerializationInclusion(Include.NON_NULL);
+            objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+            ObjectWriter writer = objectMapper.writer();
+
+            descJSON = writer.writeValueAsString(item);
+            descJSON = descJSON.substring(1, descJSON.length() - 1); // Remove first and end bracket
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        String description = descJSON.length() > 10000 ? descJSON.substring(0, 10000) + " ..." : descJSON;
+        Issue newIssue = createRVFFailureTicket(summary, description, productName, releaseDate, currentReportingStage);
+        item.setJiraLink(getBrowseURL(newIssue));
+    }
+
+    private String getBrowseURL(Issue issue) {
+        return jiraEndpoint + "/browse/" + issue.getKey();
+    }
 }
