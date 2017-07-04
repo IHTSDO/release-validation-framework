@@ -117,8 +117,11 @@ public class ValidationRunner {
 			responseMap.put(FAILURE_MESSAGE, errorMsg);
 			throw new BusinessServiceException(errorMsg);
 		}
-		
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(), 
+
+		ValidationReport report = new ValidationReport();
+		report.setExecutionId(validationConfig.getRunId());
+
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(report, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(),
 				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation());
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
@@ -154,16 +157,22 @@ public class ValidationRunner {
 		}
 		// for extension release validation we need to test the release-type validations first using previous extension against current extension
 		// first then loading the international snapshot for the file-centric and component-centric validations.
+
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
 			logger.info("Run extension release validation with runId:" +  executionConfig.getExecutionId());
-			runExtensionReleaseValidation(responseMap, validationConfig,reportStorage, executionConfig);
+			runExtensionReleaseValidation(report, responseMap, validationConfig,reportStorage, executionConfig);
 		} else {
-			runAssertionTests(executionConfig,responseMap, reportStorage);
+			runAssertionTests(report, executionConfig, reportStorage);
 		}
 
 		//Run Drool Validator
 		runDroolValidator(responseMap, validationConfig, executionConfig);
 
+		//Run MRCM Validator
+//		runMRCMAssertionTests(report, validationConfig, executionConfig);
+
+		report.sortAssertionLists();
+		responseMap.put("TestResult", report);
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
@@ -249,8 +258,8 @@ public class ValidationRunner {
 		return invalidContents;
 	}
 
-	private void runExtensionReleaseValidation(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
-			ExecutionConfig executionConfig) throws IOException,
+	private void runExtensionReleaseValidation(final ValidationReport report, final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
+											   ExecutionConfig executionConfig) throws IOException,
 			NoSuchAlgorithmException, DecoderException, BusinessServiceException, SQLException {
 		final long timeStart = System.currentTimeMillis();
 		//run release-type validations
@@ -271,7 +280,7 @@ public class ValidationRunner {
 		//run remaining component-centric and file-centric validaitons
 		assertions.removeAll(releaseTypeAssertions);
 		testItems.addAll(runAssertionTests(executionConfig, assertions, reportStorage, true));
-		constructTestReport(executionConfig, responseMap, timeStart, testItems);
+		constructTestReport(report, executionConfig, timeStart, testItems);
 	}
 
 	private List<Assertion> getAssertions(List<String> groupNames) {
@@ -301,7 +310,7 @@ public class ValidationRunner {
 		return result;
 	}
 
-	private void runAssertionTests(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, String reportStorage) throws IOException {
+	private void runAssertionTests(final ValidationReport report, final ExecutionConfig executionConfig, String reportStorage) throws IOException {
 		final long timeStart = System.currentTimeMillis();
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
@@ -321,22 +330,13 @@ public class ValidationRunner {
 		} else {
 			items.addAll(executeAssertionsConcurrently(executionConfig,assertions, batchSize, reportStorage));
 		}
-		constructTestReport(executionConfig, responseMap, timeStart, items);
+		constructTestReport(report, executionConfig, timeStart, items);
 		
 	}
 
-	private void constructTestReport(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, final long timeStart, final List<TestRunItem> items) {
+	private void constructTestReport(final ValidationReport report, final ExecutionConfig executionConfig, final long timeStart, final List<TestRunItem> items) {
 		final long timeEnd = System.currentTimeMillis();
-		
-		//summary
-		final ValidationReport summary = new ValidationReport(TestType.SQL);
-		final ValidationReport failedReport = new ValidationReport(TestType.SQL);
-		final ValidationReport warningReport = new ValidationReport(TestType.SQL);
-		
-		summary.setExecutionId(executionConfig.getExecutionId());
-		summary.setTotalTestsRun(items.size());
-		summary.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
-		
+		report.addTimeTaken((timeEnd - timeStart) / 1000);
 		//failed tests
 		final List<TestRunItem> failedItems = new ArrayList<>();
 		final List<TestRunItem> warningItems = new ArrayList<>();
@@ -347,36 +347,15 @@ public class ValidationRunner {
 			if(SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())){
 				warningItems.add(item);
 			}
+			item.setTestType(TestType.SQL);
 		}
-		
-		if (!failedItems.isEmpty()) {
-			Collections.sort(failedItems);
-			failedReport.setExecutionId(executionConfig.getExecutionId());
-			failedReport.setTotalFailures(failedItems.size());
-			failedReport.setFailedAssertions(failedItems);
-		}
-		
-		if(!warningItems.isEmpty()) {
-			Collections.sort(warningItems);
-			warningReport.setExecutionId(executionConfig.getExecutionId());
-			warningReport.setTotalWarnings(warningItems.size());
-			warningReport.setAssertionsWarning(warningItems);			
-		}
-		
+
+		report.addFailedAssertions(failedItems);
+		report.addWarningAssertions(warningItems);
+
 		items.removeAll(failedItems);
 		items.removeAll(warningItems);
-		Collections.sort(items);
-		summary.setPassedAssertions(items);
-		summary.setTotalFailures(failedItems.size());
-		summary.setTotalWarnings(warningItems.size());
-		
-		responseMap.put("SQL Test result summary", summary);
-		if(failedReport.getTotalFailures() > 0) {
-			responseMap.put(failedReport.getTestType().toString() + "FailedTestResult", failedReport);
-		}
-		if(warningReport.getTotalWarnings() > 0){
-			responseMap.put(warningReport.getTestType().toString() + "WarningTestResult", warningReport);
-		}
+		report.addPassedAssertions(items);
 	}
 
 	private List<TestRunItem> executeAssertionsConcurrently(final ExecutionConfig executionConfig, final Collection<Assertion> assertions, int batchSize, String reportStorage) {

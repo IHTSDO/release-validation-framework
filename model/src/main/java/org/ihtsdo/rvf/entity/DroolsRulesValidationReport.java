@@ -1,12 +1,7 @@
 package org.ihtsdo.rvf.entity;
 
-import org.ihtsdo.drools.response.InvalidContent;
-
 import java.util.List;
 
-/**
- * Created by TinLe on 6/27/2017.
- */
 public class DroolsRulesValidationReport {
     private TestType testType;
     private Long executionId;
