@@ -24,7 +24,7 @@
 	inner join curr_concept_s b on a.targetcomponentid = b.id
 	left join v_limcons c on c.referencedcomponentid = a.targetcomponentid
 	where a.active = '1'
-	and a.refsetid !='900000000000531004'
+	and a.refsetid not in ('900000000000531004','734138000','734139008')
 	and b.active = '0' 
 	and c.referencedcomponentid is null;
 	

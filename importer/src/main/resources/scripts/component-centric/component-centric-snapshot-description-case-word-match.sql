@@ -17,7 +17,7 @@
 */
 	drop table if exists tmp_active_caseSensitive_description;
 	create table if not exists tmp_active_caseSensitive_description as
-	select SUBSTRING_INDEX(term, ' ', 1) as firstword , a.conceptid , a.id , a.term , a.casesignificanceid, a.effectivetime
+	select SUBSTRING_INDEX(term, ' ', 1) as firstword , a.conceptid , a.id , a.term , a.casesignificanceid, a.effectivetime, a.languagecode
 	from  curr_description_s a , res_edited_active_concepts b
 	where a.casesignificanceid = 900000000000017005
 	and a.active = 1
@@ -33,6 +33,7 @@
 	and c.active = 1
 	and b.conceptid = c.id
 	and a.conceptid = b.conceptid
+	and a.languagecode = b.languagecode
 	and cast(b.effectivetime as datetime) >= cast(a.effectivetime as datetime) 
 	and BINARY SUBSTRING_INDEX(b.term, ' ', 1) = firstword;	
 	
