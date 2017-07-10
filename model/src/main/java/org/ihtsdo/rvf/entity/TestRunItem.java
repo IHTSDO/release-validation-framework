@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -7,6 +9,7 @@ import java.util.UUID;
 /**
  * A class that records metrics about execution of an {@link org.ihtsdo.rvf.entity.Test}.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestRunItem implements Comparable<TestRunItem>{
 
 	private String testCategory;
