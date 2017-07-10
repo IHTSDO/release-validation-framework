@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import net.rcarz.jiraclient.*;
+import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -168,7 +169,7 @@ public class JiraServiceImpl implements JiraService {
                 boolean itemFound = false;
                 for (Issue issue : issues) {
                     // If Issue was found, then return URL of issue
-                    if (issue.getSummary().contains(item.getAssertionUuid().toString())
+                    if (item.getAssertionUuid() != null && issue.getSummary().contains(item.getAssertionUuid().toString())
                             && item.getFailureCount().longValue() == getIssueFailureCount(issue)) {
                         String url = getBrowseURL(issue);
                         item.setJiraLink(url);
@@ -197,9 +198,9 @@ public class JiraServiceImpl implements JiraService {
 
     private void createJiraTicket(String productName, String releaseDate, String currentReportingStage, TestRunItem item)
             throws JiraException {
-        String summary = "[" + item.getTestType().toString().toUpperCase() + "] Failed assertion: " + item.getAssertionUuid().toString() + ". " + item.getJiraDescription();
-        String descJSON = "";
         try {
+            String summary = getSummary(item);
+            String descJSON;
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -208,12 +209,39 @@ public class JiraServiceImpl implements JiraService {
 
             descJSON = writer.writeValueAsString(item);
             descJSON = descJSON.substring(1, descJSON.length() - 1); // Remove first and end bracket
+            String description = descJSON.length() > 10000 ? descJSON.substring(0, 10000) + " ..." : descJSON;
+            Issue newIssue = createRVFFailureTicket(summary, description, productName, releaseDate, currentReportingStage);
+            item.setJiraLink(getBrowseURL(newIssue));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        String description = descJSON.length() > 10000 ? descJSON.substring(0, 10000) + " ..." : descJSON;
-        Issue newIssue = createRVFFailureTicket(summary, description, productName, releaseDate, currentReportingStage);
-        item.setJiraLink(getBrowseURL(newIssue));
+    }
+
+    private String getSummary(TestRunItem item) {
+        String summary = "";
+        if(item.getTestType() != null){
+            summary += "[" + item.getTestType().toString().toUpperCase() + "] ";
+        }
+        summary += "Failed assertion: ";
+        if(item.getAssertionUuid() != null) {
+            summary += item.getAssertionUuid().toString() + ". ";
+        }
+
+        switch (item.getTestType()){
+            case SQL:
+            case MRCM:
+            case DROOL_RULES:
+                summary += item.getAssertionText();
+                break;
+            case ARCHIVE_STRUCTURAL:
+                if(item.getFirstNInstances() != null && item.getFirstNInstances().size() > 0) {
+                    for (FailureDetail failItem : item.getFirstNInstances()) {
+                        summary += failItem.getDetail() + ". ";
+                    }
+                }
+                break;
+        }
+        return summary;
     }
 
     private String getBrowseURL(Issue issue) {
