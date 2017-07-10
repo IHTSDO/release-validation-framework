@@ -3,7 +3,6 @@ package org.ihtsdo.rvf.execution.service.impl;
 import com.google.common.collect.Sets;
 import net.rcarz.jiraclient.JiraException;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.drools.RuleExecutor;
 import org.ihtsdo.drools.response.InvalidContent;
@@ -13,7 +12,6 @@ import org.ihtsdo.drools.validator.rf2.domain.DroolsConcept;
 import org.ihtsdo.drools.validator.rf2.service.DroolsConceptService;
 import org.ihtsdo.drools.validator.rf2.service.DroolsDescriptionService;
 import org.ihtsdo.drools.validator.rf2.service.DroolsRelationshipService;
-import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
@@ -38,9 +36,8 @@ import org.springframework.util.Assert;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.*;
-import java.util.Date;
 import java.util.concurrent.*;
 
 @Service
@@ -176,27 +173,10 @@ public class ValidationRunner {
 		}
 
 		//Run Drool Validator
-		runDroolValidator(responseMap, validationConfig, executionConfig);
+		runDroolValidator(report, validationConfig, executionConfig);
 
 		//Run MRCM Validator
-//		runMRCMAssertionTests(report, validationConfig, executionConfig);
-
-		for (TestRunItem failedAssertion : report.getAssertionsFailed()){
-			switch (failedAssertion.getTestType()){
-				case SQL:
-				case MRCM:
-					failedAssertion.setJiraDescription(failedAssertion.getAssertionText());
-					break;
-				case ARCHIVE_STRUCTURAL:
-					if(CollectionUtils.isNotEmpty(failedAssertion.getFirstNInstances())) {
-						String jiraDescription = "";
-						for (FailureDetail failItem : failedAssertion.getFirstNInstances()) {
-							jiraDescription += failItem.getDetail() + "\\r\\n";
-						}
-						failedAssertion.setJiraDescription(jiraDescription);
-					}
-			}
-		}
+		runMRCMAssertionTests(report, validationConfig, executionConfig);
 
 		if(executionConfig.isJiraIssueCreationFlag()) {
 			// Add Jira ticket for each fail assertions
@@ -210,7 +190,7 @@ public class ValidationRunner {
 			}
 		}
 
-		report.sortAssertionLists();
+//		report.sortAssertionLists();
 		responseMap.put("TestResult", report);
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
@@ -221,9 +201,8 @@ public class ValidationRunner {
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
 	}
 
-	private void runDroolValidator(Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) {
-		long timeStart = (new Date()).getTime();
-		//String releaseFilePath = "D:\\Projects\\SNOMED\\release-validation-framework\\xSnomedCT_MRCMReferenceSets_Beta_20170210.zip";
+	private void runDroolValidator(ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) {
+		long timeStart = System.currentTimeMillis();
 		String directoryOfRuleSetsPath = droolRulesModuleName;
 
 		HashSet<String> ruleSetNamesToRun = Sets.newHashSet(validationConfig.getGroupsList().iterator().next());
@@ -231,11 +210,10 @@ public class ValidationRunner {
 		try {
 			invalidContents = validateRF2(new FileInputStream(validationConfig.getLocalProspectiveFile()), directoryOfRuleSetsPath, ruleSetNamesToRun);
 		} catch (ReleaseImportException e) {
-			e.printStackTrace();
+			logger.error("Error: " + e);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error("Error: " + e);
 		}
-		RuleExecutor ruleExecutor = new RuleExecutor(directoryOfRuleSetsPath);
 		HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
 		for(InvalidContent invalidContent : invalidContents){
 			if(!invalidContentMap.containsKey(invalidContent.getMessage())){
@@ -247,28 +225,28 @@ public class ValidationRunner {
 			}
 		}
 		invalidContents.clear();
-		List<AssertionDroolRule> assertionDroolRules = new ArrayList<>();
 		Iterator it = invalidContentMap.entrySet().iterator();
-		while (it.hasNext()) {
+		List<TestRunItem> failedAssertions = new ArrayList<>();
+		while (it.hasNext()){
 			Map.Entry pair = (Map.Entry)it.next();
-			AssertionDroolRule assertionDroolRule = new AssertionDroolRule();
+			TestRunItem failedAssertion = new TestRunItem();
+			failedAssertion.setTestType(TestType.DROOL_RULES);
+			failedAssertion.setTestCategory("");
+			failedAssertion.setAssertionUuid(null);
+			failedAssertion.setAssertionText((String) pair.getKey());
+			failedAssertion.setExtractResultInMillis(0L);
 			List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
-			assertionDroolRule.setRule((String)pair.getKey());
-			assertionDroolRule.setTotalFails(invalidContentList.size());
-			assertionDroolRule.setContentItems(invalidContentList);
-			assertionDroolRules.add(assertionDroolRule);
+			failedAssertion.setFailureCount((long) invalidContentList.size());
+			List<FailureDetail> failureDetails = new ArrayList<>();
+			for (InvalidContent invalidContent : invalidContentList){
+				failureDetails.add(new FailureDetail(invalidContent.getConceptId(), invalidContent.getMessage(), null));
+			}
+			failedAssertion.setFirstNInstances(failureDetails);
+			failedAssertions.add(failedAssertion);
 			it.remove(); // avoids a ConcurrentModificationException
 		}
-
-
-		final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
-		report.setAssertionsInvalidContent(assertionDroolRules);
-		report.setExecutionId(executionConfig.getExecutionId());
-		report.setTotalTestsRun(ruleExecutor.getTotalRulesLoaded());
-		report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-		report.setTotalFailures(invalidContents.size());
-		report.setRuleSetExecuted(validationConfig.getGroupsList().iterator().next());
-		responseMap.put(report.getTestType().toString() + "TestResult", report);
+		validationReport.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
+		validationReport.addFailedAssertions(failedAssertions);
 
 	}
 
