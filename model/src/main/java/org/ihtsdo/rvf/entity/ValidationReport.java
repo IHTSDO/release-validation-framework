@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -9,8 +10,10 @@ import java.util.List;
 /**
  * Created by NamLe on 5/29/2017.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ValidationReport {
     private Long executionId;
+    private TestType testType;
     private long timeTakenInSeconds;
     private String reportUrl;
     private int totalTestsRun;
@@ -23,6 +26,7 @@ public class ValidationReport {
     private List<TestRunItem> assertionsPassed;
 
     public ValidationReport() {
+        testType = null;
         assertionsSkipped = new ArrayList<>();
         assertionsWarning = new ArrayList<>();
         assertionsFailed = new ArrayList<>();
@@ -41,6 +45,14 @@ public class ValidationReport {
         this.executionId = executionId;
     }
 
+    public TestType getTestType() {
+        return testType;
+    }
+
+    public void setTestType(TestType testType) {
+        this.testType = testType;
+    }
+
     public long getTimeTakenInSeconds() {
         return timeTakenInSeconds;
     }
@@ -55,6 +67,10 @@ public class ValidationReport {
 
     public int getTotalTestsRun() {
         return totalTestsRun;
+    }
+
+    public void setTotalTestsRun(int totalTestsRun) {
+        this.totalTestsRun = totalTestsRun;
     }
 
     public int getTotalSkips() {

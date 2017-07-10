@@ -84,13 +84,16 @@ public class StructuralTestRunner implements InitializingBean{
 		columnPatternTest.runTests();
 	}
 	
-	public boolean verifyZipFileStructure(final ValidationReport validationReport, final File tempFile, final Long runId, final File manifestFile,
+	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final File manifestFile,
 										  final boolean writeSucceses, final String urlPrefix, String storageLocation ) throws IOException {
 		 boolean isFailed = false;
 		 final long timeStart = System.currentTimeMillis();
 		 if (tempFile != null) {
 			 logger.debug("Start verifying zip file structure of {} against manifest", tempFile.getAbsolutePath());
 		 }
+		final ValidationReport validationReport = new ValidationReport();
+		validationReport.setExecutionId(runId);
+		validationReport.setTestType(TestType.ARCHIVE_STRUCTURAL);
 		// convert groups which is passed as string to assertion groups
 		// set up the response in order to stream directly to the response
 		final File structureTestReport = new File(getReportDataFolder(), "structure_validation_"+ runId+".txt");
@@ -113,6 +116,7 @@ public class StructuralTestRunner implements InitializingBean{
 			}
 			report.getResult();
 			logger.info(report.writeSummary());
+			validationReport.setTotalTestsRun(report.getNumTestRuns());
 			// verify if manifest is valid
 			if(report.getNumErrors() > 0) {
 				validationReport.setReportUrl(urlPrefix + "/result/structure/" + runId + "?storageLocation=" + storageLocation);
@@ -135,6 +139,7 @@ public class StructuralTestRunner implements InitializingBean{
 		}
 		final long timeEnd = System.currentTimeMillis();
 		validationReport.addTimeTaken((timeEnd-timeStart)/1000);
+		responseMap.put(TestType.ARCHIVE_STRUCTURAL.toString() + "TestResult", validationReport);
 		logger.debug("Finished verifying zip file structure of {} against manifest", tempFile.getName());
 		return isFailed;
 	}
@@ -164,7 +169,6 @@ public class StructuralTestRunner implements InitializingBean{
 				
 				TestRunItem item = new TestRunItem();
 				item.setTestCategory(key);
-				item.setTestType(TestType.ARCHIVE_STRUCTURAL);
 				item.setFirstNInstances(failItems.subList(0, failItems.size() > 10 ? 10 : failItems.size()));
 				item.setFailureCount((long) failItems.size());
 				testRunFailItems.add(item);

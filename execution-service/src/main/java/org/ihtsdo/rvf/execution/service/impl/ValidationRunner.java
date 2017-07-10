@@ -128,10 +128,8 @@ public class ValidationRunner {
 			throw new BusinessServiceException(errorMsg);
 		}
 
-		ValidationReport report = new ValidationReport();
-		report.setExecutionId(validationConfig.getRunId());
 
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(report, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(),
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(),
 				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation());
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
@@ -165,6 +163,9 @@ public class ValidationRunner {
 		// for extension release validation we need to test the release-type validations first using previous extension against current extension
 		// first then loading the international snapshot for the file-centric and component-centric validations.
 
+		ValidationReport report = new ValidationReport();
+		report.setExecutionId(validationConfig.getRunId());
+
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
 			logger.info("Run extension release validation with runId:" +  executionConfig.getExecutionId());
 			runExtensionReleaseValidation(report, responseMap, validationConfig,reportStorage, executionConfig);
@@ -190,7 +191,6 @@ public class ValidationRunner {
 			}
 		}
 
-//		report.sortAssertionLists();
 		responseMap.put("TestResult", report);
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
