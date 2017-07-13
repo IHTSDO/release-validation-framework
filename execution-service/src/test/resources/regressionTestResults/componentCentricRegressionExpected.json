@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 85,
-  "totalAssertionsFailed" : 85,
+  "totalAssertionsRun" : 86,
+  "totalAssertionsFailed" : 86,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -434,6 +434,17 @@
       "detail" : "AssociationRefset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is active but the target component is an inactive concept: 609452007"
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "There is only one active member per description per dialect in the language refset snapshot file.",
+    "assertionUuid" : "eead9964-67ce-11e7-b7e7-3c15c2c6e32e",
+    "firstNInstances" : [ {
+      "conceptId" : "703860006",
+      "detail" : "Description: id=3008913022: has multiple active language refset members for a given dialect."
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Text definition: id=3008913022: has multiple active language refset members for a given dialect."
+    } ],
+    "totalFailed" : 2
   }, {
     "assertionName" : "CTV3 codes are unique in the CTV3 simple map refset",
     "assertionUuid" : "f14d521f-2472-4871-9c4e-356f0f075a3a",
