@@ -1134,3 +1134,11 @@ create table mrcmDomainRefset_d(
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
+
+drop table if exists package_info;
+create table package_info(
+ releaseedition varchar(36) not null,
+ releasetime varchar(36) not null,
+ key idx_releaseedition(releaseedition),
+    key idx_releasetime(releasetime)
+) engine=myisam default charset=utf8;

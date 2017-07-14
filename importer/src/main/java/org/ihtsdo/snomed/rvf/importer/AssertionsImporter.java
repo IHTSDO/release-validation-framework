@@ -1,23 +1,10 @@
 package org.ihtsdo.snomed.rvf.importer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.UUID;
-
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.ExecutionCommand;
-import org.ihtsdo.rvf.entity.SimpleAssertion;
-import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.entity.TestType;
+import com.facebook.presto.sql.parser.SqlParser;
+import com.facebook.presto.sql.parser.StatementSplitter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.snomed.rvf.importer.helper.RvfRestClient;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -32,10 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.facebook.presto.sql.parser.SqlParser;
-import com.facebook.presto.sql.parser.StatementSplitter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.*;
+import java.util.*;
 
 /**
  * An implementation of a {@link org.ihtsdo.snomed.rvf.importer.AssertionsImporter} that imports older
@@ -49,6 +34,7 @@ public class AssertionsImporter {
 	private static final String JSON_EXTENSION = ".json";
 	private static final SqlParser SQL_PARSER = new SqlParser();
 	private static final Logger logger = LoggerFactory.getLogger(AssertionsImporter.class);
+	public static final String DEPENDANT = "dependant_";
 	protected RvfRestClient restClient;
 	protected ObjectMapper objectMapper = new ObjectMapper();
 	protected Map<String, String> lookupMap = new HashMap<>();
@@ -276,6 +262,11 @@ public class AssertionsImporter {
 			rvfSchema = "<PREVIOUS>";
 			// we strip the prefix - note we don't include _ in length since strings are 0 indexed
 			ratSchema = ratSchema.substring("prev_".length());
+			currOrPrevFound = true;
+		} else if(ratSchema.startsWith(DEPENDANT)){
+			rvfSchema = "<DEPENDENCY>";
+			// we strip the prefix - note we don't include _ in length since strings are 0 indexed
+			ratSchema = ratSchema.substring(DEPENDANT.length());
 			currOrPrevFound = true;
 		}
 		else if(ratSchema.startsWith("v_")){

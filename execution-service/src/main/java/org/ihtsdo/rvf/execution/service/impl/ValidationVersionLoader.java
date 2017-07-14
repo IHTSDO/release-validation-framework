@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
 import java.io.*;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
 
 @Service
@@ -90,14 +87,18 @@ public class ValidationVersionLoader {
 			executionConfig.setPreviousVersion(previousVersion);
 			isSuccessful = prepareVersionsFromS3FilesForPreviousVersion(validationConfig, executionConfig, responseMap);
 		}  else {
-			if (isExtension(validationConfig)) {
-				executionConfig.setPreviousVersion(validationConfig.getPreviousExtVersion());
-			} else {
-				executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
-			}
+			isExtensionValidation(executionConfig, validationConfig);
 		}
 		return isSuccessful;
 		}
+
+	private void isExtensionValidation(ExecutionConfig executionConfig, ValidationRunConfig validationConfig) {
+		if (isExtension(validationConfig)) {
+            executionConfig.setPreviousVersion(validationConfig.getPreviousExtVersion());
+        } else {
+            executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
+        }
+	}
 
 	public boolean loadProspectiveVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
 		String prospectiveVersion = executionConfig.getExecutionId().toString();
@@ -107,11 +108,7 @@ public class ValidationVersionLoader {
 		if (validationConfig.isRf2DeltaOnly()) {
 			List<String> excludeTables = Arrays.asList(RELATIONSHIP_SNAPSHOT_TABLE);
 			rf2FilesLoaded.addAll(loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,excludeTables));
-			if (isExtension(validationConfig)) {
-				executionConfig.setPreviousVersion(validationConfig.getPreviousExtVersion());
-			} else {
-				executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
-			}
+			isExtensionValidation(executionConfig, validationConfig);
 		} else {
 			//load prospective version alone now as used to combine with dependency for extension testing
 			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
@@ -232,16 +229,32 @@ public class ValidationVersionLoader {
     }
 
 	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String storageLocation, String rvfVersion, Map<String, Object> responseMap) throws Exception {
-		String[] splits = publishedReleaseFilename.split("_");
-		int index = splits.length-2;
-		logger.debug( "release file short name:" + splits[index]);
-		String publishedFileS3Path;
-		if ("INT".equalsIgnoreCase(splits[index])) {
-			//derivative products released by the international release but during RVF testing using the same logic as extension.
-			publishedFileS3Path = INTERNATIONAL + SEPARATOR + publishedReleaseFilename;
+		String fileNameWithoutExtension;
+		if(!publishedReleaseFilename.contains(".")){
+			fileNameWithoutExtension= publishedReleaseFilename;
 		} else {
-			publishedFileS3Path = EXTENSIONS + SEPARATOR + splits[index] + SEPARATOR + publishedReleaseFilename;
+			fileNameWithoutExtension = publishedReleaseFilename.substring(0, publishedReleaseFilename.indexOf("."));
 		}
+		String releaseType = null;
+		String releaseDate = null;
+		String[] splits = fileNameWithoutExtension.split("_");
+		int releaseTypeIndex = splits.length-2;
+		int releaseDateIndex = splits.length-1;
+		logger.debug( "release file short name:" + splits[releaseTypeIndex]);
+		String publishedFileS3Path = null;
+		if(releaseTypeIndex > 0) {
+			releaseType = splits[releaseTypeIndex];
+			if ("INT".equalsIgnoreCase(releaseType)) {
+				//derivative products released by the international release but during RVF testing using the same logic as extension.
+				publishedFileS3Path = INTERNATIONAL + SEPARATOR + publishedReleaseFilename;
+			} else {
+				publishedFileS3Path = EXTENSIONS + SEPARATOR + releaseType + SEPARATOR + publishedReleaseFilename;
+			}
+		}
+		if(splits[releaseDateIndex].matches("^\\d{8}?$")){
+			releaseDate = splits[releaseDateIndex];
+		}
+
 		logger.debug("downloading published file from s3:" + publishedFileS3Path); //download previous ZIP file from S3
 		InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
 		if (publishedFileInput != null) {
@@ -251,6 +264,7 @@ public class ValidationVersionLoader {
 			IOUtils.closeQuietly(publishedFileInput);
 			IOUtils.closeQuietly(out);
 			String createdSchemaName = releaseDataManager.loadSnomedData(rvfVersion, new ArrayList<String>(),tempFile);
+			addReleasePackageInfo(releaseType, releaseDate);
 			/**
              * Backup database
              */
@@ -277,6 +291,18 @@ public class ValidationVersionLoader {
 			FileUtils.deleteQuietly(backupMyISAMZipFile);
 		} else {
 			logger.error("Previous release not found in the published bucket:" + publishedFileS3Path);
+		}
+	}
+
+	private void addReleasePackageInfo(String releaseType, String releaseDate) throws SQLException {
+		final String insertSQL = "insert into package_info(releaseedition, releasetime) values (?, ?)";
+		try (Connection connection = snomedDataSource.getConnection()) {
+			try (PreparedStatement insertStatement = connection.prepareStatement(insertSQL)) {
+				insertStatement.setString(1, releaseType);
+				insertStatement.setString(2, releaseDate);
+				// execute insert statement
+				insertStatement.execute();
+			}
 		}
 	}
 

@@ -1,31 +1,7 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.regex.Pattern;
-
-import javax.annotation.Resource;
-import javax.naming.ConfigurationException;
-
 import org.apache.commons.dbcp.BasicDataSource;
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionTest;
-import org.ihtsdo.rvf.entity.ExecutionCommand;
-import org.ihtsdo.rvf.entity.FailureDetail;
-import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.entity.TestRunItem;
+import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
@@ -35,6 +11,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.naming.ConfigurationException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.regex.Pattern;
 
 /**
  * An implementation of the {@link org.ihtsdo.rvf.execution.service.AssertionExecutionService}
@@ -284,8 +269,10 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		
 		final String prospectiveRelease = config.getProspectiveVersion();
 		final String previousRelease = config.getPreviousVersion();
+		final String releaseDependency = config.getExtensionDependencyVersion();
 		final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveRelease);
 		final String previousReleaseSchema = releaseDataManager.getSchemaForRelease(previousRelease);
+		final String releaseDependencySchema = releaseDataManager.getSchemaForRelease(releaseDependency);
 		
 		//We need both these schemas to exist
 		if (prospectiveSchema == null) {
@@ -309,6 +296,9 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = part.replaceAll("<TEMP>", prospectiveSchema);
 			if (previousReleaseSchema != null) {
 				part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
+			}
+			if(releaseDependencySchema != null){
+				part = part.replaceAll("<DEPENDENCY>", releaseDependencySchema);
 			}
 			part = part.replaceAll("<DELTA>", deltaTableSuffix);
 			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);

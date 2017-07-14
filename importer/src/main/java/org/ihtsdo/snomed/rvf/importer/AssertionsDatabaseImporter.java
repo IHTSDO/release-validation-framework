@@ -1,38 +1,27 @@
 	package org.ihtsdo.snomed.rvf.importer;
 
+	import com.facebook.presto.sql.parser.SqlParser;
+	import com.facebook.presto.sql.parser.StatementSplitter;
+	import com.fasterxml.jackson.core.JsonProcessingException;
+	import com.fasterxml.jackson.databind.ObjectMapper;
+	import org.ihtsdo.rvf.entity.*;
+	import org.ihtsdo.rvf.service.AssertionService;
+	import org.jdom2.Document;
+	import org.jdom2.Element;
+	import org.jdom2.JDOMException;
+	import org.jdom2.input.SAXBuilder;
+	import org.jdom2.xpath.XPathExpression;
+	import org.jdom2.xpath.XPathFactory;
+	import org.slf4j.Logger;
+	import org.slf4j.LoggerFactory;
+	import org.springframework.beans.factory.annotation.Autowired;
+	import org.springframework.stereotype.Service;
+
 	import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.UUID;
-
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.ExecutionCommand;
-import org.ihtsdo.rvf.entity.SimpleAssertion;
-import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.service.AssertionService;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.facebook.presto.sql.parser.SqlParser;
-import com.facebook.presto.sql.parser.StatementSplitter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+	import java.io.IOException;
+	import java.io.InputStream;
+	import java.io.InputStreamReader;
+	import java.util.*;
 
 	/**
 	 * An implementation of a {@link org.ihtsdo.snomed.rvf.importer.AssertionsDatabaseImporter} that imports older
@@ -47,7 +36,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		private static final String JSON_EXTENSION = ".json";
 		private static final SqlParser SQL_PARSER = new SqlParser();
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
-	
+		public static final String DEPENDANT = "dependant_";
+
 		protected ObjectMapper objectMapper = new ObjectMapper();
 		protected Map<String, String> lookupMap = new HashMap<>();
 		@Autowired
@@ -276,6 +266,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 				rvfSchema = "<PREVIOUS>";
 				// we strip the prefix - note we don't include _ in length since strings are 0 indexed
 				ratSchema = ratSchema.substring("prev_".length());
+				currOrPrevFound = true;
+			} else if(ratSchema.startsWith(DEPENDANT)){
+				rvfSchema = "<DEPENDENCY>";
+				// we strip the prefix - note we don't include _ in length since strings are 0 indexed
+				ratSchema = ratSchema.substring(DEPENDANT.length());
 				currOrPrevFound = true;
 			}
 			else if(ratSchema.startsWith("v_")){

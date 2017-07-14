@@ -84,7 +84,7 @@ public class StructuralTestRunner implements InitializingBean{
 		final ColumnPatternTester columnPatternTest = new ColumnPatternTester(validationLog, resourceManager, report);
 		columnPatternTest.runTests();
 	}
-	
+
 	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final File manifestFile,
 										  final boolean writeSucceses, final String urlPrefix, String storageLocation ) throws IOException {
 		 boolean isFailed = false;
@@ -169,6 +169,7 @@ public class StructuralTestRunner implements InitializingBean{
 				List<FailureDetail> failItems = structuralTestFailItemMap.get(key);
 				
 				TestRunItem item = new TestRunItem();
+				item.setTestType(TestType.ARCHIVE_STRUCTURAL);
 				item.setTestCategory(key);
 				item.setFirstNInstances(failItems.subList(0, failItems.size() > 10 ? 10 : failItems.size()));
 				item.setFailureCount((long) failItems.size());

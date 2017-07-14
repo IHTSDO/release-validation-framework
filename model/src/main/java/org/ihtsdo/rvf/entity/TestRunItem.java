@@ -21,9 +21,9 @@ public class TestRunItem implements Comparable<TestRunItem>{
 	private Long queryInMilliSeconds;
 	private Long failureCount;
 	private String failureMessage;
+	private String jiraLink;
 	private List<FailureDetail> firstNInstances;
 	private Long extractResultInMillis;
-	private String jiraLink;
 
 	/**
 	 * Empty constructor for IOC
