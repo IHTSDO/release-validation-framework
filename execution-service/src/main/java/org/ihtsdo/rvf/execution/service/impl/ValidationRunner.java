@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.execution.service.impl;
 import com.google.common.collect.Sets;
 import net.rcarz.jiraclient.JiraException;
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.drools.RuleExecutor;
 import org.ihtsdo.drools.response.InvalidContent;
@@ -24,19 +25,24 @@ import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
 import org.ihtsdo.rvf.jira.JiraService;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
+import org.ihtsdo.rvf.validation.ColumnPatternTester;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snomed.quality.validator.mrcm.ValidationRun;
 import org.snomed.quality.validator.mrcm.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import javax.annotation.Resource;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -79,6 +85,15 @@ public class ValidationRunner {
 
 	@Autowired
 	private JiraService jiraService;
+
+	@Resource(name = "snomedDataSource")
+	private BasicDataSource snomedDataSource;
+
+	@Value("${rvf.snomed.jdbc.username}")
+	private String username;
+
+	@Value("${rvf.snomed.jdbc.password}")
+	private String password;
 
 	public ValidationRunner( int batchSize) {
 		this.batchSize = batchSize;
@@ -160,6 +175,9 @@ public class ValidationRunner {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;
 		}
+
+		storeLatestVersion(validationConfig.getLocalProspectiveFile().getName());
+		
 		// for extension release validation we need to test the release-type validations first using previous extension against current extension
 		// first then loading the international snapshot for the file-centric and component-centric validations.
 
@@ -520,6 +538,27 @@ public class ValidationRunner {
 		}
 		reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()), reportStorage);
 		return results;
+	}
+
+	private void storeLatestVersion(String fileName){
+		try {
+			Connection connection = snomedDataSource.getConnection();
+			connection.setAutoCommit(true);
+			String[] fileNameStrArray = fileName.split("_");
+			String lastestVersion = fileNameStrArray[fileNameStrArray.length - 1];
+			String releaseEdition = fileNameStrArray[fileNameStrArray.length - 2];
+			lastestVersion = lastestVersion.substring(0, lastestVersion.indexOf("."));
+			if(lastestVersion.matches(ColumnPatternTester.DATE_PATTERN.pattern())){
+				//clean and create database
+				String createDbStr = "insert into package_info values ('"+ releaseEdition + "', '" + lastestVersion + "'); ";
+				try(Statement statement = connection.createStatement()) {
+					statement.execute(createDbStr);
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void setDroolRulesModuleName(String droolRulesModuleName) {
