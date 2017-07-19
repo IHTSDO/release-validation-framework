@@ -238,39 +238,41 @@ public class ValidationRunner {
 		} catch (Exception e){
 			logger.error("Error: " + e);
 		}
-		HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
-		for(InvalidContent invalidContent : invalidContents){
-			if(!invalidContentMap.containsKey(invalidContent.getMessage())){
-				List<InvalidContent> invalidContentArrayList = new ArrayList<>();
-				invalidContentArrayList.add(invalidContent);
-				invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
-			}else {
-				invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
+		if(invalidContents != null) {
+			HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
+			for (InvalidContent invalidContent : invalidContents) {
+				if (!invalidContentMap.containsKey(invalidContent.getMessage())) {
+					List<InvalidContent> invalidContentArrayList = new ArrayList<>();
+					invalidContentArrayList.add(invalidContent);
+					invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
+				} else {
+					invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
+				}
 			}
-		}
-		invalidContents.clear();
-		Iterator it = invalidContentMap.entrySet().iterator();
-		List<TestRunItem> failedAssertions = new ArrayList<>();
-		while (it.hasNext()){
-			Map.Entry pair = (Map.Entry)it.next();
-			TestRunItem failedAssertion = new TestRunItem();
-			failedAssertion.setTestType(TestType.DROOL_RULES);
-			failedAssertion.setTestCategory("");
-			failedAssertion.setAssertionUuid(null);
-			failedAssertion.setAssertionText((String) pair.getKey());
-			failedAssertion.setExtractResultInMillis(0L);
-			List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
-			failedAssertion.setFailureCount((long) invalidContentList.size());
-			List<FailureDetail> failureDetails = new ArrayList<>();
-			for (InvalidContent invalidContent : invalidContentList){
-				failureDetails.add(new FailureDetail(invalidContent.getConceptId(), invalidContent.getMessage(), null));
+			invalidContents.clear();
+			Iterator it = invalidContentMap.entrySet().iterator();
+			List<TestRunItem> failedAssertions = new ArrayList<>();
+			while (it.hasNext()) {
+				Map.Entry pair = (Map.Entry) it.next();
+				TestRunItem failedAssertion = new TestRunItem();
+				failedAssertion.setTestType(TestType.DROOL_RULES);
+				failedAssertion.setTestCategory("");
+				failedAssertion.setAssertionUuid(null);
+				failedAssertion.setAssertionText((String) pair.getKey());
+				failedAssertion.setExtractResultInMillis(0L);
+				List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
+				failedAssertion.setFailureCount((long) invalidContentList.size());
+				List<FailureDetail> failureDetails = new ArrayList<>();
+				for (InvalidContent invalidContent : invalidContentList) {
+					failureDetails.add(new FailureDetail(invalidContent.getConceptId(), invalidContent.getMessage(), null));
+				}
+				failedAssertion.setFirstNInstances(failureDetails.subList(0, failureDetails.size() > 10 ? 10 : failedAssertions.size()));
+				failedAssertions.add(failedAssertion);
+				it.remove(); // avoids a ConcurrentModificationException
 			}
-			failedAssertion.setFirstNInstances(failureDetails.subList(0, failureDetails.size() > 10 ? 10 : failedAssertions.size()));
-			failedAssertions.add(failedAssertion);
-			it.remove(); // avoids a ConcurrentModificationException
+			validationReport.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
+			validationReport.addFailedAssertions(failedAssertions);
 		}
-		validationReport.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
-		validationReport.addFailedAssertions(failedAssertions);
 
 	}
 
