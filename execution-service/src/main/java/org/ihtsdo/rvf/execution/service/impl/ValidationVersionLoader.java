@@ -256,18 +256,14 @@ public class ValidationVersionLoader {
 			File tempDir = FileUtils.getTempDirectory();
 			File backupMyISAMZipFile = new File(tempDir, rvfVersion + ZIP_FILE_EXTENSION);
 
-			File backupSQLFile = null;
-				//copy all files with extension: FRM, MYD, MYI
-				File myISAMFolder = new File(mysqlMyISamDataFolder + SEPARATOR + createdSchemaName);
-				if (myISAMFolder != null && myISAMFolder.isDirectory()) {
-					ZipFileUtils.zip(myISAMFolder.getAbsolutePath(), backupMyISAMZipFile.getAbsolutePath());
-				}
+			//copy all files with extension: FRM, MYD, MYI
+			File myISAMFolder = new File(mysqlMyISamDataFolder + SEPARATOR + createdSchemaName);
+			if (myISAMFolder != null && myISAMFolder.isDirectory()) {
+				ZipFileUtils.zip(myISAMFolder.getAbsolutePath(), backupMyISAMZipFile.getAbsolutePath());
+			}
 			//Upload to S3
 			final String previousMyISAMFullPath = storageLocation + File.separator + RVF + File.separator + backupMyISAMZipFile.getName();
 			s3PublishFileHelper.putFile(backupMyISAMZipFile, previousMyISAMFullPath);
-			if (backupSQLFile != null) {
-				FileUtils.deleteQuietly(backupSQLFile);
-			}
 			FileUtils.deleteQuietly(backupMyISAMZipFile);
 		} else {
 			logger.error("Previous release not found in the published bucket:" + publishedFileS3Path);
