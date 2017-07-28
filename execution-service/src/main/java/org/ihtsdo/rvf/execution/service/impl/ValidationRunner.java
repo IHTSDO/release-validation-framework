@@ -1,50 +1,41 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.io.FileUtils;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.otf.snomedboot.ReleaseImportException;
+import org.ihtsdo.otf.sqs.service.exception.ServiceException;
+import org.ihtsdo.rvf.entity.*;
+import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
+import org.ihtsdo.rvf.service.AssertionService;
+import org.ihtsdo.rvf.util.ZipFileUtils;
+import org.ihtsdo.rvf.validation.StructuralTestRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.snomed.quality.validator.mrcm.ValidationRun;
+import org.snomed.quality.validator.mrcm.ValidationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.io.FileUtils;
-import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.entity.TestRunItem;
-import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.entity.ValidationReport;
-import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
-import org.ihtsdo.rvf.service.AssertionService;
-import org.ihtsdo.rvf.validation.StructuralTestRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
+import java.util.*;
+import java.util.concurrent.*;
 
 @Service
 @Scope("prototype")
 public class ValidationRunner {
 	
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
+
+	private static final String MMRCM_TYPE_VALIDATION = "mrcm-validation";
 
 	private static final String VALIDATION_CONFIG = "validationConfig";
 
@@ -160,7 +151,9 @@ public class ValidationRunner {
 		} else {
 			runAssertionTests(executionConfig,responseMap, reportStorage);
 		}
-		
+		//Run MRCM Validator
+		runMRCMAssertionTests(responseMap, validationConfig, executionConfig);
+
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
@@ -168,6 +161,96 @@ public class ValidationRunner {
 		responseMap.put("endTime", endTime.getTime());
 		reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
+	}
+
+	private File extractZipFile(ValidationRunConfig validationConfig, Long executionId) throws BusinessServiceException {
+		File outputFolder;
+		try{
+			outputFolder = new File(FileUtils.getTempDirectoryPath(), "rvf_loader_data_" + executionId);
+			logger.info("MRCM output folder location = " + outputFolder.getAbsolutePath());
+			if (outputFolder.exists()) {
+				logger.info("MRCM output folder already exists and will be deleted before recreating.");
+				outputFolder.delete();
+			}
+			outputFolder.mkdir();
+			ZipFileUtils.extractFilesFromZipToOneFolder(validationConfig.getLocalProspectiveFile(), outputFolder.getAbsolutePath());
+		} catch (final IOException ex){
+			final String errorMsg = String.format("Error while loading file %s.", validationConfig.getLocalProspectiveFile());
+			logger.error(errorMsg, ex);
+			throw new BusinessServiceException(errorMsg, ex);
+		}
+		return outputFolder;
+	}
+	private void runMRCMAssertionTests(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws IOException, ReleaseImportException, ServiceException {
+		final long timeStart = System.currentTimeMillis();
+		ValidationService validationService = new ValidationService();
+		ValidationRun validationRun = new ValidationRun();
+		File outputFolder = null;
+		try {
+			outputFolder = extractZipFile(validationConfig, executionConfig.getExecutionId());
+
+		} catch (BusinessServiceException ex) {
+			logger.error("Error:" + ex);
+		}
+		if(outputFolder != null){
+			validationService.loadMRCM(outputFolder, validationRun);
+			validationService.validateRelease(outputFolder, validationRun);
+			FileUtils.deleteQuietly(outputFolder);
+		}
+
+		TestRunItem testRunItem;
+		final List<TestRunItem> passedAssertions = new ArrayList<>();
+		for(org.snomed.quality.validator.mrcm.Assertion assertion : validationRun.getCompletedAssertions()){
+			testRunItem = new TestRunItem();
+			testRunItem.setTestCategory(MMRCM_TYPE_VALIDATION);
+			testRunItem.setAssertionUuid(assertion.getUuid());
+			testRunItem.setAssertionText(assertion.getAssertionText());
+			testRunItem.setFailureCount(0L);
+			testRunItem.setExtractResultInMillis(0L);
+			passedAssertions.add(testRunItem);
+		}
+
+		final List<TestRunItem> skippedAssertions = new ArrayList<>();
+		for(org.snomed.quality.validator.mrcm.Assertion assertion : validationRun.getSkippedAssertions()){
+			testRunItem = new TestRunItem();
+			testRunItem.setTestCategory(MMRCM_TYPE_VALIDATION);
+			testRunItem.setAssertionUuid(assertion.getUuid());
+			testRunItem.setAssertionText(assertion.getAssertionText());
+			testRunItem.setFailureCount(0L);
+			testRunItem.setExtractResultInMillis(0L);
+			skippedAssertions.add(testRunItem);
+		}
+
+		final List<TestRunItem> failedAssertions = new ArrayList<>();
+		for(org.snomed.quality.validator.mrcm.Assertion assertion : validationRun.getFailedAssertions()){
+			testRunItem = new TestRunItem();
+			testRunItem.setTestCategory(MMRCM_TYPE_VALIDATION);
+			testRunItem.setAssertionUuid(assertion.getUuid());
+			testRunItem.setAssertionText(assertion.getAssertionText());
+			testRunItem.setExtractResultInMillis(0L);
+			int failureCount = assertion.getConceptIdsWithInvalidAttributeValue().size();
+			testRunItem.setFailureCount(Long.valueOf(failureCount));
+			List<FailureDetail> failedDetails = new ArrayList(failureCount);
+			for (Long conceptId : assertion.getConceptIdsWithInvalidAttributeValue()){
+				failedDetails.add(new FailureDetail(String.valueOf(conceptId), assertion.getAssertionText()));
+			}
+			testRunItem.setFirstNInstances(failedDetails);
+			failedAssertions.add(testRunItem);
+		}
+
+		Collections.sort(passedAssertions);
+		Collections.sort(skippedAssertions);
+		Collections.sort(failedAssertions);
+		final MrcmValidationReport report = new MrcmValidationReport(TestType.MRCM);
+		report.setExecutionId(executionConfig.getExecutionId());
+		report.setTotalTestsRun(passedAssertions.size() + skippedAssertions.size() + failedAssertions.size());
+		report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
+		report.setTotalSkips(skippedAssertions.size());
+		report.setTotalFailures(failedAssertions.size());
+		report.setAssertionsSkipped(skippedAssertions);
+		report.setAssertionsFailed(failedAssertions);
+		report.setAssertionsPassed(passedAssertions);
+		responseMap.put(report.getTestType().toString() + "TestResult", report);
 	}
 
 	private void runExtensionReleaseValidation(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
@@ -196,7 +279,7 @@ public class ValidationRunner {
 	}
 
 
-	
+
 
 	private List<Assertion> getAssertions(List<String> groupNames) {
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(groupNames);
