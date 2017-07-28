@@ -13,7 +13,7 @@
 	<tx:annotation-driven/>
     <context:property-placeholder location="file://${rvfConfigLocation:/tmp}/data-service.properties" order="-1"
                                   ignore-unresolvable="true" ignore-resource-not-found="true"/>
-    <context:property-placeholder location="classpath:data-service-defaults.properties"/>
+    <context:property-placeholder location="classpath:data-service-defaults.properties" ignore-unresolvable="true"/>
     
 	<!-- service beans will go here -->
 	<bean id="assertionService" class="org.ihtsdo.rvf.service.AssertionServiceImpl"/>
