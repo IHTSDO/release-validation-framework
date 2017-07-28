@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3Object;
+
 @Service
 public class ResourceDataLoaderImpl implements ResourceDataLoader {
 	private static final String US_TO_GB_TERMS_MAP_FILENAME = "us-to-gb-terms-map.txt";
@@ -61,16 +61,19 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 			throw new BusinessServiceException(errorMsg, e);
 		}
 		try {
-			ObjectListing listing = s3Client.listObjects(validationResourcePath, US_TO_GB_TERMS_MAP_FILENAME);
-			if (!listing.getObjectSummaries().isEmpty()) {
-				LOGGER.info("External configuration file {} found at {}", US_TO_GB_TERMS_MAP_FILENAME, validationResourcePath);
-				S3Object termObj = s3Client.getObject(validationResourcePath, US_TO_GB_TERMS_MAP_FILENAME);
-				File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
-				try (InputStream input = termObj.getObjectContent();
-					OutputStream out = new FileOutputStream(localMapFile);) {
-					IOUtils.copy(input, out);
-				}
-			} 
+			LOGGER.info("validationResourcePath:" + validationResourcePath);
+			int index = validationResourcePath.indexOf("/");
+			String bucketname = validationResourcePath.substring(0,index);
+			LOGGER.info("The bucket name extracted from validationResourcePath:" + bucketname);
+			String prefix = validationResourcePath.substring(index);
+			LOGGER.info("The prefix extracted from validationResourcePath:" + prefix);
+			S3Object termFileObj = s3Client.getObject(bucketname, prefix + US_TO_GB_TERMS_MAP_FILENAME);
+			LOGGER.info("External configuration file {} found at {}", US_TO_GB_TERMS_MAP_FILENAME, validationResourcePath);
+			File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
+			try (InputStream input = termFileObj.getObjectContent();
+				OutputStream out = new FileOutputStream(localMapFile);) {
+				IOUtils.copy(input, out);
+			}
 		} catch (Throwable  t) {
 			final String errorMsg = "Error when trying to download the us-to-gb-terms-map.txt file from S3 at path:" + validationResourcePath;
 			LOGGER.error(errorMsg, t);
@@ -136,6 +139,5 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 					IOUtils.copy(txtInput,writer,UTF_8);
 			}
 		}
-			
 	}
 }
