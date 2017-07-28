@@ -699,7 +699,7 @@
   }, {
     "assertionName" : "The current data in the Description snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "073832f4-6dc5-4781-9e56-9c3bc45d01bd",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702386002",
       "detail" : "DESCRIPTION: id=3004397016 is in delta file but not in snapshot file."
     }, {
@@ -729,8 +729,8 @@
     }, {
       "conceptId" : "700132006",
       "detail" : "DESCRIPTION: id=2984057019 is in delta file but not in snapshot file."
-    } ],
-    "totalFailed" : 13
+    }],
+    "totalFailed" : 14
   }, {
     "assertionName" : "The current simple refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "0988de1d-29dd-4668-bcbf-032d38692492",
@@ -1551,19 +1551,13 @@
     "assertionName" : "New inactive states follow active states in the CONCEPT snapshot.",
     "assertionUuid" : "5f1a51a3-6200-4463-8799-d75998165278",
     "firstNInstances" : [ {
-      "conceptId" : "699765003",
-      "detail" : "CONCEPT: id=699765003 should not have a new inactive state as it was inactive previously."
-    }, {
       "conceptId" : "703649004",
       "detail" : "CONCEPT: id=703649004: is inactive but no active state found in the previous release."
     }, {
       "conceptId" : "700132008",
       "detail" : "CONCEPT: id=700132008: is inactive but no active state found in the previous release."
-    }, {
-      "conceptId" : "609452007",
-      "detail" : "CONCEPT: id=609452007: is inactive but no active state found in the previous release."
-    } ],
-    "totalFailed" : 4
+    }  ],
+    "totalFailed" : 2
   }, {
     "assertionName" : "The current data in the AttributeValue refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "602a3d22-b3b0-48cc-8ebb-949f96580834",
@@ -1602,7 +1596,7 @@
   }, {
     "assertionName" : "The current concept snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "645e3292-18d6-41df-b42a-58ba4d7240d5",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702411003",
       "detail" : "CONCEPT: id=702411003 is in SNAPSHOT file, but not in FULL file."
     }, {

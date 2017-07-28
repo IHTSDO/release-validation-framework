@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
   "totalAssertionsRun" : 115,
-  "totalAssertionsFailed" : 115,
+  "totalAssertionsFailed" : 112,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -21,18 +21,12 @@
   }, {
     "assertionName" : "Active Non-human refset members refer to active components.",
     "assertionUuid" : "8479317e-8459-4362-bee8-628b8220f1e4",
-    "firstNInstances" : [ {
-      "conceptId" : "699765003",
-      "detail" : "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components."
-    }, {
-      "conceptId" : "699765003",
-      "detail" : "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components."
-    } ],
-    "totalFailed" : 2
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "The FSN term should be unique in active content.",
     "assertionUuid" : "8d6ab114-caca-4d99-9fec-bb8fd9cea518",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702411003",
       "detail" : "FSN=DoloTest profile(observable entity) descriptionid=2990804014: FSN term is not unique in description snapshot"
     }, {
@@ -292,7 +286,7 @@
     }, {
       "conceptId" : "609452007",
       "detail" : "CONCEPT: id=609452007: Concept does not have an associated CTV3 refset member."
-    } ],
+    }  ],
     "totalFailed" : 4
   }, {
     "assertionName" : "CTV3 simple map refset members are always active.",
@@ -321,10 +315,7 @@
   }, {
     "assertionName" : "Terms are unique in Description hierarchy.",
     "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "  Fracture clinic"
-    }, {
+    "firstNInstances" : [{
       "conceptId" : "702386002",
       "detail" : "  Fracture clinic"
     }, {
@@ -345,11 +336,8 @@
     }, {
       "conceptId" : "702386002",
       "detail" : "Toenail abnormality (observable entity)"
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "Toenail abnormality (observable entity)"
     } ],
-    "totalFailed" : 9
+    "totalFailed" : 7
   }, {
     "assertionName" : "Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset.",
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
@@ -372,14 +360,11 @@
   }, {
     "assertionName" : "The FSN term should be unique in active content when case sensitivity is ignored.",
     "assertionUuid" : "d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702769005",
       "detail" : "FSN=Blood Group Antibody I (substance) concept=702769005: FSN term is not unique in description snapshot when case is ignored"
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "FSN=Blood group antibody i (substance) concept=702386002: FSN term is not unique in description snapshot when case is ignored"
-    } ],
-    "totalFailed" : 2
+    }],
+    "totalFailed" : 1
   }, {
     "assertionName" : "No active definitions contain leading or trailing spaces.",
     "assertionUuid" : "da3ae7c4-6144-4cd5-9530-2a7780c53c9a",
@@ -429,11 +414,8 @@
   }, {
     "assertionName" : "Active historical association refset members have active concepts as targets.",
     "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "10123006",
-      "detail" : "AssociationRefset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba is active but the target component is an inactive concept: 609452007"
-    } ],
-    "totalFailed" : 1
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "CTV3 codes are unique in the CTV3 simple map refset",
     "assertionUuid" : "f14d521f-2472-4871-9c4e-356f0f075a3a",
@@ -468,39 +450,42 @@
       "conceptId" : "700132006",
       "detail" : "Active description id=3008913019 has no active langrefset member"
     }, {
-      "conceptId" : "702411003",
-      "detail" : "Active description id=2990804014 has no langrefset member"
-    }, {
-      "conceptId" : "702769005",
-      "detail" : "Active description id=600892343 has no langrefset member"
-    }, {
       "conceptId" : "703860006",
       "detail" : "Active description id=2984057025 has no langrefset member"
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Active description id=2989790014 has no langrefset member"
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Active description id=2989790014 has no langrefset member"
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Active description id=2989790015 has no langrefset member"
     }, {
       "conceptId" : "702386002",
       "detail" : "Active description id=3004397016 has no langrefset member"
     }, {
       "conceptId" : "702386002",
       "detail" : "Active description id=2989194011 has no langrefset member"
-    } ],
-    "totalFailed" : 17
+    }, {
+      "conceptId" : "702411003",
+      "detail" : "Active description id=2990804014 has no langrefset member"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Active description id=2989790014 has no langrefset member"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Active description id=2989790014 has no langrefset member"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Active description id=2990804019 has no langrefset member"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Active description id=2989790015 has no langrefset member"
+    }  ],
+    "totalFailed" : 18
   }, {
     "assertionName" : "Active historical association refset members have inactive concepts as reference components.",
     "assertionUuid" : "f7117eb0-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "702411003",
       "detail" : "MEMBER: id=499c1966-65d3-5384-aafb-28f4a20e34eb:Historical refset member is active, but refers to an active concept."
+    }, {
+      "conceptId" : "699765003",
+      "detail" : "MEMBER: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71:Historical refset member is active, but refers to an active concept."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "No active definitions contain double spaces.",
     "assertionUuid" : "f7b7cefe-858d-4749-ab98-7106700feaee",
@@ -515,14 +500,8 @@
   }, {
     "assertionName" : "All inactive concepts have definition status of PRIMITIVE.",
     "assertionUuid" : "fdf6a1b0-7cd6-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "699765003",
-      "detail" : "CONCEPT: id=699765003:There is an inactive concept whose definition status is not Primitive."
-    }, {
-      "conceptId" : "609452007",
-      "detail" : "CONCEPT: id=609452007:There is an inactive concept whose definition status is not Primitive."
-    } ],
-    "totalFailed" : 2
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "There is only zero or one active Definition per concept per dialect in the snapshot file.",
     "assertionUuid" : "00e87310-7e9b-11e1-b0c4-0800200c9a66",
@@ -552,13 +531,10 @@
       "conceptId" : "702386002",
       "detail" : "702386002 |Toxic effect of antimony and/or its compounds (disorder)|"
     }, {
-      "conceptId" : "702386002",
-      "detail" : "702386002 |Blood group antibody i (substance)|"
-    }, {
       "conceptId" : "700132006",
       "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
-    } ],
-    "totalFailed" : 5
+    }  ],
+    "totalFailed" : 4
   }, {
     "assertionName" : "No active Terms contain double spaces.",
     "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
@@ -593,7 +569,7 @@
   }, {
     "assertionName" : "All inferred relationships in which the concept associated is inactive, are inactive relationships.",
     "assertionUuid" : "2e4fd620-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "703649004",
       "detail" : "RELATIONSHIP: id=1000006026: Active inferred relationship is associated with an inactive sourceid concept."
     }, {
@@ -602,11 +578,8 @@
     }, {
       "conceptId" : "700132008",
       "detail" : "RELATIONSHIP: id=1000002029: Active inferred relationship is associated with an inactive destinationid concept."
-    }, {
-      "conceptId" : "699765003",
-      "detail" : "RELATIONSHIP: id=1000002029: Active inferred relationship is associated with an inactive typeid concept."
     } ],
-    "totalFailed" : 4
+    "totalFailed" : 3
   }, {
     "assertionName" : "The concepts referenced by expressions in LOINC ExpressionAssociationRefset SNAPSHOT file must exist in the concept snapshot",
     "assertionUuid" : "30947783-78f5-4ffc-a22b-b03d83c5909d",
@@ -686,15 +659,21 @@
   }, {
     "assertionName" : "All inferred is-a relationships have relationship group of 0.",
     "assertionUuid" : "36f43550-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "280844000",
       "detail" : "RELATIONSHIP: id=100000028: Inferred is-a relationship exists in a non-zero relationship group."
-    } ],
-    "totalFailed" : 1
+    }, {
+      "conceptId" : "609452007",
+      "detail" : "RELATIONSHIP: id=1000005028: Inferred is-a relationship exists in a non-zero relationship group."
+    }, {
+      "conceptId" : "609452007",
+      "detail" : "RELATIONSHIP: id=4969199027: Inferred is-a relationship exists in a non-zero relationship group."
+    }  ],
+    "totalFailed" : 3
   }, {
     "assertionName" : "All concepts have at least one inferred is-a relationship.",
     "assertionUuid" : "3ab84230-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "702411003",
       "detail" : "CONCEPT: id=702411003: Concept does not have an inferred is-a relationship."
     }, {
@@ -725,35 +704,32 @@
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 11
   }, {
     "assertionName" : "Relationship groups contain at least 2 relationships.",
     "assertionUuid" : "411e9840-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
+    "firstNInstances" : [  {
       "conceptId" : "10002003",
       "detail" : "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member."
-    }, {
-      "conceptId" : "10041001",
-      "detail" : "RELATIONSHIP: id=4969199027: Relationship is in a relationship group with a single active inferred member."
     }, {
       "conceptId" : "255135009",
       "detail" : "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member."
     }, {
       "conceptId" : "280844000",
       "detail" : "RELATIONSHIP: id=100000028: Relationship is in a relationship group with a single active inferred member."
-    } ],
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "RELATIONSHIP: id=1000005028: Relationship is in a relationship group with a single active inferred member."
+    }],
     "totalFailed" : 4
   }, {
     "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
     "assertionUuid" : "4572d730-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "Source id=702386002 has two inferred relationships with same typeid and same destinationid within a single relationship-group."
-    }, {
+    "firstNInstances" : [{
       "conceptId" : "703649004",
       "detail" : "Source id=703649004 has two inferred relationships with same typeid and same destinationid within a single relationship-group."
-    } ],
-    "totalFailed" : 2
+    }  ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "All stated relationships in which the source concept is inactive, are inactive relationships.",
     "assertionUuid" : "49487040-7d08-11e1-b0c4-0800200c9a66",
@@ -816,8 +792,11 @@
     }, {
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006: Concept does not have a stated is-a relationship."
-    } ],
-    "totalFailed" : 9
+    } ,  {
+      "conceptId" : "699765003",
+      "detail" : "CONCEPT: id=699765003: Concept does not have a stated is-a relationship."
+    }],
+    "totalFailed" : 11
   }, {
     "assertionName" : "No active Terms contain leading or trailing spaces.",
     "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",
@@ -866,17 +845,8 @@
     }, {
       "conceptId" : "702386002",
       "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
-    } ],
-    "totalFailed" : 6
+    }  ],
+    "totalFailed" : 3
   }, {
     "assertionName" : "No Concept has 2 stated relationships with the same type, destination and group.",
     "assertionUuid" : "5d27df10-7d08-11e1-b0c4-0800200c9a66",
@@ -950,7 +920,7 @@
   }, {
     "assertionName" : "There is one and only one SNOMED RT simple map refset member per concept.",
     "assertionUuid" : "730720b0-7f25-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
+    "firstNInstances" : [{
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006: Concept has more than one associated SNOMED RT refset member."
     }, {

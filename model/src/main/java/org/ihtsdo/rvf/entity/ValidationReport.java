@@ -6,11 +6,13 @@ public class ValidationReport {
 
 	private TestType testType;
 	private Long executionId;
-	private long timeTakenInSeconds;
+	private Long timeTakenInSeconds;
 	private String reportUrl;
-	private int totalTestsRun;
-	private int totalFailures;
+	private Integer totalTestsRun;
+	private Integer totalFailures;
+	private Integer totalWarnings;
 	private List<TestRunItem> assertionsFailed;
+	private List<TestRunItem> assertionsWarning;
 	private List<TestRunItem> assertionsPassed;
 
 	public ValidationReport(final TestType testType) {
@@ -26,7 +28,7 @@ public class ValidationReport {
 		totalTestsRun = numTestRuns;
 	}
 
-	public void setTotalFailures(final int numErrors) {
+	public void setTotalFailures(final Integer numErrors) {
 		totalFailures = numErrors;
 		
 	}
@@ -79,7 +81,7 @@ public class ValidationReport {
 		return totalTestsRun;
 	}
 
-	public int getTotalFailures() {
+	public Integer getTotalFailures() {
 		return totalFailures;
 	}
 
@@ -89,6 +91,22 @@ public class ValidationReport {
 
 	public long getTimeTakenInSeconds() {
 		return timeTakenInSeconds;
+	}
+
+	public Integer getTotalWarnings() {
+		return totalWarnings;
+	}
+
+	public void setTotalWarnings(Integer totalWarnings) {
+		this.totalWarnings = totalWarnings;
+	}
+
+	public List<TestRunItem> getAssertionsWarning() {
+		return assertionsWarning;
+	}
+
+	public void setAssertionsWarning(List<TestRunItem> assertionsWarning) {
+		this.assertionsWarning = assertionsWarning;
 	}
 	
 }

@@ -5,10 +5,13 @@ public class FailureDetail implements Comparable<FailureDetail>{
 
 	String conceptId;
 	String detail;
+	String errorDescription;
 	
-	public FailureDetail(String conceptId, String detail) {
+	public FailureDetail(String conceptId, String detail, String errorDescription) {
 		this.conceptId = new String (conceptId);
 		this.detail = detail;
+		this.errorDescription = errorDescription;
+
 	}
 	
 	public String getConceptId() {
@@ -24,7 +27,7 @@ public class FailureDetail implements Comparable<FailureDetail>{
 	@Override
 	public String toString() {
 		return "FailureDetail [conceptId=" + conceptId + ", detail=" + detail
-				+ "]";
+				+ ", Error Description="+ errorDescription + "]";
 	}
 	@Override
 	public int hashCode() {

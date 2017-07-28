@@ -32,24 +32,24 @@ import org.slf4j.LoggerFactory;
 
 public class ColumnPatternTester {
 
-	private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
-	private static final Pattern DATE_PATTERN = Pattern.compile("^\\d{8}$");
+	public static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+	public static final Pattern DATE_PATTERN = Pattern.compile("^\\d{8}$");
 	private static final Pattern BOOLEAN_PATTERN = Pattern.compile("[0-1]");
-	private static final Pattern SCTID_PATTERN = Pattern.compile("^\\d{6,18}$");
+	public static final Pattern SCTID_PATTERN = Pattern.compile("^\\d{6,18}$");
 	private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
 	private static final Pattern NON_ZERO_INTEGER_PATTERN = Pattern.compile("^[1-9][0-9]*$");
 	private static final Pattern BLANK = Pattern.compile("^$");
 	private static final Pattern NOT_BLANK = Pattern.compile("^(?=\\s*\\S).*$");
 	private static final Pattern URL_PATTERN = Pattern.compile("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 	private static final String UTF_8 = "UTF-8";
-	private static final String FILE_NAME_TEST_TYPE = "FileNameTest";
+	public static final String FILE_NAME_TEST_TYPE = "FileNameTest";
 	private static final String COLUMN_COUNT_TEST_TYPE = "ColumnCountTest";
 	private static final String ROW_SPACE_TEST_TYPE = "RowSpaceTest";
 	private static final String EMPTY_ROW_TEST = "BlankRowTest";
 	private static final String COLUMN_HEADING_TEST = "ColumnHeadingTest";
-	private static final String COLUMN_VALUE_TEST_TYPE = "ColumnValuesTest";
-	private static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
-	private static final String COLUMN_BOOLEAN_TEST_TYPE = "ColumnBooleanTest";
+	public static final String COLUMN_VALUE_TEST_TYPE = "ColumnValuesTest";
+	public static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
+	public static final String COLUMN_BOOLEAN_TEST_TYPE = "ColumnBooleanTest";
 
 	private final ValidationLog validationLog;
 	private final ResourceProvider resourceManager;

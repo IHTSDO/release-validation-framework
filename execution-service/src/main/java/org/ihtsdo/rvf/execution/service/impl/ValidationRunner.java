@@ -232,7 +232,7 @@ public class ValidationRunner {
 			testRunItem.setFailureCount(Long.valueOf(failureCount));
 			List<FailureDetail> failedDetails = new ArrayList(failureCount);
 			for (Long conceptId : assertion.getConceptIdsWithInvalidAttributeValue()){
-				failedDetails.add(new FailureDetail(String.valueOf(conceptId), assertion.getAssertionText()));
+				failedDetails.add(new FailureDetail(String.valueOf(conceptId), assertion.getAssertionText(), null));
 			}
 			testRunItem.setFirstNInstances(failedDetails);
 			failedAssertions.add(testRunItem);
@@ -333,6 +333,17 @@ public class ValidationRunner {
 	}
 
 	private void constructTestReport(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, final long timeStart, final List<TestRunItem> items) {
+		final long timeEnd = System.currentTimeMillis();
+		
+		//summary
+		final ValidationReport summary = new ValidationReport(TestType.SQL);
+		final ValidationReport failedReport = new ValidationReport(TestType.SQL);
+		final ValidationReport warningReport = new ValidationReport(TestType.SQL);
+		
+		summary.setExecutionId(executionConfig.getExecutionId());
+		summary.setTotalTestsRun(items.size());
+		summary.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
+		
 		//failed tests
 		final List<TestRunItem> failedItems = new ArrayList<>();
 		final List<TestRunItem> warningItems = new ArrayList<>();
@@ -344,29 +355,33 @@ public class ValidationRunner {
 				warningItems.add(item);
 			}
 		}
-		Collections.sort(failedItems);
-		final long timeEnd = System.currentTimeMillis();
-		final ValidationReport report = new ValidationReport(TestType.SQL);
-		report.setExecutionId(executionConfig.getExecutionId());
-		report.setTotalTestsRun(items.size());
-		report.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
-		report.setTotalFailures(failedItems.size());
-		report.setFailedAssertions(failedItems);
-		items.removeAll(failedItems);
-		items.removeAll(warningItems);
-		Collections.sort(items);
-		report.setPassedAssertions(items);
-		responseMap.put(report.getTestType().toString() + "TestResult", report);
+		
+		if (!failedItems.isEmpty()) {
+			Collections.sort(failedItems);
+			failedReport.setExecutionId(executionConfig.getExecutionId());
+			failedReport.setTotalFailures(failedItems.size());
+			failedReport.setFailedAssertions(failedItems);
+		}
 		
 		if(!warningItems.isEmpty()) {
 			Collections.sort(warningItems);
-			final ValidationReport warningReport = new ValidationReport(TestType.SQL);
 			warningReport.setExecutionId(executionConfig.getExecutionId());
-			warningReport.setTotalTestsRun(items.size());
-			warningReport.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
-			warningReport.setTotalFailures(warningItems.size());
-			warningReport.setFailedAssertions(warningItems);
-			report.setPassedAssertions(items);
+			warningReport.setTotalWarnings(warningItems.size());
+			warningReport.setAssertionsWarning(warningItems);			
+		}
+		
+		items.removeAll(failedItems);
+		items.removeAll(warningItems);
+		Collections.sort(items);
+		summary.setPassedAssertions(items);
+		summary.setTotalFailures(failedItems.size());
+		summary.setTotalWarnings(warningItems.size());
+		
+		responseMap.put("SQL Test result summary", summary);
+		if(failedReport.getTotalFailures() != null && failedReport.getTotalFailures() > 0) {
+			responseMap.put(failedReport.getTestType().toString() + "FailedTestResult", failedReport);
+		}
+		if(warningReport.getTotalWarnings() != null && warningReport.getTotalWarnings() > 0){
 			responseMap.put(warningReport.getTestType().toString() + "WarningTestResult", warningReport);
 		}
 	}
