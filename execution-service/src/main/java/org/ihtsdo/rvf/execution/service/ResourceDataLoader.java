@@ -8,5 +8,4 @@ import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 public interface ResourceDataLoader {
 
 	void loadResourceData(String schemaName) throws SQLException, IOException, BusinessServiceException;
-
 }
