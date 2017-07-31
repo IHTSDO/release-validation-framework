@@ -74,12 +74,6 @@ public class ValidationVersionLoader {
 	@Value("${rvf.snomed.jdbc.password}")
 	private String password;
 
-	@Value("${rvf.mysql.command.mysqldump}")
-	private String mysqlDumpCommand;
-
-	@Value("${rvf.mysql.command.mysql}")
-	private String mysqlCommand;
-
 	@Value("${rvf.jdbc.data.myisam.folder}")
 	private String mysqlMyISamDataFolder;
 	
@@ -295,80 +289,6 @@ public class ValidationVersionLoader {
 			}
 		}
 	}
-
-	private String backupDatabase(String schemaName, File backupFile){
-        String executeCommand;
-		String mySqlDumpStr = StringUtils.isEmpty(mysqlDumpCommand) ? MYSQLDUMP : mysqlDumpCommand;
-        if(StringUtils.isEmpty(password)){
-        	executeCommand = String.format(MYSQL_COMMAND_NO_PASS_PATTERN, mySqlDumpStr, schemaName, username);
-		} else {
-        	executeCommand = String.format(MYSQL_COMMAND_PATTERN, mySqlDumpStr, schemaName, username, password);
-		}
-		String backupErrorMessage = "";
-		try {
-			Process runtimeProcess = Runtime.getRuntime().exec(executeCommand);
-			InputStream inputStream = runtimeProcess.getInputStream();
-			if(inputStream != null){
-				logger.info("Start to backup database.");
-				PrintStream printStream = new PrintStream(backupFile);
-				int ch;
-				while ((ch = inputStream.read()) != -1) {
-					printStream.write(ch);
-				}
-				logger.info("Backup successful.");
-			}
-			InputStream  errorStream = runtimeProcess.getErrorStream();
-			if(errorStream != null){
-				byte[] buffer = new byte[errorStream.available()];
-				errorStream.read(buffer);
-				String str = new String(buffer);
-				logger.error("Backup error: " + str);
-			}
-		} catch (Exception e) {
-        	backupErrorMessage = "Could not backup database. Please either check MySQL Server installed in the machine or check value of property {rvf.mysql.command.mysqldump} in the config/execution-service.properties file to make sure it point to mysqldump.exe execution file. " + e;
-			logger.error("Error when backup database: " + e);
-		}
-		return backupErrorMessage;
-	}
-
-	private String restoreDatabase(String schemaName, File backupFile){
-		String executeCommand;
-		String restoredErrorMessage = "";
-		String mySqlStr = StringUtils.isEmpty(mysqlCommand) ? MYSQL : mysqlCommand;
-		if(StringUtils.isEmpty(password)){
-			executeCommand = String.format(MYSQL_COMMAND_NO_PASS_PATTERN, mySqlStr, schemaName, username);
-		} else {
-			executeCommand = String.format(MYSQL_COMMAND_PATTERN, mySqlStr, schemaName, username, password);
-		}
-        try {
-            InputStream backupStream  = new FileInputStream(backupFile);
-			Process runtimeProcess = Runtime.getRuntime().exec(executeCommand);
-            OutputStream outputStream = runtimeProcess.getOutputStream();
-            if(outputStream != null){
-                logger.info("Start to restore database.");
-                byte[] buf = new byte[8192];
-                int ch;
-                while ((ch = backupStream.read(buf, 0, buf.length)) > 0) {
-                    outputStream.write(buf, 0, ch);
-                    outputStream.flush();
-                }
-				logger.info("Restore successful.");
-            }
-            InputStream errorStream = runtimeProcess.getErrorStream();
-            if(errorStream != null) {
-                byte[] buffer = new byte[errorStream.available()];
-                errorStream.read(buffer);
-                String str = new String(buffer);
-                logger.error("Restore error: " + str);
-            }
-
-            IOUtils.closeQuietly(backupStream);
-		} catch (IOException e) {
-			restoredErrorMessage = "Could not backup database. Please either check MySQL Server installed in the machine or check value of property {rvf.mysql.command.mysql} in the config/execution-service.properties file to make sure it point to mysql.exe execution file. " + e;
-			logger.error("Error when restore database: " + e);
-        }
-        return restoredErrorMessage;
-    }
 
 	private boolean prepareVersionsFromS3FilesForPreviousVersion(ValidationRunConfig validationConfig, ExecutionConfig executionConfig, Map<String, Object> responseMap) throws Exception {
 		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
