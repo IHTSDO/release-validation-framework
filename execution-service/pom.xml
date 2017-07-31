@@ -127,8 +127,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.snomed.quality</groupId>
-			<artifactId>release-mrcm-validator</artifactId>
-			<version>1.0.1</version>
+			<artifactId>mrcm-validator</artifactId>
+			<version>1.1.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>

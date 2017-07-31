@@ -37,6 +37,7 @@ import org.springframework.util.Assert;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -291,10 +292,10 @@ public class ValidationRunner {
 		}
 		return outputFolder;
 	}
-	private void runMRCMAssertionTests(final ValidationReport report, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws IOException, ReleaseImportException, ServiceException {
+	private void runMRCMAssertionTests(final ValidationReport report, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws IOException, ReleaseImportException, ServiceException, ParseException {
 		final long timeStart = System.currentTimeMillis();
 		ValidationService validationService = new ValidationService();
-		ValidationRun validationRun = new ValidationRun();
+		ValidationRun validationRun = new ValidationRun(executionConfig.getProspectiveVersion(), true);
 		File outputFolder = null;
 		try {
 			outputFolder = extractZipFile(validationConfig, executionConfig.getExecutionId());
@@ -341,10 +342,10 @@ public class ValidationRunner {
 			testRunItem.setAssertionUuid(assertion.getUuid());
 			testRunItem.setAssertionText(assertion.getAssertionText());
 			testRunItem.setExtractResultInMillis(0L);
-			int failureCount = assertion.getConceptIdsWithInvalidAttributeValue().size();
+			int failureCount = assertion.getViolatedConceptIds().size();
 			testRunItem.setFailureCount(Long.valueOf(failureCount));
 			List<FailureDetail> failedDetails = new ArrayList(failureCount);
-			for (Long conceptId : assertion.getConceptIdsWithInvalidAttributeValue()){
+			for (Long conceptId : assertion.getViolatedConceptIds()){
 				failedDetails.add(new FailureDetail(String.valueOf(conceptId), assertion.getAssertionText(), null));
 			}
 			testRunItem.setFirstNInstances(failedDetails);
