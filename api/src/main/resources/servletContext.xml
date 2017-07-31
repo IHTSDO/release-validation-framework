@@ -80,6 +80,7 @@
 	<import resource="validationContext.xml"/>
 	<import resource="executionServiceContext.xml"/>
 	<import resource="importerServiceContext.xml"/>
+	<import resource="jiraServiceContext.xml"/>
 	<mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 	<mvc:resources mapping="/api-doc.html" location="/" />
 	<bean class="org.ihtsdo.rvf.config.SwaggerConfig" />

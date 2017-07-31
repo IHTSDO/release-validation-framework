@@ -133,6 +133,12 @@ public class ValidationVersionLoader {
 		executionConfig.setExtensionValidation( isExtension(validationConfig));
 		executionConfig.setExtensionDependencyVersion(validationConfig.getExtensionDependency());
 		executionConfig.setFirstTimeRelease(validationConfig.isFirstTimeRelease());
+		executionConfig.setJiraIssueCreationFlag(validationConfig.isJiraIssueCreationFlag());
+		executionConfig.setProductName(validationConfig.getProductName());
+		executionConfig.setReportingStage(validationConfig.getReportingStage());
+		String testFileName =  validationConfig.getTestFileName();
+		String releaseDate = validationConfig.getTestFileName().substring(testFileName.lastIndexOf("_") + 1, testFileName.endsWith(".zip") || testFileName.endsWith(".txt") ? testFileName.lastIndexOf(".") : testFileName.length());
+		executionConfig.setReleaseDate(releaseDate);
 		//default to 10
 		executionConfig.setFailureExportMax(10);
 		if (validationConfig.getFailureExportMax() != null) {

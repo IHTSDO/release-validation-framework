@@ -1,9 +1,17 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
 import com.google.common.collect.Sets;
+import net.rcarz.jiraclient.JiraException;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
-import org.ihtsdo.otf.dao.s3.helper.FileHelper;
+import org.ihtsdo.drools.RuleExecutor;
+import org.ihtsdo.drools.response.InvalidContent;
+import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentFactory;
+import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentRepository;
+import org.ihtsdo.drools.validator.rf2.domain.DroolsConcept;
+import org.ihtsdo.drools.validator.rf2.service.DroolsConceptService;
+import org.ihtsdo.drools.validator.rf2.service.DroolsDescriptionService;
+import org.ihtsdo.drools.validator.rf2.service.DroolsRelationshipService;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
@@ -13,6 +21,7 @@ import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
+import org.ihtsdo.rvf.jira.JiraService;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
@@ -27,21 +36,9 @@ import org.springframework.util.Assert;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.*;
-import java.util.Date;
 import java.util.concurrent.*;
-import org.h2.tools.*;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.ihtsdo.drools.RuleExecutor;
-import org.ihtsdo.drools.response.InvalidContent;
-import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentFactory;
-import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentRepository;
-import org.ihtsdo.drools.validator.rf2.domain.DroolsConcept;
-import org.ihtsdo.drools.validator.rf2.service.DroolsConceptService;
-import org.ihtsdo.drools.validator.rf2.service.DroolsDescriptionService;
-import org.ihtsdo.drools.validator.rf2.service.DroolsRelationshipService;
 
 @Service
 @Scope("prototype")
@@ -79,7 +76,10 @@ public class ValidationRunner {
 	ValidationVersionLoader releaseVersionLoader;
 
 	private String droolRulesModuleName;
-	
+
+	@Autowired
+	private JiraService jiraService;
+
 	public ValidationRunner( int batchSize) {
 		this.batchSize = batchSize;
 	}
@@ -127,8 +127,9 @@ public class ValidationRunner {
 			responseMap.put(FAILURE_MESSAGE, errorMsg);
 			throw new BusinessServiceException(errorMsg);
 		}
-		
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(), 
+
+
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(),
 				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation());
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
@@ -161,19 +162,36 @@ public class ValidationRunner {
 		}
 		// for extension release validation we need to test the release-type validations first using previous extension against current extension
 		// first then loading the international snapshot for the file-centric and component-centric validations.
+
+		ValidationReport report = new ValidationReport();
+		report.setExecutionId(validationConfig.getRunId());
+
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
 			logger.info("Run extension release validation with runId:" +  executionConfig.getExecutionId());
-			runExtensionReleaseValidation(responseMap, validationConfig,reportStorage, executionConfig);
+			runExtensionReleaseValidation(report, responseMap, validationConfig,reportStorage, executionConfig);
 		} else {
-			runAssertionTests(executionConfig,responseMap, reportStorage);
+			runAssertionTests(report, executionConfig, reportStorage);
 		}
 
 		//Run Drool Validator
-		runDroolValidator(responseMap, validationConfig, executionConfig);
+		runDroolValidator(report, validationConfig, executionConfig);
 
 		//Run MRCM Validator
-		runMRCMAssertionTests(responseMap, validationConfig, executionConfig);
+		runMRCMAssertionTests(report, validationConfig, executionConfig);
 
+		if(executionConfig.isJiraIssueCreationFlag()) {
+			// Add Jira ticket for each fail assertions
+			try {
+				String relaseYear = executionConfig.getReleaseDate().substring(0,4);
+				String relaseMonth = executionConfig.getReleaseDate().substring(4,6);
+				String dateMonth = executionConfig.getReleaseDate().substring(6,8);
+				jiraService.addJiraTickets(executionConfig.getProductName(),relaseYear + "-" + relaseMonth + "-"  +dateMonth,executionConfig.getReportingStage(), report.getAssertionsFailed());
+			} catch (JiraException e) {
+				logger.error("Error while creating Jira Ticket for failed assertions. Message : " + e.getMessage());
+			}
+		}
+
+		responseMap.put("TestResult", report);
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
@@ -183,9 +201,8 @@ public class ValidationRunner {
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
 	}
 
-	private void runDroolValidator(Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) {
-		long timeStart = (new Date()).getTime();
-		//String releaseFilePath = "D:\\Projects\\SNOMED\\release-validation-framework\\xSnomedCT_MRCMReferenceSets_Beta_20170210.zip";
+	private void runDroolValidator(ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) {
+		long timeStart = System.currentTimeMillis();
 		String directoryOfRuleSetsPath = droolRulesModuleName;
 
 		HashSet<String> ruleSetNamesToRun = Sets.newHashSet(validationConfig.getGroupsList().iterator().next());
@@ -193,47 +210,43 @@ public class ValidationRunner {
 		try {
 			invalidContents = validateRF2(new FileInputStream(validationConfig.getLocalProspectiveFile()), directoryOfRuleSetsPath, ruleSetNamesToRun);
 		} catch (ReleaseImportException e) {
-			e.printStackTrace();
+			logger.error("Error: " + e);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error("Error: " + e);
 		}
-        if(invalidContents != null){
-            RuleExecutor ruleExecutor = new RuleExecutor(directoryOfRuleSetsPath);
-            HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
-            for(InvalidContent invalidContent : invalidContents){
-                if(!invalidContentMap.containsKey(invalidContent.getMessage())){
-                    List<InvalidContent> invalidContentArrayList = new ArrayList<>();
-                    invalidContentArrayList.add(invalidContent);
-                    invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
-                }else {
-                    invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
-                }
-            }
-            invalidContents.clear();
-            List<AssertionDroolRule> assertionDroolRules = new ArrayList<>();
-            Iterator it = invalidContentMap.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                AssertionDroolRule assertionDroolRule = new AssertionDroolRule();
-                List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
-                assertionDroolRule.setRule((String)pair.getKey());
-                assertionDroolRule.setTotalFails(invalidContentList.size());
-                assertionDroolRule.setContentItems(invalidContentList);
-                assertionDroolRules.add(assertionDroolRule);
-                it.remove(); // avoids a ConcurrentModificationException
-            }
-
-
-            final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
-            report.setAssertionsInvalidContent(assertionDroolRules);
-            report.setExecutionId(executionConfig.getExecutionId());
-            report.setTotalTestsRun(ruleExecutor.getTotalRulesLoaded());
-            report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-            report.setTotalFailures(invalidContents.size());
-            report.setRuleSetExecuted(validationConfig.getGroupsList().iterator().next());
-            responseMap.put(report.getTestType().toString() + "TestResult", report);
-        }
-
+		HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
+		for(InvalidContent invalidContent : invalidContents){
+			if(!invalidContentMap.containsKey(invalidContent.getMessage())){
+				List<InvalidContent> invalidContentArrayList = new ArrayList<>();
+				invalidContentArrayList.add(invalidContent);
+				invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
+			}else {
+				invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
+			}
+		}
+		invalidContents.clear();
+		Iterator it = invalidContentMap.entrySet().iterator();
+		List<TestRunItem> failedAssertions = new ArrayList<>();
+		while (it.hasNext()){
+			Map.Entry pair = (Map.Entry)it.next();
+			TestRunItem failedAssertion = new TestRunItem();
+			failedAssertion.setTestType(TestType.DROOL_RULES);
+			failedAssertion.setTestCategory("");
+			failedAssertion.setAssertionUuid(null);
+			failedAssertion.setAssertionText((String) pair.getKey());
+			failedAssertion.setExtractResultInMillis(0L);
+			List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
+			failedAssertion.setFailureCount((long) invalidContentList.size());
+			List<FailureDetail> failureDetails = new ArrayList<>();
+			for (InvalidContent invalidContent : invalidContentList){
+				failureDetails.add(new FailureDetail(invalidContent.getConceptId(), invalidContent.getMessage(), null));
+			}
+			failedAssertion.setFirstNInstances(failureDetails);
+			failedAssertions.add(failedAssertion);
+			it.remove(); // avoids a ConcurrentModificationException
+		}
+		validationReport.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
+		validationReport.addFailedAssertions(failedAssertions);
 
 	}
 
@@ -278,7 +291,7 @@ public class ValidationRunner {
 		}
 		return outputFolder;
 	}
-	private void runMRCMAssertionTests(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws IOException, ReleaseImportException, ServiceException {
+	private void runMRCMAssertionTests(final ValidationReport report, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws IOException, ReleaseImportException, ServiceException {
 		final long timeStart = System.currentTimeMillis();
 		ValidationService validationService = new ValidationService();
 		ValidationRun validationRun = new ValidationRun();
@@ -300,6 +313,7 @@ public class ValidationRunner {
 		for(org.snomed.quality.validator.mrcm.Assertion assertion : validationRun.getCompletedAssertions()){
 			testRunItem = new TestRunItem();
 			testRunItem.setTestCategory(MMRCM_TYPE_VALIDATION);
+			testRunItem.setTestType(TestType.MRCM);
 			testRunItem.setAssertionUuid(assertion.getUuid());
 			testRunItem.setAssertionText(assertion.getAssertionText());
 			testRunItem.setFailureCount(0L);
@@ -311,6 +325,7 @@ public class ValidationRunner {
 		for(org.snomed.quality.validator.mrcm.Assertion assertion : validationRun.getSkippedAssertions()){
 			testRunItem = new TestRunItem();
 			testRunItem.setTestCategory(MMRCM_TYPE_VALIDATION);
+			testRunItem.setTestType(TestType.MRCM);
 			testRunItem.setAssertionUuid(assertion.getUuid());
 			testRunItem.setAssertionText(assertion.getAssertionText());
 			testRunItem.setFailureCount(0L);
@@ -322,6 +337,7 @@ public class ValidationRunner {
 		for(org.snomed.quality.validator.mrcm.Assertion assertion : validationRun.getFailedAssertions()){
 			testRunItem = new TestRunItem();
 			testRunItem.setTestCategory(MMRCM_TYPE_VALIDATION);
+			testRunItem.setTestType(TestType.MRCM);
 			testRunItem.setAssertionUuid(assertion.getUuid());
 			testRunItem.setAssertionText(assertion.getAssertionText());
 			testRunItem.setExtractResultInMillis(0L);
@@ -335,23 +351,14 @@ public class ValidationRunner {
 			failedAssertions.add(testRunItem);
 		}
 
-		Collections.sort(passedAssertions);
-		Collections.sort(skippedAssertions);
-		Collections.sort(failedAssertions);
-		final MrcmValidationReport report = new MrcmValidationReport(TestType.MRCM);
-		report.setExecutionId(executionConfig.getExecutionId());
-		report.setTotalTestsRun(passedAssertions.size() + skippedAssertions.size() + failedAssertions.size());
-		report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-		report.setTotalSkips(skippedAssertions.size());
-		report.setTotalFailures(failedAssertions.size());
-		report.setAssertionsSkipped(skippedAssertions);
-		report.setAssertionsFailed(failedAssertions);
-		report.setAssertionsPassed(passedAssertions);
-		responseMap.put(report.getTestType().toString() + "TestResult", report);
+		report.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
+		report.addSkippedAssertions(skippedAssertions);
+		report.addFailedAssertions(failedAssertions);
+		report.addPassedAssertions(passedAssertions);
 	}
 
-	private void runExtensionReleaseValidation(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
-			ExecutionConfig executionConfig) throws IOException,
+	private void runExtensionReleaseValidation(final ValidationReport report, final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
+											   ExecutionConfig executionConfig) throws IOException,
 			NoSuchAlgorithmException, DecoderException, BusinessServiceException, SQLException {
 		final long timeStart = System.currentTimeMillis();
 		//run release-type validations
@@ -372,11 +379,8 @@ public class ValidationRunner {
 		//run remaining component-centric and file-centric validaitons
 		assertions.removeAll(releaseTypeAssertions);
 		testItems.addAll(runAssertionTests(executionConfig, assertions, reportStorage, true));
-		constructTestReport(executionConfig, responseMap, timeStart, testItems);
+		constructTestReport(report, timeStart, testItems);
 	}
-
-
-
 
 	private List<Assertion> getAssertions(List<String> groupNames) {
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(groupNames);
@@ -405,7 +409,7 @@ public class ValidationRunner {
 		return result;
 	}
 
-	private void runAssertionTests(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, String reportStorage) throws IOException {
+	private void runAssertionTests(final ValidationReport report, final ExecutionConfig executionConfig, String reportStorage) throws IOException {
 		final long timeStart = System.currentTimeMillis();
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
@@ -425,22 +429,13 @@ public class ValidationRunner {
 		} else {
 			items.addAll(executeAssertionsConcurrently(executionConfig,assertions, batchSize, reportStorage));
 		}
-		constructTestReport(executionConfig, responseMap, timeStart, items);
+		constructTestReport(report, timeStart, items);
 		
 	}
 
-	private void constructTestReport(final ExecutionConfig executionConfig, final Map<String, Object> responseMap, final long timeStart, final List<TestRunItem> items) {
+	private void constructTestReport(final ValidationReport report, final long timeStart, final List<TestRunItem> items) {
 		final long timeEnd = System.currentTimeMillis();
-		
-		//summary
-		final ValidationReport summary = new ValidationReport(TestType.SQL);
-		final ValidationReport failedReport = new ValidationReport(TestType.SQL);
-		final ValidationReport warningReport = new ValidationReport(TestType.SQL);
-		
-		summary.setExecutionId(executionConfig.getExecutionId());
-		summary.setTotalTestsRun(items.size());
-		summary.setTimeTakenInSeconds((timeEnd - timeStart) / 1000);
-		
+		report.addTimeTaken((timeEnd - timeStart) / 1000);
 		//failed tests
 		final List<TestRunItem> failedItems = new ArrayList<>();
 		final List<TestRunItem> warningItems = new ArrayList<>();
@@ -451,36 +446,16 @@ public class ValidationRunner {
 			if(SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())){
 				warningItems.add(item);
 			}
+			item.setTestType(TestType.SQL);
 		}
-		
-		if (!failedItems.isEmpty()) {
-			Collections.sort(failedItems);
-			failedReport.setExecutionId(executionConfig.getExecutionId());
-			failedReport.setTotalFailures(failedItems.size());
-			failedReport.setFailedAssertions(failedItems);
-		}
-		
-		if(!warningItems.isEmpty()) {
-			Collections.sort(warningItems);
-			warningReport.setExecutionId(executionConfig.getExecutionId());
-			warningReport.setTotalWarnings(warningItems.size());
-			warningReport.setAssertionsWarning(warningItems);			
-		}
-		
+
+		report.addFailedAssertions(failedItems);
+		report.addWarningAssertions(warningItems);
+
 		items.removeAll(failedItems);
 		items.removeAll(warningItems);
-		Collections.sort(items);
-		summary.setPassedAssertions(items);
-		summary.setTotalFailures(failedItems.size());
-		summary.setTotalWarnings(warningItems.size());
-		
-		responseMap.put("SQL Test result summary", summary);
-		if(failedReport.getTotalFailures() != null && failedReport.getTotalFailures() > 0) {
-			responseMap.put(failedReport.getTestType().toString() + "FailedTestResult", failedReport);
-		}
-		if(warningReport.getTotalWarnings() != null && warningReport.getTotalWarnings() > 0){
-			responseMap.put(warningReport.getTestType().toString() + "WarningTestResult", warningReport);
-		}
+		report.addPassedAssertions(items);
+
 	}
 
 	private List<TestRunItem> executeAssertionsConcurrently(final ExecutionConfig executionConfig, final Collection<Assertion> assertions, int batchSize, String reportStorage) {
@@ -491,7 +466,7 @@ public class ValidationRunner {
 		List<Assertion> batch = null;
 		for (final Assertion assertion: assertions) {
 			if (batch == null) {
-				batch = new ArrayList<Assertion>();
+				batch = new ArrayList();
 			}
 			batch.add(assertion);
 			if (counter % batchSize == 0 || counter == assertions.size()) {

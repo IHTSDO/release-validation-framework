@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+		">
+   <context:annotation-config/>
+   <tx:annotation-driven/>
+
+   <context:property-placeholder location="classpath*:jira-service.properties" order="-1"
+                                 ignore-unresolvable="false" ignore-resource-not-found="false" />
+   <context:component-scan base-package="org.ihtsdo.rvf.jira"/>
+   
+   <bean class="net.rcarz.jiraclient.BasicCredentials" name="basicCredentials">
+      <constructor-arg name="username" value="${rvf.jira.basicAuth.username}"/>
+      <constructor-arg name="password" value="${rvf.jira.basicAuth.password}"/>
+   </bean>
+
+   <bean class="org.ihtsdo.rvf.jira.JiraClientFactoryImpl" name="jiraClientFactory">
+      <constructor-arg name="endPoint" value="${rvf.jira.endpoint}"/>
+      <constructor-arg name="credentials" ref="basicCredentials"/>
+   </bean>
+
+   
+   
+</beans>

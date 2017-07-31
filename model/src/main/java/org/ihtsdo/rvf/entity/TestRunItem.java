@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -7,9 +9,11 @@ import java.util.UUID;
 /**
  * A class that records metrics about execution of an {@link org.ihtsdo.rvf.entity.Test}.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestRunItem implements Comparable<TestRunItem>{
 
 	private String testCategory;
+	private TestType testType;
 	private UUID assertionUuid;
 	private String assertionText;
 	private String severity;
@@ -19,6 +23,7 @@ public class TestRunItem implements Comparable<TestRunItem>{
 	private String failureMessage;
 	private List<FailureDetail> firstNInstances;
 	private Long extractResultInMillis;
+	private String jiraLink;
 
 	/**
 	 * Empty constructor for IOC
@@ -35,6 +40,13 @@ public class TestRunItem implements Comparable<TestRunItem>{
 		return testCategory;
 	}
 
+	public TestType getTestType() {
+		return testType;
+	}
+
+	public void setTestType(TestType testType) {
+		this.testType = testType;
+	}
 
 	public String getFailureMessage() {
 		return failureMessage;
@@ -47,6 +59,7 @@ public class TestRunItem implements Comparable<TestRunItem>{
 				"assertionText=" + assertionText +  '\'' +	
 				"executionId=" + executionId + '\'' +
 				"testCategory=" + testCategory + '\'' +
+				"testType=" + testType + '\'' +
 				"runTime=" + queryInMilliSeconds + '\'' +
 				"failureCount=" + failureCount +
 				'}';
@@ -128,6 +141,14 @@ public class TestRunItem implements Comparable<TestRunItem>{
 		this.extractResultInMillis = extractResultInMillis;
 	}
 
+	public String getJiraLink() {
+		return jiraLink;
+	}
+
+	public void setJiraLink(String jiraLink) {
+		this.jiraLink = jiraLink;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -154,6 +175,8 @@ public class TestRunItem implements Comparable<TestRunItem>{
 						.hashCode());
 		result = prime * result
 				+ ((testCategory == null) ? 0 : testCategory.hashCode());
+		result = prime * result
+				+ ((testType == null) ? 0 : testType.hashCode());
 		return result;
 	}
 
@@ -211,11 +234,19 @@ public class TestRunItem implements Comparable<TestRunItem>{
 				return false;
 		} else if (!testCategory.equals(other.testCategory))
 			return false;
+		if (testType == null) {
+			if (other.testType != null)
+				return false;
+		} else if (!testType.equals(other.testType))
+			return false;
 		return true;
 	}
 
 	@Override
 	public int compareTo(TestRunItem other) {
+		if(this.assertionUuid == null){
+			return -1;
+		}
 		return this.assertionUuid.compareTo(other.getAssertionUuid());
 	}
 	
