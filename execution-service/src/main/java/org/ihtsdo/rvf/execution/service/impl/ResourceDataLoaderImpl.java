@@ -68,9 +68,11 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 			String prefix = US_TO_GB_TERMS_MAP_FILENAME;
 			if (index != -1) {
 				 bucketname = validationResourcePath.substring(0,index);
-				 prefix = validationResourcePath.substring(index);
-				 if (!prefix.endsWith("/")) {
-					 prefix = "/" + US_TO_GB_TERMS_MAP_FILENAME;
+				 prefix = validationResourcePath.substring(index+1);
+				 if (!prefix.isEmpty() && !prefix.endsWith("/")) {
+					 prefix += "/" + US_TO_GB_TERMS_MAP_FILENAME;
+				 } else {
+					 prefix += US_TO_GB_TERMS_MAP_FILENAME;
 				 }
 			}
 			LOGGER.info("The bucket name extracted from validationResourcePath:" + bucketname);
