@@ -10,6 +10,7 @@ public enum TestType {
     ARCHIVE_STRUCTURAL("archiveStructural"),
     MANIFEST("manifest"),
     MRCM("mrcm"),
+    DROOL_RULES("droolsRules"),
     UNKNOWN("unknown");
     
     private String name;
