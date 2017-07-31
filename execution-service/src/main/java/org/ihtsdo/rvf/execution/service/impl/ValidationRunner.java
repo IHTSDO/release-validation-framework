@@ -3,14 +3,6 @@ package org.ihtsdo.rvf.execution.service.impl;
 import com.google.common.collect.Sets;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
-import org.ihtsdo.drools.RuleExecutor;
-import org.ihtsdo.drools.response.InvalidContent;
-import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentFactory;
-import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentRepository;
-import org.ihtsdo.drools.validator.rf2.domain.DroolsConcept;
-import org.ihtsdo.drools.validator.rf2.service.DroolsConceptService;
-import org.ihtsdo.drools.validator.rf2.service.DroolsDescriptionService;
-import org.ihtsdo.drools.validator.rf2.service.DroolsRelationshipService;
 import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
@@ -41,6 +33,15 @@ import java.util.Date;
 import java.util.concurrent.*;
 import org.h2.tools.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.ihtsdo.drools.RuleExecutor;
+import org.ihtsdo.drools.response.InvalidContent;
+import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentFactory;
+import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentRepository;
+import org.ihtsdo.drools.validator.rf2.domain.DroolsConcept;
+import org.ihtsdo.drools.validator.rf2.service.DroolsConceptService;
+import org.ihtsdo.drools.validator.rf2.service.DroolsDescriptionService;
+import org.ihtsdo.drools.validator.rf2.service.DroolsRelationshipService;
 
 @Service
 @Scope("prototype")
