@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
+import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.sqs.service.exception.ServiceException;
@@ -130,7 +131,7 @@ public class ValidationRunner {
 			}
 		}
 		if (executionConfig.isReleaseValidation() && !executionConfig.isFirstTimeRelease()) {
-			boolean isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+			boolean isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, validationConfig, responseMap);
 			if (!isLoaded) {
 				reportService.writeResults(responseMap, State.FAILED, reportStorage);
 				return;

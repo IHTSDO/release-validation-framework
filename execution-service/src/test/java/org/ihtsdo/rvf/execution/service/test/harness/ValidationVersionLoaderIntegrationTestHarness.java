@@ -115,7 +115,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 		validationConfig.setS3PublishBucketName("local.publish.bucket");
 		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		Map<String, Object> responseMap = new HashMap<>();
-		boolean isLoaded = dataLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+		boolean isLoaded = dataLoader.loadPreviousVersion(executionConfig, validationConfig, responseMap);
 		Assert.assertEquals(false, isLoaded);
 		System.out.println(responseMap.get(FAILURE_MESSAGE));
 		Assert.assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
@@ -130,7 +130,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 		validationConfig.setS3PublishBucketName("local.publish.bucket");
 		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		Map<String, Object> responseMap = new HashMap<>();
-		boolean isLoaded = dataLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+		boolean isLoaded = dataLoader.loadPreviousVersion(executionConfig, validationConfig, responseMap);
 		Assert.assertEquals(false, isLoaded);
 		System.out.println(responseMap.get(FAILURE_MESSAGE));
 		Assert.assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
@@ -144,7 +144,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 		validationConfig.setS3PublishBucketName("local.publish.bucket");
 		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		Map<String, Object> responseMap = new HashMap<>();
-		boolean isLoaded = dataLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+		boolean isLoaded = dataLoader.loadPreviousVersion(executionConfig, validationConfig, responseMap);
 		Assert.assertEquals(false, isLoaded);
 		System.out.println(responseMap.get(FAILURE_MESSAGE));
 		Assert.assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
