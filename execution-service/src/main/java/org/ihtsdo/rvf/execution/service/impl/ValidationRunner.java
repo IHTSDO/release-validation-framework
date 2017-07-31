@@ -196,40 +196,43 @@ public class ValidationRunner {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		RuleExecutor ruleExecutor = new RuleExecutor(directoryOfRuleSetsPath);
-		HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
-		for(InvalidContent invalidContent : invalidContents){
-			if(!invalidContentMap.containsKey(invalidContent.getMessage())){
-				List<InvalidContent> invalidContentArrayList = new ArrayList<>();
-				invalidContentArrayList.add(invalidContent);
-				invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
-			}else {
-				invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
-			}
-		}
-		invalidContents.clear();
-		List<AssertionDroolRule> assertionDroolRules = new ArrayList<>();
-		Iterator it = invalidContentMap.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pair = (Map.Entry)it.next();
-			AssertionDroolRule assertionDroolRule = new AssertionDroolRule();
-			List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
-			assertionDroolRule.setRule((String)pair.getKey());
-			assertionDroolRule.setTotalFails(invalidContentList.size());
-			assertionDroolRule.setContentItems(invalidContentList);
-			assertionDroolRules.add(assertionDroolRule);
-			it.remove(); // avoids a ConcurrentModificationException
-		}
+        if(invalidContents != null){
+            RuleExecutor ruleExecutor = new RuleExecutor(directoryOfRuleSetsPath);
+            HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
+            for(InvalidContent invalidContent : invalidContents){
+                if(!invalidContentMap.containsKey(invalidContent.getMessage())){
+                    List<InvalidContent> invalidContentArrayList = new ArrayList<>();
+                    invalidContentArrayList.add(invalidContent);
+                    invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
+                }else {
+                    invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
+                }
+            }
+            invalidContents.clear();
+            List<AssertionDroolRule> assertionDroolRules = new ArrayList<>();
+            Iterator it = invalidContentMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                AssertionDroolRule assertionDroolRule = new AssertionDroolRule();
+                List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
+                assertionDroolRule.setRule((String)pair.getKey());
+                assertionDroolRule.setTotalFails(invalidContentList.size());
+                assertionDroolRule.setContentItems(invalidContentList);
+                assertionDroolRules.add(assertionDroolRule);
+                it.remove(); // avoids a ConcurrentModificationException
+            }
 
 
-		final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
-		report.setAssertionsInvalidContent(assertionDroolRules);
-		report.setExecutionId(executionConfig.getExecutionId());
-		report.setTotalTestsRun(ruleExecutor.getTotalRulesLoaded());
-		report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-		report.setTotalFailures(invalidContents.size());
-		report.setRuleSetExecuted(validationConfig.getGroupsList().iterator().next());
-		responseMap.put(report.getTestType().toString() + "TestResult", report);
+            final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
+            report.setAssertionsInvalidContent(assertionDroolRules);
+            report.setExecutionId(executionConfig.getExecutionId());
+            report.setTotalTestsRun(ruleExecutor.getTotalRulesLoaded());
+            report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
+            report.setTotalFailures(invalidContents.size());
+            report.setRuleSetExecuted(validationConfig.getGroupsList().iterator().next());
+            responseMap.put(report.getTestType().toString() + "TestResult", report);
+        }
+
 
 	}
 
