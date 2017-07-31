@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3Object;
 
 @Service
@@ -63,16 +64,26 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 		try {
 			LOGGER.info("validationResourcePath:" + validationResourcePath);
 			int index = validationResourcePath.indexOf("/");
-			String bucketname = validationResourcePath.substring(0,index);
+			String bucketname = validationResourcePath;
+			String prefix = US_TO_GB_TERMS_MAP_FILENAME;
+			if (index != -1) {
+				 bucketname = validationResourcePath.substring(0,index);
+				 prefix = validationResourcePath.substring(index);
+				 if (!prefix.endsWith("/")) {
+					 prefix = "/" + US_TO_GB_TERMS_MAP_FILENAME;
+				 }
+			}
 			LOGGER.info("The bucket name extracted from validationResourcePath:" + bucketname);
-			String prefix = validationResourcePath.substring(index);
-			LOGGER.info("The prefix extracted from validationResourcePath:" + prefix);
-			S3Object termFileObj = s3Client.getObject(bucketname, prefix + US_TO_GB_TERMS_MAP_FILENAME);
-			LOGGER.info("External configuration file {} found at {}", US_TO_GB_TERMS_MAP_FILENAME, validationResourcePath);
-			File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
-			try (InputStream input = termFileObj.getObjectContent();
-				OutputStream out = new FileOutputStream(localMapFile);) {
-				IOUtils.copy(input, out);
+			LOGGER.info("The prefix constructed from validationResourcePath:" + prefix);
+			ObjectListing listing = s3Client.listObjects(bucketname, prefix);
+			if (!listing.getObjectSummaries().isEmpty()) {
+				S3Object termFileObj = s3Client.getObject(bucketname, prefix);
+				LOGGER.info("External configuration file {} found at {}", US_TO_GB_TERMS_MAP_FILENAME, validationResourcePath);
+				File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
+				try (InputStream input = termFileObj.getObjectContent();
+					OutputStream out = new FileOutputStream(localMapFile);) {
+					IOUtils.copy(input, out);
+				}
 			}
 		} catch (Throwable  t) {
 			final String errorMsg = "Error when trying to download the us-to-gb-terms-map.txt file from S3 at path:" + validationResourcePath;
@@ -88,7 +99,7 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 			}
 		}
 		if (!isExternalConfigFound) {
-			LOGGER.info("No external configuration file {} found at {} therefore the default will be used", US_TO_GB_TERMS_MAP_FILENAME, validationResourcePath);
+			LOGGER.info("No external configuration file {} found at {} therefore the default file will be used", US_TO_GB_TERMS_MAP_FILENAME, validationResourcePath);
 			try {
 				copyDefaultDataFiles(localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
 			} catch (IOException e) {
