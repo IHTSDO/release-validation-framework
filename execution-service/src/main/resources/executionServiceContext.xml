@@ -19,7 +19,7 @@
 	
 	<context:property-placeholder location="file://${rvfConfigLocation:/tmp}/execution-service.properties" order="-1"
 								  ignore-unresolvable="true" ignore-resource-not-found="true" />
-	<context:property-placeholder location="classpath*:execution-service-defaults.properties" />
+	<context:property-placeholder location="classpath*:execution-service-defaults.properties" ignore-unresolvable="true"/>
     
 	<!-- Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing-->
 	<bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
@@ -78,13 +78,14 @@
 	<bean id="releaseDataManager" class="org.ihtsdo.rvf.execution.service.impl.ReleaseDataManagerImpl">
 		<property name="sctDataLocation" value="${rvf.data.folder.location}"/>
 	</bean>
-	<bean id="resourceDataLoader" class="org.ihtsdo.rvf.execution.service.impl.ResourceDataLoaderImpl"/>
+	<bean id="resourceDataLoader" class="org.ihtsdo.rvf.execution.service.impl.ResourceDataLoaderImpl">
+		<property name="validationResourcePath" value="${rvf.validation.resources}"/>
+	</bean>
 	
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationRunner" depends-on="assertionsDatabasePrimerService">
 		<constructor-arg value="${rvf.assertion.execution.BatchSize}"/>
 	</bean>
 	<bean id="versionLoader" class =" org.ihtsdo.rvf.execution.service.impl.ValidationVersionLoader"/>
-	
 	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService">
 		<constructor-arg name="bucketName" value="${executionBucketName}"/>
 	</bean>
