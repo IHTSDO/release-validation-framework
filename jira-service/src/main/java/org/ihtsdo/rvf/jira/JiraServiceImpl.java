@@ -60,7 +60,7 @@ public class JiraServiceImpl implements JiraService {
     @Override
     public List<Issue> getTicketsByJQL(String jql) throws JiraException {
         JiraClient jiraClient = jiraClientFactory.getJiraClient();
-        Issue.SearchResult searchResult = jiraClient.searchIssues(jql);
+        Issue.SearchResult searchResult = jiraClient.searchIssues(jql, 2000);
         return searchResult.issues;
     }
 
