@@ -119,5 +119,5 @@
 			<artifactId>snomed-utilities</artifactId>
 			<version>${snomed.utilities.version}</version>
 		</dependency>
-	</dependencies>
+    </dependencies>
 </project>
