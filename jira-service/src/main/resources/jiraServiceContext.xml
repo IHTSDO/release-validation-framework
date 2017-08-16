@@ -12,7 +12,7 @@
    <context:annotation-config/>
    <tx:annotation-driven/>
 
-   <context:property-placeholder location="classpath*:jira-service.properties" order="-1"
+   <context:property-placeholder location="file://${rvfConfigLocation:/tmp}/jira-service.properties" order="-1"
                                  ignore-unresolvable="false" ignore-resource-not-found="false" />
    <context:component-scan base-package="org.ihtsdo.rvf.jira"/>
    
