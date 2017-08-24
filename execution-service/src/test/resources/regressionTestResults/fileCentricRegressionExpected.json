@@ -248,10 +248,10 @@
       "conceptId" : "128534003",
       "detail" : "ASSOC RS: id=128534003:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
     }, {
-      "conceptId" : "700241009",
-      "detail" : "ASSOC RS: id=700241009:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
+      "conceptId" : "280164007",
+      "detail" : "ASSOC RS: id=280164007:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 11
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "c779d282-3c4d-4c16-a8a6-8d1a621b247d",
@@ -294,7 +294,7 @@
       "conceptId" : "2608473011",
       "detail" : "ATT RS: id=2608473011:Invalid Referencedcomponentid in ATTRIBUTEVALUE REFSET snapshot."
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Swedish language refset.",
     "assertionUuid" : "dbb49e0c-e5b0-4676-a815-70fb9f3b468e",
@@ -355,7 +355,7 @@
       "conceptId" : "2608473011",
       "detail" : "ATT RF: id=900000000000495008:Invalid valueId."
     } ],
-    "totalFailed" : 20
+    "totalFailed" : 22
   }, {
     "assertionName" : "There is at most one active definition per concept per language per dialect in the DEFINITION snapshot.",
     "assertionUuid" : "de0c4d6c-6297-41be-9979-fb1c93717baa",
@@ -425,10 +425,13 @@
     "assertionName" : "Reference componentId and valueId pair is unique in the ATTRIBUTE VALUE snapshot.",
     "assertionUuid" : "eff30fb0-7856-11e1-b0c4-0800200c9a60",
     "firstNInstances" : [ {
+      "conceptId" : "569651017",
+      "detail" : "Reference component id:569651017 valueid=900000000000495008 pair is not unique in the Attribute Value snapshot"
+    }, {
       "conceptId" : "2608473011",
       "detail" : "Reference component id:2608473011 valueid=900000000000495008 pair is not unique in the Attribute Value snapshot"
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "All members refer to a description that is referenced in either the description table or the text definition table.",
     "assertionUuid" : "f5d9ae70-7856-11e1-b0c4-0800200c9a66",
@@ -702,7 +705,7 @@
       "conceptId" : "10171006",
       "detail" : "ASSOC RS: Targetcomponentid=239777004:Invalid TargetComponentId."
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 13
   }, {
     "assertionName" : "There are no duplicate Definition terms in the DEFINITION snapshot file.",
     "assertionUuid" : "3b2c1824-8445-410e-8ae2-d943be01c33f",

@@ -8,7 +8,7 @@
 
 	<context:property-placeholder location="file://${rvfConfigLocation:/tmp}/validation-service.properties" order="-1"
 								  ignore-unresolvable="true" ignore-resource-not-found="true" />
-	<context:property-placeholder location="classpath:validation-service-defaults.properties" />
+	<context:property-placeholder location="classpath:validation-service-defaults.properties" ignore-unresolvable="true" />
 	
 	<bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.impl.ValidationLogFactoryImpl"/>
 

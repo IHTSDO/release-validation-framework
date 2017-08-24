@@ -15,5 +15,6 @@
 	from curr_associationrefset_s a
 	inner join curr_concept_s b on a.referencedcomponentid = b.id
 	where a.active = '1'
-	and b.active != '0';
-		
+	and b.active != '0'
+	and a.refsetid in 
+	(900000000000523009,900000000000524003,900000000000525002,900000000000526001,900000000000527005,900000000000528000,900000000000530003,900000000000531004);

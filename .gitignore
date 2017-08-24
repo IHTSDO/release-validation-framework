@@ -21,3 +21,6 @@ api-demo/tmp
 
 config_local
 activemq-data/
+
+# Whitelist some files
+!.gitattributes

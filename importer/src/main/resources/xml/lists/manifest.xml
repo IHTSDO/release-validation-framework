@@ -198,6 +198,8 @@
 		<!-- across multiple files in Current snapshot-->
 		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="release-type-validation" sqlFile="release-type-snapshot-unique-relationship-id.sql" text="The ids should be unique across the stated and inferred relationship snapshot files." />
 		<script uuid="560e6d0c-64e8-4726-9516-ae7a7606b0b3" category="release-type-validation" sqlFile="release-type-snapshot-unique-description-definition-id.sql" text="The ids should be unique across the description and text definition snapshot files." />
+		<script uuid="1852b9d6-38cf-11e7-8b36-3c15c2c6e32e" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-association-refset_unique_checking.sql" text="Previously published historical association components should not be modified."/>
+		
 	
 			
 		<!--  release type for complex and extended maps-->
@@ -369,15 +371,16 @@
 		<!-- Disable this for now as it needs improvements script uuid="22a95293-3acb-4671-95f8-1ff13ba3202c" category="component-centric-validation" sqlFile="component-centric-snapshot-description-casesignificanceid.sql" text="Case-sensitive terms have appropriate caseSignificanceId." /> -->	
 		<script uuid="6614ff12-fca2-42b7-a5da-ea26353979fe" category="component-centric-validation" sqlFile="component-centric-snapshot-description-valid-characters.sql" text="Active description of active concept consists of valid characters." />		
 		<script uuid="8D6AB114-CACA-4D99-9FEC-BB8FD9CEA518" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-fsn.sql" text="The FSN term should be unique in active content." />		
-		<script uuid="d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-fsn-case-insensitive-checking.sql" text="The FSN term should be unique in active content when case sensitivity is ingored." />		
+		<script uuid="d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-fsn-case-insensitive-checking.sql" text="The FSN term should be unique in active content when case sensitivity is ignored." />		
 		<script uuid="b4930ea7-4078-4599-979c-2dde18164f01" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-case-sensitive.sql" text="All definitions are case sensitive." />
 		<script uuid="73e46e72-6fdb-407b-9d50-d86a36a3a862" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-always-preferred.sql" text="All active definitions are preferred." />
 		<script uuid="da3ae7c4-6144-4cd5-9530-2a7780c53c9a" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-trim.sql" text="No active definitions contain leading or trailing spaces." />
 		<script uuid="f7b7cefe-858d-4749-ab98-7106700feaee" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-double-spaces.sql" text="No active definitions contain double spaces." />
 		<script uuid="6138248d-8cc8-4bc2-8043-cd609fdd640c" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-uppercase.sql" text="The first letter of the active definition should be capitalized." />
-		
-		
-		<script uuid="31F5E2C8-B0B9-42EE-A9BF-87D95EDAD83B" category="component-centric-validation" sqlFile="component-centric-snapshot-language-referencedcomponent-unique-per-refset.sql" text="There is only one member id per description per dialect in the language refset snapshot file." />
+		<!-- active contents only. Created specifically for US edition -->
+		<script uuid="eead9964-67ce-11e7-b7e7-3c15c2c6e32e" category="component-centric-validation,US" sqlFile="component-centric-snapshot-language-referencedcomponent-unique-active-per-refset.sql" text="There is only one active member per description per dialect in the language refset snapshot file." />
+		<!-- This one is checking both active and inactive contents  -->
+		<script uuid="31f5e2c8-b0b9-42ee-a9bf-87d95edad83b" category="component-centric-validation" sqlFile="component-centric-snapshot-language-referencedcomponent-unique-per-refset.sql" text="There is only one member id per description per dialect in the language refset snapshot file." />
 		<script uuid="d76f1430-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-inactive-members.sql" text="Members are inactive for inactive descriptions in the language refset snapshot file." />
 		<script uuid="e658fb00-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-unique-term.sql" text="Descriptions in a language refset are unique for a given concept." />
 		<script uuid="f636b7b0-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-active-members.sql" text="Members are active for active descriptions in the language refset snapshot file." />

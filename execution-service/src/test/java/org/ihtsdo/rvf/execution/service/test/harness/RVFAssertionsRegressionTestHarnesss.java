@@ -159,8 +159,8 @@ public class RVFAssertionsRegressionTestHarnesss {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
-		assertEquals(191, assertions.size());
-		assertEquals(78, releaseTypeAssertions.size());
+		assertEquals(192, assertions.size());
+		assertEquals(79, releaseTypeAssertions.size());
 	}
 	
 	@Test
@@ -182,7 +182,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("22a95293-3acb-4671-95f8-1ff13ba3202c");
+		runAssertionsTest("c3249e80-84f0-11e1-b0c4-0800200c9a66");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
