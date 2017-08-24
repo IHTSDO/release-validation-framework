@@ -89,6 +89,8 @@ public class AssertionGroupImporter {
 	//SNOMED RT Identifier is deprecated from the international 20170731 release onwards.
 	private static final String[] SNOMED_RT_IDENTIFIER_ASSERTIONS = {"730720b0-7f25-11e1-b0c4-0800200c9a66","83638340-7f25-11e1-b0c4-0800200c9a66",
 		"5e80ea3e-c4dd-4ae3-8b75-f0567e42b962","695cea40-7f25-11e1-b0c4-0800200c9a66"};
+	
+	private static final String[] US_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b"};
 		
 /* the following were included but feel that they should be validated for project level as well.
 	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
@@ -285,7 +287,9 @@ public class AssertionGroupImporter {
 			if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
 				assertionService.addAssertionToGroup(assertion, group);
 			}
-			
+			if ( AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+				continue;
+			}
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", allAssertions.size(), group.getName() );
 	}
@@ -332,6 +336,9 @@ public class AssertionGroupImporter {
 			}
 			//exclude SNOMED RT assertions
 			if ( AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				continue;
+			}
+			if ( AssertionGroupName.US_EDITION.equals(groupName) && Arrays.asList(US_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
 			assertionService.addAssertionToGroup(assertion, assertionGroup);
