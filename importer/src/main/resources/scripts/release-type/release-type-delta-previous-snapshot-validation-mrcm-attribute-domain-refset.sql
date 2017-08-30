@@ -8,7 +8,7 @@
 		a.referencedcomponentid,
 		concat('Mrcm Attribute Domain Refset: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.')
 	from curr_mrcmAttributeDomainRefset_d a
-	left join prev_mrcmAttributeDomainRefset_s; b
+	left join prev_mrcmAttributeDomainRefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

@@ -20,7 +20,7 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('MRCM Attribute Domain Refset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
-	from curr_mrcmAttributeDomainRefset_s; a
+	from curr_mrcmAttributeDomainRefset_s a
 	left join temp_mrcmattributedomainrefset_v b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
@@ -55,7 +55,7 @@
 		a.referencedcomponentid,
 		concat('MRCM Attribute Domain Refset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.')
 	from temp_mrcmattributedomainrefset_v a
-	left join curr_mrcmAttributeDomainRefset_s; b
+	left join curr_mrcmAttributeDomainRefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
