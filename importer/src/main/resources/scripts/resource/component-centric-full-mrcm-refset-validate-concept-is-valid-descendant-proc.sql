@@ -45,7 +45,7 @@ select
 	assertionId,
 	result.conceptId,
 	concat(refsetName,":id=",result.id,":ConceptId=",result.conceptId, " referenced in the column ", columnName ," in FULL is not valid descendant of expression ", expression)
-	from  (select id, conceptId from temp_full_refset_conceptid where conceptId not in (select conceptId from temp_full_concept_hierachy_tree)) as result;
+	from  (select id, conceptId from temp_full_refset_conceptId where conceptId not in (select conceptId from temp_full_concept_hierachy_tree)) as result;
 
 drop table if exists temp_full_concept_hierachy_tree;
 drop table if exists temp_full_refset_conceptId;
