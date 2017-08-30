@@ -18,8 +18,8 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('MRCM ATTRIBUTE RANGE REFSET: id=',a.id, ' is in prior full file but not in current full file.') 	
-	from prev_mrcmattributerangerefset_f a
-	left join curr_mrcmattributerangerefset_f b
+	from prev_mrcmAttributeRangeRefset_f a
+	left join curr_mrcmAttributeRangeRefset_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

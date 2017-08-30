@@ -12,8 +12,8 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('MRCM DOMAIN REFSET: id=',a.id, ' is in delta file but not in snapshot file.') 	
-	from curr_mrcmdomainrefset_d a
-	left join curr_mrcmdomainrefset_s b
+	from curr_mrcmDomainRefset_d a
+	left join curr_mrcmDomainRefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

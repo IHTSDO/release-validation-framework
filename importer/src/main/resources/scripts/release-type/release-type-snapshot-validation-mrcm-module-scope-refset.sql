@@ -4,13 +4,13 @@
 
 /* 	view of current snapshot, derived from current full */
 	drop table if exists temp_mrcmmodulescoperefset_v;
-  	create table if not exists temp_mrcmmodulescoperefset_v like curr_mrcmmodulescoperefset_f;
+  	create table if not exists temp_mrcmmodulescoperefset_v like curr_mrcmModuleScopeRefset_f;
   	insert into temp_mrcmmodulescoperefset_v
 	select a.*
-	from curr_mrcmmodulescoperefset_f a
+	from curr_mrcmModuleScopeRefset_f a
 	where cast(a.effectivetime as datetime) =
 		(select max(cast(z.effectivetime as datetime))
-		 from curr_mrcmmodulescoperefset_f z
+		 from curr_mrcmModuleScopeRefset_f z
 		 where z.id = a.id);
 
 /* in the snapshot; not in the full */
@@ -20,7 +20,7 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('MRCM Module Scope Refset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
-	from curr_mrcmmodulescoperefset_s a
+	from curr_mrcmModuleScopeRefset_s a
 	left join temp_mrcmmodulescoperefset_v b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
@@ -45,7 +45,7 @@
 		a.referencedcomponentid,
 		concat('MRCM Module Scope Refset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.')
 	from temp_mrcmmodulescoperefset_v a
-	left join curr_mrcmmodulescoperefset_s b
+	left join curr_mrcmModuleScopeRefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

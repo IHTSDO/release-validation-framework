@@ -18,8 +18,8 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('MRCM ATTRIBUTE DOMAIN REFSET: id=',a.id, ' is in prior full file but not in current full file.') 	
-	from prev_mrcmattributedomainrefset_f a
-	left join curr_mrcmattributedomainrefset_f b
+	from prev_mrcmAttributeDomainRefset_f a
+	left join curr_mrcmAttributeDomainRefset_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

@@ -12,7 +12,7 @@
 		'<ASSERTIONUUID>',
 		a.mrcmrulerefsetid,
 		concat('MRCM MODULE SCOPE: id=',a.id,' : mrcmRuleRefsetId=',a.mrcmrulerefsetid,' MRCM Module Scope Refset contains a MrcmRuleRefsetId that does not exist in the Concept snapshot.') 	
-	from curr_mrcmmodulescoperefset_s a
+	from curr_mrcmModuleScopeRefset_s a
 	left join curr_concept_s b
 	on a.mrcmrulerefsetid = b.id
 	where a.active = 1 and (b.active=0 or b.id is null);

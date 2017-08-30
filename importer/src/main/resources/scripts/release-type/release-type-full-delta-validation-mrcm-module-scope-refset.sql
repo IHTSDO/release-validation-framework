@@ -8,8 +8,8 @@
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
 	concat('Mrcm Module Scope Refset: id=',a.id, ' is in current full file, but not in prior full or current delta file.')
-	from curr_mrcmmodulescoperefset_f a
-	left join curr_mrcmmodulescoperefset_d b
+	from curr_mrcmModuleScopeRefset_f a
+	left join curr_mrcmModuleScopeRefset_d b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -17,7 +17,7 @@
 		and a.refsetid = b.refsetid
 		and a.referencedcomponentid = b.referencedcomponentid
 		and a.mrcmrulerefsetid = b.mrcmrulerefsetid
-	left join prev_mrcmmodulescoperefset_f c
+	left join prev_mrcmModuleScopeRefset_f c
 		on a.id = c.id
 		and a.effectivetime = c.effectivetime
 		and a.active = c.active

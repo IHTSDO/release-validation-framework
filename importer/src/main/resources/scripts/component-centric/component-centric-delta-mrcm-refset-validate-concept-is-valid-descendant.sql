@@ -3,17 +3,17 @@ call validateConceptIdIsValidDescendantsInMRCMRefsetDelta_procedure(<RUNID>,'<AS
 'mrcmAttributeDomainRefset_d','moduleId ','mrcmAttributeDomainRefset',
 '900000000000443000', '< 900000000000443000 |Module|');
 call validateConceptIdIsValidDescendantsInMRCMRefsetDelta_procedure(<RUNID>,'<ASSERTIONUUID>',
-'mrcmattributerangerefset_d','moduleId ','mrcmAttributeRangeRefset',
+'mrcmAttributeRangeRefset_d','moduleId ','mrcmAttributeRangeRefset',
 '900000000000443000', '< 900000000000443000 |Module|');
 call validateConceptIdIsValidDescendantsInMRCMRefsetDelta_procedure(<RUNID>,'<ASSERTIONUUID>',
-'mrcmdomainrefset_d','moduleId ','mrcmDomainRefset',
+'mrcmDomainRefset_d','moduleId ','mrcmDomainRefset',
 '900000000000443000', '< 900000000000443000 |Module|');
 call validateConceptIdIsValidDescendantsInMRCMRefsetDelta_procedure(<RUNID>,'<ASSERTIONUUID>',
-'mrcmmodulescoperefset_d','moduleId ','mrcmModuleScopeRefset',
+'mrcmModuleScopeRefset_d','moduleId ','mrcmModuleScopeRefset',
 '900000000000443000', '< 900000000000443000 |Module|');
 -- MRCM Domain Refset checks
 call validateConceptIdIsValidDescendantsInMRCMRefsetDelta_procedure(<RUNID>,'<ASSERTIONUUID>',
-'mrcmdomainrefset_d','refsetId ','mrcmDomainRefset',
+'mrcmDomainRefset_d','refsetId ','mrcmDomainRefset',
 '723589008', '< 723589008 |MRCM domain reference set|');
 -- MRCM Attribute Domain Refset checks
 call validateConceptIdIsValidDescendantsInMRCMRefsetDelta_procedure(<RUNID>,'<ASSERTIONUUID>',
