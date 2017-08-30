@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 86,
-  "totalAssertionsFailed" : 86,
+  "totalAssertionsRun" : 115,
+  "totalAssertionsFailed" : 115,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -315,7 +315,7 @@
     "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word that has en-gb spelling: tumour"
+      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word that has en-gb spelling: tumour\r"
     } ],
     "totalFailed" : 1
   }, {
@@ -355,7 +355,7 @@
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the GB Language refset but refers to a word that has en-us spelling: analog"
+      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the GB Language refset but refers to a word that has en-us spelling: analog\r"
     } ],
     "totalFailed" : 1
   }, {
@@ -1077,5 +1077,482 @@
       "detail" : "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term"
     } ],
     "totalFailed" : 4
+  }, {
+    "assertionName" : "Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN full file",
+    "assertionUuid" : "9de8d069-2055-4c21-87bc-2fc9363045dc",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e Grouped value is not in (0,1) in MRCM ATTRIBUTE DOMAIN full file"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Check that the expression constraints, refinements and expression templates in multiple columns in MRCM Attribute Range Refset include only valid SNOMED CT concept identifiers",
+    "assertionUuid" : "9ece50b0-cafc-4e13-a66a-a59d315e9f2c",
+    "firstNInstances" : [ {
+      "conceptId" : "258666001",
+      "detail" : "MRCM Attribute Range Refset:id=06805490-d51c-4180-be36-8ca0ed64ce5e:ConceptId=258666001 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "118598001",
+      "detail" : "MRCM Attribute Range Refset:id=09b44c5c-fded-43ce-9010-96ef135a6f3d:ConceptId=118598001 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "123037004",
+      "detail" : "MRCM Attribute Range Refset:id=0b6a7cf1-aad4-4ff6-82bb-3b96047a80bd:ConceptId=123037004 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "363675004",
+      "detail" : "MRCM Attribute Range Refset:id=0baa658d-7dd1-4ecf-aec0-cfcd2057a457:ConceptId=363675004 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "288526004",
+      "detail" : "MRCM Attribute Range Refset:id=10a6d260-70f6-4158-96b5-1b4fd366ae02:ConceptId=288526004 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "719982003",
+      "detail" : "MRCM Attribute Range Refset:id=1cc250da-c4a4-421e-a8ed-ba265e59f1a5:ConceptId=719982003 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "261424001",
+      "detail" : "MRCM Attribute Range Refset:id=1e2c1d24-9e76-411f-89ce-c7433b017702:ConceptId=261424001 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "288532009",
+      "detail" : "MRCM Attribute Range Refset:id=2003ae77-7a97-46a7-a6c9-f070672a3231:ConceptId=288532009 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "442083009",
+      "detail" : "MRCM Attribute Range Refset:id=244d3fc6-b622-4e8b-9e25-e19e2b8751c1:ConceptId=442083009 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "7389001",
+      "detail" : "MRCM Attribute Range Refset:id=268b70c3-aa2d-45da-8d2f-dd89f29d82b2:ConceptId=7389001 referenced in the column rangeConstraint in SNAPSHOT is invalid."
+    } ],
+    "totalFailed" : 160
+  }, {
+    "assertionName" : "Check that the value range is valid in MRCM Refsets Snapshot",
+    "assertionUuid" : "a3e31a6c-0443-46a4-8b18-daad481247ed",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000012005",
+      "detail" : "mrcmAttributeDomainRefset:id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e:ConceptId=900000000000012005 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=81da6aa5-0cb1-463f-88ad-c25a795a211b:ConceptId=900000000000012004 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=840861c7-8d9b-44a6-acfd-01f1b994b6d9:ConceptId=900000000000012004 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=883bd314-23b7-4ccc-87d6-8067d98b3660:ConceptId=900000000000012004 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=8ce25c12-3cc5-4ab0-84e2-fdc0a75dffed:ConceptId=900000000000012004 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=8d066b27-118d-4a84-886a-14dabceba155:ConceptId=900000000000012004 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a1e92414-b651-4891-a749-d66ddd17cc00:ConceptId=900000000000012004 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a3c14d1d-abd2-4259-912d-ede579e4c9d9:ConceptId=900000000000012004 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a54a5491-2986-42df-9c23-161823e88753:ConceptId=900000000000012004 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a8c88cca-305c-40e8-bf03-2d6d03d47755:ConceptId=900000000000012004 referenced in the column moduleId  in SNAPSHOT is not valid descendant of expression < 900000000000443000 |Module|"
+    } ],
+    "totalFailed" : 739
+  }, {
+    "assertionName" : "ID is unique in MRCM ATTRIBUTE DOMAIN snapshot.",
+    "assertionUuid" : "a48d78fe-8ab5-4705-bbc5-1286fb2a98a2",
+    "firstNInstances" : [ {
+      "conceptId" : "425391005",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=7e76895c-56e4-40e4-b150-134b5c347780:Non unique id in current MRCM Attribute Domain snapshot file."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "DomainId in MRCM ATTRIBUTE DOMAIN DELTA exists in the ReferencedComponentId values of MRCM DOMAIN DELTA",
+    "assertionUuid" : "b0b3d1d7-c64e-44a0-be45-062faa1dd684",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000012005",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=81da6aa5-0cb1-463f-88ad-c25a795a211b DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=840861c7-8d9b-44a6-acfd-01f1b994b6d9 DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=883bd314-23b7-4ccc-87d6-8067d98b3660 DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8ce25c12-3cc5-4ab0-84e2-fdc0a75dffed DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8d066b27-118d-4a84-886a-14dabceba155 DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a1e92414-b651-4891-a749-d66ddd17cc00 DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a3c14d1d-abd2-4259-912d-ede579e4c9d9 DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a54a5491-2986-42df-9c23-161823e88753 DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a8c88cca-305c-40e8-bf03-2d6d03d47755 DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA"
+    } ],
+    "totalFailed" : 89
+  }, {
+    "assertionName" : "AttributeCardinality value is in ('0..1','0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionUuid" : "b36b78d8-13c3-4fc7-8632-0a03f725da17",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e AttributeCardinality value is not in (\"0..1\",\"0..*\") in MRCM ATTRIBUTE DOMAIN snapshot file"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE SNAPSHOT.",
+    "assertionUuid" : "bd3bb9ec-97ae-4c53-9686-9c8c63b8d67b",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e ReferencedComponentId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE SNAPSHOT"
+    }, {
+      "conceptId" : "405814001",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=29eca2fc-ba2d-42a0-9ee1-99d97dc933ff ReferencedComponentId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE SNAPSHOT"
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "MrcmRuleRefsetId in MRCM MODULE SCOPE DELTA exists in the RefsetId values of MRCM DOMAIN DELTA or MRCM ATTRIBUTE DOMAIN DELTA or MRCM ATTRIBUTE RANGE DELTA",
+    "assertionUuid" : "c3e7f126-98b9-4c50-9909-4c3ba7b49548",
+    "firstNInstances" : [ {
+      "conceptId" : "723562009",
+      "detail" : "MRCM MODULE SCOPE REFSET: id=8e5766bc-7755-45fb-99c8-8d2c52e45da5 MrcmRuleRefsetId in MRCM MODULE SCOPE DELTA does not exist in the RefsetId values of MRCM DOMAIN DELTA or MRCM ATTRIBUTE DOMAIN DELTA or MRCM ATTRIBUTE RANGE DELTA"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionUuid" : "ce8f4bae-0c51-4248-9c42-8f05a2cccdb4",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e Grouped value is not in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "AttributeCardinality value is in ('0..1','0..*') in MRCM ATTRIBUTE DOMAIN full file",
+    "assertionUuid" : "d23a21cc-6dd0-4371-9f87-f68ea0d5f3a7",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e AttributeCardinality value is not in (\"0..1\",\"0..*\") in MRCM ATTRIBUTE DOMAIN full file"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "ID is unique in MRCM ATTRIBUTE RANGE snapshot.",
+    "assertionUuid" : "d51966ed-e034-4a25-90ef-1eb489c0bd37",
+    "firstNInstances" : [ {
+      "conceptId" : "363702006",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=7d23e837-4e2b-45cd-b5c8-8ea9b51daae0:Non unique id in current MRCM Attribute Range snapshot file."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN delta file",
+    "assertionUuid" : "d7c78573-8e02-4eab-88ba-f9e628fe2c53",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e Grouped value is not in (0,1) in MRCM ATTRIBUTE DOMAIN delta file"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "ID is unique in MRCM DOMAIN snapshot.",
+    "assertionUuid" : "e980e959-943b-4cdc-998b-f91e670a030b",
+    "firstNInstances" : [ {
+      "conceptId" : "91723000",
+      "detail" : "MRCM DOMAIN REFSET: id=7ca9ec15-74ce-488d-a250-2a3c71278268:Non unique id in current MRCM Domain snapshot file."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT",
+    "assertionUuid" : "f1fc2c4b-9202-4a0b-9c00-49b6de7a7cc5",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000012005",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=81da6aa5-0cb1-463f-88ad-c25a795a211b DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=840861c7-8d9b-44a6-acfd-01f1b994b6d9 DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=883bd314-23b7-4ccc-87d6-8067d98b3660 DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8ce25c12-3cc5-4ab0-84e2-fdc0a75dffed DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8d066b27-118d-4a84-886a-14dabceba155 DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a1e92414-b651-4891-a749-d66ddd17cc00 DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a3c14d1d-abd2-4259-912d-ede579e4c9d9 DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a54a5491-2986-42df-9c23-161823e88753 DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a8c88cca-305c-40e8-bf03-2d6d03d47755 DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT does not exist in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"
+    } ],
+    "totalFailed" : 89
+  }, {
+    "assertionName" : "AttributeInGroupCardinality value is in ('0..0', '0..1', '0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionUuid" : "f47d1537-41dc-4cb5-ad0a-ed4caf993801",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e AttributeInGroupCardinality value is not in (\"0..0\", \"0..1\", \"0..*\") in MRCM ATTRIBUTE DOMAIN snapshot file"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE RANGE DELTA exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN DELTA",
+    "assertionUuid" : "f59f13df-fb2a-406b-8788-7d173a349b0b",
+    "firstNInstances" : [ {
+      "conceptId" : "405814009",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=81288567-57a9-49b1-b7f0-bf5979a6d289 ReferencedComponentId in MRCM ATTRIBUTE RANGE DELTA does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN DELTA"
+    }, {
+      "conceptId" : "370129005",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=4dc4c6f9-4d4f-4cbe-926f-b5d8e0906f2c ReferencedComponentId in MRCM ATTRIBUTE RANGE DELTA does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN DELTA"
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE RANGE FULL exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN FULL",
+    "assertionUuid" : "07253211-e2a2-4440-919d-6fc73bdcbfdb",
+    "firstNInstances" : [ {
+      "conceptId" : "405814009",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=81288567-57a9-49b1-b7f0-bf5979a6d289 ReferencedComponentId in MRCM ATTRIBUTE RANGE FULL does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN FULL"
+    }, {
+      "conceptId" : "370129005",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=4dc4c6f9-4d4f-4cbe-926f-b5d8e0906f2c ReferencedComponentId in MRCM ATTRIBUTE RANGE FULL does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN FULL"
+    }, {
+      "conceptId" : "0",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=52d8ebc7-6c09-41b5-be7f-2373d1686be3 ReferencedComponentId in MRCM ATTRIBUTE RANGE FULL does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN FULL"
+    } ],
+    "totalFailed" : 3
+  }, {
+    "assertionName" : "AttributeInGroupCardinality value is in ('0..0', '0..1', '0..*') in MRCM ATTRIBUTE DOMAIN delta file",
+    "assertionUuid" : "1f6a9168-534a-4ebe-b0e7-3f424e56a7d1",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e AttributeInGroupCardinality value is not in (\"0..0\", \"0..1\", \"0..*\") in MRCM ATTRIBUTE DOMAIN delta file"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "MrcmRuleRefsetId in MRCM MODULE SCOPE FULL exists in the RefsetId values of MRCM DOMAIN FULL or MRCM ATTRIBUTE DOMAIN FULL or MRCM ATTRIBUTE RANGE FULL",
+    "assertionUuid" : "2bf6ec9a-7cc5-491b-99cd-0e3092ff8055",
+    "firstNInstances" : [ {
+      "conceptId" : "723562009",
+      "detail" : "MRCM MODULE SCOPE REFSET: id=8e5766bc-7755-45fb-99c8-8d2c52e45da5 MrcmRuleRefsetId in MRCM MODULE SCOPE FULL does not exist in the RefsetId values of MRCM DOMAIN FULL or MRCM ATTRIBUTE DOMAIN FULL or MRCM ATTRIBUTE RANGE FULL"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "AttributeInGroupCardinality value is in ('0..0', '0..1', '0..*') in MRCM ATTRIBUTE DOMAIN full file",
+    "assertionUuid" : "36c983cc-e355-4c5a-b14e-548959072fb4",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e AttributeInGroupCardinality value is not in (\"0..0\", \"0..1\", \"0..*\") in MRCM ATTRIBUTE DOMAIN full file"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "AttributeCardinality value is in ('0..1','0..*') in MRCM ATTRIBUTE DOMAIN delta file",
+    "assertionUuid" : "3ffbe5e3-ef3e-4c73-983f-24e3438a8434",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e AttributeCardinality value is not in (\"0..1\",\"0..*\") in MRCM ATTRIBUTE DOMAIN delta file"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "MrcmRuleRefsetId in MRCM MODULE SCOPE SNAPSHOT exists in the RefsetId values of MRCM DOMAIN SNAPSHOT or MRCM ATTRIBUTE DOMAIN SNAPSHOT or MRCM ATTRIBUTE RANGE SNAPSHOT",
+    "assertionUuid" : "57ae69cd-26f0-4001-ba2f-ae56129e2e28",
+    "firstNInstances" : [ {
+      "conceptId" : "723562009",
+      "detail" : "MRCM MODULE SCOPE REFSET: id=8e5766bc-7755-45fb-99c8-8d2c52e45da5 MrcmRuleRefsetId in MRCM MODULE SCOPE SNAPSHOT does not exist in the RefsetId values of MRCM DOMAIN SNAPSHOT or MRCM ATTRIBUTE DOMAIN SNAPSHOT or MRCM ATTRIBUTE RANGE SNAPSHOT"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Check that the expression constraints, refinements and expression templates in multiple columns in MRCM Domain Refset include only valid SNOMED CT concept identifiers",
+    "assertionUuid" : "5d0fdbf5-fef6-44b2-aa42-ebb302132178",
+    "firstNInstances" : [ {
+      "conceptId" : "129125009",
+      "detail" : "MRCM Domain Refset:id=07225f48-d874-403f-a051-d0fa9d2895e2:ConceptId=129125009 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "413350009",
+      "detail" : "MRCM Domain Refset:id=0b0b9db5-3be5-44e5-86e8-1389756ec245:ConceptId=413350009 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "123038009",
+      "detail" : "MRCM Domain Refset:id=16e1c6dc-513f-4bfb-a1ab-dc1fbeb370fb:ConceptId=123038009 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "91723000",
+      "detail" : "MRCM Domain Refset:id=233fcd4d-2d2f-4f2b-9ed1-387212390c71:ConceptId=91723000 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "123037004",
+      "detail" : "MRCM Domain Refset:id=273f1341-03c9-44a1-9797-9b5106c07e8b:ConceptId=123037004 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "387713003",
+      "detail" : "MRCM Domain Refset:id=29c92b36-6617-4ae6-a1f5-07cd5d256849:ConceptId=387713003 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "243796009",
+      "detail" : "MRCM Domain Refset:id=2ea42f3f-138e-4cf8-92d1-cc7786e8e486:ConceptId=243796009 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "363787002",
+      "detail" : "MRCM Domain Refset:id=3afa8ba9-6196-4792-afd0-224450e79166:ConceptId=363787002 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "64572001",
+      "detail" : "MRCM Domain Refset:id=3f013ed8-b9bd-4938-9b80-0873ee329304:ConceptId=64572001 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    }, {
+      "conceptId" : "433590000",
+      "detail" : "MRCM Domain Refset:id=4c97efc0-bfb8-4afc-b3f1-d60862074973:ConceptId=433590000 referenced in the column domainConstraint in SNAPSHOT is invalid."
+    } ],
+    "totalFailed" : 78
+  }, {
+    "assertionName" : "Check that the value range is valid in MRCM Refsets Delta",
+    "assertionUuid" : "6ce65376-c701-4042-8eae-70c78be08476",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000012005",
+      "detail" : "mrcmAttributeDomainRefset:id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e:ConceptId=900000000000012005 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=81da6aa5-0cb1-463f-88ad-c25a795a211b:ConceptId=900000000000012004 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=840861c7-8d9b-44a6-acfd-01f1b994b6d9:ConceptId=900000000000012004 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=883bd314-23b7-4ccc-87d6-8067d98b3660:ConceptId=900000000000012004 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=8ce25c12-3cc5-4ab0-84e2-fdc0a75dffed:ConceptId=900000000000012004 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=8d066b27-118d-4a84-886a-14dabceba155:ConceptId=900000000000012004 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a1e92414-b651-4891-a749-d66ddd17cc00:ConceptId=900000000000012004 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a3c14d1d-abd2-4259-912d-ede579e4c9d9:ConceptId=900000000000012004 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a54a5491-2986-42df-9c23-161823e88753:ConceptId=900000000000012004 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a8c88cca-305c-40e8-bf03-2d6d03d47755:ConceptId=900000000000012004 referenced in the column moduleId  in DELTA is not valid descendant of expression < 900000000000443000 |Module|"
+    } ],
+    "totalFailed" : 739
+  }, {
+    "assertionName" : "ID is unique in MRCM MODULE SCOPE snapshot.",
+    "assertionUuid" : "6f4aa58c-cc59-4a51-a630-fe4c69bac53b",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000207008",
+      "detail" : "MRCM MODULE SCOPE REFSET: id=60dcf17f-6054-4ee2-a657-606104c49bb5:Non unique id in current MRCM Module Scope snapshot file."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "DomainId in MRCM ATTRIBUTE DOMAIN FULL exists in the ReferencedComponentId values of MRCM DOMAIN FULL",
+    "assertionUuid" : "6f8cc7ba-c59f-486a-9c52-4a725ac735be",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000012005",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=81da6aa5-0cb1-463f-88ad-c25a795a211b DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=840861c7-8d9b-44a6-acfd-01f1b994b6d9 DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=883bd314-23b7-4ccc-87d6-8067d98b3660 DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8ce25c12-3cc5-4ab0-84e2-fdc0a75dffed DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8d066b27-118d-4a84-886a-14dabceba155 DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a1e92414-b651-4891-a749-d66ddd17cc00 DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a3c14d1d-abd2-4259-912d-ede579e4c9d9 DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a54a5491-2986-42df-9c23-161823e88753 DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a8c88cca-305c-40e8-bf03-2d6d03d47755 DomainId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM DOMAIN FULL"
+    } ],
+    "totalFailed" : 89
+  }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE RANGE SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN SNAPSHOT",
+    "assertionUuid" : "73772817-4654-4abf-b801-e849fbae1ba0",
+    "firstNInstances" : [ {
+      "conceptId" : "405814009",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=81288567-57a9-49b1-b7f0-bf5979a6d289 ReferencedComponentId in MRCM ATTRIBUTE RANGE SNAPSHOT does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN SNAPSHOT"
+    }, {
+      "conceptId" : "370129005",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=4dc4c6f9-4d4f-4cbe-926f-b5d8e0906f2c ReferencedComponentId in MRCM ATTRIBUTE RANGE SNAPSHOT does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN SNAPSHOT"
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "Check that the value range is valid in MRCM Refsets Full",
+    "assertionUuid" : "7654d06e-4f9d-421c-91e5-842b0bddb6bc",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000012005",
+      "detail" : "mrcmAttributeDomainRefset:id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e:ConceptId=900000000000012005 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=81da6aa5-0cb1-463f-88ad-c25a795a211b:ConceptId=900000000000012004 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=840861c7-8d9b-44a6-acfd-01f1b994b6d9:ConceptId=900000000000012004 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=883bd314-23b7-4ccc-87d6-8067d98b3660:ConceptId=900000000000012004 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=8ce25c12-3cc5-4ab0-84e2-fdc0a75dffed:ConceptId=900000000000012004 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=8d066b27-118d-4a84-886a-14dabceba155:ConceptId=900000000000012004 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a1e92414-b651-4891-a749-d66ddd17cc00:ConceptId=900000000000012004 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a3c14d1d-abd2-4259-912d-ede579e4c9d9:ConceptId=900000000000012004 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a54a5491-2986-42df-9c23-161823e88753:ConceptId=900000000000012004 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    }, {
+      "conceptId" : "900000000000012004",
+      "detail" : "mrcmAttributeDomainRefset:id=a8c88cca-305c-40e8-bf03-2d6d03d47755:ConceptId=900000000000012004 referenced in the column moduleId  in FULL is not valid descendant of expression < 900000000000443000 |Module|"
+    } ],
+    "totalFailed" : 742
+  }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE DOMAIN FULL exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE FULL.",
+    "assertionUuid" : "7c564691-3463-4115-b5f7-f19bd7b5888d",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e ReferencedComponentId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE FULL"
+    }, {
+      "conceptId" : "405814001",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=29eca2fc-ba2d-42a0-9ee1-99d97dc933ff ReferencedComponentId in MRCM ATTRIBUTE DOMAIN FULL does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE FULL"
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE DOMAIN DELTA exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE DELTA",
+    "assertionUuid" : "7c9489ee-22a3-40bd-b0f3-e4777ae25d7e",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e ReferencedComponentId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE DELTA"
+    }, {
+      "conceptId" : "405814001",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=29eca2fc-ba2d-42a0-9ee1-99d97dc933ff ReferencedComponentId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE DELTA"
+    } ],
+    "totalFailed" : 2
   } ]
 }
