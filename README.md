@@ -10,7 +10,7 @@ These instructions will provide guidance in getting the RVF running on your loca
 ### Prerequisites
 You will need:
 - [Git Client](https://git-scm.com/) to clone the project
-- [JDK 1.7](http://www.oracle.com/technetwork/java/javase/downloads) or above 
+- [JDK 1.8](http://www.oracle.com/technetwork/java/javase/downloads)
 - [Maven](https://maven.apache.org/) to build
 
 
