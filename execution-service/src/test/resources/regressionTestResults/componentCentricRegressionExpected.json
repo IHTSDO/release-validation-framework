@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 115,
-  "totalAssertionsFailed" : 112,
+  "totalAssertionsRun" : 116,
+  "totalAssertionsFailed" : 116,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -309,7 +309,7 @@
     "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word that has en-gb spelling: tumour\r"
+      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word that has en-gb spelling: tumour"
     } ],
     "totalFailed" : 1
   }, {
@@ -343,7 +343,7 @@
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the GB Language refset but refers to a word that has en-us spelling: analog\r"
+      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the GB Language refset but refers to a word that has en-us spelling: analog"
     } ],
     "totalFailed" : 1
   }, {
@@ -416,6 +416,17 @@
     "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : null,
     "totalFailed" : 0
+  }, {
+    "assertionName" : "There is only one active member per description per dialect in the language refset snapshot file.",
+    "assertionUuid" : "eead9964-67ce-11e7-b7e7-3c15c2c6e32e",
+    "firstNInstances" : [ {
+      "conceptId" : "703860006",
+      "detail" : "Description: id=3008913022: has multiple active language refset members for a given dialect."
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Text definition: id=3008913022: has multiple active language refset members for a given dialect."
+    } ],
+    "totalFailed" : 2
   }, {
     "assertionName" : "CTV3 codes are unique in the CTV3 simple map refset",
     "assertionUuid" : "f14d521f-2472-4871-9c4e-356f0f075a3a",

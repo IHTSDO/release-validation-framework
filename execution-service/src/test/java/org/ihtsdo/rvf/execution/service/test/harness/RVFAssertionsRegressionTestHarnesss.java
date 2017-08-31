@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -182,7 +183,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("22a95293-3acb-4671-95f8-1ff13ba3202c");
+		runAssertionsTest("c3249e80-84f0-11e1-b0c4-0800200c9a66");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
@@ -220,14 +221,14 @@ public class RVFAssertionsRegressionTestHarnesss {
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
-//		File tempResult = File.createTempFile("tempResult_"+ type, ".txt");
-//		FileWriter writer = new FileWriter(tempResult);
-//		mapper.writeValue(writer,actualReport);
-//		System.out.println("Please see result in file:" + tempResult.getAbsolutePath());
+		File tempResult = File.createTempFile("tempResult_"+ type, ".json");
+		mapper.writerWithDefaultPrettyPrinter().writeValue(tempResult, actualReport);
 
-		System.out.println("Test result");
-		String actualReportStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport);
-		System.out.println(actualReportStr);
+//		System.out.println("Test result");
+//		String actualReportStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport);
+//		System.out.println(actualReportStr);
+		
+		System.out.println("Please see actual result in file:" + tempResult.getAbsolutePath());
 		final Gson gson = new Gson();
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));
 		final TestReport expectedReport = gson.fromJson(br, TestReport.class);

@@ -661,7 +661,7 @@
       "conceptId" : "2608473011",
       "detail" : "ATTRIBUTE VALUE REFSET: id=00000629-2697-5041-9438-3845fb99fe93 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 29
+    "totalFailed" : 31
   }, {
     "assertionName" : "The current Stated Relationship full file contains all previously published data unchanged.",
     "assertionUuid" : "fd8ed390-94e9-4fd9-9e20-902a24273dca",
@@ -1078,8 +1078,14 @@
     "firstNInstances" : [ {
       "conceptId" : "527806011",
       "detail" : "AttributeRefsetId=0001d24b-d872-5077-8955-b9c7e055b015 should not have a new inactive state as it was inactive previously."
+    }, {
+      "conceptId" : "2608473011",
+      "detail" : "AttributeRefsetId=00000629-2697-5041-9438-3845fb99fe93 is inactive but no active state found in the previous snapshot."
+    }, {
+      "conceptId" : "569651017",
+      "detail" : "AttributeRefsetId=000e70b1-5825-5abd-a4c3-5ced92f3f8de is inactive but no active state found in the previous snapshot."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 3
   }, {
     "assertionName" : "New inactive states follow active states in the DESCRIPTION snapshot.",
     "assertionUuid" : "2b193a88-8dab-4d19-b995-b556ed59398d",
@@ -1585,14 +1591,8 @@
     }, {
       "conceptId" : "250933017",
       "detail" : "ATTRUBUTE VALUE REFSET: id=000dce0d-951a-5a02-84f0-efed3f8d6292 is in delta but not in snapshot file."
-    }, {
-      "conceptId" : "569651017",
-      "detail" : "ATTRUBUTE VALUE REFSET: id=000e70b1-5825-5abd-a4c3-5ced92f3f7ed is in delta but not in snapshot file."
-    }, {
-      "conceptId" : "2608473011",
-      "detail" : "ATTRUBUTE VALUE REFSET: id=00000629-2697-5041-9438-3845fb99fe92 is in delta but not in snapshot file."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 8
   }, {
     "assertionName" : "The current concept snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "645e3292-18d6-41df-b42a-58ba4d7240d5",
