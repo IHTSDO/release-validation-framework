@@ -175,7 +175,7 @@ public class ValidationRunner {
 		}
 
 		//Run Drool Validator
-		//runDroolValidator(report, validationConfig, executionConfig);
+		runDroolValidator(report, validationConfig, executionConfig);
 
 		//Run MRCM Validator
 		runMRCMAssertionTests(report, validationConfig, executionConfig);
