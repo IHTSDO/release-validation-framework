@@ -803,11 +803,11 @@
     }, {
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006: Concept does not have a stated is-a relationship."
-    } ,  {
+    }, {
       "conceptId" : "699765003",
       "detail" : "CONCEPT: id=699765003: Concept does not have a stated is-a relationship."
-    }],
-    "totalFailed" : 11
+    } ],
+    "totalFailed" : 12
   }, {
     "assertionName" : "No active Terms contain leading or trailing spaces.",
     "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",

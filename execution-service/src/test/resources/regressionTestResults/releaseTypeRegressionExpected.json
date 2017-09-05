@@ -1596,7 +1596,7 @@
   }, {
     "assertionName" : "The current concept snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "645e3292-18d6-41df-b42a-58ba4d7240d5",
-    "firstNInstances" : [{
+    "firstNInstances" : [ {
       "conceptId" : "702411003",
       "detail" : "CONCEPT: id=702411003 is in SNAPSHOT file, but not in FULL file."
     }, {
@@ -1624,10 +1624,10 @@
       "conceptId" : "609452007",
       "detail" : "CONCEPT: id=609452007 is in SNAPSHOT file, but not in FULL file."
     }, {
-      "conceptId" : "100001001",
-      "detail" : "CONCEPT: id=100001001 is in FULL file, but not in SNAPSHOT file."
+      "conceptId" : "609452008",
+      "detail" : "CONCEPT: id=609452008 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 17
+    "totalFailed" : 18
   }, {
     "assertionName" : "The current Association refset full file contains all previously published data unchanged.",
     "assertionUuid" : "653ce147-780e-4b3d-8afe-bd8d116c8c17",
