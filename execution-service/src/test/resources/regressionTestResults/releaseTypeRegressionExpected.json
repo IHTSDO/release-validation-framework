@@ -39,6 +39,14 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "The current MRCM Domain Refset full file contains all previously published data unchanged.",
+    "assertionUuid" : "87af4df0-c506-41ed-9089-6a359f16b34f",
+    "firstNInstances" : [ {
+      "conceptId" : "91723000",
+      "detail" : "MRCM DOMAIN REFSET: id=7ca9ec15-74ce-488d-a250-2a3c71278268 is in prior full file but not in current full file."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "New inactive states follow active states in the SIMPLE MAP REFSET snapshot.",
     "assertionUuid" : "88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
     "firstNInstances" : [ {
@@ -55,6 +63,41 @@
       "detail" : "SimpleMap Refset: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249623 is inactive but no active state found in the previous snapshot."
     } ],
     "totalFailed" : 4
+  }, {
+    "assertionName" : "There must be actual changes made to previously published MRCM Domain Refset components in order for them to appear in the current delta.",
+    "assertionUuid" : "8864db45-0f97-4eda-b7ba-414289dd3a99",
+    "firstNInstances" : [ {
+      "conceptId" : "71388003",
+      "detail" : "Mrcm Domain Refset: id=821b5d55-2985-4293-98a9-2959a69b0b3b is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "386053000",
+      "detail" : "Mrcm Domain Refset: id=dcc4c43d-0ff3-448a-b200-fc9c6c3e7a56 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "723264001",
+      "detail" : "Mrcm Domain Refset: id=eb0bebd1-991a-4f69-97ab-e1c5bf64dd27 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "404684003",
+      "detail" : "Mrcm Domain Refset: id=f1136b12-f2bd-46db-b9fb-be484129e40c is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "129125009",
+      "detail" : "Mrcm Domain Refset: id=07225f48-d874-403f-a051-d0fa9d2895e2 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "413350009",
+      "detail" : "Mrcm Domain Refset: id=0b0b9db5-3be5-44e5-86e8-1389756ec245 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "123038009",
+      "detail" : "Mrcm Domain Refset: id=16e1c6dc-513f-4bfb-a1ab-dc1fbeb370fb is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "123037004",
+      "detail" : "Mrcm Domain Refset: id=273f1341-03c9-44a1-9797-9b5106c07e8b is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "387713003",
+      "detail" : "Mrcm Domain Refset: id=29c92b36-6617-4ae6-a1f5-07cd5d256849 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "243796009",
+      "detail" : "Mrcm Domain Refset: id=2ea42f3f-138e-4cf8-92d1-cc7786e8e486 is in the detla file, but no actual changes made since the previous release."
+    } ],
+    "totalFailed" : 19
   }, {
     "assertionName" : "All stated relationships inactivated in current release must have been active in the previous release.",
     "assertionUuid" : "89ceaf00-79b9-11e1-b0c4-0800200c9a66",
@@ -186,6 +229,14 @@
     } ],
     "totalFailed" : 4
   }, {
+    "assertionName" : "The current full MRCM Attribute Range Refset file consists of the previously published full file and the changes for the current release.",
+    "assertionUuid" : "ad0f8978-c8a7-4d91-8e3e-a887e4830fec",
+    "firstNInstances" : [ {
+      "conceptId" : "0",
+      "detail" : "Mrcm Attribute Range Refset: id=52d8ebc7-6c09-41b5-be7f-2373d1686be3 is in current full file, but not in prior full or current delta file."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "The current full text definition file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "b0ce145b-323b-484c-9cdc-25ea021e179d",
     "firstNInstances" : [ {
@@ -207,6 +258,49 @@
       "detail" : "Stated relationship: id=3574321020 is in current full file, but not in prior full or current delta file."
     } ],
     "totalFailed" : 3
+  }, {
+    "assertionName" : "There must be actual changes made to previously published MRCM Attribute Domain Refset components in order for them to appear in the current delta.",
+    "assertionUuid" : "b1ebc4cb-6a86-498f-a3ea-aeef250b9399",
+    "firstNInstances" : [ {
+      "conceptId" : "370129004",
+      "detail" : "Mrcm Attribute Domain Refset: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "363713009",
+      "detail" : "Mrcm Attribute Domain Refset: id=81da6aa5-0cb1-463f-88ad-c25a795a211b is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "405813007",
+      "detail" : "Mrcm Attribute Domain Refset: id=840861c7-8d9b-44a6-acfd-01f1b994b6d9 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "704324001",
+      "detail" : "Mrcm Attribute Domain Refset: id=883bd314-23b7-4ccc-87d6-8067d98b3660 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "704327008",
+      "detail" : "Mrcm Attribute Domain Refset: id=8ce25c12-3cc5-4ab0-84e2-fdc0a75dffed is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "363698007",
+      "detail" : "Mrcm Attribute Domain Refset: id=8d066b27-118d-4a84-886a-14dabceba155 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "363704007",
+      "detail" : "Mrcm Attribute Domain Refset: id=a1e92414-b651-4891-a749-d66ddd17cc00 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "704318007",
+      "detail" : "Mrcm Attribute Domain Refset: id=a3c14d1d-abd2-4259-912d-ede579e4c9d9 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "424244007",
+      "detail" : "Mrcm Attribute Domain Refset: id=a54a5491-2986-42df-9c23-161823e88753 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "272741003",
+      "detail" : "Mrcm Attribute Domain Refset: id=a8c88cca-305c-40e8-bf03-2d6d03d47755 is in the detla file, but no actual changes made since the previous release."
+    } ],
+    "totalFailed" : 90
+  }, {
+    "assertionName" : "New inactive states follow active states in the MRCM ATTRIBUTE DOMAIN REFSET snapshot.",
+    "assertionUuid" : "b205d819-2ef6-48e3-8fe1-1793e83a7b8a",
+    "firstNInstances" : [ {
+      "conceptId" : "425391005",
+      "detail" : "Mrcm Attribute Domain Refset: id=163180ba-e94e-4cfe-a008-0d22ec2316e4 is inactive but no active state found in the previous snapshot."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "The current Inferred Relationship full file contains all previously published data unchanged.",
     "assertionUuid" : "b46ec8df-1bfd-4825-be49-f09ed8a0076b",
@@ -406,6 +500,14 @@
     } ],
     "totalFailed" : 10
   }, {
+    "assertionName" : "The current MRCM Attribute Range Refset full file contains all previously published data unchanged.",
+    "assertionUuid" : "becfbeaa-5eab-4a4a-90ca-7c893b7495b2",
+    "firstNInstances" : [ {
+      "conceptId" : "47429007",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=52d8ebc7-6c09-41b5-be7f-2373d1686be3 is in prior full file but not in current full file."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "The current SimpleMap refset full file contains all previously published data unchanged.",
     "assertionUuid" : "c19b9008-bbc9-4209-a3d7-896d414df565",
     "firstNInstances" : [ {
@@ -474,6 +576,80 @@
       "detail" : "Stated relationship: id=4768117023 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 2
+  }, {
+    "assertionName" : "New inactive states follow active states in the MRCM MODULE SCOPE REFSET snapshot.",
+    "assertionUuid" : "ccd8f56e-45ec-40b7-9404-9b264881e64d",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000207008",
+      "detail" : "Mrcm Module Scope Refset: id=f1524dde-5466-46a7-926c-37b0e161bc7f is inactive but no active state found in the previous snapshot."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "There must be actual changes made to previously published MRCM Attribute Range Refset components in order for them to appear in the current delta.",
+    "assertionUuid" : "cec2a50e-c04b-4442-a979-e8ad8f83ff91",
+    "firstNInstances" : [ {
+      "conceptId" : "405814009",
+      "detail" : "Mrcm Attribute Range Refset: id=81288567-57a9-49b1-b7f0-bf5979a6d289 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "246090004",
+      "detail" : "Mrcm Attribute Range Refset: id=8163e3c0-b0c4-4c92-82e7-e93a23770b17 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "118170007",
+      "detail" : "Mrcm Attribute Range Refset: id=81f6d23b-66c7-46ce-b003-08380b9b236a is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "425391005",
+      "detail" : "Mrcm Attribute Range Refset: id=903d4612-9e2e-4434-94e8-eaff214f4467 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "363713009",
+      "detail" : "Mrcm Attribute Range Refset: id=9883dd72-0fdc-47bf-89d0-4f206ca7800c is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "419066007",
+      "detail" : "Mrcm Attribute Range Refset: id=98984674-6f17-40fe-8859-5ad2d0f5c09d is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "363700003",
+      "detail" : "Mrcm Attribute Range Refset: id=9f31fae1-65e6-4ffd-9a0d-badeaf298a8f is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "363698007",
+      "detail" : "Mrcm Attribute Range Refset: id=a079f482-e7de-4fd8-b4f9-5c8b56798676 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "116686009",
+      "detail" : "Mrcm Attribute Range Refset: id=a0a0149b-6541-4789-8645-1e7ce775bdd3 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "363714003",
+      "detail" : "Mrcm Attribute Range Refset: id=a107baf4-2724-4ef2-acd1-8f153ed31c21 is in the detla file, but no actual changes made since the previous release."
+    } ],
+    "totalFailed" : 82
+  }, {
+    "assertionName" : "New inactive states follow active states in the MRCM ATTRIBUTE RANGE REFSET snapshot.",
+    "assertionUuid" : "d182e8d4-c8e1-4e5f-ae17-b2f786f55727",
+    "firstNInstances" : [ {
+      "conceptId" : "363702006",
+      "detail" : "Mrcm Attribute Range Refset: id=9f81ad41-c5ee-4d46-8393-6a1455018880 is inactive but no active state found in the previous snapshot."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "There must be actual changes made to previously published MRCM Module Scope Refset components in order for them to appear in the current delta.",
+    "assertionUuid" : "d7e12c75-9979-4adb-9b5b-3b8a80ab4fbb",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000207009",
+      "detail" : "Mrcm Module Scope Refset: id=8e5766bc-7755-45fb-99c8-8d2c52e45da5 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "900000000000207008",
+      "detail" : "Mrcm Module Scope Refset: id=d3b7a01f-6fcd-4d8d-815b-ca6a63511310 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "900000000000207008",
+      "detail" : "Mrcm Module Scope Refset: id=60dcf17f-6054-4ee2-a657-606104c49bb5 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "900000000000207008",
+      "detail" : "Mrcm Module Scope Refset: id=60dcf17f-6054-4ee2-a657-606104c49bb5 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "900000000000207008",
+      "detail" : "Mrcm Module Scope Refset: id=60dcf17f-6054-4ee2-a657-606104c49bb5 is in the detla file, but no actual changes made since the previous release."
+    }, {
+      "conceptId" : "900000000000207008",
+      "detail" : "Mrcm Module Scope Refset: id=60dcf17f-6054-4ee2-a657-606104c49bb5 is in the detla file, but no actual changes made since the previous release."
+    } ],
+    "totalFailed" : 6
   }, {
     "assertionName" : "The current text definition delta file is an accurate derivative of the current full file",
     "assertionUuid" : "dc71ca52-f58e-45c7-8f31-c747206a391c",
@@ -697,9 +873,17 @@
     } ],
     "totalFailed" : 5
   }, {
+    "assertionName" : "The current full MRCM Module Scope Refset file consists of the previously published full file and the changes for the current release.",
+    "assertionUuid" : "054bccb0-c678-4722-94dd-b664e0c6267e",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000207008",
+      "detail" : "Mrcm Module Scope Refset: id=8029dc27-0ece-4454-b863-0f16348edc6c is in current full file, but not in prior full or current delta file."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "The current data in the Description snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "073832f4-6dc5-4781-9e56-9c3bc45d01bd",
-    "firstNInstances" : [{
+    "firstNInstances" : [ {
       "conceptId" : "702386002",
       "detail" : "DESCRIPTION: id=3004397016 is in delta file but not in snapshot file."
     }, {
@@ -729,7 +913,7 @@
     }, {
       "conceptId" : "700132006",
       "detail" : "DESCRIPTION: id=2984057019 is in delta file but not in snapshot file."
-    }],
+    } ],
     "totalFailed" : 14
   }, {
     "assertionName" : "The current simple refset snapshot file is an accurate derivative of the current full file",
@@ -764,11 +948,27 @@
     } ],
     "totalFailed" : 9
   }, {
+    "assertionName" : "The current data in the MRCM Module Scope Refset snapshot file are the same as the data in the current delta file.",
+    "assertionUuid" : "0999e34c-36b5-4d33-951a-8e949a66062e",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000207008",
+      "detail" : "MRCM MODULE SCOPE REFSET: id=0ed5d8f4-0a9e-479f-929d-e0a6bb9eb871 is in delta file but not in snapshot file."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : " There must be actual changes made to previously published descriptions in order for them to appear in the current delta.",
     "assertionUuid" : "0cc708af-6816-4370-91be-dba8da99d227",
     "firstNInstances" : [ {
       "conceptId" : "698906002",
       "detail" : "Description: id=2981505010 is in the detla file, but no actual changes made since the previous release."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The current MRCM Module Scope Refset full file contains all previously published data unchanged.",
+    "assertionUuid" : "0f7b6979-7a9d-45d4-956b-972d452f1638",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000207008",
+      "detail" : "MRCM MODULE SCOPE REFSET: id=380be434-a71f-44d7-b5e4-fdf79c5b5512 is in prior full file but not in current full file."
     } ],
     "totalFailed" : 1
   }, {
@@ -971,6 +1171,14 @@
     } ],
     "totalFailed" : 9
   }, {
+    "assertionName" : "New inactive states follow active states in the MRCM DOMAIN REFSET snapshot.",
+    "assertionUuid" : "23a71f2e-5c90-4090-af07-bcb3fa3d5673",
+    "firstNInstances" : [ {
+      "conceptId" : "91723000",
+      "detail" : "Mrcm Domain Refset: id=233fcd4d-2d2f-4f2b-9ed1-387212390c71 is inactive but no active state found in the previous snapshot."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "The current stated relationship snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "23f18cc4-d2d7-4759-96e3-c7d0f0b30a3a",
     "firstNInstances" : [ {
@@ -1128,6 +1336,20 @@
     } ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "The current MRCM Module Scope Refset snapshot file is an accurate derivative of the current full file",
+    "assertionUuid" : "388b2eff-f8b0-418c-9794-d35aaa4d748b",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000207008",
+      "detail" : "MRCM Module Scope Refset: id=f1524dde-5466-46a7-926c-37b0e161bc7f is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "900000000000207008",
+      "detail" : "MRCM Module Scope Refset: id=a1254c49-74a0-48dd-8abb-4042c137515c is in FULL file, but not in SNAPSHOT file."
+    }, {
+      "conceptId" : "900000000000207008",
+      "detail" : "MRCM Module Scope Refset: id=8029dc27-0ece-4454-b863-0f16348edc6c is in FULL file, but not in SNAPSHOT file."
+    } ],
+    "totalFailed" : 3
+  }, {
     "assertionName" : "The current description delta file is an accurate derivative of the current full file",
     "assertionUuid" : "3efbc7d7-3485-4f7f-8c07-f1a7c5a0fdf6",
     "firstNInstances" : [ {
@@ -1191,6 +1413,14 @@
       "detail" : "DEFINITION: id=2983208019 is in the previous full file, but not in the current full file."
     } ],
     "totalFailed" : 8
+  }, {
+    "assertionName" : "The current full MRCM Domain Refset file consists of the previously published full file and the changes for the current release.",
+    "assertionUuid" : "43bdeea9-be7b-4235-b58e-8842a8e47793",
+    "firstNInstances" : [ {
+      "conceptId" : "91723000",
+      "detail" : "Mrcm Domain Refset: id=a7ae90fa-670f-4eaa-8721-435103db089d is in current full file, but not in prior full or current delta file."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "There must be actual changes made to previously published concepts in order for them to appear in the current delta.",
     "assertionUuid" : "4478a896-2724-4417-8bce-8986ecc53c4e",
@@ -1268,6 +1498,36 @@
     } ],
     "totalFailed" : 3
   }, {
+    "assertionName" : "The current MRCM Attribute Domain Refset full file contains all previously published data unchanged.",
+    "assertionUuid" : "4fdf8c6a-8b58-4bf7-a8b5-71176ede7ac0",
+    "firstNInstances" : [ {
+      "conceptId" : "425391005",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a42a0ca6-7449-4806-b931-747d04d4db05 is in prior full file but not in current full file."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The current MRCM Attribute Domain Refset snapshot file is an accurate derivative of the current full file",
+    "assertionUuid" : "501dc4c4-49d4-41d9-9751-271687d54820",
+    "firstNInstances" : [ {
+      "conceptId" : "425391005",
+      "detail" : "MRCM Attribute Domain Refset: id=163180ba-e94e-4cfe-a008-0d22ec2316e4 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "425391005",
+      "detail" : "MRCM Attribute Domain Refset: id=40ff4498-e828-4299-bca9-bd14a5ebb20a is in FULL file, but not in SNAPSHOT file."
+    } ],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "The current MRCM Domain Refset snapshot file is an accurate derivative of the current full file",
+    "assertionUuid" : "504d10af-deba-46f0-85d5-f792749b0d62",
+    "firstNInstances" : [ {
+      "conceptId" : "91723000",
+      "detail" : "MRCM Domain Refset: id=233fcd4d-2d2f-4f2b-9ed1-387212390c71 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "91723000",
+      "detail" : "MRCM Domain Refset: id=a7ae90fa-670f-4eaa-8721-435103db089d is in FULL file, but not in SNAPSHOT file."
+    } ],
+    "totalFailed" : 2
+  }, {
     "assertionName" : "The current full association refset file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "5491a181-02b0-48a8-bb17-f65c347e9b91",
     "firstNInstances" : [ {
@@ -1281,6 +1541,14 @@
     "firstNInstances" : [ {
       "conceptId" : "703860006",
       "detail" : "Description: id=3008913022 is duplicated in the description and text definition snapshot."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The current data in the MRCM Attribute Range Refset snapshot file are the same as the data in the current delta file.",
+    "assertionUuid" : "56c6abd0-11c7-409e-b0ed-f9d0f08f2cd7",
+    "firstNInstances" : [ {
+      "conceptId" : "363702006",
+      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=ec577967-d8fd-40aa-92a2-f3a35c20653f is in delta file but not in snapshot file."
     } ],
     "totalFailed" : 1
   }, {
@@ -1562,7 +1830,7 @@
     }, {
       "conceptId" : "700132008",
       "detail" : "CONCEPT: id=700132008: is inactive but no active state found in the previous release."
-    }  ],
+    } ],
     "totalFailed" : 2
   }, {
     "assertionName" : "The current data in the AttributeValue refset snapshot file are the same as the data in the current delta file.",
@@ -1593,6 +1861,14 @@
       "detail" : "ATTRUBUTE VALUE REFSET: id=000dce0d-951a-5a02-84f0-efed3f8d6292 is in delta but not in snapshot file."
     } ],
     "totalFailed" : 8
+  }, {
+    "assertionName" : "The current data in the MRCM Attribute Domain Refset snapshot file are the same as the data in the current delta file.",
+    "assertionUuid" : "609ed083-737c-401a-9aa9-5666bbd2aff2",
+    "firstNInstances" : [ {
+      "conceptId" : "425391005",
+      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=2ef8e651-0b1c-40ce-9697-e3386b68c740 is in delta file but not in snapshot file."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "The current concept snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "645e3292-18d6-41df-b42a-58ba4d7240d5",
@@ -1785,6 +2061,14 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "The current data in the MRCM Domain Refset snapshot file are the same as the data in the current delta file.",
+    "assertionUuid" : "75afe90a-eb1c-4e86-9312-22bc742f5b49",
+    "firstNInstances" : [ {
+      "conceptId" : "91723000",
+      "detail" : "MRCM DOMAIN REFSET: id=1cbb7123-ab92-41d9-8b6f-b7826a2d539b is in delta file but not in snapshot file."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "The current inferred relationship snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "79582950-bf7a-4f63-92cf-7809a29b5dc3",
     "firstNInstances" : [ {
@@ -1858,6 +2142,14 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "The current full MRCM Attribute Domain Refset file consists of the previously published full file and the changes for the current release.",
+    "assertionUuid" : "7c3fe37c-6ad5-446e-bc82-7c2bc078042a",
+    "firstNInstances" : [ {
+      "conceptId" : "425391005",
+      "detail" : "Mrcm Attribute Domain Refset: id=40ff4498-e828-4299-bca9-bd14a5ebb20a is in current full file, but not in prior full or current delta file."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "The current full description file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "7c4165b0-bff2-4b62-b70c-f68d5a147053",
     "firstNInstances" : [ {
@@ -1890,306 +2182,6 @@
     } ],
     "totalFailed" : 9
   }, {
-    "assertionName" : "Changes from the MapCorrelationOriginRefset delta file must be in the current full file",
-    "assertionUuid" : "7e203a1f-2b6d-462a-a6f9-93cbc3893616",
-    "firstNInstances" : [ {
-      "conceptId" : "707689009",
-      "detail" : "ExpressionAssociation: id=39761BDC-96AB-47AF-B10F-0A57B6C01278 is in DELTA file, but not in FULL file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current MRCM Domain Refset full file contains all previously published data unchanged.",
-    "assertionUuid" : "87af4df0-c506-41ed-9089-6a359f16b34f",
-    "firstNInstances" : [ {
-      "conceptId" : "91723000",
-      "detail" : "MRCM DOMAIN REFSET: id=7ca9ec15-74ce-488d-a250-2a3c71278268 is in prior full file but not in current full file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "There must be actual changes made to previously published MRCM Domain Refset components in order for them to appear in the current delta.",
-    "assertionUuid" : "8864db45-0f97-4eda-b7ba-414289dd3a99",
-    "firstNInstances" : [ {
-      "conceptId" : "71388003",
-      "detail" : "Mrcm Domain Refset: id=821b5d55-2985-4293-98a9-2959a69b0b3b is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "386053000",
-      "detail" : "Mrcm Domain Refset: id=dcc4c43d-0ff3-448a-b200-fc9c6c3e7a56 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "723264001",
-      "detail" : "Mrcm Domain Refset: id=eb0bebd1-991a-4f69-97ab-e1c5bf64dd27 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "404684003",
-      "detail" : "Mrcm Domain Refset: id=f1136b12-f2bd-46db-b9fb-be484129e40c is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "129125009",
-      "detail" : "Mrcm Domain Refset: id=07225f48-d874-403f-a051-d0fa9d2895e2 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "413350009",
-      "detail" : "Mrcm Domain Refset: id=0b0b9db5-3be5-44e5-86e8-1389756ec245 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "123038009",
-      "detail" : "Mrcm Domain Refset: id=16e1c6dc-513f-4bfb-a1ab-dc1fbeb370fb is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "123037004",
-      "detail" : "Mrcm Domain Refset: id=273f1341-03c9-44a1-9797-9b5106c07e8b is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "387713003",
-      "detail" : "Mrcm Domain Refset: id=29c92b36-6617-4ae6-a1f5-07cd5d256849 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "243796009",
-      "detail" : "Mrcm Domain Refset: id=2ea42f3f-138e-4cf8-92d1-cc7786e8e486 is in the detla file, but no actual changes made since the previous release."
-    } ],
-    "totalFailed" : 19
-  }, {
-    "assertionName" : "The current full MRCM Attribute Range Refset file consists of the previously published full file and the changes for the current release.",
-    "assertionUuid" : "ad0f8978-c8a7-4d91-8e3e-a887e4830fec",
-    "firstNInstances" : [ {
-      "conceptId" : "0",
-      "detail" : "Mrcm Attribute Range Refset: id=52d8ebc7-6c09-41b5-be7f-2373d1686be3 is in current full file, but not in prior full or current delta file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "There must be actual changes made to previously published MRCM Attribute Domain Refset components in order for them to appear in the current delta.",
-    "assertionUuid" : "b1ebc4cb-6a86-498f-a3ea-aeef250b9399",
-    "firstNInstances" : [ {
-      "conceptId" : "370129004",
-      "detail" : "Mrcm Attribute Domain Refset: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "363713009",
-      "detail" : "Mrcm Attribute Domain Refset: id=81da6aa5-0cb1-463f-88ad-c25a795a211b is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "405813007",
-      "detail" : "Mrcm Attribute Domain Refset: id=840861c7-8d9b-44a6-acfd-01f1b994b6d9 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "704324001",
-      "detail" : "Mrcm Attribute Domain Refset: id=883bd314-23b7-4ccc-87d6-8067d98b3660 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "704327008",
-      "detail" : "Mrcm Attribute Domain Refset: id=8ce25c12-3cc5-4ab0-84e2-fdc0a75dffed is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "363698007",
-      "detail" : "Mrcm Attribute Domain Refset: id=8d066b27-118d-4a84-886a-14dabceba155 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "363704007",
-      "detail" : "Mrcm Attribute Domain Refset: id=a1e92414-b651-4891-a749-d66ddd17cc00 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "704318007",
-      "detail" : "Mrcm Attribute Domain Refset: id=a3c14d1d-abd2-4259-912d-ede579e4c9d9 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "424244007",
-      "detail" : "Mrcm Attribute Domain Refset: id=a54a5491-2986-42df-9c23-161823e88753 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "272741003",
-      "detail" : "Mrcm Attribute Domain Refset: id=a8c88cca-305c-40e8-bf03-2d6d03d47755 is in the detla file, but no actual changes made since the previous release."
-    } ],
-    "totalFailed" : 90
-  }, {
-    "assertionName" : "New inactive states follow active states in the MRCM ATTRIBUTE DOMAIN REFSET snapshot.",
-    "assertionUuid" : "b205d819-2ef6-48e3-8fe1-1793e83a7b8a",
-    "firstNInstances" : [ {
-      "conceptId" : "425391005",
-      "detail" : "Mrcm Attribute Domain Refset: id=163180ba-e94e-4cfe-a008-0d22ec2316e4 is inactive but no active state found in the previous snapshot."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current MRCM Attribute Range Refset full file contains all previously published data unchanged.",
-    "assertionUuid" : "becfbeaa-5eab-4a4a-90ca-7c893b7495b2",
-    "firstNInstances" : [ {
-      "conceptId" : "47429007",
-      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=52d8ebc7-6c09-41b5-be7f-2373d1686be3 is in prior full file but not in current full file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "New inactive states follow active states in the MRCM MODULE SCOPE REFSET snapshot.",
-    "assertionUuid" : "ccd8f56e-45ec-40b7-9404-9b264881e64d",
-    "firstNInstances" : [ {
-      "conceptId" : "900000000000207008",
-      "detail" : "Mrcm Module Scope Refset: id=f1524dde-5466-46a7-926c-37b0e161bc7f is inactive but no active state found in the previous snapshot."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "There must be actual changes made to previously published MRCM Attribute Range Refset components in order for them to appear in the current delta.",
-    "assertionUuid" : "cec2a50e-c04b-4442-a979-e8ad8f83ff91",
-    "firstNInstances" : [ {
-      "conceptId" : "405814009",
-      "detail" : "Mrcm Attribute Range Refset: id=81288567-57a9-49b1-b7f0-bf5979a6d289 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "246090004",
-      "detail" : "Mrcm Attribute Range Refset: id=8163e3c0-b0c4-4c92-82e7-e93a23770b17 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "118170007",
-      "detail" : "Mrcm Attribute Range Refset: id=81f6d23b-66c7-46ce-b003-08380b9b236a is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "425391005",
-      "detail" : "Mrcm Attribute Range Refset: id=903d4612-9e2e-4434-94e8-eaff214f4467 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "363713009",
-      "detail" : "Mrcm Attribute Range Refset: id=9883dd72-0fdc-47bf-89d0-4f206ca7800c is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "419066007",
-      "detail" : "Mrcm Attribute Range Refset: id=98984674-6f17-40fe-8859-5ad2d0f5c09d is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "363700003",
-      "detail" : "Mrcm Attribute Range Refset: id=9f31fae1-65e6-4ffd-9a0d-badeaf298a8f is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "363698007",
-      "detail" : "Mrcm Attribute Range Refset: id=a079f482-e7de-4fd8-b4f9-5c8b56798676 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "116686009",
-      "detail" : "Mrcm Attribute Range Refset: id=a0a0149b-6541-4789-8645-1e7ce775bdd3 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "363714003",
-      "detail" : "Mrcm Attribute Range Refset: id=a107baf4-2724-4ef2-acd1-8f153ed31c21 is in the detla file, but no actual changes made since the previous release."
-    } ],
-    "totalFailed" : 82
-  }, {
-    "assertionName" : "New inactive states follow active states in the MRCM ATTRIBUTE RANGE REFSET snapshot.",
-    "assertionUuid" : "d182e8d4-c8e1-4e5f-ae17-b2f786f55727",
-    "firstNInstances" : [ {
-      "conceptId" : "363702006",
-      "detail" : "Mrcm Attribute Range Refset: id=9f81ad41-c5ee-4d46-8393-6a1455018880 is inactive but no active state found in the previous snapshot."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "There must be actual changes made to previously published MRCM Module Scope Refset components in order for them to appear in the current delta.",
-    "assertionUuid" : "d7e12c75-9979-4adb-9b5b-3b8a80ab4fbb",
-    "firstNInstances" : [ {
-      "conceptId" : "900000000000207009",
-      "detail" : "Mrcm Module Scope Refset: id=8e5766bc-7755-45fb-99c8-8d2c52e45da5 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "Mrcm Module Scope Refset: id=d3b7a01f-6fcd-4d8d-815b-ca6a63511310 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "Mrcm Module Scope Refset: id=60dcf17f-6054-4ee2-a657-606104c49bb5 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "Mrcm Module Scope Refset: id=60dcf17f-6054-4ee2-a657-606104c49bb5 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "Mrcm Module Scope Refset: id=60dcf17f-6054-4ee2-a657-606104c49bb5 is in the detla file, but no actual changes made since the previous release."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "Mrcm Module Scope Refset: id=60dcf17f-6054-4ee2-a657-606104c49bb5 is in the detla file, but no actual changes made since the previous release."
-    } ],
-    "totalFailed" : 6
-  }, {
-    "assertionName" : "The current data in the MRCM Module Scope Refset snapshot file are the same as the data in the current delta file.",
-    "assertionUuid" : "0999e34c-36b5-4d33-951a-8e949a66062e",
-    "firstNInstances" : [ {
-      "conceptId" : "900000000000207008",
-      "detail" : "MRCM MODULE SCOPE REFSET: id=0ed5d8f4-0a9e-479f-929d-e0a6bb9eb871 is in delta file but not in snapshot file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current MRCM Module Scope Refset full file contains all previously published data unchanged.",
-    "assertionUuid" : "0f7b6979-7a9d-45d4-956b-972d452f1638",
-    "firstNInstances" : [ {
-      "conceptId" : "900000000000207008",
-      "detail" : "MRCM MODULE SCOPE REFSET: id=380be434-a71f-44d7-b5e4-fdf79c5b5512 is in prior full file but not in current full file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "New inactive states follow active states in the MRCM DOMAIN REFSET snapshot.",
-    "assertionUuid" : "23a71f2e-5c90-4090-af07-bcb3fa3d5673",
-    "firstNInstances" : [ {
-      "conceptId" : "91723000",
-      "detail" : "Mrcm Domain Refset: id=233fcd4d-2d2f-4f2b-9ed1-387212390c71 is inactive but no active state found in the previous snapshot."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current full MRCM Domain Refset file consists of the previously published full file and the changes for the current release.",
-    "assertionUuid" : "43bdeea9-be7b-4235-b58e-8842a8e47793",
-    "firstNInstances" : [ {
-      "conceptId" : "91723000",
-      "detail" : "Mrcm Domain Refset: id=a7ae90fa-670f-4eaa-8721-435103db089d is in current full file, but not in prior full or current delta file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current full MRCM Module Scope Refset file consists of the previously published full file and the changes for the current release.",
-    "assertionUuid" : "054bccb0-c678-4722-94dd-b664e0c6267e",
-    "firstNInstances" : [ {
-      "conceptId" : "900000000000207008",
-      "detail" : "Mrcm Module Scope Refset: id=8029dc27-0ece-4454-b863-0f16348edc6c is in current full file, but not in prior full or current delta file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current MRCM Attribute Domain Refset full file contains all previously published data unchanged.",
-    "assertionUuid" : "4fdf8c6a-8b58-4bf7-a8b5-71176ede7ac0",
-    "firstNInstances" : [ {
-      "conceptId" : "425391005",
-      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=a42a0ca6-7449-4806-b931-747d04d4db05 is in prior full file but not in current full file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current data in the MRCM Attribute Range Refset snapshot file are the same as the data in the current delta file.",
-    "assertionUuid" : "56c6abd0-11c7-409e-b0ed-f9d0f08f2cd7",
-    "firstNInstances" : [ {
-      "conceptId" : "363702006",
-      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=ec577967-d8fd-40aa-92a2-f3a35c20653f is in delta file but not in snapshot file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current data in the MRCM Attribute Domain Refset snapshot file are the same as the data in the current delta file.",
-    "assertionUuid" : "609ed083-737c-401a-9aa9-5666bbd2aff2",
-    "firstNInstances" : [ {
-      "conceptId" : "425391005",
-      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=2ef8e651-0b1c-40ce-9697-e3386b68c740 is in delta file but not in snapshot file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current data in the MRCM Domain Refset snapshot file are the same as the data in the current delta file.",
-    "assertionUuid" : "75afe90a-eb1c-4e86-9312-22bc742f5b49",
-    "firstNInstances" : [ {
-      "conceptId" : "91723000",
-      "detail" : "MRCM DOMAIN REFSET: id=1cbb7123-ab92-41d9-8b6f-b7826a2d539b is in delta file but not in snapshot file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current full MRCM Attribute Domain Refset file consists of the previously published full file and the changes for the current release.",
-    "assertionUuid" : "7c3fe37c-6ad5-446e-bc82-7c2bc078042a",
-    "firstNInstances" : [ {
-      "conceptId" : "425391005",
-      "detail" : "Mrcm Attribute Domain Refset: id=40ff4498-e828-4299-bca9-bd14a5ebb20a is in current full file, but not in prior full or current delta file."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The current MRCM Module Scope Refset snapshot file is an accurate derivative of the current full file",
-    "assertionUuid" : "388b2eff-f8b0-418c-9794-d35aaa4d748b",
-    "firstNInstances" : [ {
-      "conceptId" : "900000000000207008",
-      "detail" : "MRCM Module Scope Refset: id=f1524dde-5466-46a7-926c-37b0e161bc7f is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "MRCM Module Scope Refset: id=a1254c49-74a0-48dd-8abb-4042c137515c is in FULL file, but not in SNAPSHOT file."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "MRCM Module Scope Refset: id=8029dc27-0ece-4454-b863-0f16348edc6c is in FULL file, but not in SNAPSHOT file."
-    } ],
-    "totalFailed" : 3
-  }, {
-    "assertionName" : "The current MRCM Attribute Domain Refset snapshot file is an accurate derivative of the current full file",
-    "assertionUuid" : "501dc4c4-49d4-41d9-9751-271687d54820",
-    "firstNInstances" : [ {
-      "conceptId" : "425391005",
-      "detail" : "MRCM Attribute Domain Refset: id=163180ba-e94e-4cfe-a008-0d22ec2316e4 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : "425391005",
-      "detail" : "MRCM Attribute Domain Refset: id=40ff4498-e828-4299-bca9-bd14a5ebb20a is in FULL file, but not in SNAPSHOT file."
-    } ],
-    "totalFailed" : 2
-  }, {
-    "assertionName" : "The current MRCM Domain Refset snapshot file is an accurate derivative of the current full file",
-    "assertionUuid" : "504d10af-deba-46f0-85d5-f792749b0d62",
-    "firstNInstances" : [ {
-      "conceptId" : "91723000",
-      "detail" : "MRCM Domain Refset: id=233fcd4d-2d2f-4f2b-9ed1-387212390c71 is in SNAPSHOT file, but not in FULL file."
-    }, {
-      "conceptId" : "91723000",
-      "detail" : "MRCM Domain Refset: id=a7ae90fa-670f-4eaa-8721-435103db089d is in FULL file, but not in SNAPSHOT file."
-    } ],
-    "totalFailed" : 2
-  }, {
     "assertionName" : "The current MRCM Attribute Range Refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "7c87a865-beb5-4e03-a489-2b05a40bd860",
     "firstNInstances" : [ {
@@ -2203,5 +2195,13 @@
       "detail" : "MRCM Attribute Range Refset: id=01d91b64-af91-4f28-b6a0-27eb51faab8b is in FULL file, but not in SNAPSHOT file."
     } ],
     "totalFailed" : 3
+  }, {
+    "assertionName" : "Changes from the MapCorrelationOriginRefset delta file must be in the current full file",
+    "assertionUuid" : "7e203a1f-2b6d-462a-a6f9-93cbc3893616",
+    "firstNInstances" : [ {
+      "conceptId" : "707689009",
+      "detail" : "ExpressionAssociation: id=39761BDC-96AB-47AF-B10F-0A57B6C01278 is in DELTA file, but not in FULL file."
+    } ],
+    "totalFailed" : 1
   } ]
 }
