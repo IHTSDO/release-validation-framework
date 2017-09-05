@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
   "totalAssertionsRun" : 74,
-  "totalAssertionsFailed" : 70,
+  "totalAssertionsFailed" : 71,
   "results" : [ {
     "assertionName" : "Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot.",
     "assertionUuid" : "8ea2e5d9-5c35-4436-b67d-c5268b5da06c",
@@ -773,7 +773,7 @@
   }, {
     "assertionName" : "Every active concept has one active preferred term in the Swedish language refset.",
     "assertionUuid" : "4ea5e02b-9364-4326-9082-816edb950dbf",
-    "firstNInstances" : [{
+    "firstNInstances" : [ {
       "conceptId" : "702411003",
       "detail" : "Concept: id=702411003: has no active preferred term in the Swedish language refset"
     }, {
@@ -803,8 +803,8 @@
     }, {
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Swedish language refset"
-    }  ],
-    "totalFailed" : 12
+    } ],
+    "totalFailed" : 13
   }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DEFINITION snapshot.",
     "assertionUuid" : "5a83783e-3366-48bd-a50d-8f3a53812174",
@@ -1560,7 +1560,7 @@
       "conceptId" : "609452008",
       "detail" : "Concept: id=609452008 in the US extension does not have an FSN preferred in the US language refset."
     } ],
-    "totalFailed" : 0
+    "totalFailed" : 1
   }, {
     "assertionName" : "Same terms but using different cases will be considered as duplicates in the DESCRIPTION snapshot .",
     "assertionUuid" : "50e773f8-072c-4426-a8e3-50b0f942822c",
