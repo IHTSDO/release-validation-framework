@@ -1556,7 +1556,10 @@
   }, {
     "assertionName" : "Every active FSN in the US module is referenced in the US lang refset.",
     "assertionUuid" : "eba7fa2b-efb3-40fc-9ee0-caf9e914bac2",
-    "firstNInstances" : null,
+    "firstNInstances" : [ {
+      "conceptId" : "609452008",
+      "detail" : "Concept: id=609452008 in the US extension does not have an FSN preferred in the US language refset."
+    } ],
     "totalFailed" : 0
   }, {
     "assertionName" : "Same terms but using different cases will be considered as duplicates in the DESCRIPTION snapshot .",
