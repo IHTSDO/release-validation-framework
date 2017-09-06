@@ -142,8 +142,8 @@ public class JiraServiceImpl implements JiraService {
         Issue issue = jiraClient.createIssue(valueProjectKey, "Bug")
                 .field(Field.SUMMARY, summary)
                 .field(Field.DESCRIPTION, description)
-                .field(fieldIdProductName, productNameObj)
-                .field(fieldIdReportStage, reportingStageObj)
+                .field(fieldIdProductName, new ArrayList<>().add(productNameObj))
+                .field(fieldIdReportStage, new ArrayList<>().add(reportingStageObj))
                 .field(fieldIdReleaseDate, releaseDate)
                 .execute();
         if (!defaultAssignee.isEmpty()) {
