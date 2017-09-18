@@ -45,4 +45,10 @@ public class InstanceManagerIntegrationTestManual {
 		Assert.assertNotNull(result);
 		Assert.assertEquals(2, instanceIds.size());
 	}
+	
+	@Test
+	public void testConStructStartupScript() {
+		String script = instanceManager.constructStartUpScript();
+		System.out.println(script);
+	}
 }
