@@ -18,8 +18,8 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('MRCM MODULE SCOPE REFSET: id=',a.id, ' is in prior full file but not in current full file.') 	
-	from prev_mrcmmodulescoperefset_f a
-	left join curr_mrcmmodulescoperefset_f b
+	from prev_mrcmModuleScopeRefset_f a
+	left join curr_mrcmModuleScopeRefset_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

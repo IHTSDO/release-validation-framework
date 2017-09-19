@@ -3,17 +3,17 @@ call validateConceptIdIsValidDescendantsInMRCMRefsetSnap_proc(<RUNID>,'<ASSERTIO
 'mrcmAttributeDomainRefset_s','moduleId ','mrcmAttributeDomainRefset',
 '900000000000443000', '< 900000000000443000 |Module|');
 call validateConceptIdIsValidDescendantsInMRCMRefsetSnap_proc(<RUNID>,'<ASSERTIONUUID>',
-'mrcmattributerangerefset_s','moduleId ','mrcmAttributeRangeRefset',
+'mrcmAttributeRangeRefset_s','moduleId ','mrcmAttributeRangeRefset',
 '900000000000443000', '< 900000000000443000 |Module|');
 call validateConceptIdIsValidDescendantsInMRCMRefsetSnap_proc(<RUNID>,'<ASSERTIONUUID>',
-'mrcmdomainrefset_s','moduleId ','mrcmDomainRefset',
+'mrcmDomainRefset_s','moduleId ','mrcmDomainRefset',
 '900000000000443000', '< 900000000000443000 |Module|');
 call validateConceptIdIsValidDescendantsInMRCMRefsetSnap_proc(<RUNID>,'<ASSERTIONUUID>',
-'mrcmmodulescoperefset_s','moduleId ','mrcmModuleScopeRefset_s',
+'mrcmModuleScopeRefset_s','moduleId ','mrcmModuleScopeRefset_s',
 '900000000000443000', '< 900000000000443000 |Module|');
 -- MRCM Domain Refset checks
 call validateConceptIdIsValidDescendantsInMRCMRefsetSnap_proc(<RUNID>,'<ASSERTIONUUID>',
-'mrcmdomainrefset_s','refsetId ','mrcmDomainRefset',
+'mrcmDomainRefset_s','refsetId ','mrcmDomainRefset',
 '723589008', '< 723589008 |MRCM domain reference set|');
 -- MRCM Attribute Domain Refset checks
 call validateConceptIdIsValidDescendantsInMRCMRefsetSnap_proc(<RUNID>,'<ASSERTIONUUID>',

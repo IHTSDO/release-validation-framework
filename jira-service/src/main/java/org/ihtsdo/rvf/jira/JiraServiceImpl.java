@@ -139,11 +139,15 @@ public class JiraServiceImpl implements JiraService {
         productNameObj.put("value", productName);
         JSONObject reportingStageObj = new JSONObject();
         reportingStageObj.put("value", reportingStage);
+        ArrayList products = new ArrayList();
+        products.add(productName);
+        ArrayList reportingStages = new ArrayList();
+        reportingStages.add(reportingStage);
         Issue issue = jiraClient.createIssue(valueProjectKey, "Bug")
                 .field(Field.SUMMARY, summary)
                 .field(Field.DESCRIPTION, description)
                 .field(fieldIdProductName, productNameObj)
-                .field(fieldIdReportStage, reportingStageObj)
+                .field(fieldIdReportStage, reportingStages)
                 .field(fieldIdReleaseDate, releaseDate)
                 .execute();
         if (!defaultAssignee.isEmpty()) {

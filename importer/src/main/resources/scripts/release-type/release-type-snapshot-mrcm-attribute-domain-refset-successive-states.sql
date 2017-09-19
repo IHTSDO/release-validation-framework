@@ -12,7 +12,7 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('Mrcm Attribute Domain Refset: id=',a.id, '  should not have a new inactive state as it was inactive previously.')
-	from curr_mrcmattributedomainrefset_s a , prev_mrcmattributedomainrefset_s b
+	from curr_mrcmAttributeDomainRefset_s a , prev_mrcmAttributeDomainRefset_s b
 	where a.effectivetime != b.effectivetime
 	and a.active = 0
 	and a.id = b.id
@@ -25,7 +25,7 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('Mrcm Attribute Domain Refset: id=',a.id, ' is inactive but no active state found in the previous snapshot.')
-	from curr_mrcmattributedomainrefset_s a  left join prev_mrcmattributedomainrefset_s b
+	from curr_mrcmAttributeDomainRefset_s a  left join prev_mrcmAttributeDomainRefset_s b
 	on a.id = b.id
 	where a.active = 0
 	and b.id is null;

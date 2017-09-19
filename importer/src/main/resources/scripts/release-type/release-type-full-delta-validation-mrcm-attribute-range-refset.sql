@@ -8,8 +8,8 @@
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
 	concat('Mrcm Attribute Range Refset: id=',a.id, ' is in current full file, but not in prior full or current delta file.')
-	from curr_mrcmattributerangerefset_f a
-	left join curr_mrcmattributerangerefset_d b
+	from curr_mrcmAttributeRangeRefset_f a
+	left join curr_mrcmAttributeRangeRefset_d b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -20,7 +20,7 @@
 		and a.attributerule = b.attributerule
 		and a.rulestrengthid = b.rulestrengthid
 		and a.contenttypeid = b.contenttypeid
-	left join prev_mrcmattributerangerefset_f c
+	left join prev_mrcmAttributeRangeRefset_f c
 		on a.id = c.id
 		and a.effectivetime = c.effectivetime
 		and a.active = c.active

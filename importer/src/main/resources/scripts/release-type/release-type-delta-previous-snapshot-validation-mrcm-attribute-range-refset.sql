@@ -7,8 +7,8 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('Mrcm Attribute Range Refset: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.')
-	from curr_mrcmattributerangerefset_d a
-	left join prev_mrcmattributerangerefset_s b
+	from curr_mrcmAttributeRangeRefset_d a
+	left join prev_mrcmAttributeRangeRefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

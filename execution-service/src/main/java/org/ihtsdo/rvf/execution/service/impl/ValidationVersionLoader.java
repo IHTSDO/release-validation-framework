@@ -351,6 +351,7 @@ public class ValidationVersionLoader {
 			FileUtils.copyDirectory(tmp, myISamDataFolder);
 			FileUtils.deleteQuietly(restoredZipFile);
 			FileUtils.deleteQuietly(tmp);
+			releaseDataManager.setSchemaForRelease(rvfVersion, schemaName);
 			return true;
 		}
 		logger.debug("Can not download previous published MyISAM file from S3:" + previousMyISAMS3Path);
