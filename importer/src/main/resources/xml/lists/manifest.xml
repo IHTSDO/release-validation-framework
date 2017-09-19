@@ -391,8 +391,6 @@
 		<script uuid="da3ae7c4-6144-4cd5-9530-2a7780c53c9a" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-trim.sql" text="No active definitions contain leading or trailing spaces." />
 		<script uuid="f7b7cefe-858d-4749-ab98-7106700feaee" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-double-spaces.sql" text="No active definitions contain double spaces." />
 		<script uuid="6138248d-8cc8-4bc2-8043-cd609fdd640c" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-uppercase.sql" text="The first letter of the active definition should be capitalized." />
-
-
 		<script uuid="31F5E2C8-B0B9-42EE-A9BF-87D95EDAD83B" category="component-centric-validation" sqlFile="component-centric-snapshot-language-referencedcomponent-unique-per-refset.sql" text="There is only one member id per description per dialect in the language refset snapshot file." />
 		<!-- active contents only. Created specifically for US edition -->
 		<script uuid="eead9964-67ce-11e7-b7e7-3c15c2c6e32e" category="component-centric-validation,US" sqlFile="component-centric-snapshot-language-referencedcomponent-unique-active-per-refset.sql" text="There is only one active member per description per dialect in the language refset snapshot file." />
