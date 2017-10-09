@@ -22,6 +22,7 @@
 		inner join curr_langrefset_s b on a.id = b.referencedComponentId
 		and a.active = '1'
 		and b.active = '1'
+		and a.moduleid != '715515008'
 		and b.acceptabilityid ='900000000000548007'	
 		and b.refsetid = '900000000000508004' /* GB English */
 		and a.typeid = '900000000000013009';	/* synonym */
