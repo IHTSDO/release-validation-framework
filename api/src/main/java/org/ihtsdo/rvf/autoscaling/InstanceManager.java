@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,22 +51,24 @@ public class InstanceManager {
 	private String instanceTagName;
 	@Autowired
 	private String ec2SubnetId;
-	private String ec2InstanceStartupScript;
-	
-	@Value("${rvf.drools.rules.version:#{null}}")
+	@Autowired
 	private String droolsRulesVersion;
-	
-	@Value("${rvf.droolrule.module.name:#{null}}")
-	private String droolsRulesPath;
+	@Autowired
+	private String droolsRuelsModuleName;
+	private String ec2InstanceStartupScript;
 
 	public InstanceManager(AWSCredentials credentials, String ec2Endpoint) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
 		amazonEC2Client.setEndpoint(ec2Endpoint);
-		ec2InstanceStartupScript = Base64
-				.encodeBase64String(constructStartUpScript().getBytes());
+	}
+	
+	public void init() {
+		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
 
 	public List<String> createInstance(int totalToCreate) {
+		ec2InstanceStartupScript = Base64
+				.encodeBase64String(constructStartUpScript().getBytes());
 		RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
 		runInstancesRequest.withImageId(imageId).withInstanceType(instanceType)
 				.withMinCount(1).withMaxCount(totalToCreate)
@@ -316,18 +316,14 @@ public class InstanceManager {
 		return propertiesByFileName;
 	}
 
-	 String constructStartUpScript() {
+	 /** use curl http://169.254.169.254/latest/user-data
+	  *  to check the user-data in the ec2 instance.
+	 * @return
+	 */
+	String constructStartUpScript() {
 		String appVersion = getAppVersion();
-		String droolsRulesRoot = "/opt";
-		if (droolsRulesPath != null) {
-			droolsRulesRoot = Paths.get(droolsRulesPath).getParent().toString();
-		}
 		StringBuilder builder = new StringBuilder();
-		builder.append("#!/bin/sh\n");
-		builder.append("drools rules verion:" + droolsRulesVersion + "\n");
-		builder.append("drools rules location:" + droolsRulesPath + "\n");
-		builder.append("drools rules root dir:" + droolsRulesRoot + "\n");
-		
+		builder.append("#!/bin/sh\n");		
 		builder.append("sudo apt-get update -o Dir::Etc::sourcelist=\"sources.list.d/maven_ihtsdotools_org_content_repositories_*\""
 				+ "\n");
 		if (appVersion != null && !appVersion.isEmpty()) {
@@ -336,7 +332,7 @@ public class InstanceManager {
 			builder.append("if [ $? != 0 ]\n");
 			builder.append(" then\n" );
 			builder.append("sudo apt-get install --force-yes -y rvf-api \n");
-			builder.append("fi");
+			builder.append("fi\n");
 		} else {
 			builder.append("sudo apt-get install --force-yes -y rvf-api \n");
 		}
@@ -348,14 +344,18 @@ public class InstanceManager {
 		}
 		// checkout drools version
 		builder.append("git clone");
-		if (droolsRulesVersion != null) {
+		if (droolsRulesVersion != null && !droolsRulesVersion.isEmpty()) {
 			//git clone -b 'v1.9'
 			builder.append(" -b " +"'v" + droolsRulesVersion + "'");		
 			builder.append(" --single-branch");
-		}
+		} 
 		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
 		builder.append(" https://github.com/IHTSDO/snomed-drools-rules.git ");
-		builder.append(droolsRulesRoot + "\n");
+		if (droolsRuelsModuleName == null || droolsRuelsModuleName.isEmpty() || !droolsRuelsModuleName.startsWith("/")) {
+			droolsRuelsModuleName= "/opt/snomed-drools-rules/";
+		}
+		builder.append(droolsRuelsModuleName + "\n");
+		
 		builder.append("sudo supervisorctl start rvf-api" + "\n");
 		builder.append("if [ $? = 0 ]\n");
 		builder.append(" then\n" );
