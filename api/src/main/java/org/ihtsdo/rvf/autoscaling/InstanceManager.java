@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,6 +19,7 @@ import org.ihtsdo.rvf.controller.VersionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.auth.AWSCredentials;
@@ -51,6 +54,12 @@ public class InstanceManager {
 	@Autowired
 	private String ec2SubnetId;
 	private String ec2InstanceStartupScript;
+	
+	@Value("${rvf.drools.rules.version:#{null}}")
+	private String droolsRulesVersion;
+	
+	@Value("${rvf.droolrule.module.name:#{null}}")
+	private String droolsRulesPath;
 
 	public InstanceManager(AWSCredentials credentials, String ec2Endpoint) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
@@ -307,27 +316,53 @@ public class InstanceManager {
 		return propertiesByFileName;
 	}
 
-	private String constructStartUpScript() {
+	 String constructStartUpScript() {
 		String appVersion = getAppVersion();
+		String droolsRulesRoot = "/opt";
+		if (droolsRulesPath != null) {
+			droolsRulesRoot = Paths.get(droolsRulesPath).getParent().toString();
+		}
 		StringBuilder builder = new StringBuilder();
 		builder.append("#!/bin/sh\n");
+		builder.append("drools rules verion:" + droolsRulesVersion + "\n");
+		builder.append("drools rules location:" + droolsRulesPath + "\n");
+		builder.append("drools rules root dir:" + droolsRulesRoot + "\n");
+		
 		builder.append("sudo apt-get update -o Dir::Etc::sourcelist=\"sources.list.d/maven_ihtsdotools_org_content_repositories_*\""
 				+ "\n");
 		if (appVersion != null && !appVersion.isEmpty()) {
 			builder.append("sudo apt-get install --force-yes -y rvf-api="
 					+ appVersion + "\n");
+			builder.append("if [ $? != 0 ]\n");
+			builder.append(" then\n" );
+			builder.append("sudo apt-get install --force-yes -y rvf-api \n");
+			builder.append("fi");
 		} else {
 			builder.append("sudo apt-get install --force-yes -y rvf-api \n");
 		}
-		builder.append("sudo dpkg -s rvf-api\n");
 		String rvfConfig = System.getProperty(RVF_CONFIG_LOCATION);
 		Map<String, String> propertyStrByFilename = getProperties(rvfConfig);
 		for (String filename : propertyStrByFilename.keySet()) {
 			builder.append("sudo echo \"" + propertyStrByFilename.get(filename)
 					+ "\" > " + rvfConfig + "/" + filename + "\n");
 		}
+		// checkout drools version
+		builder.append("git clone");
+		if (droolsRulesVersion != null) {
+			//git clone -b 'v1.9'
+			builder.append(" -b " +"'v" + droolsRulesVersion + "'");		
+			builder.append(" --single-branch");
+		}
+		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
+		builder.append(" https://github.com/IHTSDO/snomed-drools-rules.git ");
+		builder.append(droolsRulesRoot + "\n");
 		builder.append("sudo supervisorctl start rvf-api" + "\n");
-		builder.append("exit 0");
+		builder.append("if [ $? = 0 ]\n");
+		builder.append(" then\n" );
+		builder.append("exit 0\n");
+		builder.append("else\n");
+		builder.append("sudo halt\n");
+		builder.append("fi\n");
 		return builder.toString();
 	}
 
