@@ -311,11 +311,11 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Calling procedure testing that terms that contain EN-US language-specific words are in the same US language refset.",
+    "assertionName" : "Terms that contain en-us specific words are in the en-us language refset.",
     "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word that has en-gb spelling: tumour"
+      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: tumour"
     } ],
     "totalFailed" : 1
   }, {
@@ -351,11 +351,11 @@
     } ],
     "totalFailed" : 9
   }, {
-    "assertionName" : "Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset.",
+    "assertionName" : "Terms that contain en-gb specific words are in the en-gb language refset.",
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the GB Language refset but refers to a word that has en-us spelling: analog"
+      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the en-gb language refset but refers to a word that has en-us spelling: analog"
     } ],
     "totalFailed" : 1
   }, {
