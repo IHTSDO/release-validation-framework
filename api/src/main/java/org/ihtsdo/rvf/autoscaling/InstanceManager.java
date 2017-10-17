@@ -355,7 +355,7 @@ public class InstanceManager {
 			droolsRuelsModuleName= "/opt/snomed-drools-rules/";
 		}
 		builder.append(droolsRuelsModuleName + "\n");
-		
+		builder.append("sudo chown -R rvf-api:rvf-api " + droolsRuelsModuleName + "\n");
 		builder.append("sudo supervisorctl start rvf-api" + "\n");
 		builder.append("if [ $? = 0 ]\n");
 		builder.append(" then\n" );
