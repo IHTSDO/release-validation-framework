@@ -175,10 +175,14 @@ public class ValidationRunner {
 		}
 
 		//Run Drool Validator
-		runDroolValidator(report, validationConfig, executionConfig);
+		if(validationConfig.getGroupsList().contains("common-authoring")) {
+			runDroolValidator(report, validationConfig, executionConfig);
+		}
 
 		//Run MRCM Validator
-		runMRCMAssertionTests(report, validationConfig, executionConfig);
+		if(validationConfig.getGroupsList().contains("mrcm-validation")) {
+			runMRCMAssertionTests(report, validationConfig, executionConfig);
+		}
 
 		if(executionConfig.isJiraIssueCreationFlag()) {
 			// Add Jira ticket for each fail assertions
