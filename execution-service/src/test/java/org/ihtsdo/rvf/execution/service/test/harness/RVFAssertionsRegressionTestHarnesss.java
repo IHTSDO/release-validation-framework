@@ -140,8 +140,6 @@ public class RVFAssertionsRegressionTestHarnesss {
 		 System.out.println("found total assertions:" + assertions.size());
 		 long timeStart = System.currentTimeMillis();
 			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
-//		 final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
-			
 			long timeEnd = System.currentTimeMillis();
 			System.out.println("Time taken:" +(timeEnd-timeStart));
 			assertTestResult(groupName, expectedJsonFile, runItems);
@@ -232,12 +230,6 @@ public class RVFAssertionsRegressionTestHarnesss {
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));
 		final TestReport expectedReport = gson.fromJson(br, TestReport.class);
 		
-		/*InputStream is = new FileInputStream(expectedJsonFileName);
-		String expectedReportStr = IOUtils.toString(is);
-		JSONObject expectedReportObj = new JSONObject(expectedReportStr);
-		JSONObject actualReportObj = new JSONObject(actualReportStr);
-		JSONAssert.assertEquals(expectedReportObj, actualReportObj, false);*/
-		
 		final List<RVFTestResult> expected = expectedReport.getResults();
 		final List<RVFTestResult> actual = actualReport.getResults();
 		final Map<UUID,RVFTestResult> expectedResultByNameMap = new HashMap<>();
@@ -254,14 +246,15 @@ public class RVFAssertionsRegressionTestHarnesss {
 			final RVFTestResult actualResult = actualResultByNameMap.get(uuid);
 			assertEquals("Assertion name is not the same" + " for assertion uuid:" + uuid, expectedResult.getAssertionName(),actualResult.getAssertionName());
 			assertEquals("Total failures count doesn't match"  + " for assertion uuid:" + uuid, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
-			if (expectedResult.getTotalFailed() >0) {
+			if (expectedResult.getTotalFailed() > 0 ) {
 				explainDifference(uuid, expectedResult, actualResult);
 				assertTrue("First N instances not matching" + " for assertion uuid:" + uuid, expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()));
 			}
 		}
 		Collections.sort(expected);
 		Collections.sort(actual);
-		for(int i=0;i < expected.size();i++) {
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size();i++) {
 			if (!expected.get(i).equals(actual.get(i))) {
 				explainDifference(actual.get(i).getAssertionUuid(), expected.get(i),actual.get(i));
 			}
