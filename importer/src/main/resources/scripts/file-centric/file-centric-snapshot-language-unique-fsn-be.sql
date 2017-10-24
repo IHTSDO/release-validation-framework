@@ -1,15 +1,13 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-language-unique-fsn-se
+	file-centric-snapshot-language-unique-fsn-be
 
 	Assertion:
-	Every active concept defined in the Swedish extension has a preferred FSN in the en-US language refset.
+	Every active concept defined in the Belgian extension has a preferred FSN in the en-US language refset.
 	
 
 ********************************************************************************/
-	
-	
-	/* TEST: Concept does not have an FSN in each refset for us and danish dialect*/
+
 	/*Only for Swedish module concepts*/
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
@@ -19,7 +17,7 @@
 		concat('Concept: id=',a.id, ' does not have an FSN preferred in the en-US language refset.') 
 	from curr_concept_s a
 	where a.active = '1'
-	and a.moduleid in ('45991000052106')
+	and a.moduleid in ('11000172109')
 	and not exists (select b.id
 		from curr_description_s b, curr_langrefset_s c
 		where b.id=c.referencedcomponentid

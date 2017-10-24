@@ -1,9 +1,9 @@
 
 /******************************************************************************** 
-	file-centric-snapshot-language-unique-pt-gb
+	file-centric-snapshot-language-unique-pt-be-fr.sql
 
 	Assertion:
-	Every active concept has one active preferred term in the en-GB language refset.
+	Every active concept has one active preferred term in the Belgian French language refset.
 
 ********************************************************************************/
 
@@ -12,7 +12,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ': has no active preferred term in the en-GB language refset') 
+		concat('Concept: id=',a.id, ': has no active preferred term in the Belgian French language refset')
 	from curr_concept_s a
 	where
 	 a.active=1
@@ -22,6 +22,5 @@
 			and b.active=1
 			and c.active=1
 			and c.acceptabilityid = '900000000000548007'
-			and c.refsetid = '900000000000508004'
+			and c.refsetid = '21000172104'
 			and b.conceptid=a.id);
-	

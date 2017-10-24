@@ -104,7 +104,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' does not have an FSN preferred in the US language refset.') 
+		concat('Concept: id=',a.id, ' does not have an FSN preferred in the en-US language refset.') 
 	from curr_concept_s a
 	where a.active = '1'
 	and a.moduleid in ('900000000000207008','900000000000012004')

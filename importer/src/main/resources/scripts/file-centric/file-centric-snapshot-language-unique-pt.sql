@@ -78,7 +78,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' has no active preferred terms in the US language refset') 
+		concat('Concept: id=',a.id, ' has no active preferred terms in the en-US language refset') 
 	from res_edited_active_concepts a
 	left join 
 	(select b.* from tmp_pt b
