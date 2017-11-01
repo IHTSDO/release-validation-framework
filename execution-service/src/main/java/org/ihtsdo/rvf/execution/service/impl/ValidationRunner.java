@@ -172,17 +172,12 @@ public class ValidationRunner {
 			runExtensionReleaseValidation(report, responseMap, validationConfig,reportStorage, executionConfig);
 		} else {
 			runAssertionTests(report, executionConfig, reportStorage);
+			//Run MRCM Validator
+			runMRCMAssertionTests(report, validationConfig, executionConfig);
 		}
 
 		//Run Drool Validator
-		if(validationConfig.getGroupsList().contains("common-authoring")) {
-			runDroolValidator(report, validationConfig, executionConfig);
-		}
-
-		//Run MRCM Validator
-		if(validationConfig.getGroupsList().contains("mrcm-validation")) {
-			runMRCMAssertionTests(report, validationConfig, executionConfig);
-		}
+		startDroolValidation(report, validationConfig);
 
 		if(executionConfig.isJiraIssueCreationFlag()) {
 			// Add Jira ticket for each fail assertions
@@ -206,11 +201,32 @@ public class ValidationRunner {
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
 	}
 
-	private void runDroolValidator(ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) {
+	private void startDroolValidation(ValidationReport validationReport, ValidationRunConfig validationConfig) {
+		String directoryOfRuleSetsPath = droolRulesModuleName;
+		HashSet<String> allRuleNames = Sets.newHashSet(validationConfig.getGroupsList().iterator().next());
+		File droolDir = new File(directoryOfRuleSetsPath);
+		Assert.isTrue(droolDir.isDirectory(), "The rules directory " + directoryOfRuleSetsPath + " is not accessible.");
+		try {
+			Set<String> droolRuleNames = new HashSet<>();
+			for (File file : droolDir.listFiles()) {
+				if(file.isDirectory()) droolRuleNames.add(file.getName());
+			}
+			droolRuleNames.retainAll(allRuleNames);
+			if(!droolRuleNames.isEmpty()) {
+				runDroolValidator(validationReport, validationConfig, droolRuleNames);
+			} else {
+				logger.info("No matching drool rule set found for all of specified assertion groups");
+			}
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+
+	}
+
+	private void runDroolValidator(ValidationReport validationReport, ValidationRunConfig validationConfig, Set<String> ruleSetNamesToRun) {
 		long timeStart = System.currentTimeMillis();
 		String directoryOfRuleSetsPath = droolRulesModuleName;
 
-		HashSet<String> ruleSetNamesToRun = Sets.newHashSet(validationConfig.getGroupsList().iterator().next());
 		List<InvalidContent> invalidContents = null;
 		try {
 			invalidContents = validateRF2(new FileInputStream(validationConfig.getLocalProspectiveFile()), directoryOfRuleSetsPath, ruleSetNamesToRun);
@@ -258,7 +274,7 @@ public class ValidationRunner {
 
 	}
 
-	private List<InvalidContent> validateRF2(InputStream fileInputStream, String directoryOfRuleSetsPath, HashSet<String> ruleSetNamesToRun) throws ReleaseImportException {
+	private List<InvalidContent> validateRF2(InputStream fileInputStream, String directoryOfRuleSetsPath, Set<String> ruleSetNamesToRun) throws ReleaseImportException {
 		long start = (new Date()).getTime();
 		Assert.isTrue((new File(directoryOfRuleSetsPath)).isDirectory(), "The rules directory is not accessible.");
 		Assert.isTrue(ruleSetNamesToRun != null && !ruleSetNamesToRun.isEmpty(), "The name of at least one rule set must be specified.");
