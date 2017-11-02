@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.rvf.util.ECLParser;
 import org.ihtsdo.rvf.util.ECLParserUtil;
 import org.ihtsdo.rvf.util.ExpressionTemplateParser;
+import org.ihtsdo.rvf.util.LongECLGrammar;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.model.ColumnType;
 import org.ihtsdo.rvf.validation.resource.ResourceProvider;
@@ -254,7 +255,7 @@ public class ColumnPatternTester {
 		 || column.getName().equalsIgnoreCase("parentDomain")
 		 || column.getName().equalsIgnoreCase("proximalPrimitiveConstraint")
 		 || column.getName().equalsIgnoreCase("proximalPrimitiveRefinement")) { // Expression Constrain Language validation
-			if(ECLParserUtil.validateECLString(ECLParser.getInstance(),value)){
+			if(ECLParserUtil.validateECLString(LongECLGrammar.getInstance(),value)){
 				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(),"");
 			} else {

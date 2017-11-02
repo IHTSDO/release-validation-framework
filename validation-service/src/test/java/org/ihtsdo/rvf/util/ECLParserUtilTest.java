@@ -12,20 +12,17 @@ public class ECLParserUtilTest {
     public void testECLParser() throws Exception {
     	String correctECL = "<< 71388002 |Procedure (procedure)|";
     	String wrongECL = "<< 71388002 |Procedure (procedure)";
-    	assertTrue(ECLParserUtil.validateECLString(ECLParser.getInstance(), correctECL));
-    	assertFalse(ECLParserUtil.validateECLString(ECLParser.getInstance(), wrongECL));
+    	assertTrue(ECLParserUtil.validateECLString(LongECLGrammar.getInstance(), correctECL));
+    	assertFalse(ECLParserUtil.validateECLString(LongECLGrammar.getInstance(), wrongECL));
     }
     
-    /**
-     * The test seems not to work since not enough rules for Expression Template
-     * @throws Exception
-     */
+
     @Test
     public void testExpressionTemplateParser() throws Exception {
     	String correctExpressionTemplate = "[[+scg(<< 309795001 |Surgical access values (qualifier value)|)]]";
     	String wrongExpressionTemplate = "[[+id(<< 71388002 |Procedure (procedure)|)]";
     	
-    	//assertTrue(ECLParserUtil.validateECLString(ExpressionTemplateParser.getInstance(), correctExpressionTemplate));
-    	//assertFalse(ECLParserUtil.validateECLString(ExpressionTemplateParser.getInstance(), wrongExpressionTemplate));
+    	assertTrue(ECLParserUtil.validateECLString(ExpressionTemplateGrammar.getInstance(), correctExpressionTemplate));
+    	assertFalse(ECLParserUtil.validateECLString(ExpressionTemplateGrammar.getInstance(), wrongExpressionTemplate));
     }
 }

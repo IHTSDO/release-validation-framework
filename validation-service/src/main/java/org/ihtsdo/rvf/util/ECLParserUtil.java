@@ -13,16 +13,16 @@ import apg.Parser;
 public class ECLParserUtil {
     private static final Logger logger = LoggerFactory.getLogger(ECLParserUtil.class);
     public static boolean validateECLString(Grammar grammar, String txt){
-        if(StringUtils.isNotEmpty(txt)){
+        if(StringUtils.isNotBlank(txt)){
             Parser parser = new Parser(grammar);
             parser.setInputString(txt);
             try {
-                parser.parse();
-                return parser.getResult().success();
+                Parser.Result result = parser.parse();
+                return result.success();
             } catch (Exception e) {
             	logger.error("Error: " + e);
             }
         }
-        return false;
+        return true;
     }    
 }
