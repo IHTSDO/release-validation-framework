@@ -171,9 +171,9 @@ public class ValidationRunner {
 			logger.info("Run extension release validation with runId:" +  executionConfig.getExecutionId());
 			runExtensionReleaseValidation(report, responseMap, validationConfig,reportStorage, executionConfig);
 		} else {
-			runAssertionTests(report, executionConfig, reportStorage);
+			//runAssertionTests(report, executionConfig, reportStorage);
 			//Run MRCM Validator
-			runMRCMAssertionTests(report, validationConfig, executionConfig);
+			//runMRCMAssertionTests(report, validationConfig, executionConfig);
 		}
 
 		//Run Drool Validator
