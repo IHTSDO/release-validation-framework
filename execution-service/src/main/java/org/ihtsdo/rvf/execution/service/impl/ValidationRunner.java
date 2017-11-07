@@ -208,17 +208,19 @@ public class ValidationRunner {
 		Assert.isTrue(droolDir.isDirectory(), "The rules directory " + directoryOfRuleSetsPath + " is not accessible.");
 		try {
 			Set<String> droolRuleNames = new HashSet<>();
-			for (File file : droolDir.listFiles()) {
+			File[] rulesSetDefined = droolDir.listFiles();
+			Assert.isTrue(rulesSetDefined != null && rulesSetDefined.length > 0, "Failed to load rule sets from " + directoryOfRuleSetsPath);
+			for (File file : rulesSetDefined) {
 				if(file.isDirectory()) droolRuleNames.add(file.getName());
 			}
 			droolRuleNames.retainAll(allRuleNames);
 			if(!droolRuleNames.isEmpty()) {
 				runDroolValidator(validationReport, validationConfig, droolRuleNames);
 			} else {
-				logger.info("No matching drool rule set found for all of specified assertion groups");
+				logger.info("No matching drool rule set found for any of specified assertion groups");
 			}
 		} catch (Exception ex) {
-			logger.error(ex.getMessage());
+			throw ex;
 		}
 
 	}
@@ -292,10 +294,14 @@ public class ValidationRunner {
 
 		Collection<DroolsConcept> concepts = repository.getConcepts();
 		this.logger.info("Running tests");
-		List<InvalidContent> invalidContents = ruleExecutor.execute(ruleSetNamesToRun, concepts, conceptService, descriptionService, relationshipService, true, false);
-		this.logger.info("Tests complete. Total run time {} seconds", Long.valueOf(((new Date()).getTime() - start) / 1000L));
-		this.logger.info("invalidContent count {}", Integer.valueOf(invalidContents.size()));
-		return invalidContents;
+		try {
+			List<InvalidContent> invalidContents = ruleExecutor.execute(ruleSetNamesToRun, concepts, conceptService, descriptionService, relationshipService, true, false);
+			this.logger.info("Tests complete. Total run time {} seconds", Long.valueOf(((new Date()).getTime() - start) / 1000L));
+			this.logger.info("invalidContent count {}", Integer.valueOf(invalidContents.size()));
+			return invalidContents;
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 	private File extractZipFile(ValidationRunConfig validationConfig, Long executionId) throws BusinessServiceException {
 		File outputFolder;
