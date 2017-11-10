@@ -261,9 +261,13 @@ public class ValidationRunner {
 				failedAssertion.setExtractResultInMillis(0L);
 				List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
 				failedAssertion.setFailureCount((long) invalidContentList.size());
-				List<FailureDetail> failureDetails = new ArrayList<>();
+				Integer maxFailureExport = validationConfig.getFailureExportMax() == null ? 10 : validationConfig.getFailureExportMax();
+				List<FailureDetail> failureDetails = new ArrayList<>(maxFailureExport);
+				int failuresCount = 0;
 				for (InvalidContent invalidContent : invalidContentList){
+					if(failuresCount > maxFailureExport) break;
 					failureDetails.add(new FailureDetail(invalidContent.getConceptId(), invalidContent.getMessage(), null));
+					failuresCount++;
 				}
 				failedAssertion.setFirstNInstances(failureDetails);
 				failedAssertions.add(failedAssertion);
@@ -373,9 +377,13 @@ public class ValidationRunner {
 			testRunItem.setExtractResultInMillis(0L);
 			int failureCount = assertion.getViolatedConceptIds().size();
 			testRunItem.setFailureCount(Long.valueOf(failureCount));
-			List<FailureDetail> failedDetails = new ArrayList(failureCount);
+			Integer maxFailureExport = validationConfig.getFailureExportMax() == null ? 10 : validationConfig.getFailureExportMax();
+			List<FailureDetail> failedDetails = new ArrayList<>(maxFailureExport);
+			int exportedFailuresCount = 0;
 			for (Long conceptId : assertion.getViolatedConceptIds()){
+				if(exportedFailuresCount > maxFailureExport) break;
 				failedDetails.add(new FailureDetail(String.valueOf(conceptId), assertion.getAssertionText(), null));
+				exportedFailuresCount++;
 			}
 			testRunItem.setFirstNInstances(failedDetails);
 			failedAssertions.add(testRunItem);
