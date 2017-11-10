@@ -203,7 +203,7 @@ public class ValidationRunner {
 
 	private void startDroolValidation(ValidationReport validationReport, ValidationRunConfig validationConfig) {
 		String directoryOfRuleSetsPath = droolRulesModuleName;
-		HashSet<String> allRuleNames = Sets.newHashSet(validationConfig.getGroupsList().iterator().next());
+		HashSet<String> allGroups = Sets.newHashSet(validationConfig.getGroupsList());
 		File droolDir = new File(directoryOfRuleSetsPath);
 		Assert.isTrue(droolDir.isDirectory(), "The rules directory " + directoryOfRuleSetsPath + " is not accessible.");
 		try {
@@ -213,7 +213,7 @@ public class ValidationRunner {
 			for (File file : rulesSetDefined) {
 				if(file.isDirectory()) droolRuleNames.add(file.getName());
 			}
-			droolRuleNames.retainAll(allRuleNames);
+			droolRuleNames.retainAll(allGroups);
 			if(!droolRuleNames.isEmpty()) {
 				runDroolValidator(validationReport, validationConfig, droolRuleNames);
 			} else {
