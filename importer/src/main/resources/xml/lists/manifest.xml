@@ -322,6 +322,7 @@
 		<script uuid="3b2c1824-8445-410e-8ae2-d943be01c33f" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-unique-terms.sql" text="There are no duplicate Definition terms in the DEFINITION snapshot file." />
 		<script uuid="6e70ea3e-c4dd-4ae3-8b75-f0567e41b57" category="file-centric-validation,ICD-9-CM" sqlFile="file-centric-snapshot-complexmap-unique-id.sql" text="ComplexMap refset id is unique in the snapshot file" />
 	  	<script uuid="6e70ea3e-c4dd-4ae3-8b75-f0567e42c62" category="file-centric-validation,ICD-MAP,INT" sqlFile="file-centric-snapshot-extendedmap-unique-id.sql" text="Extendedmap refset id must be unique in the snapshot file" />
+	  	<script uuid="bb88a465-3f40-4890-b5be-14f94632c3a9" category="file-centric-validation,INT" sqlFile="file-centric-snapshot-simple-map-module-id.sql" text="The module id of all SimpleMap members should be the core module id." />
 		
 		<!-- LOINC <script uuid="" category="file-centric-validation" sqlFile="" text="" />-->
 		<script uuid="E33922C3-5200-458B-B8F3-2CD08252234E" category="file-centric-validation,LOINC" sqlFile="file-centric-snapshot-association-expression-valid-referencecomponentid.sql" text="ReferenceComponentIds refers to valid concepts in the LOINC ExpressionAssociationRefset snapshot file." />
@@ -346,6 +347,7 @@
 		<!-- Belgium extension -->
 		<script uuid="eef4d352-b7e6-11e7-a7c5-3c15c2c6e32e" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-be-dutch-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Belgian Dutch language refset." />
 		<script uuid="ff33e7f8-b7e6-11e7-9e35-3c15c2c6e32e" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-be-french-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Belgian French language refset." />
+		<script uuid="17d0297b-7a61-43c5-814b-532df4691ddd" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-be-translated-concepts.sql" text="Newly translated concepts must have preferred terms in Dutch and French." />
 		
 		<script uuid="eb940ee0-7cd6-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-active-target.sql" text="Active historical association refset members have active concepts as targets." />
 		<script uuid="90bcb7f0-7f25-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-refers-to-parent.sql" text="No active Historical Association member associates an inactive concept with its parent." />
@@ -408,6 +410,11 @@
 		<script uuid="8479317e-8459-4362-bee8-628b8220f1e4" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-nonhuman-active.sql" text="Active Non-human refset members refer to active components." />
 		<script uuid="c3249e80-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-us-call-proc.sql" text="Terms that contain en-us specific words are in the en-us language refset." />
 		<script uuid="cc9c5340-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation,INT" sqlFile="component-centric-delta-language-lang-specific-words-gb-call-proc.sql" text="Terms that contain en-gb specific words are in the en-gb language refset." />
+		
+		<script uuid="7c406d6c-7e30-4aa1-b99d-e00b4e2d52a5" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-definition-preferred-in-en_us-and-en_gb.sql" text="There is an equivalent definition in the en-us and en-gb language when provided." />
+		<script uuid="905122c9-f24f-4d57-b478-435d693ff209" category="component-centric-validation" sqlFile="component-centric-snapshot-descripton-term-length.sql" text="A description should not have more than 255 characters long." />
+		<script uuid="7dd01495-2099-4e7b-9d02-39899bf774f3" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-term-used-in-description-warning.sql" text="A description normally has less than 35 words." />
+		
 		<!-- Exclude these assertion for the time being 
 		<script uuid="0a4bba70-85b7-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-navigation.sql" text="targetComponentId in association refset file does not refer to navigation concepts." />
 		<script uuid="38b88ff6-7ee3-40a5-b362-98a87e80526e" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-inactive.sql" text="Inactive Non-human refset members refer to inactive components." />

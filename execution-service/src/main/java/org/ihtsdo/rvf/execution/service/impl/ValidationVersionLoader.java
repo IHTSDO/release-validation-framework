@@ -211,16 +211,8 @@ public class ValidationVersionLoader {
     }
 	
 	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
-		String[] splits = publishedReleaseFilename.split("_");
-		int index = splits.length-2;
-		logger.debug( "release file short name:" + splits[index]);
-		String publishedFileS3Path = null;
-		if (splits[index].equalsIgnoreCase("INT")) {
-			//derivative products released by the international release but during RVF testing using the same logic as extension.
-			publishedFileS3Path = INTERNATIONAL + SEPARATOR + publishedReleaseFilename;
-		} else {
-			publishedFileS3Path = EXTENSIONS + SEPARATOR + splits[index] + SEPARATOR + publishedReleaseFilename;
-		}
+		
+		String publishedFileS3Path = INTERNATIONAL + SEPARATOR + publishedReleaseFilename;
 		logger.debug("downloading published file from s3:" + publishedFileS3Path);
 		InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
 		if (publishedFileInput != null) {
@@ -231,7 +223,9 @@ public class ValidationVersionLoader {
 			IOUtils.closeQuietly(out);
 			releaseDataManager.loadSnomedData(rvfVersion, new ArrayList<String>(),tempFile);
 		} else {
-			logger.error("Previous release not found in the published bucket:" + publishedFileS3Path);
+			String msg = "Previous release not found in the published bucket:" + publishedFileS3Path;
+			logger.error(msg);
+			throw new BusinessServiceException(msg);
 		}
 	}
 	
