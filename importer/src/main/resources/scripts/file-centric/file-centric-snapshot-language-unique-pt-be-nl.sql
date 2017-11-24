@@ -16,6 +16,7 @@
 	from curr_concept_s a
 	where
 	 a.active=1
+	 and a.moduleid in ('11000172109')
 	 and not exists ( select b.id from curr_description_s b, curr_langrefset_s c
 			where b.id = c.referencedcomponentid
 			and b.typeid = '900000000000013009'

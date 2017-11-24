@@ -1,6 +1,6 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 86,
+  "totalAssertionsRun" : 89,
   "totalAssertionsFailed" : 86,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
@@ -207,6 +207,11 @@
       "detail" : "ExtendedMap: id=69703317-411e-5d4d-b853-eef523f0109c : Gender rule without gender advice"
     } ],
     "totalFailed" : 2
+  }, {
+    "assertionName" : "A description should not have more than 255 characters long.",
+    "assertionUuid" : "905122c9-f24f-4d57-b478-435d693ff209",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "No active Historical Association member associates an inactive concept with its parent.",
     "assertionUuid" : "90bcb7f0-7f25-11e1-b0c4-0800200c9a66",
@@ -962,6 +967,16 @@
       "detail" : "CONCEPT: Concept=703672002: concept has definition not \"preferred\"."
     } ],
     "totalFailed" : 2
+  }, {
+    "assertionName" : "There is an equivalent definition in the en-us and en-gb language when provided.",
+    "assertionUuid" : "7c406d6c-7e30-4aa1-b99d-e00b4e2d52a5",
+    "firstNInstances" : null,
+    "totalFailed" : -1
+  }, {
+    "assertionName" : "A description normally has less than 35 words.",
+    "assertionUuid" : "7dd01495-2099-4e7b-9d02-39899bf774f3",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "Rule based complex MapGroup must be in sequential order and not blank",
     "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42b58",
