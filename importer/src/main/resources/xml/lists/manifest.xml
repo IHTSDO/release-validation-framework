@@ -695,21 +695,6 @@
 			</keywords>
 		</script>
 
-		<script uuid="6ce65376-c701-4042-8eae-70c78be08476" category="component-centric-validation"
-				  sqlFile="component-centric-delta-mrcm-refset-validate-concept-is-valid-descendant.sql"
-				  text="Check that the value range is valid in MRCM Refsets Delta"  >
-			<keywords>Check that the value range is valid in MRCM Refsets Delta
-			</keywords>
-		</script>
-
-
-		<script uuid="7654d06e-4f9d-421c-91e5-842b0bddb6bc" category="component-centric-validation"
-				  sqlFile="component-centric-full-mrcm-refset-validate-concept-is-valid-descendant.sql"
-				  text="Check that the value range is valid in MRCM Refsets Full"  >
-			<keywords>Check that the value range is valid in MRCM Refsets Full
-			</keywords>
-		</script>
-		
 		<script uuid="e980e959-943b-4cdc-998b-f91e670a030b" category="component-centric-validation" 
 				  sqlFile="component-centric-snapshot-mrcm-domain-unique-id.sql" text="ID is unique in MRCM DOMAIN snapshot."  >
 			<keywords>ID is unique in MRCM DOMAIN snapshot</keywords>
@@ -735,32 +720,12 @@
 			<keywords>ReferencedComponentId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE SNAPSHOT</keywords>
 		</script>
 		
-		<script uuid="7c564691-3463-4115-b5f7-f19bd7b5888d" category="component-centric-validation" 
-				  sqlFile="component-centric-full-mrcm-attribute-domain-referencedcomponentid-exist-in-attribute-range-referencedcomponentid.sql" text="ReferencedComponentId in MRCM ATTRIBUTE DOMAIN FULL exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE FULL."  >
-			<keywords>ReferencedComponentId in MRCM ATTRIBUTE DOMAIN FULL exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE FULL</keywords>
-		</script>
-		
-		<script uuid="7c9489ee-22a3-40bd-b0f3-e4777ae25d7e" category="component-centric-validation" 
-				  sqlFile="component-centric-delta-mrcm-attribute-domain-referencedcomponentid-exist-in-attribute-range-referencedcomponentid.sql" text="ReferencedComponentId in MRCM ATTRIBUTE DOMAIN DELTA exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE DELTA" >
-			<keywords>ReferencedComponentId in MRCM ATTRIBUTE DOMAIN DELTA exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE DELTA</keywords>
-		</script>
-		
-		<script uuid="f1fc2c4b-9202-4a0b-9c00-49b6de7a7cc5" category="component-centric-validation" 
+		<script uuid="f1fc2c4b-9202-4a0b-9c00-49b6de7a7cc5" category="component-centric-validation"
 				  sqlFile="component-centric-snapshot-mrcm-attribute-domain-domainid-exist-in-domain-refset-referencedcomponentid.sql" text="DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT" >
 			<keywords>DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT</keywords>
 		</script>
 		
-		<script uuid="6f8cc7ba-c59f-486a-9c52-4a725ac735be" category="component-centric-validation" 
-				  sqlFile="component-centric-full-mrcm-attribute-domain-domainid-exist-in-domain-refset-referencedcomponentid.sql" text="DomainId in MRCM ATTRIBUTE DOMAIN FULL exists in the ReferencedComponentId values of MRCM DOMAIN FULL" >
-			<keywords>DomainId in MRCM ATTRIBUTE DOMAIN FULL exists in the ReferencedComponentId values of MRCM DOMAIN FULL</keywords>
-		</script>
-		
-		<script uuid="b0b3d1d7-c64e-44a0-be45-062faa1dd684" category="component-centric-validation" 
-				  sqlFile="component-centric-delta-mrcm-attribute-domain-domainid-exist-in-domain-refset-referencedcomponentid.sql" text="DomainId in MRCM ATTRIBUTE DOMAIN DELTA exists in the ReferencedComponentId values of MRCM DOMAIN DELTA" >
-			<keywords>DomainId in MRCM ATTRIBUTE DOMAIN DELTA exists in the ReferencedComponentId values of MRCM DOMAIN DELTA</keywords>
-		</script>
-		
-		<script uuid="ce8f4bae-0c51-4248-9c42-8f05a2cccdb4" category="component-centric-validation" 
+		<script uuid="ce8f4bae-0c51-4248-9c42-8f05a2cccdb4" category="component-centric-validation"
 				  sqlFile="component-centric-snapshot-mrcm-attribute-domain-valid-grouped.sql" text="Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file" >
 			<keywords>Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file</keywords>
 		</script>
@@ -810,29 +775,9 @@
 			<keywords>ReferencedComponentId in MRCM ATTRIBUTE RANGE SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN SNAPSHOT</keywords>
 		</script>
 		
-		<script uuid="07253211-e2a2-4440-919d-6fc73bdcbfdb" category="component-centric-validation" 
-				  sqlFile="component-centric-full-mrcm-attribute-range-referencedcomponentId-exist-in-attribute-domain-refset-referencedcomponentid.sql" text="ReferencedComponentId in MRCM ATTRIBUTE RANGE FULL exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN FULL" >
-			<keywords>ReferencedComponentId in MRCM ATTRIBUTE RANGE FULL exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN FULL</keywords>
-		</script>
-		
-		<script uuid="f59f13df-fb2a-406b-8788-7d173a349b0b" category="component-centric-validation" 
-				  sqlFile="component-centric-delta-mrcm-attribute-range-referencedcomponentId-exist-in-attribute-domain-refset-referencedcomponentid.sql" text="ReferencedComponentId in MRCM ATTRIBUTE RANGE DELTA exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN DELTA" >
-			<keywords>ReferencedComponentId in MRCM ATTRIBUTE RANGE DELTA exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN DELTA</keywords>
-		</script>
-		
-		<script uuid="57ae69cd-26f0-4001-ba2f-ae56129e2e28" category="component-centric-validation" 
+		<script uuid="57ae69cd-26f0-4001-ba2f-ae56129e2e28" category="component-centric-validation"
 				  sqlFile="component-centric-snapshot-mrcm-module-scope-valid-mrcmrulerefsetid.sql" text="MrcmRuleRefsetId in MRCM MODULE SCOPE SNAPSHOT exists in the RefsetId values of MRCM DOMAIN SNAPSHOT or MRCM ATTRIBUTE DOMAIN SNAPSHOT or MRCM ATTRIBUTE RANGE SNAPSHOT" >
 			<keywords>MrcmRuleRefsetId in MRCM MODULE SCOPE SNAPSHOT exists in the RefsetId values of MRCM DOMAIN SNAPSHOT or MRCM ATTRIBUTE DOMAIN SNAPSHOT or MRCM ATTRIBUTE RANGE SNAPSHOT</keywords>
-		</script>
-		
-		<script uuid="2bf6ec9a-7cc5-491b-99cd-0e3092ff8055" category="component-centric-validation" 
-				  sqlFile="component-centric-full-mrcm-module-scope-valid-mrcmrulerefsetid.sql" text="MrcmRuleRefsetId in MRCM MODULE SCOPE FULL exists in the RefsetId values of MRCM DOMAIN FULL or MRCM ATTRIBUTE DOMAIN FULL or MRCM ATTRIBUTE RANGE FULL" >
-			<keywords>MrcmRuleRefsetId in MRCM MODULE SCOPE FULL exists in the RefsetId values of MRCM DOMAIN FULL or MRCM ATTRIBUTE DOMAIN FULL or MRCM ATTRIBUTE RANGE FULL</keywords>
-		</script>
-		
-		<script uuid="c3e7f126-98b9-4c50-9909-4c3ba7b49548" category="component-centric-validation" 
-				  sqlFile="component-centric-delta-mrcm-module-scope-valid-mrcmrulerefsetid.sql" text="MrcmRuleRefsetId in MRCM MODULE SCOPE DELTA exists in the RefsetId values of MRCM DOMAIN DELTA or MRCM ATTRIBUTE DOMAIN DELTA or MRCM ATTRIBUTE RANGE DELTA" >
-			<keywords>MrcmRuleRefsetId in MRCM MODULE SCOPE DELTA exists in the RefsetId values of MRCM DOMAIN DELTA or MRCM ATTRIBUTE DOMAIN DELTA or MRCM ATTRIBUTE RANGE DELTA</keywords>
 		</script>
 
 		<!-- rt added this as a template... -->
