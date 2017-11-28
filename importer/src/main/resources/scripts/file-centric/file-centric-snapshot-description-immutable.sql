@@ -4,6 +4,7 @@
 
 	Assertion:
 	There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot.
+	Note: Checking for current authoring cycle only as there are some voilations in the published releases.
 
 ********************************************************************************/
 	insert into qa_result (runid, assertionuuid, concept_id, details)
@@ -11,7 +12,8 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('DESC: id=',a.id, ':There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot.') 	
+		concat('Concept:',a.id, ' has multiple description ids for the same term:', a.term) 	
 	from curr_description_s a 
-	group by a.id , a.typeid , a.languagecode , a.conceptid
-	having count(a.id) > 1 and count(a.typeid ) > 1 and count(languagecode) > 1 and count(conceptid) > 1;
+	where exists (select id from curr_description_d b where a.conceptid=b.conceptid and a.term=b.term and b.active=1)
+	group by a.typeid, a.languagecode, a.conceptid, a.term
+	having count(a.id) > 1;

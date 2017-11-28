@@ -267,7 +267,7 @@
     "assertionUuid" : "c779d282-3c4d-4c16-a8a6-8d1a621b247d",
     "firstNInstances" : [ {
       "conceptId" : "699765003",
-      "detail" : "Simple Refset: id=65f4359b-bf19-5d99-abc1-7139bbff5d47 has more than one set of immutable keys in the snapshot file."
+      "detail" : "Refset id:447564002 and referencedcomponent Id:699765003 are duplicated in the simple refset snapshot file."
     } ],
     "totalFailed" : 1
   }, {
@@ -372,14 +372,14 @@
     } ],
     "totalFailed" : 22
   }, {
-    "assertionName" : "There is at most one active definition per concept per language per dialect in the DEFINITION snapshot.",
+    "assertionName" : "There is at most one active definition per concept per dialect.",
     "assertionUuid" : "de0c4d6c-6297-41be-9979-fb1c93717baa",
     "firstNInstances" : [ {
-      "conceptId" : "278512001",
-      "detail" : "CONCEPT: id=278512001 has more than one active definition per concept per dialect in the DEFINITION snapshot."
+      "conceptId" : "703672002",
+      "detail" : "Concept id=703672002 has more than one active definitions in dialect:900000000000508004"
     }, {
       "conceptId" : "703672002",
-      "detail" : "CONCEPT: id=703672002 has more than one active definition per concept per dialect in the DEFINITION snapshot."
+      "detail" : "Concept id=703672002 has more than one active definitions in dialect:900000000000509007"
     } ],
     "totalFailed" : 2
   }, {
@@ -707,7 +707,7 @@
     "assertionUuid" : "2ddc9a28-150d-47a4-9b0e-7dbff2efdd72",
     "firstNInstances" : [ {
       "conceptId" : "10171006",
-      "detail" : "ReferencedComponent: id=10171006 and targetComponentId:239777004 contains multiple association refset memember ids."
+      "detail" : "ReferencedComponentId:10171006 targetComponentId:239777004 and refsetId:900000000000523009 are duplicated in the association refset snapshot file."
     } ],
     "totalFailed" : 1
   }, {
@@ -774,18 +774,21 @@
     "assertionUuid" : "3cb10511-33b7-4eca-ba0e-93bcccf70d86",
     "firstNInstances" : [ {
       "conceptId" : "703568007",
-      "detail" : "SM RS: id=cff7ca5c-286c-52b3-9322-e489c65c8ab5:Invalid keys in SIMPLE MAP REFSET snapshot file."
+      "detail" : "referencedcomponentId:703568007refsetId:446608001mapTarget:8474/3are duplicated in the Simple Map Refset Snapshot file."
     }, {
-      "conceptId" : "703568007",
-      "detail" : "SM RS: id=cff7ca5c-286c-52b3-9322-e489c65c8de4:Invalid keys in SIMPLE MAP REFSET snapshot file."
+      "conceptId" : "700132006",
+      "detail" : "referencedcomponentId:700132006refsetId:900000000000497000mapTarget:XUjjkare duplicated in the Simple Map Refset Snapshot file."
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "referencedcomponentId:700132006refsetId:900000000000498005mapTarget:C-D1637are duplicated in the Simple Map Refset Snapshot file."
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 3
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the immutable values in  the DESCRIPTION snapshot.",
     "assertionUuid" : "48118153-d32a-4d1c-bfbc-23ed953e9991",
     "firstNInstances" : [ {
       "conceptId" : "703860006",
-      "detail" : "DESC: id=2989790014:There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot."
+      "detail" : "Concept:2984057023 has multiple description ids for the same term:Biclotymol"
     } ],
     "totalFailed" : 1
   }, {
@@ -923,10 +926,13 @@
     "assertionName" : "There is a 1:1 relationship between the id and the immutable values in the DEFINITION snapshot.",
     "assertionUuid" : "718cc822-73b5-42c2-9c01-f8df09a9bf8d",
     "firstNInstances" : [ {
+      "conceptId" : "278512001",
+      "detail" : "Definition: id=2995945017 references a term which is duplicated."
+    }, {
       "conceptId" : "703672002",
-      "detail" : "DEFINITION: id=3005197021 is referneced with more than one set of immutable values in the definition snapshot."
+      "detail" : "Definition: id=3005197017 references a term which is duplicated."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "All source ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "72184790-79b9-11e1-b0c4-0800200c9a66",

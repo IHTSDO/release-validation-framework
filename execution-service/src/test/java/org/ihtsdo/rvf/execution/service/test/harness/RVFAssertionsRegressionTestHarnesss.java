@@ -180,7 +180,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("c3249e80-84f0-11e1-b0c4-0800200c9a66");
+		runAssertionsTest("2ddc9a28-150d-47a4-9b0e-7dbff2efdd72");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
