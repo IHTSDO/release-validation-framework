@@ -173,11 +173,11 @@ public class ValidationRunner {
 		} else {
 			runAssertionTests(report, executionConfig, reportStorage);
 			//Run MRCM Validator
-			runMRCMAssertionTests(report, validationConfig, executionConfig);
+			//runMRCMAssertionTests(report, validationConfig, executionConfig);
 		}
 
 		//Run Drool Validator
-		startDroolValidation(report, validationConfig);
+		//startDroolValidation(report, validationConfig);
 
 		if(executionConfig.isJiraIssueCreationFlag()) {
 			// Add Jira ticket for each fail assertions
