@@ -466,8 +466,11 @@
     }, {
       "conceptId" : "2794052013",
       "detail" : "Language Refset: ReferencedComponentId =2794052013 is neither in the description nor the definition snapshot file."
+    }, {
+      "conceptId" : "2988954017",
+      "detail" : "Language Refset: ReferencedComponentId =2988954017 is neither in the description nor the definition snapshot file."
     } ],
-    "totalFailed" : 5
+    "totalFailed" : 6
   }, {
     "assertionName" : "The current Language Refset snapshot file does not contain duplicate Member Ids.",
     "assertionUuid" : "fc24db60-7856-11e1-b0c4-0800200c9a66",
@@ -767,8 +770,11 @@
     "firstNInstances" : [ {
       "conceptId" : "703860006",
       "detail" : "DESC: id=2989790014:Non unique id in description release file."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESC: id=3008913021:Non unique id in description release file."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the SIMPLE MAP REFSET snapshot.",
     "assertionUuid" : "3cb10511-33b7-4eca-ba0e-93bcccf70d86",
