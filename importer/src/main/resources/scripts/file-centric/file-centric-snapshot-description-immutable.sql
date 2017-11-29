@@ -3,7 +3,7 @@
 	file-centric-snapshot-description-immutable
 
 	Assertion:
-	There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot.
+	There is a 1:1 relationship between the id and the immutable values in the description snapshot.
 	Note: Checking for current authoring cycle only as there are some voilations in the published releases.
 
 ********************************************************************************/

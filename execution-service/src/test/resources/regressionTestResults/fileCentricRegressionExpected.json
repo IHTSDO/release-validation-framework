@@ -776,21 +776,21 @@
     } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "There is a 1:1 relationship between the id and the key values in the SIMPLE MAP REFSET snapshot.",
+    "assertionName" : "There is a 1:1 relationship between the id and the key values in the simple map refset snapshot.",
     "assertionUuid" : "3cb10511-33b7-4eca-ba0e-93bcccf70d86",
     "firstNInstances" : [ {
       "conceptId" : "703568007",
-      "detail" : "referencedcomponentId:703568007refsetId:446608001mapTarget:8474/3are duplicated in the Simple Map Refset Snapshot file."
+      "detail" : "referencedcomponentId:703568007 refsetId:446608001 mapTarget:8474/3 are duplicated in the simple map fefset snapshot file."
     }, {
       "conceptId" : "700132006",
-      "detail" : "referencedcomponentId:700132006refsetId:900000000000497000mapTarget:XUjjkare duplicated in the Simple Map Refset Snapshot file."
+      "detail" : "referencedcomponentId:700132006 refsetId:900000000000497000 mapTarget:XUjjk are duplicated in the simple map fefset snapshot file."
     }, {
       "conceptId" : "700132006",
-      "detail" : "referencedcomponentId:700132006refsetId:900000000000498005mapTarget:C-D1637are duplicated in the Simple Map Refset Snapshot file."
+      "detail" : "referencedcomponentId:700132006 refsetId:900000000000498005 mapTarget:C-D1637 are duplicated in the simple map fefset snapshot file."
     } ],
     "totalFailed" : 3
   }, {
-    "assertionName" : "There is a 1:1 relationship between the id and the immutable values in  the DESCRIPTION snapshot.",
+    "assertionName" : "There is a 1:1 relationship between the id and the immutable values in the description snapshot.",
     "assertionUuid" : "48118153-d32a-4d1c-bfbc-23ed953e9991",
     "firstNInstances" : [ {
       "conceptId" : "703860006",

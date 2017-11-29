@@ -245,7 +245,7 @@
 		<script uuid="1491f72c-cb00-42db-a97b-9c685f4e4cb0" category="file-centric-validation" sqlFile="file-centric-snapshot-description-valid-conceptid.sql" text="ConceptId value refers to valid concept identifier in the DESCRIPTION snapshot."  >
 			<keywords>ConceptId value refers to valid concept identifier in DESCRIPTION snapshot.</keywords>
 		</script>
-		<script uuid="48118153-d32a-4d1c-bfbc-23ed953e9991" category="file-centric-validation" sqlFile="file-centric-snapshot-description-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in  the DESCRIPTION snapshot."  >
+		<script uuid="48118153-d32a-4d1c-bfbc-23ed953e9991" category="file-centric-validation" sqlFile="file-centric-snapshot-description-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in the description snapshot."  >
 			<keywords>There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot.</keywords>
 		</script>
 		
@@ -288,7 +288,7 @@
 		<script uuid="ad7ae768-d14a-4f15-a5cb-4c56b8b4fed6" category="file-centric-validation" sqlFile="file-centric-snapshot-simple-map-unique-id.sql" text="ID is unique in the SIMPLEMAP REFSET snapshot."  >
 			<keywords>ID is unique in the SIMPLEMAP REFSET snapshot.</keywords>
 		</script>
-		<script uuid="3cb10511-33b7-4eca-ba0e-93bcccf70d86" category="file-centric-validation" sqlFile="file-centric-snapshot-simple-map-valid-key.sql" text="There is a 1:1 relationship between the id and the key values in the SIMPLE MAP REFSET snapshot."  >
+		<script uuid="3cb10511-33b7-4eca-ba0e-93bcccf70d86" category="file-centric-validation" sqlFile="file-centric-snapshot-simple-map-valid-key.sql" text="There is a 1:1 relationship between the id and the key values in the simple map refset snapshot."  >
 			<keywords>There is a 1:1 relationship between the id and the key values in the SIMPLE MAP REFSET snapshot.</keywords>
 		</script>
 		

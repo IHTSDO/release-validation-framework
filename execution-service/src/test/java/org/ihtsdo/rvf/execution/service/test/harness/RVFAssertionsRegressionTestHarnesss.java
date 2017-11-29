@@ -175,7 +175,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
 		
 		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(82, assertions.size());
+		assertEquals(81, assertions.size());
 	}
 	
 	@Test
