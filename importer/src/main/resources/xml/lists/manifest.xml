@@ -17,7 +17,7 @@
 		<script uuid="8d25d6e7-e4c6-488d-b96b-df1665c968ad" category="resource" sqlFile="component-centric-full-mrcm-refset-validate-concept-is-valid-descendant-proc.sql" text="Defines a procedure to validate whether a concept is a descendant of specified concepts in MRCM Refsets Full" />
 
 
-		<script uuid="f636b7b0-7e9a-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-language-active-members.sql" text="Members are active for active descriptions in the language refset snapshot file." />
+		<script uuid="d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e" category="component-centric-validation" sqlFile="component-centric-snapshot-description-unique-fsn-case-insensitive-checking.sql" text="The FSN term should be unique in active content when case sensitivity is ignored." />
 
 	</useCase>
 </manifest>

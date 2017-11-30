@@ -47,7 +47,7 @@
 		concat('Active description id=',a.id, ' has no langrefset member') 
 	from curr_description_s a
 	inner join curr_concept_s c on a.conceptid = c.id
-	left join (select distinct referencedcomponentid from curr_langrefset_s) b on a.id = b.referencedComponentId
+	left join v_act_langrs b on a.id = b.referencedComponentId
 	where a.active = '1' 
 	and c.active = '1'
 	and b.referencedComponentId is null;
