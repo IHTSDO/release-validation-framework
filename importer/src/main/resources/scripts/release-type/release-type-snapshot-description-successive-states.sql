@@ -19,7 +19,6 @@
 	and b.active = '0'
 	and a.id = b.id
 	and a.moduleid =b.moduleid
-	and a.typeid = b.typeid
 	and a.casesignificanceid = b.casesignificanceid;
 	
 	

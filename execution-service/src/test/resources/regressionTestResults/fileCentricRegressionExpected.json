@@ -794,9 +794,12 @@
     "assertionUuid" : "48118153-d32a-4d1c-bfbc-23ed953e9991",
     "firstNInstances" : [ {
       "conceptId" : "703860006",
-      "detail" : "Concept:2984057023 has multiple description ids for the same term:Biclotymol"
+      "detail" : "Concept:3008366010 has multiple description ids for the same term:Biclotymol"
+    }, {
+      "conceptId" : "699400005",
+      "detail" : "Description:2984057019 has changes in the immutable fields either type id, language code or concept id since previous release."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "ID is unique in the DEFINITION snapshot.",
     "assertionUuid" : "4ba823ce-8ae4-4b2e-beb5-e119b822cfe2",
