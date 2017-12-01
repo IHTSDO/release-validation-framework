@@ -498,14 +498,6 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file",
-    "assertionUuid" : "ce8f4bae-0c51-4248-9c42-8f05a2cccdb4",
-    "firstNInstances" : [ {
-      "conceptId" : "370129004",
-      "detail" : "MRCM ATTRIBUTE DOMAIN REFSET: id=8038688b-80f5-49b3-b3d8-c6fe13f8fb1e Grouped value is not in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file"
-    } ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "AttributeCardinality value is in ('0..1','0..*') in MRCM ATTRIBUTE DOMAIN full file",
     "assertionUuid" : "d23a21cc-6dd0-4371-9f87-f68ea0d5f3a7",
     "firstNInstances" : [ {

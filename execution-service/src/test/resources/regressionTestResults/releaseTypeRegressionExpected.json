@@ -500,14 +500,6 @@
     } ],
     "totalFailed" : 10
   }, {
-    "assertionName" : "The current MRCM Attribute Range Refset full file contains all previously published data unchanged.",
-    "assertionUuid" : "becfbeaa-5eab-4a4a-90ca-7c893b7495b2",
-    "firstNInstances" : [ {
-      "conceptId" : "47429007",
-      "detail" : "MRCM ATTRIBUTE RANGE REFSET: id=52d8ebc7-6c09-41b5-be7f-2373d1686be3 is in prior full file but not in current full file."
-    } ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "The current SimpleMap refset full file contains all previously published data unchanged.",
     "assertionUuid" : "c19b9008-bbc9-4209-a3d7-896d414df565",
     "firstNInstances" : [ {

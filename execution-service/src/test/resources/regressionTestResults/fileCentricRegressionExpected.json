@@ -410,23 +410,6 @@
     } ],
     "totalFailed" : 17
   }, {
-    "assertionName" : "ReferencedComponentId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot",
-    "assertionUuid" : "c4920cb7-7e7f-4f3f-ae87-f15b7c8fb1b6",
-    "firstNInstances" : [ {
-      "conceptId" : "900000000000207009",
-      "detail" : "MRCM MODULE SCOPE: id=8e5766bc-7755-45fb-99c8-8d2c52e45da5 : referencedComponentId=900000000000207009 MRCM Module Scope Refset contains a ReferencedComponentId that does not exist in the Concept snapshot."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "MRCM MODULE SCOPE: id=d3b7a01f-6fcd-4d8d-815b-ca6a63511310 : referencedComponentId=900000000000207008 MRCM Module Scope Refset contains a ReferencedComponentId that does not exist in the Concept snapshot."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "MRCM MODULE SCOPE: id=60dcf17f-6054-4ee2-a657-606104c49bb5 : referencedComponentId=900000000000207008 MRCM Module Scope Refset contains a ReferencedComponentId that does not exist in the Concept snapshot."
-    }, {
-      "conceptId" : "900000000000207008",
-      "detail" : "MRCM MODULE SCOPE: id=60dcf17f-6054-4ee2-a657-606104c49bb5 : referencedComponentId=900000000000207008 MRCM Module Scope Refset contains a ReferencedComponentId that does not exist in the Concept snapshot."
-    } ],
-    "totalFailed" : 4
-  }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "c779d282-3c4d-4c16-a8a6-8d1a621b247d",
     "firstNInstances" : [ {
