@@ -130,13 +130,13 @@ public class ValidationRunner {
 		}
 
 
-		/*boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(),
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(responseMap, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(),
 				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation());
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;
-		} */
+		}
 
 		//load previous published version
 		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
@@ -173,11 +173,11 @@ public class ValidationRunner {
 		} else {
 			runAssertionTests(report, executionConfig, reportStorage);
 			//Run MRCM Validator
-			//runMRCMAssertionTests(report, validationConfig, executionConfig);
+			runMRCMAssertionTests(report, validationConfig, executionConfig);
 		}
 
 		//Run Drool Validator
-		//startDroolValidation(report, validationConfig);
+		startDroolValidation(report, validationConfig);
 
 		if(executionConfig.isJiraIssueCreationFlag()) {
 			// Add Jira ticket for each fail assertions
