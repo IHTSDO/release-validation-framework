@@ -11,7 +11,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Simple Refset: id=',a.id, ' has more than one set of immutable keys in the snapshot file.') 	
+		concat('Refset id:',a.refsetid, ' and referencedcomponent Id:', a.referencedcomponentid, ' are duplicated in the simple refset snapshot file.') 	
 	from curr_simplerefset_s a 
-	group by a.id , a.refsetid , a.referencedcomponentid
-	having count(a.id) > 1 and count(a.refsetid) > 1 and count(a.referencedcomponentid ) > 1;
+	group by a.refsetid , a.referencedcomponentid
+	having count(a.id) > 1;

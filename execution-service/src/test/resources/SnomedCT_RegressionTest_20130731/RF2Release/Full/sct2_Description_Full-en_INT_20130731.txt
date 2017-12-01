@@ -8,3 +8,4 @@ id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignific
 100005014	20020131	0	900000000000207008	60206007	en	900000000000013009	Cutaneous actinobacillosis of sheep and cattle	900000000000020002
 100006010	20020131	1	900000000000207008	60207003	en	900000000000013009	Fibre lapper	900000000000020002
 100007018	20020131	1	900000000000207008	60208008	en	900000000000013009	Coagulation factor V	900000000000020002
+3008913021	20140731	1	900000000000207008	703860006	en	900000000000013009	A subtype of non-spastic cerebral palsy with loss of muscular coordination with abnormal force and rhythm, and impairment of accuracy; commonly presents with gait and trunk ataxia, poor balance, past pointing, terminal intention tremor, scanning speech, nystagmus and other abnormal eye movements, and hypotonia. Low tone is a prominent feature.	900000000000020002

@@ -13,7 +13,7 @@
 	no term of an active description of a concept of which a description was edited 
 	matches that of an inactive description within the same concept
 
-	Note: NOT case sensitive.
+	Note: case sensitive.
 
 ********************************************************************************/
 

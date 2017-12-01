@@ -11,10 +11,9 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('ReferencedComponent: id=',a.referencedcomponentid, ' and targetComponentId:',a.targetcomponentid,
-		' contains multiple association refset memember ids.') 	
+		concat('ReferencedComponentId:', a.referencedcomponentid, ' targetComponentId:', a.targetcomponentid, ' and refsetId:', a.refsetid, ' are duplicated in the association refset snapshot file.') 	
 	from curr_associationrefset_s a 
-	group by a.id,a.refsetid , a.referencedcomponentid , a.targetcomponentid
-	having count(a.id) >1 or count(a.refsetid) > 1 or count(a.referencedcomponentid ) > 1 or count(a.targetcomponentid) > 1;
-	commit;
+	group by a.refsetid , a.referencedcomponentid , a.targetcomponentid
+	having count(id) > 1;
+	
 	

@@ -245,7 +245,7 @@
 		<script uuid="1491f72c-cb00-42db-a97b-9c685f4e4cb0" category="file-centric-validation" sqlFile="file-centric-snapshot-description-valid-conceptid.sql" text="ConceptId value refers to valid concept identifier in the DESCRIPTION snapshot."  >
 			<keywords>ConceptId value refers to valid concept identifier in DESCRIPTION snapshot.</keywords>
 		</script>
-		<script uuid="48118153-d32a-4d1c-bfbc-23ed953e9991" category="file-centric-validation" sqlFile="file-centric-snapshot-description-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in  the DESCRIPTION snapshot."  >
+		<script uuid="48118153-d32a-4d1c-bfbc-23ed953e9991" category="file-centric-validation" sqlFile="file-centric-snapshot-description-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in the description snapshot."  >
 			<keywords>There is a 1:1 relationship between the id and the immutable values in DESCRIPTION snapshot.</keywords>
 		</script>
 		
@@ -259,8 +259,8 @@
 		<script uuid="5a83783e-3366-48bd-a50d-8f3a53812174" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-valid conceptid.sql" text="ConceptId value refers to valid concept identifier in the DEFINITION snapshot."  >
 			<keywords>ConceptId value refers to valid concept identifier in the DEFINITION snapshot.</keywords>
 		</script>
-		<script uuid="de0c4d6c-6297-41be-9979-fb1c93717baa" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-cardinality.sql" text="There is at most one active definition per concept per language per dialect in the DEFINITION snapshot."  >
-			<keywords>There is at most one active definition per concept per dialect per language in the DEFINITION snapshot.</keywords>
+		<script uuid="de0c4d6c-6297-41be-9979-fb1c93717baa" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-cardinality.sql" text="There is at most one active definition per concept per dialect."  >
+			<keywords>There is at most one active definition per concept per dialect.</keywords>
 		</script>
 		
 		<script uuid="18a9f6b4-b66f-4af3-8c67-2a07b4655d27" category="file-centric-validation" sqlFile="file-centric-snapshot-association-unique-id.sql" text="ID is unique in the ASSOCIATION REFSET snapshot."  >
@@ -288,7 +288,7 @@
 		<script uuid="ad7ae768-d14a-4f15-a5cb-4c56b8b4fed6" category="file-centric-validation" sqlFile="file-centric-snapshot-simple-map-unique-id.sql" text="ID is unique in the SIMPLEMAP REFSET snapshot."  >
 			<keywords>ID is unique in the SIMPLEMAP REFSET snapshot.</keywords>
 		</script>
-		<script uuid="3cb10511-33b7-4eca-ba0e-93bcccf70d86" category="file-centric-validation" sqlFile="file-centric-snapshot-simple-map-valid-key.sql" text="There is a 1:1 relationship between the id and the key values in the SIMPLE MAP REFSET snapshot."  >
+		<script uuid="3cb10511-33b7-4eca-ba0e-93bcccf70d86" category="file-centric-validation" sqlFile="file-centric-snapshot-simple-map-valid-key.sql" text="There is a 1:1 relationship between the id and the key values in the simple map refset snapshot."  >
 			<keywords>There is a 1:1 relationship between the id and the key values in the SIMPLE MAP REFSET snapshot.</keywords>
 		</script>
 		

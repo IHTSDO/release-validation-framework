@@ -13,7 +13,8 @@
 	no term of an active description of a concept of which a description was edited 
 	matches that of an inactive description within the same concept
 
-	Note: NOT case sensitive. This is for authoring validaiton only.
+	Note: case sensitive. This is for authoring validaiton only as it only has snapshot file.
+	Uses component-centric-snapshot-description-active-inactive-term-match for release validations.
 
 ********************************************************************************/
 
@@ -68,7 +69,7 @@
 	join tmp_inactive_desc b
 	on a.conceptid = b.conceptid
 	and a.moduleid = b.moduleid
-	and cast(a.term as binary)= cast(b.term as binary)
+	and cast(a.term as binary) = cast(b.term as binary)
 	where a.active != b.active
 	and cast(a.effectivetime as datetime) >= cast(b.effectivetime as datetime);
 	commit;

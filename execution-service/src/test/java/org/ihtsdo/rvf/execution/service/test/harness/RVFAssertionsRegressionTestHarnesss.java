@@ -123,7 +123,6 @@ public class RVFAssertionsRegressionTestHarnesss {
 	@Test
 	public void testReleaseTypeAssertions() throws Exception {
 		runAssertionsTest(RELEASE_TYPE_VALIDATION, releaseTypeExpectedResults.getFile());
-		
 	}
 	
 	@Test
@@ -142,6 +141,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
 			long timeEnd = System.currentTimeMillis();
 			System.out.println("Time taken:" +(timeEnd-timeStart));
+			releaseDataManager.clearQAResult(config.getExecutionId());
 			assertTestResult(groupName, expectedJsonFile, runItems);
 	 }
 	
@@ -175,12 +175,12 @@ public class RVFAssertionsRegressionTestHarnesss {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
 		
 		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(82, assertions.size());
+		assertEquals(81, assertions.size());
 	}
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("c3249e80-84f0-11e1-b0c4-0800200c9a66");
+		runAssertionsTest("2ddc9a28-150d-47a4-9b0e-7dbff2efdd72");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
@@ -194,6 +194,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 			System.out.println (item.getAssertionUuid() + " failures: " + item.getFailureCount());
 		}
 		long timeEnd = System.currentTimeMillis();
+		releaseDataManager.clearQAResult(config.getExecutionId());
 		System.out.println("Time taken:" +(timeEnd-timeStart));
 	 }
 	
@@ -208,7 +209,12 @@ public class RVFAssertionsRegressionTestHarnesss {
 //			assertNull("No failure should have occured for assertion uuid." + item.getAssertionUuid(), item.getFailureMessage());
 			result.setTotalFailed(item.getFailureCount() != null ? item.getFailureCount() : -1L);
 			results.add(result);
-			if(result.getTotalFailed() > 0) {
+		
+			if (result.getTotalFailed() < 0) {
+				throw new RuntimeException("Assetion didn't complete sucessfully!" + item.toString());
+			} 
+			
+			if (result.getTotalFailed() > 0) {
 				failureCounter ++;
 			}
 		}
