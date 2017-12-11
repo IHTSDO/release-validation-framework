@@ -177,7 +177,7 @@ public class ValidationRunner {
 		}
 
 		//Run Drool Validator
-		startDroolValidation(report, validationConfig);
+		startDroolValidation(report, validationConfig, executionConfig);
 
 		if(executionConfig.isJiraIssueCreationFlag()) {
 			// Add Jira ticket for each fail assertions
@@ -203,8 +203,8 @@ public class ValidationRunner {
 
 	private void startDroolValidation(ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) {
 		String directoryOfRuleSetsPath = droolRulesModuleName;
+		HashSet<String> allGroups = Sets.newHashSet(validationConfig.getGroupsList());
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
-		HashSet<String> allGroups = new HashSet<>();
 		for (AssertionGroup group : groups) {
 			allGroups.add(group.getName());
 		}
@@ -221,7 +221,7 @@ public class ValidationRunner {
 			if(!droolRuleNames.isEmpty()) {
 				runDroolValidator(validationReport, validationConfig, droolRuleNames);
 			} else {
-				logger.info("No matching drool rule set found for any of specified assertion groups");
+				logger.info("[startDroolValidation] - No matching drools rule set found for any of specified assertion groups");
 			}
 		} catch (Exception ex) {
 			throw ex;
