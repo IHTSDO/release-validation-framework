@@ -201,9 +201,13 @@ public class ValidationRunner {
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
 	}
 
-	private void startDroolValidation(ValidationReport validationReport, ValidationRunConfig validationConfig) {
+	private void startDroolValidation(ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) {
 		String directoryOfRuleSetsPath = droolRulesModuleName;
-		HashSet<String> allGroups = Sets.newHashSet(validationConfig.getGroupsList());
+		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
+		HashSet<String> allGroups = new HashSet<>();
+		for (AssertionGroup group : groups) {
+			allGroups.add(group.getName());
+		}
 		File droolDir = new File(directoryOfRuleSetsPath);
 		Assert.isTrue(droolDir.isDirectory(), "The rules directory " + directoryOfRuleSetsPath + " is not accessible.");
 		try {

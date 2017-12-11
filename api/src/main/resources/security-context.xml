@@ -16,6 +16,8 @@
    <http pattern="/" security="none"/>
    <http pattern="/**/test-pre" security="none"/>
    <http pattern="/**/test-post" security="none"/>
+   <http pattern="/**/run-post-via-s3" security="none"/>
+   <http pattern="/**/run-post" security="none"/>
    <http create-session="stateless" auto-config="false">
       <intercept-url pattern="/**" access="ROLE_ihtsdo-sca-author"/>
       <http-basic />
