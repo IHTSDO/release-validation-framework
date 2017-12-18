@@ -33,6 +33,7 @@
 	where a.active = '1'
 	group by a.conceptid, b.refsetid, b.referencedcomponentid
 	having count(b.referencedcomponentid) >1;
+	commit;
 
 
 /* 	testing for the absence of preferred terms
@@ -58,6 +59,7 @@
 	left join tmp_pt b
 		on a.id = b.conceptid
 	where b.conceptid is null;
+	commit;
 	
 	
 	/*  descriptions in the temp table having duplicate preferred language refset members */	
@@ -70,6 +72,7 @@
 	from tmp_pt a
 	group by a.refsetid, a.conceptid
 	having count(a.id) >1;
+	commit;
 	
 	/*  identify concepts that have been edited this cycle, for which there is no 
 	US preferred term */
@@ -81,7 +84,7 @@
 		concat('Concept: id=',a.id, ' has no active preferred terms in the en-US language refset') 
 	from res_edited_active_concepts a
 	left join 
-	(select b.* from tmp_pt b
+	(select b.conceptid from tmp_pt b
 	where b.refsetid = '900000000000509007') as tmp_us_pt
 	on a.id = tmp_us_pt.conceptid
 	where tmp_us_pt.conceptid is null;
