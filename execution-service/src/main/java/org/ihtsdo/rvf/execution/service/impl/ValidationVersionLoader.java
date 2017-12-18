@@ -99,7 +99,7 @@ public class ValidationVersionLoader {
 			}
 		} else {
 			//load prospective version alone now as used to combine with dependency for extension testing
-			uploadProspectiveVersion(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+			uploadReleaseFileIntoDB(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		}
 		responseMap.put("totalRF2FilesLoaded", rf2FilesLoaded.size());
 		Collections.sort(rf2FilesLoaded);
@@ -211,9 +211,13 @@ public class ValidationVersionLoader {
     }
 	
 	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
-		
+		//default to the international folder;
 		String publishedFileS3Path = INTERNATIONAL + SEPARATOR + publishedReleaseFilename;
-		logger.debug("downloading published file from s3:" + publishedFileS3Path);
+		if (publishedReleaseFilename != null && publishedReleaseFilename.startsWith("S3://")) {
+			//published release file in is S3
+			publishedFileS3Path = publishedReleaseFilename.replace("//", "");
+			publishedFileS3Path = publishedFileS3Path.substring(publishedFileS3Path.indexOf("/") + 1);
+		} 
 		InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
 		if (publishedFileInput != null) {
 			File tempFile = File.createTempFile(publishedReleaseFilename, ZIP_FILE_EXTENSION);
@@ -255,7 +259,7 @@ public class ValidationVersionLoader {
 	}
 	
 	
-	private void uploadProspectiveVersion(final String prospectiveVersion, final String knownVersion, final File tempFile, 
+	private void uploadReleaseFileIntoDB(final String prospectiveVersion, final String knownVersion, final File tempFile, 
 			final List<String> rf2FilesLoaded) throws ConfigurationException, BusinessServiceException {
 		
 		if (knownVersion != null && !knownVersion.trim().isEmpty()) {

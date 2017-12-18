@@ -33,8 +33,6 @@
 	where a.active = '1'
 	group by a.conceptid, b.refsetid, b.referencedcomponentid
 	having count(b.referencedcomponentid) >1;
-	commit;
-
 
 /* 	testing for the absence of preferred terms
 	make a list of active preferred terms for the active concepts that changed
@@ -59,8 +57,6 @@
 	left join tmp_pt b
 		on a.id = b.conceptid
 	where b.conceptid is null;
-	commit;
-	
 	
 	/*  descriptions in the temp table having duplicate preferred language refset members */	
 	insert into qa_result (runid, assertionuuid, concept_id, details)
@@ -72,7 +68,6 @@
 	from tmp_pt a
 	group by a.refsetid, a.conceptid
 	having count(a.id) >1;
-	commit;
 	
 	/*  identify concepts that have been edited this cycle, for which there is no 
 	US preferred term */
@@ -92,6 +87,6 @@
 	drop table if exists description_tmp;
 	drop table if exists tmp_pt;
 	
-	commit;
+	
 	
 	

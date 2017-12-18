@@ -332,4 +332,50 @@ public class TestUploadFileController {
 			FileUtils.deleteQuietly(tempFile);
 		}
 	}
+	
+	
+	@RequestMapping(value = "/run-adhoc-extension-post", method = RequestMethod.POST)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation(position = 3, value = "Run validations for a RF2 extension release packages.")
+	public ResponseEntity<Map<String, String>> runAdhocPostTestPackage(
+			@ApiParam(value = "Prospective RF2 release package in zip file") @RequestParam(value = "prospectiveFile") final MultipartFile prospectiveFile,
+			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = "groups") final List<String> groupsList,
+			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion") final String previousExtVersion,
+			@ApiParam(value = "The depdenent international release") @RequestParam(value = "extensionDependencyReleaseVersion", required = true) final String extensionDependency,
+			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = "runId") final Long runId,
+			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
+			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			final HttpServletRequest request) throws IOException {
+
+		final String requestUrl = String.valueOf(request.getRequestURL());
+		final String urlPrefix = requestUrl.substring(0,
+				requestUrl.lastIndexOf(request.getPathInfo()));
+
+		final ValidationRunConfig vrConfig = new ValidationRunConfig();
+		vrConfig.addFile(prospectiveFile)
+				.addGroupsList(groupsList)
+				.addPreviousExtVersion(previousExtVersion)
+				.addExtensionDependencyVersion(extensionDependency)
+				.addRunId(runId).addStorageLocation(storageLocation)
+				.addFailureExportMax(exportMax).addUrl(urlPrefix)
+				.addProspectiveFilesInS3(false);
+
+		// Before we start running, ensure that we've made our mark in the
+		// storage location
+		// Init will fail if we can't write the "running" state to storage
+		final Map<String, String> responseMap = new HashMap<>();
+		HttpStatus returnStatus = HttpStatus.OK;
+
+		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
+			// Queue incoming validation request
+			queueManager.queueValidationRequest(vrConfig, responseMap);
+			final String urlToPoll = urlPrefix + "/result/" + runId
+					+ "?storageLocation=" + storageLocation;
+			responseMap.put("resultURL", urlToPoll);
+		} else {
+			returnStatus = HttpStatus.PRECONDITION_FAILED;
+		}
+		return new ResponseEntity<>(responseMap, returnStatus);
+	}
 }

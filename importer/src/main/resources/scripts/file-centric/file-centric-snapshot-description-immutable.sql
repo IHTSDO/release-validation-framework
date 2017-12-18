@@ -14,7 +14,7 @@
 		a.conceptid,
 		concat('Concept:',a.id, ' has multiple description ids for the same term:', a.term) 	
 	from curr_description_d a 
-	group by a.conceptid, binary (a.term)
+	group by a.conceptid, a.languagecode, binary (a.term)
 	having count(a.id) > 1;
 	commit;
 	

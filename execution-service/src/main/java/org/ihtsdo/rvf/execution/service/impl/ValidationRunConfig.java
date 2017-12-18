@@ -9,7 +9,7 @@ public class ValidationRunConfig {
 	private String testFileName;
 	private Long runId;
 	private transient MultipartFile file;
-	private boolean writeSucceses;
+	private boolean writeSucceses = false;
 	private transient MultipartFile manifestFile;
 	private List<String> groupsList;
 	private String prevIntReleaseVersion;
@@ -25,7 +25,8 @@ public class ValidationRunConfig {
 	private transient File localProspectiveFile;
 	private transient File localManifestFile;
 	private String s3PublishBucketName;
-	private boolean isRf2DeltaOnly;
+	private boolean isRf2DeltaOnly = false;
+	
 	public MultipartFile getFile() {
 		return file;
 	}
@@ -151,9 +152,11 @@ public class ValidationRunConfig {
 		this.manifestFileFullPath = manifestFileFullPath;
 	}
 	public boolean isFirstTimeRelease() {
+		
 		if (prevIntReleaseVersion == null && previousExtVersion == null) {
 			return true;
 		}
+		
         return prevIntReleaseVersion != null && prevIntReleaseVersion.trim().isEmpty()
                 && previousExtVersion != null && previousExtVersion.trim().isEmpty();
 
