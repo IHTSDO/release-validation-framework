@@ -233,12 +233,14 @@ public class ValidationVersionLoader {
 	
 	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
 		//default to the international folder;
-		String publishedFileS3Path = INTERNATIONAL + SEPARATOR + publishedReleaseFilename;
+		String publishedFileS3Path = null;
 		if (publishedReleaseFilename != null && publishedReleaseFilename.startsWith("S3://")) {
 			//published release file in is S3
 			publishedFileS3Path = publishedReleaseFilename.replace("//", "");
 			publishedFileS3Path = publishedFileS3Path.substring(publishedFileS3Path.indexOf("/") + 1);
-		} 
+		} else {
+			publishedFileS3Path = INTERNATIONAL + SEPARATOR + publishedReleaseFilename;
+		}
 		InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
 		if (publishedFileInput != null) {
 			File tempFile = File.createTempFile(publishedReleaseFilename, ZIP_FILE_EXTENSION);

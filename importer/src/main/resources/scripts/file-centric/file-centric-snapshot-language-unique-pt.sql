@@ -9,8 +9,7 @@
 /* 	testing for multiple perferred terms */
 /* 	temp table: active sysonyms of active concepts edited in the current release cycle */ 	
 	create table if not exists description_tmp 
-	(index idx_desc_tmp_id(id), index idx_desc_tmp_cid(conceptid), index idx_desc_tmp_active(active))
-	as select c.*
+	as select c.id, c.conceptid, c.active
 	from res_concepts_edited a
 	join curr_concept_s b 
 		on a.conceptid = b.id
@@ -19,6 +18,10 @@
 		and b.active = c.active
 		and c.typeid = '900000000000013009' /* synonym */
 	where b.active = 1;		
+	
+	alter table description_tmp add index idx_desc_tmp_id(id);
+	alter table description_tmp add index idx_desc_tmp_cid(conceptid);
+	alter table description_tmp add index idx_desc_tmp_active(active);
 	
 	/*  descriptions in the temp table having duplicate language refset members for a given language refset */	
 	insert into qa_result (runid, assertionuuid, concept_id, details)
@@ -38,7 +41,6 @@
 	make a list of active preferred terms for the active concepts that changed
 	in the current release cycle */
 	create table if not exists tmp_pt 
-	(index idx_tmp_pt_cid(conceptid), index idx_tmp_pt_rid(refsetid))
 	as select a.id, a.conceptid, b.refsetid
 	from description_tmp a
 	join curr_langrefset_s b
@@ -46,6 +48,8 @@
 	where b.active = 1
 	and b.acceptabilityid = '900000000000548007'; /* preferred */
 
+	alter table tmp_pt add index idx_tmp_pt_cid(conceptid);
+	alter table tmp_pt add index idx_tmp_pt_rid(refsetid);
 
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select  	
@@ -83,10 +87,4 @@
 	where b.refsetid = '900000000000509007') as tmp_us_pt
 	on a.id = tmp_us_pt.conceptid
 	where tmp_us_pt.conceptid is null;
-	
-	drop table if exists description_tmp;
-	drop table if exists tmp_pt;
-	
-	
-	
 	
