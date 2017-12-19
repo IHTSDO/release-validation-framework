@@ -132,24 +132,23 @@ public class ValidationRunner {
 		//load previous published version
 		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		//check dependency version is loaded
+		boolean isLoaded = false;
 		if (executionConfig.isExtensionValidation()) {
-			boolean isLoaded = false;
 			isLoaded = releaseVersionLoader.loadDependncyVersion(executionConfig, responseMap, validationConfig);
-			
-			if (executionConfig.isReleaseValidation() && !executionConfig.isFirstTimeRelease()) {
-			   isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
-			}
-			
-			if (!isLoaded) {
-				reportService.writeResults(responseMap, State.FAILED, reportStorage);
-				return;
-			}
 			if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
 				reportService.writeResults(responseMap, State.FAILED, reportStorage);
 				return;
 			}
 		}
-		//check version are loaded
+		//check previous version is loaded
+		if (executionConfig.isReleaseValidation() && !executionConfig.isFirstTimeRelease()) {
+		   isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+		}
+		if (!isLoaded) {
+			reportService.writeResults(responseMap, State.FAILED, reportStorage);
+			return;
+		}
+
 		//load prospective version
 		boolean isSuccessful = releaseVersionLoader.loadProspectiveVersion(executionConfig, responseMap, validationConfig);
 		if (!isSuccessful) {
