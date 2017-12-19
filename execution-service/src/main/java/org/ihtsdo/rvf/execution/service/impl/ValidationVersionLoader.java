@@ -35,7 +35,7 @@ public class ValidationVersionLoader {
 	private static final String COMBINED = "_combined";
 	private static final String RELATIONSHIP_SNAPSHOT_TABLE = "relationship_s";
 	private static final String PREVIOUS = "previous_";
-	private static final String EXTENSIONS = "extensions";
+	private static final String DEPENDENCY = "dependency_";
 	private static final String SNAPSHOT_TABLE = "%_s";
 	private static final String SEPARATOR = "/";
 
@@ -63,24 +63,45 @@ public class ValidationVersionLoader {
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
 	
 	
+	public boolean loadDependncyVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws BusinessServiceException {
+		boolean isSucessful = true;
+		if (validationConfig.getExtensionDependency() != null && validationConfig.getExtensionDependency().endsWith(ZIP_FILE_EXTENSION)) {
+			//load dependency release
+			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
+			String extensionDependencyVersion = DEPENDENCY + executionConfig.getExecutionId();
+			executionConfig.setExtensionDependencyVersion(extensionDependencyVersion);
+			try {
+				loadPublishedVersionIntoDB(s3PublishFileHelper, validationConfig.getExtensionDependency(), extensionDependencyVersion);
+			} catch (Exception e) {
+				throw new BusinessServiceException("Failed to load dependency release from S3.", e);
+			}
+			String schemaName = releaseDataManager.getSchemaForRelease(executionConfig.getExtensionDependencyVersion());
+			if (schemaName == null) {
+				String failureMsg = "Failed to load dependency version:" + schemaName;
+				responseMap.put(FAILURE_MESSAGE, failureMsg);
+				reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
+				isSucessful = false;
+			}
+        }
+		return isSucessful;
+	}
+	
 	public boolean loadPreviousVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
-		
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		boolean isSucessful = true;
 		String reportStorage = validationConfig.getStorageLocation();
-		if (!isPublishedVersionsLoaded(validationConfig)) {
-			//load published versions from s3 
+		if (!isPeviousVersionLoaded(validationConfig)) {
+			//load previous published versions from s3 
 			String priviousVersion = PREVIOUS + executionConfig.getExecutionId();
 			executionConfig.setPreviousVersion(priviousVersion);
 			isSucessful = prepareVersionsFromS3FilesForPreviousVersion(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
-		}  else {
+		} else {
 			if (isExtension(validationConfig)) {
 				executionConfig.setPreviousVersion(validationConfig.getPreviousExtVersion());
 			} else {
 				executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
 			}
 		}
-		
 		return isSucessful;
 		}
 		
@@ -200,14 +221,14 @@ public class ValidationVersionLoader {
 		return true;
 	}
 	
-	private boolean isPublishedVersionsLoaded(ValidationRunConfig validationConfig) {
+	private boolean isPeviousVersionLoaded(ValidationRunConfig validationConfig) {
 		if (validationConfig.getPrevIntReleaseVersion() != null && validationConfig.getPrevIntReleaseVersion().endsWith(ZIP_FILE_EXTENSION)) {
 			return false;
 		}
 		if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
 			return false;
 		}
-        return !(validationConfig.getExtensionDependency() != null && validationConfig.getExtensionDependency().endsWith(ZIP_FILE_EXTENSION));
+        return true;
     }
 	
 	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
@@ -232,7 +253,6 @@ public class ValidationVersionLoader {
 			throw new BusinessServiceException(msg);
 		}
 	}
-	
 	
 	private boolean prepareVersionsFromS3FilesForPreviousVersion(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap,List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception {
 		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
