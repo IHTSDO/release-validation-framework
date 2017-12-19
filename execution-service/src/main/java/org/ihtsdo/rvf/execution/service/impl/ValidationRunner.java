@@ -133,16 +133,17 @@ public class ValidationRunner {
 		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		//check dependency version is loaded
 		if (executionConfig.isExtensionValidation()) {
+			boolean isLoaded = false;
+			isLoaded = releaseVersionLoader.loadDependncyVersion(executionConfig, responseMap, validationConfig);
 			
 			if (executionConfig.isReleaseValidation() && !executionConfig.isFirstTimeRelease()) {
-				boolean isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
-				isLoaded = releaseVersionLoader.loadDependncyVersion(executionConfig, responseMap, validationConfig);
-				if (!isLoaded) {
-					reportService.writeResults(responseMap, State.FAILED, reportStorage);
-					return;
-				}
+			   isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
 			}
 			
+			if (!isLoaded) {
+				reportService.writeResults(responseMap, State.FAILED, reportStorage);
+				return;
+			}
 			if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
 				reportService.writeResults(responseMap, State.FAILED, reportStorage);
 				return;
