@@ -341,7 +341,7 @@ public class TestUploadFileController {
 	public ResponseEntity<Map<String, String>> runAdhocPostTestPackage(
 			@ApiParam(value = "Prospective RF2 release package in zip file") @RequestParam(value = "prospectiveFile") final MultipartFile prospectiveFile,
 			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = "groups") final List<String> groupsList,
-			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion") final String previousExtVersion,
+			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
 			@ApiParam(value = "The depdenent international release") @RequestParam(value = "extensionDependencyReleaseVersion", required = true) final String extensionDependency,
 			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = "runId") final Long runId,
 			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
