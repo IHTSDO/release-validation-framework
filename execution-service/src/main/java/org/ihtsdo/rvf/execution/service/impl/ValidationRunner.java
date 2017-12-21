@@ -143,10 +143,9 @@ public class ValidationRunner {
 		//check previous version is loaded
 		if (executionConfig.isReleaseValidation() && !executionConfig.isFirstTimeRelease()) {
 		   isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
-		}
-		if (!isLoaded) {
-			reportService.writeResults(responseMap, State.FAILED, reportStorage);
-			return;
+		   if (!isLoaded) {
+				return;
+			}
 		}
 
 		//load prospective version

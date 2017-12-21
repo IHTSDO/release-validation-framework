@@ -274,6 +274,7 @@ public class ValidationVersionLoader {
 						+ " into " + executionConfig.getPreviousVersion();
 				responseMap.put(FAILURE_MESSAGE, failureMsg);
 				reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
+				logger.error(failureMsg);
 				return false;
 			}
 		} 

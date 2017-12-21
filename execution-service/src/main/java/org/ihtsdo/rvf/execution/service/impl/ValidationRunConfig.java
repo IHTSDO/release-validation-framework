@@ -9,7 +9,7 @@ public class ValidationRunConfig {
 	private String testFileName;
 	private Long runId;
 	private transient MultipartFile file;
-	private boolean writeSucceses = false;
+	private boolean writeSucceses;
 	private transient MultipartFile manifestFile;
 	private List<String> groupsList;
 	private String prevIntReleaseVersion;
@@ -25,7 +25,7 @@ public class ValidationRunConfig {
 	private transient File localProspectiveFile;
 	private transient File localManifestFile;
 	private String s3PublishBucketName;
-	private boolean isRf2DeltaOnly = false;
+	private boolean isRf2DeltaOnly;
 	
 	public MultipartFile getFile() {
 		return file;
