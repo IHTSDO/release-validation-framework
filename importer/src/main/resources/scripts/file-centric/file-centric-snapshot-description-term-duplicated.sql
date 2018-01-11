@@ -6,6 +6,7 @@
 	 Same terms but using different case will be considered as duplicates.
 
 ********************************************************************************/
+  set SESSION group_concat_max_len=4000;
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,

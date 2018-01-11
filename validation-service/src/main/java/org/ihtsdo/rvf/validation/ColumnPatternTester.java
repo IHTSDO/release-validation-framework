@@ -219,9 +219,10 @@ public class ColumnPatternTester {
 		final PatternTest columnTest = columnTests.get(columnType);
 
 		if (columnTest != null) {
-			if(isMRCMValidationCheckOnly(fileName,column)) {
+			/*if(isMRCMValidationCheckOnly(fileName,column)) {
 				validateMRCMRules(id,lineNumber,value,column,startTime,fileName,columnTest);
-			} else if (canBeBlank(value, column) || columnTest.validate(column, lineNumber, value)) {
+			} else */
+			if (canBeBlank(value, column) || columnTest.validate(column, lineNumber, value)) {
 				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(), columnTest.getPatternString());
 			} else {
