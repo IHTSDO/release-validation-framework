@@ -222,10 +222,11 @@
 			<plugin>
   				<groupId>org.apache.maven.plugins</groupId>
   				<artifactId>maven-javadoc-plugin</artifactId>
-    			<configuration>
-      				<additionalparam>-Xdoclint:none</additionalparam>
-   			 	</configuration>
- 		 </plugin>
+  				<version>3.0.0</version>
+  				<configuration>
+       				<doclint>none</doclint>
+    			</configuration>
+ 		 	</plugin>
 		</plugins>
 	</build>
 
