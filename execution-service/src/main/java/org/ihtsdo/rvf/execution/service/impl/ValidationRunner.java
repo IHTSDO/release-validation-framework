@@ -162,14 +162,15 @@ public class ValidationRunner {
 		} else {
 			runAssertionTests(executionConfig,responseMap, reportStorage);
 		}
-		reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
-		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
-		releaseDataManager.clearQAResult(executionConfig.getExecutionId());
+		
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
 		responseMap.put("startTime", startTime.getTime());
 		responseMap.put("endTime", endTime.getTime());
+		reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
+		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
+		releaseDataManager.clearQAResult(executionConfig.getExecutionId());
 	}
 
 	private void runExtensionReleaseValidation(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
