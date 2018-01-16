@@ -132,20 +132,22 @@ public class ValidationRunner {
 		//load previous published version
 		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		//check dependency version is loaded
+		boolean isLoaded = false;
 		if (executionConfig.isExtensionValidation()) {
+			isLoaded = releaseVersionLoader.loadDependncyVersion(executionConfig, responseMap, validationConfig);
 			if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
 				reportService.writeResults(responseMap, State.FAILED, reportStorage);
 				return;
 			}
 		}
+		//check previous version is loaded
 		if (executionConfig.isReleaseValidation() && !executionConfig.isFirstTimeRelease()) {
-			boolean isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
-			if (!isLoaded) {
-				reportService.writeResults(responseMap, State.FAILED, reportStorage);
+		   isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+		   if (!isLoaded) {
 				return;
 			}
 		}
-		//check version are loaded
+
 		//load prospective version
 		boolean isSuccessful = releaseVersionLoader.loadProspectiveVersion(executionConfig, responseMap, validationConfig);
 		if (!isSuccessful) {
@@ -160,14 +162,15 @@ public class ValidationRunner {
 		} else {
 			runAssertionTests(executionConfig,responseMap, reportStorage);
 		}
-		reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
-		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
-		releaseDataManager.clearQAResult(executionConfig.getExecutionId());
+		
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
 		responseMap.put("startTime", startTime.getTime());
 		responseMap.put("endTime", endTime.getTime());
+		reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
+		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
+		releaseDataManager.clearQAResult(executionConfig.getExecutionId());
 	}
 
 	private void runExtensionReleaseValidation(final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
