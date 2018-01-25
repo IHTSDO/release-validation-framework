@@ -1,8 +1,0 @@
-Package: [[packageName]]
-Version: [[version]]
-Priority: optional
-Architecture: all
-Maintainer: Delivery Development Team <delivery@ihtsdo.org>
-Description: [[name]]
-Distribution: stable
-Section: web

@@ -26,7 +26,6 @@
 		<module>data-service</module>
 		<module>validation-service</module>
 		<module>api</module>
-		<module>web</module>
 		<module>execution-service</module>
 		<module>importer</module>
 	</modules>
