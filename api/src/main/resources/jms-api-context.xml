@@ -17,11 +17,12 @@
 		<constructor-arg value="${rvf.execution.isAutoScalingEnabled}"/>
 	</bean>
 
-	<bean class = "org.ihtsdo.rvf.autoscaling.AutoScalingManager">
+	<bean id="autoScalingManager" class = "org.ihtsdo.rvf.autoscaling.AutoScalingManager">
 		<constructor-arg type="java.lang.Boolean" value="${rvf.execution.isAutoScalingEnabled}"/>
 		<constructor-arg  type="java.lang.String" value="${rvf.validation.queue.name}"/>
 		<constructor-arg  type="java.lang.Integer" value="${rvf.autoscaling.maxInstances}"/>
 	</bean>
+	
 	<bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
 		<property name="brokerURL" value="${orchestration.jms.url}"/>
 		<property name="userName" value="${orchestration.jms.username}"/>
@@ -42,9 +43,10 @@
     <constructor-arg ref="connectionFactory"/>
     <property name="defaultDestination" ref="defaultDestination" />
   </bean> 
-	<bean class="org.ihtsdo.rvf.messaging.ValidationQueueManager"/>
+	
+  <bean id="queueManager" class="org.ihtsdo.rvf.messaging.ValidationQueueManager"/>
 	 
-	<bean class="org.ihtsdo.rvf.messaging.RvfValidationMessageConsumer">
+ <bean id="messageConsumer" class="org.ihtsdo.rvf.messaging.RvfValidationMessageConsumer">
 		<constructor-arg value="${rvf.validation.queue.name}"/>
 		<constructor-arg type="java.lang.Boolean" value="${rvf.execution.isWorker}"/>
 		<constructor-arg type="java.lang.Boolean" value="${rvf.autoscaling.isEc2Instance}"/>
