@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.facebook.presto.sql.parser.SqlParser;
 import com.facebook.presto.sql.parser.StatementSplitter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		private static final String FILE_SEPARATOR = System.getProperty("file.separator");
 		private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
 		private static final String JSON_EXTENSION = ".json";
-		private static final SqlParser SQL_PARSER = new SqlParser();
+//		private static final SqlParser SQL_PARSER = new SqlParser();
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 	
 		protected ObjectMapper objectMapper = new ObjectMapper();

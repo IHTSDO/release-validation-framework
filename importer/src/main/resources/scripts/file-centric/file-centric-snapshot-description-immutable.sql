@@ -5,6 +5,7 @@
 	Assertion:
 	There is a 1:1 relationship between the id and the immutable values in the description snapshot.
 	Note: Checking for current authoring cycle only as there are some voilations in the published releases.
+	Add moduleid for edition release validation.(RVF-306)
 
 ********************************************************************************/
 	insert into qa_result (runid, assertionuuid, concept_id, details)
@@ -12,9 +13,9 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Concept:',a.id, ' has multiple description ids for the same term:', a.term) 	
+		concat('Concept:',a.conceptid, ' has multiple description ids for the same term:', a.term) 	
 	from curr_description_d a 
-	group by a.conceptid, a.languagecode, binary (a.term)
+	group by a.conceptid, a.moduleid, a.languagecode, binary (a.term)
 	having count(a.id) > 1;
 	commit;
 	

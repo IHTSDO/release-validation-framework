@@ -47,7 +47,6 @@ public class AssertionsImporter {
 
 	private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
 	private static final String JSON_EXTENSION = ".json";
-	private static final SqlParser SQL_PARSER = new SqlParser();
 	private static final Logger logger = LoggerFactory.getLogger(AssertionsImporter.class);
 	protected RvfRestClient restClient;
 	protected ObjectMapper objectMapper = new ObjectMapper();

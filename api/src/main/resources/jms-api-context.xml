@@ -17,13 +17,7 @@
 		<constructor-arg value="${rvf.execution.isAutoScalingEnabled}"/>
 	</bean>
 
- 	<!--  
-	<bean class="org.ihtsdo.rvf.messaging.JMSBrokerManager">
-		<constructor-arg value="${rvf.validation.queue.brokerUrl}"/>
-		<constructor-arg type="java.lang.Boolean" value="${rvf.execution.isAutoScalingEnabled}"/>
-	 </bean>
-	 -->
-	<bean class = "org.ihtsdo.rvf.autoscaling.AutoScalingManager" init-method="startUp">
+	<bean class = "org.ihtsdo.rvf.autoscaling.AutoScalingManager">
 		<constructor-arg type="java.lang.Boolean" value="${rvf.execution.isAutoScalingEnabled}"/>
 		<constructor-arg  type="java.lang.String" value="${rvf.validation.queue.name}"/>
 		<constructor-arg  type="java.lang.Integer" value="${rvf.autoscaling.maxInstances}"/>
@@ -49,13 +43,8 @@
     <property name="defaultDestination" ref="defaultDestination" />
   </bean> 
 	<bean class="org.ihtsdo.rvf.messaging.ValidationQueueManager"/>
-	<!--  
-	<bean class="org.ihtsdo.rvf.messaging.ReleaseValidationMessageListener" init-method="start">
-	  <constructor-arg type="java.lang.Boolean" value="${rvf.execution.isWorker}"/>
-	   <constructor-arg type="java.lang.Boolean" value="${rvf.autoscaling.isEc2Instance}"/>
-	 </bean>-->
 	 
-	<bean class="org.ihtsdo.rvf.messaging.RvfValidationMessageConsumer" init-method="start">
+	<bean class="org.ihtsdo.rvf.messaging.RvfValidationMessageConsumer">
 		<constructor-arg value="${rvf.validation.queue.name}"/>
 		<constructor-arg type="java.lang.Boolean" value="${rvf.execution.isWorker}"/>
 		<constructor-arg type="java.lang.Boolean" value="${rvf.autoscaling.isEc2Instance}"/>

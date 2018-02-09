@@ -26,11 +26,6 @@
             <artifactId>data-service</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>${project.groupId}</groupId>-->
-            <!--<artifactId>api</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
@@ -60,12 +55,7 @@
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.foundationdb</groupId>
-            <artifactId>fdb-sql-parser</artifactId>
-            <version>1.5.0</version>
-        </dependency>
-        <dependency>
+       <dependency>
             <groupId>com.facebook.presto</groupId>
             <artifactId>presto-parser</artifactId>
             <version>0.83</version>
