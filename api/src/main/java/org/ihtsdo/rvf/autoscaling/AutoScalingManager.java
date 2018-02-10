@@ -31,7 +31,7 @@ public class AutoScalingManager {
 	@Autowired
 	private ConnectionFactory connectionFactory;
 	
-	private boolean isAutoScalling;
+	private boolean isAutoScallingEnabled;
 	
 	private String queueName;
 	
@@ -44,7 +44,7 @@ public class AutoScalingManager {
 	private ExecutorService executorService;
 
 	public AutoScalingManager(Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
-		isAutoScalling = isAutoScalling.booleanValue();
+		isAutoScallingEnabled = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
 		activeInstances = new ArrayList<>();
 		this.maxRunningInstance = maxRunningInstance;
@@ -53,8 +53,8 @@ public class AutoScalingManager {
 
 	@PostConstruct
 	public void init() {
-		logger.info("isAutoScalingEnabled:" + isAutoScalling);
-		if (isAutoScalling) {
+		logger.info("isAutoScalingEnabled:" + isAutoScallingEnabled);
+		if (isAutoScallingEnabled) {
 			executorService = Executors.newSingleThreadExecutor();
 			executorService.submit(new Runnable() {
 				@Override
