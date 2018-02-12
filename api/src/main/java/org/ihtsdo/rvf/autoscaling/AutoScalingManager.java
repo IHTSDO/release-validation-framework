@@ -15,6 +15,9 @@ import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +32,7 @@ public class AutoScalingManager {
 	private InstanceManager instanceManager;
 	
 	@Autowired
-	private ConnectionFactory connectionFactory;
+	private ActiveMQConnectionFactory connectionFactory;
 	
 	private boolean isAutoScallingEnabled;
 	
@@ -42,6 +45,8 @@ public class AutoScalingManager {
 	private static List<String> activeInstances;
 
 	private ExecutorService executorService;
+	
+	private PooledConnectionFactory pooledConnectionFactory;
 
 	public AutoScalingManager(Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
 		isAutoScallingEnabled = isAutoScalling.booleanValue();
@@ -55,6 +60,9 @@ public class AutoScalingManager {
 	public void init() {
 		logger.info("isAutoScalingEnabled:" + isAutoScallingEnabled);
 		if (isAutoScallingEnabled) {
+			pooledConnectionFactory = new PooledConnectionFactory(connectionFactory);
+			pooledConnectionFactory.setMaxConnections(2);
+			pooledConnectionFactory.setMaximumActiveSessionPerConnection(1);
 			executorService = Executors.newSingleThreadExecutor();
 			executorService.submit(new Runnable() {
 				@Override
@@ -135,7 +143,7 @@ public class AutoScalingManager {
 		int counter = 0;
 		Connection connection = null;
 		try {
-			connection = connectionFactory.createConnection();
+			connection = pooledConnectionFactory.createConnection();
 			connection.start();
 			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			Queue tempQueue = session.createQueue(queueName);
@@ -163,6 +171,9 @@ public class AutoScalingManager {
 	public void shutDown() {
 	  if (executorService != null) {
 		  executorService.shutdownNow();
+	  }
+	  if (pooledConnectionFactory != null) {
+		  pooledConnectionFactory.stop();
 	  }
 	}
 }

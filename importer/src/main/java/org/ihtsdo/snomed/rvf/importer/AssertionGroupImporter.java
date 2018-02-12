@@ -128,7 +128,7 @@ public class AssertionGroupImporter {
 		List<String> existingGroups = new ArrayList<>();
 		if (allGroups != null) {
 			for (AssertionGroup group : allGroups) {
-				LOGGER.debug("Validation group is already created:" + group.getName());
+				LOGGER.info("Validation group is already created:" + group.getName());
 				existingGroups.add(group.getName());
 			}
 		}

@@ -44,7 +44,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		private static final String FILE_SEPARATOR = System.getProperty("file.separator");
 		private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
 		private static final String JSON_EXTENSION = ".json";
-//		private static final SqlParser SQL_PARSER = new SqlParser();
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 	
 		protected ObjectMapper objectMapper = new ObjectMapper();
