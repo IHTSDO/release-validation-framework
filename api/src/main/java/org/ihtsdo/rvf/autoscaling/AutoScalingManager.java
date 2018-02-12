@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.autoscaling;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -10,7 +12,6 @@ import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueBrowser;
@@ -48,6 +49,8 @@ public class AutoScalingManager {
 	
 	private PooledConnectionFactory pooledConnectionFactory;
 
+	private LocalTime lastCheckTime;
+
 	public AutoScalingManager(Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
 		isAutoScallingEnabled = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
@@ -67,14 +70,14 @@ public class AutoScalingManager {
 			executorService.submit(new Runnable() {
 				@Override
 				public void run() {
-					requestInstancesWhenRequired();
+					manageInstances();
 				}
 			});
 			executorService.shutdown();
 		}
 	}
 	
-	private void requestInstancesWhenRequired() {
+	private void manageInstances() {
 		boolean isFirstTime = true;
 		while (true) {
 			try {
@@ -82,11 +85,13 @@ public class AutoScalingManager {
 					isFirstTime = false;
 					// check any running instances
 					activeInstances.addAll(instanceManager.getActiveInstances());
+					lastCheckTime = LocalTime.now();
 				} else {
 					int current = getQueueSize();
-					if (current != lastPolledQueueSize) {
+					if (current != lastPolledQueueSize || hourElapsedSinceLastCheck()) {
 						logger.info("Total messages in queue:" + current);
 						activeInstances = instanceManager.checkActiveInstances(activeInstances);
+						lastCheckTime = LocalTime.now();
 					}
 					if ((current > lastPolledQueueSize) || (current > activeInstances.size())) {
 						if (current > lastPolledQueueSize) {
@@ -118,6 +123,10 @@ public class AutoScalingManager {
 		}
 	}
 	
+	private boolean hourElapsedSinceLastCheck() {
+		return Duration.between(lastCheckTime, LocalTime.now()).abs().toHours() >= 1;
+	}
+
 	private int getTotalInstancesToCreate(int currentMsgSize, int currentActiveInstances, int maxRunningInstance) {
 		int result = 0;
 		if (currentActiveInstances < maxRunningInstance) {
