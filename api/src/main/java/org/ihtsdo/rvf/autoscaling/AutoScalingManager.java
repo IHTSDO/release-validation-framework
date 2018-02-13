@@ -2,7 +2,6 @@ package org.ihtsdo.rvf.autoscaling;
 
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -43,18 +42,16 @@ public class AutoScalingManager {
 
 	private int maxRunningInstance;
 
-	private static List<String> activeInstances;
 
 	private ExecutorService executorService;
 	
 	private PooledConnectionFactory pooledConnectionFactory;
 
-	private LocalTime lastCheckTime;
+	private boolean shutDown;
 
 	public AutoScalingManager(Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
 		isAutoScallingEnabled = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
-		activeInstances = new ArrayList<>();
 		this.maxRunningInstance = maxRunningInstance;
 
 	}
@@ -79,18 +76,20 @@ public class AutoScalingManager {
 	
 	private void manageInstances() {
 		boolean isFirstTime = true;
-		while (true) {
+		List<String> activeInstances = null;
+		LocalTime lastCheckTime = LocalTime.now();
+		while (!shutDown) {
 			try {
 				if (isFirstTime) {
 					isFirstTime = false;
 					// check any running instances
-					activeInstances.addAll(instanceManager.getActiveInstances());
+					activeInstances = instanceManager.getActiveInstances();
 					lastCheckTime = LocalTime.now();
 				} else {
 					int current = getQueueSize();
-					if (current != lastPolledQueueSize || hourElapsedSinceLastCheck()) {
+					if (current != lastPolledQueueSize || hourElapsedSinceLastCheck(lastCheckTime)) {
 						logger.info("Total messages in queue:" + current);
-						activeInstances = instanceManager.checkActiveInstances(activeInstances);
+						activeInstances = instanceManager.getActiveInstances();
 						lastCheckTime = LocalTime.now();
 					}
 					if ((current > lastPolledQueueSize) || (current > activeInstances.size())) {
@@ -123,7 +122,7 @@ public class AutoScalingManager {
 		}
 	}
 	
-	private boolean hourElapsedSinceLastCheck() {
+	private boolean hourElapsedSinceLastCheck(LocalTime lastCheckTime) {
 		return Duration.between(lastCheckTime, LocalTime.now()).abs().toHours() >= 1;
 	}
 
@@ -178,6 +177,7 @@ public class AutoScalingManager {
 
 	@PreDestroy
 	public void shutDown() {
+	  shutDown = true;
 	  if (executorService != null) {
 		  executorService.shutdownNow();
 	  }

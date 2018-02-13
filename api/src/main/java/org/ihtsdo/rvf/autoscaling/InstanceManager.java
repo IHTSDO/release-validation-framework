@@ -164,7 +164,7 @@ public class InstanceManager {
 				}
 			}
 		}
-		logger.info("Current total active instances:" + activeInstances.size());
+		logger.debug("Current total active instances:" + activeInstances.size());
 		return activeInstances;
 	}
 
@@ -178,7 +178,7 @@ public class InstanceManager {
 			for (Reservation reserv : reservations) {
 				instances.addAll(reserv.getInstances());
 			}
-			logger.info("Total instances {} found with filter {}", instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
+			logger.debug("Total instances {} found with filter {}", instances.size(), TAG + WORKER_TYPE + "=" + instanceTagName);
 		} catch (Exception e) {
 			String msg = "Unexpected error encountered when checking active instances.";
 			logger.error(msg, e);
@@ -191,11 +191,10 @@ public class InstanceManager {
 			if (PENDING.equalsIgnoreCase(state.getName())
 					|| RUNNING.equalsIgnoreCase(state.getName())) {
 				activeInstances.add(instance.getInstanceId());
-				logger.info("Active instance {} with public address {}",
-						instance.getInstanceId(), instance.getPublicIpAddress());
+				logger.info("Active instance {} with public ip address {}", instance.getInstanceId(), instance.getPublicIpAddress());
 			}
 		}
-		logger.info("Total active instances found:" + activeInstances.size());
+		logger.info("Total active instances:" + activeInstances.size());
 		return activeInstances;
 	}
 
