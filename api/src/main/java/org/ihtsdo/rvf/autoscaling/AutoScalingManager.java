@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -42,12 +43,11 @@ public class AutoScalingManager {
 
 	private int maxRunningInstance;
 
-
 	private ExecutorService executorService;
 	
 	private PooledConnectionFactory pooledConnectionFactory;
-
-	private boolean shutDown;
+	
+	private final static AtomicBoolean shutDown = new AtomicBoolean(false);
 
 	public AutoScalingManager(Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
 		isAutoScallingEnabled = isAutoScalling.booleanValue();
@@ -63,6 +63,7 @@ public class AutoScalingManager {
 			pooledConnectionFactory = new PooledConnectionFactory(connectionFactory);
 			pooledConnectionFactory.setMaxConnections(2);
 			pooledConnectionFactory.setMaximumActiveSessionPerConnection(1);
+			pooledConnectionFactory.start();
 			executorService = Executors.newSingleThreadExecutor();
 			executorService.submit(new Runnable() {
 				@Override
@@ -78,7 +79,7 @@ public class AutoScalingManager {
 		boolean isFirstTime = true;
 		List<String> activeInstances = null;
 		LocalTime lastCheckTime = LocalTime.now();
-		while (!shutDown) {
+		while (!shutDown.get()) {
 			try {
 				if (isFirstTime) {
 					isFirstTime = false;
@@ -113,7 +114,8 @@ public class AutoScalingManager {
 					try {
 						Thread.sleep(30 * 1000);
 					} catch (InterruptedException e) {
-						logger.error("AutoScalingManager delay is interrupted.", e);
+						logger.warn("AutoScalingManager thread is interrupted possibly due to shut down request.", e);
+						shutDown.set(true);
 					}
 				}
 			} catch (Throwable t) {
@@ -151,6 +153,10 @@ public class AutoScalingManager {
 		int counter = 0;
 		Connection connection = null;
 		try {
+			//check if shut down has been requested to avoid null pointer exception
+			if (shutDown.get()) {
+				return counter;
+			}
 			connection = pooledConnectionFactory.createConnection();
 			connection.start();
 			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -177,7 +183,7 @@ public class AutoScalingManager {
 
 	@PreDestroy
 	public void shutDown() {
-	  shutDown = true;
+	  shutDown.set(true);
 	  if (executorService != null) {
 		  executorService.shutdownNow();
 	  }
