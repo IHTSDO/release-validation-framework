@@ -1,9 +1,0 @@
-#!/bin/sh -e
-
-#For debugging uncomment these two lines
-set -x
-echo $*
-
-APP_NAME=[[packageName]]
-
-dpkg -s [[packageName]] >/srv/http/[[packageName]]/version.txt

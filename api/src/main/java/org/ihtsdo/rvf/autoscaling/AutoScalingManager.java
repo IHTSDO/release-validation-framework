@@ -1,112 +1,138 @@
 package org.ihtsdo.rvf.autoscaling;
 
-import java.util.ArrayList;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 
-import org.apache.log4j.Logger;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AutoScalingManager {
 
-	private boolean shutDown;
-	private Logger logger = Logger.getLogger(AutoScalingManager.class);
+	private Logger logger = LoggerFactory.getLogger(AutoScalingManager.class);
+	
 	@Autowired
 	private InstanceManager instanceManager;
-	private boolean isAutoScalling;
+	
 	@Autowired
-	private ConnectionFactory connectionFactory;
+	private ActiveMQConnectionFactory connectionFactory;
+	
+	private boolean isAutoScallingEnabled;
+	
 	private String queueName;
+	
 	private static int lastPolledQueueSize;
 
 	private int maxRunningInstance;
 
-	private static List<String> activeInstances;
+	private ExecutorService executorService;
+	
+	private PooledConnectionFactory pooledConnectionFactory;
+	
+	private final static AtomicBoolean shutDown = new AtomicBoolean(false);
 
-	private boolean isFirstTime = true;
-
-	public AutoScalingManager(Boolean isAutoScalling,
-			String destinationQueueName, Integer maxRunningInstance) {
-		this.isAutoScalling = isAutoScalling.booleanValue();
+	public AutoScalingManager(Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
+		isAutoScallingEnabled = isAutoScalling.booleanValue();
 		queueName = destinationQueueName;
-		activeInstances = new ArrayList<>();
 		this.maxRunningInstance = maxRunningInstance;
 
 	}
 
-	public void startUp() {
-		logger.info("isAutoScalingEnabled:" + isAutoScalling);
-			if (isAutoScalling) {
-				Thread thread = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						while (!shutDown) {
-							if (isFirstTime) {
-								isFirstTime = false;
-								// check any running instances
-								activeInstances.addAll(instanceManager.getActiveInstances());
-							} else {
-								int current = getQueueSize();
-								if (current != lastPolledQueueSize) {
-									logger.info("Total messages in queue:"
-											+ current);
-									activeInstances = instanceManager
-											.checkActiveInstances(activeInstances);
-								}
-								if ((current > lastPolledQueueSize)
-										|| (current > activeInstances.size())) {
-									// will add logic later in terms how many
-									// instances need to create for certain size
-									// the current approach is to create one
-									// instance per message.
-									if (current > lastPolledQueueSize) {
-										logger.info("Messages have been increased by:"
-												+ (current - lastPolledQueueSize)
-												+ " since last poll.");
-									}
-									int totalToCreate = getTotalInstancesToCreate(
-											current, activeInstances.size(),
-											maxRunningInstance);
-									if (totalToCreate != 0) {
-										logger.info("Start creating "
-												+ totalToCreate
-												+ " new worker instance");
-										long start = System.currentTimeMillis();
-										activeInstances.addAll(instanceManager
-												.createInstance(totalToCreate));
-										logger.info("Time taken to create new intance in seconds:"
-												+ (System.currentTimeMillis() - start)
-												/ 1000);
-									}
-								}
-								lastPolledQueueSize = current;
-								try {
-									Thread.sleep(30 * 1000);
-								} catch (InterruptedException e) {
-									logger.error("AutoScalingManager delay is interrupted.", e);
-								}
+	@PostConstruct
+	public void init() {
+		logger.info("isAutoScalingEnabled:" + isAutoScallingEnabled);
+		if (isAutoScallingEnabled) {
+			pooledConnectionFactory = new PooledConnectionFactory(connectionFactory);
+			pooledConnectionFactory.setMaxConnections(2);
+			pooledConnectionFactory.setMaximumActiveSessionPerConnection(1);
+			pooledConnectionFactory.start();
+			executorService = Executors.newSingleThreadExecutor();
+			executorService.submit(new Runnable() {
+				@Override
+				public void run() {
+					manageInstances();
+				}
+			});
+			executorService.shutdown();
+		}
+	}
+	
+	private void manageInstances() {
+		boolean isFirstTime = true;
+		List<String> activeInstances = null;
+		LocalTime lastCheckTime = LocalTime.now();
+		while (!shutDown.get()) {
+			try {
+				if (isFirstTime) {
+					isFirstTime = false;
+					// check any running instances
+					activeInstances = instanceManager.getActiveInstances();
+					lastCheckTime = LocalTime.now();
+				} else {
+					int current = getQueueSize();
+					if (current != lastPolledQueueSize || hourElapsedSinceLastCheck(lastCheckTime)) {
+						logger.info("Total messages in queue:" + current);
+						activeInstances = instanceManager.getActiveInstances();
+						lastCheckTime = LocalTime.now();
+					}
+					if ((current > lastPolledQueueSize) || (current > activeInstances.size())) {
+						if (current > lastPolledQueueSize) {
+							logger.info("Messages have been increased by:" + (current - lastPolledQueueSize) + " since last poll.");
+						}
+						int totalToCreate = getTotalInstancesToCreate(current, activeInstances.size(), maxRunningInstance);
+						if (totalToCreate != 0) {
+							logger.info("Start creating " + totalToCreate + " new worker instance");
+							long start = System.currentTimeMillis();
+							List<String> newlyCreated = instanceManager.createInstance(totalToCreate);
+							activeInstances.addAll(newlyCreated);
+							logger.info("Time taken to create new intance in seconds:" + (System.currentTimeMillis() - start)/1000);
+							Map<String,String> instanceIpAddressMap = instanceManager.getPublicIpAddress(newlyCreated);
+							for (String instance : instanceIpAddressMap.keySet()) {
+								logger.info("Instance {} created with public IP address {}", instance, instanceIpAddressMap.get(instance));
 							}
 						}
 					}
-				});
-				thread.start();
+					lastPolledQueueSize = current;
+					try {
+						Thread.sleep(30 * 1000);
+					} catch (InterruptedException e) {
+						logger.warn("AutoScalingManager thread is interrupted possibly due to shut down request.", e);
+						shutDown.set(true);
+					}
+				}
+			} catch (Throwable t) {
+				logger.error("Error occurred", t);
 			}
+		}
+	}
+	
+	private boolean hourElapsedSinceLastCheck(LocalTime lastCheckTime) {
+		return Duration.between(lastCheckTime, LocalTime.now()).abs().toHours() >= 1;
 	}
 
-	private int getTotalInstancesToCreate(int currentMsgSize,
-			int currentActiveInstances, int maxRunningInstance) {
+	private int getTotalInstancesToCreate(int currentMsgSize, int currentActiveInstances, int maxRunningInstance) {
 		int result = 0;
 		if (currentActiveInstances < maxRunningInstance) {
 			if (currentMsgSize <= currentActiveInstances) {
-				logger.info("No new instance will be created as message size is:"
-						+ currentMsgSize);
+				logger.info("No new instance will be created as message size is:" + currentMsgSize);
 			} else {
 				if (currentMsgSize <= maxRunningInstance) {
 					result = currentMsgSize - currentActiveInstances;
@@ -115,7 +141,7 @@ public class AutoScalingManager {
 				}
 			}
 		} else {
-			logger.info("No new instance will be created as total running instances:"
+			logger.info("No new instance will be created as total running instances:" 
 					+ currentActiveInstances
 					+ " has reached max:"
 					+ maxRunningInstance);
@@ -127,10 +153,13 @@ public class AutoScalingManager {
 		int counter = 0;
 		Connection connection = null;
 		try {
-			connection = connectionFactory.createConnection();
+			//check if shut down has been requested to avoid null pointer exception
+			if (shutDown.get()) {
+				return counter;
+			}
+			connection = pooledConnectionFactory.createConnection();
 			connection.start();
-			Session session = connection.createSession(false,
-					Session.AUTO_ACKNOWLEDGE);
+			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			Queue tempQueue = session.createQueue(queueName);
 			QueueBrowser browser = session.createBrowser(tempQueue);
 			Enumeration<?> enumerator = browser.getEnumeration();
@@ -139,8 +168,7 @@ public class AutoScalingManager {
 				counter++;
 			}
 		} catch (JMSException e) {
-			logger.error("Error when checking message size in queue:"
-					+ queueName, e);
+			logger.error("Error when checking message size in queue:" + queueName, e);
 		} finally {
 			if (connection != null) {
 				try {
@@ -153,8 +181,14 @@ public class AutoScalingManager {
 		return counter;
 	}
 
+	@PreDestroy
 	public void shutDown() {
-		this.shutDown = true;
+	  shutDown.set(true);
+	  if (executorService != null) {
+		  executorService.shutdownNow();
+	  }
+	  if (pooledConnectionFactory != null) {
+		  pooledConnectionFactory.stop();
+	  }
 	}
-
 }

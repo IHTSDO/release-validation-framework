@@ -8,6 +8,7 @@
 ********************************************************************************/
 /* 	testing for multiple perferred terms */
 /* 	temp table: active sysonyms of active concepts edited in the current release cycle */ 	
+	drop table if exists description_tmp;
 	create table if not exists description_tmp 
 	as select c.id, c.conceptid, c.active
 	from res_concepts_edited a
@@ -40,6 +41,7 @@
 /* 	testing for the absence of preferred terms
 	make a list of active preferred terms for the active concepts that changed
 	in the current release cycle */
+	drop table if exists tmp_pt;
 	create table if not exists tmp_pt 
 	as select a.id, a.conceptid, b.refsetid
 	from description_tmp a
@@ -87,4 +89,3 @@
 	where b.refsetid = '900000000000509007') as tmp_us_pt
 	on a.id = tmp_us_pt.conceptid
 	where tmp_us_pt.conceptid is null;
-	
