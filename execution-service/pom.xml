@@ -2,7 +2,7 @@
 	<parent>
 		<artifactId>release-validation-framework</artifactId>
 		<groupId>org.ihtsdo.snomed.rvf</groupId>
-		<version>1.3.7-SNAPSHOT</version>
+		<version>1.3.7</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
