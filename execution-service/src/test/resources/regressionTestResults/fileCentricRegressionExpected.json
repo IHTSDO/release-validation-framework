@@ -1,8 +1,39 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 60,
-  "totalAssertionsFailed" : 51,
+  "totalAssertionsRun" : 68,
+  "totalAssertionsFailed" : 57,
   "results" : [ {
+    "assertionName" : "Every active concept defined in the Norwegian extension has a preferred FSN in the en-US language refset.",
+    "assertionUuid" : "853bfc3a-1635-11e8-a510-3c15c2c6e32e",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Newly added active concept has one active preferred term in the Norwegian language refset.",
+    "assertionUuid" : "88d0de42-0c5a-4382-82e5-45601c7c3f74",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: is added in recent international release but has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: is added in recent international release but has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: is added in recent international release but has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: is added in recent international release but has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: is added in recent international release but has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: is added in recent international release but has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: is added in recent international release but has no active preferred term in the Norwegian language refset"
+    } ],
+    "totalFailed" : 7
+  }, {
     "assertionName" : "Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot.",
     "assertionUuid" : "8ea2e5d9-5c35-4436-b67d-c5268b5da06c",
     "firstNInstances" : [ {
@@ -263,6 +294,41 @@
     } ],
     "totalFailed" : 11
   }, {
+    "assertionName" : "Every active concept from international release is recommended to have one active preferred term in the Belgian French language refset.",
+    "assertionUuid" : "c71a9b0c-18cf-4a05-8de1-e1f3b9a3fe2f",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: has no active preferred term in the Belgian French language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: has no active preferred term in the Belgian French language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: has no active preferred term in the Belgian French language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: has no active preferred term in the Belgian French language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: has no active preferred term in the Belgian French language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: has no active preferred term in the Belgian French language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: has no active preferred term in the Belgian French language refset"
+    }, {
+      "conceptId" : "702850005",
+      "detail" : "Concept: id=702850005: has no active preferred term in the Belgian French language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Belgian French language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Belgian French language refset"
+    } ],
+    "totalFailed" : 10
+  }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "c779d282-3c4d-4c16-a8a6-8d1a621b247d",
     "firstNInstances" : [ {
@@ -411,6 +477,41 @@
       "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "Every active concept from international release is recommended to have one active preferred term in the Danish language refset.",
+    "assertionUuid" : "e6f653a1-cac8-43d8-9b4b-00e6e4ab2397",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: has no active preferred term in the Danish language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: has no active preferred term in the Danish language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: has no active preferred term in the Danish language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: has no active preferred term in the Danish language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: has no active preferred term in the Danish language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: has no active preferred term in the Danish language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: has no active preferred term in the Danish language refset"
+    }, {
+      "conceptId" : "702850005",
+      "detail" : "Concept: id=702850005: has no active preferred term in the Danish language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Danish language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Danish language refset"
+    } ],
+    "totalFailed" : 10
   }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Belgian Dutch language refset.",
     "assertionUuid" : "eef4d352-b7e6-11e7-a7c5-3c15c2c6e32e",
@@ -706,6 +807,41 @@
     } ],
     "totalFailed" : 7
   }, {
+    "assertionName" : "Every active concept from international release is recommended to have one active preferred term in the Norwegian language refset.",
+    "assertionUuid" : "26fdfee3-13da-45b9-b483-ff7fa37701ec",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "702850005",
+      "detail" : "Concept: id=702850005: has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Norwegian language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Norwegian language refset"
+    } ],
+    "totalFailed" : 10
+  }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the ASSOCIATION REFSET snapshot file.",
     "assertionUuid" : "2ddc9a28-150d-47a4-9b0e-7dbff2efdd72",
     "firstNInstances" : [ {
@@ -721,6 +857,46 @@
       "detail" : "CONCEPT: id=700132006:Non unique id in current release file."
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "Every active concept from international release is recommended to have one active preferred term in the Belgian Dutch language refset.",
+    "assertionUuid" : "3467c1c8-203f-4161-8af4-a2dc3d641811",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: has no active preferred term in the Belgian Dutch language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: has no active preferred term in the Belgian Dutch language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: has no active preferred term in the Belgian Dutch language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: has no active preferred term in the Belgian Dutch language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: has no active preferred term in the Belgian Dutch language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: has no active preferred term in the Belgian Dutch language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: has no active preferred term in the Belgian Dutch language refset"
+    }, {
+      "conceptId" : "702850005",
+      "detail" : "Concept: id=702850005: has no active preferred term in the Belgian Dutch language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Belgian Dutch language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Belgian Dutch language refset"
+    } ],
+    "totalFailed" : 10
+  }, {
+    "assertionName" : "Every active concept has one active preferred term in the Norwegian language refset.",
+    "assertionUuid" : "3539253a-5143-4945-a16c-800e66c6d836",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "TargetComponentId refers to valid concepts in the ASSOCIATION REFSET snapshot file.",
     "assertionUuid" : "35ec824d-b53d-4567-833e-8ce79774acae",
@@ -869,6 +1045,41 @@
       "detail" : "RELATIONSHIP : id=1000006026: Relationship Id is repeated in the Inferred Relationship snapshot file."
     } ],
     "totalFailed" : 3
+  }, {
+    "assertionName" : "Every active concept from international release is recommended to have one active preferred term in the Swedish language refset.",
+    "assertionUuid" : "69500336-2cde-45a5-93b3-1e262069f136",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: has no active preferred term in the Swedish language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: has no active preferred term in the Swedish language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: has no active preferred term in the Swedish language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: has no active preferred term in the Swedish language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: has no active preferred term in the Swedish language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: has no active preferred term in the Swedish language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: has no active preferred term in the Swedish language refset"
+    }, {
+      "conceptId" : "702850005",
+      "detail" : "Concept: id=702850005: has no active preferred term in the Swedish language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Swedish language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Swedish language refset"
+    } ],
+    "totalFailed" : 10
   }, {
     "assertionName" : "Referencedcomponentid refers to valid concepts in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "6a407415-8415-4870-a6ef-b5bc22f73c1f",

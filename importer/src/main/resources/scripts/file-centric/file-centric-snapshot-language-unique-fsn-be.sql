@@ -17,7 +17,7 @@
 		concat('Concept: id=',a.id, ' does not have an FSN preferred in the en-US language refset.') 
 	from curr_concept_s a
 	where a.active = '1'
-	and a.moduleid in ('11000172109')
+	and a.moduleid = '11000172109'
 	and not exists (select b.id
 		from curr_description_s b, curr_langrefset_s c
 		where b.id=c.referencedcomponentid
