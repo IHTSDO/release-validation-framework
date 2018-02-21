@@ -37,13 +37,15 @@ public class AssertionGroupImporter {
 		SE_AUTHORING ("SE", "se-authoring"),
 		US_AUTHORING ("US", "us-authoring"),
 		BE_AUTHORING("BE", "be-authoring"),
+		NO_AUTHORING("NO", "no-authoring"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC", "first-time-loinc-validation"),
 		FIRST_TIME_COMMON_EDITION_VALIDATION ("COMMON", "first-time-common-edition"),
 		LOINC_EDITION ("LOINC", "LoincEdition"),
 		DANISH_EDITION("DK", "DanishEdition"),
 		SWEDISH_EDITION("SE", "SwedishEdition"),
 		US_EDITION("US", "USEdition"),
-		BE_EDITION("BE", "BelgianEdition");
+		BE_EDITION("BE", "BelgianEdition"),
+		NO_EDITION("NO", "NorwegianEdition");
 		private String name;
 		private String releaseCenter;
 		private AssertionGroupName(String releaseCenter, String name) {
@@ -159,6 +161,7 @@ public class AssertionGroupImporter {
 			case US_EDITION :
 			case BE_EDITION :
 			case COMMON_EDITION :
+			case NO_EDITION :
 				createReleaseAssertionGroup(allAssertions, groupName);
 				break;
 			case COMMON_AUTHORING :
@@ -169,6 +172,7 @@ public class AssertionGroupImporter {
 			case SE_AUTHORING :
 			case US_AUTHORING :
 			case BE_AUTHORING :
+			case NO_AUTHORING : 
 				createSnapshotAssertionGroup(groupName);
 				break;
 			case FIRST_TIME_LOINC_VALIDATION :
