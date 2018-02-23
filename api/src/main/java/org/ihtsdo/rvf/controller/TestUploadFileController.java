@@ -181,6 +181,9 @@ public class TestUploadFileController {
 			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = "runId") final Long runId,
 			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			@ApiParam(value = "True if require to create JIRA issue. Defaults to false.") @RequestParam(value = "jiraIssueCreationFlag", required = false) final boolean jiraIssueCreationFlag,
+			@ApiParam(value = "Release product name (e.g SNOMED CT International edition, SNOMED CT Spanish edition, SNOMED CT Managed Service - Denmark Extension (DK), SNOMED CT Managed Service - Sweden Extension (SE), SNOMED CT to GMDN Simple Map)") @RequestParam(value = "productName", required = false) final String productName,
+			@ApiParam(value = "Reproting State (e.g Pre-Alpha, Alpha feedback, Beta feedback, Pre-Production feedback, Post-Production)") @RequestParam(value = "reportingStage", required = false) final String reportingStage,
 			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
@@ -196,6 +199,9 @@ public class TestUploadFileController {
 				.addExtensionDependencyVersion(extensionDependency)
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax).addUrl(urlPrefix)
+				.addJiraIssueCreationFlag(jiraIssueCreationFlag)
+				.addProductName(productName)
+				.addReportingStage(reportingStage)
 				.addProspectiveFilesInS3(false);
 
 		// Before we start running, ensure that we've made our mark in the
@@ -232,6 +238,9 @@ public class TestUploadFileController {
 			@ApiParam(value = "Unique run id e.g Timestamp") @RequestParam(value = "runId") final Long runId,
 			@ApiParam(value = "Defaults to 10") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			@ApiParam(value = "True if require to create JIRA issue. Defaults to false.") @RequestParam(value = "jiraIssueCreationFlag", required = false) final boolean jiraIssueCreationFlag,
+			@ApiParam(value = "Release product name (e.g SNOMED CT International edition, SNOMED CT Spanish edition, SNOMED CT Managed Service - Denmark Extension (DK), SNOMED CT Managed Service - Sweden Extension (SE), SNOMED CT to GMDN Simple Map)") @RequestParam(value = "productName", required = false) final String productName,
+			@ApiParam(value = "Reproting State (e.g Pre-Alpha, Alpha feedback, Beta feedback, Pre-Production feedback, Post-Production)") @RequestParam(value = "reportingStage", required = false) final String reportingStage,
 			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
@@ -248,6 +257,9 @@ public class TestUploadFileController {
 				.addExtensionDependencyVersion(extensionDependency)
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax).addUrl(urlPrefix)
+				.addJiraIssueCreationFlag(jiraIssueCreationFlag)
+				.addProductName(productName)
+				.addReportingStage(reportingStage)
 				.addProspectiveFilesInS3(true);
 
 		// Before we start running, ensure that we've made our mark in the

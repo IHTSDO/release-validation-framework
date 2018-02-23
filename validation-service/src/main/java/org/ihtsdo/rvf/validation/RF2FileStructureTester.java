@@ -26,7 +26,7 @@ public class RF2FileStructureTester {
 	
 	private static final String EMPTY_FILE_CHECKING = " empty file checking";
 	private static final String RF2_LINE_SEPARATOR = "\r\n";
-	private static final String TEST_TYPE = "line terminator check";
+	public static final String TEST_TYPE = "line terminator check";
 	private final ValidationLog validationLog;
 	private final ResourceProvider resourceManager;
 	private final TestReportable testReport;
@@ -88,7 +88,7 @@ public class RF2FileStructureTester {
 				totalLine++;
 			}
 			if (totalLine == 0) {
-				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), fileName + EMPTY_FILE_CHECKING, EMPTY_FILE_CHECKING, null,"total line is :" + totalLine, " RF2 file can't be empty and should at least have a header line");
+				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), fileName + EMPTY_FILE_CHECKING, EMPTY_FILE_CHECKING, null,"total line is :" + totalLine, " RF2 file can't be empty and should at least have a header line",null);
 			}
 			while (scanner.hasNext()) {
 				scanner.next();
@@ -96,7 +96,7 @@ public class RF2FileStructureTester {
 			}
 			if (totalLineScanned < totalLine) {
 				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), fileName + " line terminator", TEST_TYPE, null, "total line is terminated with CR+LF:" + totalLineScanned , 
-						 "total line is terminated with CR+LF:" + totalLine);
+						 "total line is terminated with CR+LF:" + totalLine,null);
 			} 
 		} catch (Exception e) {
 			validationLog.executionError("Error", "Failed to read file:" + fileName);
@@ -121,7 +121,7 @@ public class RF2FileStructureTester {
 						actualResult.append(actualLineSeparator);
 						actualResult.append("]");
 						testReport.addError(totalLine + "-0", startTime, fileName, resourceManager.getFilePath(), fileName + " ast line terminator",TEST_TYPE, null,
-								actualResult.toString(), "the last line is terminated with CR+LF");
+								actualResult.toString(), "the last line is terminated with CR+LF",null);
 					}
 					break;
 				}

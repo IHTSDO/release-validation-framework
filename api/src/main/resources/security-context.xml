@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+      xmlns="http://www.springframework.org/schema/security"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:beans="http://www.springframework.org/schema/beans"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+ 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+   <context:property-placeholder location="file:${rvfConfigLocation:/tmp}/api.properties" order="-1"/>
+   <!-- REST should have no state, each request is re-authenticated -->
+   <http pattern="/**/api-doc.html" security="none"/>
+   <http pattern="/**/api-docs/**" security="none"/>
+   <http pattern="/**/static/**" security="none"/>
+   <http pattern="/**/webjars/**" security="none"/>
+   <http pattern="/" security="none"/>
+   <http pattern="/**/test-pre" security="none"/>
+   <http pattern="/**/test-post" security="none"/>
+   <http pattern="/**/run-post-via-s3" security="none"/>
+   <http pattern="/**/run-post" security="none"/>
+   <http create-session="stateless" auto-config="false">
+      <intercept-url pattern="/**" access="ROLE_ihtsdo-sca-author"/>
+      <http-basic />
+      <custom-filter ref="authenticationDecorator" after="BASIC_AUTH_FILTER" />
+   </http>
+
+   <global-method-security pre-post-annotations="enabled" secured-annotations="enabled" proxy-target-class="true" />
+
+   <!-- Basic Authentication -->
+   <authentication-manager>
+      <authentication-provider>
+         <user-service>
+            <user name="${rvf.basicAuth.user}" password="${rvf.basicAuth.password}" authorities="ROLE_USER" />
+         </user-service>
+      </authentication-provider>
+   </authentication-manager>
+
+   <!-- SSO Authentication -->
+   <beans:bean id="authenticationDecorator" class="org.ihtsdo.sso.integration.RequestHeaderAuthenticationDecorator" />
+
+   <beans:bean id="http403EntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint" />
+
+</beans:beans>

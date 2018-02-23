@@ -1,13 +1,11 @@
 package org.ihtsdo.rvf.validation;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
-
 import org.apache.commons.io.FileUtils;
+import org.ihtsdo.rvf.entity.FailureDetail;
+import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
+import org.ihtsdo.rvf.validation.contanst.ErrorMessage;
 import org.ihtsdo.rvf.validation.impl.CsvMetadataResultFormatter;
 import org.ihtsdo.rvf.validation.impl.StreamTestReport;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
@@ -20,6 +18,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class StructuralTestRunner implements InitializingBean{
@@ -79,15 +85,16 @@ public class StructuralTestRunner implements InitializingBean{
 		columnPatternTest.runTests();
 	}
 	
-	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final File manifestFile, 
-			final boolean writeSucceses, final String urlPrefix, String storageLocation ) throws IOException {
+	public boolean verifyZipFileStructure(final Map<String, Object> responseMap, final File tempFile, final Long runId, final File manifestFile,
+										  final boolean writeSucceses, final String urlPrefix, String storageLocation ) throws IOException {
 		 boolean isFailed = false;
 		 final long timeStart = System.currentTimeMillis();
 		 if (tempFile != null) {
 			 logger.debug("Start verifying zip file structure of {} against manifest", tempFile.getAbsolutePath());
 		 }
-		 final ValidationReport validationReport = new ValidationReport(TestType.ARCHIVE_STRUCTURAL);
-		 validationReport.setExecutionId(runId);
+		final ValidationReport validationReport = new ValidationReport();
+		validationReport.setExecutionId(runId);
+		validationReport.setTestType(TestType.ARCHIVE_STRUCTURAL);
 		// convert groups which is passed as string to assertion groups
 		// set up the response in order to stream directly to the response
 		final File structureTestReport = new File(getReportDataFolder(), "structure_validation_"+ runId+".txt");
@@ -113,7 +120,6 @@ public class StructuralTestRunner implements InitializingBean{
 			validationReport.setTotalTestsRun(report.getNumTestRuns());
 			// verify if manifest is valid
 			if(report.getNumErrors() > 0) {
-				validationReport.setTotalFailures(report.getNumErrors());
 				validationReport.setReportUrl(urlPrefix + "/result/structure/" + runId + "?storageLocation=" + storageLocation);
 				logger.error("No Errors expected but got " + report.getNumErrors() + " errors");
 				logger.info("reportPhysicalUrl : " + structureTestReport.getAbsolutePath());
@@ -122,6 +128,10 @@ public class StructuralTestRunner implements InitializingBean{
 				logger.info("report.getNumTestRuns() = " + report.getNumTestRuns());
 				final double threshold = report.getNumErrors() / report.getNumTestRuns();
 				logger.info("threshold = " + threshold);
+				
+				// Extract failed tests to report instead showing URL only which link to an physical test result
+				extractFailedTestsToReport(validationReport, report);
+				
 				// bail out only if number of test failures exceeds threshold
 				if(threshold > getFailureThreshold()){
 					isFailed = true;
@@ -129,10 +139,43 @@ public class StructuralTestRunner implements InitializingBean{
 			}
 		}
 		final long timeEnd = System.currentTimeMillis();
-		validationReport.setTimeTakenInSeconds((timeEnd-timeStart)/1000);
+		validationReport.addTimeTaken((timeEnd-timeStart)/1000);
 		responseMap.put(TestType.ARCHIVE_STRUCTURAL.toString() + "TestResult", validationReport);
-		logger.debug("Finished verifying zip file structure of {} against manifest", tempFile.getName());		
+		logger.debug("Finished verifying zip file structure of {} against manifest", tempFile.getName());
 		return isFailed;
+	}
+
+	private void extractFailedTestsToReport(final ValidationReport validationReport, TestReportable report) {
+		List<StructuralTestRunItem> structuralTestFailItems = report.getFailedItems();
+		Map<String,List<FailureDetail>> structuralTestFailItemMap = new HashMap<>();
+		for(StructuralTestRunItem structuralTestRunItem : structuralTestFailItems){
+			List<FailureDetail> failDetailList;
+			if(structuralTestFailItemMap.containsKey(structuralTestRunItem.getFileName())){
+				failDetailList = structuralTestFailItemMap.get(structuralTestRunItem.getFileName());
+			} else {
+				failDetailList = new ArrayList<>();
+			}
+			String failMsg = "Column: " + structuralTestRunItem.getColumnName() + 
+							" - Line: " + structuralTestRunItem.getLineNr() + 
+							" - Message :" + structuralTestRunItem.getActualExpectedValue();
+			FailureDetail testFailItem  = new FailureDetail("",failMsg, ErrorMessage.getErrorDescription(structuralTestRunItem));
+			failDetailList.add(testFailItem);
+			structuralTestFailItemMap.put(structuralTestRunItem.getFileName(), failDetailList);
+		}
+		
+		if(!structuralTestFailItemMap.isEmpty()){
+			List<TestRunItem> testRunFailItems = new ArrayList<>();
+			for(String key : structuralTestFailItemMap.keySet()){
+				List<FailureDetail> failItems = structuralTestFailItemMap.get(key);
+				
+				TestRunItem item = new TestRunItem();
+				item.setTestCategory(key);
+				item.setFirstNInstances(failItems.subList(0, failItems.size() > 10 ? 10 : failItems.size()));
+				item.setFailureCount((long) failItems.size());
+				testRunFailItems.add(item);
+			}
+			validationReport.addFailedAssertions(testRunFailItems);
+		}
 	}
 
 	/**

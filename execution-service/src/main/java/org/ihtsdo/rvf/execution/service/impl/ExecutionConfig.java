@@ -13,6 +13,10 @@ public class ExecutionConfig {
 	private boolean extensionValidation;
 	private boolean isReleaseValidation;
 	private String extensionDependencyVersion;
+	private String releaseDate;
+	private boolean jiraIssueCreationFlag;
+	private String productName;
+	private String reportingStage;
 
 	public ExecutionConfig(final Long runId) {
 		this(runId,false);
@@ -95,5 +99,39 @@ public class ExecutionConfig {
 	public void setExtensionDependencyVersion(String extensionDependencyVersion) {
 		this.extensionDependencyVersion = extensionDependencyVersion;
 	}
+
+	public String getReleaseDate() {
+		return releaseDate;
+	}
+
+	public void setReleaseDate(String releaseDate) {
+		this.releaseDate = releaseDate;
+	}
+
+	public boolean isJiraIssueCreationFlag() {
+		return jiraIssueCreationFlag;
+	}
+
+	public void setJiraIssueCreationFlag(boolean jiraIssueCreationFlag) {
+		this.jiraIssueCreationFlag = jiraIssueCreationFlag;
+	}
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+
+	public String getReportingStage() {
+		return reportingStage;
+	}
+
+	public void setReportingStage(String reportingStage) {
+		this.reportingStage = reportingStage;
+	}
+
+	
 	
 }

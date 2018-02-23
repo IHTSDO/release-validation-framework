@@ -17,6 +17,7 @@ import org.ihtsdo.rvf.controller.VersionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.auth.AWSCredentials;
@@ -50,6 +51,10 @@ public class InstanceManager {
 	private String instanceTagName;
 	@Autowired
 	private String ec2SubnetId;
+	@Autowired
+	private String droolsRulesVersion;
+	@Autowired
+	private String droolsRuelsModuleName;
 	private String ec2InstanceStartupScript;
 
 	public InstanceManager(AWSCredentials credentials, String ec2Endpoint) {
@@ -59,6 +64,8 @@ public class InstanceManager {
 	}
 
 	public List<String> createInstance(int totalToCreate) {
+		ec2InstanceStartupScript = Base64
+				.encodeBase64String(constructStartUpScript().getBytes());
 		RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
 		runInstancesRequest.withImageId(imageId).withInstanceType(instanceType)
 				.withMinCount(1).withMaxCount(totalToCreate)
@@ -285,27 +292,49 @@ public class InstanceManager {
 		return propertiesByFileName;
 	}
 
-	private String constructStartUpScript() {
+	public String constructStartUpScript() {
 		String appVersion = getAppVersion();
 		StringBuilder builder = new StringBuilder();
-		builder.append("#!/bin/sh\n");
+		builder.append("#!/bin/sh\n");		
 		builder.append("sudo apt-get update -o Dir::Etc::sourcelist=\"sources.list.d/maven_ihtsdotools_org_content_repositories_*\""
 				+ "\n");
 		if (appVersion != null && !appVersion.isEmpty()) {
 			builder.append("sudo apt-get install --force-yes -y rvf-api="
 					+ appVersion + "\n");
+			builder.append("if [ $? != 0 ]\n");
+			builder.append(" then\n" );
+			builder.append("sudo apt-get install --force-yes -y rvf-api \n");
+			builder.append("fi\n");
 		} else {
 			builder.append("sudo apt-get install --force-yes -y rvf-api \n");
 		}
-		builder.append("sudo dpkg -s rvf-api\n");
 		String rvfConfig = System.getProperty(RVF_CONFIG_LOCATION);
 		Map<String, String> propertyStrByFilename = getProperties(rvfConfig);
 		for (String filename : propertyStrByFilename.keySet()) {
 			builder.append("sudo echo \"" + propertyStrByFilename.get(filename)
 					+ "\" > " + rvfConfig + "/" + filename + "\n");
 		}
+		// checkout drools version
+		builder.append("git clone");
+		if (droolsRulesVersion != null && !droolsRulesVersion.isEmpty()) {
+			//git clone -b 'v1.9'
+			builder.append(" -b " +"'v" + droolsRulesVersion + "'");		
+			builder.append(" --single-branch");
+		} 
+		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
+		builder.append(" https://github.com/IHTSDO/snomed-drools-rules.git ");
+		if (droolsRuelsModuleName == null || droolsRuelsModuleName.isEmpty() || !droolsRuelsModuleName.startsWith("/")) {
+			droolsRuelsModuleName= "/opt/snomed-drools-rules/";
+		}
+		builder.append(droolsRuelsModuleName + "\n");
+		builder.append("sudo chown -R rvf-api:rvf-api " + droolsRuelsModuleName + "\n");
 		builder.append("sudo supervisorctl start rvf-api" + "\n");
-		builder.append("exit 0");
+		builder.append("if [ $? = 0 ]\n");
+		builder.append(" then\n" );
+		builder.append("exit 0\n");
+		builder.append("else\n");
+		builder.append("sudo halt\n");
+		builder.append("fi\n");
 		return builder.toString();
 	}
 

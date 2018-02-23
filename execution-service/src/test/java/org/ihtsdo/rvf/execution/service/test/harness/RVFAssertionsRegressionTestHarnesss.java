@@ -139,6 +139,8 @@ public class RVFAssertionsRegressionTestHarnesss {
 		 System.out.println("found total assertions:" + assertions.size());
 		 long timeStart = System.currentTimeMillis();
 			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
+//		 final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
+			
 			long timeEnd = System.currentTimeMillis();
 			System.out.println("Time taken:" +(timeEnd-timeStart));
 			releaseDataManager.clearQAResult(config.getExecutionId());
@@ -157,8 +159,8 @@ public class RVFAssertionsRegressionTestHarnesss {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
-		assertEquals(195, assertions.size());
-		assertEquals(79, releaseTypeAssertions.size());
+		assertEquals(257, assertions.size());
+		assertEquals(103, releaseTypeAssertions.size());
 	}
 	
 	@Test
@@ -166,7 +168,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		AssertionGroup group = assertionService.getAssertionGroupByName("int-authoring");
 		
 		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(23, assertions.size());
+		assertEquals(21, assertions.size());
 	}
 	
 	
@@ -175,12 +177,12 @@ public class RVFAssertionsRegressionTestHarnesss {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
 		
 		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(81, assertions.size());
+		assertEquals(121, assertions.size());
 	}
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("03cf9850-7857-11e1-b0c4-0800200c9a66");
+		runAssertionsTest("c3249e80-84f0-11e1-b0c4-0800200c9a66");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
@@ -235,6 +237,12 @@ public class RVFAssertionsRegressionTestHarnesss {
 		final Gson gson = new Gson();
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));
 		final TestReport expectedReport = gson.fromJson(br, TestReport.class);
+		
+		/*InputStream is = new FileInputStream(expectedJsonFileName);
+		String expectedReportStr = IOUtils.toString(is);
+		JSONObject expectedReportObj = new JSONObject(expectedReportStr);
+		JSONObject actualReportObj = new JSONObject(actualReportStr);
+		JSONAssert.assertEquals(expectedReportObj, actualReportObj, false);*/
 		
 		final List<RVFTestResult> expected = expectedReport.getResults();
 		final List<RVFTestResult> actual = actualReport.getResults();

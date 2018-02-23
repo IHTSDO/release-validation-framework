@@ -16,6 +16,10 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ihtsdo.rvf.util.ECLParser;
+import org.ihtsdo.rvf.util.ECLParserUtil;
+import org.ihtsdo.rvf.util.ExpressionTemplateParser;
+import org.ihtsdo.rvf.util.LongECLGrammar;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.model.ColumnType;
 import org.ihtsdo.rvf.validation.resource.ResourceProvider;
@@ -29,23 +33,24 @@ import org.slf4j.LoggerFactory;
 
 public class ColumnPatternTester {
 
-	private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
-	private static final Pattern DATE_PATTERN = Pattern.compile("^\\d{8}$");
+	public static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+	public static final Pattern DATE_PATTERN = Pattern.compile("^\\d{8}$");
 	private static final Pattern BOOLEAN_PATTERN = Pattern.compile("[0-1]");
-	private static final Pattern SCTID_PATTERN = Pattern.compile("^\\d{6,18}$");
+	public static final Pattern SCTID_PATTERN = Pattern.compile("^\\d{6,18}$");
 	private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
 	private static final Pattern NON_ZERO_INTEGER_PATTERN = Pattern.compile("^[1-9][0-9]*$");
 	private static final Pattern BLANK = Pattern.compile("^$");
 	private static final Pattern NOT_BLANK = Pattern.compile("^(?=\\s*\\S).*$");
+	private static final Pattern URL_PATTERN = Pattern.compile("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 	private static final String UTF_8 = "UTF-8";
-	private static final String FILE_NAME_TEST_TYPE = "FileNameTest";
+	public static final String FILE_NAME_TEST_TYPE = "FileNameTest";
 	private static final String COLUMN_COUNT_TEST_TYPE = "ColumnCountTest";
 	private static final String ROW_SPACE_TEST_TYPE = "RowSpaceTest";
 	private static final String EMPTY_ROW_TEST = "BlankRowTest";
 	private static final String COLUMN_HEADING_TEST = "ColumnHeadingTest";
-	private static final String COLUMN_VALUE_TEST_TYPE = "ColumnValuesTest";
-	private static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
-	private static final String COLUMN_BOOLEAN_TEST_TYPE = "ColumnBooleanTest";
+	public static final String COLUMN_VALUE_TEST_TYPE = "ColumnValuesTest";
+	public static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
+	public static final String COLUMN_BOOLEAN_TEST_TYPE = "ColumnBooleanTest";
 
 	private final ValidationLog validationLog;
 	private final ResourceProvider resourceManager;
@@ -105,7 +110,7 @@ public class ColumnPatternTester {
 			return linesTested;
 		}
 		if (!fileName.endsWith("txt")) {
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "Incorrect file extension, should end with a .txt");
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "Incorrect file extension, should end with a .txt",null);
 			return linesTested;
 		}
 
@@ -114,12 +119,12 @@ public class ColumnPatternTester {
 			tableSchema = schemaFactory.createSchemaBean(fileName);
 		} catch (final FileRecognitionException e) {
 			// log the problem and continue to the next file
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, e.getMessage());
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, e.getMessage(),null);
 			return linesTested;
 		}
 		if (tableSchema == null) {
 			// log the problem and continue to the next file
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "unexpected filename format.");
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "unexpected filename format.",null);
 			return linesTested;
 		}
 
@@ -162,12 +167,12 @@ public class ColumnPatternTester {
 				}
 			} catch (final IOException e) {
 				validationLog.executionError("Problem reading file {}", fileName, e);
-				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", fileName, "Unable to read the file");
+				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", fileName, "Unable to read the file",null);
 			}
 
 		} else {
 			validationLog.executionError("Invalid fileName {} does not match the expected pattern ", fileName);
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "", fileName, "valid release 2 filename");
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "", fileName, "valid release 2 filename",null);
 		}
 		return linesTested;
 		
@@ -185,12 +190,12 @@ public class ColumnPatternTester {
 	public boolean validateRow(final Date startTime, final String fileName, final String line, final long lineNumber, final int configColumnCount, final int dataColumnCount) {
 		if (StringUtils.isEmpty(line)) {
 			validationLog.assertionError("Empty line at line {}", lineNumber);
-			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Empty Row", EMPTY_ROW_TEST, "", line, "expected data");
+			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Empty Row", EMPTY_ROW_TEST, "", line, "expected data",lineNumber);
 			return false;
 		}
 		if (dataColumnCount != configColumnCount) {
 			validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
-			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Column Count Mismatch", COLUMN_COUNT_TEST_TYPE, "", String.valueOf(dataColumnCount), String.valueOf(configColumnCount));
+			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Column Count Mismatch", COLUMN_COUNT_TEST_TYPE, "", String.valueOf(dataColumnCount), String.valueOf(configColumnCount),lineNumber);
 			// cannot continue at this point as any validation will be off
 			return false;
 		}
@@ -199,7 +204,7 @@ public class ColumnPatternTester {
 		if (line.endsWith("\t") || line.endsWith(" ")) {
 			// extra spaces lets see if it is at the end, can still continue testing
 			validationLog.assertionError("Extra space at the end of line {}, expected {}, actual {}", lineNumber, line.trim(), line);
-			testReport.addError(lineNumber + "-" + dataColumnCount + 1, startTime, fileName, resourceManager.getFilePath(), "End of Row Space", ROW_SPACE_TEST_TYPE, "", line, line.trim());
+			testReport.addError(lineNumber + "-" + dataColumnCount + 1, startTime, fileName, resourceManager.getFilePath(), "End of Row Space", ROW_SPACE_TEST_TYPE, "", line, line.trim(),lineNumber);
 			// continue testing
 			return true;
 		}
@@ -214,6 +219,9 @@ public class ColumnPatternTester {
 		final PatternTest columnTest = columnTests.get(columnType);
 
 		if (columnTest != null) {
+			/*if(isMRCMValidationCheckOnly(fileName,column)) {
+				validateMRCMRules(id,lineNumber,value,column,startTime,fileName,columnTest);
+			} else */
 			if (canBeBlank(value, column) || columnTest.validate(column, lineNumber, value)) {
 				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(), columnTest.getPatternString());
@@ -221,8 +229,57 @@ public class ColumnPatternTester {
 				final String testedValue = StringUtils.isNoneEmpty(value) ? value : "No Value";
 				validationLog.assertionError(columnTest.getMessage(), columnTest.getErrorArgs());
 				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
-						columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue());
+						columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue(),lineNumber);
 			}
+		}
+	}
+	
+	
+	private boolean isMRCMValidationCheckOnly(final String fileName, final Field column){
+		if(	fileName.contains("Refset_MRCMDomain")	&& 
+				   (column.getName().equalsIgnoreCase("domainConstraint")
+				 || column.getName().equalsIgnoreCase("parentDomain")
+				 || column.getName().equalsIgnoreCase("proximalPrimitiveConstraint")
+				 || column.getName().equalsIgnoreCase("proximalPrimitiveRefinement")
+				 || column.getName().equalsIgnoreCase("domainTemplateForPrecoordination")
+				 || column.getName().equalsIgnoreCase("domainTemplateForPostcoordination")
+				 || column.getName().equalsIgnoreCase("guideURL")))
+			return true;
+		return false;
+	}
+	
+	/**
+	 * This specific method is used for checking some validations which will be applied for MRCM Domain SNAPSHOT/FULL/DELTA only
+	 */
+	private void validateMRCMRules(final String id, final long lineNumber, final String value, final Field column, final Date startTime, final String fileName, final PatternTest columnTest){
+		if(column.getName().equalsIgnoreCase("domainConstraint")
+		 || column.getName().equalsIgnoreCase("parentDomain")
+		 || column.getName().equalsIgnoreCase("proximalPrimitiveConstraint")
+		 || column.getName().equalsIgnoreCase("proximalPrimitiveRefinement")) { // Expression Constrain Language validation
+			if(ECLParserUtil.validateECLString(LongECLGrammar.getInstance(),value)){
+				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(),"");
+			} else {
+				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(), columnTest.getPatternString(), "Invalid ECL", column.getName() + " is a valid Expression Constrain Language string",lineNumber);
+			}			
+		} else if (column.getName().equalsIgnoreCase("domainTemplateForPrecoordination")
+				 || column.getName().equalsIgnoreCase("domainTemplateForPostcoordination")) { // Expression Template validation
+			if(ECLParserUtil.validateECLString(ExpressionTemplateParser.getInstance(),value)){
+				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(),"");
+			} else {
+				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(), columnTest.getPatternString(), "Invalid Expression Template",column.getName() + " is a valid Expression Template",lineNumber);
+			}
+		} else if (column.getName().equalsIgnoreCase("guideURL")){
+			if(URL_PATTERN.matcher(value).matches()){
+				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(),"");
+			} else {
+				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(), URL_PATTERN.pattern(), value, URL_PATTERN.pattern(),lineNumber);
+			}			
 		}
 	}
 
@@ -257,7 +314,7 @@ public class ColumnPatternTester {
 			column.setName(value);
 		} else if (!expectedColumnName.equalsIgnoreCase(value)) {
 			validationLog.assertionError("Column name does not match expected value: expected '{}', actual '{}'", expectedColumnName, value);
-			testReport.addError("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "", value, expectedColumnName);
+			testReport.addError("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "", value, expectedColumnName,1l);
 		} else {
 			testReport.addSuccess("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "");
 		}

@@ -24,3 +24,4 @@ activemq-data/
 
 # Whitelist some files
 !.gitattributes
+*.orig
