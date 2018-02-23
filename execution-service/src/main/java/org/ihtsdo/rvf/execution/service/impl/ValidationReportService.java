@@ -18,6 +18,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.dao.s3.S3Client;
 import org.ihtsdo.otf.dao.s3.helper.FileHelper;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -61,19 +62,25 @@ public class ValidationReportService {
 		structureTestReportPath = rvfRoot + "structure_validation.txt";
 	}
 	
-	public void writeResults(final Map<String , Object> responseMap, final State state, String storageLocation) throws IOException, NoSuchAlgorithmException, DecoderException {
+	public void writeResults(final Map<String , Object> responseMap, final State state, String storageLocation) throws BusinessServiceException {
 		final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
-		final File temp = File.createTempFile("resultJson", ".tmp"); 
+		File temp = null;
 		try {
+	        temp = File.createTempFile("resultJson", ".tmp"); 
 			try (final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp),Charset.forName(UTF_8)))) {
 				prettyGson.toJson(responseMap, bw);
 				//Now copy to our S3 Location
 			} 
 			s3Helper.putFile(temp, storageLocation + resultsFilePath);
-		} finally {
-			temp.delete();
+			writeState(state, storageLocation);
+		} catch (NoSuchAlgorithmException | IOException | DecoderException e) {
+			throw new BusinessServiceException("Failed to write results to file.", e);
+		} 		
+		finally {
+			if (temp != null) {
+				temp.delete();
+			}
 		}
-		writeState(state, storageLocation);
 	}
 	
 	public void writeState(final State state, String storageLocation) throws IOException, NoSuchAlgorithmException, DecoderException {

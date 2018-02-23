@@ -33,7 +33,7 @@
 				runid,
 				assertionid,
 				a.conceptid,
-				concat('DESCRIPTION: id=',a.id, ': Synonym is prefered in US Language refset but refers to a word that has en-gb spelling: ',gbTerm) 
+				concat('DESCRIPTION: id=',a.id, ': Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: ',gbTerm) 
 			from v_curr_delta_us a 
 			where MATCH a.term AGAINST (gbTerm IN BOOLEAN MODE);
 		end loop validate; 

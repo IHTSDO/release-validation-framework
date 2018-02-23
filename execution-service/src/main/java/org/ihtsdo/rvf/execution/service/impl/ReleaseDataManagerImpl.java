@@ -546,4 +546,15 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		return schemaName;
 	}
+
+	@Override
+	public void clearQAResult(Long runId) {
+		String deleteQaResultSQL = " delete from rvf_master.qa_result where run_id = " + runId;
+		try (Connection connection = snomedDataSource.getConnection();
+				Statement statement = connection.createStatement() ) {
+			statement.execute(deleteQaResultSQL);
+		} catch (final SQLException e) {
+			logger.error("Failed to delete data from qa_result table for runId {}  due to {} ", runId, e.fillInStackTrace());
+		}
+	}
 }

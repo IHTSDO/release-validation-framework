@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 86,
-  "totalAssertionsFailed" : 86,
+  "totalAssertionsRun" : 89,
+  "totalAssertionsFailed" : 89,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -208,6 +208,14 @@
     } ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "A description should not have more than 255 characters long.",
+    "assertionUuid" : "905122c9-f24f-4d57-b478-435d693ff209",
+    "firstNInstances" : [ {
+      "conceptId" : "703860006",
+      "detail" : "Description: id=3008913021 has a term more than 255 characters long."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "No active Historical Association member associates an inactive concept with its parent.",
     "assertionUuid" : "90bcb7f0-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -311,11 +319,11 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Calling procedure testing that terms that contain EN-US language-specific words are in the same US language refset.",
+    "assertionName" : "Terms that contain en-us specific words are in the en-us language refset.",
     "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in US Language refset but refers to a word that has en-gb spelling: tumour"
+      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: tumour"
     } ],
     "totalFailed" : 1
   }, {
@@ -351,11 +359,11 @@
     } ],
     "totalFailed" : 9
   }, {
-    "assertionName" : "Calling procedure testing that terms that contain EN-GB language-specific words are in the same GB language refset.",
+    "assertionName" : "Terms that contain en-gb specific words are in the en-gb language refset.",
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the GB Language refset but refers to a word that has en-us spelling: analog"
+      "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the en-gb language refset but refers to a word that has en-us spelling: analog"
     } ],
     "totalFailed" : 1
   }, {
@@ -550,14 +558,14 @@
     "assertionName" : "No active Terms contain double spaces.",
     "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
     "firstNInstances" : [ {
+      "conceptId" : "703860006",
+      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
+    }, {
       "conceptId" : "702386002",
       "detail" : "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces."
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
     } ],
     "totalFailed" : 3
   }, {
@@ -962,6 +970,22 @@
       "detail" : "CONCEPT: Concept=703672002: concept has definition not \"preferred\"."
     } ],
     "totalFailed" : 2
+  }, {
+    "assertionName" : "There is an equivalent definition in the en-us and en-gb language when provided.",
+    "assertionUuid" : "7c406d6c-7e30-4aa1-b99d-e00b4e2d52a5",
+    "firstNInstances" : [ {
+      "conceptId" : "699683004",
+      "detail" : "ConceptId=699683004 has definition in EN-US but no equivalent found for EN-GB"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "A description normally has less than 35 words.",
+    "assertionUuid" : "7dd01495-2099-4e7b-9d02-39899bf774f3",
+    "firstNInstances" : [ {
+      "conceptId" : "703860006",
+      "detail" : "Description: id=3008913021 has a term more than 35 words."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "Rule based complex MapGroup must be in sequential order and not blank",
     "assertionUuid" : "7e70ea3e-c4dd-4ae3-8b75-0f0567e42b58",

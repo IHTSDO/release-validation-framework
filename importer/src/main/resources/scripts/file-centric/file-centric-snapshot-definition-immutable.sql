@@ -13,8 +13,8 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('DEFINITION: id=',a.id, ' is referneced with more than one set of immutable values in the definition snapshot.') 	
+		concat('Definition: id=',a.id, ' references a term which is duplicated.') 	
 	from curr_textdefinition_s a 
-	group by a.id , a.typeid , a.languagecode , a.conceptid
-	having count(a.id) > 1 and count(a.typeid ) > 1 and count(languagecode) > 1 and count(conceptid) > 1;
-	
+	group by a.typeid, a.languagecode, a.conceptid, binary a.term
+	having count(a.id) > 1;
+	commit;

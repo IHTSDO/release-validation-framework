@@ -57,7 +57,11 @@ public class ZipFileResourceProvider implements ResourceProvider {
 	private void assignFileNames(ZipEntry zipEntry) {
 		if (!zipEntry.isDirectory()) {
 			String key = new File(zipEntry.getName()).getName();
-			if (key.endsWith(".txt") && (!(key.toLowerCase().contains("Readme".toLowerCase()) || key.startsWith(".")))) {
+			if (key.toLowerCase().contains("Readme".toLowerCase()) || key.startsWith(".") || key.startsWith("res2")) {
+				//skip
+				return;
+			}
+			if (key.endsWith(".txt")) {
 				filenames.put(key, zipEntry);
 			}
 		}

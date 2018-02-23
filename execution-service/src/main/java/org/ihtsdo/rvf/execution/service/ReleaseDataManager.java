@@ -42,4 +42,6 @@ public interface ReleaseDataManager {
 	String loadSnomedDataIntoExistingDb(String productVersion,List<String> rf2FilesLoaded,File ... zipDataFile) throws BusinessServiceException;
 
 	String createSchema(String versionName);
+
+	void clearQAResult(Long runId);
 }

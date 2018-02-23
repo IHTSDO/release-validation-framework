@@ -140,7 +140,7 @@
       "conceptId" : "713135019",
       "detail" : "LANGUAGE REFSET: id=00002fb2-d982-5fbd-822f-045c938480c7 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 26
+    "totalFailed" : 27
   }, {
     "assertionName" : "The current data in the SimpleMap refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "959e11e7-9ff9-40b9-b833-387495e320d0",
@@ -721,16 +721,16 @@
       "conceptId" : "703860006",
       "detail" : "DESCRIPTION: id=3008366010 is in delta file but not in snapshot file."
     }, {
+      "conceptId" : "703860006",
+      "detail" : "DESCRIPTION: id=3008366012 is in delta file but not in snapshot file."
+    }, {
       "conceptId" : "700132006",
       "detail" : "DESCRIPTION: id=3008913020 is in delta file but not in snapshot file."
     }, {
       "conceptId" : "700132006",
       "detail" : "DESCRIPTION: id=3005197021 is in delta file but not in snapshot file."
-    }, {
-      "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=2984057019 is in delta file but not in snapshot file."
     } ],
-    "totalFailed" : 13
+    "totalFailed" : 14
   }, {
     "assertionName" : "The current simple refset snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "0988de1d-29dd-4668-bcbf-032d38692492",
@@ -1155,13 +1155,13 @@
       "conceptId" : "703860006",
       "detail" : "DESCRIPTION: id=3008366010 is in DELTA file, but not in FULL file."
     }, {
-      "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=3008862015 is in DELTA file, but not in FULL file."
+      "conceptId" : "703860006",
+      "detail" : "DESCRIPTION: id=3008366012 is in DELTA file, but not in FULL file."
     }, {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=3008913020 is in DELTA file, but not in FULL file."
+      "detail" : "DESCRIPTION: id=3008862015 is in DELTA file, but not in FULL file."
     } ],
-    "totalFailed" : 16
+    "totalFailed" : 17
   }, {
     "assertionName" : "The current Definition full file contains all previously published data unchanged.",
     "assertionUuid" : "433adc93-fdd5-462a-b1fa-11fb4045a9ec",

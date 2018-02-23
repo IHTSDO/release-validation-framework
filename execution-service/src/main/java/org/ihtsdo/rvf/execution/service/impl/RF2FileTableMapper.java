@@ -16,7 +16,7 @@ public class RF2FileTableMapper {
 	private static final String COMPLEX_MAP_FILE_HEADER = "der2_iissscRefset_.*ComplexMap";
 	private static final String EXTENDED_MAP_FILE_HEADER = "der2_iisssccRefset_.*ExtendedMap";
 	private static final String ATTRIBUTE_VALUE_FILE_HEADER = "der2_cRefset_.*AttributeValue";
-	private static final String ASSOCIATION_REFERENCE_FILE_HEADER = "der2_cRefset_.*AssociationReference";
+	private static final String ASSOCIATION_REFERENCE_FILE_HEADER = "der2_cRefset_.*Association";
 	private static final String DESCRIPTION_FILE_HEADER = "sct2_Description_";
 	private static final String CONCEPT_FILE_HEADER = "sct2_Concept_";
 	private static final String EXPRESSION_ASSOCIATION_FILE_HEADER = "der2_sscccRefset_.*ExpressionAssociation";
