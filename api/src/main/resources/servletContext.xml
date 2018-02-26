@@ -71,7 +71,7 @@
 		<constructor-arg value="${rvf.autoscaling.ec2SubnetId}"/>
 	</bean>
     
-    <bean id="instanceManager" class ="org.ihtsdo.rvf.autoscaling.InstanceManager" init-method="init">
+    <bean id="instanceManager" class ="org.ihtsdo.rvf.autoscaling.InstanceManager">
     	<constructor-arg>
 			<bean class="com.amazonaws.auth.BasicAWSCredentials">
 				<constructor-arg value="${aws.key}" />

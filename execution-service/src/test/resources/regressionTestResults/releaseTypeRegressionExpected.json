@@ -140,7 +140,7 @@
       "conceptId" : "703860006",
       "detail" : "Description: id=2989790014 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 34
+    "totalFailed" : 31
   }, {
     "assertionName" : "New inactive states for existing components must have active states in the previous SIMPLE REFSET snapshot.",
     "assertionUuid" : "9190473a-29f7-40fc-b879-9ae0d038b681",

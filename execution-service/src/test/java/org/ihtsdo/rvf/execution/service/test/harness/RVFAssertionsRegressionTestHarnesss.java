@@ -159,7 +159,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
-		assertEquals(257, assertions.size());
+		assertEquals(259, assertions.size());
 		assertEquals(103, releaseTypeAssertions.size());
 	}
 	
@@ -168,7 +168,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		AssertionGroup group = assertionService.getAssertionGroupByName("int-authoring");
 		
 		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(21, assertions.size());
+		assertEquals(23, assertions.size());
 	}
 	
 	
@@ -214,7 +214,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		
 			if (result.getTotalFailed() < 0) {
 				throw new RuntimeException("Assetion didn't complete sucessfully!" + item.toString());
-			} 
+			}
 			
 			if (result.getTotalFailed() > 0) {
 				failureCounter ++;

@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 107,
-  "totalAssertionsFailed" : 104,
+  "totalAssertionsRun" : 110,
+  "totalAssertionsFailed" : 107,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -21,14 +21,8 @@
   }, {
     "assertionName" : "Active Non-human refset members refer to active components.",
     "assertionUuid" : "8479317e-8459-4362-bee8-628b8220f1e4",
-    "firstNInstances" : [ {
-      "conceptId" : "699765003",
-      "detail" : "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components."
-    }, {
-      "conceptId" : "699765003",
-      "detail" : "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components."
-    } ],
-    "totalFailed" : 2
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "The FSN term should be unique in active content.",
     "assertionUuid" : "8d6ab114-caca-4d99-9fec-bb8fd9cea518",
@@ -444,8 +438,8 @@
       "conceptId" : "702386002",
       "detail" : "  Fracture clinic"
     }, {
-      "conceptId" : "703860006",
-      "detail" : "Exposure to vibration"
+      "conceptId" : "702386002",
+      "detail" : "  Fracture clinic"
     }, {
       "conceptId" : "703860006",
       "detail" : "Exposure to vibration  "
@@ -461,8 +455,11 @@
     }, {
       "conceptId" : "702386002",
       "detail" : "Toenail abnormality (observable entity)"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Toenail abnormality (observable entity)"
     } ],
-    "totalFailed" : 8
+    "totalFailed" : 9
   }, {
     "assertionName" : "Terms that contain en-gb specific words are in the en-gb language refset.",
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
@@ -519,9 +516,12 @@
     "assertionUuid" : "d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e",
     "firstNInstances" : [ {
       "conceptId" : "702769005",
-      "detail" : "FSN=Blood Group Antibody I (substance) concept=702769005: FSN term is not unique in description snapshot when case is ignored"
+      "detail" : "FSN=Blood group antibody I (substance) concept=702769005: FSN term is not unique in description snapshot when case is ignored"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "FSN=Blood group antibody i (substance) concept=702386002: FSN term is not unique in description snapshot when case is ignored"
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "No active definitions contain leading or trailing spaces.",
     "assertionUuid" : "da3ae7c4-6144-4cd5-9530-2a7780c53c9a",
@@ -687,13 +687,13 @@
       "conceptId" : "703860006",
       "detail" : "Active description id=2989790014 has no langrefset member"
     }, {
-      "conceptId" : "703860006",
-      "detail" : "Active description id=2989790014 has no langrefset member"
+      "conceptId" : "703649005",
+      "detail" : "Active description id=2990804019 has no langrefset member"
     }, {
       "conceptId" : "703860006",
-      "detail" : "Active description id=2989790019 has no langrefset member"
+      "detail" : "Active description id=2989790015 has no langrefset member"
     } ],
-    "totalFailed" : 22
+    "totalFailed" : 20
   }, {
     "assertionName" : "Active historical association refset members have inactive concepts as reference components.",
     "assertionUuid" : "f7117eb0-7cd6-11e1-b0c4-0800200c9a66",
@@ -750,10 +750,13 @@
       "conceptId" : "702386002",
       "detail" : "702386002 |Toxic effect of antimony and/or its compounds (disorder)|"
     }, {
+      "conceptId" : "702386002",
+      "detail" : "702386002 |Blood group antibody i (substance)|"
+    }, {
       "conceptId" : "700132006",
       "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
     } ],
-    "totalFailed" : 4
+    "totalFailed" : 5
   }, {
     "assertionName" : "AttributeInGroupCardinality value is in ('0..0', '0..1', '0..*') in MRCM ATTRIBUTE DOMAIN delta file",
     "assertionUuid" : "1f6a9168-534a-4ebe-b0e7-3f424e56a7d1",
@@ -766,14 +769,14 @@
     "assertionName" : "No active Terms contain double spaces.",
     "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
     "firstNInstances" : [ {
-      "conceptId" : "703860006",
-      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
-    }, {
       "conceptId" : "702386002",
       "detail" : "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces."
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
     } ],
     "totalFailed" : 3
   }, {
@@ -791,11 +794,8 @@
     }, {
       "conceptId" : "703860006",
       "detail" : "DESC: Id=2989790014: non-unique term within concept."
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "DESC: Id=2989790014: non-unique term within concept."
     } ],
-    "totalFailed" : 5
+    "totalFailed" : 4
   }, {
     "assertionName" : "All inferred relationships in which the concept associated is inactive, are inactive relationships.",
     "assertionUuid" : "2e4fd620-7d08-11e1-b0c4-0800200c9a66",
@@ -1116,8 +1116,17 @@
     }, {
       "conceptId" : "702386002",
       "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "DESC: conceptid=702386002:Active FSN for a given concept with different semantic tag."
     } ],
-    "totalFailed" : 3
+    "totalFailed" : 6
   }, {
     "assertionName" : "Check that the expression constraints, refinements and expression templates in multiple columns in MRCM Domain Refset include only valid SNOMED CT concept identifiers",
     "assertionUuid" : "5d0fdbf5-fef6-44b2-aa42-ebb302132178",
