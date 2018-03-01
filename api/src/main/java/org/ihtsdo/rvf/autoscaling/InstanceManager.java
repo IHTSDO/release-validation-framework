@@ -64,8 +64,6 @@ public class InstanceManager {
 	}
 
 	public List<String> createInstance(int totalToCreate) {
-		ec2InstanceStartupScript = Base64
-				.encodeBase64String(constructStartUpScript().getBytes());
 		RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
 		runInstancesRequest.withImageId(imageId).withInstanceType(instanceType)
 				.withMinCount(1).withMaxCount(totalToCreate)
@@ -99,7 +97,7 @@ public class InstanceManager {
 		}
 		return ids;
 	}
-	
+
 	public Map<String,String> getPublicIpAddress(List<String> instanceIds) {
 		Map<String, String> instacneIpAddressMap = new HashMap<>();
 		try {
@@ -191,7 +189,7 @@ public class InstanceManager {
 			logger.error(msg, e);
 			throw new RuntimeException(msg, e);
 		}
-	
+
 		List<String> activeInstances = new ArrayList<>();
 		for (Instance instance : instances) {
 			InstanceState state = instance.getState();
@@ -292,22 +290,19 @@ public class InstanceManager {
 		return propertiesByFileName;
 	}
 
-	public String constructStartUpScript() {
+	private String constructStartUpScript() {
 		String appVersion = getAppVersion();
 		StringBuilder builder = new StringBuilder();
-		builder.append("#!/bin/sh\n");		
+		builder.append("#!/bin/sh\n");
 		builder.append("sudo apt-get update -o Dir::Etc::sourcelist=\"sources.list.d/maven_ihtsdotools_org_content_repositories_*\""
 				+ "\n");
 		if (appVersion != null && !appVersion.isEmpty()) {
 			builder.append("sudo apt-get install --force-yes -y rvf-api="
 					+ appVersion + "\n");
-			builder.append("if [ $? != 0 ]\n");
-			builder.append(" then\n" );
-			builder.append("sudo apt-get install --force-yes -y rvf-api \n");
-			builder.append("fi\n");
 		} else {
 			builder.append("sudo apt-get install --force-yes -y rvf-api \n");
 		}
+		builder.append("sudo dpkg -s rvf-api\n");
 		String rvfConfig = System.getProperty(RVF_CONFIG_LOCATION);
 		Map<String, String> propertyStrByFilename = getProperties(rvfConfig);
 		for (String filename : propertyStrByFilename.keySet()) {
@@ -318,9 +313,9 @@ public class InstanceManager {
 		builder.append("git clone");
 		if (droolsRulesVersion != null && !droolsRulesVersion.isEmpty()) {
 			//git clone -b 'v1.9'
-			builder.append(" -b " +"'v" + droolsRulesVersion + "'");		
+			builder.append(" -b " +"'v" + droolsRulesVersion + "'");
 			builder.append(" --single-branch");
-		} 
+		}
 		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
 		builder.append(" https://github.com/IHTSDO/snomed-drools-rules.git ");
 		if (droolsRuelsModuleName == null || droolsRuelsModuleName.isEmpty() || !droolsRuelsModuleName.startsWith("/")) {
@@ -329,12 +324,7 @@ public class InstanceManager {
 		builder.append(droolsRuelsModuleName + "\n");
 		builder.append("sudo chown -R rvf-api:rvf-api " + droolsRuelsModuleName + "\n");
 		builder.append("sudo supervisorctl start rvf-api" + "\n");
-		builder.append("if [ $? = 0 ]\n");
-		builder.append(" then\n" );
-		builder.append("exit 0\n");
-		builder.append("else\n");
-		builder.append("sudo halt\n");
-		builder.append("fi\n");
+		builder.append("exit 0");
 		return builder.toString();
 	}
 

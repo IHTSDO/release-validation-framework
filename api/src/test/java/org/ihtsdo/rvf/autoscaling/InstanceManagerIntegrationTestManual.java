@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class InstanceManagerIntegrationTestManual {
 	@Autowired
 	InstanceManager instanceManager;
-	
+
 	@Test
 	@Ignore
 	public void testCreateEc2Instance() {
@@ -33,8 +33,8 @@ public class InstanceManagerIntegrationTestManual {
 		Assert.assertNotNull(result);
 		instanceManager.terminate( Arrays.asList("i-e3021268"));
 	}
-	
-	
+
+
 	@Test
 	@Ignore
 	public void testGetInstanceStatus() {
@@ -44,11 +44,5 @@ public class InstanceManagerIntegrationTestManual {
 		List<String> result = instanceManager.checkActiveInstances(instanceIds);
 		Assert.assertNotNull(result);
 		Assert.assertEquals(2, instanceIds.size());
-	}
-	
-	@Test
-	public void testConStructStartupScript() {
-		String script = instanceManager.constructStartUpScript();
-		System.out.println(script);
 	}
 }
