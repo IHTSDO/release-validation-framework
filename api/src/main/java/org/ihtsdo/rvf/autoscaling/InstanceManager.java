@@ -310,7 +310,7 @@ public class InstanceManager {
 					+ "\" > " + rvfConfig + "/" + filename + "\n");
 		}
 		// checkout drools version
-		builder.append("git clone");
+		builder.append("sudo git clone");
 		if (droolsRulesVersion != null && !droolsRulesVersion.isEmpty()) {
 			//git clone -b 'v1.9'
 			builder.append(" -b " +"'v" + droolsRulesVersion + "'");
