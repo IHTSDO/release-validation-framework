@@ -184,10 +184,15 @@ public class ValidationRunner {
 	private void runDroolsAssertions(Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws RVFExecutionException {
 		long timeStart = new Date().getTime();
 
-		Set<String> ruleSetNamesToRun = Sets.newHashSet(validationConfig.getGroupsList());
-		List<InvalidContent> invalidContents = null;
+		Set<String> assertionGroups = Sets.newHashSet(validationConfig.getGroupsList());
+		int totalTestsRun = 0;
+		List<InvalidContent> invalidContents;
 		try (InputStream snapshotStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
-			invalidContents = new DroolsRF2Validator().validateSnapshot(snapshotStream, droolsRuleDirectoryPath, ruleSetNamesToRun);
+			DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath);
+			invalidContents = droolsRF2Validator.validateSnapshot(snapshotStream, assertionGroups);
+			for (String assertionGroup : assertionGroups) {
+				totalTestsRun += droolsRF2Validator.getRuleExecutor().getAssertionGroupRuleCount(assertionGroup);
+			}
 		} catch (ReleaseImportException | IOException e) {
 			throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
 		}
@@ -214,11 +219,10 @@ public class ValidationRunner {
 			assertionDroolRules.add(assertionDroolRule);
 		}
 
-
 		final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
 		report.setAssertionsInvalidContent(assertionDroolRules);
 		report.setExecutionId(executionConfig.getExecutionId());
-		report.setTotalTestsRun(ruleExecutor.getTotalRulesLoaded());
+		report.setTotalTestsRun(totalTestsRun);
 		report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
 		report.setTotalFailures(invalidContents.size());
 		report.setRuleSetExecuted(validationConfig.getGroupsList().iterator().next());
