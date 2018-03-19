@@ -5,16 +5,9 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.drools.RuleExecutor;
 import org.ihtsdo.drools.response.InvalidContent;
-import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentFactory;
-import org.ihtsdo.drools.validator.rf2.SnomedDroolsComponentRepository;
-import org.ihtsdo.drools.validator.rf2.domain.DroolsConcept;
-import org.ihtsdo.drools.validator.rf2.service.DroolsConceptService;
-import org.ihtsdo.drools.validator.rf2.service.DroolsDescriptionService;
-import org.ihtsdo.drools.validator.rf2.service.DroolsRelationshipService;
+import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
-import org.ihtsdo.otf.snomedboot.ReleaseImporter;
-import org.ihtsdo.otf.snomedboot.factory.LoadingProfile;
 import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
@@ -26,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
@@ -166,8 +158,13 @@ public class ValidationRunner {
 			runAssertionTests(report, executionConfig, reportStorage);
 		}
 
-		//Run Drool Validator
-		runDroolValidator(responseMap, validationConfig, executionConfig);
+		// Run Drools Validator
+		try {
+			runDroolsAssertions(responseMap, validationConfig, executionConfig);
+		} catch (RVFExecutionException e) {
+			reportService.writeResults(responseMap, State.FAILED, reportStorage);
+			return;
+		}
 
 		//Run MRCM Validator
 //		runMRCMAssertionTests(report, validationConfig, executionConfig);
@@ -184,21 +181,17 @@ public class ValidationRunner {
 		releaseDataManager.clearQAResult(executionConfig.getExecutionId());
 	}
 
-	private void runDroolValidator(Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) {
-		long timeStart = (new Date()).getTime();
-		//String releaseFilePath = "D:\\Projects\\SNOMED\\release-validation-framework\\xSnomedCT_MRCMReferenceSets_Beta_20170210.zip";
-		String directoryOfRuleSetsPath = droolRulesModuleName;
+	private void runDroolsAssertions(Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws RVFExecutionException {
+		long timeStart = new Date().getTime();
 
-		HashSet<String> ruleSetNamesToRun = Sets.newHashSet(validationConfig.getGroupsList().iterator().next());
+		Set<String> ruleSetNamesToRun = Sets.newHashSet(validationConfig.getGroupsList());
 		List<InvalidContent> invalidContents = null;
-		try {
-			invalidContents = validateRF2(new FileInputStream(validationConfig.getLocalProspectiveFile()), directoryOfRuleSetsPath, ruleSetNamesToRun);
-		} catch (ReleaseImportException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+		try (InputStream snapshotStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
+			invalidContents = new DroolsRF2Validator().validateSnapshot(snapshotStream, droolsRuleDirectoryPath, ruleSetNamesToRun);
+		} catch (ReleaseImportException | IOException e) {
+			throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
 		}
-		RuleExecutor ruleExecutor = new RuleExecutor(directoryOfRuleSetsPath);
+		RuleExecutor ruleExecutor = new RuleExecutor(droolsRuleDirectoryPath);
 		HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
 		for(InvalidContent invalidContent : invalidContents){
 			if(!invalidContentMap.containsKey(invalidContent.getMessage())){
@@ -210,17 +203,15 @@ public class ValidationRunner {
 			}
 		}
 		invalidContents.clear();
+
 		List<AssertionDroolRule> assertionDroolRules = new ArrayList<>();
-		Iterator it = invalidContentMap.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry pair = (Map.Entry)it.next();
+		for (String ruleName : invalidContentMap.keySet()) {
 			AssertionDroolRule assertionDroolRule = new AssertionDroolRule();
-			List<InvalidContent> invalidContentList = (List<InvalidContent>) pair.getValue();
-			assertionDroolRule.setGroupRule((String)pair.getKey());
+			assertionDroolRule.setGroupRule(ruleName);
+			List<InvalidContent> invalidContentList = invalidContentMap.get(ruleName);
 			assertionDroolRule.setTotalFails(invalidContentList.size());
 			assertionDroolRule.setContentItems(invalidContentList);
 			assertionDroolRules.add(assertionDroolRule);
-			it.remove(); // avoids a ConcurrentModificationException
 		}
 
 
@@ -232,31 +223,6 @@ public class ValidationRunner {
 		report.setTotalFailures(invalidContents.size());
 		report.setRuleSetExecuted(validationConfig.getGroupsList().iterator().next());
 		responseMap.put(report.getTestType().toString() + "TestResult", report);
-
-	}
-
-	private List<InvalidContent> validateRF2(InputStream fileInputStream, String directoryOfRuleSetsPath, HashSet<String> ruleSetNamesToRun) throws ReleaseImportException {
-		long start = (new Date()).getTime();
-		Assert.isTrue((new File(directoryOfRuleSetsPath)).isDirectory(), "The rules directory is not accessible.");
-		Assert.isTrue(ruleSetNamesToRun != null && !ruleSetNamesToRun.isEmpty(), "The name of at least one rule set must be specified.");
-		ReleaseImporter importer = new ReleaseImporter();
-		SnomedDroolsComponentRepository repository = new SnomedDroolsComponentRepository();
-		this.logger.info("Loading components from RF2");
-		LoadingProfile loadingProfile = LoadingProfile.complete;
-
-		importer.loadSnapshotReleaseFiles(fileInputStream, loadingProfile,  new SnomedDroolsComponentFactory(repository));
-		this.logger.info("Components loaded");
-		DroolsConceptService conceptService = new DroolsConceptService(repository);
-		DroolsDescriptionService descriptionService = new DroolsDescriptionService(repository);
-		DroolsRelationshipService relationshipService = new DroolsRelationshipService(repository);
-		RuleExecutor ruleExecutor = new RuleExecutor(directoryOfRuleSetsPath);
-
-		Collection<DroolsConcept> concepts = repository.getConcepts();
-		this.logger.info("Running tests");
-		List<InvalidContent> invalidContents = ruleExecutor.execute(ruleSetNamesToRun, concepts, conceptService, descriptionService, relationshipService, true, false);
-		this.logger.info("Tests complete. Total run time {} seconds", Long.valueOf(((new Date()).getTime() - start) / 1000L));
-		this.logger.info("invalidContent count {}", Integer.valueOf(invalidContents.size()));
-		return invalidContents;
 	}
 
 	private void runExtensionReleaseValidation(final ValidationReport report, final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
