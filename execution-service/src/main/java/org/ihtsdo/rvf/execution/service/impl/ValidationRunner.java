@@ -68,10 +68,11 @@ public class ValidationRunner {
 	@Autowired
 	ValidationVersionLoader releaseVersionLoader;
 
-	private String droolRulesModuleName;
+	private String droolsRuleDirectoryPath;
 	
-	public ValidationRunner( int batchSize) {
+	public ValidationRunner(int batchSize, String droolsRuleDirectoryPath) {
 		this.batchSize = batchSize;
+		this.droolsRuleDirectoryPath = droolsRuleDirectoryPath;
 	}
 	
 	public void run(ValidationRunConfig validationConfig) {
@@ -416,7 +417,4 @@ public class ValidationRunner {
 		return results;
 	}
 
-	public void setDroolRulesModuleName(String droolRulesModuleName) {
-		this.droolRulesModuleName = droolRulesModuleName;
-	}
 }
