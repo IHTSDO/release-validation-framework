@@ -130,16 +130,5 @@
 			<artifactId>snomed-drools-rf2-validator</artifactId>
 			<version>${snomed-drools.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.snomed.otf</groupId>
-			<artifactId>snomed-boot</artifactId>
-			<version>1.4.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.google.collections</groupId>
-					<artifactId>google-collections</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 	</dependencies>
 </project>
