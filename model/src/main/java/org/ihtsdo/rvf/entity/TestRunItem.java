@@ -10,8 +10,10 @@ import java.util.UUID;
 public class TestRunItem implements Comparable<TestRunItem>{
 
 	private String testCategory;
+	private TestType testType;
 	private UUID assertionUuid;
 	private String assertionText;
+	private String severity;
 	private String executionId;
 	private Long queryInMilliSeconds;
 	private Long failureCount;
@@ -34,6 +36,13 @@ public class TestRunItem implements Comparable<TestRunItem>{
 		return testCategory;
 	}
 
+	public TestType getTestType() {
+		return testType;
+	}
+
+	public void setTestType(TestType testType) {
+		this.testType = testType;
+	}
 
 	public String getFailureMessage() {
 		return failureMessage;
@@ -46,6 +55,7 @@ public class TestRunItem implements Comparable<TestRunItem>{
 				"assertionText=" + assertionText +  '\'' +	
 				"executionId=" + executionId + '\'' +
 				"testCategory=" + testCategory + '\'' +
+				"testType=" + testType + '\'' +
 				"runTime=" + queryInMilliSeconds + '\'' +
 				"failureCount=" + failureCount +
 				'}';
@@ -103,6 +113,14 @@ public class TestRunItem implements Comparable<TestRunItem>{
 		this.assertionText = assertionText;
 	}
 
+	public String getSeverity() {
+		return severity;
+	}
+
+	public void setSeverity(String severity) {
+		this.severity = severity;
+	}
+
 	public UUID getAssertionUuid() {
 		return assertionUuid;
 	}
@@ -145,6 +163,8 @@ public class TestRunItem implements Comparable<TestRunItem>{
 						.hashCode());
 		result = prime * result
 				+ ((testCategory == null) ? 0 : testCategory.hashCode());
+		result = prime * result
+				+ ((testType == null) ? 0 : testType.hashCode());
 		return result;
 	}
 
@@ -201,6 +221,11 @@ public class TestRunItem implements Comparable<TestRunItem>{
 			if (other.testCategory != null)
 				return false;
 		} else if (!testCategory.equals(other.testCategory))
+			return false;
+		if (testType == null) {
+			if (other.testType != null)
+				return false;
+		} else if (!testType.equals(other.testType))
 			return false;
 		return true;
 	}
