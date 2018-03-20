@@ -52,9 +52,14 @@ public class InstanceManager {
 	private String ec2SubnetId;
 	private String ec2InstanceStartupScript;
 
-	public InstanceManager(AWSCredentials credentials, String ec2Endpoint) {
+	private String droolsRulesVersion;
+	private String droolsRulesDirectory;
+
+	public InstanceManager(AWSCredentials credentials, String ec2Endpoint, String droolsRulesVersion, String droolsRulesDirectory) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
 		amazonEC2Client.setEndpoint(ec2Endpoint);
+		this.droolsRulesVersion = droolsRulesVersion;
+		this.droolsRulesDirectory = droolsRulesDirectory;
 		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
 
@@ -304,6 +309,20 @@ public class InstanceManager {
 			builder.append("sudo echo \"" + propertyStrByFilename.get(filename)
 					+ "\" > " + rvfConfig + "/" + filename + "\n");
 		}
+		// checkout drools version
+		builder.append("sudo git clone");
+		if (droolsRulesVersion != null && !droolsRulesVersion.isEmpty()) {
+			//git clone -b 'v1.9'
+			builder.append(" -b " +"'v" + droolsRulesVersion + "'");
+			builder.append(" --single-branch");
+		}
+		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
+		builder.append(" https://github.com/IHTSDO/snomed-drools-rules.git ");
+		if (droolsRulesDirectory == null || droolsRulesDirectory.isEmpty() || !droolsRulesDirectory.startsWith("/")) {
+			droolsRulesDirectory= "/opt/snomed-drools-rules/";
+		}
+		builder.append(droolsRulesDirectory + "\n");
+		builder.append("sudo chown -R rvf-api:rvf-api " + droolsRulesDirectory + "\n");
 		builder.append("sudo supervisorctl start rvf-api" + "\n");
 		builder.append("exit 0");
 		return builder.toString();

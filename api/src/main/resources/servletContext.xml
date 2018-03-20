@@ -73,6 +73,8 @@
 			</bean>
 		</constructor-arg>
 		<constructor-arg ref="ec2Endpoint"/>
+       <constructor-arg name="droolsRulesVersion" value="${rvf.drools.rule.version}"/>
+       <constructor-arg name="droolsRulesDirectory" value="${rvf.drools.rule.directory}"/>
 	</bean>
     <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>
     <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.impl.ValidationLogFactoryImpl"/>
