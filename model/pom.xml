@@ -9,6 +9,10 @@
     <artifactId>model</artifactId>
     <name>model</name>
 
+    <properties>
+        <snomed-drools.version>1.5.0-SNAPSHOT</snomed-drools.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -38,7 +42,7 @@
         <dependency>
             <groupId>org.ihtsdo.drools</groupId>
             <artifactId>snomed-drools-engine</artifactId>
-            <version>1.3.0-SNAPSHOT</version>
+            <version>${snomed-drools.version}</version>
         </dependency>
     </dependencies>
 
