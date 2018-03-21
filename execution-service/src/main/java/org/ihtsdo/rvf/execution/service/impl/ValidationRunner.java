@@ -25,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 @Service
 @Scope("prototype")
@@ -120,7 +121,7 @@ public class ValidationRunner {
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			return;
-		} 
+		}
 
 		//load previous published version
 		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
@@ -183,14 +184,17 @@ public class ValidationRunner {
 
 	private void runDroolsAssertions(Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws RVFExecutionException {
 		long timeStart = new Date().getTime();
+		//Filter only Drools rules set from all the assertion groups
+		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getGroupsList()));
 
-		Set<String> assertionGroups = Sets.newHashSet(validationConfig.getGroupsList());
+		//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
+		if(droolsRulesSets.isEmpty()) return;
 		int totalTestsRun = 0;
 		List<InvalidContent> invalidContents;
 		try (InputStream snapshotStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
 			DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath);
-			invalidContents = droolsRF2Validator.validateSnapshot(snapshotStream, assertionGroups);
-			for (String assertionGroup : assertionGroups) {
+			invalidContents = droolsRF2Validator.validateSnapshot(snapshotStream, droolsRulesSets);
+			for (String assertionGroup : droolsRulesSets) {
 				totalTestsRun += droolsRF2Validator.getRuleExecutor().getAssertionGroupRuleCount(assertionGroup);
 			}
 		} catch (ReleaseImportException | IOException e) {
@@ -208,14 +212,15 @@ public class ValidationRunner {
 			}
 		}
 		invalidContents.clear();
-
+		
 		List<AssertionDroolRule> assertionDroolRules = new ArrayList<>();
+		int failureExportMax = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
 		for (String ruleName : invalidContentMap.keySet()) {
 			AssertionDroolRule assertionDroolRule = new AssertionDroolRule();
 			assertionDroolRule.setGroupRule(ruleName);
 			List<InvalidContent> invalidContentList = invalidContentMap.get(ruleName);
 			assertionDroolRule.setTotalFails(invalidContentList.size());
-			assertionDroolRule.setContentItems(invalidContentList);
+			assertionDroolRule.setContentItems(invalidContentList.stream().limit(failureExportMax).collect(Collectors.toList()));
 			assertionDroolRules.add(assertionDroolRule);
 		}
 
@@ -224,9 +229,22 @@ public class ValidationRunner {
 		report.setExecutionId(executionConfig.getExecutionId());
 		report.setTotalTestsRun(totalTestsRun);
 		report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-		report.setTotalFailures(invalidContents.size());
-		report.setRuleSetExecuted(validationConfig.getGroupsList().iterator().next());
+		report.setTotalFailures(invalidContentMap.size());
+		report.setRuleSetExecuted(String.join(",", droolsRulesSets));
 		responseMap.put(report.getTestType().toString() + "TestResult", report);
+	}
+
+	private Set<String> getDroolsRulesSetFromAssertionGroups(Set<String> assertionGroups) throws RVFExecutionException {
+		File droolsRuleDir = new File(droolsRuleDirectoryPath);
+		if(!droolsRuleDir.isDirectory()) throw new RVFExecutionException("Drools rules directory path " + droolsRuleDirectoryPath + " is not a directory or inaccessible");
+		Set<String> droolsRulesModules = new HashSet<>();
+		File[] droolsRulesSubfiles = droolsRuleDir.listFiles();
+		for (File droolsRulesSubfile : droolsRulesSubfiles) {
+			if(droolsRulesSubfile.isDirectory()) droolsRulesModules.add(droolsRulesSubfile.getName());
+		}
+		//Only keep the assertion groups with matching Drools Rule modules in the Drools Directory
+		droolsRulesModules.retainAll(assertionGroups);
+		return droolsRulesModules;
 	}
 
 	private void runExtensionReleaseValidation(final ValidationReport report, final Map<String, Object> responseMap, ValidationRunConfig validationConfig, String reportStorage,
