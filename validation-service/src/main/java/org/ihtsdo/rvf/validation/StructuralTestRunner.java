@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class StructuralTestRunner implements InitializingBean{
@@ -85,12 +86,12 @@ public class StructuralTestRunner implements InitializingBean{
 	}
 	
 	public boolean verifyZipFileStructure(final ValidationReport validationReport, final File tempFile, final Long runId, final File manifestFile,
-										  final boolean writeSucceses, final String urlPrefix, String storageLocation ) throws IOException {
-		 boolean isFailed = false;
-		 final long timeStart = System.currentTimeMillis();
-		 if (tempFile != null) {
-			 logger.debug("Start verifying zip file structure of {} against manifest", tempFile.getAbsolutePath());
-		 }
+										  final boolean writeSucceses, final String urlPrefix, String storageLocation, Integer maxFailuresExport ) throws IOException {
+		boolean isFailed = false;
+		final long timeStart = System.currentTimeMillis();
+		if (tempFile != null) {
+			logger.debug("Start verifying zip file structure of {} against manifest", tempFile.getAbsolutePath());
+		}
 		// convert groups which is passed as string to assertion groups
 		// set up the response in order to stream directly to the response
 		final File structureTestReport = new File(getReportDataFolder(), "structure_validation_"+ runId+".txt");
@@ -139,7 +140,7 @@ public class StructuralTestRunner implements InitializingBean{
 		return isFailed;
 	}
 
-	private void extractFailedTestsToReport(final ValidationReport validationReport, TestReportable report) {
+	private void extractFailedTestsToReport(final ValidationReport validationReport, TestReportable report, Integer maxFailuresExport) {
 		List<StructuralTestRunItem> structuralTestFailItems = report.getFailedItems();
 		Map<String,List<FailureDetail>> structuralTestFailItemMap = new HashMap<>();
 		for(StructuralTestRunItem structuralTestRunItem : structuralTestFailItems){
@@ -149,9 +150,9 @@ public class StructuralTestRunner implements InitializingBean{
 			} else {
 				failDetailList = new ArrayList<>();
 			}
-			String failMsg = "Column: " + structuralTestRunItem.getColumnName() + 
-							" - Line: " + structuralTestRunItem.getLineNr() + 
-							" - Message :" + structuralTestRunItem.getActualExpectedValue();
+			String failMsg = "Structural test " + structuralTestRunItem.getTestType() +
+					" failed at row-column " + structuralTestRunItem.getExecutionId() +
+					" with error: " + structuralTestRunItem.getActualExpectedValue();
 			FailureDetail testFailItem  = new FailureDetail("",failMsg);
 			failDetailList.add(testFailItem);
 			structuralTestFailItemMap.put(structuralTestRunItem.getFileName(), failDetailList);
@@ -159,13 +160,14 @@ public class StructuralTestRunner implements InitializingBean{
 		
 		if(!structuralTestFailItemMap.isEmpty()){
 			List<TestRunItem> testRunFailItems = new ArrayList<>();
+			int firstNInstance = maxFailuresExport != null ? maxFailuresExport : 10;
 			for(String key : structuralTestFailItemMap.keySet()){
 				List<FailureDetail> failItems = structuralTestFailItemMap.get(key);
 				
 				TestRunItem item = new TestRunItem();
 				item.setTestCategory(key);
 				item.setTestType(TestType.ARCHIVE_STRUCTURAL);
-				item.setFirstNInstances(failItems.subList(0, failItems.size() > 10 ? 10 : failItems.size()));
+				item.setFirstNInstances(failItems.stream().limit(firstNInstance).collect(Collectors.toList()));
 				item.setFailureCount((long) failItems.size());
 				testRunFailItems.add(item);
 			}

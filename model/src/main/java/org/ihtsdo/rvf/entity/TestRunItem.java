@@ -232,6 +232,9 @@ public class TestRunItem implements Comparable<TestRunItem>{
 
 	@Override
 	public int compareTo(TestRunItem other) {
+		if(other.assertionUuid == null || this.assertionUuid == null) {
+			return 0;
+		}
 		return this.assertionUuid.compareTo(other.getAssertionUuid());
 	}
 	

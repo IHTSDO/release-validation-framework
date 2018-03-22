@@ -116,7 +116,8 @@ public class ValidationRunner {
 		report.setExecutionId(validationConfig.getRunId());
 
 		boolean isFailed = structuralTestRunner.verifyZipFileStructure(report, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(),
-				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation());
+				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation(),
+				validationConfig.getFailureExportMax());
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
