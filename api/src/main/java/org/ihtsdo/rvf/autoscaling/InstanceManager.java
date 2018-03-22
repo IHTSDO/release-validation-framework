@@ -54,12 +54,14 @@ public class InstanceManager {
 
 	private String droolsRulesVersion;
 	private String droolsRulesDirectory;
+	private String droolsRulesRepository;
 
-	public InstanceManager(AWSCredentials credentials, String ec2Endpoint, String droolsRulesVersion, String droolsRulesDirectory) {
+	public InstanceManager(AWSCredentials credentials, String ec2Endpoint, String droolsRulesVersion, String droolsRulesDirectory, String droolsRulesRepository) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
 		amazonEC2Client.setEndpoint(ec2Endpoint);
 		this.droolsRulesVersion = droolsRulesVersion;
 		this.droolsRulesDirectory = droolsRulesDirectory;
+		this.droolsRulesRepository = droolsRulesRepository;
 		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
 
@@ -317,7 +319,7 @@ public class InstanceManager {
 			builder.append(" --single-branch");
 		}
 		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
-		builder.append(" https://github.com/IHTSDO/snomed-drools-rules.git ");
+		builder.append(" " + droolsRulesRepository + " ");
 		if (droolsRulesDirectory == null || droolsRulesDirectory.isEmpty() || !droolsRulesDirectory.startsWith("/")) {
 			droolsRulesDirectory= "/opt/snomed-drools-rules/";
 		}
