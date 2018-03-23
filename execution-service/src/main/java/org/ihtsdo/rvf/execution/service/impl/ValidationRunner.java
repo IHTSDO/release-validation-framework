@@ -196,7 +196,6 @@ public class ValidationRunner {
 		} catch (ReleaseImportException | IOException e) {
 			throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
 		}
-		RuleExecutor ruleExecutor = new RuleExecutor(droolsRuleDirectoryPath);
 		HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
 		for(InvalidContent invalidContent : invalidContents){
 			if(!invalidContentMap.containsKey(invalidContent.getMessage())){
