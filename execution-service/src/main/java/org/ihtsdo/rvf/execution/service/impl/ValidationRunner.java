@@ -161,12 +161,7 @@ public class ValidationRunner {
 		}
 
 		// Run Drools Validator
-		try {
-			runDroolsAssertions(responseMap, validationConfig, executionConfig);
-		} catch (RVFExecutionException e) {
-			reportService.writeResults(responseMap, State.FAILED, reportStorage);
-			return;
-		}
+		runDroolsAssertions(responseMap, validationConfig, executionConfig);
 
 		//Run MRCM Validator
 //		runMRCMAssertionTests(report, validationConfig, executionConfig);
