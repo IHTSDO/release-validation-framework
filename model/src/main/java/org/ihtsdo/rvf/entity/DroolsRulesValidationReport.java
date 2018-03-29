@@ -11,6 +11,8 @@ public class DroolsRulesValidationReport {
     private int totalSkips;
     private int totalFailures;
     private String ruleSetExecuted;
+    private boolean isCompleted;
+    private String message;
 
     private List<AssertionDroolRule> assertionsInvalidContent;
 
@@ -88,5 +90,21 @@ public class DroolsRulesValidationReport {
 
     public void setRuleSetExecuted(String ruleSetExecuted) {
         this.ruleSetExecuted = ruleSetExecuted;
+    }
+
+    public boolean isCompleted() {
+        return isCompleted;
+    }
+
+    public void setCompleted(boolean completed) {
+        isCompleted = completed;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

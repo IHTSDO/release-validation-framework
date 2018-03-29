@@ -26,6 +26,7 @@ public class ValidationRunConfig {
 	private transient File localManifestFile;
 	private String s3PublishBucketName;
 	private boolean isRf2DeltaOnly;
+	private boolean enableDrools;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -232,5 +233,13 @@ public class ValidationRunConfig {
 	}
 	public void setExtensionDependency(String extensionDependency) {
 		this.extensionDependency = extensionDependency;
+	}
+
+	public boolean isEnableDrools() {
+		return enableDrools;
+	}
+
+	public void setEnableDrools(boolean enableDrools) {
+		this.enableDrools = enableDrools;
 	}
 }

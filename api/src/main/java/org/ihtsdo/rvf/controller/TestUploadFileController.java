@@ -181,6 +181,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = "runId") final Long runId,
 			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			@ApiParam(value = "Defaults to false") @RequestParam(value = "enableDrools", required = false) final boolean enableDrools,
 			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
@@ -196,7 +197,8 @@ public class TestUploadFileController {
 				.addExtensionDependencyVersion(extensionDependency)
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax).addUrl(urlPrefix)
-				.addProspectiveFilesInS3(false);
+				.addProspectiveFilesInS3(false)
+				.setEnableDrools(enableDrools);
 
 		// Before we start running, ensure that we've made our mark in the
 		// storage location
@@ -232,6 +234,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Unique run id e.g Timestamp") @RequestParam(value = "runId") final Long runId,
 			@ApiParam(value = "Defaults to 10") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			@ApiParam(value = "Defaults to false") @RequestParam(value = "enableDrools", required = false) final boolean enableDrools,
 			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
@@ -248,7 +251,8 @@ public class TestUploadFileController {
 				.addExtensionDependencyVersion(extensionDependency)
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax).addUrl(urlPrefix)
-				.addProspectiveFilesInS3(true);
+				.addProspectiveFilesInS3(true)
+				.setEnableDrools(enableDrools);
 
 		// Before we start running, ensure that we've made our mark in the
 		// storage location
@@ -346,6 +350,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = "runId") final Long runId,
 			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
+			@ApiParam(value = "Defaults to false") @RequestParam(value = "enableDrools", required = false) final boolean enableDrools,
 			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
@@ -359,7 +364,8 @@ public class TestUploadFileController {
 				.addExtensionDependencyVersion(extensionDependency)
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax).addUrl(urlPrefix)
-				.addProspectiveFilesInS3(false);
+				.addProspectiveFilesInS3(false)
+				.setEnableDrools(enableDrools);
 
 		// Before we start running, ensure that we've made our mark in the
 		// storage location

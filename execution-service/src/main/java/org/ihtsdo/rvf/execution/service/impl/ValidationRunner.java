@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.execution.service.impl;
 import com.google.common.collect.Sets;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.ihtsdo.drools.RuleExecutor;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
@@ -160,8 +161,12 @@ public class ValidationRunner {
 			runAssertionTests(report, executionConfig, reportStorage);
 		}
 
-		// Run Drools Validator
-		runDroolsAssertions(responseMap, validationConfig, executionConfig);
+		if(validationConfig.isEnableDrools()) {
+			// Run Drools Validator
+			runDroolsAssertions(responseMap, validationConfig, executionConfig);
+		}
+
+
 
 		//Run MRCM Validator
 //		runMRCMAssertionTests(report, validationConfig, executionConfig);
@@ -179,54 +184,67 @@ public class ValidationRunner {
 	}
 
 	private void runDroolsAssertions(Map<String, Object> responseMap, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws RVFExecutionException {
-		long timeStart = new Date().getTime();
-		//Filter only Drools rules set from all the assertion groups
-		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getGroupsList()));
 
-		//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
-		if(droolsRulesSets.isEmpty()) return;
-		int totalTestsRun = 0;
-		List<InvalidContent> invalidContents;
-		try (InputStream snapshotStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
-			DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath);
-			invalidContents = droolsRF2Validator.validateSnapshot(snapshotStream, droolsRulesSets);
-			for (String assertionGroup : droolsRulesSets) {
-				totalTestsRun += droolsRF2Validator.getRuleExecutor().getAssertionGroupRuleCount(assertionGroup);
+			long timeStart = new Date().getTime();
+			//Filter only Drools rules set from all the assertion groups
+			Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getGroupsList()));
+
+			//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
+			if(droolsRulesSets.isEmpty()) return;
+			int totalTestsRun = 0;
+			try {
+				List<InvalidContent> invalidContents;
+			try (InputStream snapshotStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
+				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath);
+				invalidContents = droolsRF2Validator.validateSnapshot(snapshotStream, droolsRulesSets);
+				for (String assertionGroup : droolsRulesSets) {
+					totalTestsRun += droolsRF2Validator.getRuleExecutor().getAssertionGroupRuleCount(assertionGroup);
+				}
+			} catch (ReleaseImportException | IOException e) {
+				throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
 			}
-		} catch (ReleaseImportException | IOException e) {
-			throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
-		}
-		HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
-		for(InvalidContent invalidContent : invalidContents){
-			if(!invalidContentMap.containsKey(invalidContent.getMessage())){
-				List<InvalidContent> invalidContentArrayList = new ArrayList<>();
-				invalidContentArrayList.add(invalidContent);
-				invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
-			}else {
-				invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
+			HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
+			for(InvalidContent invalidContent : invalidContents){
+				if(!invalidContentMap.containsKey(invalidContent.getMessage())){
+					List<InvalidContent> invalidContentArrayList = new ArrayList<>();
+					invalidContentArrayList.add(invalidContent);
+					invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
+				}else {
+					invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
+				}
 			}
-		}
-		invalidContents.clear();
-		
-		List<AssertionDroolRule> assertionDroolRules = new ArrayList<>();
-		int failureExportMax = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
-		for (String ruleName : invalidContentMap.keySet()) {
-			AssertionDroolRule assertionDroolRule = new AssertionDroolRule();
-			assertionDroolRule.setGroupRule(ruleName);
-			List<InvalidContent> invalidContentList = invalidContentMap.get(ruleName);
-			assertionDroolRule.setTotalFails(invalidContentList.size());
-			assertionDroolRule.setContentItems(invalidContentList.stream().limit(failureExportMax).collect(Collectors.toList()));
-			assertionDroolRules.add(assertionDroolRule);
+			invalidContents.clear();
+
+			List<AssertionDroolRule> assertionDroolRules = new ArrayList<>();
+			int failureExportMax = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
+			for (String ruleName : invalidContentMap.keySet()) {
+				AssertionDroolRule assertionDroolRule = new AssertionDroolRule();
+				assertionDroolRule.setGroupRule(ruleName);
+				List<InvalidContent> invalidContentList = invalidContentMap.get(ruleName);
+				assertionDroolRule.setTotalFails(invalidContentList.size());
+				assertionDroolRule.setContentItems(invalidContentList.stream().limit(failureExportMax).collect(Collectors.toList()));
+				assertionDroolRules.add(assertionDroolRule);
+			}
+
+			final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
+			report.setAssertionsInvalidContent(assertionDroolRules);
+			report.setExecutionId(executionConfig.getExecutionId());
+			report.setTotalTestsRun(totalTestsRun);
+			report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
+			report.setTotalFailures(invalidContentMap.size());
+			report.setRuleSetExecuted(String.join(",", droolsRulesSets));
+			report.setCompleted(true);
+			responseMap.put(report.getTestType().toString() + "TestResult", report);
+		} catch (Exception ex){
+			final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
+			report.setRuleSetExecuted(String.join(",", droolsRulesSets));
+			report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
+			report.setExecutionId(executionConfig.getExecutionId());
+			report.setMessage(ExceptionUtils.getStackTrace(ex));
+			report.setCompleted(false);
+			responseMap.put(report.getTestType().toString() + "TestResult", report);
 		}
 
-		final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
-		report.setAssertionsInvalidContent(assertionDroolRules);
-		report.setExecutionId(executionConfig.getExecutionId());
-		report.setTotalTestsRun(totalTestsRun);
-		report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-		report.setTotalFailures(invalidContentMap.size());
-		report.setRuleSetExecuted(String.join(",", droolsRulesSets));
-		responseMap.put(report.getTestType().toString() + "TestResult", report);
 	}
 
 	private Set<String> getDroolsRulesSetFromAssertionGroups(Set<String> assertionGroups) throws RVFExecutionException {
