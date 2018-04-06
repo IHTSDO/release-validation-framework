@@ -206,7 +206,7 @@
 
 		<script uuid="5e203a1f-2b6d-462a-a6f9-93cbc3893611" category="release-type-validation,ICD-MAP,INT,USEdition" sqlFile="release-type-delta-validation-extendedmap-refset.sql" text="Changes from the the current extended map delta file must be in the current full file" />
 		<script uuid="5c37bee7-62ad-41f9-93e3-12eb4803e612" category="release-type-validation,ICD-MAP,INT,USEdition" sqlFile="release-type-full-delta-validation-extendedmap-refset.sql" text="The current full extended map file consists of the previously published full file and the current delta file"/>
-		<script uuid="5c37bee7-62ad-41f9-93e3-12eb4803e613" category="release-type-validation,ICD-MAP,INT,USEdition" sqlFile="release-type-full-validation-extendedmap-refset.sql" text="The current extended map refset full file contains all previously published data unchanged"/>
+		<script uuid="5c37bee7-62ad-41f9-93e3-12eb4803e613" category="release-type-validation,ICD-MAP,INT" sqlFile="release-type-full-validation-extendedmap-refset.sql" text="The current extended map refset full file contains all previously published data unchanged"/>
 		<script uuid="5c37bee7-62ad-41f9-93e3-12eb4803e614" category="release-type-validation,ICD-MAP,INT,USEdition" sqlFile="release-type-snapshot-delta-validation-extendedmap-refset.sql" text="The current extended map snapshot file contains all the data from current delta file"/>
 		<script uuid="5c37bee7-62ad-41f9-93e3-12eb4803e615" category="release-type-validation,ICD-MAP,INT,USEdition" sqlFile="release-type-snapshot-validation-extendedmap-refset.sql" text="The current extended map snapshot file is an accurate derivative of the current full file"/>
 
