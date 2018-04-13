@@ -330,34 +330,16 @@
     "assertionName" : "Terms are unique in Description hierarchy.",
     "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
     "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "  Fracture clinic"
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "  Fracture clinic"
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "  Fracture clinic"
+      "conceptId" : "703860006",
+      "detail" : "Exposure to vibration   non-unique term within hierarchy (disorder)"
     }, {
       "conceptId" : "703860006",
-      "detail" : "Exposure to vibration  "
+      "detail" : "Exposure to vibration non-unique term within hierarchy (disorder)"
     }, {
-      "conceptId" : "700132006",
-      "detail" : "Proglumetacin"
-    }, {
-      "conceptId" : "700132006",
-      "detail" : "Proglumetacin"
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "Toenail abnormality (observable entity)"
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "Toenail abnormality (observable entity)"
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "Toenail abnormality (observable entity)"
+      "conceptId" : "703860006",
+      "detail" : "Exposure to vibration   non-unique term within hierarchy (disorder)"
     } ],
-    "totalFailed" : 9
+    "totalFailed" : 3
   }, {
     "assertionName" : "Terms that contain en-gb specific words are in the en-gb language refset.",
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
@@ -572,19 +554,10 @@
     "assertionName" : "For a given concept, all description terms are unique.",
     "assertionUuid" : "2e0eb135-fd7d-4f24-83c1-0cba797ee766",
     "firstNInstances" : [ {
-      "conceptId" : "700132006",
-      "detail" : "DESC: Id=3008862015: non-unique term within concept."
-    }, {
-      "conceptId" : "700132006",
-      "detail" : "DESC: Id=3008913019: non-unique term within concept."
-    }, {
-      "conceptId" : "700132006",
-      "detail" : "DESC: Id=3008913020: non-unique term within concept."
-    }, {
       "conceptId" : "703860006",
-      "detail" : "DESC: Id=2989790014: non-unique term within concept."
+      "detail" : "DESC: Id=2989790014 contains non-unique term Exposure to vibration  "
     } ],
-    "totalFailed" : 4
+    "totalFailed" : 1
   }, {
     "assertionName" : "All inferred relationships in which the concept associated is inactive, are inactive relationships.",
     "assertionUuid" : "2e4fd620-7d08-11e1-b0c4-0800200c9a66",

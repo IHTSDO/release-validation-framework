@@ -46,16 +46,12 @@ drop table if exists temp_active_fsn_hierarchy;
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		cast(a.term as binary)
-	from tmp_description_syn a
-	join temp_active_fsn_hierarchy b
-	on a.conceptid = b.conceptid
-	and a.languagecode = b.languagecode
-	group by binary a.term, a.semantictag, a.conceptid
-	having count(a.term) > 1
-	and count(a.semantictag) > 1;
-	commit;
-	
+		concat(cast(a.term as binary), ' non-unique term within hierarchy ', a.semantictag)
+	from tmp_description_syn a,
+	(select a.term from tmp_description_syn a 
+		group by binary a.term, a.semantictag
+		having count(a.id) > 1) as duplicate
+	where a.term = duplicate.term;
 	drop table if exists temp_active_fsn_hierarchy;
 	drop table if exists tmp_description_syn;
 	
