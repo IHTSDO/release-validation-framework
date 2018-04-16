@@ -331,13 +331,13 @@
     "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
     "firstNInstances" : [ {
       "conceptId" : "703860006",
-      "detail" : "Exposure to vibration   non-unique term within hierarchy (disorder)"
+      "detail" : "Synonym=Exposure to vibration   is duplicated within hierarchy (disorder)"
     }, {
       "conceptId" : "703860006",
-      "detail" : "Exposure to vibration non-unique term within hierarchy (disorder)"
+      "detail" : "Synonym=exposure to vibration is duplicated within hierarchy (disorder)"
     }, {
-      "conceptId" : "703860006",
-      "detail" : "Exposure to vibration   non-unique term within hierarchy (disorder)"
+      "conceptId" : "703672002",
+      "detail" : "Synonym=exposure to vibration   is duplicated within hierarchy (disorder)"
     } ],
     "totalFailed" : 3
   }, {
@@ -543,11 +543,11 @@
       "conceptId" : "703860006",
       "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
     }, {
-      "conceptId" : "703860006",
-      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
-    }, {
       "conceptId" : "702386002",
       "detail" : "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces."
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "CONCEPT: Term=exposure to vibration  :Active Terms containing double spaces."
     } ],
     "totalFailed" : 3
   }, {
@@ -555,7 +555,7 @@
     "assertionUuid" : "2e0eb135-fd7d-4f24-83c1-0cba797ee766",
     "firstNInstances" : [ {
       "conceptId" : "703860006",
-      "detail" : "DESC: Id=2989790014 contains non-unique term Exposure to vibration  "
+      "detail" : "Description: Id=2989790014 contains non-unique term Exposure to vibration  "
     } ],
     "totalFailed" : 1
   }, {
