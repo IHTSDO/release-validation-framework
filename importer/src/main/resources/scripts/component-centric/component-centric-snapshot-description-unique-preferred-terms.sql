@@ -45,8 +45,9 @@
 		a.conceptid,
 		concat('Preferred term=', a.term, ' is duplicated in hierarchy ', a.semantictag)
 	from tmp_description_syn a,
-	(select a.term from tmp_description_syn a 
+	(select a.term, a.semantictag from tmp_description_syn a 
 		group by a.term, a.semantictag
 		having count(a.id) > 1) as duplicate
-	where a.term = duplicate.term;
+	where a.term = duplicate.term
+		and a.semantictag = duplicate.semantictag;
 	
