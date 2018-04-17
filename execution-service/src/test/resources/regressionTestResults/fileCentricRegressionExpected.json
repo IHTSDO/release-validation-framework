@@ -669,19 +669,19 @@
       "conceptId" : "703155005",
       "detail" : "Concept: id=703155005 has no active preferred terms in any language refset"
     }, {
-      "conceptId" : "703672002",
-      "detail" : "Concept: id=703672002 has no active preferred terms in any language refset"
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Concept: id=703860006 has no active preferred terms in any language refset"
-    }, {
       "conceptId" : "702386002",
       "detail" : "Concept: id=702386002 has multiple active preferred terms in language refset=900000000000509007"
     }, {
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006 has no active preferred terms in the en-US language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006 has no active preferred terms in the en-US language refset"
+    }, {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003 has no active preferred terms in the en-US language refset"
     } ],
-    "totalFailed" : 16
+    "totalFailed" : 12
   }, {
     "assertionName" : "Every active concept has a preferred FSN in the en-GB language refset.",
     "assertionUuid" : "0dde2aec-14c0-428b-ba1c-15e483aaa155",

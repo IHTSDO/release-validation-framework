@@ -8,8 +8,11 @@
     "firstNInstances" : [ {
       "conceptId" : "700132006",
       "detail" : "DESC: conceptid=700132006:has terms not sharing case-sensitivity."
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "DESC: conceptid=703672002:has terms not sharing case-sensitivity."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "SNOMED RT identifier simple map refset members are unique.",
     "assertionUuid" : "83638340-7f25-11e1-b0c4-0800200c9a66",
@@ -327,19 +330,16 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Terms are unique in Description hierarchy.",
+    "assertionName" : "Active preferred terms for active concepts are unique in the same hierarchy",
     "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
     "firstNInstances" : [ {
       "conceptId" : "703860006",
-      "detail" : "Synonym=Exposure to vibration   is duplicated within hierarchy (disorder)"
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Synonym=exposure to vibration is duplicated within hierarchy (disorder)"
+      "detail" : "Preferred term=Exposure to vibration   is duplicated in hierarchy (disorder)"
     }, {
       "conceptId" : "703672002",
-      "detail" : "Synonym=exposure to vibration   is duplicated within hierarchy (disorder)"
+      "detail" : "Preferred term=Exposure to vibration   is duplicated in hierarchy (disorder)"
     } ],
-    "totalFailed" : 3
+    "totalFailed" : 2
   }, {
     "assertionName" : "Terms that contain en-gb specific words are in the en-gb language refset.",
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
@@ -547,7 +547,7 @@
       "detail" : "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces."
     }, {
       "conceptId" : "703672002",
-      "detail" : "CONCEPT: Term=exposure to vibration  :Active Terms containing double spaces."
+      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
     } ],
     "totalFailed" : 3
   }, {
@@ -555,7 +555,7 @@
     "assertionUuid" : "2e0eb135-fd7d-4f24-83c1-0cba797ee766",
     "firstNInstances" : [ {
       "conceptId" : "703860006",
-      "detail" : "Description: Id=2989790014 contains non-unique term Exposure to vibration  "
+      "detail" : "Duplicate term=Exposure to vibration  "
     } ],
     "totalFailed" : 1
   }, {

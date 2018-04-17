@@ -1,8 +1,8 @@
 /******************************************************************************** 
-	component-centric-snapshot-description-unique-terms
+	component-centric-snapshot-description-unique-preferred-terms
 
 	Assertion:
-	Active terms associated with active concepts are unique within hierarchy.
+	Active preferred terms for active concepts are unique in the same hierarchy.
 
 ********************************************************************************/
 
@@ -14,7 +14,6 @@
 		on a.conceptid = b.id
 	where a.active = 1
 		and b.active =1
-		and a.moduleid != '715515008'
 		and a.typeid = '900000000000003001'; /* fully specified name */
 		
 	alter table temp_active_fsn_hierarchy add index idx_tmp_afh_cid (conceptId);
@@ -23,23 +22,16 @@
 
 /* 	a list of descriptions and their hierarchies */
 	drop table if exists tmp_description_syn;
-	create table if not exists tmp_description_syn (
-	id bigint(20) not null,
-	languagecode varchar(2) not null,
-	conceptid bigint(20) not null,
-	term varchar(256) not null,
-	semantictag varchar(100));
-	
-	insert into tmp_description_syn (id, languagecode, conceptid, term, semantictag) 
+	create table if not exists tmp_description_syn as 
 	select a.id, a.languagecode, a.conceptid, a.term, b.semantictag as semantictag
 	from curr_description_s a
 	join temp_active_fsn_hierarchy b
 		on a.conceptid = b.conceptid
 		and a.languagecode = b.languagecode
-	where a.moduleid != '715515008'
-	and a.active =1
-	and a.typeid = '900000000000013009'; /* syn */
-	
+	where a.active =1
+	and a.typeid = '900000000000013009'
+	and exists (select id from curr_langrefset_s c where c.referencedcomponentid=a.id and c.acceptabilityid='900000000000548007' and c.active=1);
+
 	alter table tmp_description_syn add index idx_tmp_ds_cid (conceptId);
 	alter table tmp_description_syn add index idx_tmp_ds_l (languagecode);
 	alter table tmp_description_syn add index idx_tmp_ds_st (semantictag);
@@ -51,7 +43,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Synonym=', a.term, ' is duplicated within hierarchy ', a.semantictag)
+		concat('Preferred term=', a.term, ' is duplicated in hierarchy ', a.semantictag)
 	from tmp_description_syn a,
 	(select a.term from tmp_description_syn a 
 		group by a.term, a.semantictag
