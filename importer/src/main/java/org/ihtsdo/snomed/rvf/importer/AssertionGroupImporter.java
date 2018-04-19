@@ -45,7 +45,9 @@ public class AssertionGroupImporter {
 		SWEDISH_EDITION("SE", "SwedishEdition"),
 		US_EDITION("US", "USEdition"),
 		BE_EDITION("BE", "BelgianEdition"),
-		NO_EDITION("NO", "NorwegianEdition");
+		NO_EDITION("NO", "NorwegianEdition"),
+		GPFP_ICPC2("GPFP-ICPC2","GPFP-ICPC2"),
+		GMDN("GMDN","GMDN");
 		private String name;
 		private String releaseCenter;
 		private AssertionGroupName(String releaseCenter, String name) {
@@ -162,6 +164,8 @@ public class AssertionGroupImporter {
 			case BE_EDITION :
 			case COMMON_EDITION :
 			case NO_EDITION :
+			case GMDN:
+			case GPFP_ICPC2:
 				createReleaseAssertionGroup(allAssertions, groupName);
 				break;
 			case COMMON_AUTHORING :
@@ -328,4 +332,5 @@ public class AssertionGroupImporter {
 			}
 		}
 	}
+
 }
