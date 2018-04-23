@@ -10,7 +10,7 @@
     <name>model</name>
 
     <properties>
-        <snomed-drools.version>1.5.0-SNAPSHOT</snomed-drools.version>
+        <snomed-drools.version>1.6.0-SNAPSHOT</snomed-drools.version>
     </properties>
 
     <dependencies>
