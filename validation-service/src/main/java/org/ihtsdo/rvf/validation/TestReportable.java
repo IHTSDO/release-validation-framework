@@ -1,10 +1,11 @@
 package org.ihtsdo.rvf.validation;
 
 import java.util.Date;
+import java.util.List;
 
 public interface TestReportable {
 
-	void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue);
+	void addError(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue, Long lineNr);
 	
 	void addSuccess(String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern);
 
@@ -21,6 +22,8 @@ public interface TestReportable {
 	String writeSummary();
 
 	void addNewLine();
+	
+	List<StructuralTestRunItem> getFailedItems();
 
 	class TestRunItemCount {
 		private StructuralTestRunItem item;
