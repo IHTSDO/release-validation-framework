@@ -625,9 +625,6 @@
       "conceptId" : "703155005",
       "detail" : "Concept: id=703155005 does not have an FSN defined."
     }, {
-      "conceptId" : "703672002",
-      "detail" : "Concept: id=703672002 does not have an FSN defined."
-    }, {
       "conceptId" : "702850005",
       "detail" : "Concept: id=702850005 does not have an FSN defined."
     }, {
@@ -645,8 +642,11 @@
     }, {
       "conceptId" : "703649005",
       "detail" : "Concept: id=703649005 does not have an active FSN in any refset."
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002 does not have an active FSN in any refset."
     } ],
-    "totalFailed" : 23
+    "totalFailed" : 22
   }, {
     "assertionName" : "Preferred Term exists exactly once in each language refset for each concept.",
     "assertionUuid" : "03cf9850-7857-11e1-b0c4-0800200c9a66",
@@ -669,19 +669,19 @@
       "conceptId" : "703155005",
       "detail" : "Concept: id=703155005 has no active preferred terms in any language refset"
     }, {
-      "conceptId" : "703672002",
-      "detail" : "Concept: id=703672002 has no active preferred terms in any language refset"
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Concept: id=703860006 has no active preferred terms in any language refset"
-    }, {
       "conceptId" : "702386002",
       "detail" : "Concept: id=702386002 has multiple active preferred terms in language refset=900000000000509007"
     }, {
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006 has no active preferred terms in the en-US language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006 has no active preferred terms in the en-US language refset"
+    }, {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003 has no active preferred terms in the en-US language refset"
     } ],
-    "totalFailed" : 16
+    "totalFailed" : 12
   }, {
     "assertionName" : "Every active concept has a preferred FSN in the en-GB language refset.",
     "assertionUuid" : "0dde2aec-14c0-428b-ba1c-15e483aaa155",
@@ -945,7 +945,7 @@
     "assertionUuid" : "3be8c763-a5bc-404b-af9f-a2cb681f6f3d",
     "firstNInstances" : [ {
       "conceptId" : "703860006",
-      "detail" : "DESC: id=2989790014:Non unique id in description release file."
+      "detail" : "DESC: id=2989790017:Non unique id in description release file."
     }, {
       "conceptId" : "702386002",
       "detail" : "DESC: id=3008913021:Non unique id in description release file."

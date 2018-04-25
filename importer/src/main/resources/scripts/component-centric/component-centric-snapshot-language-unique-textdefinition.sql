@@ -1,6 +1,6 @@
 
 /******************************************************************************** 
-	component-centric-snapshot-language-unique-description
+	component-centric-snapshot-language-unique-textdefinition
 
 	Assertion:
 	There is only zero or one active Definition per concept per dialect in 
