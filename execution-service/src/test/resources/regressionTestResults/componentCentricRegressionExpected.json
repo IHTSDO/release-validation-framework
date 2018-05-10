@@ -1,18 +1,15 @@
 {
   "assertionType" : "component-centric-validation",
   "totalAssertionsRun" : 110,
-  "totalAssertionsFailed" : 107,
+  "totalAssertionsFailed" : 106,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
       "detail" : "DESC: conceptid=700132006:has terms not sharing case-sensitivity."
-    }, {
-      "conceptId" : "703672002",
-      "detail" : "DESC: conceptid=703672002:has terms not sharing case-sensitivity."
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 1
   }, {
     "assertionName" : "SNOMED RT identifier simple map refset members are unique.",
     "assertionUuid" : "83638340-7f25-11e1-b0c4-0800200c9a66",
@@ -434,14 +431,8 @@
   }, {
     "assertionName" : "Active preferred terms for active concepts are unique in the same hierarchy",
     "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
-    "firstNInstances" : [ {
-      "conceptId" : "703860006",
-      "detail" : "Preferred term=Exposure to vibration   is duplicated in hierarchy (disorder)"
-    }, {
-      "conceptId" : "703672002",
-      "detail" : "Preferred term=Exposure to vibration   is duplicated in hierarchy (disorder)"
-    } ],
-    "totalFailed" : 2
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "Terms that contain en-gb specific words are in the en-gb language refset.",
     "assertionUuid" : "cc9c5340-84f0-11e1-b0c4-0800200c9a66",
@@ -757,10 +748,7 @@
       "conceptId" : "703860006",
       "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
     }, {
-      "conceptId" : "702386002",
-      "detail" : "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces."
-    }, {
-      "conceptId" : "703672002",
+      "conceptId" : "703860006",
       "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
     } ],
     "totalFailed" : 3

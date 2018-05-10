@@ -31,6 +31,12 @@
          <groupId>com.google.gdata</groupId>
          <artifactId>core</artifactId>
          <version>1.47.1</version>
+         <exclusions>
+            <exclusion>
+               <groupId>org.mortbay.jetty</groupId>
+               <artifactId>servlet-api</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
    </dependencies>
 

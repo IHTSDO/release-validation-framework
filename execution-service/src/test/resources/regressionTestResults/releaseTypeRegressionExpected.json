@@ -138,9 +138,9 @@
       "detail" : "Description: id=2989790014 is in SNAPSHOT file, but not in FULL file."
     }, {
       "conceptId" : "703860006",
-      "detail" : "Description: id=2989790017 is in SNAPSHOT file, but not in FULL file."
+      "detail" : "Description: id=2989790014 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 33
+    "totalFailed" : 31
   }, {
     "assertionName" : "New inactive states for existing components must have active states in the previous SIMPLE REFSET snapshot.",
     "assertionUuid" : "9190473a-29f7-40fc-b879-9ae0d038b681",
@@ -183,7 +183,7 @@
       "conceptId" : "713135019",
       "detail" : "LANGUAGE REFSET: id=00002fb2-d982-5fbd-822f-045c938480c7 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 29
+    "totalFailed" : 27
   }, {
     "assertionName" : "The current data in the SimpleMap refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "959e11e7-9ff9-40b9-b833-387495e320d0",

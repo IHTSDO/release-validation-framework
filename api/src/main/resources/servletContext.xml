@@ -55,10 +55,7 @@
 	</bean>
 	
 	<bean class="java.lang.String" id="droolsRulesVersion">
-		<constructor-arg value="${rvf.drools.rules.version}"/>
-	</bean>
-	<bean class="java.lang.String" id="droolsRuelsModuleName">
-		<constructor-arg value="${rvf.droolrule.module.name}"/>
+		<constructor-arg value="${rvf.drools.rule.version}"/>
 	</bean>
 	<bean class="java.lang.String" id="keyName">
 		<constructor-arg value="${rvf.autoscaling.keyPairName}"/>
