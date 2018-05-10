@@ -29,6 +29,7 @@ public class ValidationRunConfig {
 	private boolean jiraIssueCreationFlag;
 	private String productName;
 	private String reportingStage;
+	private boolean enableDrools;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -269,5 +270,13 @@ public class ValidationRunConfig {
 	}
 	public void setExtensionDependency(String extensionDependency) {
 		this.extensionDependency = extensionDependency;
+	}
+
+	public boolean isEnableDrools() {
+		return enableDrools;
+	}
+
+	public void setEnableDrools(boolean enableDrools) {
+		this.enableDrools = enableDrools;
 	}
 }

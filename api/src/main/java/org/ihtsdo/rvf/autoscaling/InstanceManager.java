@@ -17,7 +17,6 @@ import org.ihtsdo.rvf.controller.VersionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.auth.AWSCredentials;
@@ -51,15 +50,18 @@ public class InstanceManager {
 	private String instanceTagName;
 	@Autowired
 	private String ec2SubnetId;
-	@Autowired
-	private String droolsRulesVersion;
-	@Autowired
-	private String droolsRuelsModuleName;
 	private String ec2InstanceStartupScript;
 
-	public InstanceManager(AWSCredentials credentials, String ec2Endpoint) {
+	private String droolsRulesVersion;
+	private String droolsRulesDirectory;
+	private String droolsRulesRepository;
+
+	public InstanceManager(AWSCredentials credentials, String ec2Endpoint, String droolsRulesVersion, String droolsRulesDirectory, String droolsRulesRepository) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
 		amazonEC2Client.setEndpoint(ec2Endpoint);
+		this.droolsRulesVersion = droolsRulesVersion;
+		this.droolsRulesDirectory = droolsRulesDirectory;
+		this.droolsRulesRepository = droolsRulesRepository;
 		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
 
@@ -97,7 +99,7 @@ public class InstanceManager {
 		}
 		return ids;
 	}
-
+	
 	public Map<String,String> getPublicIpAddress(List<String> instanceIds) {
 		Map<String, String> instacneIpAddressMap = new HashMap<>();
 		try {
@@ -189,7 +191,7 @@ public class InstanceManager {
 			logger.error(msg, e);
 			throw new RuntimeException(msg, e);
 		}
-
+	
 		List<String> activeInstances = new ArrayList<>();
 		for (Instance instance : instances) {
 			InstanceState state = instance.getState();
@@ -317,12 +319,12 @@ public class InstanceManager {
 			builder.append(" --single-branch");
 		}
 		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
-		builder.append(" https://github.com/IHTSDO/snomed-drools-rules.git ");
-		if (droolsRuelsModuleName == null || droolsRuelsModuleName.isEmpty() || !droolsRuelsModuleName.startsWith("/")) {
-			droolsRuelsModuleName= "/opt/snomed-drools-rules/";
+		builder.append(" " + droolsRulesRepository + " ");
+		if (droolsRulesDirectory == null || droolsRulesDirectory.isEmpty() || !droolsRulesDirectory.startsWith("/")) {
+			droolsRulesDirectory= "/opt/snomed-drools-rules/";
 		}
-		builder.append(droolsRuelsModuleName + "\n");
-		builder.append("sudo chown -R rvf-api:rvf-api " + droolsRuelsModuleName + "\n");
+		builder.append(droolsRulesDirectory + "\n");
+		builder.append("sudo chown -R rvf-api:rvf-api " + droolsRulesDirectory + "\n");
 		builder.append("sudo supervisorctl start rvf-api" + "\n");
 		builder.append("exit 0");
 		return builder.toString();

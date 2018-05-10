@@ -9,16 +9,16 @@ import java.util.List;
  * on 6/28/2017.
  */
 public class AssertionDroolRule {
-        private String rule;
+        private String groupRule;
         private int totalFails;
         private List<InvalidContent> contentItems;
 
-        public String getrule() {
-            return rule;
+        public String getGroupRule() {
+            return groupRule;
         }
 
-        public void setRule(String rule) {
-            this.rule = rule;
+        public void setGroupRule(String groupRule) {
+            this.groupRule = groupRule;
         }
 
         public List<InvalidContent> getContentItems() {

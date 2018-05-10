@@ -63,7 +63,7 @@ public class ValidationReportService {
 	}
 	
 	public void writeResults(final Map<String , Object> responseMap, final State state, String storageLocation) throws BusinessServiceException {
-		final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
+		final Gson prettyGson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 		File temp = null;
 		try {
 	        temp = File.createTempFile("resultJson", ".tmp"); 

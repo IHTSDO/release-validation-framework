@@ -2,7 +2,7 @@
 	<parent>
 		<artifactId>release-validation-framework</artifactId>
 		<groupId>org.ihtsdo.snomed.rvf</groupId>
-		<version>1.4.0</version>
+		<version>1.5.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -13,6 +13,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<lucene.version>5.5.2</lucene.version>
+		<snomed-drools.version>1.6.0-SNAPSHOT</snomed-drools.version>
 	</properties>
 
 	<dependencies>
@@ -108,7 +109,7 @@
 		<!--<dependency>-->
 			<!--<groupId>com.foundationdb</groupId>-->
 			<!--<artifactId>fdb-sql-parser</artifactId>-->
-			<!--<version>1.4.0</version>-->
+			<!--<version>1.5.0-SNAPSHOT</version>-->
 		<!--</dependency>-->
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -139,18 +140,7 @@
 		<dependency>
 			<groupId>org.ihtsdo.drools</groupId>
 			<artifactId>snomed-drools-engine</artifactId>
-			<version>1.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ihtsdo.drools</groupId>
-			<artifactId>snomed-drools-rf2-validator</artifactId>
-			<version>1.4.0</version>
-
-		</dependency>
-		<dependency>
-			<groupId>org.snomed.otf</groupId>
-			<artifactId>snomed-boot</artifactId>
-			<version>1.4.0</version>
+			<version>${snomed-drools.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.collections</groupId>
@@ -158,36 +148,16 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-core</artifactId>
-			<version>${lucene.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-queries</artifactId>
-			<version>${lucene.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-analyzers-common</artifactId>
-			<version>${lucene.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-queryparser</artifactId>
-			<version>${lucene.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-join</artifactId>
-			<version>${lucene.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime</artifactId>
-			<version>4.5.1</version>
+			<groupId>org.ihtsdo.drools</groupId>
+			<artifactId>snomed-drools-rf2-validator</artifactId>
+			<version>${snomed-drools.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.collections</groupId>
+					<artifactId>google-collections</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 </project>
