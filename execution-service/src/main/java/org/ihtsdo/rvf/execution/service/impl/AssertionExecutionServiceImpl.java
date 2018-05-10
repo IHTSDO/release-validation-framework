@@ -171,6 +171,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		runItem.setTestCategory(assertion.getKeywords());
 		runItem.setAssertionText(assertion.getAssertionText());
 		runItem.setAssertionUuid(assertion.getUuid());
+		runItem.setSeverity(assertion.getSeverity());
 
 		// get command from test and validate the included command object
 		final ExecutionCommand command = test.getCommand();

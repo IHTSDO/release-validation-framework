@@ -8,7 +8,9 @@ public enum TestType {
     REGEX("regex"),
     SEMANTIC("semantic"), 
     ARCHIVE_STRUCTURAL("archiveStructural"),
-    MANIFEST("manifest"), 
+    MANIFEST("manifest"),
+    MRCM("mrcm"),
+    DROOL_RULES("droolsRules"),
     UNKNOWN("unknown");
     
     private String name;

@@ -2,7 +2,10 @@ package org.ihtsdo.rvf.validation.impl;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,6 +23,7 @@ public class StreamTestReport implements TestReportable {
 	private int numTestRuns = 0;
 	private boolean writeSuccesses;
 	private ConcurrentHashMap<String, TestRunItemCount> errorMap = new ConcurrentHashMap<>();
+	private List<StructuralTestRunItem> failedItems = Collections.synchronizedList(new ArrayList<StructuralTestRunItem>());
 
 	public StreamTestReport(ResultFormatter formatter, OutputStream outputStream, boolean writeSuccesses) {
 		this.formatter = formatter;
@@ -60,8 +64,9 @@ public class StreamTestReport implements TestReportable {
 	}
 
 	@Override
-	public void addError( String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue) {
-		StructuralTestRunItem item = new StructuralTestRunItem (executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, actualValue, expectedValue);
+	public void addError( String executionId, Date testTime, String fileName, String filePath, String columnName, String testType, String testPattern, String actualValue, String expectedValue, Long lineNr) {
+		StructuralTestRunItem item = new StructuralTestRunItem (executionId, testTime, fileName, filePath, columnName, testType, testPattern, true, actualValue, expectedValue, lineNr);
+		failedItems.add(item);
 		if (errorMap.containsKey(columnName)) {
 			TestRunItemCount errorCounter = errorMap.get(columnName);
 			errorCounter.addError();
@@ -108,6 +113,11 @@ public class StreamTestReport implements TestReportable {
 
 	public void setWriteSuccesses(boolean writeSuccesses) {
 		this.writeSuccesses = writeSuccesses;
+	}
+
+	@Override
+	public List<StructuralTestRunItem> getFailedItems() {
+		return failedItems;
 	}
 
 }
