@@ -196,7 +196,7 @@ public class ValidationRunner {
 				List<InvalidContent> invalidContents;
 			try (InputStream snapshotStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
 				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath);
-				invalidContents = droolsRF2Validator.validateSnapshot(snapshotStream, droolsRulesSets);
+				invalidContents = droolsRF2Validator.validateSnapshot(snapshotStream, droolsRulesSets,"");
 				for (String assertionGroup : droolsRulesSets) {
 					totalTestsRun += droolsRF2Validator.getRuleExecutor().getAssertionGroupRuleCount(assertionGroup);
 				}
