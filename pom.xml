@@ -4,7 +4,7 @@
 
 	<groupId>org.ihtsdo.snomed.rvf</groupId>
 	<artifactId>release-validation-framework</artifactId>
-	<version>1.4.1-SNAPSHOT</version>
+	<version>1.4.1</version>
 	<packaging>pom</packaging>
 	<name>SNOMED Release Validation Framework</name>
 
@@ -18,7 +18,7 @@
 		<skip.integration.tests>true</skip.integration.tests>
 		<mysql.connector.java.version>5.1.20</mysql.connector.java.version>
 		<dbcp.version>1.4</dbcp.version>
-		<snomed.utilities.version>1.0.9</snomed.utilities.version>
+		<snomed.utilities.version>1.2</snomed.utilities.version>
 	</properties>
 
 	<modules>
