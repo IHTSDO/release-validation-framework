@@ -19,7 +19,7 @@
    <http pattern="/**/run-post-via-s3" security="none"/>
    <http pattern="/**/run-post" security="none"/>
    <http create-session="stateless" auto-config="false">
-      <intercept-url pattern="/**" access="ROLE_ihtsdo-sca-author"/>
+      <intercept-url pattern="/**" access="permitAll()"/>
       <http-basic />
       <custom-filter ref="authenticationDecorator" after="BASIC_AUTH_FILTER" />
    </http>
