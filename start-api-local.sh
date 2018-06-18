@@ -2,7 +2,7 @@
 set -e
 
 #example useage ./start-api-local.sh -d -p 8081
-apiPort=8080
+apiPort=8081
 
 while getopts ":dsp:" opt
 do
@@ -41,6 +41,5 @@ fi
 configLocation="$(pwd)/config"
 echo "Starting RVF API webapp on port ${apiPort} with config directory ${configLocation}"
 echo
-java -Xmx4g ${debugFlags} -DENV_NAME=$(whoami) -jar api/target/validation-api.jar -DrvfConfigLocation=${configLocation} -httpPort=${apiPort}
-
+java -Xmx4g ${debugFlags} -DENV_NAME=$(whoami)  -DrvfConfigLocation=${configLocation} -jar api/target/dependency/webapp-runner.jar api/target/api.war --path /api --port ${apiPort}
 
