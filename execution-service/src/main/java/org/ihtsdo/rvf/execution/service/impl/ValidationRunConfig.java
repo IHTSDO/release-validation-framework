@@ -139,11 +139,14 @@ public class ValidationRunConfig {
 	@Override
 	public String toString() {
 		return "ValidationRunConfig [testFileName=" + testFileName
-				+ ", writeSucceses=" + writeSucceses + ", groupsList="
-				+ groupsList + ", prevIntReleaseVersion="
-				+ prevIntReleaseVersion + ", previousExtVersion="
-				+ previousExtVersion + ", extensionDependency="
-				+ extensionDependency + ", runId=" + runId + ", url=" + url + "]";
+				+ ", writeSucceses=" + writeSucceses
+				+ ", groupsList=" + groupsList
+				+ ", prevIntReleaseVersion="+ prevIntReleaseVersion
+				+ ", previousExtVersion="+ previousExtVersion
+				+ ", extensionDependency="+ extensionDependency
+				+ ", drools=" + enableDrools
+				+ ", runId=" + runId 
+				+ ", url=" + url + "]";
 	}
 	
 	public String getManifestFileFullPath() {
