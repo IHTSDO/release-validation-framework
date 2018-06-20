@@ -14,7 +14,7 @@
 		concat('Description: id=',a.id, ' has active term with leading or trailing spaces.') 	
 	from curr_description_s a 
 	where a.active = 1
-	and ( a.term != LTRIM(term) or a.term != RTRIM(term)); 
+	and ( a.term not like LTRIM(term) or a.term not like RTRIM(term));
 	commit;
 	
 	

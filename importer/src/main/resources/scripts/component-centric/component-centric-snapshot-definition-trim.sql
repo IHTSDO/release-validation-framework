@@ -15,6 +15,6 @@
 		concat('TEXTDEF: id=',a.id, ':Active Terms with leading or trailing spaces.') 	
 	from curr_textdefinition_s a 
 	where a.active = 1
-	and ( a.term != LTRIM(term) or a.term != RTRIM(term)); 
+	and ( a.term not like LTRIM(term) or a.term not like RTRIM(term));
 	commit;
 	
