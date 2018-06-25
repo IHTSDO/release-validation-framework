@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 89,
-  "totalAssertionsFailed" : 89,
+  "totalAssertionsRun" : 90,
+  "totalAssertionsFailed" : 90,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -1074,5 +1074,15 @@
       "detail" : "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term"
     } ],
     "totalFailed" : 4
-  } ]
+  },
+    {
+    "assertionName" : "Metadata concepts must only exist in model component module.",
+    "assertionUuid" : "84335167-9105-4377-beca-b80b0d5dff83",
+    "firstNInstances" : [ {
+      "conceptId" : "733073007",
+      "detail" : "Metadata concept (733073007|OWL axiom reference set (foundation metadata concept)|) in module other than model module"
+    } ],
+    "totalFailed" : 1
+  }
+  ]
 }

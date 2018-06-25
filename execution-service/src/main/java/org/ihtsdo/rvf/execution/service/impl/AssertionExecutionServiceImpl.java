@@ -232,8 +232,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 					cs.execute();
 				}
 				logger.info("End of calling stored proecure {}", sqlStatement);
-			}
-			else if (sqlStatement.startsWith("select")){
+			} else if (sqlStatement.toLowerCase().startsWith("select")){
 				//TODO need to verify this is required.
 				logger.info("Select query found:" + sqlStatement);
 				final Long executionId = config.getExecutionId();

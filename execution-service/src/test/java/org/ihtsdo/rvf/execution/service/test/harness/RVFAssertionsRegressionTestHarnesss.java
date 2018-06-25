@@ -58,6 +58,8 @@ import com.google.gson.Gson;
 @ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
 @Transactional
 public class RVFAssertionsRegressionTestHarnesss {
+	
+	public static final String DIFF = "*** Difference explained: ";
 
 	private static final String FILE_CENTRIC_VALIDATION = "file-centric-validation";
 	private static final String COMPONENT_CENTRIC_VALIDATION = "component-centric-validation";
@@ -157,7 +159,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
-		assertEquals(195, assertions.size());
+		assertEquals(196, assertions.size());
 		assertEquals(79, releaseTypeAssertions.size());
 	}
 	
@@ -166,7 +168,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		AssertionGroup group = assertionService.getAssertionGroupByName("int-authoring");
 		
 		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(24, assertions.size());
+		assertEquals(25, assertions.size());
 	}
 	
 	
@@ -180,7 +182,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("30947783-78F5-4FFC-A22B-B03D83C5909D");
+		runAssertionsTest("84335167-9105-4377-beca-b80b0d5dff83");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
@@ -206,12 +208,12 @@ public class RVFAssertionsRegressionTestHarnesss {
 			result.setAssertonName(item.getAssertionText());
 			result.setFirstNInstances(item.getFirstNInstances());
 			result.setAssertionUuid(item.getAssertionUuid());
-//			assertNull("No failure should have occured for assertion uuid." + item.getAssertionUuid(), item.getFailureMessage());
+//			assertNull("No failure should have occurred for assertion uuid." + item.getAssertionUuid(), item.getFailureMessage());
 			result.setTotalFailed(item.getFailureCount() != null ? item.getFailureCount() : -1L);
 			results.add(result);
 		
 			if (result.getTotalFailed() < 0) {
-				throw new RuntimeException("Assetion didn't complete sucessfully!" + item.toString());
+				throw new RuntimeException("Assertion didn't complete sucessfully - " + item.toString());
 			} 
 			
 			if (result.getTotalFailed() > 0) {
@@ -224,39 +226,62 @@ public class RVFAssertionsRegressionTestHarnesss {
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
-//		File tempResult = File.createTempFile("tempResult_"+ type, ".txt");
-//		FileWriter writer = new FileWriter(tempResult);
-//		mapper.writeValue(writer,actualReport);
-//		System.out.println("Please see result in file:" + tempResult.getAbsolutePath());
-
+		/*
+		File tempResult = File.createTempFile("tempResult_"+ type, ".txt");
+		FileWriter writer = new FileWriter(tempResult);
+		mapper.writeValue(writer,actualReport);
+		System.out.println("Please see result in file:" + tempResult.getAbsolutePath());
+		
+		//No need for full result now we just print exact difference
 		System.out.println("Test result");
 		String actualReportStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport);
 		System.out.println(actualReportStr);
+		*/
+		
 		final Gson gson = new Gson();
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));
 		final TestReport expectedReport = gson.fromJson(br, TestReport.class);
 		
 		final List<RVFTestResult> expected = expectedReport.getResults();
 		final List<RVFTestResult> actual = actualReport.getResults();
-		final Map<UUID,RVFTestResult> expectedResultByNameMap = new HashMap<>();
+		
+		final Map<UUID,RVFTestResult> expectedResultByUuidMap = new HashMap<>();
 		for (final RVFTestResult result : expectedReport.getResults()) {
-			expectedResultByNameMap.put(result.getAssertionUuid(), result);
+			expectedResultByUuidMap.put(result.getAssertionUuid(), result);
 		}
-		final Map<UUID,RVFTestResult> actualResultByNameMap = new HashMap<>();
+		
+		final Map<UUID,RVFTestResult> actualResultByUuidMap = new HashMap<>();
 		for (final RVFTestResult result : actualReport.getResults()) {
-			actualResultByNameMap.put(result.getAssertionUuid(), result);
+			actualResultByUuidMap.put(result.getAssertionUuid(), result);
 		}
-		for (final UUID uuid : expectedResultByNameMap.keySet()) {
-			assertTrue("Actual test result should have assertion uuid but doesn't: " + uuid, actualResultByNameMap.containsKey(uuid));
-			final RVFTestResult expectedResult = expectedResultByNameMap.get(uuid);
-			final RVFTestResult actualResult = actualResultByNameMap.get(uuid);
-			assertEquals("Assertion name is not the same" + " for assertion uuid:" + uuid, expectedResult.getAssertionName(),actualResult.getAssertionName());
-			assertEquals("Total failures count doesn't match"  + " for assertion uuid:" + uuid, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
+		
+		for (final UUID uuid : expectedResultByUuidMap.keySet()) {
+			assertTrue( type + " actual test result should have expected assertion but does not: " + expectedResultByUuidMap.get(uuid), actualResultByUuidMap.containsKey(uuid));
+			final RVFTestResult expectedResult = expectedResultByUuidMap.get(uuid);
+			final RVFTestResult actualResult = actualResultByUuidMap.get(uuid);
+			assertEquals("Assertion name is not the same" + " for assertion: " + actualResult, expectedResult.getAssertionName(),actualResult.getAssertionName());
+			if (expectedResult.getTotalFailed() > 0 || actualResult.getTotalFailed() > 0) {
+				explainDifference(uuid, expectedResult, actualResult);
+				if (expectedResult.getFirstNInstances() != null && actualResult.getFirstNInstances() != null) {
+					assertTrue("First N instances not matching" + " for assertion: " + actualResult, expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()));
+				}
+			}
+			assertEquals(type + " total failures count doesn't match"  + " for assertion: " + actualResult, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
+		}
+		
+		//And also work through the actual results, in case we have additional items there.
+		for (final UUID uuid : actualResultByUuidMap.keySet()) {
+			assertTrue( type + " unexpected test result in actual: " + actualResultByUuidMap.get(uuid), expectedResultByUuidMap.containsKey(uuid));
+			final RVFTestResult expectedResult = expectedResultByUuidMap.get(uuid);
+			final RVFTestResult actualResult = actualResultByUuidMap.get(uuid);
+			assertEquals("Assertion name is not the same" + " for assertion: " + actualResult, expectedResult.getAssertionName(),actualResult.getAssertionName());
 			if (expectedResult.getTotalFailed() > 0 ) {
 				explainDifference(uuid, expectedResult, actualResult);
-				assertTrue("First N instances not matching" + " for assertion uuid:" + uuid, expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()));
+				assertTrue("First N instances not matching" + " for assertion: " + actualResult, expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()));
 			}
+			assertEquals(type +  " total failures count doesn't match"  + " for assertion: " + actualResult, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
 		}
+		
 		Collections.sort(expected);
 		Collections.sort(actual);
 		assertEquals(expected.size(), actual.size());
@@ -264,7 +289,10 @@ public class RVFAssertionsRegressionTestHarnesss {
 			if (!expected.get(i).equals(actual.get(i))) {
 				explainDifference(actual.get(i).getAssertionUuid(), expected.get(i),actual.get(i));
 			}
-			assertEquals(expected.get(i), actual.get(i));
+			if (!expected.get(i).equals(actual.get(i))) {
+				System.out.println("Debug Here!");
+			}
+ 			assertEquals(expected.get(i), actual.get(i));
 			if (expected.get(i).getTotalFailed() > 0) {
 				for (FailureDetail detail : actual.get(i).getFirstNInstances()) {
 					assertTrue("ConceptId should not be null", detail.getConceptId() != null); 
@@ -276,25 +304,42 @@ public class RVFAssertionsRegressionTestHarnesss {
 		assertEquals(expectedReport.getTotalAssertionsFailed(),actualReport.getTotalAssertionsFailed());
 		assertEquals(expectedReport.getResults().size(), actualReport.getResults().size());
 	}
-	
+
 	private void explainDifference(UUID uuid, RVFTestResult left,
 			RVFTestResult right) {
 		if (!left.getAssertionUuid().equals(right.getAssertionUuid())) {
-			System.out.println ("Difference explained: Result UUID " + left.getAssertionUuid() + " does not match actual compared value " + right.getAssertionUuid());
+			System.out.println (DIFF + left + "\n\t expected result UUID " + left.getAssertionUuid() + " does not match actual value " + right.getAssertionUuid());
 		} else if (!left.getAssertionName().equals(right.getAssertionName())) {
-			System.out.println ("Difference explained: Result assertion name  " + left.getAssertionName() + " does not match actual compared value " + right.getAssertionName());
+			System.out.println (DIFF + left+ "\n\t expected result assertion name  " + left.getAssertionName() + " does not match actual value " + right.getAssertionName());
+		}  else if (left.getFirstNInstances() == null && right.getFirstNInstances() != null) {
+			System.out.println (DIFF + left + "\n\t expected result firstN is null, unlike actual compared value " + right.getFirstNInstances().size());
+		} else if (left.getFirstNInstances() != null && right.getFirstNInstances() == null) {
+			System.out.println (DIFF + left + "\n\t expected result firstN size " + left.getFirstNInstances().size() + " does not match actual compared value which is null");
 		} else if (left.getTotalFailed() != right.getTotalFailed()) {
-			System.out.println ("Difference explained: Result total failed  " + left.getTotalFailed() + " does not match actual compared value" + right.getTotalFailed());
+			System.out.println (DIFF + left + "\n\t expected result total failed " + left.getTotalFailed() + " does not match actual value " + right.getTotalFailed());
+		} else if (left.getFirstNInstances() == null && right.getFirstNInstances() == null) {
+			//Can't explain difference if there are no failure instances to examine
+			return;
 		} else if (left.getFirstNInstances().size() != right.getFirstNInstances().size()) {
-			System.out.println ("Difference explained: " + uuid + " Result firstN size  " + left.getFirstNInstances().size() + " does not match actual compared value " + right.getFirstNInstances().size());
+			System.out.println (DIFF + left + "\n\t expected result firstN size " + left.getFirstNInstances().size() + " does not match actual compared value " + right.getFirstNInstances().size());
 		}
-		
-		for (int i=0; i<left.getFirstNInstances().size(); i++) {
-			FailureDetail leftFd = left.getFirstNInstances().get(i);
-			FailureDetail rightFd = right.getFirstNInstances().get(i); 
-			if (!leftFd.equals(rightFd)) {
-				System.out.println ("Difference explained: " + uuid + " expected Failure Detail " + i + ": " + leftFd + " does not match actual compared value " + rightFd);
-				return;
+		int leftSize = left.getFirstNInstances() == null ? 0 : left.getFirstNInstances().size();
+		int rightSize = right.getFirstNInstances() == null ? 0 : right.getFirstNInstances().size();
+		int size =  leftSize > rightSize ? leftSize : rightSize;
+		for (int i=0; i< size; i++) {
+			if (i < leftSize && i < rightSize) {
+				FailureDetail leftFd = left.getFirstNInstances().get(i);
+				FailureDetail rightFd = right.getFirstNInstances().get(i); 
+				if (!leftFd.equals(rightFd)) {
+					System.out.println (DIFF + left + "\n\t expected Failure Detail " + (i+1) + ": " + leftFd + " does not match actual compared value " + rightFd);
+					return;
+				}
+			} else if ( i >= leftSize) {
+				FailureDetail rightFd = right.getFirstNInstances().get(i); 
+				System.out.println (DIFF + left + "\n\t unexpected extra actual Failure Detail " + (i+1) + ": " + rightFd);
+			} else if ( i >= rightSize) {
+				FailureDetail leftFd = left.getFirstNInstances().get(i);
+				System.out.println ( DIFF + left + "\n\t actual results missing expected Failure Detail " + (i+1) + ": " + leftFd);
 			}
 		}
 	}
@@ -454,23 +499,29 @@ public class RVFAssertionsRegressionTestHarnesss {
 			if (assertionName == null) {
 				if (other.assertionName != null)
 					return false;
-			} else if (!assertionName.equals(other.assertionName))
+			} else if (!assertionName.equals(other.assertionName)) {
 				return false;
+			}
+			
 			if (assertionUuid == null) {
 				if (other.assertionUuid != null)
 					return false;
-			} else if (!assertionUuid.equals(other.assertionUuid))
+			} else if (!assertionUuid.equals(other.assertionUuid)) {
 				return false;
-			if (firstNInstances == null) {
-				if (other.firstNInstances != null)
-					return false;
-			} else {
+			}
+
+			if (firstNInstances == null && other.firstNInstances != null ) {
+				return false;
+			} else if (other.firstNInstances == null && firstNInstances != null ) {
+				return false;
+			} else if (firstNInstances != null && other.firstNInstances != null ) {
 				Collections.sort(firstNInstances);
 				Collections.sort(other.firstNInstances);
 				if (!firstNInstances.equals(other.firstNInstances)) {
 					return false;
 				}
 			}
+			//Final case that will drop through is that both are null
 				
 			return totalFailed == other.totalFailed;
 		}
@@ -482,7 +533,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		
 		@Override
 		public String toString() {
-			return assertionUuid.toString() + ":" + assertionName + " [" + totalFailed +" failures, " + firstNInstances.size() + " examples]";
+			return assertionUuid.toString() + ":" + assertionName + " [" + totalFailed +" failures, " + (firstNInstances == null ? "NULL":firstNInstances.size()) + " examples]";
 		}
 	}
 }

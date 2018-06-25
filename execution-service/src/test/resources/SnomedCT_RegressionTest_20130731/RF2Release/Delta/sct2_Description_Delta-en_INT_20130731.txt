@@ -17,3 +17,5 @@ id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignific
 500891345	20140731	1	900000000000207008	702386002	en	900000000000003001	Blood group antibody i (substance)	900000000000017005
 3008913022	20140731	1	900000000000207008	703860006	en	900000000000003001	Toxic effect of antimony AND/OR its compounds (disorder)	900000000000020002
 3008913021	20140731	1	900000000000207008	703860006	en	900000000000013009	A subtype of non-spastic cerebral palsy with loss of muscular coordination with abnormal force and rhythm, and impairment of accuracy; commonly presents with gait and trunk ataxia, poor balance, past pointing, terminal intention tremor, scanning speech, nystagmus and other abnormal eye movements, and hypotonia. Low tone is a prominent feature.	900000000000020002
+3494181019	20140731	1	900000000000012004	733073007	en	900000000000013009	OWL axiom reference set	900000000000017005
+3494182014	20140731	1	900000000000012004	733073007	en	900000000000003001	OWL axiom reference set (foundation metadata concept)	900000000000017005

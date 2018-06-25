@@ -420,7 +420,7 @@
 		<script uuid="8479317e-8459-4362-bee8-628b8220f1e4" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-nonhuman-active.sql" text="Active Non-human refset members refer to active components." />
 		<script uuid="c3249e80-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-delta-language-lang-specific-words-us-call-proc.sql" text="Terms that contain en-us specific words are in the en-us language refset." />
 		<script uuid="cc9c5340-84f0-11e1-b0c4-0800200c9a66" category="component-centric-validation,INT" sqlFile="component-centric-delta-language-lang-specific-words-gb-call-proc.sql" text="Terms that contain en-gb specific words are in the en-gb language refset." />
-
+		<script uuid="84335167-9105-4377-beca-b80b0d5dff83" category="component-centric-validation,INT" sqlFile="component-centric-delta-metadata-only-in-model-module.sql" text="Metadata concepts must only exist in model component module." />
 		<script uuid="7c406d6c-7e30-4aa1-b99d-e00b4e2d52a5" category="component-centric-validation,INT,US" sqlFile="component-centric-snapshot-definition-preferred-in-en_us-and-en_gb.sql" text="There is an equivalent definition in the en-us and en-gb language when provided." />
 		<script uuid="905122c9-f24f-4d57-b478-435d693ff209" category="component-centric-validation" sqlFile="component-centric-snapshot-descripton-term-length.sql" text="A description should not have more than 255 characters long." />
 		<script uuid="7dd01495-2099-4e7b-9d02-39899bf774f3" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-term-used-in-description-warning.sql" text="A description normally has less than 35 words." />
