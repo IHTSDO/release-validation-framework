@@ -38,6 +38,7 @@ public class AssertionGroupImporter {
 		US_AUTHORING ("US", "us-authoring"),
 		BE_AUTHORING("BE", "be-authoring"),
 		NO_AUTHORING("NO", "no-authoring"),
+		CH_AUTHORING("CH", "ch-authoring"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC", "first-time-loinc-validation"),
 		FIRST_TIME_COMMON_EDITION_VALIDATION ("COMMON", "first-time-common-edition"),
 		LOINC_EDITION ("LOINC", "LoincEdition"),
