@@ -374,13 +374,16 @@
     "assertionName" : "No active definitions contain leading or trailing spaces.",
     "assertionUuid" : "da3ae7c4-6144-4cd5-9530-2a7780c53c9a",
     "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "TEXTDEF: id=3008053018:Active Terms with leading or trailing spaces."
+    }, {
       "conceptId" : "702769005",
       "detail" : "TEXTDEF: id=2989768014:Active Terms with leading or trailing spaces."
     }, {
       "conceptId" : "700237005",
       "detail" : "TEXTDEF: id=2989691019:Active Terms with leading or trailing spaces."
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 3
   }, {
     "assertionName" : "The first letter of the FSN should be capitalized.",
     "assertionUuid" : "dd0d0406-7481-444a-9f04-b6fc7db49039",
@@ -792,8 +795,23 @@
     "firstNInstances" : [ {
       "conceptId" : "702386002",
       "detail" : "Description: id=3006276018 has active term with leading or trailing spaces."
+    }, {
+      "conceptId" : "700244001",
+      "detail" : "Description: id=3006191013 has active term with leading or trailing spaces."
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Description: id=2989790014 has active term with leading or trailing spaces."
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Description: id=2989790017 has active term with leading or trailing spaces."
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Description: id=2989790015 has active term with leading or trailing spaces."
+    }, {
+      "conceptId" : "703649004",
+      "detail" : "Description: id=2989770013 has active term with leading or trailing spaces."
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 6
   }, {
     "assertionName" : "Relationship groups contain at least 2 relationships.",
     "assertionUuid" : "59b574a0-7d08-11e1-b0c4-0800200c9a66",
@@ -1076,13 +1094,13 @@
     "totalFailed" : 4
   },
     {
-    "assertionName" : "Metadata concepts must only exist in model component module.",
-    "assertionUuid" : "84335167-9105-4377-beca-b80b0d5dff83",
-    "firstNInstances" : [ {
-      "conceptId" : "733073007",
-      "detail" : "Metadata concept (733073007|OWL axiom reference set (foundation metadata concept)|) in module other than model module"
-    } ],
-    "totalFailed" : 1
-  }
+      "assertionName" : "Metadata concepts must only exist in model component module.",
+      "assertionUuid" : "84335167-9105-4377-beca-b80b0d5dff83",
+      "firstNInstances" : [ {
+        "conceptId" : "733073007",
+        "detail" : "Metadata concept (733073007|OWL axiom reference set (foundation metadata concept)|) in module other than model module"
+      } ],
+      "totalFailed" : 1
+    }
   ]
 }

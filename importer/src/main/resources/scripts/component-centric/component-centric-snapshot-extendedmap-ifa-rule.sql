@@ -34,6 +34,7 @@ where a.active = 1
   and not exists
    (select * from curr_concept_s b, curr_description_s c
      where b.active = 1
+       and c.active = 1
        and b.id = substr(substring_index(a.mapRule,' ',2),5)
        and b.id =c.conceptid
        and c.term = rtrim(ltrim(substring_index(substr(a.mapRule,instr(a.mapRule,'|')+1),'|',1))));
