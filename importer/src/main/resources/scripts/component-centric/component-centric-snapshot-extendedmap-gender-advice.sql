@@ -11,8 +11,8 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
  from curr_extendedmaprefset_s a
 	where a.active = 1
   	and mapAdvice like '%MAP IS CONTEXT DEPENDENT FOR GENDER%'
- 	and a.mapRule != 'IFA 248153007 | Male (finding) |'
-  	and a.mapRule != 'IFA 248152002 | Female (finding) |';
+ 	and a.mapRule not like '%IFA 248153007 | Male (finding) |%'
+  	and a.mapRule not like '%IFA 248152002 | Female (finding) |%';
  commit;
  
 /*
@@ -28,8 +28,8 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
  from curr_extendedmaprefset_s a
 where a.active = 1
   and mapAdvice not like '%MAP IS CONTEXT DEPENDENT FOR GENDER%'
-  and (a.mapRule = 'IFA 248153007 | Male (finding) |'
-       or a.mapRule = 'IFA 248152002 | Female (finding) |');
+  and (a.mapRule like '%IFA 248153007 | Male (finding) |%'
+       or a.mapRule like '%IFA 248152002 | Female (finding) |%');
  commit;
 
  
