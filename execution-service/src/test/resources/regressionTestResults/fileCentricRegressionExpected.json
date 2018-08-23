@@ -875,6 +875,41 @@
     } ],
     "totalFailed" : 29
   }, {
+    "assertionName" : "The module id of components should be in module dependency list",
+    "assertionUuid" : "0145fbad-f067-41ff-b700-cf54fc639e21",
+    "firstNInstances" : [ {
+      "conceptId" : "0",
+      "detail" : "complexmaprefset ::id= 217a9bea-0b4e-5499-8a61-e4d661e722b2 ::module id: 449080006 is not in module dependency list"
+    }, {
+      "conceptId" : "0",
+      "detail" : "complexmaprefset ::id= 69703317-411e-5d4d-b853-eef523f0109d ::module id: 449080006 is not in module dependency list"
+    }, {
+      "conceptId" : "0",
+      "detail" : "complexmaprefset ::id= 317a9bea-0b4e-5499-8a61-e4d661e722b3 ::module id: 449080006 is not in module dependency list"
+    }, {
+      "conceptId" : "0",
+      "detail" : "complexmaprefset ::id= 79703317-411e-5d4d-b853-eef523f0109a ::module id: 449080006 is not in module dependency list"
+    }, {
+      "conceptId" : "0",
+      "detail" : "expressionAssociationRefset ::id= 1ca0b461-66a6-45c8-b01e-5a227c1fc27a ::module id: 705115006 is not in module dependency list"
+    }, {
+      "conceptId" : "0",
+      "detail" : "expressionAssociationRefset ::id= 576ac8fc-2830-426b-9ae8-de3f36a23300 ::module id: 705115006 is not in module dependency list"
+    }, {
+      "conceptId" : "0",
+      "detail" : "expressionAssociationRefset ::id= 210ffde0-105e-4825-9501-ae49a28ffa0d ::module id: 705115006 is not in module dependency list"
+    }, {
+      "conceptId" : "0",
+      "detail" : "expressionAssociationRefset ::id= 9568f7f7-cf6f-4d6d-98f0-59d7ec447504 ::module id: 705115006 is not in module dependency list"
+    }, {
+      "conceptId" : "0",
+      "detail" : "expressionAssociationRefset ::id= d01509a6-02a2-419a-9b68-ab77e21864c2 ::module id: 705115006 is not in module dependency list"
+    }, {
+      "conceptId" : "0",
+      "detail" : "expressionAssociationRefset ::id= adb4ebdb-c3af-4f6a-9d80-add0730fcee0 ::module id: 705115006 is not in module dependency list"
+    } ],
+    "totalFailed" : 50
+  }, {
     "assertionName" : "Preferred Term exists exactly once in each language refset for each concept.",
     "assertionUuid" : "03cf9850-7857-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
