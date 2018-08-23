@@ -11,7 +11,8 @@
 		<script uuid="B4B5EE89-372F-4AE3-8C18-9C37CF4E932E" category="resource" sqlFile="component-centric-snomed-ct-expression-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the SNOMED CT expression for LOIC mapping." />
 		<script uuid="dd124acf-52d3-45e6-b5b4-d40454ff1b5e" category="resource" sqlFile="component-centric-snapshot-mrcm-attribute-range-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Domain Refsets." />
 		<script uuid="646390b7-c4aa-4aab-92c0-0031cf2e45ae" category="resource" sqlFile="component-centric-snapshot-mrcm-domain-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Attribute Range Refsets." />
-		
+		<script uuid="045b977a-a5cb-49f6-9a80-54ff478062bb" category="resource" sqlFile="file-centric-moduleid-validation-proc.sql" text="Defines procedure to validate module ID in data" />
+
 		<!-- release-type-full-validation -->
 		<script uuid="84f5edda-1249-4d79-87da-e248e61f06a6" category="release-type-validation" sqlFile="release-type-full-validation-concept.sql" text="The current Concept full file contains all previously published data unchanged."/>
 		
@@ -608,5 +609,7 @@
 		<script uuid="73772817-4654-4abf-b801-e849fbae1ba0" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-mrcm-attribute-range-referencedcomponentId-exist-in-attribute-domain-refset-referencedcomponentid.sql" text="ReferencedComponentId in MRCM ATTRIBUTE RANGE SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN SNAPSHOT"/>
 		
 		<script uuid="57ae69cd-26f0-4001-ba2f-ae56129e2e28" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-mrcm-module-scope-valid-mrcmrulerefsetid.sql" text="MrcmRuleRefsetId in MRCM MODULE SCOPE SNAPSHOT exists in the RefsetId values of MRCM DOMAIN SNAPSHOT or MRCM ATTRIBUTE DOMAIN SNAPSHOT or MRCM ATTRIBUTE RANGE SNAPSHOT"/>
+
+		<script uuid="0145fbad-f067-41ff-b700-cf54fc639e21" category="file-centric-validation" sqlFile="file-centric-snapshot-correct-module-id.sql" text="The module id of components should be in module dependency list" />
 	</useCase>
 </manifest>
