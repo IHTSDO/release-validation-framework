@@ -18,3 +18,4 @@ select distinct moduleid from curr_moduledependencyrefset_s
 where active = 1;
 
 call validate_module_id('<PROSPECTIVE>',<RUNID>,'<ASSERTIONUUID>');
+
