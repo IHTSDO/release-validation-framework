@@ -20,10 +20,10 @@ public class EntityDaoImpl<T> implements EntityDao<T> {
 	@Autowired
 	private SessionFactory sessionFactory;
 
-    protected EntityDaoImpl() {
-    }
+	protected EntityDaoImpl() {
+	}
 
-    protected EntityDaoImpl(final Class<T> type) {
+	protected EntityDaoImpl(final Class<T> type) {
 		this.type = type;
 	}
 
@@ -35,15 +35,15 @@ public class EntityDaoImpl<T> implements EntityDao<T> {
 
 	@Override
 	public T update(final T entity) {
-        try {
-            final Object merged = getCurrentSession().merge(entity);
-            getCurrentSession().update(merged);
-            return (T) merged;
-        }
-        catch (final ObjectNotFoundException e) {
-            // disappeared already due to cascade
-            return entity;
-        }
+		try {
+			final Object merged = getCurrentSession().merge(entity);
+			getCurrentSession().update(merged);
+			return (T) merged;
+		}
+		catch (final ObjectNotFoundException e) {
+			// disappeared already due to cascade
+			return entity;
+		}
 	}
 
 	@Override
@@ -54,26 +54,26 @@ public class EntityDaoImpl<T> implements EntityDao<T> {
 	@Override
 	public T findByUuid(final Class clazz, final UUID uuid) {
 
-        return (T) getCurrentSession().createCriteria(clazz).add(Restrictions.eq("uuid", uuid.toString())).uniqueResult();
+		return (T) getCurrentSession().createCriteria(clazz).add(Restrictions.eq("uuid", uuid.toString())).uniqueResult();
 	}
 
 	@Override
 	public void delete(final T entity) {
-        getCurrentSession().delete(entity);
+		getCurrentSession().delete(entity);
 	}
 
-    @Override
-    public List<T> findAll(final Class clazz){
-        return getCurrentSession().createCriteria(clazz).list();
-    }
-
-    @Override
-    public Long count(final Class clazz){
-        return (Long) getCurrentSession().createCriteria(clazz).setProjection(Projections.rowCount()).uniqueResult();
-    }
+	@Override
+	public List<T> findAll(final Class clazz){
+		return getCurrentSession().createCriteria(clazz).list();
+	}
 
 	@Override
-    public Session getCurrentSession() { return sessionFactory.getCurrentSession();
+	public Long count(final Class clazz){
+		return (Long) getCurrentSession().createCriteria(clazz).setProjection(Projections.rowCount()).uniqueResult();
+	}
+
+	@Override
+	public Session getCurrentSession() { return sessionFactory.getCurrentSession();
 	}
 
 }

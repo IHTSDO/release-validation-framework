@@ -66,7 +66,7 @@ public class ValidationReportService {
 		final Gson prettyGson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 		File temp = null;
 		try {
-	        temp = File.createTempFile("resultJson", ".tmp"); 
+			temp = File.createTempFile("resultJson", ".tmp");
 			try (final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp),Charset.forName(UTF_8)))) {
 				prettyGson.toJson(responseMap, bw);
 				//Now copy to our S3 Location

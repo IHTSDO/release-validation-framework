@@ -23,11 +23,11 @@ public class Test {
 	private Long id;
 	private String name;
 	private String description;
-    private TestType type = TestType.UNKNOWN;
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "command_id")
-    @JsonManagedReference
-    private ExecutionCommand command;
+	private TestType type = TestType.UNKNOWN;
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "command_id")
+	@JsonManagedReference
+	private ExecutionCommand command;
 
 	public Test() {
 	}
@@ -65,24 +65,24 @@ public class Test {
 	}
 
 	@ApiModelProperty(value="Test type", required=true)
-    public TestType getType() {
-        return type;
-    }
+	public TestType getType() {
+		return type;
+	}
 
-    public void setType(final TestType type) {
-        this.type = type;
-    }
+	public void setType(final TestType type) {
+		this.type = type;
+	}
 
-    @ApiModelProperty(value="Test execution command", required=true)
-    public ExecutionCommand getCommand() {
-        return command;
-    }
+	@ApiModelProperty(value="Test execution command", required=true)
+	public ExecutionCommand getCommand() {
+		return command;
+	}
 
-    public void setCommand(final ExecutionCommand command) {
-        this.command = command;
-        this.command.setTest(this);
-    }
-    
+	public void setCommand(final ExecutionCommand command) {
+		this.command = command;
+		this.command.setTest(this);
+	}
+
 	@Override
 	public String toString() {
 		return "Test [id=" + id + ", name=" + name + ", description="

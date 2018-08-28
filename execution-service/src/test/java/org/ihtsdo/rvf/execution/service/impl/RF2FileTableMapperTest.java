@@ -45,7 +45,7 @@ public class RF2FileTableMapperTest {
 	private static final String[] INT_EXPECTED_DELTA = {
 			"associationrefset_d",
 			"attributevaluerefset_d",
-			"simplerefset_d",            
+			"simplerefset_d",
 			"langrefset_d",
 			"extendedmaprefset_d",
 			"complexmaprefset_d",

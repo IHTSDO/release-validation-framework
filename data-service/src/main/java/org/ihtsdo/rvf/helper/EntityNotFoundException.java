@@ -10,9 +10,9 @@ public class EntityNotFoundException extends RuntimeException{
 	private static final long serialVersionUID = 1L;
 
 	public EntityNotFoundException(final Long id) {
-        super("No entity found with given id " + id);
-    }
-    public EntityNotFoundException(final UUID uuid) {
-        super("No entity found with given uuid " + uuid);
-    }
+		super("No entity found with given id " + id);
+	}
+	public EntityNotFoundException(final UUID uuid) {
+		super("No entity found with given uuid " + uuid);
+	}
 }

@@ -10,17 +10,17 @@ public interface EntityDao<T> {
 
 	T save(T entity);
 
-    T update(T entity);
+	T update(T entity);
 
-    T load(Class clazz, Serializable id);
+	T load(Class clazz, Serializable id);
 
-    T findByUuid(Class clazz, UUID uuid);
+	T findByUuid(Class clazz, UUID uuid);
 
-    void delete(T entity);
+	void delete(T entity);
 
-    List<T> findAll(Class clazz);
+	List<T> findAll(Class clazz);
 
-    Long count(Class clazz);
+	Long count(Class clazz);
 
-    Session getCurrentSession();
+	Session getCurrentSession();
 }

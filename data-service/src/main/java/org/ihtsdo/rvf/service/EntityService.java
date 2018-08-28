@@ -9,13 +9,13 @@ public interface EntityService<T> {
 
 	void delete(T entity);
 
-    T create(T entity);
+	T create(T entity);
 
-    List<T> findAll(Class clazz);
+	List<T> findAll(Class clazz);
 
-    T find(Class clazz, Long id);
+	T find(Class clazz, Long id);
 
-    T find(Class clazz, UUID uuid);
+	T find(Class clazz, UUID uuid);
 
-    Long count(Class clazz);
+	Long count(Class clazz);
 }

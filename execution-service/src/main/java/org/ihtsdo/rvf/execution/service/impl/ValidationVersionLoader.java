@@ -82,7 +82,7 @@ public class ValidationVersionLoader {
 				reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
 				isSucessful = false;
 			}
-        }
+		}
 		return isSucessful;
 	}
 	
@@ -206,7 +206,7 @@ public class ValidationVersionLoader {
 	
 	private boolean isExtension(final ValidationRunConfig runConfig) {
 		return (runConfig.getExtensionDependency() != null
-                && !runConfig.getExtensionDependency().trim().isEmpty());
+				&& !runConfig.getExtensionDependency().trim().isEmpty());
 	}
 
 	public boolean isKnownVersion(final String vertionToCheck, final Map<String, Object> responseMap) {
@@ -228,8 +228,8 @@ public class ValidationVersionLoader {
 		if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
 			return false;
 		}
-        return true;
-    }
+		return true;
+	}
 	
 	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
 		//default to the international folder;

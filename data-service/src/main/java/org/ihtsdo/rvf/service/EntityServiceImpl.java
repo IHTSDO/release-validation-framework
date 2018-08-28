@@ -20,49 +20,49 @@ public class EntityServiceImpl<T> implements EntityService<T> {
 
 	@Override
 	public T update(T entity) {
-        dao.update(entity);
-        return entity;
+		dao.update(entity);
+		return entity;
 	}
 
 	@Override
 	public void delete(T entity) {
-        dao.delete(entity);
+		dao.delete(entity);
 	}
 
-    @Override
-    public T create(T entity) {
-       return dao.save(entity);
-    }
+	@Override
+	public T create(T entity) {
+	   return dao.save(entity);
+	}
 
-    @Override
-    public List<T> findAll(Class clazz) {
-        return dao.findAll(clazz);
-    }
+	@Override
+	public List<T> findAll(Class clazz) {
+		return dao.findAll(clazz);
+	}
 
-    @Override
-    public T find(Class clazz, Long id){
-        T t = dao.load(clazz, id);
-        if (t == null){
-            throw new EntityNotFoundException(id);
-        }
-        else{
-            return t;
-        }
-    }
+	@Override
+	public T find(Class clazz, Long id){
+		T t = dao.load(clazz, id);
+		if (t == null){
+			throw new EntityNotFoundException(id);
+		}
+		else{
+			return t;
+		}
+	}
 
-    @Override
-    public T find(Class clazz, UUID uuid){
-        T t = dao.findByUuid(clazz, uuid);
-        if (t == null){
-            throw new EntityNotFoundException(uuid);
-        }
-        else{
-            return t;
-        }
-    }
+	@Override
+	public T find(Class clazz, UUID uuid){
+		T t = dao.findByUuid(clazz, uuid);
+		if (t == null){
+			throw new EntityNotFoundException(uuid);
+		}
+		else{
+			return t;
+		}
+	}
 
-    @Override
-    public Long count(Class clazz){
-        return dao.count(clazz);
-    }
+	@Override
+	public Long count(Class clazz){
+		return dao.count(clazz);
+	}
 }

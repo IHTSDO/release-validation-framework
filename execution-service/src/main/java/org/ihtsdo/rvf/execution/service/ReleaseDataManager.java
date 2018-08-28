@@ -14,19 +14,19 @@ import org.ihtsdo.otf.rest.exception.BusinessServiceException;
  */
 public interface ReleaseDataManager {
 
-    boolean uploadPublishedReleaseData(InputStream inputStream, String fileName, String product, String version) throws BusinessServiceException;
+	boolean uploadPublishedReleaseData(InputStream inputStream, String fileName, String product, String version) throws BusinessServiceException;
 
-    boolean uploadPublishedReleaseData(File releasePackZip, String product, String version) throws BusinessServiceException;
+	boolean uploadPublishedReleaseData(File releasePackZip, String product, String version) throws BusinessServiceException;
 
-    String loadSnomedData(String productVersion,List<String> rf2FilesLoaded,File ... zipDataFile) throws BusinessServiceException;
+	String loadSnomedData(String productVersion,List<String> rf2FilesLoaded,File ... zipDataFile) throws BusinessServiceException;
 
-    boolean isKnownRelease(String releaseVersion);
+	boolean isKnownRelease(String releaseVersion);
 
-    Set<String> getAllKnownReleases();
+	Set<String> getAllKnownReleases();
 
-    String getSchemaForRelease(String releaseVersion);
+	String getSchemaForRelease(String releaseVersion);
 
-    void setSchemaForRelease(String releaseVersion, String schemaName);
+	void setSchemaForRelease(String releaseVersion, String schemaName);
 
 	List<File> getZipFileForKnownRelease(String knownVersion);
 	

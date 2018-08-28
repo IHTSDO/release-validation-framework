@@ -28,59 +28,59 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 @ApiModel(description="Assertion test SQL statements")
 public class ExecutionCommand {
 
-    @Id
-    @GeneratedValue
-    Long id;
-    
-    @Column(columnDefinition = "text")
-    @ApiModelProperty(required=false)
-    String template = null;
-    @JsonBackReference
-    @OneToOne(fetch = FetchType.EAGER, mappedBy = "command")
-    Test test;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name="command_statements", joinColumns=@JoinColumn(name="command_id"))
-    @Column(name="statement", columnDefinition = "text")
-    @OrderColumn(name="statement_index")
-    List<String> statements = new ArrayList<>();
+	@Id
+	@GeneratedValue
+	Long id;
 
-    /**
-     * No argument constructor for IOC
-     */
-    public ExecutionCommand() {
-    }
+	@Column(columnDefinition = "text")
+	@ApiModelProperty(required=false)
+	String template = null;
+	@JsonBackReference
+	@OneToOne(fetch = FetchType.EAGER, mappedBy = "command")
+	Test test;
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name="command_statements", joinColumns=@JoinColumn(name="command_id"))
+	@Column(name="statement", columnDefinition = "text")
+	@OrderColumn(name="statement_index")
+	List<String> statements = new ArrayList<>();
 
-    public String getTemplate() {
-        return template;
-    }
+	/**
+	 * No argument constructor for IOC
+	 */
+	public ExecutionCommand() {
+	}
 
-    public void setTemplate(final String template) {
-        this.template = template;
-    }
+	public String getTemplate() {
+		return template;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setTemplate(final String template) {
+		this.template = template;
+	}
 
-    public void setId(final Long id) {
-        this.id = id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public Test getTest() {
-        return test;
-    }
+	public void setId(final Long id) {
+		this.id = id;
+	}
 
-    public void setTest(final Test test) {
-        this.test = test;
-    }
+	public Test getTest() {
+		return test;
+	}
 
-    public List<String> getStatements() {
-        return statements;
-    }
+	public void setTest(final Test test) {
+		this.test = test;
+	}
 
-    public void setStatements(final List<String> statements) {
-        this.statements = statements;
-    }
+	public List<String> getStatements() {
+		return statements;
+	}
+
+	public void setStatements(final List<String> statements) {
+		this.statements = statements;
+	}
 
 	@Override
 	public String toString() {

@@ -96,46 +96,46 @@ public class ZipFileUtils {
 	
 	
 	/**
-     * Zip it
-     * @param zipFile output ZIP file location
+	 * Zip it
+	 * @param zipFile output ZIP file location
 	 * @param sourceFileDir 
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
-     */
-    public static void zip(final String sourceFileDir, final String zipFile) throws IOException {
-     final byte[] buffer = new byte[1024];
-     try ( final FileOutputStream fos = new FileOutputStream(zipFile);
-    	 final ZipOutputStream zos = new ZipOutputStream(fos) ) {
-    	final List<File> fileList = new ArrayList<>();
-    	generateFileList(new File(sourceFileDir), fileList);
+	 */
+	public static void zip(final String sourceFileDir, final String zipFile) throws IOException {
+	 final byte[] buffer = new byte[1024];
+	 try ( final FileOutputStream fos = new FileOutputStream(zipFile);
+		 final ZipOutputStream zos = new ZipOutputStream(fos) ) {
+		final List<File> fileList = new ArrayList<>();
+		generateFileList(new File(sourceFileDir), fileList);
 		for (final File file : fileList) {
-    		final ZipEntry ze= new ZipEntry(file.getName());
-        	zos.putNextEntry(ze);
-        	try (final FileInputStream in = new FileInputStream(file) ) {
-        		int len;
-            	while ((len = in.read(buffer)) > 0) {
-            		zos.write(buffer, 0, len);
-            	}
-        	}
-    	}
-     } 
+			final ZipEntry ze= new ZipEntry(file.getName());
+			zos.putNextEntry(ze);
+			try (final FileInputStream in = new FileInputStream(file) ) {
+				int len;
+				while ((len = in.read(buffer)) > 0) {
+					zos.write(buffer, 0, len);
+				}
+			}
+		}
+	 }
    }
  
-    /**
-     * Traverse a directory and get all files,
-     * and add the file into fileList  
-     * @param node file or directory
-     */
-    private static void generateFileList(final File node, final List<File> fileList){
-    	//add file only
-    	if(node.isFile()){
-    		fileList.add(node);
-    	}
-    	if(node.isDirectory()){
-    		final String[] subNote = node.list();
-    		for(final String filename : subNote){
-    			generateFileList(new File(node, filename),fileList);
-    		}
-    	}
-    }
+	/**
+	 * Traverse a directory and get all files,
+	 * and add the file into fileList
+	 * @param node file or directory
+	 */
+	private static void generateFileList(final File node, final List<File> fileList){
+		//add file only
+		if(node.isFile()){
+			fileList.add(node);
+		}
+		if(node.isDirectory()){
+			final String[] subNote = node.list();
+			for(final String filename : subNote){
+				generateFileList(new File(node, filename),fileList);
+			}
+		}
+	}
 }

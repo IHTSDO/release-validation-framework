@@ -161,10 +161,10 @@ public class ValidationRunConfig {
 			return true;
 		}
 		
-        return prevIntReleaseVersion != null && prevIntReleaseVersion.trim().isEmpty()
-                && previousExtVersion != null && previousExtVersion.trim().isEmpty();
+		return prevIntReleaseVersion != null && prevIntReleaseVersion.trim().isEmpty()
+				&& previousExtVersion != null && previousExtVersion.trim().isEmpty();
 
-    }
+	}
 	public ValidationRunConfig addProspectiveFileFullPath(String s3File) {
 		this.prospectiveFileFullPath = s3File;
 		String[] parts = s3File.split("/");

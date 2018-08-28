@@ -52,8 +52,8 @@ public class HypermediaGenerator {
 	 *
 	 * @param entity
 	 * @param currentResource
-	 *            - if true indicates that the URL already contains the entity
-	 *            id. If false, the entity will be added.
+	 *			- if true indicates that the URL already contains the entity
+	 *			id. If false, the entity will be added.
 	 * @param request
 	 * @param entityLinks
 	 * @return

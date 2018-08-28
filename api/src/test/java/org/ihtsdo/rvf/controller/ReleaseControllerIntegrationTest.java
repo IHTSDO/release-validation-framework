@@ -32,61 +32,61 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebAppConfiguration
 public class ReleaseControllerIntegrationTest {
 
-    @Autowired
-    private WebApplicationContext ctx;
-    private MockMvc mockMvc;
-    @Autowired
-    private ReleaseDataManager releaseDataManager;
+	@Autowired
+	private WebApplicationContext ctx;
+	private MockMvc mockMvc;
+	@Autowired
+	private ReleaseDataManager releaseDataManager;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
-            MediaType.APPLICATION_JSON.getType(),
-            MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+	private final ObjectMapper objectMapper = new ObjectMapper();
+	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
+			MediaType.APPLICATION_JSON.getType(),
+			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
-    @Before
-    public void setUp() throws Exception {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
-        assertNotNull(releaseDataManager);
-        releaseDataManager.uploadPublishedReleaseData(getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip") ,
-                "SnomedCT_Release_INT_20140131.zip", "int","20140131");
-        assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("int_20140131"));
-        assertTrue("Release 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("int_20140131"));
-    }
+	@Before
+	public void setUp() throws Exception {
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
+		assertNotNull(releaseDataManager);
+		releaseDataManager.uploadPublishedReleaseData(getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip") ,
+				"SnomedCT_Release_INT_20140131.zip", "int","20140131");
+		assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("int_20140131"));
+		assertTrue("Release 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("int_20140131"));
+	}
 
-    @Test
-    public void testGetReleases() throws Exception {
-        mockMvc.perform(get("/releases").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8)).andDo(print());
-    }
+	@Test
+	public void testGetReleases() throws Exception {
+		mockMvc.perform(get("/releases").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andDo(print());
+	}
 
-    @Test
-    public void testGetRelease() throws Exception {
+	@Test
+	public void testGetRelease() throws Exception {
 
-        mockMvc.perform(get("/releases/{version}", "int_20140131").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON_UTF8));
-    }
+		mockMvc.perform(get("/releases/{version}", "int_20140131").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(content().contentType(APPLICATION_JSON_UTF8));
+	}
 
-    @Test
-    public void testGetMissingRelease() throws Exception {
-        mockMvc.perform(get("/releases/{version}", "19000131").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
+	@Test
+	public void testGetMissingRelease() throws Exception {
+		mockMvc.perform(get("/releases/{version}", "19000131").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound());
+	}
 
-//    @Test
-//    public void testUploadRelease() throws Exception {
+//	@Test
+//	public void testUploadRelease() throws Exception {
 //
-//        mockMvc.perform(
-//                fileUpload("/releases/{version}", "20140131")
-//                        .file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140131.zip", "application/zip",
-//                                getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip")))
-//                .param("overWriteExisting", "false")
-//                .param("purgeExistingDatabase", "false")
-//                )
-//                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-//                .andExpect(status().isOk())
-//                .andExpect(content().string(containsString("true")))
-//                .andDo(print());
-//    }
+//		mockMvc.perform(
+//				fileUpload("/releases/{version}", "20140131")
+//						.file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140131.zip", "application/zip",
+//								getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip")))
+//				.param("overWriteExisting", "false")
+//				.param("purgeExistingDatabase", "false")
+//				)
+//				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+//				.andExpect(status().isOk())
+//				.andExpect(content().string(containsString("true")))
+//				.andDo(print());
+//	}
 }
