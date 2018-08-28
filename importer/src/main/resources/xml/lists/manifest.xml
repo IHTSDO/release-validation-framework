@@ -478,6 +478,9 @@
 		<script uuid="A6F78382-91C4-4E0A-A9D6-6D47B1A16979" category="component-centric-validation,LOINC" sqlFile="component-centric-snapshot-expression-association-unique-mapTarget.sql" text="The mapTarget in LOINC ExpressionAssociationRefset snapshot is unique."/>
 		<script uuid="18D36527-9247-406A-BD1F-D7D608B0663A" category="component-centric-validation,LOINC" sqlFile="component-centric-snapshot-expression-association-mapTarget-valid-loinc.sql" text="The mapTarget in LOINC ExpressionAssociationRefset snapshot is a valid LOINC code"/>
 		<script uuid="335B2810-8CBB-43BF-807E-092DACB20F6A" category="component-centric-validation,LOINC" sqlFile="component-centric-snapshot-map-correlation-origin-valid-loinc-parts.sql" text="The LOINC parts in MapCorrelationOriginRefset snapshot are in correct format" />
+		
+		<script uuid="22d3065c-98d3-458e-b020-35eec49b4be3" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-association.sql" text="Newly inactive concepts must have an active historical association to an active concept - unless indicator NCEP." />
+		
 		<!-- rt added this as a template... -->
 		<!--  <script uuid="" category="" sqlFile="" text=""  />-->
 	</useCase>
