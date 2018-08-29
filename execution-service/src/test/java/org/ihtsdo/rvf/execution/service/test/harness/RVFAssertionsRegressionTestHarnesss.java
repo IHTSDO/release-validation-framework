@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -159,7 +160,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
-		assertEquals(196, assertions.size());
+		assertEquals(199, assertions.size());
 		assertEquals(79, releaseTypeAssertions.size());
 	}
 	
@@ -168,7 +169,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		AssertionGroup group = assertionService.getAssertionGroupByName("int-authoring");
 		
 		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(25, assertions.size());
+		assertEquals(28, assertions.size());
 	}
 	
 	
@@ -226,17 +227,17 @@ public class RVFAssertionsRegressionTestHarnesss {
 		actualReport.setTotalAssertionsRun(runItems.size());
 		actualReport.setTotalFailures(failureCounter);
 		actualReport.setResults(results);
-		/*
+		
 		File tempResult = File.createTempFile("tempResult_"+ type, ".txt");
 		FileWriter writer = new FileWriter(tempResult);
-		mapper.writeValue(writer,actualReport);
-		System.out.println("Please see result in file:" + tempResult.getAbsolutePath());
+		mapper.writerWithDefaultPrettyPrinter().writeValue(writer,actualReport);
+		System.err.println("Please see " + type + " result in file:" + tempResult.getAbsolutePath());
 		
 		//No need for full result now we just print exact difference
 		System.out.println("Test result");
 		String actualReportStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport);
 		System.out.println(actualReportStr);
-		*/
+		
 		
 		final Gson gson = new Gson();
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));

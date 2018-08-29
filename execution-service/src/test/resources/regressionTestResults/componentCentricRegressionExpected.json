@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 90,
-  "totalAssertionsFailed" : 90,
+  "totalAssertionsRun" : 93,
+  "totalAssertionsFailed" : 93,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -19,6 +19,14 @@
     "firstNInstances" : [ {
       "conceptId" : "700132006",
       "detail" : "MEMBER: id=e406cda8-4ffe-54d0-b0d0-b0b8f8249621: SNOMED RT member key (referencedcomponentid, maptarget) is not unique."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Metadata concepts must only exist in model component module.",
+    "assertionUuid" : "84335167-9105-4377-beca-b80b0d5dff83",
+    "firstNInstances" : [ {
+      "conceptId" : "733073007",
+      "detail" : "Metadata concept (733073007|OWL axiom reference set (foundation metadata concept)|) in module other than model module"
     } ],
     "totalFailed" : 1
   }, {
@@ -349,14 +357,14 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Members are inactive for inactive descriptions in the language refset snapshot file.",
+    "assertionName" : "Lang refset members are active for inactive descriptions in the language refset snapshot file.",
     "assertionUuid" : "d76f1430-7e9a-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "699400005",
-      "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c9: Refset member is active for an inactive description."
+      "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c9: Language refset member is active for an inactive description."
     }, {
       "conceptId" : "699400005",
-      "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c4: Refset member is active for an inactive description."
+      "detail" : "MEMBER: id=00002fb2-d982-5fbd-822f-045c938480c4: Language refset member is active for an inactive description."
     } ],
     "totalFailed" : 2
   }, {
@@ -384,6 +392,17 @@
       "detail" : "TEXTDEF: id=2989691019:Active Terms with leading or trailing spaces."
     } ],
     "totalFailed" : 3
+  }, {
+    "assertionName" : "Concepts inactivated in this release cycle must have an active FSN, preferred in both US and GB Language Reference Sets.",
+    "assertionUuid" : "db3f62b0-b824-463d-8d05-7974c81f3caa",
+    "firstNInstances" : [ {
+      "conceptId" : "699765003",
+      "detail" : "Inactive concept (699765003|NO ACTIVE FSN FOUND|) missing active FSN preferred in en-gb AND en-us dialects."
+    }, {
+      "conceptId" : "71388002",
+      "detail" : "Inactive concept (71388002|NO ACTIVE FSN FOUND|) missing active FSN preferred in en-gb AND en-us dialects."
+    } ],
+    "totalFailed" : 2
   }, {
     "assertionName" : "The first letter of the FSN should be capitalized.",
     "assertionUuid" : "dd0d0406-7481-444a-9f04-b6fc7db49039",
@@ -493,6 +512,17 @@
     } ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "Concepts inactivated in this release cycle must have an active Preferred Term in both US and GB Language Reference Sets.",
+    "assertionUuid" : "f7bd336c-4ced-48e3-881c-b61e23a19530",
+    "firstNInstances" : [ {
+      "conceptId" : "699765003",
+      "detail" : "Inactive concept (699765003|NO ACTIVE FSN FOUND|) missing active Preferred Term in one or more English dialects."
+    }, {
+      "conceptId" : "71388002",
+      "detail" : "Inactive concept (71388002|NO ACTIVE FSN FOUND|) missing active Preferred Term in one or more English dialects."
+    } ],
+    "totalFailed" : 2
+  }, {
     "assertionName" : "All inactive concepts have definition status of PRIMITIVE.",
     "assertionUuid" : "fdf6a1b0-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -539,6 +569,17 @@
       "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
     } ],
     "totalFailed" : 5
+  }, {
+    "assertionName" : "Newly inactive concepts must have an active historical association to an active concept - unless indicator NCEP.",
+    "assertionUuid" : "22d3065c-98d3-458e-b020-35eec49b4be3",
+    "firstNInstances" : [ {
+      "conceptId" : "699765003",
+      "detail" : "Inactive concept (699765003|NO ACTIVE FSN FOUND|) missing active historical association to active concept."
+    }, {
+      "conceptId" : "71388002",
+      "detail" : "Inactive concept (71388002|NO ACTIVE FSN FOUND|) missing active historical association to active concept."
+    } ],
+    "totalFailed" : 2
   }, {
     "assertionName" : "No active Terms contain double spaces.",
     "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
@@ -1092,15 +1133,5 @@
       "detail" : "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term"
     } ],
     "totalFailed" : 4
-  },
-    {
-      "assertionName" : "Metadata concepts must only exist in model component module.",
-      "assertionUuid" : "84335167-9105-4377-beca-b80b0d5dff83",
-      "firstNInstances" : [ {
-        "conceptId" : "733073007",
-        "detail" : "Metadata concept (733073007|OWL axiom reference set (foundation metadata concept)|) in module other than model module"
-      } ],
-      "totalFailed" : 1
-    }
-  ]
+  } ]
 }
