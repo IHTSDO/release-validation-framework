@@ -5,7 +5,7 @@
  */
 insert into qa_result (runid, assertionuuid, concept_id, details)
 SELECT <RUNID>, '<ASSERTIONUUID>', c.id,  
-concat('Inactive concept (', c.id, '|', d1.term,'|) missing active FSN preferred in en-gb AND en-us dialects.') 
+concat('Inactive concept (', c.id, '|', IFNULL(d1.term, 'NO ACTIVE FSN FOUND'),'|) missing active FSN preferred in en-gb AND en-us dialects.') 
 FROM curr_concept_d c LEFT JOIN curr_description_s d1
 	ON d1.conceptid = c.id 
 	AND d1.typeid = 900000000000003001 -- FSN
@@ -13,7 +13,8 @@ FROM curr_concept_d c LEFT JOIN curr_description_s d1
 WHERE c.active = 0 
 AND ( NOT EXISTS (
 		SELECT 1 FROM curr_description_s d2, curr_langrefset_s l
-		WHERE l.referencedcomponentid = d2.id
+		WHERE c.id = d2.conceptid 
+		AND l.referencedcomponentid = d2.id
 		AND l.active = 1
 		AND d2.active = 1
 		AND d2.typeid = 900000000000003001 -- |Fully specified name (core metadata concept)|
@@ -22,7 +23,8 @@ AND ( NOT EXISTS (
 		)
 	OR NOT EXISTS (
 		SELECT 1 FROM curr_description_s d2, curr_langrefset_s l
-		WHERE l.referencedcomponentid = d2.id
+		WHERE c.id = d2.conceptid 
+		AND l.referencedcomponentid = d2.id
 		AND l.active = 1
 		AND d2.active = 1
 		AND d2.typeid = 900000000000003001 -- |Fully specified name (core metadata concept)|

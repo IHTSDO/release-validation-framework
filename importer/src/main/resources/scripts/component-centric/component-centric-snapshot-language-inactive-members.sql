@@ -3,7 +3,7 @@
 	component-centric-snapshot-language-inactive-members
 
 	Assertion:
-	Members are inactive for inactive descriptions in the language refset snapshot file.
+	LangRefset members are active for inactive descriptions in the language refset snapshot file.
 
 ********************************************************************************/
 	
@@ -16,7 +16,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('MEMBER: id=',b.id, ': Refset member is active for an inactive description.') 
+		concat('MEMBER: id=',b.id, ': Language refset member is active for an inactive description.') 
 	from curr_description_s a
 	inner join curr_langrefset_s b 
 		on a.id = b.referencedcomponentid

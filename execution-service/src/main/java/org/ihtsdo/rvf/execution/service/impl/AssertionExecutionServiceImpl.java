@@ -84,7 +84,10 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	public Collection<TestRunItem> executeAssertion(final Assertion assertion, final ExecutionConfig config) {
 
 		final Collection<TestRunItem> runItems = new ArrayList<>();
-
+		
+/*		if (assertion.getUuid().toString().equals("f7bd336c-4ced-48e3-881c-b61e23a19530")) {
+			System.err.println("Debug Me!");
+		}*/
 		//get tests for given assertion
 		for(final Test test: assertionService.getTests(assertion))
 		{
