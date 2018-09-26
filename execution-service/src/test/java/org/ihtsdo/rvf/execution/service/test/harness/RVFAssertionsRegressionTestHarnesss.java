@@ -91,12 +91,19 @@ public class RVFAssertionsRegressionTestHarnesss {
 	public void setUp() throws IOException, SQLException, BusinessServiceException {
 		//load previous and prospective versions if not loaded already
 		assertNotNull(releaseDataManager);
+		String binaryArchive = "/var/folders/tx/cz83k2fj6c38h5mht21h0bgw0000gn/T/rvf_regression_test_previous.zip";
 		if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
-			final URL previousReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130131");
-			assertNotNull("Must not be null", previousReleaseUrl);
-			final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
-			ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
-			releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
+			if (binaryArchive == null) {
+				final URL previousReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130131");
+				assertNotNull("Must not be null", previousReleaseUrl);
+				final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
+				ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
+				releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
+				String archiveFileName = releaseDataManager.archivePublishedReleaseInBinary("regression_test", "previous");
+				System.out.println("Mysql binary file is archvied at " + archiveFileName);
+				releaseDataManager.dropVersion("rvf_" + PREVIOUS_RELEASE);
+			}
+			releaseDataManager.restoreReleaseFromBinaryArchive(binaryArchive, "rvf_" + PREVIOUS_RELEASE);
 		}
 		if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
 			final URL prospectiveReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130731");

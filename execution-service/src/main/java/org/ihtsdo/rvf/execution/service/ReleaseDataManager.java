@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.execution.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
@@ -44,4 +45,10 @@ public interface ReleaseDataManager {
 	String createSchema(String versionName);
 
 	void clearQAResult(Long runId);
+
+	void restoreReleaseFromBinaryArchive(String archiveFileName, String schemaName) throws IOException;
+
+	String archivePublishedReleaseInBinary(String product, String version) throws BusinessServiceException;
+
+	boolean uploadPublishedReleaseViaS3(String releaseFileS3Path, String product, String version) throws BusinessServiceException;
 }

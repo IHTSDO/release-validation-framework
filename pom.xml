@@ -19,6 +19,7 @@
 		<mysql.connector.java.version>5.1.20</mysql.connector.java.version>
 		<dbcp.version>1.4</dbcp.version>
 		<snomed.utilities.version>1.2</snomed.utilities.version>
+		<spring-cloud-version>1.2.2.RELEASE</spring-cloud-version>
 	</properties>
 
 	<modules>
@@ -105,7 +106,7 @@
 		<dependency>
 			<groupId>org.ihtsdo.otf.common</groupId>
 			<artifactId>otf-common</artifactId>
-			<version>1.4.3</version>
+			<version>1.6.0</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>spring-beans</artifactId>

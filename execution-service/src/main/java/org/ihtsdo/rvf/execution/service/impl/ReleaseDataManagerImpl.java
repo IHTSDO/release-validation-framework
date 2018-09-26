@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -28,6 +29,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
+import org.ihtsdo.otf.dao.resources.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
@@ -36,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,13 +56,16 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	@Resource(name = "snomedDataSource")
 	private BasicDataSource snomedDataSource;
 	
+	@Value("/usr/local/var/mysql/")
+	private String mysqlDataDir;
+	
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	private final Map<String, String> releaseSchemaNameLookup = new ConcurrentHashMap<>();
-	/**
-	 * No args constructor for IOC. Always call 'init' method after creation
-	 */
+	
+	private ResourceManager publishedResourceManager;
 	public ReleaseDataManagerImpl() {
+		publishedResourceManager = new ResourceManager(resourceConfiguration, cloudResourceLoader);
 	}
 
 	/**
@@ -106,6 +112,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 
 	}
+	
+	public String getRVFVersion(String product, String releaseVersion) {
+		return product + "_" + releaseVersion;
+	}
 
 	/**
 	 * Method that uses a {@link java.io.InputStream}  to copy a known/published release pack into the data folder.
@@ -133,17 +143,17 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		// if we are here then release date is a valid date format
 		// now call loadSnomedData method passing release zip, if there is no matching database
-		String productVersion = product + "_" + version;
-		logger.info("Product version:" + productVersion);
-		if (releaseSchemaNameLookup.keySet().contains(productVersion) ) {
-			logger.info("Product version is already known in RVF and the existing one will be deleted and reloaded: " + productVersion);
+		String rvfVersion = getRVFVersion(product, version);
+		logger.info("RVF release version:" + rvfVersion);
+		if (releaseSchemaNameLookup.keySet().contains(rvfVersion) ) {
+			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: " + rvfVersion);
 		}
-		logger.info("Loading data into schema " + RVF_DB_PREFIX + productVersion);
+		logger.info("Loading data into schema " + RVF_DB_PREFIX + rvfVersion);
 		List<String> rf2FilesLoaded = new ArrayList<>();
-		final String schemaName = loadSnomedData(productVersion, rf2FilesLoaded, fileDestination);
+		final String schemaName = loadSnomedData(rvfVersion, rf2FilesLoaded, fileDestination);
 		logger.info("schemaName = " + schemaName);
 		// now add to releaseSchemaNameLookup
-		releaseSchemaNameLookup.put(productVersion, schemaName);
+		releaseSchemaNameLookup.put(rvfVersion, schemaName);
 		return true;
 	}
 
@@ -446,9 +456,16 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	@Override
 	public void dropVersion(String version) {
-		//just remove the schema name from the map for the time being as the actual schema data is
-		//removed a RvfDbScheduleEventGenerator
-		if (version != null) {
+		if (version != null && releaseSchemaNameLookup.containsKey(version)) {
+			String schema = releaseSchemaNameLookup.get(version);
+			try (Connection connection = rvfDynamicDataSource.getConnection(schema)) {
+				String dropSchemaSQL = "drop database "  + schema;
+				try( PreparedStatement statement = connection.prepareStatement(dropSchemaSQL)) {
+					statement.execute();
+				}
+			} catch(SQLException e) {
+				logger.error("Failed to drop schema " + schema);
+			}
 			releaseSchemaNameLookup.remove(version);
 		}
 	}
@@ -556,5 +573,38 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		} catch (final SQLException e) {
 			logger.error("Failed to delete data from qa_result table for runId {}  due to {} ", runId, e.fillInStackTrace());
 		}
+	}
+
+	@Override
+	public String archivePublishedReleaseInBinary(String product, String version) throws BusinessServiceException {
+		String schema = getSchemaForRelease(getRVFVersion(product, version));
+		if (schema == null) {
+			throw new IllegalArgumentException("No schema found for RVF version " + getRVFVersion(product, version));
+		}
+		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schema + ".zip");
+		File binaryFile = new File(mysqlDataDir, schema);
+		try {
+			ZipFileUtils.zip(binaryFile.getAbsolutePath(), archiveFile.getAbsolutePath());
+		} catch (IOException e) {
+			throw new BusinessServiceException("Failed to zip binary file " + binaryFile.getAbsolutePath(), e);
+		}
+		return archiveFile.getAbsolutePath();
+	}
+
+	@Override
+	public void restoreReleaseFromBinaryArchive(String archiveFileName, String schemaName) throws IOException {
+		File outputDir = new File(mysqlDataDir + schemaName);
+		if (outputDir.exists()) {
+			outputDir.delete();
+		}
+		outputDir.mkdir();
+		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(new File(archiveFileName), outputDir.getAbsolutePath());
+	}
+
+	@Override
+	public boolean uploadPublishedReleaseViaS3(String releaseFileS3Path, String product, String version)
+			throws BusinessServiceException {
+		
+		return false;
 	}
 }

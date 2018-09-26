@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.amazonaws.services.simpleworkflow.flow.annotations.SkipTypeRegistration;
-
 /**
  * A test class for {@link org.ihtsdo.snomed.rvf.importer.AssertionsImporter}
  */

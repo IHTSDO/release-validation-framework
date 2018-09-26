@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.controller;
 
 import java.io.IOException;
 
+import org.ihtsdo.otf.dao.resources.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.slf4j.Logger;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -38,6 +38,9 @@ public class ReleaseController {
 			.getLogger(ReleaseController.class);
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
+	
+	@Autowired
+	private ResourceManager resourceManager;
 
 	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
 	@ResponseBody
@@ -72,6 +75,53 @@ public class ReleaseController {
 		}
 	}
 
+	@RequestMapping(value = "{product}/{version}/archive", method = RequestMethod.POST)
+	@ResponseBody
+	@ApiOperation(value = "Upload and generate RVF MySQL binary archive for a published release", notes = "Uploads a published release for a given product.")
+	public ResponseEntity genereateReleaseBinaryArchive(
+			@ApiParam(value = "Release zip file path in AWS S3 published bucket") @RequestParam(value = "publishedFileS3Path") final String publishedFileS3Path,
+			@ApiParam(value = "The short product name e.g int for international RF2 release") @PathVariable final String product,
+			@ApiParam(value = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
+		try {
+			 boolean isSuccessful = releaseDataManager.uploadPublishedReleaseViaS3(publishedFileS3Path, product, version);
+			 if (isSuccessful) {
+				 String archiveFile = releaseDataManager.archivePublishedReleaseInBinary(product, version);
+					return new ResponseEntity<>(archiveFile, HttpStatus.OK);
+			 } else {
+				 return new ResponseEntity<>(isSuccessful, HttpStatus.OK);
+			 }
+			
+		} catch (BusinessServiceException e) {
+			logger.warn("Error getting input stream from upload. Nested exception is : \n"
+					+ e.fillInStackTrace());
+			return new ResponseEntity<>(
+					"Error getting input stream from upload. Nested exception is : "
+							+ e.fillInStackTrace(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
+	
+	@RequestMapping(value = "{product}/{version}/archive/export", method = RequestMethod.POST)
+	@ResponseBody
+	@ApiOperation(value = "Upload and generate RVF MySQL binary archive for a published release", notes = "Uploads a published release for a given product.")
+	public ResponseEntity exportReleaseBinaryArchive(
+			@ApiParam(value = "The short product name e.g int for international RF2 release") @PathVariable final String product,
+			@ApiParam(value = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
+		try {
+			 String archiveFile = releaseDataManager.archivePublishedReleaseInBinary(product, version);
+				return new ResponseEntity<>(archiveFile, HttpStatus.OK);
+			
+		} catch (BusinessServiceException e) {
+			logger.warn("Error when exporting RVF binary version. Nested exception is : \n"
+					+ e.fillInStackTrace());
+			return new ResponseEntity<>(
+					"Error getting input stream from upload. Nested exception is : "
+							+ e.fillInStackTrace(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
