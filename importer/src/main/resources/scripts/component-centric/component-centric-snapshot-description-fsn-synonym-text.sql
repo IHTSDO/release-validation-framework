@@ -24,7 +24,18 @@
 	join tmp_consedited b
 	on a.conceptid = b.conceptid
 	and a.active = 1
-	where a.typeid ='900000000000003001';
+	where a.typeid ='900000000000003001' 
+		and a.term not like '%(product)' 
+  		and a.term not like '%(medicinal product)'
+  		and a.term not like '%(medicinal product form)'
+  		and a.term not like '%(clinical drug)'
+  		and a.term not like '%(substance)'
+  		and a.term not like '%(product name)'
+  		and a.term not like '%(packaged clinical drug)'
+  		and a.term not like '%(real clinical drug)'
+  		and a.term not like '%(real medicinal product)'
+  		and a.term not like '%(real packaged clinical drug)'
+  		and a.term not like '%(supplier)';
 
 /* all terms for edited concepts */
 	create table if not exists tmp_allterms as
