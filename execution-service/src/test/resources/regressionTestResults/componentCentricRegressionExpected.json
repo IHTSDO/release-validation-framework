@@ -334,7 +334,7 @@
     "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: tumour"
+      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: tumour\r"
     } ],
     "totalFailed" : 1
   }, {
@@ -568,13 +568,10 @@
       "conceptId" : "702386002",
       "detail" : "702386002 |Toxic effect of antimony and/or its compounds (disorder)|"
     }, {
-      "conceptId" : "702386002",
-      "detail" : "702386002 |Blood group antibody i (substance)|"
-    }, {
       "conceptId" : "700132006",
       "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
     } ],
-    "totalFailed" : 5
+    "totalFailed" : 4
   }, {
     "assertionName" : "Newly inactive concepts must have an active historical association to an active concept - unless indicator NCEP.",
     "assertionUuid" : "22d3065c-98d3-458e-b020-35eec49b4be3",
