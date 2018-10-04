@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties("rvf.validation.storagee")
-public class RVFValidationResourceConfiguration extends ResourceConfiguration{
-
+@ConfigurationProperties(prefix="rvf.validation.storage")
+public class RVFValidationResourceConfiguration extends ResourceConfiguration {
+	
 }

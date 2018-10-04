@@ -35,7 +35,6 @@ public class ValidationReportService {
 	private S3Client s3Client;
 	
 	private final Logger logger = LoggerFactory.getLogger(ValidationReportService.class);
-	
 	private String bucketName;
 	
 	private String stateFilePath;
@@ -48,10 +47,17 @@ public class ValidationReportService {
 	
 	public enum State { QUEUED, READY, RUNNING, FAILED, COMPLETE,  } 
 	
-	public ValidationReportService(final String bucketName) {
-		this.bucketName = bucketName;
+	public ValidationReportService() {
 	}
 	
+	public String getBucketName() {
+		return bucketName;
+	}
+
+	public void setBucketName(String bucketName) {
+		this.bucketName = bucketName;
+	}
+
 	@PostConstruct
 	public void init() {
 		s3Helper = new FileHelper(bucketName, s3Client);

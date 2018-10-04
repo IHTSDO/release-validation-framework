@@ -48,12 +48,6 @@
 			<artifactId>spring-jdbc</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		<!-- Spring Cloud -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-aws-autoconfigure</artifactId>
-			<version>${spring-cloud-version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
@@ -105,12 +99,6 @@
 			<artifactId>gson</artifactId>
 			<version>2.3.1</version>
 		</dependency>
-	
-		<!--<dependency>-->
-			<!--<groupId>com.foundationdb</groupId>-->
-			<!--<artifactId>fdb-sql-parser</artifactId>-->
-			<!--<version>1.4.0</version>-->
-		<!--</dependency>-->
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>

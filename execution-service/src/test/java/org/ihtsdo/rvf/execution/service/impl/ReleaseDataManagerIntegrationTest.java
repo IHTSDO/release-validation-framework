@@ -16,12 +16,12 @@ import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
-public class ReleaseDataManagerImplIntegrationTest {
+@SpringBootTest(classes ={ExecutionServiceXmlConfig.class})
+public class ReleaseDataManagerIntegrationTest {
 	@Resource(name = "dataSource")
 	private DataSource dataSource;
 	@Autowired
@@ -59,6 +59,17 @@ public class ReleaseDataManagerImplIntegrationTest {
 		final File inputFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
 		assertNotNull(inputFile);
 		final boolean writeSucess =releaseDataManager.uploadPublishedReleaseData(inputFile, "INT", "20140131");
+		assertTrue("Upload must have been successful", writeSucess);
+
+		assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));
+
+		assertTrue("Relese 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("20140131"));
+	}
+	
+	@Test
+	public void testUploadPublishedDataViaS3() throws Exception {
+		assert dataSource != null;
+		final boolean writeSucess =releaseDataManager.uploadPublishedReleaseViaS3("/SnomedCT_Release_INT_20140131.zip","INT", "20140131");
 		assertTrue("Upload must have been successful", writeSucess);
 
 		assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));

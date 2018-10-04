@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,11 +50,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingBean {
 
+	private static final String ZIP_FILE_EXTENSION = ".zip";
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManagerImpl.class);
 	private static final String RVF_DB_PREFIX = "rvf_";
 	private String sctDataLocation;
 	private File sctDataFolder;
-	@Resource(name = "snomedDataSource")
+	@Resource(name = "dataSource")
 	private BasicDataSource snomedDataSource;
 	
 	@Value("/usr/local/var/mysql/")
@@ -63,9 +65,15 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	private final Map<String, String> releaseSchemaNameLookup = new ConcurrentHashMap<>();
 	
+	@Autowired
+	private ResourceLoader cloudResourceLoader;
+
+	@Autowired
+	private RVFValidationResourceConfiguration validationResourceConfig;
+	
 	private ResourceManager publishedResourceManager;
+	
 	public ReleaseDataManagerImpl() {
-		publishedResourceManager = new ResourceManager(resourceConfiguration, cloudResourceLoader);
 	}
 
 	/**
@@ -326,7 +334,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 				public boolean accept(final File dir, final String name) {
 					final String[] tokens = name.split("_");
 					final String lastToken = tokens[tokens.length -1];
-					return lastToken.endsWith(".zip") && lastToken.contains(knownVersion);
+					return lastToken.endsWith(ZIP_FILE_EXTENSION) && lastToken.contains(knownVersion);
 				}
 			});
 			filesFound.addAll(Arrays.asList(zipFiles));
@@ -581,7 +589,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		if (schema == null) {
 			throw new IllegalArgumentException("No schema found for RVF version " + getRVFVersion(product, version));
 		}
-		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schema + ".zip");
+		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schema + ZIP_FILE_EXTENSION);
 		File binaryFile = new File(mysqlDataDir, schema);
 		try {
 			ZipFileUtils.zip(binaryFile.getAbsolutePath(), archiveFile.getAbsolutePath());
@@ -605,6 +613,23 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	public boolean uploadPublishedReleaseViaS3(String releaseFileS3Path, String product, String version)
 			throws BusinessServiceException {
 		
-		return false;
+		System.out.println(validationResourceConfig);
+		
+		assert(validationResourceConfig.isReadonly());
+		
+		publishedResourceManager = new ResourceManager(validationResourceConfig, cloudResourceLoader);
+		InputStream publishedInput;
+		try {
+			publishedInput = publishedResourceManager.readResourceStream(releaseFileS3Path);
+		} catch (IOException e) {
+			throw new BusinessServiceException("Failed to read data from " + releaseFileS3Path, e);
+		}
+		String fileName = product + "_" + version + ZIP_FILE_EXTENSION;
+		int lastSlash = releaseFileS3Path.lastIndexOf("/");
+		if (lastSlash != -1 && releaseFileS3Path.endsWith(ZIP_FILE_EXTENSION)) {
+			fileName = releaseFileS3Path.substring(lastSlash);
+		}
+		uploadPublishedReleaseData(publishedInput, fileName, product, version);
+		return true;
 	}
 }

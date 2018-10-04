@@ -43,13 +43,13 @@ import org.springframework.stereotype.Service;
 public class AssertionExecutionServiceImpl implements AssertionExecutionService, InitializingBean {
 
 	@Autowired
-	AssertionService assertionService;
+	private AssertionService assertionService;
 	@Resource(name = "dataSource")
-	BasicDataSource dataSource;
+	private BasicDataSource dataSource;
 	@Autowired
-	RvfDynamicDataSource rvfDynamicDataSource;
+	private RvfDynamicDataSource rvfDynamicDataSource;
 	@Autowired
-	ReleaseDataManager releaseDataManager;
+	private ReleaseDataManager releaseDataManager;
 	private String qaResulTableName;
 	private String deltaTableSuffix = "d";
 	private String snapshotTableSuffix = "s";

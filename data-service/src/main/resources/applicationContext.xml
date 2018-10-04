@@ -44,8 +44,10 @@
 		<property name="testWhileIdle" value="true"/>
 		<property name="validationQuery" value="SELECT 1"/>
 		<property name="numTestsPerEvictionRun" value="3"/>
+		<!-- READ_COMMITTED -->
+		<property name="defaultTransactionIsolation" value="2"/>
 	</bean>
-	
+		
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource"/>
 		<property name="packagesToScan">

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class RvfDynamicDataSource {
 
 	private String url;
-	@Resource(name = "snomedDataSource")
+	@Resource(name = "dataSource")
 	private BasicDataSource basicDataSource;
 	private ConcurrentHashMap<String, BasicDataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
 
