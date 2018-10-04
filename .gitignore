@@ -17,7 +17,7 @@ release.properties
 api-demo/report.csv
 api-demo/tmp
 
-/bin
+*/bin/
 
 config_local
 activemq-data/
