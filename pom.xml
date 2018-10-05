@@ -6,6 +6,7 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.4.1.RELEASE</version>
 	</parent>
+	
 	<groupId>org.ihtsdo.snomed.rvf</groupId>
 	<artifactId>release-validation-framework</artifactId>
 	<version>1.4.7-SNAPSHOT</version>
@@ -217,21 +218,24 @@
 				<skipTests>${skip.integration.tests}</skipTests>
 			 </configuration>
 			</plugin>
-			<plugin>
-  				<groupId>org.apache.maven.plugins</groupId>
-  				<artifactId>maven-javadoc-plugin</artifactId>
-  				<configuration>
-       				<doclint>none</doclint>
-    			</configuration>
- 		 	</plugin>
  		 	<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<mainClass>org.ihtsdo.rvf.App</mainClass>
 				</configuration>
+				<executions>
+            	<execution>
+                <goals>
+                    <goal>repackage</goal>
+                </goals>
+                <configuration>
+                    <classifier>exec</classifier>
+                </configuration>
+            </execution>
+        	</executions>
 			</plugin>
-		</plugins>
+    </plugins>
 	</build>
 
 	<repositories>

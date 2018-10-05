@@ -12,6 +12,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.ihtsdo.rvf.execution.service.Config;
+import org.ihtsdo.rvf.execution.service.ExecutionServiceXmlConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes ={ExecutionServiceXmlConfig.class})
+@SpringBootTest(classes ={Config.class, ExecutionServiceXmlConfig.class})
 public class ReleaseDataManagerIntegrationTest {
 	@Resource(name = "dataSource")
 	private DataSource dataSource;

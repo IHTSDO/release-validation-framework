@@ -47,17 +47,10 @@ public class ValidationReportService {
 	
 	public enum State { QUEUED, READY, RUNNING, FAILED, COMPLETE,  } 
 	
-	public ValidationReportService() {
-	}
-	
-	public String getBucketName() {
-		return bucketName;
-	}
-
-	public void setBucketName(String bucketName) {
+	public ValidationReportService(String bucketName) {
 		this.bucketName = bucketName;
 	}
-
+	
 	@PostConstruct
 	public void init() {
 		s3Helper = new FileHelper(bucketName, s3Client);

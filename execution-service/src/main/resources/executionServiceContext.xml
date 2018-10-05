@@ -20,25 +20,6 @@
 	<context:property-placeholder location="file://${rvfConfigLocation:/tmp}/execution-service.properties" order="-1"
 								  ignore-unresolvable="true" ignore-resource-not-found="true" />
 	<context:property-placeholder location="classpath*:execution-service-defaults.properties" ignore-unresolvable="true"/>
-	    
-	 <!-- Specify explicit data source so we can point to MySQL database, while rvf data is stored in H2 during testing-->
-	<!-- <bean id="snomedDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-		<property name="driverClassName" value="${rvf.snomed.jdbc.driverClassName}"/>
-		<property name="url" value="${rvf.snomed.jdbc.url}"/>
-		<property name="username" value="${rvf.snomed.jdbc.username}"/>
-		<property name="password" value="${rvf.snomed.jdbc.password}"/>
-		<property name="minEvictableIdleTimeMillis" value="1800000"/>
-		<property name="timeBetweenEvictionRunsMillis" value="1800000"/>
-		<property name="maxActive" value="-1"/>
-		<property name="testOnBorrow" value="true"/>
-		<property name="testOnReturn" value="true"/>
-		<property name="testWhileIdle" value="true"/>
-		<property name="validationQuery" value="SELECT 1"/>
-		<property name="numTestsPerEvictionRun" value="3"/>
-		READ_COMMITTED
-		<property name="defaultTransactionIsolation" value="2"/>
-		
-	</bean>  -->
 	
 	<bean id="s3Client" factory-bean="s3ClientFactory" factory-method="getClient">
 		<constructor-arg value="${offlineMode}" />
@@ -86,8 +67,9 @@
 		<constructor-arg name="batchSize" value="${rvf.assertion.execution.BatchSize}"/>
 		<constructor-arg name="droolsRuleDirectoryPath" value="${rvf.drools.rule.directory}"/>
 	</bean>
-	<!-- <bean id="resportService" class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService">
-		<property name="bucketName" value="${executionBucketName}"/>
-	</bean> -->
-<bean id ="validationResourceConfig" class ="org.ihtsdo.rvf.execution.service.impl.RVFValidationResourceConfiguration"/>
+	<bean id="versionLoader" class =" org.ihtsdo.rvf.execution.service.impl.ValidationVersionLoader"/>
+	<bean class="org.ihtsdo.rvf.execution.service.impl.ValidationReportService">
+		<constructor-arg name="bucketName" value="${executionBucketName}"/>
+	</bean>
+	<bean id ="validationResourceConfig" class ="org.ihtsdo.rvf.execution.service.RVFValidationResourceConfiguration"/>
 </beans>
