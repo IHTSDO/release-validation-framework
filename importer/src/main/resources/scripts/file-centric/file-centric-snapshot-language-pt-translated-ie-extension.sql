@@ -11,7 +11,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ': has no active preferred term in the Danish language refset') 
+		concat('Concept: id=',a.id, ': has no active preferred term in the Irish language refset') 
 	from curr_concept_s a
 	where
 	 a.active=1
