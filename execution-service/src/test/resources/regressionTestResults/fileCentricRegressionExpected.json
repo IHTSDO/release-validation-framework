@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 79,
-  "totalAssertionsFailed" : 64,
+  "totalAssertionsRun" : 83,
+  "totalAssertionsFailed" : 66,
   "results" : [ {
     "assertionName" : "Every active concept defined in the Norwegian extension has a preferred FSN in the en-US language refset.",
     "assertionUuid" : "853bfc3a-1635-11e8-a510-3c15c2c6e32e",
@@ -1203,6 +1203,80 @@
   }, {
     "assertionName" : "Every active concept has one active preferred term in the Swedish language refset.",
     "assertionUuid" : "4ea5e02b-9364-4326-9082-816edb950dbf",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Newly added active concept has one active preferred term in the Irish language refset.",
+    "assertionUuid" : "5afdd601-407e-4955-9a23-9ee0780b231c",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: is added recently in the international release but has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: is added recently in the international release but has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: is added recently in the international release but has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: is added recently in the international release but has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: is added recently in the international release but has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: is added recently in the international release but has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: is added recently in the international release but has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "733073007",
+      "detail" : "Concept: id=733073007: is added recently in the international release but has no active preferred term in the Irish language refset"
+    } ],
+    "totalFailed" : 8
+  }, {
+    "assertionName" : "Every active concept from international release is recommended to have one active preferred term in the Irish language refset.",
+    "assertionUuid" : "44eba8c9-2dbd-43b7-9380-3bbbd816828d",
+    "firstNInstances" : [ {
+      "conceptId" : "138875005",
+      "detail" : "Concept: id=138875005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702850005",
+      "detail" : "Concept: id=702850005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Irish language refset"
+    } ],
+    "totalFailed" : 12
+  },{
+    "assertionName" : "Every active concept has one active preferred term in the Irish language refset.",
+    "assertionUuid" : "d91e6e62-8195-4655-b7d5-6c44fcfd7490",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  },{
+    "assertionName" : "Every active concept defined in the Irish extension has a preferred FSN in the en-US language refset.",
+    "assertionUuid" : "28fbe41f-132b-43b6-a7e2-ee1454dd7736",
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
