@@ -371,13 +371,19 @@
     "assertionName" : "The FSN term should be unique in active content when case sensitivity is ignored.",
     "assertionUuid" : "d9f8a8d6-2c02-11e7-b0e7-3c15c2c6e32e",
     "firstNInstances" : [ {
-      "conceptId" : "702769005",
-      "detail" : "FSN=Blood group antibody I (substance) concept=702769005: FSN term is not unique in description snapshot when case is ignored"
+      "conceptId" : "700501004",
+      "detail" : "FSN=doloTest profile(observable entity) concept=700501004: FSN term is not unique in description snapshot when case is ignored"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "FSN=Proglumetacin (substance) concept=700132006: FSN term is not unique in description snapshot when case is ignored"
     }, {
       "conceptId" : "702386002",
       "detail" : "FSN=Blood group antibody i (substance) concept=702386002: FSN term is not unique in description snapshot when case is ignored"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "FSN=Toxic effect of antimony AND/OR its compounds (disorder) concept=703860006: FSN term is not unique in description snapshot when case is ignored"
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 4
   }, {
     "assertionName" : "No active definitions contain leading or trailing spaces.",
     "assertionUuid" : "da3ae7c4-6144-4cd5-9530-2a7780c53c9a",
@@ -562,13 +568,10 @@
       "conceptId" : "702386002",
       "detail" : "702386002 |Toxic effect of antimony and/or its compounds (disorder)|"
     }, {
-      "conceptId" : "702386002",
-      "detail" : "702386002 |Blood group antibody i (substance)|"
-    }, {
       "conceptId" : "700132006",
       "detail" : "700132006 |Proglumetacin, different semantic tag (procedure)|"
     } ],
-    "totalFailed" : 5
+    "totalFailed" : 4
   }, {
     "assertionName" : "Newly inactive concepts must have an active historical association to an active concept - unless indicator NCEP.",
     "assertionUuid" : "22d3065c-98d3-458e-b020-35eec49b4be3",
