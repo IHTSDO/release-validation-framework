@@ -33,18 +33,9 @@ public class MysqlConfig {
     
     @Value("${rvf.master.schema.name}")
     private String defaultSchemaName;
-    
-    @Value("${rvf.hibernate.dialect}")
-    private String dialect;
 
     @Bean(name = "dataSource")
     public BasicDataSource getDataSource() {
-//    	DataSource dataSource = DataSourceBuilder.create()
-//                .username(username)
-//                .password(password)
-//                .url(url)
-//                .driverClassName(driverClassName)
-//                .build();
     	BasicDataSource basicDataSource = new BasicDataSource();
     	basicDataSource.setUrl(url);
     	basicDataSource.setUsername(username);

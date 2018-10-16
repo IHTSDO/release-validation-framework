@@ -81,8 +81,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	@Autowired
 	private ResourceDataLoader resourceDataLoader;
 	
-	
-	private  URL releaseTypeExpectedResults;
+	private URL releaseTypeExpectedResults;
 	private URL componentCentrilExpected;
 	private URL fileCentricExpected;
 	private ExecutionConfig config;
