@@ -10,22 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 
-import org.ihtsdo.rvf.execution.service.Config;
-import org.ihtsdo.rvf.execution.service.ExecutionServiceXmlConfig;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.rvf.MysqlConfig;
+import org.ihtsdo.rvf.execution.service.ExecutionServiceConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes ={Config.class, ExecutionServiceXmlConfig.class})
+@ContextConfiguration(classes = {ExecutionServiceConfig.class, MysqlConfig.class})
 public class ReleaseDataManagerIntegrationTest {
 	@Resource(name = "dataSource")
-	private DataSource dataSource;
+	private BasicDataSource dataSource;
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 

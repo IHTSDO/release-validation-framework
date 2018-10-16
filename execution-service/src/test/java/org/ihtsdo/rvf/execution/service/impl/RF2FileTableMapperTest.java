@@ -2,9 +2,11 @@ package org.ihtsdo.rvf.execution.service.impl;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
 public class RF2FileTableMapperTest {
-	
 	
 	private static final String[] INT_DELTA_FILES = {
 			"der2_cRefset_AssociationReferenceDelta_INT_20150131.txt",

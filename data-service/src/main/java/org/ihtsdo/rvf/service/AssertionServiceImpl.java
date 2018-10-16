@@ -3,190 +3,110 @@ package org.ihtsdo.rvf.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import org.hibernate.ObjectNotFoundException;
-import org.ihtsdo.rvf.dao.AssertionDao;
-import org.ihtsdo.rvf.dao.AssertionGroupDao;
+import org.ihtsdo.rvf.dao.AssertionGroupRepository;
+import org.ihtsdo.rvf.dao.AssertionRepository;
+import org.ihtsdo.rvf.dao.AssertionTestRepository;
+import org.ihtsdo.rvf.dao.TestRepository;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.helper.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implements AssertionService {
+public class AssertionServiceImpl implements AssertionService {
 
 	@Autowired
-	private AssertionDao assertionDao;
+	private AssertionRepository assertionRepo;
 	@Autowired
-	private AssertionGroupDao assertionGroupDao;
-	
-	@SuppressWarnings("rawtypes")
+	private AssertionGroupRepository assertionGroupRepo;
 	@Autowired
-	private EntityService entityService;
-
+	private AssertionTestRepository assertionTestRepo;
 	@Autowired
-	public AssertionServiceImpl(final AssertionDao assertionDao) {
-		super(assertionDao);
-	}
+	private TestRepository testRepo;
 
-	@Override
-	public Assertion create(final Map<String, String> properties) {
-		final Assertion assertion = new Assertion();
-		setProperties(assertion, properties);
-		assertionDao.save(assertion);
-		return assertion;
-	}
-
-	@Override
-	public Assertion update(final Long id, final Map<String, String> newValues) {
-		final Assertion assertion = find(id);
-		setProperties(assertion, newValues);
-		assertionDao.save(assertion);
-		return assertion;
-	}
 
 	@Override
 	public void delete(final Assertion assertion) {
 		// first get all associated AssertionTests and delete them
-		for(final AssertionTest assertionTest : getAssertionTests(assertion)) {
-			entityService.delete(assertionTest);
+		for ( AssertionTest assertionTest : getAssertionTests(assertion)) {
+			assertionTestRepo.delete(assertionTest);
 		}
-
-		// then delete assertion, but first merge assertion, in case it has been detached from session
-		try {
-			final Object merged = assertionDao.getCurrentSession().merge(assertion);
-			assertionDao.getCurrentSession().delete(merged);
-		}
-		catch (ObjectNotFoundException | org.hibernate.ObjectDeletedException e) {
-			// disappeared already due to cascade
-		}
-
+		assertionRepo.delete(assertion);
 	}
 
 	@Override
 	public List<Assertion> findAll() {
-		return assertionDao.findAll();
+		return assertionRepo.findAll();
 	}
 
 	@Override
 	public Assertion find(final Long id) {
-		final Assertion assertion = assertionDao.load(Assertion.class, id);
-		if(assertion != null){
-			return assertion;
-		}
-		else{
-			throw new EntityNotFoundException(id);
-		}
+		return assertionRepo.getOne(id);
 	}
 	
 	@Override
-	public Collection <Assertion> find(final List<Long> ids) {
-		final Collection <Assertion>assertionsFound = new ArrayList<Assertion>();
-		for (final Long id : ids) {
-			assertionsFound.add(find(id));
-		}
-		return assertionsFound;
-	}
-
-	@Override
-	public Assertion find(final UUID uuid) {
-		return assertionDao.findByUuid(Assertion.class, uuid);
-	}
-
-	// todo use beanUtils/propertyUtils reflection for each of the properties
-	private void setProperties(final Assertion assertion, final Map<String, String> properties) {
-		assertion.setAssertionText(properties.get("assertionText"));
-		assertion.setKeywords(properties.get("keywords"));
-		if(properties.get("uuid") != null ){
-			assertion.setUuid(UUID.fromString(properties.get("uuid")));
-		}
+	public Assertion findAssertionByUUID(final UUID uuid) {
+		return assertionRepo.findByUuid(uuid.toString());
 	}
 
 	@Override
 	public List<AssertionTest> getAssertionTests(final Assertion assertion){
-		return assertionDao.getAssertionTests(assertion);
+		return assertionTestRepo.findAssertionTestsByAssertion(assertion);
 	}
 
 	@Override
-	public List<AssertionTest> getAssertionTests(final Long assertionId){
-		return assertionDao.getAssertionTests(assertionId);
-	}
+	public Assertion addTest( Assertion assertion, final Test test){
 
-	@Override
-	public List<AssertionTest> getAssertionTests(final UUID uuid){
-		return assertionDao.getAssertionTests(uuid);
-	}
-
-	@Override
-	public List<Test> getTests(final Assertion assertion){
-		return assertionDao.getTests(assertion);
-	}
-
-	@Override
-	public List<Test> getTests(final Long assertionId){
-		return assertionDao.getTests(assertionId);
-	}
-
-	@Override
-	public List<Test> getTests(final UUID uuid){
-		return assertionDao.getTests(uuid);
-	}
-
-	@Override
-	public Assertion addTest(final Assertion assertion, final Test test){
-
-		// see if matching assertion test already exists
-		AssertionTest assertionTest = assertionDao.getAssertionTests(assertion, test);
-		if(assertionTest == null)
-		{
-			assertionTest = new AssertionTest();
-			// verify if assertion has been saved - otherwise save it
-			if(assertion.getAssertionId() == null){
-				assertionDao.save(assertion);
-			}
-			// verify if test has been saved - otherwise save first
-			if(test.getId() == null){
-				entityService.create(test);
-			}
-			assertionTest.setTest(test);
-			assertionTest.setInactive(false);
-			assertionTest.setAssertion(assertion);
-			entityService.create(assertionTest);
-		}
-		else{
-			assertionTest.setTest(test);
-			assertionTest.setInactive(false);
-			assertionTest.setAssertion(assertion);
-			entityService.update(assertionTest);
-		}
-
+//		// see if matching assertion test already exists
+//		AssertionTest assertionTest = assertionTestRepo.findByAssertionAndTest(assertion, test);
+//		if (assertionTest == null) {
+//			assertionTest = new AssertionTest();
+//			// verify if assertion has been saved - otherwise save it
+//			if (assertion.getAssertionId() == null){
+//				assertion = assertionRepo.save(assertion);
+//			}
+//			// verify if test has been saved - otherwise save first
+//			if(test.getId() == null){
+//				testRepo.save(test);
+//			}
+//			assertionTest.setTest(test);
+//			assertionTest.setInactive(false);
+//			assertionTest.setAssertion(assertion);
+//			assertionTestRepo.save(assertionTest);
+//		} else{
+//			assertionTest.setTest(test);
+//			assertionTest.setInactive(false);
+//			assertionTest.setAssertion(assertion);
+//			assertionTestRepo.save(assertionTest);
+//		}
+		AssertionTest assertionTest = new AssertionTest();
+		assertionTest.setAssertion(assertion);
+		assertionTest.setTest(test);
+		assertionTestRepo.save(assertionTest);
 		return assertion;
 	}
 
 	@Override
 	public Assertion addTests(final Assertion assertion, final Collection<Test> tests){
-		for(final Test test : tests)
-		{
+		for ( Test test : tests) {
 			addTest(assertion, test);
 		}
-
 		return assertion;
 	}
 
 	@Override
 	public Assertion deleteTest(final Assertion assertion, final Test test){
 		// get assertion tests for assertion
-		final AssertionTest assertionTest = assertionDao.getAssertionTests(assertion, test);
+		AssertionTest assertionTest = assertionTestRepo.findByAssertionAndTest(assertion, test);
 		// delete assertion test
 		if (assertionTest != null) {
-			entityService.delete(assertionTest);
+			assertionTestRepo.delete(assertionTest);
 		}
 		return assertion;
 	}
@@ -208,44 +128,18 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 
 	@Override
 	public Long count() {
-		return super.count(Assertion.class);
+		return assertionRepo.count();
 	}
-
-	@Override
-	public List<AssertionGroup> getGroupsForAssertion(final Assertion assertion) {
-		return assertionDao.getGroupsForAssertion(assertion);
-	}
-
-	@Override
-	public List<AssertionGroup> getGroupsForAssertion(final Long assertionId) {
-		return assertionDao.getGroupsForAssertion(assertionId);
-	}
-
-	@Override
-	public List<Assertion> getAssertionsForGroup(final AssertionGroup group) {
-		return assertionDao.getAssertionsForGroup(group);
-	}
-
-	@Override
-	public List<Assertion> getAssertionsForGroup(final Long groupId) {
-		return assertionDao.getAssertionsForGroup(groupId);
-	}
-
+	
 	@Override
 	public AssertionGroup addAssertionToGroup(final Assertion assertion, final AssertionGroup group){
-		/*
-			see if group already exists. We get groups for assertion, instead of assertions for group since getting
-			assertions is likely to return a large number of entites. It is likely that a group might have a large
-			number of assertions
-		  */
+	
 		final List<AssertionGroup> assertionGroups = getGroupsForAssertion(assertion);
-		if(! assertionGroups.contains(group))
-		{
+		if(!assertionGroups.contains(group)) {
 			group.getAssertions().add(assertion);
-			assertionDao.update(assertion);
+			assertionRepo.save(assertion);
 		}
-
-		return (AssertionGroup) entityService.update(group);
+		return assertionGroupRepo.save(group);
 	}
 
 	@Override
@@ -259,27 +153,32 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 		for (AssertionGroup grp : assertionGroups) {
 			if (grp.getId().equals(group.getId())) {
 				grp.removeAssertion(assertion);
-				return assertionGroupDao.update(grp);
+				return assertionGroupRepo.save(grp);
 			}
 		}
 		return group;
 	}
 
-	@Override
-	public List<Assertion> getResourceAssertions() {
-		return assertionDao.getAssertionsByKeyWord("resource", true);
-				
-	}
 	
 	@Override
-	public List<Assertion> getAssertionsByKeyWord(String keyWord, boolean fullyMatched) {
-		return assertionDao.getAssertionsByKeyWord(keyWord, fullyMatched);
-		
+	public List<Assertion> getAssertionsByKeyWords(String keyWord, boolean exactMatched) {
+		if (exactMatched) {
+			return assertionRepo.findAssertionsByKeywords(keyWord);
+		} else {
+			List<Assertion> result = assertionRepo.findAll();
+			List<Assertion> matchedResults = new ArrayList<>();
+			for (Assertion assertion : result) {
+				if (assertion.getKeywords().contains(keyWord)) {
+					matchedResults.add(assertion);
+				}
+			}
+			return matchedResults;
+		}
 	}
 
 	@Override
 	public AssertionGroup getAssertionGroupByName(final String groupName) {
-		return assertionDao.getAssertionGroupsByName(groupName);
+		return assertionGroupRepo.findByName(groupName);
 	}
 
 	@Override
@@ -296,7 +195,74 @@ public class AssertionServiceImpl extends EntityServiceImpl<Assertion> implement
 
 	@Override
 	public List<AssertionGroup> getAllAssertionGroups() {
-		return assertionGroupDao.findAll();
+		return assertionGroupRepo.findAll();
 	}
 
+	@Override
+	public Assertion create(Assertion assertion) {
+		return assertionRepo.save(assertion);
+	}
+
+	@Override
+	public Assertion save(Assertion assertion) {
+		return assertionRepo.save(assertion);
+	}
+
+	@Override
+	public Collection<Assertion> find(List<Long> ids) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Test> getTests(Assertion assertion) {
+		List<Test> results = new ArrayList<>();
+		for (AssertionTest assertionTest : assertionTestRepo.findAssertionTestsByAssertion(assertion)) {
+			results.add(assertionTest.getTest());
+		}
+		return results;
+	}
+
+	@Override
+	public List<Test> getTestsByAssertionId(Long assertionId) {
+		Assertion assertion = assertionRepo.getOne(assertionId);
+		return getTests(assertion);
+	}
+
+	@Override
+	public List<AssertionGroup> getGroupsForAssertion(Assertion assertion) {
+		List<AssertionGroup> allGroups = assertionGroupRepo.findAll();
+		List<AssertionGroup> matched = new ArrayList<>();
+		for (AssertionGroup grp : allGroups) {
+			if (grp.getAssertions().contains(assertion)) {
+				matched.add(grp);
+			}
+		}
+		return matched;
+	}
+
+	@Override
+	public List<AssertionGroup> getGroupsForAssertion(Long assertionId) {
+		Assertion assertion = assertionRepo.getOne(assertionId);
+		return getGroupsForAssertion(assertion);
+	}
+
+
+	@Override
+	public List<Assertion> getResourceAssertions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Assertion getAssertionByUuid(UUID uuid) {
+		return assertionRepo.findByUuid(uuid.toString());
+	}
+
+	@Override
+	public AssertionGroup createAssertionGroup(AssertionGroup group) {
+		return assertionGroupRepo.save(group);
+	}
+
+	
 }

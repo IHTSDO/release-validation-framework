@@ -21,7 +21,6 @@ import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.ihtsdo.rvf.messaging.ValidationQueueManager;
 import org.ihtsdo.rvf.service.AssertionService;
-import org.ihtsdo.rvf.service.EntityService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.ihtsdo.rvf.validation.TestReportable;
 import org.ihtsdo.rvf.validation.model.ManifestFile;
@@ -31,7 +30,6 @@ import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -43,10 +41,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mangofactory.swagger.annotations.ApiIgnore;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * The controller that handles uploaded files for the validation to run
@@ -65,14 +63,10 @@ public class TestUploadFileController {
 	@Autowired
 	private AssertionService assertionService;
 	@Autowired
-	private EntityService entityService;
-	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 	private final ObjectMapper objectMapper = new ObjectMapper();
-	@Autowired
-	private TaskExecutor taskExecutor;
 	@Autowired
 	Provider<ValidationRunner> validationRunnerProvider;
 	@Autowired
@@ -80,8 +74,8 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation(value = "Structure tests", notes = "Uploaded files should be in RF2 format. Service can accept zip file or txt file. ")
-	@ApiIgnore
+//	@ApiOperation(value = "Structure tests", notes = "Uploaded files should be in RF2 format. Service can accept zip file or txt file. ")
+//	@ApiIgnore
 	public ResponseEntity uploadTestPackage(
 			@RequestParam(value = "file") final MultipartFile file,
 			@RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,

@@ -1,15 +1,45 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
-import com.google.common.collect.Sets;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.ihtsdo.drools.RuleExecutor;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
-import org.ihtsdo.rvf.entity.*;
+import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionDroolRule;
+import org.ihtsdo.rvf.entity.AssertionGroup;
+import org.ihtsdo.rvf.entity.DroolsRulesValidationReport;
+import org.ihtsdo.rvf.entity.SeverityLevel;
+import org.ihtsdo.rvf.entity.TestRunItem;
+import org.ihtsdo.rvf.entity.TestType;
+import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
@@ -18,15 +48,11 @@ import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
+import com.google.common.collect.Sets;
 
 @Service
 @Scope("prototype")
@@ -52,7 +78,8 @@ public class ValidationRunner {
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	
-	private int batchSize = 0;
+	@Value("${rvf.assertion.execution.BatchSize}")
+	private int batchSize;
 
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -61,13 +88,9 @@ public class ValidationRunner {
 	
 	@Autowired
 	ValidationVersionLoader releaseVersionLoader;
-
-	private String droolsRuleDirectoryPath;
 	
-	public ValidationRunner(int batchSize, String droolsRuleDirectoryPath) {
-		this.batchSize = batchSize;
-		this.droolsRuleDirectoryPath = droolsRuleDirectoryPath;
-	}
+	@Value("${rvf.drools.rule.directory}")
+	private String droolsRuleDirectoryPath;
 	
 	public void run(ValidationRunConfig validationConfig) {
 		final Map<String , Object> responseMap = new LinkedHashMap<>();
@@ -289,7 +312,7 @@ public class ValidationRunner {
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(groupNames);
 		final Set<Assertion> assertions = new HashSet<>();
 		for (final AssertionGroup group : groups) {
-			assertions.addAll(assertionService.getAssertionsForGroup(group));
+			assertions.addAll(group.getAssertions());
 		}
 		return new ArrayList<Assertion>(assertions);
 	}
@@ -322,9 +345,7 @@ public class ValidationRunner {
 		 final List<TestRunItem> items = executeAssertions(executionConfig, resourceAssertions, reportStorage);
 		final Set<Assertion> assertions = new HashSet<>();
 		for (final AssertionGroup group : groups) {
-			for (final Assertion assertion : assertionService.getAssertionsForGroup(group)) {
-				assertions.add(assertion);
-			}
+			assertions.addAll(group.getAssertions());
 		}
 		logger.info("Total assertions to run: " + assertions.size());
 		if (batchSize == 0) {

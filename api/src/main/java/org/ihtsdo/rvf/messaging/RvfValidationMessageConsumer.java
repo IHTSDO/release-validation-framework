@@ -24,6 +24,7 @@ import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -40,6 +41,7 @@ public class RvfValidationMessageConsumer {
 	private static final long FITY_NINE_MINUTES = 59 * 60 * 1000;
 	private static final long HOUR_IN_MILLIS = 60 * 60 * 1000;
 	private static final long ONE_MINUTE_IN_MILLIS = 60 * 1000;
+	
 	private String queueName;
 	@Autowired
 	private ValidationRunner runner;
@@ -55,7 +57,9 @@ public class RvfValidationMessageConsumer {
 	private boolean isValidationRunning = false;
 	private ExecutorService executorService;
 
-	public RvfValidationMessageConsumer(String queueName, Boolean isRvfWorker, Boolean ec2Instance) {
+	public RvfValidationMessageConsumer(@Value("${rvf.validation.queue.name}") String queueName, 
+			@Value("${rvf.execution.isWorker}") Boolean isRvfWorker,
+			@Value("${rvf.autoscaling.isEc2Instance}") Boolean ec2Instance) {
 		isWorker = isRvfWorker.booleanValue();
 		this.queueName = queueName;
 		this.isEc2Instance = ec2Instance.booleanValue();

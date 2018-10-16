@@ -11,17 +11,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.controller.VersionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.*;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.ec2.model.CreateTagsRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Filter;
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.InstanceStateChange;
+import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.RunInstancesRequest;
+import com.amazonaws.services.ec2.model.RunInstancesResult;
+import com.amazonaws.services.ec2.model.Tag;
+import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 @Service
 public class InstanceManager {
 
@@ -38,30 +56,52 @@ public class InstanceManager {
 	private Logger logger = LoggerFactory.getLogger(InstanceManager.class);
 	private AmazonEC2Client amazonEC2Client;
 	private static int counter;
-	@Autowired
-	private String imageId;
-	@Autowired
-	private String instanceType;
-	@Autowired
-	private String securityGroupId;
-	@Autowired
-	private String keyName;
-	@Autowired
-	private String instanceTagName;
-	@Autowired
-	private String ec2SubnetId;
 	private String ec2InstanceStartupScript;
+	
+	@Value("${rvf.autoscaling.imageId}")
+	private String imageId;
+	
+	@Value("${rvf.autoscaling.instanceType}")
+	private String instanceType;
+	
+	@Value("${rvf.autoscaling.securityGroupId}")
+	private String securityGroupId;
+	
+	@Value("${rvf.autoscaling.keyPairName}")
+	private String keyName;
+	
+	@Value("${rvf.autoscaling.tagName}")
+	private String instanceTagName;
+	
+	@Value("${rvf.autoscaling.ec2SubnetId}")
+	private String ec2SubnetId;
 
+	@Value("${rvf.drools.rule.version}")	 
 	private String droolsRulesVersion;
+	
+	@Value("${rvf.drools.rule.directory}")	 
 	private String droolsRulesDirectory;
+	
+	@Value("${rvf.drools.rule.repository}")
 	private String droolsRulesRepository;
+	
+	@Value("${aws.key}")
+	private String awsPubicKey;
+	
+	@Value("${aws.privateKey}")
+	private String awsPrivateKey;
+	
+	@Value("${rvf.autoscaling.ec2Endpoint}")
+	private String serviceEndpoint;
+	@Value("us-east-1")
+	private String signingRegion;
 
-	public InstanceManager(AWSCredentials credentials, String ec2Endpoint, String droolsRulesVersion, String droolsRulesDirectory, String droolsRulesRepository) {
-		amazonEC2Client = new AmazonEC2Client(credentials);
-		amazonEC2Client.setEndpoint(ec2Endpoint);
-		this.droolsRulesVersion = droolsRulesVersion;
-		this.droolsRulesDirectory = droolsRulesDirectory;
-		this.droolsRulesRepository = droolsRulesRepository;
+	@PostConstruct
+	public void init() {
+		AWSCredentials credentials = new BasicAWSCredentials(awsPubicKey, awsPrivateKey);
+		amazonEC2Client = (AmazonEC2Client) AmazonEC2ClientBuilder.standard()
+				.withCredentials(new AWSStaticCredentialsProvider(credentials))
+				.withEndpointConfiguration(new EndpointConfiguration(serviceEndpoint, signingRegion)).build();
 		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
 

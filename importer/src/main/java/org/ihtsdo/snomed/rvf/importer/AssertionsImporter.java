@@ -29,10 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
-import com.facebook.presto.sql.parser.SqlParser;
 import com.facebook.presto.sql.parser.StatementSplitter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Release Assertion Toolkit content via XML and SQL files. The XML file defines the assertions and the SQL files are
  * used to populate the corresponding tests.
  */
-@Service
+@Deprecated
 public class AssertionsImporter {
 
 	private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";

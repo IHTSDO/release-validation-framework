@@ -13,16 +13,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
+import org.ihtsdo.rvf.dao.TestRepository;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.service.AssertionService;
-import org.ihtsdo.rvf.service.EntityService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +51,7 @@ public class AssertionControllerIntegrationTest {
 	@Autowired
 	private AssertionService assertionService;
 	@Autowired
-	private EntityService entityService;
+	private TestRepository testRepository;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
@@ -217,6 +214,6 @@ public class AssertionControllerIntegrationTest {
 		final org.ihtsdo.rvf.entity.Test test = new org.ihtsdo.rvf.entity.Test();
 		test.setName("Random Test " + UUID.randomUUID());
 		test.setCommand(new ExecutionCommand());
-		return (org.ihtsdo.rvf.entity.Test) entityService.create(test);
+		return testRepository.save(test);
 	}
 }

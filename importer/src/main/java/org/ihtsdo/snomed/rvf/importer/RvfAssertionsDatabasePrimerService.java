@@ -3,6 +3,8 @@ package org.ihtsdo.snomed.rvf.importer;
 
 import java.io.InputStream;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ public class RvfAssertionsDatabasePrimerService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RvfAssertionsDatabasePrimerService.class);
 	
+	@PostConstruct
 	public void importAssertionsAndGroups() {
 		if (dbImporter.isAssertionImportRequired()) {
 			LOGGER.info("No assertons exist and start importing...");

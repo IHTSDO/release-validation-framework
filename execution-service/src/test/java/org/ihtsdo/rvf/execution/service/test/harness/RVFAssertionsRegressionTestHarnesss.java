@@ -17,18 +17,20 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.rvf.dao.AssertionDao;
+import org.ihtsdo.rvf.MysqlConfig;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.ExecutionServiceConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
@@ -56,7 +58,7 @@ import com.google.gson.Gson;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
+@ContextConfiguration(classes = {ExecutionServiceConfig.class, MysqlConfig.class})
 @Transactional
 public class RVFAssertionsRegressionTestHarnesss {
 	
@@ -78,8 +80,8 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private ReleaseDataManager releaseDataManager;
 	@Autowired
 	private ResourceDataLoader resourceDataLoader;
-	@Autowired
-	private  AssertionDao assertionDao;
+	
+	
 	private  URL releaseTypeExpectedResults;
 	private URL componentCentrilExpected;
 	private URL fileCentricExpected;
@@ -89,9 +91,11 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Before
 	public void setUp() throws IOException, SQLException, BusinessServiceException {
+		
 		//load previous and prospective versions if not loaded already
 		assertNotNull(releaseDataManager);
-		String binaryArchive = "/var/folders/tx/cz83k2fj6c38h5mht21h0bgw0000gn/T/rvf_regression_test_previous.zip";
+//		String binaryArchive = "/var/folders/tx/cz83k2fj6c38h5mht21h0bgw0000gn/T/rvf_regression_test_previous.zip";
+		String binaryArchive = null;
 		if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
 			if (binaryArchive == null) {
 				final URL previousReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130131");
@@ -122,7 +126,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_" + PREVIOUS_RELEASE);
 		releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_"+ PROSPECTIVE_RELEASE);
 		resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
-		final List<Assertion> assertions = assertionDao.getAssertionsByKeyWord("resource",true);
+		final List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource",true);
 		config = new ExecutionConfig(System.currentTimeMillis());
 		config.setPreviousVersion(PREVIOUS_RELEASE);
 		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
@@ -145,7 +149,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	}
 	 
 	private void runAssertionsTest(final String groupName, final String expectedJsonFile) throws Exception {
-		 final List<Assertion> assertions= assertionDao.getAssertionsByKeyWord(groupName, false);
+		 final List<Assertion> assertions= assertionService.getAssertionsByKeyWords(groupName, false);
 		 System.out.println("found total assertions:" + assertions.size());
 		 long timeStart = System.currentTimeMillis();
 			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
@@ -159,10 +163,9 @@ public class RVFAssertionsRegressionTestHarnesss {
 	@Test
 	public void testGetAssertionsByGroup() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("InternationalEdition");
-		
-		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
+		Set<Assertion> assertions =  group.getAssertions();
 		List<Assertion> releaseTypeAssertions = new ArrayList<>();
-		for (Assertion assertion : assertions) {
+		for (Assertion assertion : group.getAssertions()) {
 			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION)) {
 				releaseTypeAssertions.add(assertion);
 			}
@@ -174,18 +177,14 @@ public class RVFAssertionsRegressionTestHarnesss {
 	@Test
 	public void testGetAssertionsForIntAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("int-authoring");
-		
-		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(28, assertions.size());
+		assertEquals(28, group.getAssertions().size());
 	}
 	
 	
 	@Test
 	public void testGetAssertionsForCommonAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
-		
-		List<Assertion> assertions = assertionService.getAssertionsForGroup(group);
-		assertEquals(80, assertions.size());
+		assertEquals(80, group.getAssertions().size());
 	}
 	
 	@Test
@@ -195,7 +194,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
 		final List<Assertion> assertions= new ArrayList<>();
-		assertions.add(assertionDao.getAssertionByUUID(assertionUUID));
+		assertions.add(assertionService.getAssertionByUuid(UUID.fromString(assertionUUID)));
 		System.out.println("found total assertions:" + assertions.size());
 		long timeStart = System.currentTimeMillis();
 		final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);

@@ -3,20 +3,19 @@ package org.ihtsdo.rvf.execution.service.impl;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
-
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
+import org.ihtsdo.rvf.MysqlConfig;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
+import org.ihtsdo.rvf.execution.service.ExecutionServiceConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.service.AssertionService;
-import org.ihtsdo.rvf.service.EntityService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,22 +28,23 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
+@ContextConfiguration(classes = {ExecutionServiceConfig.class, MysqlConfig.class})
 @Transactional
 public class AssertionExecutionServiceImplIT {
-	
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceImplIT.class);
-
+	
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
+	
 	@Resource(name = "dataSource")
 	private DataSource dataSource;
-	@Autowired
-	private EntityService entityService;
+	
 	@Autowired
 	private AssertionService assertionService;
+	
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
+	
 	private Assertion assertion;
 	private AssertionTest assertionTest;
 	private org.ihtsdo.rvf.entity.Test test;
@@ -53,8 +53,7 @@ public class AssertionExecutionServiceImplIT {
 
 	@Before
 	public void setUp() {
-
-		assertNotNull(entityService);
+		assertNotNull(assertionService);
 		assertNotNull(releaseDataManager);
 
 		// register releases with release manager, since they will be used during SQL replacement
@@ -65,24 +64,22 @@ public class AssertionExecutionServiceImplIT {
 		config.setProspectiveVersion("int_20140731");
 		config.setExecutionId(1L);
 
-		assertion = assertionService.create(new HashMap<String, String>());
+		assertion  = new Assertion();
+		assertion.setAssertionText("Assertion test");
+		assertion = assertionService.create(assertion);
 		// create test
 		test = new org.ihtsdo.rvf.entity.Test();
 		test.setType(TestType.SQL);
 		test.setName("Test 1");
-		test = (org.ihtsdo.rvf.entity.Test) entityService.create(test);
 		assertNotNull(test);
 		assertNotNull(test.getId());
-		assertTrue(entityService.count(org.ihtsdo.rvf.entity.Test.class) > 0);
 
 		//create assertion test
 		assertionTest = new AssertionTest();
 		assertionTest.setAssertion(assertion);
 		assertionTest.setTest(test);
-		assertionTest = (AssertionTest) entityService.create(assertionTest);
 		assertNotNull(assertionTest);
 		assertNotNull(assertionTest.getId());
-		assertTrue(entityService.count(AssertionTest.class) > 0);
 	}
 
 	@Test

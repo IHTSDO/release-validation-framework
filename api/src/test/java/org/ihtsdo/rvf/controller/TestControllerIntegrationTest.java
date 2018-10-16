@@ -13,9 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.nio.charset.Charset;
 
 import org.hamcrest.Matchers;
+import org.ihtsdo.rvf.dao.TestRepository;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.service.EntityService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -46,7 +46,7 @@ public class TestControllerIntegrationTest {
 	private WebApplicationContext ctx;
 	private MockMvc mockMvc;
 	@Autowired
-	private EntityService entityService;
+	private TestRepository testRepo;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
 			MediaType.APPLICATION_JSON.getType(),
@@ -60,8 +60,8 @@ public class TestControllerIntegrationTest {
 		test.setName("Test Name");
 		test.setDescription("Example Test Description");
 		test.setCommand(new ExecutionCommand());
-		assert entityService != null;
-		test = (org.ihtsdo.rvf.entity.Test) entityService.create(test);
+		assert testRepo != null;
+		test = testRepo.save(test);
 		assert test != null;
 		assert test.getId() != null;
 	}
@@ -183,9 +183,9 @@ public class TestControllerIntegrationTest {
 
 	@After
 	public void tearDown() throws Exception {
-		assert entityService != null;
+		assert testRepo != null;
 		if (test != null) {
-			entityService.delete(test);
+			testRepo.delete(test);
 		}
 	}
 }

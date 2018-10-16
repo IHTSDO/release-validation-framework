@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.ihtsdo.rvf.dao.AssertionGroupRepository;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.service.AssertionService;
-import org.ihtsdo.rvf.service.EntityService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +54,7 @@ public class AssertionGroupControllerIntegrationTest {
 	@Autowired
 	private AssertionService assertionService;
 	@Autowired
-	private EntityService entityService;
+	private AssertionGroupRepository assertionGroupRepo;
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
@@ -69,8 +69,8 @@ public class AssertionGroupControllerIntegrationTest {
 		group.setName("Test group");
 
 		assertNotNull(assertionService);
-		assertNotNull(entityService);
-		group = (AssertionGroup) entityService.create(group);
+		assertNotNull(assertionGroupRepo);
+		group = (AssertionGroup) assertionGroupRepo.save(group);
 		assertNotNull(group.getId());
 	}
 
@@ -194,9 +194,9 @@ public class AssertionGroupControllerIntegrationTest {
 
 	@After
 	public void tearDown() throws Exception {
-		assert entityService != null;
+		assert assertionGroupRepo != null;
 		if (group != null) {
-			entityService.delete(group);
+			assertionGroupRepo.delete(group);
 		}
 	}
 

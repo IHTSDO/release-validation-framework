@@ -11,17 +11,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 /**
  * A simple REST client that communicates with the RVF API. This class is used to populate the RVF database.
  */
-@Service
 public class RvfRestClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(RvfRestClient.class);
-	private final static String defaultServerUrl = "http://localhost:8080/api/v1/";
+	private final static String defaultServerUrl = "http://localhost:8080/api/v2/";
 	private String serverUrl;
 	private final RestTemplate restTemplate;
 	private final HttpHeaders headers;

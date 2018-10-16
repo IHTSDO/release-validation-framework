@@ -21,6 +21,7 @@ import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,21 +36,19 @@ public class ValidationReportService {
 	private S3Client s3Client;
 	
 	private final Logger logger = LoggerFactory.getLogger(ValidationReportService.class);
+	
+	@Value("${executionBucketName}")
 	private String bucketName;
 	
 	private String stateFilePath;
 	private String resultsFilePath;
 	private String progressFilePath;
 	private String structureTestReportPath;
+	private Gson prettyGson;
 	
 	private static final String UTF_8 = "UTF-8";
 	
-	
 	public enum State { QUEUED, READY, RUNNING, FAILED, COMPLETE,  } 
-	
-	public ValidationReportService(String bucketName) {
-		this.bucketName = bucketName;
-	}
 	
 	@PostConstruct
 	public void init() {
@@ -59,10 +58,10 @@ public class ValidationReportService {
 		resultsFilePath = rvfRoot + "results.json";
 		progressFilePath = rvfRoot + "progress.txt";
 		structureTestReportPath = rvfRoot + "structure_validation.txt";
+		prettyGson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 	}
 	
 	public void writeResults(final Map<String , Object> responseMap, final State state, String storageLocation) throws BusinessServiceException {
-		final Gson prettyGson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 		File temp = null;
 		try {
 			temp = File.createTempFile("resultJson", ".tmp");

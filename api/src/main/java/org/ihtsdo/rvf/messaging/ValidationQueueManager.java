@@ -17,6 +17,7 @@ import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -37,11 +38,13 @@ public class ValidationQueueManager {
 	@Resource
 	private S3Client s3Client;
 
-	@Autowired
+	@Value("${executionBucketName}")
 	private String s3ExecutionBucketName;
-	@Autowired
+	
+	@Value("${publishBucketName}")
 	private String s3PublishBucketName;
-	@Autowired
+	
+	@Value("${rvf.execution.isAutoScalingEnabled}")
 	private Boolean isAutoScalingEnabled;
 
 	private static final Logger LOGGER = LoggerFactory

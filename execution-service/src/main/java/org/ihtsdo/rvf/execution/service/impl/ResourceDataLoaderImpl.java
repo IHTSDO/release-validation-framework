@@ -25,27 +25,25 @@ import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3Object;
 
+@Service
 public class ResourceDataLoaderImpl implements ResourceDataLoader {
 	private static final String US_TO_GB_TERMS_MAP_FILENAME = "us-to-gb-terms-map.txt";
 	private static final String UTF_8 = "UTF-8";
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
+	
+	@Value("${rvf.validation.resources}")
 	private String validationResourcePath;
-
-	public String getValidationResourcePath() {
-		return validationResourcePath;
-	}
-
-	public void setValidationResourcePath(String validationResourcePath) {
-		this.validationResourcePath = validationResourcePath;
-	}
 
 	@Resource
 	private S3Client s3Client;
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResourceDataLoaderImpl.class);
 	private File localResourceDir;
 	

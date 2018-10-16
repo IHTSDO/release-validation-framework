@@ -18,8 +18,6 @@ import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
  * An entity that reprsents a collection of {@link org.ihtsdo.rvf.entity.Assertion}s. Note that this is deliberately not
@@ -28,16 +26,16 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 @Entity
 @Table(name = "assertion_group")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = AssertionGroup.class)
-@ApiModel(description="Assertion group model")
+//@ApiModel(description="Assertion group model")
 public class AssertionGroup {
 
 	@Id
 	@GeneratedValue
 	@Column(name = "group_id")
-	@ApiModelProperty(value="Auto generated id")
+//	@ApiModelProperty(value="Auto generated id")
 	private Long id;
 	
-	@ApiModelProperty(value="Assertion group name", required=true)
+//	@ApiModelProperty(value="Assertion group name", required=true)
 	private String name;
 	
 	@ManyToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -50,7 +48,7 @@ public class AssertionGroup {
 	private Set<Assertion> assertions = new HashSet<>();
 	
 	@Transient
-	@ApiModelProperty(value="Total assertions")
+//	@ApiModelProperty(value="Total assertions")
 	private final int total = 0;
 	
 	

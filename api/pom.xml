@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>api</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<name>api</name>
 
@@ -21,11 +21,6 @@
 
 	<dependencies>
 		<!-- Module dependencies -->
-		<dependency>
-			<groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-			<version>2.9.9</version>
-		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>data-service</artifactId>
@@ -46,58 +41,58 @@
 			<artifactId>importer</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- Spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jms</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
 		<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <scope>provided</scope>
         </dependency>
-		<!-- ActiveMQ -->
 		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-kahadb-store</artifactId>
-			<version>5.15.3</version>
+      		<groupId>org.springframework.boot</groupId>
+      		<artifactId>spring-boot-starter-activemq</artifactId>
+  		</dependency>
+  		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-pool</artifactId>
-			<version>5.15.3</version>
-		</dependency>
-		<!-- Jackson JSON -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${jackson.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>${jackson.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-aws-autoconfigure</artifactId>
+			<version>${spring-cloud-version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${springfox-swagger.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${springfox-swagger.version}</version>
+		</dependency>
+  		<dependency>
+      		<groupId>org.apache.activemq</groupId>
+     		<artifactId>activemq-broker</artifactId>
+  		</dependency>
+ 		<dependency>
+      		<groupId>com.fasterxml.jackson.core</groupId>
+      		<artifactId>jackson-databind</artifactId>
+ 		</dependency>
+	   <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>5.2.17.Final</version>
+	   </dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.3</version>
 		</dependency>
 		<!-- apache commons -->
 		<dependency>
@@ -124,12 +119,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
 			<version>1.2.0</version>
@@ -141,50 +130,18 @@
 			<version>1.2.0</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- Provided -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
-
-	<!-- jar debug run command to enable intelliJ remote debugging: java -Xdebug 
-		-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -jar api/target/validation-api.jar -->
-
+	
 	<build>
 		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.github.jsimone</groupId>
-									<artifactId>webapp-runner-main</artifactId>
-									<version>${webapp-runner.version}</version>
-									<destFileName>webapp-runner.jar</destFileName>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>org.ihtsdo.rvf.App</mainClass>
+				</configuration>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.tomcat.maven</groupId> <artifactId>tomcat7-maven-plugin</artifactId> 
-				<version>2.1</version> <executions> <execution> <id>tomcat-run</id> <goals> 
-				<goal>exec-war-only</goal> </goals> <phase>package</phase> <configuration> 
-				<path>/api</path> <port>8083</port> <finalName>${execFinalName}</finalName> 
-				<enableNaming>true</enableNaming> </configuration> </execution> </executions> 
-				</plugin> -->
 			<plugin>
 				<groupId>org.vafer</groupId>
 				<artifactId>jdeb</artifactId>
@@ -204,20 +161,16 @@
 							<classifier>all</classifier>
 							<signPackage>false</signPackage>
 							<dataSet>
-								<!-- <data> <src>${project.build.directory}/${execFinalName}</src> 
-									<dst>app.jar</dst> <type>file</type> <mapper> <type>perm</type> <prefix>/opt/${packageName}/lib/</prefix> 
-									</mapper> </data> -->
-
 								<data>
 									<src>${project.build.directory}/${project.artifactId}.${project.packaging}</src>
-									<dst>app.war</dst>
+									<dst>app.jar</dst>
 									<type>file</type>
 									<mapper>
 										<type>perm</type>
 										<prefix>/opt/${packageName}/lib/</prefix>
 									</mapper>
 								</data>
-								<data>
+								<!-- data>
 									<src>${project.build.directory}/dependency/webapp-runner.jar</src>
 									<dst>webapp-runner.jar</dst>
 									<type>file</type>
@@ -225,7 +178,7 @@
 										<type>perm</type>
 										<prefix>/opt/${packageName}/lib/</prefix>
 									</mapper>
-								</data>
+								</data> -->
 								<data>
 									<src>${basedir}/src/deb/supervisor.conf</src>
 									<dst>/etc/supervisor/conf.d/${packageName}.conf</dst>
@@ -276,9 +229,6 @@
 										<filemode>0750</filemode>
 									</mapper>
 								</data>
-								<!-- <data> <type>link</type> <linkName>/var/log/${packageName}</linkName> 
-									<linkTarget>/var/opt/${packageName}/log</linkTarget> <symlink>true</symlink> 
-									</data> -->
 							</dataSet>
 						</configuration>
 					</execution>

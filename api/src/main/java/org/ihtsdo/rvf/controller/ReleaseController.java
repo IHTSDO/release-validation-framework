@@ -2,7 +2,6 @@ package org.ihtsdo.rvf.controller;
 
 import java.io.IOException;
 
-import org.ihtsdo.otf.dao.resources.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.slf4j.Logger;
@@ -19,9 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 
 /**
  * A controller that handles API calls for uploading and checking status of
@@ -39,9 +39,6 @@ public class ReleaseController {
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 	
-	@Autowired
-	private ResourceManager resourceManager;
-
 	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiOperation(value = "Upload a published release version", notes = "Uploads a published release for a given product.")

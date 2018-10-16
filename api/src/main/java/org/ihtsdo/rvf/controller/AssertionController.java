@@ -1,31 +1,5 @@
 package org.ihtsdo.rvf.controller;
 
-import com.wordnik.swagger.annotations.*;
-
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
-import org.ihtsdo.rvf.helper.AssertionHelper;
-import org.ihtsdo.rvf.service.AssertionService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import org.springframework.stereotype.Controller;
-
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,14 +10,36 @@ import java.util.UUID;
 
 import javax.persistence.EntityNotFoundException;
 
+import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
+import org.ihtsdo.rvf.entity.Test;
+import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
+import org.ihtsdo.rvf.helper.AssertionHelper;
+import org.ihtsdo.rvf.service.AssertionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @Controller
 @RequestMapping("/assertions")
-@Api(position = 1, value = "Assertions")
+//@Api(position = 1, value = "Assertions")
 public class AssertionController {
 	@Autowired
 	private AssertionService assertionService;
-	@Autowired
-	private AssertionExecutionService assertionExecutionService;
 	@Autowired
 	private AssertionHelper assertionHelper;
 	@Autowired
@@ -67,7 +63,7 @@ public class AssertionController {
 	public List<Test> getTestsForAssertion(@PathVariable final String id) {
 		final Assertion assertion = find(id);
 
-		return assertionService.getTests(assertion.getAssertionId());
+		return assertionService.getTestsByAssertionId(assertion.getAssertionId());
 	}
 
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.POST)
@@ -175,7 +171,7 @@ public class AssertionController {
 
 		// Now make sure we don't already have one of those (otherwise conflict)
 		Assertion existingAssertion = assertionService
-				.find(assertion.getUuid());
+				.findAssertionByUUID(assertion.getUuid());
 
 		if (existingAssertion != null) {
 			return new ResponseEntity<Assertion>((Assertion) null,
@@ -203,7 +199,7 @@ public class AssertionController {
 
 		assertion.setAssertionId(existing.getAssertionId());
 
-		return assertionService.update(assertion);
+		return assertionService.save(assertion);
 	}
 
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.PUT)
@@ -293,7 +289,7 @@ public class AssertionController {
 			try {
 				UUID uuid = UUID.fromString(id);
 
-				return assertionService.find(uuid);
+				return assertionService.findAssertionByUUID(uuid);
 			} catch (IllegalArgumentException e) {
 				throw new InvalidFormatException("Id is not a valid uuid:" + id);
 			}

@@ -1,13 +1,12 @@
 package org.ihtsdo.rvf.helper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+
 import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.service.EntityService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A custom {@link org.springframework.core.convert.converter.Converter} for
@@ -17,8 +16,6 @@ import java.io.IOException;
 public class AssertionGroupConverter implements
 		Converter<String, AssertionGroup> {
 
-	@Autowired
-	EntityService entityService;
 	ObjectMapper mapper = new ObjectMapper();
 
 	@Override

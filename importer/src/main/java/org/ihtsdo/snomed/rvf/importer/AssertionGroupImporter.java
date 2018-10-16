@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.ihtsdo.rvf.dao.AssertionGroupDao;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -74,8 +73,6 @@ public class AssertionGroupImporter {
 	private static final String ICD_9_COMPLEX_MAP ="ICD-9-CM";
 	@Autowired	
 	private AssertionService assertionService;
-	@Autowired
-	private AssertionGroupDao assertionGroupDao;
 	
 	private static final String[] SPANISH_EXTENSION_EXCLUDE_LIST = {"dd0d0406-7481-444a-9f04-b6fc7db49039","c3249e80-84f0-11e1-b0c4-0800200c9a66"};
 	
@@ -112,7 +109,7 @@ public class AssertionGroupImporter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AssertionGroupImporter.class);
 	
 	public boolean isImportRequired() {
-		List<AssertionGroup> allGroups = assertionGroupDao.findAll();
+		List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
 		if (allGroups == null || allGroups.isEmpty()) {
 			return true;
 		} else {
@@ -132,7 +129,7 @@ public class AssertionGroupImporter {
 	 */
 			
 	public void importAssertionGroups() {
-		List<AssertionGroup> allGroups = assertionGroupDao.findAll();
+		List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
 		List<String> existingGroups = new ArrayList<>();
 		if (allGroups != null) {
 			for (AssertionGroup group : allGroups) {
@@ -200,7 +197,7 @@ public class AssertionGroupImporter {
 	private void createFirstTimeReleaseGroup(List<Assertion> allAssertions, AssertionGroupName groupName) {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(groupName.getName());
-		group = assertionGroupDao.create(group);
+		group = assertionService.createAssertionGroup(group);
 		int counter = 0;
 		String keyWords;
 		for (Assertion assertion : allAssertions) {
@@ -227,7 +224,7 @@ public class AssertionGroupImporter {
 	private void createCommonSnapshotAssertionGroup(List<Assertion> allAssertions) {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(AssertionGroupName.COMMON_AUTHORING.getName());
-		group = assertionGroupDao.create(group);
+		group = assertionService.createAssertionGroup(group);
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
 			String keyWords = assertion.getKeywords();
@@ -254,8 +251,8 @@ public class AssertionGroupImporter {
 	private void createSnapshotAssertionGroup( AssertionGroupName groupName) {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(groupName.getName());
-		group = assertionGroupDao.create(group);
-		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWord("," + groupName.getReleaseCenter(), false);
+		group = assertionService.createAssertionGroup(group);
+		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWords("," + groupName.getReleaseCenter(), false);
 		for (Assertion assertion : allAssertions) {
 			//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
 			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
@@ -307,7 +304,7 @@ public class AssertionGroupImporter {
 		//create international assertion group
 		AssertionGroup assertionGroup = new AssertionGroup();
 		assertionGroup.setName(groupName.getName());
-		assertionGroup = assertionGroupDao.create(assertionGroup);
+		assertionGroup = assertionService.createAssertionGroup(assertionGroup);
 		List<Assertion> assertionsToBeAdded = getCommonReleaseAssertions(allAssertions);
 		assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()));
 		
@@ -333,7 +330,7 @@ public class AssertionGroupImporter {
 	private void createAssertionGroupByKeyWord(List<Assertion> allAssertions, String assertionGroupName) {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(assertionGroupName);
-		group = assertionGroupDao.create(group);
+		group = assertionService.createAssertionGroup(group);
 		for (Assertion assertion : allAssertions) {
 			if (assertion.getKeywords().equals(assertionGroupName)) {
 				assertionService.addAssertionToGroup(assertion, group);

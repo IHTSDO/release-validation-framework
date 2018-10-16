@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.4.1.RELEASE</version>
+		<version>2.0.1.RELEASE</version>
 	</parent>
 	
 	<groupId>org.ihtsdo.snomed.rvf</groupId>
@@ -18,9 +18,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<packageName>${project.artifactId}</packageName>
 		<execFinalName>${project.build.finalName}.jar</execFinalName>
-		<spring.version>4.3.5.RELEASE</spring.version>
 		<slf4j.version>1.7.5</slf4j.version>
-		<hibernate.version>3.6.10.Final</hibernate.version>
 		<hsql.version>5.3.0</hsql.version>
 		<skip.integration.tests>true</skip.integration.tests>
 		<mysql.connector.java.version>5.1.20</mysql.connector.java.version>
@@ -30,6 +28,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<hibernate.version>5.2.17.Final</hibernate.version>
+		<springfox-swagger.version>2.7.0</springfox-swagger.version>
 	</properties>
 
 	<modules>
@@ -61,13 +61,6 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
-		<!-- Test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
@@ -79,24 +72,42 @@
 			<artifactId>javax.inject</artifactId>
 			<version>1</version>
 		</dependency>
-		<!-- Swagger lib for api documentation -->
+		 <!-- Swagger lib for api documentation -->
+		 <!-- 
 		<dependency>
 		    <groupId>com.mangofactory</groupId>
 		    <artifactId>swagger-springmvc</artifactId>
 		    <version>1.0.2</version>
+		</dependency> -->
+		<dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+        <exclusions>
+            <exclusion>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-logging</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
 		</dependency>
-		
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+   		 	<artifactId>spring-boot-starter-data-jpa</artifactId>
+	   </dependency>
 		<dependency>
     		<groupId>joda-time</groupId>
     		<artifactId>joda-time</artifactId>
    			 <version>2.8.1</version>
 		</dependency>		
 		
-		<dependency>
+	<!-- 	<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>swagger-ui</artifactId>
 			<version>2.0.24</version>
-		</dependency>	
+		</dependency> -->	
 		<dependency>
 			<groupId>org.ihtsdo.otf.common</groupId>
 			<artifactId>otf-common</artifactId>
@@ -112,37 +123,25 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+	   
+	   <dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
+		
+	   <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <!--   <version>${hibernate.version}</version>  -->
+	   </dependency>
+	   
+	   <dependency>
+           <groupId>mysql</groupId>
+           <artifactId>mysql-connector-java</artifactId>
+           <scope>runtime</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-aws-autoconfigure</artifactId>
-			<version>${spring-cloud-version}</version>
-		</dependency>
-		<dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter</artifactId>
-        <exclusions>
-            <exclusion>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-logging</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
+    
 	</dependencies>
 
 	<dependencyManagement>
@@ -193,9 +192,8 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<!--
-				To run integration tests use: mvn clean install -Dskip.integration.tests=false
-			-->
+			
+				<!-- To run integration tests use: mvn clean install -Dskip.integration.tests=false -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
@@ -217,24 +215,7 @@
 				</includes>
 				<skipTests>${skip.integration.tests}</skipTests>
 			 </configuration>
-			</plugin>
- 		 	<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<mainClass>org.ihtsdo.rvf.App</mainClass>
-				</configuration>
-				<executions>
-            	<execution>
-                <goals>
-                    <goal>repackage</goal>
-                </goals>
-                <configuration>
-                    <classifier>exec</classifier>
-                </configuration>
-            </execution>
-        	</executions>
-			</plugin>
+			</plugin> 
     </plugins>
 	</build>
 

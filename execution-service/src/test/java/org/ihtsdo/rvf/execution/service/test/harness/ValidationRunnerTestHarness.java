@@ -3,6 +3,8 @@ package org.ihtsdo.rvf.execution.service.test.harness;
 import java.io.File;
 import java.util.Arrays;
 
+import org.ihtsdo.rvf.MysqlConfig;
+import org.ihtsdo.rvf.execution.service.ExecutionServiceConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.junit.Test;
@@ -12,7 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/testExecutionServiceContext.xml"})
+@ContextConfiguration(classes = {ExecutionServiceConfig.class, MysqlConfig.class})
 public class ValidationRunnerTestHarness {
 @Autowired
 ValidationRunner runner;
