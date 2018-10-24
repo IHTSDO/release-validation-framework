@@ -1,4 +1,4 @@
-package org.ihtsdo.snomed.rvf.importer.impl;
+package org.ihtsdo.rvf.importer;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -8,7 +8,7 @@ import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.snomed.rvf.importer.AssertionsImporter;
+import org.ihtsdo.rvf.importer.AssertionsImporter;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +17,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * A test class for {@link org.ihtsdo.snomed.rvf.importer.AssertionsImporter}
+ * A test class for {@link org.ihtsdo.rvf.importer.AssertionsImporter}
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/testImporterServiceContext.xml"})

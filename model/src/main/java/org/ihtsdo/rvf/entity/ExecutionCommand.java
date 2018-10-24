@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 //@Embeddable
 @Entity(name = "command")
 @Table(name = "execution_command")
-//@ApiModel(description="Assertion test SQL statements")
 public class ExecutionCommand {
 
 	@Id
@@ -31,7 +30,6 @@ public class ExecutionCommand {
 	Long id;
 
 	@Column(columnDefinition = "text")
-//	@ApiModelProperty(required=false)
 	String template = null;
 	@JsonBackReference
 	@OneToOne(fetch = FetchType.EAGER, mappedBy = "command")

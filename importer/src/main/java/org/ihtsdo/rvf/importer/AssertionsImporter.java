@@ -1,4 +1,4 @@
-package org.ihtsdo.snomed.rvf.importer;
+package org.ihtsdo.rvf.importer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +18,7 @@ import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.SimpleAssertion;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.snomed.rvf.importer.helper.RvfRestClient;
+import org.ihtsdo.rvf.importer.helper.RvfRestClient;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -36,7 +36,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * An implementation of a {@link org.ihtsdo.snomed.rvf.importer.AssertionsImporter} that imports older
+ * An implementation of a {@link org.ihtsdo.rvf.importer.AssertionsImporter} that imports older
  * Release Assertion Toolkit content via XML and SQL files. The XML file defines the assertions and the SQL files are
  * used to populate the corresponding tests.
  */

@@ -1,4 +1,4 @@
-	package org.ihtsdo.snomed.rvf.importer;
+	package org.ihtsdo.rvf.importer;
 
 	import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 	/**
-	 * An implementation of a {@link org.ihtsdo.snomed.rvf.importer.AssertionsDatabaseImporter} that imports older
+	 * An implementation of a {@link org.ihtsdo.rvf.importer.AssertionsDatabaseImporter} that imports older
 	 * Release Assertion Toolkit content via XML and SQL files. The XML file defines the assertions and the SQL files are
 	 * used to populate the corresponding tests.
 	 */

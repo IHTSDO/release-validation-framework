@@ -1,4 +1,4 @@
-package org.ihtsdo.snomed.rvf.importer;
+package org.ihtsdo.rvf.importer;
 
 
 import java.io.InputStream;

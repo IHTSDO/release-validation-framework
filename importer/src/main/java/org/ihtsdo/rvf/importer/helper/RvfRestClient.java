@@ -1,4 +1,4 @@
-package org.ihtsdo.snomed.rvf.importer.helper;
+package org.ihtsdo.rvf.importer.helper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

@@ -1,6 +1,6 @@
-package org.ihtsdo.snomed.rvf.importer.impl;
+package org.ihtsdo.rvf.importer;
 
-import org.ihtsdo.snomed.rvf.importer.RvfAssertionsDatabasePrimerService;
+import org.ihtsdo.rvf.importer.RvfAssertionsDatabasePrimerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -12,8 +12,6 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.ihtsdo.rvf.MysqlConfig;
-import org.ihtsdo.rvf.execution.service.ExecutionServiceConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +20,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExecutionServiceConfig.class, MysqlConfig.class})
+@ContextConfiguration(classes = {ExecutionServiceTestConfig.class})
 public class ReleaseDataManagerIntegrationTest {
 	@Resource(name = "dataSource")
 	private BasicDataSource dataSource;

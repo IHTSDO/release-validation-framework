@@ -4,6 +4,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -13,11 +14,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "test")
-//@ApiModel( description="Test")
 public class Test {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
 	private String description;
@@ -35,7 +35,6 @@ public class Test {
 		this.name = name;
 	}
 
-//	@ApiModelProperty(value="Auto generated test Id", required=false) 
 	public Long getId() {
 		return id;
 	}
@@ -44,7 +43,6 @@ public class Test {
 		this.id = id;
 	}
 
-//	@ApiModelProperty(value="Test name", required=false)
 	public String getName() {
 		return name;
 	}
@@ -53,7 +51,6 @@ public class Test {
 		this.name = name;
 	}
 
-//	@ApiModelProperty(value="Test description", required=false)
 	public String getDescription() {
 		return description;
 	}
@@ -62,7 +59,6 @@ public class Test {
 		this.description = description;
 	}
 
-//	@ApiModelProperty(value="Test type", required=true)
 	public TestType getType() {
 		return type;
 	}
@@ -71,7 +67,6 @@ public class Test {
 		this.type = type;
 	}
 
-//	@ApiModelProperty(value="Test execution command", required=true)
 	public ExecutionCommand getCommand() {
 		return command;
 	}

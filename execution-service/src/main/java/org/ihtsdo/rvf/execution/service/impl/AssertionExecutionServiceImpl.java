@@ -32,7 +32,6 @@ import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,7 +40,7 @@ import org.springframework.stereotype.Service;
  * An implementation of the {@link org.ihtsdo.rvf.execution.service.AssertionExecutionService}
  */
 @Service
-public class AssertionExecutionServiceImpl implements AssertionExecutionService, InitializingBean {
+public class AssertionExecutionServiceImpl implements AssertionExecutionService {
 
 	@Autowired
 	private AssertionService assertionService;
@@ -60,11 +59,6 @@ public class AssertionExecutionServiceImpl implements AssertionExecutionService,
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceImpl.class);
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		
-	}
 
 	@Override
 	public TestRunItem executeAssertionTest(final AssertionTest assertionTest, final ExecutionConfig config) {

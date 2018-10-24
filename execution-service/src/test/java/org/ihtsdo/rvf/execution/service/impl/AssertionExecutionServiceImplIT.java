@@ -6,18 +6,15 @@ import static org.junit.Assert.assertTrue;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-import org.ihtsdo.rvf.MysqlConfig;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.ExecutionServiceConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -28,7 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExecutionServiceConfig.class, MysqlConfig.class})
+@ContextConfiguration(classes = ExecutionServiceTestConfig.class)
 @Transactional
 public class AssertionExecutionServiceImplIT {
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceImplIT.class);
@@ -83,7 +80,6 @@ public class AssertionExecutionServiceImplIT {
 	}
 
 	@Test
-	@Ignore
 	public void testExecuteAssertionTest() throws Exception {
 		assert assertionExecutionService != null;
 		assert dataSource != null;
@@ -113,7 +109,6 @@ public class AssertionExecutionServiceImplIT {
 	}
 
 	@Test
-	@Ignore
 	public void testExecuteAssertionTestWithMultipleStatements() throws Exception {
 		assert assertionExecutionService != null;
 		assert dataSource != null;

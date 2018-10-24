@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.entity;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -16,11 +17,10 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "assertion_test")
-//@ApiModel(description="AssertionTest model")
 public class AssertionTest {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne(cascade = CascadeType.PERSIST)

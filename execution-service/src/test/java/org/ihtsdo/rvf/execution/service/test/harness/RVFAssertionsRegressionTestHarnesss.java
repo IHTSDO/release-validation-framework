@@ -20,20 +20,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Resource;
-import javax.sql.DataSource;
-
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.rvf.MysqlConfig;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.ExecutionServiceConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.impl.ExecutionServiceTestConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.After;
@@ -42,8 +38,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -57,9 +52,8 @@ import com.google.gson.Gson;
  * SnomedCT_RegressionTest_20130131 and SnomedCT_RegressionTest_20130731 are made up data for testing purpose.
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExecutionServiceConfig.class, MysqlConfig.class})
-@Transactional
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = ExecutionServiceTestConfig.class)
 public class RVFAssertionsRegressionTestHarnesss {
 	
 	public static final String DIFF = "*** Difference explained: ";
@@ -72,14 +66,14 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private static final String PREVIOUS_RELEASE = "regression_test_previous";
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
-	@Resource(name = "dataSource")
-	private DataSource dataSource;
 	@Autowired
 	private AssertionService assertionService;
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 	@Autowired
 	private ResourceDataLoader resourceDataLoader;
+//	@Autowired
+//	private RvfAssertionsDatabasePrimerService primerService;
 	
 	private URL releaseTypeExpectedResults;
 	private URL componentCentrilExpected;
@@ -90,7 +84,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Before
 	public void setUp() throws IOException, SQLException, BusinessServiceException {
-		
+//		primerService.importAssertionsAndGroups();
 		//load previous and prospective versions if not loaded already
 		assertNotNull(releaseDataManager);
 //		String binaryArchive = "/var/folders/tx/cz83k2fj6c38h5mht21h0bgw0000gn/T/rvf_regression_test_previous.zip";

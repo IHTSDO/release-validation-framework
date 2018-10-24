@@ -28,16 +28,12 @@ public class RvfDynamicDataSource {
     @Value("${rvf.jdbc.password}") 
     private String password;
     
-    @Value("${rvf.hibernate.dialect}")
-    private String dialect;
-    
 	private ConcurrentHashMap<String, BasicDataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
 
 	private final Logger LOGGER = LoggerFactory.getLogger(RvfDynamicDataSource.class);
 
 	/**
 	 * Returns a connection for the given schema. It uses an underlying map to store relevant {@link org.apache.commons.dbcp.BasicDataSource}
-	 * so datasources are reused
 	 * @param schema the schema for which the connection needs to be returned
 	 * @return the connection for this schema
 	 * @throws SQLException
