@@ -72,8 +72,6 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private ReleaseDataManager releaseDataManager;
 	@Autowired
 	private ResourceDataLoader resourceDataLoader;
-//	@Autowired
-//	private RvfAssertionsDatabasePrimerService primerService;
 	
 	private URL releaseTypeExpectedResults;
 	private URL componentCentrilExpected;
@@ -84,7 +82,6 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Before
 	public void setUp() throws IOException, SQLException, BusinessServiceException {
-//		primerService.importAssertionsAndGroups();
 		//load previous and prospective versions if not loaded already
 		assertNotNull(releaseDataManager);
 //		String binaryArchive = "/var/folders/tx/cz83k2fj6c38h5mht21h0bgw0000gn/T/rvf_regression_test_previous.zip";

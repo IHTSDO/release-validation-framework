@@ -59,7 +59,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	@Resource(name = "dataSource")
 	private BasicDataSource snomedDataSource;
 	
-	@Value("/usr/local/var/mysql/")
+	@Value("{rvf.jdbc.data.myisam.folder}")
 	private String mysqlDataDir;
 	
 	@Autowired
