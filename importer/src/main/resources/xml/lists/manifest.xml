@@ -486,8 +486,7 @@
 		<script uuid="22d3065c-98d3-458e-b020-35eec49b4be3" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-association.sql" text="Newly inactive concepts must have an active historical association to an active concept - unless indicator NCEP." />
 		<script uuid="f7bd336c-4ced-48e3-881c-b61e23a19530" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-PT.sql" text="Concepts inactivated in this release cycle must have an active Preferred Term in both US and GB Language Reference Sets." />
 		<script uuid="db3f62b0-b824-463d-8d05-7974c81f3caa" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-FSN.sql" text="Concepts inactivated in this release cycle must have an active FSN, preferred in both US and GB Language Reference Sets." />
-
-		<script uuid="d55eee56-c5f2-44da-971b-86f39378fe38" category="file-centric-validation" sqlFile="file-centric-snapshot-relationship-must-not-be-both-stated-inferred.sql" text="Relationships should not exist in Stated Relationship and Relationship files at the same time" />
+		
 		<!-- rt added this as a template... -->
 		<!--  <script uuid="" category="" sqlFile="" text=""  />-->
 	</useCase>
