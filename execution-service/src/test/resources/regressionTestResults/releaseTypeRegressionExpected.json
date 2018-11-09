@@ -1,7 +1,7 @@
 {
   "assertionType" : "release-type-validation",
-  "totalAssertionsRun" : 97,
-  "totalAssertionsFailed" : 97,
+  "totalAssertionsRun" : 96,
+  "totalAssertionsFailed" : 96,
   "results" : [ {
     "assertionName" : "There must be actual changes made to previously published complex map refset components in order for them to appear in the current delta.",
     "assertionUuid" : "80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
@@ -881,17 +881,6 @@
       "detail" : "Relationship: id=1002334021 is in delta, but not in snapshot file."
     } ],
     "totalFailed" : 10
-  }, {
-    "assertionName" : "Previously published historical association components should not be modified.",
-    "assertionUuid" : "1852b9d6-38cf-11e7-8b36-3c15c2c6e32e",
-    "firstNInstances" : [ {
-      "conceptId" : "10123006",
-      "detail" : "Association refset id=38cae8c9-fc5c-5a39-9f87-b2ac578296ba has historical association components changed since the previous release."
-    }, {
-      "conceptId" : "10171006",
-      "detail" : "Association refset id=c379d5d1-9c77-5a03-a403-a07fc9b151d7 has historical association components changed since the previous release."
-    } ],
-    "totalFailed" : 2
   }, {
     "assertionName" : "The current delta file is an accurate derivative of the current full file",
     "assertionUuid" : "1be975bb-2a1b-4c21-ae61-6e9fcd556718",
