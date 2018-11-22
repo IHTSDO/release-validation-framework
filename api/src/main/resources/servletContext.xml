@@ -76,6 +76,7 @@
        <constructor-arg name="droolsRulesVersion" value="${rvf.drools.rule.version}"/>
        <constructor-arg name="droolsRulesDirectory" value="${rvf.drools.rule.directory}"/>
 		 <constructor-arg name="droolsRulesRepository" value="${rvf.drools.rule.repository}"/>
+		 <constructor-arg name="mysqlDirectory" value="${rvf.jdbc.data.myisam.folder}"/>
 	</bean>
     <bean class="org.ihtsdo.rvf.helper.JsonEntityGenerator"/>
     <bean id="resourceProviderFactory" class="org.ihtsdo.rvf.validation.log.impl.ValidationLogFactoryImpl"/>

@@ -24,9 +24,13 @@ public class ValidationRunConfig {
 	private boolean isProspectiveFilesInS3;
 	private transient File localProspectiveFile;
 	private transient File localManifestFile;
+	private transient File localDependencyFile;
 	private String s3PublishBucketName;
 	private boolean isRf2DeltaOnly;
 	private boolean enableDrools;
+	private String effectiveTime;
+	private boolean releaseAsAnEdition;
+	private String includedModules;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -242,7 +246,44 @@ public class ValidationRunConfig {
 		return enableDrools;
 	}
 
-	public void setEnableDrools(boolean enableDrools) {
+	public ValidationRunConfig setEnableDrools(boolean enableDrools) {
 		this.enableDrools = enableDrools;
+		return this;
+	}
+
+	public String getEffectiveTime() {
+		return effectiveTime;
+	}
+
+	public ValidationRunConfig setEffectiveTime(String effectiveTime) {
+		this.effectiveTime = effectiveTime;
+		return this;
+	}
+
+	public File getLocalDependencyFile() {
+		return localDependencyFile;
+	}
+
+	public ValidationRunConfig setLocalDependencyFile(File localDependencyFile) {
+		this.localDependencyFile = localDependencyFile;
+		return this;
+	}
+
+	public boolean isReleaseAsAnEdition() {
+		return releaseAsAnEdition;
+	}
+
+	public ValidationRunConfig setReleaseAsAnEdition(boolean releaseAsAnEdition) {
+		this.releaseAsAnEdition = releaseAsAnEdition;
+		return this;
+	}
+
+	public String getIncludedModules() {
+		return includedModules;
+	}
+
+	public ValidationRunConfig setIncludedModules(String includedModules) {
+		this.includedModules = includedModules;
+		return this;
 	}
 }

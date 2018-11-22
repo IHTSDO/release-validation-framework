@@ -55,13 +55,16 @@ public class InstanceManager {
 	private String droolsRulesVersion;
 	private String droolsRulesDirectory;
 	private String droolsRulesRepository;
+	private String mysqlDirectory;
 
-	public InstanceManager(AWSCredentials credentials, String ec2Endpoint, String droolsRulesVersion, String droolsRulesDirectory, String droolsRulesRepository) {
+	public InstanceManager(AWSCredentials credentials, String ec2Endpoint, String droolsRulesVersion, String droolsRulesDirectory, String droolsRulesRepository,
+						   String mysqlDirectory) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
 		amazonEC2Client.setEndpoint(ec2Endpoint);
 		this.droolsRulesVersion = droolsRulesVersion;
 		this.droolsRulesDirectory = droolsRulesDirectory;
 		this.droolsRulesRepository = droolsRulesRepository;
+		this.mysqlDirectory = mysqlDirectory;
 		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
 
@@ -315,7 +318,8 @@ public class InstanceManager {
 		builder.append("sudo git clone");
 		if (droolsRulesVersion != null && !droolsRulesVersion.isEmpty()) {
 			//git clone -b 'v1.9'
-			builder.append(" -b " +"'v" + droolsRulesVersion + "'");
+			String tag = droolsRulesVersion.startsWith("v") ? droolsRulesVersion : "v" + droolsRulesVersion;
+			builder.append(" -b " +"'" + tag + "'");
 			builder.append(" --single-branch");
 		}
 		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
@@ -325,6 +329,12 @@ public class InstanceManager {
 		}
 		builder.append(droolsRulesDirectory + "\n");
 		builder.append("sudo chown -R rvf-api:rvf-api " + droolsRulesDirectory + "\n");
+
+		//Set permission for rvf-api on mysql group to make it possible to backup the database MySQL ISAM directory to published bucket
+		// so that all RVF workers can get the data from s3 instead of pre-loading the AMI
+		builder.append("sudo setfacl -Rdm u:rvf-api:rwx " + mysqlDirectory +"\n");
+		builder.append("sudo setfacl -Rm u:rvf-api:rwx " + mysqlDirectory + "\n");
+
 		builder.append("sudo supervisorctl start rvf-api" + "\n");
 		builder.append("exit 0");
 		return builder.toString();

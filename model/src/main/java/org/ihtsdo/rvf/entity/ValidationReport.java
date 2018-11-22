@@ -15,15 +15,15 @@ public class ValidationReport {
 	private int totalSkips;
 	private int totalWarnings;
 	private int totalFailures;
-	private List<TestRunItem> assertionsSkipped;
-	private List<TestRunItem> assertionsWarning;
 	private List<TestRunItem> assertionsFailed;
+	private List<TestRunItem> assertionsWarning;
+	private List<TestRunItem> assertionsSkipped;
 	private List<TestRunItem> assertionsPassed;
 
 	public ValidationReport() {
-		assertionsSkipped = new ArrayList<>();
-		assertionsWarning = new ArrayList<>();
 		assertionsFailed = new ArrayList<>();
+		assertionsWarning = new ArrayList<>();
+		assertionsSkipped = new ArrayList<>();
 		assertionsPassed = new ArrayList<>();
 		totalTestsRun = 0;
 		totalSkips = 0;
@@ -123,9 +123,9 @@ public class ValidationReport {
 	}
 
 	public void sortAssertionLists() {
-		Collections.sort(assertionsSkipped);
 		Collections.sort(assertionsFailed);
 		Collections.sort(assertionsWarning);
+		Collections.sort(assertionsSkipped);
 		Collections.sort(assertionsPassed);
 	}
 
