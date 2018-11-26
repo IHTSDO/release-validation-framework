@@ -25,6 +25,7 @@ public class ValidationRunConfig {
 	private transient File localProspectiveFile;
 	private transient File localManifestFile;
 	private transient File localDependencyFile;
+	private transient File localPreviousFile;
 	private String s3PublishBucketName;
 	private boolean isRf2DeltaOnly;
 	private boolean enableDrools;
@@ -267,6 +268,14 @@ public class ValidationRunConfig {
 	public ValidationRunConfig setLocalDependencyFile(File localDependencyFile) {
 		this.localDependencyFile = localDependencyFile;
 		return this;
+	}
+
+	public File getLocalPreviousFile() {
+		return localPreviousFile;
+	}
+
+	public void setLocalPreviousFile(File localPreviousFile) {
+		this.localPreviousFile = localPreviousFile;
 	}
 
 	public boolean isReleaseAsAnEdition() {

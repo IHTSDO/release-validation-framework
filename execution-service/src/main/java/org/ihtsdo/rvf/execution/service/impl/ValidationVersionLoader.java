@@ -247,14 +247,37 @@ public class ValidationVersionLoader {
 			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
 			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
 			if (publishedFileInput != null) {
-				File tempFile = File.createTempFile(DEPENDENCY +validationConfig.getRunId(), ZIP_FILE_EXTENSION);
-				OutputStream out = new FileOutputStream(tempFile);
+				File dependencyFile = File.createTempFile(DEPENDENCY +validationConfig.getRunId(), ZIP_FILE_EXTENSION);
+				OutputStream out = new FileOutputStream(dependencyFile);
 				IOUtils.copy(publishedFileInput,out);
 				IOUtils.closeQuietly(publishedFileInput);
 				IOUtils.closeQuietly(out);
-				validationConfig.setLocalDependencyFile(tempFile);
+				logger.debug("local dependency file" + dependencyFile.getAbsolutePath());
+				validationConfig.setLocalDependencyFile(dependencyFile);
 			} else {
 				String msg = "Failed to load dependency " + extensionDependencyVersion + ": not an S3 path or dependency release not found in the published bucket:" + publishedFileS3Path;
+				logger.error(msg);
+				throw new BusinessServiceException(msg);
+			}
+		}
+	}
+
+	public void downloadPreviousVersion(ValidationRunConfig validationConfig) throws IOException, BusinessServiceException {
+		String previousVersion = validationConfig.getPreviousExtVersion();
+		if (StringUtils.isNotBlank(previousVersion) && previousVersion.endsWith(ZIP_FILE_EXTENSION)) {
+			String publishedFileS3Path = getPublishedFilePath(validationConfig.getPreviousExtVersion());
+			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
+			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
+			if (publishedFileInput != null) {
+				File previousDependency = File.createTempFile(PREVIOUS +validationConfig.getRunId(), ZIP_FILE_EXTENSION);
+				OutputStream out = new FileOutputStream(previousDependency);
+				IOUtils.copy(publishedFileInput,out);
+				IOUtils.closeQuietly(publishedFileInput);
+				IOUtils.closeQuietly(out);
+				logger.debug("local previous file" + previousDependency.getAbsolutePath());
+				validationConfig.setLocalPreviousFile(previousDependency);
+			} else {
+				String msg = "Failed to load previous version " + previousVersion + ": not an S3 path or dependency release not found in the published bucket:" + publishedFileS3Path;
 				logger.error(msg);
 				throw new BusinessServiceException(msg);
 			}

@@ -204,9 +204,17 @@ public class ValidationRunner {
 			try (InputStream snapshotStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
 				Set<InputStream> inputStreams = new HashSet<>();
 				inputStreams.add(snapshotStream);
-				Set<String> modulesSet = null;
+
+				//If the validation is Delta validation, previous snapshot file must be loaded
+				if(validationConfig.isRf2DeltaOnly()) {
+					releaseVersionLoader.downloadPreviousVersion(validationConfig);
+					InputStream previousStream = new FileInputStream(validationConfig.getLocalPreviousFile());
+					inputStreams.add(previousStream);
+				}
+
 				//Load the dependency package from S3 before validating if the package is a MS product and not an edition release
 				//If the package is an MS edition, it is not necessary to load the dependency
+				Set<String> modulesSet = null;
 				if(executionConfig.isExtensionValidation() && !validationConfig.isReleaseAsAnEdition()) {
 					releaseVersionLoader.downloadDependencyVersion(validationConfig);
 					InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyFile());
