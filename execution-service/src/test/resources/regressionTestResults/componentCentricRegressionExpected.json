@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 93,
-  "totalAssertionsFailed" : 93,
+  "totalAssertionsRun" : 94,
+  "totalAssertionsFailed" : 94,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -1136,5 +1136,14 @@
       "detail" : "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term"
     } ],
     "totalFailed" : 4
-  } ]
+  },
+  {
+    "assertionName" : "Concept should not have any duplicated historical association indicators.",
+    "assertionUuid" : "041dcf55-4c9c-4dd4-baa7-584eb0e53d5a",
+    "firstNInstances" : [ {
+      "conceptId" : "10171006",
+      "detail" : "MEMBER: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb73 in historical association refset member has a duplicated indicator with MEMBER id= fb7f359a-8a7b-5b89-8afc-ed60ba61eb71"
+    }],
+    "totalFailed" : 1
+   } ]
 }

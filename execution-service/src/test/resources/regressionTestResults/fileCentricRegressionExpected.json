@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 83,
-  "totalAssertionsFailed" : 66,
+  "totalAssertionsRun" : 82,
+  "totalAssertionsFailed" : 65,
   "results" : [ {
     "assertionName" : "Every active concept defined in the Norwegian extension has a preferred FSN in the en-US language refset.",
     "assertionUuid" : "853bfc3a-1635-11e8-a510-3c15c2c6e32e",
@@ -477,14 +477,6 @@
       "detail" : "Concept: id=733073007: is added in a recent international release but has no active preferred term in the Swiss German language refset"
     } ],
     "totalFailed" : 8
-  }, {
-    "assertionName" : "Relationships should not exist in Stated Relationship and Relationship files at the same time",
-    "assertionUuid" : "d55eee56-c5f2-44da-971b-86f39378fe38",
-    "firstNInstances" : [ {
-      "conceptId" : "10041001",
-      "detail" : "RELATIONSHIP : id=4969199027: Relationship Id exists in both Relationship and Stated Relationship files"
-    } ],
-    "totalFailed" : 1
   }, {
     "assertionName" : "Referencedcomponentid refers to valid concepts in the ATTRIBUTEVALUE snapshot file.",
     "assertionUuid" : "d5c80582-ad32-4f26-a729-a91fe04a06b2",
