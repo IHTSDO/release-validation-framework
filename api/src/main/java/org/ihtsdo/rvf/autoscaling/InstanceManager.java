@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.rvf.controller.VersionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,15 +56,17 @@ public class InstanceManager {
 	private String droolsRulesVersion;
 	private String droolsRulesDirectory;
 	private String droolsRulesRepository;
+	private String droolsRulesBranch;
 	private String mysqlDirectory;
 
 	public InstanceManager(AWSCredentials credentials, String ec2Endpoint, String droolsRulesVersion, String droolsRulesDirectory, String droolsRulesRepository,
-						   String mysqlDirectory) {
+						   String droolsRulesBranch, String mysqlDirectory) {
 		amazonEC2Client = new AmazonEC2Client(credentials);
 		amazonEC2Client.setEndpoint(ec2Endpoint);
 		this.droolsRulesVersion = droolsRulesVersion;
 		this.droolsRulesDirectory = droolsRulesDirectory;
 		this.droolsRulesRepository = droolsRulesRepository;
+		this.droolsRulesBranch = droolsRulesBranch;
 		this.mysqlDirectory = mysqlDirectory;
 		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
@@ -316,12 +319,22 @@ public class InstanceManager {
 		}
 		// checkout drools version
 		builder.append("sudo git clone");
-		if (droolsRulesVersion != null && !droolsRulesVersion.isEmpty()) {
-			//git clone -b 'v1.9'
-			String tag = droolsRulesVersion.startsWith("v") ? droolsRulesVersion : "v" + droolsRulesVersion;
-			builder.append(" -b " +"'" + tag + "'");
-			builder.append(" --single-branch");
-		}
+		if(StringUtils.isNotBlank(droolsRulesBranch)) {
+            //git clone -b master --single-branch
+            builder.append(" -b " +"'" + droolsRulesBranch + "'");
+            builder.append(" --single-branch");
+        } else {
+            if (StringUtils.isNotBlank(droolsRulesVersion)) {
+                //git clone -b 'v1.9'
+                String tag = droolsRulesVersion.startsWith("v") ? droolsRulesVersion : "v" + droolsRulesVersion;
+                builder.append(" -b " +"'" + tag + "'");
+                builder.append(" --single-branch");
+            } else {
+                //default to master branch if there is no specific configuration
+                builder.append(" -b master --single-branch");
+            }
+        }
+
 		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
 		builder.append(" " + droolsRulesRepository + " ");
 		if (droolsRulesDirectory == null || droolsRulesDirectory.isEmpty() || !droolsRulesDirectory.startsWith("/")) {

@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.execution.service.impl;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.google.common.collect.Sets;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
@@ -9,6 +11,9 @@ import org.ihtsdo.drools.RuleExecutor;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.response.Severity;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
+import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
+import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
+import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
@@ -22,6 +27,8 @@ import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -67,7 +74,20 @@ public class ValidationRunner {
 	ValidationVersionLoader releaseVersionLoader;
 
 	private String droolsRuleDirectoryPath;
-	
+
+	@Value("${test-resources.cloud.bucket}")
+	private String testResourceBucket;
+
+	@Value("${test-resources.cloud.path}")
+	private String testResourcePath;
+
+	@Value("${aws.key}")
+	private String awsKey;
+
+	@Value("${aws.privateKey}")
+	private String awsPrivateKey;
+
+
 	public ValidationRunner(int batchSize, String droolsRuleDirectoryPath) {
 		this.batchSize = batchSize;
 		this.droolsRuleDirectoryPath = droolsRuleDirectoryPath;
@@ -167,7 +187,6 @@ public class ValidationRunner {
 
 		if(validationConfig.isEnableDrools()) {
 			// Run Drools Validator
-			//runDroolsAssertions(responseMap, validationConfig, executionConfig);
 			final String droolsTestStartMsg = "Start Drools validation for release file:" + validationConfig.getTestFileName();
 			logger.info(droolsTestStartMsg);
 			reportService.writeProgress(droolsTestStartMsg, reportStorage);
@@ -194,31 +213,35 @@ public class ValidationRunner {
 	private void runDroolsAssertions(Map<String, Object> responseMap, ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws RVFExecutionException {
 		long timeStart = new Date().getTime();
 		//Filter only Drools rules set from all the assertion groups
-		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getGroupsList()));
+		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
 		Set<String> directoryPaths = new HashSet<>();
 		//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
 		if(droolsRulesSets.isEmpty()) return;
-		int totalTestsRun = 0;
 		try {
 			List<InvalidContent> invalidContents;
-			try (InputStream snapshotStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
-				Set<InputStream> inputStreams = new HashSet<>();
-				inputStreams.add(snapshotStream);
+			try {
+				Set<InputStream> snapshotsInputStream = new HashSet<>();
+				InputStream deltaInputStream = null;
 
-				//If the validation is Delta validation, previous snapshot file must be loaded
+				InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile());
+				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 				if(validationConfig.isRf2DeltaOnly()) {
 					releaseVersionLoader.downloadPreviousVersion(validationConfig);
 					InputStream previousStream = new FileInputStream(validationConfig.getLocalPreviousFile());
-					inputStreams.add(previousStream);
+					snapshotsInputStream.add(previousStream);
+					deltaInputStream = testedReleaseFileStream;
+				} else {
+					//If the validation is Snapshot validation, current file must be loaded to snapshot files list
+					snapshotsInputStream.add(testedReleaseFileStream);
 				}
 
-				//Load the dependency package from S3 before validating if the package is a MS product and not an edition release
+				//Load the dependency package from S3 to snapshot files list before validating if the package is a MS extension and not an edition release
 				//If the package is an MS edition, it is not necessary to load the dependency
 				Set<String> modulesSet = null;
 				if(executionConfig.isExtensionValidation() && !validationConfig.isReleaseAsAnEdition()) {
 					releaseVersionLoader.downloadDependencyVersion(validationConfig);
 					InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyFile());
-					inputStreams.add(dependencyStream);
+					snapshotsInputStream.add(dependencyStream);
 
 					//Will filter the results based on component's module IDs if the package is an extension only
 					String moduleIds = validationConfig.getIncludedModules();
@@ -226,21 +249,26 @@ public class ValidationRunner {
 						modulesSet = Sets.newHashSet(moduleIds.split(","));
 					}
 				}
-				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath);
+				ResourceConfiguration manualResourceConfiguration = new ManualResourceConfiguration(true,true,null,new ResourceConfiguration.Cloud(testResourceBucket,testResourcePath));
+				
+				ResourceManager resourceManager = new ResourceManager(manualResourceConfiguration, new SimpleStorageResourceLoader(new AmazonS3Client(new BasicAWSCredentials(awsKey,awsPrivateKey))));
+				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, resourceManager);
 				String effectiveTime = validationConfig.getEffectiveTime();
 				if (StringUtils.isNotBlank(effectiveTime)) {
 					effectiveTime = effectiveTime.replaceAll("-", "");
 				} else {
 					effectiveTime = "";
 				}
-				for (InputStream inputStream : inputStreams) {
+				for (InputStream inputStream : snapshotsInputStream) {
 					String snapshotDirectoryPath = new ReleaseImporter().unzipRelease(inputStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
 					directoryPaths.add(snapshotDirectoryPath);
 				}
-				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, droolsRulesSets, effectiveTime, modulesSet);
-				for (String assertionGroup : droolsRulesSets) {
-					totalTestsRun += droolsRF2Validator.getRuleExecutor().getAssertionGroupRuleCount(assertionGroup);
+				String deltaDirectoryPath = null;
+				if(deltaInputStream != null) {
+					deltaDirectoryPath = new ReleaseImporter().unzipRelease(deltaInputStream, ReleaseImporter.ImportType.DELTA).getAbsolutePath();
 				}
+
+				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, droolsRulesSets, effectiveTime, modulesSet);
 			} catch (ReleaseImportException | IOException e) {
 				throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
 			}
@@ -264,8 +292,9 @@ public class ValidationRunner {
 				validationRule.setTestType(TestType.DROOL_RULES);
 				validationRule.setTestCategory("");
 				//Some Drools validations message has SCTID, making it is impossible to group the same failures together unless the message is generalized by replacing the SCTID
-				String groupedRuleName = rule.replaceAll("\\d{6,20}","<SCTID>");
-				if(groupedRuleName.contains("<SCTID>")) {
+				String groupedRuleName = rule.replaceAll("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}","<UUID>")
+						.replaceAll("\\d{6,20}","<SCTID>");
+				if(groupedRuleName.contains("<UUID>") || groupedRuleName.contains("<SCTID>")) {
 					groupDroolsRules(groupRules, groupedRuleName, invalidContentMap.get(rule), failureExportMax);
 				} else {
 					validationRule.setAssertionText(rule);
@@ -286,7 +315,7 @@ public class ValidationRunner {
 				for (String rule : groupRules.keySet()) {
 					TestRunItem testRunItem = new TestRunItem();
 					testRunItem.setTestType(TestType.DROOL_RULES);
-					testRunItem.setTestCategory("");;
+					testRunItem.setTestCategory("");
 					testRunItem.setAssertionText(rule);
 					List<InvalidContent> invalidContentList = groupRules.get(rule);
 					testRunItem.setFailureCount((long)invalidContentList.size());

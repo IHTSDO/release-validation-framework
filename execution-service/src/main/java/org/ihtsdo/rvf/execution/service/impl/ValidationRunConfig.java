@@ -32,6 +32,7 @@ public class ValidationRunConfig {
 	private String effectiveTime;
 	private boolean releaseAsAnEdition;
 	private String includedModules;
+	private List<String> droolsRulesGroupList;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -59,6 +60,10 @@ public class ValidationRunConfig {
 	}
 	public ValidationRunConfig addGroupsList(final List<String> groupsList) {
 		this.groupsList = groupsList;
+		return this;
+	}
+	public ValidationRunConfig addDroolsRulesGroupList(final List<String> droolsRulesGroupList) {
+		this.droolsRulesGroupList = droolsRulesGroupList;
 		return this;
 	}
 	public String getPrevIntReleaseVersion() {
@@ -294,5 +299,13 @@ public class ValidationRunConfig {
 	public ValidationRunConfig setIncludedModules(String includedModules) {
 		this.includedModules = includedModules;
 		return this;
+	}
+
+	public List<String> getDroolsRulesGroupList() {
+		return droolsRulesGroupList;
+	}
+
+	public void setDroolsRulesGroupList(List<String> droolsRulesGroupList) {
+		this.droolsRulesGroupList = droolsRulesGroupList;
 	}
 }

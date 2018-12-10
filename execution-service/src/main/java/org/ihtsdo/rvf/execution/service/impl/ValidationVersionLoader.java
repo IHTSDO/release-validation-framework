@@ -263,9 +263,9 @@ public class ValidationVersionLoader {
 	}
 
 	public void downloadPreviousVersion(ValidationRunConfig validationConfig) throws IOException, BusinessServiceException {
-		String previousVersion = validationConfig.getPreviousExtVersion();
+		String previousVersion = StringUtils.isNotBlank(validationConfig.getPreviousExtVersion()) ? validationConfig.getPreviousExtVersion() : validationConfig.getPrevIntReleaseVersion();
 		if (StringUtils.isNotBlank(previousVersion) && previousVersion.endsWith(ZIP_FILE_EXTENSION)) {
-			String publishedFileS3Path = getPublishedFilePath(validationConfig.getPreviousExtVersion());
+			String publishedFileS3Path = getPublishedFilePath(previousVersion);
 			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
 			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
 			if (publishedFileInput != null) {
@@ -455,47 +455,59 @@ public class ValidationVersionLoader {
 		if(!versionString.endsWith(ZIP_FILE_EXTENSION)) {
 			return versionString;
 		}
-		String publishedS3Path = getPublishedFilePath(versionString);
-		String[] splits = publishedS3Path.split("/");
-		String releaseCenter = splits[0];
-		String fileName = splits[splits.length-1];
-		Pattern pattern = Pattern.compile("\\d{8}(?=(T\\d+|.zip))");
-		Matcher matcher = pattern.matcher(fileName);
-		String versionDate = null;
-		if(matcher.find()) {
-			versionDate = matcher.group();
-		}
-		if(versionDate==null) {
-			throw new BusinessServiceException("Could not extract version date from " + versionString);
-		}
-		if(releaseCenter.equalsIgnoreCase(INTERNATIONAL)) {
-			releaseCenter = INT;
+		if(versionString.contains(" <= ")) {
+			return versionString.substring(0,versionString.indexOf(" <= ")).trim();
+
 		} else {
-			//If MS product, check whether it is an edition
-			if(isEdition) {
-				releaseCenter = releaseCenter + "_edition";
+			String publishedS3Path = getPublishedFilePath(versionString);
+			String[] splits = publishedS3Path.split("/");
+			String releaseCenter = splits[0];
+			String fileName = splits[splits.length-1];
+			Pattern pattern = Pattern.compile("\\d{8}(?=(T\\d+|.zip))");
+			Matcher matcher = pattern.matcher(fileName);
+			String versionDate = null;
+			if(matcher.find()) {
+				versionDate = matcher.group();
 			}
+			if(versionDate==null) {
+				throw new BusinessServiceException("Could not extract version date from " + versionString);
+			}
+			if(releaseCenter.equalsIgnoreCase(INTERNATIONAL)) {
+				releaseCenter = INT;
+			} else {
+				//If MS product, check whether it is an edition
+				if(isEdition) {
+					releaseCenter = releaseCenter + "_edition";
+				}
+			}
+			//Add s3 prefix to know that this version is loaded from S3 instead of being pre-loaded into RVF DB
+			return "s3_" + releaseCenter + "_" + versionDate;
 		}
-		//Add s3 prefix to know that this version is loaded from S3 instead of being pre-loaded into RVF DB
-		return "s3_" + releaseCenter + "_" + versionDate;
+
 	}
 
 	private String getPublishedFilePath(String publishedReleasePath) {
+		String preparedPath = null;
+		if(publishedReleasePath.contains(" <= ")) {
+			preparedPath = publishedReleasePath.substring(publishedReleasePath.indexOf(" <= ")+4).trim();
+		} else {
+			preparedPath = publishedReleasePath;
+		}
 		//default to the international folder;
 		String publishedFileS3Path = null;
-		if (publishedReleasePath != null && publishedReleasePath.contains("/")) {
+		if (preparedPath != null && preparedPath.contains("/")) {
 			//published release file with s3 prefix
-			if(publishedReleasePath.startsWith("s3:")) {
-				publishedFileS3Path = publishedReleasePath.replace("//", "");
+			if(preparedPath.startsWith("s3:")) {
+				publishedFileS3Path = preparedPath.replace("//", "");
 				publishedFileS3Path = publishedFileS3Path.substring(publishedFileS3Path.indexOf("/") + 1);
 			} else {
-				publishedFileS3Path = publishedReleasePath;
+				publishedFileS3Path = preparedPath;
 				if(publishedFileS3Path.startsWith("/")) {
 					publishedFileS3Path = publishedFileS3Path.substring(1);
 				}
 			}
 		} else {
-			publishedFileS3Path = INTERNATIONAL + SEPARATOR + publishedReleasePath;
+			publishedFileS3Path = INTERNATIONAL + SEPARATOR + preparedPath;
 		}
 		return publishedFileS3Path;
 	}

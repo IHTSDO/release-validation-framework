@@ -12,7 +12,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<snomed-drools.version>1.9.1</snomed-drools.version>
+		<snomed-drools.version>2.0.0-SNAPSHOT</snomed-drools.version>
 	</properties>
 
 	<dependencies>
@@ -149,7 +149,7 @@
 		<dependency>
 			<groupId>org.snomed.otf</groupId>
 			<artifactId>snomed-boot</artifactId>
-			<version>1.10.1</version>
+			<version>2.0.0-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.collections</groupId>
