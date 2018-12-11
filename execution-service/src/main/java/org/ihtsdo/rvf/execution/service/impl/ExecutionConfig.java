@@ -13,6 +13,8 @@ public class ExecutionConfig {
 	private boolean extensionValidation;
 	private boolean isReleaseValidation;
 	private String extensionDependencyVersion;
+	private String effectiveTime;
+	private String dependencyEffectiveTime;
 
 	public ExecutionConfig(final Long runId) {
 		this(runId,false);
@@ -95,5 +97,20 @@ public class ExecutionConfig {
 	public void setExtensionDependencyVersion(String extensionDependencyVersion) {
 		this.extensionDependencyVersion = extensionDependencyVersion;
 	}
-	
+
+	public String getEffectiveTime() {
+		return effectiveTime;
+	}
+
+	public void setEffectiveTime(String effectiveTime) {
+		this.effectiveTime = effectiveTime;
+	}
+
+	public String getDependencyEffectiveTime() {
+		return dependencyEffectiveTime;
+	}
+
+	public void setDependencyEffectiveTime(String dependencyEffectiveTime) {
+		this.dependencyEffectiveTime = dependencyEffectiveTime;
+	}
 }

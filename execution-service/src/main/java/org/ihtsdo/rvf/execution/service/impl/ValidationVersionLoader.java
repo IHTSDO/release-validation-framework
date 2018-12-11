@@ -7,26 +7,37 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
 
+import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.dao.s3.S3Client;
 import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
+import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,27 +50,38 @@ public class ValidationVersionLoader {
 	private static final String SNAPSHOT_TABLE = "%_s";
 	private static final String SEPARATOR = "/";
 
+	private static final String RVF_PREFIX = "rvf_";
+
 	private static final String INTERNATIONAL = "international";
+	private static final String INT = "int";
 
 	private static final String ZIP_FILE_EXTENSION = ".zip";
 
 	public static final String FAILURE_MESSAGE = "failureMessage";
+	private static final String ISAM_BACKUP = "isam_backup";
 
-	@Autowired
-	private ReleaseDataManager releaseDataManager;
-	@Autowired
-	private ValidationReportService reportService;
-	
 	private static final String UTF_8 = "UTF-8";
 	private static final String DELTA_TABLE = "%_d";
 	private static final String FULL_TABLE = "%_f";
-	
+
+	@Autowired
+	private ReleaseDataManager releaseDataManager;
+
+	@Autowired
+	private ValidationReportService reportService;
+
 	@Resource
 	private S3Client s3Client;
 
 	@Autowired
 	private ResourceDataLoader resourceLoader;
-	
+
+	@Resource(name = "snomedDataSource")
+	private BasicDataSource snomedDataSource;
+
+	@Value("${rvf.jdbc.data.myisam.folder}")
+	private String mysqlMyISamDataFolder;
+
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
 	
 	
@@ -68,10 +90,12 @@ public class ValidationVersionLoader {
 		if (validationConfig.getExtensionDependency() != null && validationConfig.getExtensionDependency().endsWith(ZIP_FILE_EXTENSION)) {
 			//load dependency release
 			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
-			String extensionDependencyVersion = DEPENDENCY + executionConfig.getExecutionId();
+			String extensionDependencyVersion = getVersion(validationConfig.getExtensionDependency(), false);
 			executionConfig.setExtensionDependencyVersion(extensionDependencyVersion);
 			try {
-				loadPublishedVersionIntoDB(s3PublishFileHelper, validationConfig.getExtensionDependency(), extensionDependencyVersion);
+				if(!databaseExists(RVF_PREFIX + executionConfig.getExtensionDependencyVersion())){
+					loadPublishedVersionIntoDatabase(s3PublishFileHelper, validationConfig.getExtensionDependency(), executionConfig.getExtensionDependencyVersion());
+				}
 			} catch (Exception e) {
 				throw new BusinessServiceException("Failed to load dependency release from S3.", e);
 			}
@@ -91,15 +115,20 @@ public class ValidationVersionLoader {
 		boolean isSucessful = true;
 		String reportStorage = validationConfig.getStorageLocation();
 		if (!isPeviousVersionLoaded(validationConfig)) {
-			//load previous published versions from s3 
-			String priviousVersion = PREVIOUS + executionConfig.getExecutionId();
-			executionConfig.setPreviousVersion(priviousVersion);
+			String previousVersion = null;
+			//load previous published versions from s3
+			if(isExtension(validationConfig)) {
+				previousVersion = getVersion(validationConfig.getPreviousExtVersion(), validationConfig.isReleaseAsAnEdition());
+			} else {
+				previousVersion = getVersion(validationConfig.getPrevIntReleaseVersion(), false);
+			}
+			executionConfig.setPreviousVersion(previousVersion);
 			isSucessful = prepareVersionsFromS3FilesForPreviousVersion(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
 		} else {
 			if (isExtension(validationConfig)) {
-				executionConfig.setPreviousVersion(validationConfig.getPreviousExtVersion());
+				executionConfig.setPreviousVersion(getVersion(validationConfig.getPreviousExtVersion(), validationConfig.isReleaseAsAnEdition()));
 			} else {
-				executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
+				executionConfig.setPreviousVersion(getVersion(validationConfig.getPrevIntReleaseVersion(),false));
 			}
 		}
 		return isSucessful;
@@ -114,9 +143,9 @@ public class ValidationVersionLoader {
 			List<String> excludeTables = Arrays.asList(RELATIONSHIP_SNAPSHOT_TABLE);
 			rf2FilesLoaded.addAll(loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,excludeTables));
 			if (isExtension(validationConfig)) {
-				executionConfig.setPreviousVersion(validationConfig.getPreviousExtVersion());
+				executionConfig.setPreviousVersion(getVersion(validationConfig.getPreviousExtVersion(), validationConfig.isReleaseAsAnEdition()));
 			} else {
-				executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
+				executionConfig.setPreviousVersion(getVersion(validationConfig.getPrevIntReleaseVersion(),false));
 			}
 		} else {
 			//load prospective version alone now as used to combine with dependency for extension testing
@@ -140,6 +169,10 @@ public class ValidationVersionLoader {
 		executionConfig.setExtensionValidation( isExtension(validationConfig));
 		executionConfig.setExtensionDependencyVersion(validationConfig.getExtensionDependency());
 		executionConfig.setFirstTimeRelease(validationConfig.isFirstTimeRelease());
+		executionConfig.setEffectiveTime(validationConfig.getEffectiveTime());
+		if(validationConfig.getExtensionDependency() != null) {
+			executionConfig.setDependencyEffectiveTime(extractEffetiveTimeFromDepedencyVersion(validationConfig.getExtensionDependency()));
+		}
 		//default to 10
 		executionConfig.setFailureExportMax(10);
 		if (validationConfig.getFailureExportMax() != null) {
@@ -154,16 +187,19 @@ public class ValidationVersionLoader {
 		if (validationConfig.isRf2DeltaOnly()) {
 			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, validationConfig.getLocalProspectiveFile());
 			if (isExtension(validationConfig)) {
+				String previousVersion = getVersion(validationConfig.getPreviousExtVersion(), validationConfig.isReleaseAsAnEdition());
+				String extensionDependencyVersion = getVersion(validationConfig.getExtensionDependency(), false);
 				if (!validationConfig.isFirstTimeRelease()) {
-					releaseDataManager.copyTableData(validationConfig.getPreviousExtVersion(),validationConfig.getExtensionDependency(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
+					releaseDataManager.copyTableData(previousVersion,extensionDependencyVersion, prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				} else {
-					releaseDataManager.copyTableData(validationConfig.getExtensionDependency(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
+					releaseDataManager.copyTableData(extensionDependencyVersion, prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				}
 				
 			} else {
 				//copy snapshot from previous release
 				if (!validationConfig.isFirstTimeRelease()) {
-					releaseDataManager.copyTableData(validationConfig.getPrevIntReleaseVersion(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
+					String previousVersion = getVersion(validationConfig.getPrevIntReleaseVersion(), false);
+					releaseDataManager.copyTableData(previousVersion, prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				}
 			}
 			releaseDataManager.updateSnapshotTableWithDataFromDelta(prospectiveVersion);
@@ -203,7 +239,51 @@ public class ValidationVersionLoader {
 		}
 		
 	}
-	
+
+	public void downloadDependencyVersion(ValidationRunConfig validationConfig) throws IOException, BusinessServiceException {
+		String extensionDependencyVersion = validationConfig.getExtensionDependency();
+		if (StringUtils.isNotBlank(extensionDependencyVersion) && extensionDependencyVersion.endsWith(ZIP_FILE_EXTENSION)) {
+			String publishedFileS3Path = getPublishedFilePath(validationConfig.getExtensionDependency());
+			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
+			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
+			if (publishedFileInput != null) {
+				File dependencyFile = File.createTempFile(DEPENDENCY +validationConfig.getRunId(), ZIP_FILE_EXTENSION);
+				OutputStream out = new FileOutputStream(dependencyFile);
+				IOUtils.copy(publishedFileInput,out);
+				IOUtils.closeQuietly(publishedFileInput);
+				IOUtils.closeQuietly(out);
+				logger.debug("local dependency file" + dependencyFile.getAbsolutePath());
+				validationConfig.setLocalDependencyFile(dependencyFile);
+			} else {
+				String msg = "Failed to load dependency " + extensionDependencyVersion + ": not an S3 path or dependency release not found in the published bucket:" + publishedFileS3Path;
+				logger.error(msg);
+				throw new BusinessServiceException(msg);
+			}
+		}
+	}
+
+	public void downloadPreviousVersion(ValidationRunConfig validationConfig) throws IOException, BusinessServiceException {
+		String previousVersion = StringUtils.isNotBlank(validationConfig.getPreviousExtVersion()) ? validationConfig.getPreviousExtVersion() : validationConfig.getPrevIntReleaseVersion();
+		if (StringUtils.isNotBlank(previousVersion) && previousVersion.endsWith(ZIP_FILE_EXTENSION)) {
+			String publishedFileS3Path = getPublishedFilePath(previousVersion);
+			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
+			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
+			if (publishedFileInput != null) {
+				File previousDependency = File.createTempFile(PREVIOUS +validationConfig.getRunId(), ZIP_FILE_EXTENSION);
+				OutputStream out = new FileOutputStream(previousDependency);
+				IOUtils.copy(publishedFileInput,out);
+				IOUtils.closeQuietly(publishedFileInput);
+				IOUtils.closeQuietly(out);
+				logger.debug("local previous file" + previousDependency.getAbsolutePath());
+				validationConfig.setLocalPreviousFile(previousDependency);
+			} else {
+				String msg = "Failed to load previous version " + previousVersion + ": not an S3 path or dependency release not found in the published bucket:" + publishedFileS3Path;
+				logger.error(msg);
+				throw new BusinessServiceException(msg);
+			}
+		}
+	}
+
 	private boolean isExtension(final ValidationRunConfig runConfig) {
 		return (runConfig.getExtensionDependency() != null
 				&& !runConfig.getExtensionDependency().trim().isEmpty());
@@ -232,15 +312,7 @@ public class ValidationVersionLoader {
 	}
 	
 	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
-		//default to the international folder;
-		String publishedFileS3Path = null;
-		if (publishedReleaseFilename != null && publishedReleaseFilename.startsWith("s3:")) {
-			//published release file in is S3
-			publishedFileS3Path = publishedReleaseFilename.replace("//", "");
-			publishedFileS3Path = publishedFileS3Path.substring(publishedFileS3Path.indexOf("/") + 1);
-		} else {
-			publishedFileS3Path = INTERNATIONAL + SEPARATOR + publishedReleaseFilename;
-		}
+		String publishedFileS3Path = getPublishedFilePath(publishedReleaseFilename);
 		InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
 		if (publishedFileInput != null) {
 			File tempFile = File.createTempFile(publishedReleaseFilename, ZIP_FILE_EXTENSION);
@@ -255,36 +327,241 @@ public class ValidationVersionLoader {
 			throw new BusinessServiceException(msg);
 		}
 	}
-	
+
+	private void loadPublishedVersionIntoDatabase( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
+		//Try to restore schema from S3 if there is MyISAM backup, otherwise load data from published package
+		if(!downloadMyISAMOnS3AndRestore(s3PublishFileHelper, rvfVersion)) {
+			String publishedFileS3Path = getPublishedFilePath(publishedReleaseFilename);
+			logger.debug("downloading published file from s3: " + publishedFileS3Path); //download previous ZIP file from S3
+			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
+			if (publishedFileInput != null) {
+				File tempFile = File.createTempFile(publishedReleaseFilename, ZIP_FILE_EXTENSION);
+				OutputStream out = new FileOutputStream(tempFile);
+				IOUtils.copy(publishedFileInput,out);
+				IOUtils.closeQuietly(publishedFileInput);
+				IOUtils.closeQuietly(out);
+				String createdSchemaName = releaseDataManager.loadSnomedData(rvfVersion, new ArrayList<String>(),tempFile);
+				//Backup database to S3 for faster loading
+				backupDatabaseToS3(rvfVersion, createdSchemaName, s3PublishFileHelper);
+			} else {
+				String msg = "Previous release not found in the published bucket:" + publishedFileS3Path;
+				logger.error(msg);
+				//throw new BusinessServiceException(msg);
+			}
+		}
+	}
+
+	private void backupDatabaseToS3(String rvfVersion, String createdSchemaName, FileHelper s3PublishFileHelper) throws Exception {
+		File mysqlISAMFolder = new File(mysqlMyISamDataFolder);
+		//Have to check the MYSQL data directory permission, if RVF cannot read or write to this directory, skip backup step
+		if(mysqlISAMFolder.isDirectory() && mysqlISAMFolder.canWrite()) {
+			File tempDir = FileUtils.getTempDirectory();
+			File backupMyISAMZipFile = new File(tempDir, createdSchemaName + ZIP_FILE_EXTENSION);
+
+			//copy all files with extension: FRM, MYD, MYI
+			File myISAMFolder = new File(mysqlMyISamDataFolder + SEPARATOR + createdSchemaName);
+			File[] files = myISAMFolder.listFiles();
+			if(files == null) {
+				logger.warn("RVF cannot access {} with user {} to backup database {} to S3. Skip this step", mysqlISAMFolder, System.getProperty("user.name"), createdSchemaName);
+				return;
+			}
+
+			ZipFileUtils.zip(myISAMFolder.getAbsolutePath(), backupMyISAMZipFile.getAbsolutePath());
+			//Upload to S3
+			final String previousMyISAMFullPath = ISAM_BACKUP + File.separator + backupMyISAMZipFile.getName();
+			s3PublishFileHelper.putFile(backupMyISAMZipFile, previousMyISAMFullPath);
+			FileUtils.deleteQuietly(backupMyISAMZipFile);
+		} else {
+			logger.warn("RVF cannot access {} with user {} to backup database {} to S3. Skip this step", mysqlISAMFolder, System.getProperty("user.name"), createdSchemaName);
+		}
+
+
+	}
+
+	/**
+	 * Check whether database exists or not
+	 */
+	private boolean databaseExists(String schemaName) throws SQLException {
+		logger.info("Checking existence of database {}", schemaName);
+		try (Connection connection = snomedDataSource.getConnection()) {
+			connection.setAutoCommit(true);
+			//check whether database exists or not
+			String createDbStr = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '"+ schemaName + "';";
+			try(Statement statement = connection.createStatement()) {
+				ResultSet resultSet = statement.executeQuery(createDbStr);
+				boolean result = resultSet.first();
+				logger.info("Checking condition: Database {} has already existed: {}", schemaName, result);
+				return result;
+			}
+		}
+	}
+
 	private boolean prepareVersionsFromS3FilesForPreviousVersion(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap,List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception {
 		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
 		if (!validationConfig.isFirstTimeRelease()) {
 			if (isExtension(validationConfig)) {
 				if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
-					loadPublishedVersionIntoDB(s3PublishFileHelper, validationConfig.getPreviousExtVersion(), executionConfig.getPreviousVersion());
-				} 
+					if(!databaseExists(RVF_PREFIX + executionConfig.getPreviousVersion())){
+						loadPublishedVersionIntoDatabase(s3PublishFileHelper, validationConfig.getPreviousExtVersion(),  executionConfig.getPreviousVersion());
+					}
+				}
 			} else {
 				if (validationConfig.getPrevIntReleaseVersion() != null && validationConfig.getPrevIntReleaseVersion().endsWith(ZIP_FILE_EXTENSION)) {
-					loadPublishedVersionIntoDB(s3PublishFileHelper, validationConfig.getPrevIntReleaseVersion(), executionConfig.getPreviousVersion());
+					//check database exist or not
+					if(!databaseExists(RVF_PREFIX + executionConfig.getPreviousVersion())){
+						loadPublishedVersionIntoDatabase(s3PublishFileHelper, validationConfig.getPrevIntReleaseVersion(), executionConfig.getPreviousVersion());
+					}
 				}
 			}
-			String schemaName = releaseDataManager.getSchemaForRelease(executionConfig.getPreviousVersion());
-			if (schemaName == null) {
-				String failureMsg = "Failed to load previous version:" + (isExtension(validationConfig) ? validationConfig.getPreviousExtVersion(): validationConfig.getPrevIntReleaseVersion())
-						+ " into " + executionConfig.getPreviousVersion();
-				responseMap.put(FAILURE_MESSAGE, failureMsg);
-				reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
-				logger.error(failureMsg);
-				return false;
-			}
-		} 
+		}
+
+		/**
+		 * this code to make sure that we have a database of previous published package
+		 */
+		if (!databaseExists(RVF_PREFIX + executionConfig.getPreviousVersion())) {
+			String failureMsg = "Failed to load previous version:" + (isExtension(validationConfig) ? validationConfig.getPreviousExtVersion(): validationConfig.getPrevIntReleaseVersion())
+					+ " into " + executionConfig.getPreviousVersion();
+			responseMap.put(FAILURE_MESSAGE, failureMsg);
+			reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
+			return false;
+		}
 		return true;
 	}
-	
-	
-	private void uploadReleaseFileIntoDB(final String prospectiveVersion, final String knownVersion, final File tempFile, 
-			final List<String> rf2FilesLoaded) throws ConfigurationException, BusinessServiceException {
-		
+
+	private String extractEffetiveTimeFromDepedencyVersion(String dependencyVersion) {
+		String effectiveTime = null;
+		try {
+			Pattern pattern = null;
+			String text;
+			if(dependencyVersion.endsWith(ZIP_FILE_EXTENSION)) {
+				pattern = Pattern.compile("\\d{8}(?=(T\\d+|.zip))");
+				String[] splits = dependencyVersion.split("/");
+				text = splits[splits.length-1];
+			} else {
+				pattern = Pattern.compile("(?<=_)(\\d{8})");
+				text = dependencyVersion;
+			}
+			Matcher matcher = pattern.matcher(text);
+			if(matcher.find()) {
+				effectiveTime = matcher.group();
+			}
+		} catch (Exception e) {
+			logger.error("Encounter error when extracting effective time from {}", dependencyVersion);
+		}
+		return  effectiveTime;
+	}
+
+	private String getVersion(String versionString, boolean isEdition) throws BusinessServiceException {
+		if(!versionString.endsWith(ZIP_FILE_EXTENSION)) {
+			return versionString;
+		}
+		if(versionString.contains(" <= ")) {
+			return versionString.substring(0,versionString.indexOf(" <= ")).trim();
+
+		} else {
+			String publishedS3Path = getPublishedFilePath(versionString);
+			String[] splits = publishedS3Path.split("/");
+			String releaseCenter = splits[0];
+			String fileName = splits[splits.length-1];
+			Pattern pattern = Pattern.compile("\\d{8}(?=(T\\d+|.zip))");
+			Matcher matcher = pattern.matcher(fileName);
+			String versionDate = null;
+			if(matcher.find()) {
+				versionDate = matcher.group();
+			}
+			if(versionDate==null) {
+				throw new BusinessServiceException("Could not extract version date from " + versionString);
+			}
+			if(releaseCenter.equalsIgnoreCase(INTERNATIONAL)) {
+				releaseCenter = INT;
+			} else {
+				//If MS product, check whether it is an edition
+				if(isEdition) {
+					releaseCenter = releaseCenter + "_edition";
+				}
+			}
+			//Add s3 prefix to know that this version is loaded from S3 instead of being pre-loaded into RVF DB
+			return "s3_" + releaseCenter + "_" + versionDate;
+		}
+
+	}
+
+	private String getPublishedFilePath(String publishedReleasePath) {
+		String preparedPath = null;
+		if(publishedReleasePath.contains(" <= ")) {
+			preparedPath = publishedReleasePath.substring(publishedReleasePath.indexOf(" <= ")+4).trim();
+		} else {
+			preparedPath = publishedReleasePath;
+		}
+		//default to the international folder;
+		String publishedFileS3Path = null;
+		if (preparedPath != null && preparedPath.contains("/")) {
+			//published release file with s3 prefix
+			if(preparedPath.startsWith("s3:")) {
+				publishedFileS3Path = preparedPath.replace("//", "");
+				publishedFileS3Path = publishedFileS3Path.substring(publishedFileS3Path.indexOf("/") + 1);
+			} else {
+				publishedFileS3Path = preparedPath;
+				if(publishedFileS3Path.startsWith("/")) {
+					publishedFileS3Path = publishedFileS3Path.substring(1);
+				}
+			}
+		} else {
+			publishedFileS3Path = INTERNATIONAL + SEPARATOR + preparedPath;
+		}
+		return publishedFileS3Path;
+	}
+
+
+	private boolean downloadMyISAMOnS3AndRestore(FileHelper s3PublishFileHelper, String rvfVersion) throws Exception {
+		File myISAMDirectory = new File(mysqlMyISamDataFolder);
+		String schemaName = RVF_PREFIX + rvfVersion;
+		if(myISAMDirectory.isDirectory() && myISAMDirectory.canWrite()) {
+			String previousMyISAMS3Path =  ISAM_BACKUP + File.separator + schemaName + ZIP_FILE_EXTENSION;
+			logger.debug("Downloading previous published MyISAM file from s3:" + previousMyISAMS3Path);
+			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(previousMyISAMS3Path);
+			if (publishedFileInput != null) {
+				logger.debug("Download previous published MyISAM file from s3 successfully:" + previousMyISAMS3Path);
+				File restoredZipFile = File.createTempFile(schemaName, ZIP_FILE_EXTENSION);
+				OutputStream out = new FileOutputStream(restoredZipFile);
+				IOUtils.copy(publishedFileInput, out);
+				IOUtils.closeQuietly(publishedFileInput);
+				IOUtils.closeQuietly(out);
+				File tmp = new File(restoredZipFile.getParentFile().getAbsolutePath() + File.separator + schemaName + new Date().getTime());
+				tmp.mkdir();
+				ZipFileUtils.unzip(restoredZipFile.getPath(), tmp.getPath());
+				File myISamDataFolder = new File(mysqlMyISamDataFolder + SEPARATOR + schemaName);
+				FileUtils.copyDirectory(tmp, myISamDataFolder);
+				FileUtils.deleteQuietly(restoredZipFile);
+				FileUtils.deleteQuietly(tmp);
+				//ISAM binary files' permissions must be update to allow MySQL to read
+				updateFilesPermissions(myISamDataFolder);
+				releaseDataManager.setSchemaForRelease(rvfVersion, schemaName);
+				return true;
+			}
+			logger.debug("Can not find published MyISAM file from S3:" + rvfVersion);
+			return false;
+		}
+		logger.warn("RVF cannot access {} with user to restore version {} to S3. Skip this step", mysqlMyISamDataFolder, System.getProperty("user.name"), rvfVersion);
+		return false;
+	}
+
+	private void updateFilesPermissions(File schemaDirectory) {
+		File[] files = schemaDirectory.listFiles();
+		for (File file : files) {
+			file.setExecutable(true,false);
+			file.setReadable(true,false);
+			file.setWritable(true,false);
+		}
+		schemaDirectory.setExecutable(true,false);
+		schemaDirectory.setReadable(true,false);
+		schemaDirectory.setWritable(true,false);
+
+	}
+
+	private void uploadReleaseFileIntoDB(final String prospectiveVersion, final String knownVersion, final File tempFile,
+										 final List<String> rf2FilesLoaded) throws ConfigurationException, BusinessServiceException {
+
 		if (knownVersion != null && !knownVersion.trim().isEmpty()) {
 			logger.info(String.format("Baseline verison: [%1s] will be combined with prospective release file: [%2s]", knownVersion, tempFile.getName()));
 			//load them together here as opposed to clone the existing DB so that to make sure it is clean.
