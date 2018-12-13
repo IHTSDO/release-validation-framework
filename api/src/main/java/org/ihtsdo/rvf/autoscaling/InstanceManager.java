@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.rvf.controller.VersionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,14 +96,13 @@ public class InstanceManager {
 	private String serviceEndpoint;
 	@Value("us-east-1")
 	private String signingRegion;
-
+	
 	@PostConstruct
 	public void init() {
 		AWSCredentials credentials = new BasicAWSCredentials(awsPubicKey, awsPrivateKey);
 		amazonEC2Client = (AmazonEC2Client) AmazonEC2ClientBuilder.standard()
 				.withCredentials(new AWSStaticCredentialsProvider(credentials))
 				.withEndpointConfiguration(new EndpointConfiguration(serviceEndpoint, signingRegion)).build();
-		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
 	}
 
 	public List<String> createInstance(int totalToCreate) {

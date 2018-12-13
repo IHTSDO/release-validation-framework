@@ -169,6 +169,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Default to false to reduce the size of report file") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@ApiParam(value = "manifest.xml file") @RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
 			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = "groups") final List<String> groupsList,
+			@ApiParam(value = "Drools rules group names") @RequestParam(value = "droolsRulesGroups", required = false) final List<String> droolsRulesGroupsList,
 			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = "previousIntReleaseVersion", required = false) final String prevIntReleaseVersion,
 			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
 			@ApiParam(value = "Required for extension release testing") @RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
@@ -176,6 +177,9 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = "enableDrools", required = false) final boolean enableDrools,
+			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = "effectiveTime", required = false) final String effectiveTime,
+			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = "releaseAsAnEdition", required = false) final boolean releaseAsAnEdition,
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = "includedModules", required = false) final String includedModules,
 			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
@@ -184,7 +188,7 @@ public class TestUploadFileController {
 
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
-				.addWriteSucceses(writeSucceses).addGroupsList(groupsList)
+				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFile(manifestFile)
 				.addPrevIntReleaseVersion(prevIntReleaseVersion)
 				.addPreviousExtVersion(previousExtVersion)
@@ -192,7 +196,10 @@ public class TestUploadFileController {
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax).addUrl(urlPrefix)
 				.addProspectiveFilesInS3(false)
-				.setEnableDrools(enableDrools);
+				.setEnableDrools(enableDrools)
+				.setEffectiveTime(effectiveTime)
+				.setReleaseAsAnEdition(releaseAsAnEdition)
+				.setIncludedModules(includedModules);
 
 		// Before we start running, ensure that we've made our mark in the
 		// storage location
@@ -222,6 +229,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to false to reduce the size of report file") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@ApiParam(value = "manifest.xml file path in AWS S3") @RequestParam(value = "manifestFileS3Path", required = false) final String manifestFileS3Path,
 			@ApiParam(value = "Assertion group names") @RequestParam(value = "groups") final List<String> groupsList,
+			@ApiParam(value = "Drools rules group names") @RequestParam(value = "droolsRulesGroups", required = false) final List<String> droolsRulesGroupsList,
 			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = "previousIntReleaseVersion", required = false) final String prevIntReleaseVersion,
 			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
 			@ApiParam(value = "Required for extension release testing") @RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
@@ -229,6 +237,9 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to 10") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = "enableDrools", required = false) final boolean enableDrools,
+			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = "effectiveTime", required = false) final String effectiveTime,
+			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = "releaseAsAnEdition", required = false) final boolean releaseAsAnEdition,
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = "includedModules", required = false) final String includedModules,
 			final HttpServletRequest request) throws IOException {
 
 		final String requestUrl = String.valueOf(request.getRequestURL());
@@ -238,7 +249,7 @@ public class TestUploadFileController {
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
 		vrConfig.addProspectiveFileFullPath(releaseFileS3Path)
 				.addRF2DeltaOnly(isRf2DeltaOnly)
-				.addWriteSucceses(writeSucceses).addGroupsList(groupsList)
+				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFileFullPath(manifestFileS3Path)
 				.addPrevIntReleaseVersion(prevIntReleaseVersion)
 				.addPreviousExtVersion(previousExtVersion)
@@ -246,7 +257,10 @@ public class TestUploadFileController {
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax).addUrl(urlPrefix)
 				.addProspectiveFilesInS3(true)
-				.setEnableDrools(enableDrools);
+				.setEnableDrools(enableDrools)
+				.setEffectiveTime(effectiveTime)
+				.setReleaseAsAnEdition(releaseAsAnEdition)
+				.setIncludedModules(includedModules);
 
 		// Before we start running, ensure that we've made our mark in the
 		// storage location

@@ -4,12 +4,12 @@
     <parent>
         <groupId>org.ihtsdo.snomed.rvf</groupId>
         <artifactId>release-validation-framework</artifactId>
-        <version>1.5.1-SNAPSHOT</version>
+        <version>1.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>model</artifactId>
     <name>model</name>
     <properties>
-        <snomed-drools.version>1.8.0</snomed-drools.version>
+        <snomed-drools.version>2.0.0-SNAPSHOT</snomed-drools.version>
     </properties>
     <dependencies>
         <dependency>

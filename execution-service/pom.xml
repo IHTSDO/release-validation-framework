@@ -2,7 +2,7 @@
 	<parent>
 		<artifactId>release-validation-framework</artifactId>
 		<groupId>org.ihtsdo.snomed.rvf</groupId>
-		<version>1.5.1-SNAPSHOT</version>
+		<version>1.7.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -12,7 +12,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<snomed-drools.version>1.8.0</snomed-drools.version>
+		<snomed-drools.version>2.0.0-SNAPSHOT</snomed-drools.version>
 	</properties>
 
 	<dependencies>
@@ -82,6 +82,21 @@
 			<groupId>org.ihtsdo.drools</groupId>
 			<artifactId>snomed-drools-rf2-validator</artifactId>
 			<version>${snomed-drools.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.collections</groupId>
+					<artifactId>google-collections</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.snomed.otf</groupId>
+					<artifactId>snomed-boot</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.snomed.otf</groupId>
+			<artifactId>snomed-boot</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.collections</groupId>

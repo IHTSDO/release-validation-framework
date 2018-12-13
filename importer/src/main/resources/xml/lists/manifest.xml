@@ -198,8 +198,6 @@
 		<!-- across multiple files in Current snapshot-->
 		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="release-type-validation" sqlFile="release-type-snapshot-unique-relationship-id.sql" text="The ids should be unique across the stated and inferred relationship snapshot files." />
 		<script uuid="560e6d0c-64e8-4726-9516-ae7a7606b0b3" category="release-type-validation" sqlFile="release-type-snapshot-unique-description-definition-id.sql" text="The ids should be unique across the description and text definition snapshot files." />
-		<script uuid="1852b9d6-38cf-11e7-8b36-3c15c2c6e32e" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-association-refset_unique_checking.sql" text="Previously published historical association components should not be modified."/>
-
 
 
 		<!--  release type for complex and extended maps-->
@@ -447,6 +445,8 @@
 		<script uuid="0a4bba70-85b7-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-navigation.sql" text="targetComponentId in association refset file does not refer to navigation concepts." />
 		<script uuid="38b88ff6-7ee3-40a5-b362-98a87e80526e" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-inactive.sql" text="Inactive Non-human refset members refer to inactive components." />
 		-->
+		<script uuid="041dcf55-4c9c-4dd4-baa7-584eb0e53d5a" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-unique-indicator.sql" text="Concept should not have any duplicated historical association indicators." />
+		
 		<script uuid="b72bc5f4-7afb-4a2e-ac3a-e0f4373b03e6" category="component-centric-validation" sqlFile="component-centric-snapshot-active-concept-with-inactivation-reason.sql" text="Active concepts do not have active inactivation indicators" />
 		<script uuid="e2aa5b09-5754-484f-9eb8-bb18732617ef" category="component-centric-validation" sqlFile="component-centric-snapshot-active-description-with-inactivation-reason.sql" text="Active descriptions do not have active inactivation indicators" />
 		<script uuid="638e1194-1934-11e7-819d-3c15c2c6e32e" category="component-centric-validation" sqlFile="component-centric-snapshot-attribute-value-only-one-active-inactivation-reason.sql" text="There is only one active inactivation reason for a given referenced component in the attribute value snapshot" />
@@ -486,8 +486,8 @@
 		<script uuid="22d3065c-98d3-458e-b020-35eec49b4be3" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-association.sql" text="Newly inactive concepts must have an active historical association to an active concept - unless indicator NCEP." />
 		<script uuid="f7bd336c-4ced-48e3-881c-b61e23a19530" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-PT.sql" text="Concepts inactivated in this release cycle must have an active Preferred Term in both US and GB Language Reference Sets." />
 		<script uuid="db3f62b0-b824-463d-8d05-7974c81f3caa" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-FSN.sql" text="Concepts inactivated in this release cycle must have an active FSN, preferred in both US and GB Language Reference Sets." />
-
-		<script uuid="d55eee56-c5f2-44da-971b-86f39378fe38" category="file-centric-validation" sqlFile="file-centric-snapshot-relationship-must-not-be-both-stated-inferred.sql" text="Relationships should not exist in Stated Relationship and Relationship files at the same time" />
+		
+		<!-- <script uuid="d55eee56-c5f2-44da-971b-86f39378fe38" category="file-centric-validation" sqlFile="file-centric-snapshot-relationship-must-not-be-both-stated-inferred.sql" text="Relationships should not exist in Stated Relationship and Relationship files at the same time" /> -->
 		<!-- rt added this as a template... -->
 		<!--  <script uuid="" category="" sqlFile="" text=""  />-->
 	</useCase>

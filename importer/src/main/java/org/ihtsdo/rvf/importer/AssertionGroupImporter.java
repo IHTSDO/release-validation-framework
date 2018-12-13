@@ -96,7 +96,7 @@ public class AssertionGroupImporter {
 	
 	private static final String[] US_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b"};
 	
-	private static final String[] FIRST_TIME_COMMON_ADDITIONAL_EXCLUDE_LIST = {"1852b9d6-38cf-11e7-8b36-3c15c2c6e32e", "3cb10511-33b7-4eca-ba0e-93bcccf70d86", "48118153-d32a-4d1c-bfbc-23ed953e9991"};
+	private static final String[] FIRST_TIME_COMMON_ADDITIONAL_EXCLUDE_LIST = {"3cb10511-33b7-4eca-ba0e-93bcccf70d86", "48118153-d32a-4d1c-bfbc-23ed953e9991"};
 		
 /* the following were included but feel that they should be validated for project level as well.
 	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
