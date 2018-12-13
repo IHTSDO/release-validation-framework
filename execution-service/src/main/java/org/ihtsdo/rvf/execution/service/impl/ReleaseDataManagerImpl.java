@@ -29,10 +29,11 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
-import org.ihtsdo.otf.dao.resources.ResourceManager;
+import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.rvf.execution.service.RVFValidationResourceConfiguration;
+import org.ihtsdo.rvf.execution.service.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.ValidationMysqlBinaryStorageConfig;
 import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	@Resource(name = "dataSource")
 	private BasicDataSource snomedDataSource;
 	
-	@Value("{rvf.jdbc.data.myisam.folder}")
+	@Value("${rvf.jdbc.data.myisam.folder}")
 	private String mysqlDataDir;
 	
 	@Autowired
@@ -70,9 +71,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	private ResourceLoader cloudResourceLoader;
 
 	@Autowired
-	private RVFValidationResourceConfiguration validationResourceConfig;
+	private ValidationReleaseStorageConfig releaseStorageConfig;
 	
-	private ResourceManager publishedResourceManager;
+	@Autowired
+	private ValidationMysqlBinaryStorageConfig mysqlBinaryStorageConfig;
 	
 	public ReleaseDataManagerImpl() {
 	}
@@ -163,6 +165,39 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		logger.info("schemaName = " + schemaName);
 		// now add to releaseSchemaNameLookup
 		releaseSchemaNameLookup.put(rvfVersion, schemaName);
+		return true;
+	}
+	
+	
+	
+	@Override
+	public boolean uploadReleaseDataIntoDB(final InputStream inputStream, String fileName, String schemaName) throws BusinessServiceException {
+		// copy release pack zip to data location
+		logger.info("Receiving release data - " + fileName);
+		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
+		OutputStream out = null;
+		try {
+			out = new FileOutputStream(fileDestination);
+			IOUtils.copy(inputStream, out);
+			logger.info("Release file copied to : " + fileDestination.getAbsolutePath());
+		} catch (final IOException e) {
+			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
+			return false;
+			
+		} finally {
+			IOUtils.closeQuietly(inputStream);
+			IOUtils.closeQuietly(out);
+		}
+		
+		if (releaseSchemaNameLookup.keySet().contains(schemaName)) {
+			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: " + schemaName);
+		}
+		logger.info("Loading data into schema " + schemaName);
+		List<String> rf2FilesLoaded = new ArrayList<>();
+		loadSnomedData(schemaName, rf2FilesLoaded, fileDestination);
+		logger.info("schemaName = " + schemaName);
+		// now add to releaseSchemaNameLookup
+		releaseSchemaNameLookup.put(schemaName, schemaName);
 		return true;
 	}
 
@@ -583,21 +618,28 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			logger.error("Failed to delete data from qa_result table for runId {}  due to {} ", runId, e.fillInStackTrace());
 		}
 	}
-
+	
 	@Override
-	public String archivePublishedReleaseInBinary(String product, String version) throws BusinessServiceException {
-		String schema = getSchemaForRelease(getRVFVersion(product, version));
+	public String generateBinaryArchive(String schemaName) throws BusinessServiceException {
+		String schema = getSchemaForRelease(schemaName);
 		if (schema == null) {
-			throw new IllegalArgumentException("No schema found for RVF version " + getRVFVersion(product, version));
+			throw new IllegalArgumentException("No schema found for " + schemaName);
 		}
 		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schema + ZIP_FILE_EXTENSION);
 		File binaryFile = new File(mysqlDataDir, schema);
+		if (!binaryFile.exists()) {
+			throw new BusinessServiceException("No mysql binary file found for " + binaryFile.getPath());
+		}
 		try {
 			ZipFileUtils.zip(binaryFile.getAbsolutePath(), archiveFile.getAbsolutePath());
+			logger.info("Mysql binary archive file is created " + archiveFile.getName());
+			ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
+			resourceManager.writeResource(archiveFile.getName(), new FileInputStream(archiveFile));
+			logger.info("Mysql binary archive file " + archiveFile.getName() + " is loaded to " + mysqlBinaryStorageConfig.toString());
 		} catch (IOException e) {
 			throw new BusinessServiceException("Failed to zip binary file " + binaryFile.getAbsolutePath(), e);
 		}
-		return archiveFile.getAbsolutePath();
+		return archiveFile.getName();
 	}
 
 	@Override
@@ -611,26 +653,17 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 
 	@Override
-	public boolean uploadPublishedReleaseViaS3(String releaseFileS3Path, String product, String version)
+	public boolean uploadReleaseViaS3(String releaseFilename, String schemaName)
 			throws BusinessServiceException {
 		
-		System.out.println(validationResourceConfig);
-		
-		assert(validationResourceConfig.isReadonly());
-		
-		publishedResourceManager = new ResourceManager(validationResourceConfig, cloudResourceLoader);
-		InputStream publishedInput;
+		InputStream inputStream;
 		try {
-			publishedInput = publishedResourceManager.readResourceStream(releaseFileS3Path);
+			ResourceManager resourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
+			inputStream = resourceManager.readResourceStream(releaseFilename);
 		} catch (IOException e) {
-			throw new BusinessServiceException("Failed to read data from " + releaseFileS3Path, e);
+			throw new BusinessServiceException("Failed to read file " + releaseFilename + " via " + releaseStorageConfig.toString(), e);
 		}
-		String fileName = product + "_" + version + ZIP_FILE_EXTENSION;
-		int lastSlash = releaseFileS3Path.lastIndexOf("/");
-		if (lastSlash != -1 && releaseFileS3Path.endsWith(ZIP_FILE_EXTENSION)) {
-			fileName = releaseFileS3Path.substring(lastSlash);
-		}
-		uploadPublishedReleaseData(publishedInput, fileName, product, version);
+		uploadReleaseDataIntoDB(inputStream, releaseFilename, schemaName);
 		return true;
 	}
 }

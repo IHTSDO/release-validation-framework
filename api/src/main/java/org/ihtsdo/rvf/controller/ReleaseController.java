@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.util.RvfReleaseDbSchemaNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,17 +73,16 @@ public class ReleaseController {
 		}
 	}
 
-	@RequestMapping(value = "{product}/{version}/archive", method = RequestMethod.POST)
+	@RequestMapping(value = "{releasePackage}/archive", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation(value = "Upload and generate RVF MySQL binary archive for a published release", notes = "Uploads a published release for a given product.")
-	public ResponseEntity genereateReleaseBinaryArchive(
-			@ApiParam(value = "Release zip file path in AWS S3 published bucket") @RequestParam(value = "publishedFileS3Path") final String publishedFileS3Path,
-			@ApiParam(value = "The short product name e.g int for international RF2 release") @PathVariable final String product,
-			@ApiParam(value = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
+	@ApiOperation(value = "Upload a previous release package and generate an MySQL binary archive for RVF validation.")
+	public ResponseEntity genereateReleaseBinaryArchive(@PathVariable final String releasePackage) {
 		try {
-			 boolean isSuccessful = releaseDataManager.uploadPublishedReleaseViaS3(publishedFileS3Path, product, version);
+			RvfReleaseDbSchemaNameGenerator generator = new RvfReleaseDbSchemaNameGenerator();
+			String dbSchemaName = generator.generate(releasePackage);
+			 boolean isSuccessful = releaseDataManager.uploadReleaseViaS3(releasePackage, dbSchemaName);
 			 if (isSuccessful) {
-				 String archiveFile = releaseDataManager.archivePublishedReleaseInBinary(product, version);
+				 String archiveFile = releaseDataManager.generateBinaryArchive(dbSchemaName);
 					return new ResponseEntity<>(archiveFile, HttpStatus.OK);
 			 } else {
 				 return new ResponseEntity<>(isSuccessful, HttpStatus.OK);
@@ -97,32 +97,11 @@ public class ReleaseController {
 		}
 	}
 	
-	
-	
-	@RequestMapping(value = "{product}/{version}/archive/export", method = RequestMethod.POST)
-	@ResponseBody
-	@ApiOperation(value = "Upload and generate RVF MySQL binary archive for a published release", notes = "Uploads a published release for a given product.")
-	public ResponseEntity exportReleaseBinaryArchive(
-			@ApiParam(value = "The short product name e.g int for international RF2 release") @PathVariable final String product,
-			@ApiParam(value = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
-		try {
-			 String archiveFile = releaseDataManager.archivePublishedReleaseInBinary(product, version);
-				return new ResponseEntity<>(archiveFile, HttpStatus.OK);
-			
-		} catch (BusinessServiceException e) {
-			logger.warn("Error when exporting RVF binary version. Nested exception is : \n"
-					+ e.fillInStackTrace());
-			return new ResponseEntity<>(
-					"Error getting input stream from upload. Nested exception is : "
-							+ e.fillInStackTrace(), HttpStatus.BAD_REQUEST);
-		}
-	}
-	
-	
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Get all versions that are loaded in the RVF database", notes = "Gets all versions that are loaded in the RVF database. Published versions are loaded in the format of {product}_{releaseDate} e.g int_20170131.")
+	@ApiOperation(value = "Get all versions that are loaded in the RVF database", 
+	notes = "Gets all versions that are loaded in the RVF database. Published versions are loaded in the format of {product}_{releaseDate} e.g int_20170131.")
 	public java.util.Set<String> getAllKnownReleases() {
 		
 		return releaseDataManager.getAllKnownReleases();

@@ -69,7 +69,7 @@ public class ReleaseDataManagerIntegrationTest {
 	@Test
 	public void testUploadPublishedDataViaS3() throws Exception {
 		assert dataSource != null;
-		final boolean writeSucess =releaseDataManager.uploadPublishedReleaseViaS3("/SnomedCT_Release_INT_20140131.zip","INT", "20140131");
+		final boolean writeSucess =releaseDataManager.uploadReleaseViaS3("/SnomedCT_Release_INT_20140131.zip","int_20140131");
 		assertTrue("Upload must have been successful", writeSucess);
 
 		assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));

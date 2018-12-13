@@ -56,7 +56,7 @@ Start the stand-alone web application using the executable jar, replacing "{conf
 
 API Documentation
 --------------------
-The RVF API is documented using Swagger http://localhost:8081/api/v1/api-doc.html
+The RVF API is documented using Swagger http://localhost:8081/api/v2/swagger-ui.html
 
 ### Upload a Published Release
 Option 1:

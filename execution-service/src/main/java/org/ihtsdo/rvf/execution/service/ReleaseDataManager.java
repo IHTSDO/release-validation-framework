@@ -48,7 +48,10 @@ public interface ReleaseDataManager {
 
 	void restoreReleaseFromBinaryArchive(String archiveFileName, String schemaName) throws IOException;
 
-	String archivePublishedReleaseInBinary(String product, String version) throws BusinessServiceException;
+	String generateBinaryArchive(String schemaName) throws BusinessServiceException;
 
-	boolean uploadPublishedReleaseViaS3(String releaseFileS3Path, String product, String version) throws BusinessServiceException;
+	boolean uploadReleaseDataIntoDB(InputStream inputStream, String fileName, String schemaName)
+			throws BusinessServiceException;
+
+	boolean uploadReleaseViaS3(String releaseFilename, String schemaName) throws BusinessServiceException;
 }

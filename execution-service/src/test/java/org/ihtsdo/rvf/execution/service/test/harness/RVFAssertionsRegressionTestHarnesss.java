@@ -93,7 +93,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 				final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 				ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
 				releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
-				String archiveFileName = releaseDataManager.archivePublishedReleaseInBinary("regression_test", "previous");
+				String archiveFileName = releaseDataManager.generateBinaryArchive("rvf_regression_test_previous");
 				System.out.println("Mysql binary file is archvied at " + archiveFileName);
 				releaseDataManager.dropVersion("rvf_" + PREVIOUS_RELEASE);
 			}
