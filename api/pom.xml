@@ -166,20 +166,10 @@
 										<prefix>/opt/${packageName}/lib/</prefix>
 									</mapper>
 								</data>
-								<!-- data>
-									<src>${project.build.directory}/dependency/webapp-runner.jar</src>
-									<dst>webapp-runner.jar</dst>
-									<type>file</type>
-									<mapper>
-										<type>perm</type>
-										<prefix>/opt/${packageName}/lib/</prefix>
-									</mapper>
-								</data> -->
 								<data>
 									<src>${basedir}/src/deb/supervisor.conf</src>
 									<dst>/etc/supervisor/conf.d/${packageName}.conf</dst>
 									<type>file</type>
-									<!-- <conffile>true</conffile> -->
 								</data>
 								<data>
 									<src>${basedir}/src/deb/config.properties</src>
@@ -193,37 +183,11 @@
 									</mapper>
 								</data>
 								<data>
-									<src>${basedir}/src/deb/server.xml</src>
-									<dst>/etc/opt/${packageName}/server.xml</dst>
-									<type>file</type>
-									<conffile>true</conffile>
-									<mapper>
-										<type>perm</type>
-										<filemode>0644</filemode>
-									</mapper>
-								</data>
-								<data>
 									<type>template</type>
 									<paths>
 										<path>/etc/opt/${packageName}</path>
 										<path>/opt/${packageName}</path>
 									</paths>
-								</data>
-								<data>
-									<type>template</type>
-									<paths>
-										<path>/var/opt/${packageName}</path>
-										<path>/var/opt/${packageName}/run</path>
-										<path>/var/opt/${packageName}/logs</path>
-										<path>/opt/${packageName}/data</path>
-									</paths>
-									<mapper>
-										<type>perm</type>
-										<user>${packageName}</user>
-										<group>${packageName}</group>
-										<dirmode>0750</dirmode>
-										<filemode>0750</filemode>
-									</mapper>
 								</data>
 							</dataSet>
 						</configuration>
