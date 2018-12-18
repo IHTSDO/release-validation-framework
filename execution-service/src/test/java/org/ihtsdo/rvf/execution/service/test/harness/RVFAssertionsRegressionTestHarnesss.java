@@ -84,20 +84,16 @@ public class RVFAssertionsRegressionTestHarnesss {
 	public void setUp() throws IOException, SQLException, BusinessServiceException {
 		//load previous and prospective versions if not loaded already
 		assertNotNull(releaseDataManager);
-//		String binaryArchive = "/var/folders/tx/cz83k2fj6c38h5mht21h0bgw0000gn/T/rvf_regression_test_previous.zip";
-		String binaryArchive = null;
 		if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
-			if (binaryArchive == null) {
-				final URL previousReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130131");
+			if (!releaseDataManager.restoreReleaseFromBinaryArchive("rvf_" + PREVIOUS_RELEASE + ".zip")) {
+				URL previousReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130131");
 				assertNotNull("Must not be null", previousReleaseUrl);
-				final File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
+				File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 				ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
 				releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
 				String archiveFileName = releaseDataManager.generateBinaryArchive("rvf_regression_test_previous");
 				System.out.println("Mysql binary file is archvied at " + archiveFileName);
-				releaseDataManager.dropVersion("rvf_" + PREVIOUS_RELEASE);
 			}
-			releaseDataManager.restoreReleaseFromBinaryArchive(binaryArchive, "rvf_" + PREVIOUS_RELEASE);
 		}
 		if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
 			final URL prospectiveReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130731");
@@ -116,12 +112,15 @@ public class RVFAssertionsRegressionTestHarnesss {
 		releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_" + PREVIOUS_RELEASE);
 		releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_"+ PROSPECTIVE_RELEASE);
 		resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
-		final List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource",true);
+		List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource",true);
+		assertNotNull(assertions);
+		assertTrue(!assertions.isEmpty());
 		config = new ExecutionConfig(System.currentTimeMillis());
 		config.setPreviousVersion(PREVIOUS_RELEASE);
 		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
 		config.setFailureExportMax(10);
 		assertionExecutionService.executeAssertions(assertions, config);
+		
 	}
 	
 	@Test
@@ -181,6 +180,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	public void testSpecificAssertion() throws Exception {
 		runAssertionsTest("84335167-9105-4377-beca-b80b0d5dff83");
 	}
+	
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
 		final List<Assertion> assertions= new ArrayList<>();

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.jms.Destination;
 
 import org.apache.commons.codec.DecoderException;
 import org.ihtsdo.otf.dao.s3.S3Client;
@@ -46,6 +47,9 @@ public class ValidationQueueManager {
 	
 	@Value("${rvf.execution.isAutoScalingEnabled}")
 	private Boolean isAutoScalingEnabled;
+	
+	@Value("${rvf.validation.queue.name}")
+	private String destinationName;
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ValidationQueueManager.class);
@@ -65,9 +69,8 @@ public class ValidationQueueManager {
 				String configJson = gson.toJson(config);
 				LOGGER.info("Send Jms message to queue for validation config json:"
 						+ configJson);
-				jmsTemplate.convertAndSend(configJson); // Send to default queue
-				reportService.writeState(State.QUEUED,
-						config.getStorageLocation());
+				jmsTemplate.convertAndSend(destinationName, configJson);
+				reportService.writeState(State.QUEUED, config.getStorageLocation());
 			}
 		} catch (IOException e) {
 			responseMap.put(FAILURE_MESSAGE,

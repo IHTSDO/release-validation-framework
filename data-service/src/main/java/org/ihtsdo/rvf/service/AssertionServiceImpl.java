@@ -5,14 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.rvf.dao.AssertionGroupRepository;
-import org.ihtsdo.rvf.dao.AssertionRepository;
-import org.ihtsdo.rvf.dao.AssertionTestRepository;
-import org.ihtsdo.rvf.dao.TestRepository;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
+import org.ihtsdo.rvf.repository.AssertionGroupRepository;
+import org.ihtsdo.rvf.repository.AssertionRepository;
+import org.ihtsdo.rvf.repository.AssertionTestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +22,12 @@ public class AssertionServiceImpl implements AssertionService {
 
 	@Autowired
 	private AssertionRepository assertionRepo;
+	
 	@Autowired
 	private AssertionGroupRepository assertionGroupRepo;
+	
 	@Autowired
 	private AssertionTestRepository assertionTestRepo;
-	@Autowired
-	private TestRepository testRepo;
 
 
 	@Override
@@ -62,29 +61,6 @@ public class AssertionServiceImpl implements AssertionService {
 
 	@Override
 	public Assertion addTest( Assertion assertion, final Test test){
-
-//		// see if matching assertion test already exists
-//		AssertionTest assertionTest = assertionTestRepo.findByAssertionAndTest(assertion, test);
-//		if (assertionTest == null) {
-//			assertionTest = new AssertionTest();
-//			// verify if assertion has been saved - otherwise save it
-//			if (assertion.getAssertionId() == null){
-//				assertion = assertionRepo.save(assertion);
-//			}
-//			// verify if test has been saved - otherwise save first
-//			if(test.getId() == null){
-//				testRepo.save(test);
-//			}
-//			assertionTest.setTest(test);
-//			assertionTest.setInactive(false);
-//			assertionTest.setAssertion(assertion);
-//			assertionTestRepo.save(assertionTest);
-//		} else{
-//			assertionTest.setTest(test);
-//			assertionTest.setInactive(false);
-//			assertionTest.setAssertion(assertion);
-//			assertionTestRepo.save(assertionTest);
-//		}
 		AssertionTest assertionTest = new AssertionTest();
 		assertionTest.setAssertion(assertion);
 		assertionTest.setTest(test);
@@ -118,8 +94,7 @@ public class AssertionServiceImpl implements AssertionService {
 			tests = getTests(assertion);
 		}
 		
-		for(final Test test : tests)
-		{
+		for (final Test test : tests) {
 			deleteTest(assertion, test);
 		}
 
@@ -134,8 +109,8 @@ public class AssertionServiceImpl implements AssertionService {
 	@Override
 	public AssertionGroup addAssertionToGroup(final Assertion assertion, final AssertionGroup group){
 	
-		final List<AssertionGroup> assertionGroups = getGroupsForAssertion(assertion);
-		if(!assertionGroups.contains(group)) {
+		List<AssertionGroup> assertionGroups = getGroupsForAssertion(assertion);
+		if (!assertionGroups.contains(group)) {
 			group.getAssertions().add(assertion);
 			assertionRepo.save(assertion);
 		}
@@ -149,7 +124,7 @@ public class AssertionServiceImpl implements AssertionService {
 			assertions is likely to return a large number of entities. It is likely that a group might have a large
 			number of assertions
 		  */
-		final List<AssertionGroup> assertionGroups = getGroupsForAssertion(assertion);
+		List<AssertionGroup> assertionGroups = getGroupsForAssertion(assertion);
 		for (AssertionGroup grp : assertionGroups) {
 			if (grp.getId().equals(group.getId())) {
 				grp.removeAssertion(assertion);
@@ -183,9 +158,9 @@ public class AssertionServiceImpl implements AssertionService {
 
 	@Override
 	public List<AssertionGroup> getAssertionGroupsByNames( final List<String> groupNames) {
-		final List<AssertionGroup> result = new ArrayList<>();
+		List<AssertionGroup> result = new ArrayList<>();
 		for (final String groupName : groupNames) {
-			final AssertionGroup group = getAssertionGroupByName(groupName);
+			AssertionGroup group = getAssertionGroupByName(groupName);
 			if (group != null) {
 				result.add(group);
 			}
@@ -206,12 +181,6 @@ public class AssertionServiceImpl implements AssertionService {
 	@Override
 	public Assertion save(Assertion assertion) {
 		return assertionRepo.save(assertion);
-	}
-
-	@Override
-	public Collection<Assertion> find(List<Long> ids) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -247,13 +216,6 @@ public class AssertionServiceImpl implements AssertionService {
 		return getGroupsForAssertion(assertion);
 	}
 
-
-	@Override
-	public List<Assertion> getResourceAssertions() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	public Assertion getAssertionByUuid(UUID uuid) {
 		return assertionRepo.findByUuid(uuid.toString());
@@ -263,6 +225,4 @@ public class AssertionServiceImpl implements AssertionService {
 	public AssertionGroup createAssertionGroup(AssertionGroup group) {
 		return assertionGroupRepo.save(group);
 	}
-
-	
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.Api;
@@ -30,7 +31,7 @@ import io.swagger.annotations.ApiParam;
  * not allow a release file to be downloaded - instead it only tells you if the
  * release is already known to RVF.
  */
-@Controller
+@RestController
 @RequestMapping("/releases")
 @Api(position = 7, value = "Manage published releases")
 public class ReleaseController {
@@ -39,6 +40,9 @@ public class ReleaseController {
 			.getLogger(ReleaseController.class);
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
+	
+	@Autowired
+	private RvfReleaseDbSchemaNameGenerator generator;
 	
 	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
 	@ResponseBody
@@ -78,9 +82,8 @@ public class ReleaseController {
 	@ApiOperation(value = "Upload a previous release package and generate an MySQL binary archive for RVF validation.")
 	public ResponseEntity genereateReleaseBinaryArchive(@PathVariable final String releasePackage) {
 		try {
-			RvfReleaseDbSchemaNameGenerator generator = new RvfReleaseDbSchemaNameGenerator();
 			String dbSchemaName = generator.generate(releasePackage);
-			 boolean isSuccessful = releaseDataManager.uploadReleaseViaS3(releasePackage, dbSchemaName);
+			 boolean isSuccessful = releaseDataManager.uploadRelease(releasePackage, dbSchemaName);
 			 if (isSuccessful) {
 				 String archiveFile = releaseDataManager.generateBinaryArchive(dbSchemaName);
 					return new ResponseEntity<>(archiveFile, HttpStatus.OK);

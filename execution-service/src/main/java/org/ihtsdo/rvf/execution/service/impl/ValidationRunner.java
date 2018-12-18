@@ -93,33 +93,22 @@ public class ValidationRunner {
 	
 	@Value("${rvf.assertion.execution.BatchSize}")
 	private int batchSize;
-
-	private ExecutorService executorService = Executors.newCachedThreadPool();
-
+	
 	@Autowired
 	private ValidationReportService reportService;
 	
 	@Autowired
-	ValidationVersionLoader releaseVersionLoader;
-
-	private String droolsRuleDirectoryPath;
-
-	@Value("${test-resources.cloud.bucket}")
-	private String testResourceBucket;
-
-	@Value("${test-resources.cloud.path}")
-	private String testResourcePath;
-
-	public ValidationRunner(int batchSize, String droolsRuleDirectoryPath) {
-		this.batchSize = batchSize;
-		this.droolsRuleDirectoryPath = droolsRuleDirectoryPath;
-	}
+	private ValidationVersionLoader releaseVersionLoader;
+	
+	@Autowired DroolsRulesValidationService droolsValidationService;
+	
+	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
 	public void run(ValidationRunConfig validationConfig) {
 		final Map<String , Object> responseMap = new LinkedHashMap<>();
 		try {
 			responseMap.put(VALIDATION_CONFIG, validationConfig);
-			runValidation(responseMap, validationConfig);
+			runValidations(responseMap, validationConfig);
 		} catch (final Throwable t) {
 			final StringWriter errors = new StringWriter();
 			t.printStackTrace(new PrintWriter(errors));
@@ -129,7 +118,6 @@ public class ValidationRunner {
 			try {
 				reportService.writeResults(responseMap, State.FAILED, validationConfig.getStorageLocation());
 			} catch (final Exception e) {
-				//Can't even record the error to disk!  Lets hope Telemetry is working
 				logger.error("Failed to record failure (which was: " + failureMsg + ") due to " + e.getMessage());
 			}
 		} finally {
@@ -138,19 +126,19 @@ public class ValidationRunner {
 		}
 	}
 	
-	
-	private void runValidation(final Map<String , Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
-		final Calendar startTime = Calendar.getInstance();
+	private ValidationReport runRF2StructureTests(ValidationRunConfig validationConfig, Map<String, Object> responseMap) throws Exception {
 		//download prospective version
 		releaseVersionLoader.downloadProspectiveVersion(validationConfig);
 		logger.info(String.format("Started execution with runId [%1s] : ", validationConfig.getRunId()));
 		// load the filename
-		final String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
+		String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
 		logger.info(structureTestStartMsg);
 		String reportStorage = validationConfig.getStorageLocation();
+		ValidationReport report = new ValidationReport();
+		report.setExecutionId(validationConfig.getRunId());
 		reportService.writeProgress(structureTestStartMsg, reportStorage);
 		reportService.writeState(State.RUNNING, reportStorage);
-	
+
 		if (validationConfig.getLocalProspectiveFile() == null) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
 			String errorMsg ="Prospective file can't be null" + validationConfig.getLocalProspectiveFile();
@@ -159,67 +147,33 @@ public class ValidationRunner {
 			throw new BusinessServiceException(errorMsg);
 		}
 
-		ValidationReport report = new ValidationReport();
-		report.setExecutionId(validationConfig.getRunId());
-
 		boolean isFailed = structuralTestRunner.verifyZipFileStructure(report, validationConfig.getLocalProspectiveFile(), validationConfig.getRunId(),
 				validationConfig.getLocalManifestFile(), validationConfig.isWriteSucceses(), validationConfig.getUrl(), validationConfig.getStorageLocation(),
 				validationConfig.getFailureExportMax());
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
 			reportService.writeResults(responseMap, State.FAILED, reportStorage);
-			return;
 		}
-
+		return report;
+	}
+	private void runValidations(final Map<String , Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
+		
+		//validating config
+		//prepare validation dependencies
+		//execute validations
+		final Calendar startTime = Calendar.getInstance();
+		ValidationReport report = runRF2StructureTests(validationConfig, responseMap);
 		//load previous published version
 		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
-		//check dependency version is loaded
-		boolean isLoaded = false;
-		if (executionConfig.isExtensionValidation()) {
-			isLoaded = releaseVersionLoader.loadDependncyVersion(executionConfig, responseMap, validationConfig);
-			if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
-				reportService.writeResults(responseMap, State.FAILED, reportStorage);
-				return;
-			}
-		}
-		//check previous version is loaded
-		if (!executionConfig.isFirstTimeRelease()) {
-		   isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
-			if (!isLoaded) {
-				reportService.writeResults(responseMap, State.FAILED, reportStorage);
-				return;
-			}
-		}
+		report = runRF2MysqlValidations(responseMap, validationConfig, report, executionConfig);
 
-		//load prospective version
-		boolean isSuccessful = releaseVersionLoader.loadProspectiveVersion(executionConfig, responseMap, validationConfig);
-		if (!isSuccessful) {
-			reportService.writeResults(responseMap, State.FAILED, reportStorage);
-			return;
-		}
-		// for extension release validation we need to test the release-type validations first using previous extension against current extension
-		// first then loading the international snapshot for the file-centric and component-centric validations.
-
-		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
-			logger.info("Run extension release validation with runId:" +  executionConfig.getExecutionId());
-			runExtensionReleaseValidation(report, responseMap, validationConfig,reportStorage, executionConfig);
-		} else {
-			runAssertionTests(report, executionConfig, reportStorage);
-		}
-
-		if(validationConfig.isEnableDrools()) {
-			// Run Drools Validator
+		if (validationConfig.isEnableDrools()) {
+			// Run Drools validations
 			final String droolsTestStartMsg = "Start Drools validation for release file:" + validationConfig.getTestFileName();
 			logger.info(droolsTestStartMsg);
-			reportService.writeProgress(droolsTestStartMsg, reportStorage);
-			runDroolsAssertions(responseMap, report, validationConfig, executionConfig);
+			reportService.writeProgress(droolsTestStartMsg, validationConfig.getStorageLocation());
+			droolsValidationService.runDroolsAssertions(responseMap, report, validationConfig, executionConfig);
 		}
-
-
-
-		//Run MRCM Validator
-//		runMRCMAssertionTests(report, validationConfig, executionConfig);
-
 		report.sortAssertionLists();
 		responseMap.put("TestResult", report);
 		final Calendar endTime = Calendar.getInstance();
@@ -227,172 +181,54 @@ public class ValidationRunner {
 		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
 		responseMap.put("startTime", startTime.getTime());
 		responseMap.put("endTime", endTime.getTime());
-		reportService.writeResults(responseMap, State.COMPLETE, reportStorage);
+		reportService.writeResults(responseMap, State.COMPLETE, validationConfig.getStorageLocation());
 		releaseDataManager.dropVersion(executionConfig.getProspectiveVersion());
 		releaseDataManager.clearQAResult(executionConfig.getExecutionId());
 	}
 
-	private void runDroolsAssertions(Map<String, Object> responseMap, ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws RVFExecutionException {
-		long timeStart = new Date().getTime();
-		//Filter only Drools rules set from all the assertion groups
-		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
-		Set<String> directoryPaths = new HashSet<>();
-		//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
-		if(droolsRulesSets.isEmpty()) return;
-		try {
-			List<InvalidContent> invalidContents;
-			try {
-				Set<InputStream> snapshotsInputStream = new HashSet<>();
-				InputStream deltaInputStream = null;
-
-				InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile());
-				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
-				if(validationConfig.isRf2DeltaOnly()) {
-					releaseVersionLoader.downloadPreviousVersion(validationConfig);
-					InputStream previousStream = new FileInputStream(validationConfig.getLocalPreviousFile());
-					snapshotsInputStream.add(previousStream);
-					deltaInputStream = testedReleaseFileStream;
-				} else {
-					//If the validation is Snapshot validation, current file must be loaded to snapshot files list
-					snapshotsInputStream.add(testedReleaseFileStream);
-				}
-
-				//Load the dependency package from S3 to snapshot files list before validating if the package is a MS extension and not an edition release
-				//If the package is an MS edition, it is not necessary to load the dependency
-				Set<String> modulesSet = null;
-				if(executionConfig.isExtensionValidation() && !validationConfig.isReleaseAsAnEdition()) {
-					releaseVersionLoader.downloadDependencyVersion(validationConfig);
-					InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyFile());
-					snapshotsInputStream.add(dependencyStream);
-
-					//Will filter the results based on component's module IDs if the package is an extension only
-					String moduleIds = validationConfig.getIncludedModules();
-					if(StringUtils.isNotBlank(moduleIds)) {
-						modulesSet = Sets.newHashSet(moduleIds.split(","));
-					}
-				}
-
-				ResourceConfiguration manualResourceConfiguration = new ManualResourceConfiguration(true,true,null,new ResourceConfiguration.Cloud(testResourceBucket,testResourcePath));
-				ResourceManager resourceManager = new ResourceManager(manualResourceConfiguration, new SimpleStorageResourceLoader(new AmazonS3Client(new AnonymousAWSCredentials())));
-				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, resourceManager);
-				String effectiveTime = validationConfig.getEffectiveTime();
-				if (StringUtils.isNotBlank(effectiveTime)) {
-					effectiveTime = effectiveTime.replaceAll("-", "");
-				} else {
-					effectiveTime = "";
-				}
-				for (InputStream inputStream : snapshotsInputStream) {
-					String snapshotDirectoryPath = new ReleaseImporter().unzipRelease(inputStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
-					directoryPaths.add(snapshotDirectoryPath);
-				}
-				String deltaDirectoryPath = null;
-				if(deltaInputStream != null) {
-					deltaDirectoryPath = new ReleaseImporter().unzipRelease(deltaInputStream, ReleaseImporter.ImportType.DELTA).getAbsolutePath();
-				}
-
-				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, droolsRulesSets, effectiveTime, modulesSet);
-			} catch (ReleaseImportException | IOException e) {
-				throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
+	private ValidationReport runRF2MysqlValidations(final Map<String, Object> responseMap, ValidationRunConfig validationConfig,
+			ValidationReport report, ExecutionConfig executionConfig) throws BusinessServiceException, Exception,
+			IOException, NoSuchAlgorithmException, DecoderException, SQLException {
+		//check dependency version is loaded
+		boolean isLoaded = false;
+		String reportStorage = validationConfig.getStorageLocation();
+		if (executionConfig.isExtensionValidation()) {
+			isLoaded = releaseVersionLoader.loadDependncyVersion(executionConfig, responseMap, validationConfig);
+			if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion(), responseMap)) {
+				reportService.writeResults(responseMap, State.FAILED, reportStorage);
+				return report;
 			}
-			HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
-			for (InvalidContent invalidContent : invalidContents) {
-				if (!invalidContentMap.containsKey(invalidContent.getMessage())) {
-					List<InvalidContent> invalidContentArrayList = new ArrayList<>();
-					invalidContentArrayList.add(invalidContent);
-					invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
-				} else {
-					invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
-				}
-			}
-			invalidContents.clear();
-			List<TestRunItem> failedAssertions = new ArrayList<>();
-			List<TestRunItem> warningAssertions = new ArrayList<>();
-			int failureExportMax = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
-			Map<String, List<InvalidContent>> groupRules = new HashMap<>();
-			for (String rule : invalidContentMap.keySet()) {
-				TestRunItem validationRule = new TestRunItem();
-				validationRule.setTestType(TestType.DROOL_RULES);
-				validationRule.setTestCategory("");
-				//Some Drools validations message has SCTID, making it is impossible to group the same failures together unless the message is generalized by replacing the SCTID
-				String groupedRuleName = rule.replaceAll("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}","<UUID>")
-						.replaceAll("\\d{6,20}","<SCTID>");
-				if(groupedRuleName.contains("<UUID>") || groupedRuleName.contains("<SCTID>")) {
-					groupDroolsRules(groupRules, groupedRuleName, invalidContentMap.get(rule), failureExportMax);
-				} else {
-					validationRule.setAssertionText(rule);
-					List<InvalidContent> invalidContentList = invalidContentMap.get(rule);
-					validationRule.setFailureCount((long) invalidContentList.size());
-					validationRule.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
-							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage()))
-							.collect(Collectors.toList()));
-					Severity severity = invalidContentList.get(0).getSeverity();
-					if(Severity.WARNING.equals(severity)) {
-						warningAssertions.add(validationRule);
-					} else {
-						failedAssertions.add(validationRule);
-					}
-				}
-			}
-			if(!groupRules.isEmpty()) {
-				for (String rule : groupRules.keySet()) {
-					TestRunItem testRunItem = new TestRunItem();
-					testRunItem.setTestType(TestType.DROOL_RULES);
-					testRunItem.setTestCategory("");
-					testRunItem.setAssertionText(rule);
-					List<InvalidContent> invalidContentList = groupRules.get(rule);
-					testRunItem.setFailureCount((long)invalidContentList.size());
-					testRunItem.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
-							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage()))
-							.collect(Collectors.toList()));
-					Severity severity = invalidContentList.get(0).getSeverity();
-					if(Severity.WARNING.equals(severity)) {
-						warningAssertions.add(testRunItem);
-					} else {
-						failedAssertions.add(testRunItem);
-					}
-				}
-			}
-			validationReport.addFailedAssertions(failedAssertions);
-			validationReport.addWarningAssertions(warningAssertions);
-			validationReport.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
-		} catch (Exception ex) {
-			final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
-			report.setRuleSetExecuted(String.join(",", droolsRulesSets));
-			report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-			report.setExecutionId(executionConfig.getExecutionId());
-			report.setMessage(ExceptionUtils.getStackTrace(ex));
-			report.setCompleted(false);
-			responseMap.put(report.getTestType().toString() + "TestResult", report);
-		} finally {
-			for (String directoryPath : directoryPaths) {
-				FileUtils.deleteQuietly(new File(directoryPath));
+		}
+		//check previous version is loaded
+		if (!executionConfig.isFirstTimeRelease()) {
+		   isLoaded = releaseVersionLoader.loadPreviousVersion(executionConfig, responseMap, validationConfig);
+			if (!isLoaded) {
+				reportService.writeResults(responseMap, State.FAILED, reportStorage);
+				return report;
 			}
 		}
 
-
-	}
-
-	private Set<String> getDroolsRulesSetFromAssertionGroups(Set<String> assertionGroups) throws RVFExecutionException {
-		File droolsRuleDir = new File(droolsRuleDirectoryPath);
-		if(!droolsRuleDir.isDirectory()) throw new RVFExecutionException("Drools rules directory path " + droolsRuleDirectoryPath + " is not a directory or inaccessible");
-		Set<String> droolsRulesModules = new HashSet<>();
-		File[] droolsRulesSubfiles = droolsRuleDir.listFiles();
-		for (File droolsRulesSubfile : droolsRulesSubfiles) {
-			if(droolsRulesSubfile.isDirectory()) droolsRulesModules.add(droolsRulesSubfile.getName());
+		//load prospective version
+		boolean isSuccessful = releaseVersionLoader.loadProspectiveVersion(executionConfig, responseMap, validationConfig);
+		if (!isSuccessful) {
+			reportService.writeResults(responseMap, State.FAILED, reportStorage);
+			return report;
 		}
-		//Only keep the assertion groups with matching Drools Rule modules in the Drools Directory
-		droolsRulesModules.retainAll(assertionGroups);
-		return droolsRulesModules;
+		// for extension release validation we need to test the release-type validations first using previous extension against current extension
+		// first then loading the international snapshot for the file-centric and component-centric validations.
+
+		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
+			logger.info("Run extension release validation with config " +  executionConfig);
+			runExtensionReleaseValidation(report, responseMap, validationConfig,reportStorage, executionConfig);
+		} else {
+			logger.info("Run international release validation with config " + executionConfig);
+			runAssertionTests(report, executionConfig, reportStorage);
+		}
+		return report;
 	}
 
-	private Map<String, List<InvalidContent>> groupDroolsRules(Map<String, List<InvalidContent>> groupedRules, String rule, List<InvalidContent> invalidContents,
-															   int failureMaxExport) {
-		if(!groupedRules.containsKey(rule)) {
-			groupedRules.put(rule, new ArrayList<>());
-		}
-		groupedRules.get(rule).addAll(invalidContents);
-		return groupedRules;
-	}
+	
+
 
 	private File extractZipFile(ValidationRunConfig validationConfig, Long executionId) throws BusinessServiceException {
 		File outputFolder;
@@ -450,7 +286,7 @@ public class ValidationRunner {
 	private List<TestRunItem> runAssertionTests(ExecutionConfig executionConfig,List<Assertion> assertions, String reportStorage, boolean runResourceAssertions) {
 		List<TestRunItem> result = new ArrayList<>();
 		if (runResourceAssertions) {
-			final List<Assertion> resourceAssertions = assertionService.getResourceAssertions();
+			final List<Assertion> resourceAssertions = assertionService.getAssertionsByKeyWords("resource", true);
 			logger.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
 			reportService.writeProgress("Start executing assertions...", reportStorage);
 			result.addAll(executeAssertions(executionConfig, resourceAssertions, reportStorage));
@@ -469,7 +305,7 @@ public class ValidationRunner {
 		final long timeStart = System.currentTimeMillis();
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
-		final List<Assertion> resourceAssertions = assertionService.getResourceAssertions();
+		final List<Assertion> resourceAssertions = assertionService.getAssertionsByKeyWords("resource", true);
 		logger.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
 		reportService.writeProgress("Start executing assertions...", reportStorage);
 		 final List<TestRunItem> items = executeAssertions(executionConfig, resourceAssertions, reportStorage);

@@ -3,22 +3,24 @@ package org.ihtsdo.rvf.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.impl.DroolsRulesValidationRequest;
+import org.ihtsdo.rvf.execution.service.impl.RVFMysqlValidationRequest;
+import org.ihtsdo.rvf.execution.service.impl.ValidationRequest;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
-import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.ihtsdo.rvf.messaging.ValidationQueueManager;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
@@ -33,14 +35,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,8 +53,8 @@ import io.swagger.annotations.ApiParam;
 /**
  * The controller that handles uploaded files for the validation to run
  */
-@Controller
-@Api(position = 4, value = "Validate release files")
+@RestController
+//@Api(position = 4, value = "Validate release files")
 public class TestUploadFileController {
 
 	private static final String ZIP = ".zip";
@@ -62,13 +66,6 @@ public class TestUploadFileController {
 	private StructuralTestRunner structureTestRunner;
 	@Autowired
 	private AssertionService assertionService;
-	@Autowired
-	private AssertionExecutionService assertionExecutionService;
-	@Autowired
-	private ReleaseDataManager releaseDataManager;
-	private final ObjectMapper objectMapper = new ObjectMapper();
-	@Autowired
-	Provider<ValidationRunner> validationRunnerProvider;
 	@Autowired
 	ValidationQueueManager queueManager;
 
@@ -179,14 +176,11 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to false") @RequestParam(value = "enableDrools", required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = "effectiveTime", required = false) final String effectiveTime,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = "releaseAsAnEdition", required = false) final boolean releaseAsAnEdition,
-			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = "includedModules", required = false) final String includedModules,
-			final HttpServletRequest request) throws IOException {
-
-		final String requestUrl = String.valueOf(request.getRequestURL());
-		final String urlPrefix = requestUrl.substring(0,
-				requestUrl.lastIndexOf(request.getPathInfo()));
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = "includedModules", required = false) final String includedModules
+			) throws IOException, URISyntaxException {
 
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
+		String urlPrefix = getRequestUrlPrefix();
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFile(manifestFile)
@@ -218,6 +212,62 @@ public class TestUploadFileController {
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}
+	
+	
+	@RequestMapping(value = "/run-post-new", method = RequestMethod.POST)
+	@ResponseBody
+	@ResponseStatus(HttpStatus.OK)
+	@ApiOperation(position = 3, value = "Run validations for a RF2 release file package.", notes = "It runs structure tests and assertion validations specified by the assertion groups. You can specify mutilple assertion group names separated by a comma. e.g common-authoring,int-authoring")
+	public ResponseEntity<Map<String, String>> runPostTestPackage(
+			@RequestParam(value = "runId") final Long runId,
+			@RequestParam(value = "file") final MultipartFile file,
+			@RequestParam(value = "storageLocation") final String storageLocation,
+			@RequestBody ValidationRequest request) throws IOException, URISyntaxException {
+		ValidationRunConfig config = createValidationRunConfig(request);
+		String urlPrefix = getRequestUrlPrefix();
+		config.addUrl(urlPrefix);
+		// Before we start running, ensure that we've made our mark in the
+		// storage location
+		// Init will fail if we can't write the "running" state to storage
+		final Map<String, String> responseMap = new HashMap<>();
+		HttpStatus returnStatus = HttpStatus.OK;
+
+		if (isAssertionGroupsValid(config.getGroupsList(), responseMap)) {
+			// Queue incoming validation request
+			queueManager.queueValidationRequest(config, responseMap);
+			final String urlToPoll = urlPrefix + "/result/" + runId
+					+ "?storageLocation=" + storageLocation;
+			responseMap.put("resultURL", urlToPoll);
+		} else {
+			returnStatus = HttpStatus.PRECONDITION_FAILED;
+		}
+		return new ResponseEntity<>(responseMap, returnStatus);
+	}
+
+	private ValidationRunConfig createValidationRunConfig(ValidationRequest request) {
+		ValidationRunConfig vrConfig = new ValidationRunConfig();
+		RVFMysqlValidationRequest mysqlValidationReq = request.getMysqlValidationRequest();
+		DroolsRulesValidationRequest droolsValidationReq = request.getDroolsRulesValidationRequest();
+		
+		vrConfig.addProspectiveFileFullPath(request.getReleaseFileS3Path())
+				.addRF2DeltaOnly(mysqlValidationReq.isRf2DeltaOnly())
+				.addWriteSucceses(mysqlValidationReq.writeSucceses())
+				.addGroupsList(mysqlValidationReq.getGroupsList())
+				.addManifestFileFullPath(request.getManifestFileS3Path())
+				.addDependencyRelease(request.getDependencyRelease())
+				.addPreviousRelease(request.getPreviousRelease())
+				.addRunId(request.getRunId())
+				.addStorageLocation(request.getStorageLocation())
+				.addFailureExportMax(mysqlValidationReq.getExportMax())
+				.addProspectiveFilesInS3(true);
+			if (droolsValidationReq != null) {
+				vrConfig.setEnableDrools(true);
+				vrConfig.setEffectiveTime(droolsValidationReq.getEffectiveTime());
+				vrConfig.setReleaseAsAnEdition(droolsValidationReq.isReleaseAsAnEdition());
+				vrConfig.setDroolsRulesGroupList(droolsValidationReq.getDroolsRulesGroupList());
+			}
+		return vrConfig;
+	}
 
 	@RequestMapping(value = "/run-post-via-s3", method = RequestMethod.POST)
 	@ResponseBody
@@ -245,7 +295,6 @@ public class TestUploadFileController {
 		final String requestUrl = String.valueOf(request.getRequestURL());
 		final String urlPrefix = requestUrl.substring(0,
 				requestUrl.lastIndexOf(request.getPathInfo()));
-
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
 		vrConfig.addProspectiveFileFullPath(releaseFileS3Path)
 				.addRF2DeltaOnly(isRf2DeltaOnly)
@@ -280,11 +329,18 @@ public class TestUploadFileController {
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}
 
+	
+	private String getRequestUrlPrefix() throws MalformedURLException {
+		String requestUrl = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri().toURL().toString();
+		String contextPath = ServletUriComponentsBuilder.fromCurrentContextPath().build().getPath();
+		return requestUrl.substring(0, requestUrl.lastIndexOf(contextPath)) + contextPath;
+	}
+	
+	
 	private boolean isAssertionGroupsValid(List<String> validationGroups,
 			Map<String, String> responseMap) {
 		// check assertion groups
-		final List<AssertionGroup> groups = assertionService
-				.getAssertionGroupsByNames(validationGroups);
+		List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(validationGroups);
 		if (groups.size() != validationGroups.size()) {
 			final List<String> found = new ArrayList<>();
 			for (final AssertionGroup group : groups) {
@@ -345,51 +401,4 @@ public class TestUploadFileController {
 		}
 	}
 	
-	
-	@RequestMapping(value = "/run-adhoc-extension-post", method = RequestMethod.POST)
-	@ResponseBody
-	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(position = 3, value = "Run validations for a RF2 extension release packages.")
-	public ResponseEntity<Map<String, String>> runAdhocPostTestPackage(
-			@ApiParam(value = "Prospective RF2 release package in zip file") @RequestParam(value = "prospectiveFile") final MultipartFile prospectiveFile,
-			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = "groups") final List<String> groupsList,
-			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
-			@ApiParam(value = "The depdenent international release") @RequestParam(value = "extensionDependencyReleaseVersion", required = true) final String extensionDependency,
-			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = "runId") final Long runId,
-			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
-			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
-			@ApiParam(value = "Defaults to false") @RequestParam(value = "enableDrools", required = false) final boolean enableDrools,
-			final HttpServletRequest request) throws IOException {
-
-		final String requestUrl = String.valueOf(request.getRequestURL());
-		final String urlPrefix = requestUrl.substring(0,
-				requestUrl.lastIndexOf(request.getPathInfo()));
-
-		final ValidationRunConfig vrConfig = new ValidationRunConfig();
-		vrConfig.addFile(prospectiveFile)
-				.addGroupsList(groupsList)
-				.addPreviousExtVersion(previousExtVersion)
-				.addExtensionDependencyVersion(extensionDependency)
-				.addRunId(runId).addStorageLocation(storageLocation)
-				.addFailureExportMax(exportMax).addUrl(urlPrefix)
-				.addProspectiveFilesInS3(false)
-				.setEnableDrools(enableDrools);
-
-		// Before we start running, ensure that we've made our mark in the
-		// storage location
-		// Init will fail if we can't write the "running" state to storage
-		final Map<String, String> responseMap = new HashMap<>();
-		HttpStatus returnStatus = HttpStatus.OK;
-
-		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
-			// Queue incoming validation request
-			queueManager.queueValidationRequest(vrConfig, responseMap);
-			final String urlToPoll = urlPrefix + "/result/" + runId
-					+ "?storageLocation=" + storageLocation;
-			responseMap.put("resultURL", urlToPoll);
-		} else {
-			returnStatus = HttpStatus.PRECONDITION_FAILED;
-		}
-		return new ResponseEntity<>(responseMap, returnStatus);
-	}
 }

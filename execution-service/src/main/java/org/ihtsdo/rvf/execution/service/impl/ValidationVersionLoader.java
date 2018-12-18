@@ -33,6 +33,7 @@ import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
+import org.ihtsdo.rvf.execution.service.util.RvfReleaseDbSchemaNameGenerator;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,14 +77,32 @@ public class ValidationVersionLoader {
 	@Autowired
 	private ResourceDataLoader resourceLoader;
 
-	@Resource(name = "snomedDataSource")
+	@Resource(name = "dataSource")
 	private BasicDataSource snomedDataSource;
 
 	@Value("${rvf.jdbc.data.myisam.folder}")
 	private String mysqlMyISamDataFolder;
 
+	@Autowired
+	private RvfReleaseDbSchemaNameGenerator generator;
+
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
 	
+	public String loadRelease(ExecutionConfig executionConfig, Map<String, Object> responseMap) throws BusinessServiceException, IOException {
+		String previousVersion = executionConfig.getPreviousVersion();
+		if (previousVersion != null && previousVersion.endsWith(ZIP_FILE_EXTENSION)) {
+			String schemaName = generator.generate(previousVersion);
+			if (!releaseDataManager.isKnownRelease(schemaName)) {
+				if (!releaseDataManager.restoreReleaseFromBinaryArchive(schemaName + ZIP_FILE_EXTENSION)) {
+					releaseDataManager.uploadRelease(previousVersion, schemaName);
+					String archiveFilename = releaseDataManager.generateBinaryArchive(schemaName);
+					logger.info("Release mysql binary archive is generated:" + archiveFilename);
+				} 
+			} 
+			return schemaName;
+		}
+		return previousVersion;
+	}
 	
 	public boolean loadDependncyVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws BusinessServiceException {
 		boolean isSucessful = true;
@@ -111,19 +130,17 @@ public class ValidationVersionLoader {
 	}
 	
 	public boolean loadPreviousVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
-		List<String> rf2FilesLoaded = new ArrayList<>();
 		boolean isSucessful = true;
-		String reportStorage = validationConfig.getStorageLocation();
 		if (!isPeviousVersionLoaded(validationConfig)) {
 			String previousVersion = null;
 			//load previous published versions from s3
-			if(isExtension(validationConfig)) {
+			if (isExtension(validationConfig)) {
 				previousVersion = getVersion(validationConfig.getPreviousExtVersion(), validationConfig.isReleaseAsAnEdition());
 			} else {
-				previousVersion = getVersion(validationConfig.getPrevIntReleaseVersion(), false);
+				executionConfig.setPreviousVersion(validationConfig.getPrevIntReleaseVersion());
+				previousVersion = loadRelease(executionConfig, responseMap);
 			}
 			executionConfig.setPreviousVersion(previousVersion);
-			isSucessful = prepareVersionsFromS3FilesForPreviousVersion(validationConfig, reportStorage,responseMap, rf2FilesLoaded, executionConfig);
 		} else {
 			if (isExtension(validationConfig)) {
 				executionConfig.setPreviousVersion(getVersion(validationConfig.getPreviousExtVersion(), validationConfig.isReleaseAsAnEdition()));
@@ -132,7 +149,7 @@ public class ValidationVersionLoader {
 			}
 		}
 		return isSucessful;
-		}
+	}
 		
 	public boolean loadProspectiveVersion(ExecutionConfig executionConfig, Map<String, Object> responseMap, ValidationRunConfig validationConfig) throws Exception {
 		String prospectiveVersion = executionConfig.getExecutionId().toString();
@@ -145,7 +162,7 @@ public class ValidationVersionLoader {
 			if (isExtension(validationConfig)) {
 				executionConfig.setPreviousVersion(getVersion(validationConfig.getPreviousExtVersion(), validationConfig.isReleaseAsAnEdition()));
 			} else {
-				executionConfig.setPreviousVersion(getVersion(validationConfig.getPrevIntReleaseVersion(),false));
+				executionConfig.setPreviousVersion(getVersion(validationConfig.getPrevIntReleaseVersion(), false));
 			}
 		} else {
 			//load prospective version alone now as used to combine with dependency for extension testing
@@ -452,10 +469,10 @@ public class ValidationVersionLoader {
 	}
 
 	private String getVersion(String versionString, boolean isEdition) throws BusinessServiceException {
-		if(!versionString.endsWith(ZIP_FILE_EXTENSION)) {
+		if (!versionString.endsWith(ZIP_FILE_EXTENSION)) {
 			return versionString;
 		}
-		if(versionString.contains(" <= ")) {
+		if (versionString.contains(" <= ")) {
 			return versionString.substring(0,versionString.indexOf(" <= ")).trim();
 
 		} else {

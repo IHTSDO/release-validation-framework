@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.controller;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -9,12 +10,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
 
+import org.ihtsdo.rvf.App;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
@@ -23,9 +28,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -34,7 +40,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = App.class)
 @WebAppConfiguration
 public class TestUploadFileControllerIntegrationTest {
 
@@ -55,8 +62,8 @@ public class TestUploadFileControllerIntegrationTest {
 	@Test
 	public void testUploadTestPackage() throws Exception {
 		final MvcResult result = mockMvc.perform(
-				fileUpload("/test-file")
-						.file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140831.zip", "application/zip",
+				multipart("/test-file")
+				.file( new MockMultipartFile("file", "SnomedCT_Release_INT_20140831.zip", "application/zip",
 								getClass().getResourceAsStream("/SnomedCT_Release_INT_20140831.zip")))
 				.requestAttr("writeSuccess", Boolean.FALSE))
 				.andDo(print())
@@ -68,8 +75,8 @@ public class TestUploadFileControllerIntegrationTest {
 	@Test
 	public void testPostUploadTestPackage() throws Exception {
 		final MvcResult result = mockMvc.perform(
-				fileUpload("/test-post")
-						.file(new MockMultipartFile("file", "ValidPostconditionAll.zip", "application/zip",
+				multipart("/test-post")
+				.file(new MockMultipartFile("file", "ValidPostconditionAll.zip", "application/zip",
 								getClass().getResourceAsStream("/ValidPostconditionAll.zip")))
 		)
 				.andDo(print())
@@ -80,8 +87,8 @@ public class TestUploadFileControllerIntegrationTest {
 	@Test
 	public void testUploadTestPackageExtendedMap() throws Exception {
 		final MvcResult result = mockMvc.perform(
-				fileUpload("/test-file")
-						.file(new MockMultipartFile("file", "SnomedCT_test2_INT_20140131.zip", "application/zip",
+				multipart("/test-file")
+				.file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140831.zip", "application/zip",
 								getClass().getResourceAsStream("/SnomedCT_test2_INT_20140131.zip")))
 		)
 				.andDo(print())
@@ -92,8 +99,8 @@ public class TestUploadFileControllerIntegrationTest {
 	@Test
 	public void testUploadTestDescription() throws Exception {
 		final MvcResult result = mockMvc.perform(
-				fileUpload("/test-pre")
-						.file(new MockMultipartFile("file", "rel2_Description_Delta-en_INT_20240731.txt", "application/zip",
+				multipart("/test-pre")
+				.file(new MockMultipartFile("file", "rel2_Description_Delta-en_INT_20240731.txt", "application/zip",
 								getClass().getResourceAsStream("/rel2_Description_Delta-en_INT_20240731.txt")))
 		)
 				.andDo(print())
@@ -104,8 +111,8 @@ public class TestUploadFileControllerIntegrationTest {
 	@Test
 	public void testUploadPre() throws Exception {
 		final MvcResult result = mockMvc.perform(
-				fileUpload("/test-file")
-						.file(new MockMultipartFile("file", "rel2_sRefset_SimpleMapDelta_INT_20140731.txt", "application/zip",
+				multipart("/test-file")
+				.file(new MockMultipartFile("file", "rel2_sRefset_SimpleMapDelta_INT_20140731.txt", "application/zip",
 								getClass().getResourceAsStream("/rel2_sRefset_SimpleMapDelta_INT_20140731.txt")))
 		)
 				.andDo(print())
@@ -184,8 +191,8 @@ public class TestUploadFileControllerIntegrationTest {
 
 		final String[] groups = new String[1];
 		Collections.singletonList(group.getId().toString()).toArray(groups);
-		mockMvc.perform(fileUpload("/run-post")
-				.file(new MockMultipartFile("file", "SnomedCT_test2_INT_20140131.zip", "application/zip",
+		mockMvc.perform(multipart("/run-post",
+				new MockMultipartFile("file", "SnomedCT_test2_INT_20140131.zip", "application/zip",
 						getClass().getResourceAsStream("/SnomedCT_test2_INT_20140131.zip")))
 				.file(new MockMultipartFile("manifest", "manifest_20250731.xml", "application/xml",
 						getClass().getResourceAsStream("/manifest_20250731.xml")))
@@ -195,6 +202,5 @@ public class TestUploadFileControllerIntegrationTest {
 				.param("writeSuccesses", "false")
 				.param("runId", "1"))
 				.andDo(print());
-
 	}
 }

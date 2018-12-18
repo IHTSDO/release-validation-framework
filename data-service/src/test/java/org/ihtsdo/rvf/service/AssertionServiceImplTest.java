@@ -11,13 +11,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.rvf.MysqlConfig;
-import org.ihtsdo.rvf.dao.AssertionGroupRepository;
-import org.ihtsdo.rvf.dao.AssertionRepository;
-import org.ihtsdo.rvf.dao.AssertionTestRepository;
-import org.ihtsdo.rvf.dao.TestRepository;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
+import org.ihtsdo.rvf.repository.AssertionGroupRepository;
+import org.ihtsdo.rvf.repository.AssertionRepository;
+import org.ihtsdo.rvf.repository.AssertionTestRepository;
+import org.ihtsdo.rvf.repository.TestRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.rvf.dao.TestRepository;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
+import org.ihtsdo.rvf.repository.TestRepository;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.After;
 import org.junit.Before;

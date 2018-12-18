@@ -4,10 +4,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,17 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class RvfDynamicDataSource {
 
-	@Value("${rvf.jdbc.driverClassName}") 
-	private String driverClassName;
-
-    @Value("${rvf.jdbc.url}") 
-    private String url;
-
-    @Value("${rvf.jdbc.username}") 
-    private String username;
-
-    @Value("${rvf.jdbc.password}") 
-    private String password;
+	@Resource(name = "dataSource")
+	private BasicDataSource dataSource;
     
 	private ConcurrentHashMap<String, BasicDataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
 
@@ -43,33 +35,29 @@ public class RvfDynamicDataSource {
 			LOGGER.debug("get connection for schema:" + schema);
 			return schemaDatasourceMap.get(schema).getConnection();
 		}
-		else{
-			BasicDataSource dataSource = createDataSource(schema);
-			// add to map
-			schemaDatasourceMap.putIfAbsent(schema, dataSource);
-			LOGGER.debug("Create datasource for schema:" + schema);
-			return dataSource.getConnection();
-		}
+		BasicDataSource dataSource = createDataSource(schema);
+		schemaDatasourceMap.putIfAbsent(schema, dataSource);
+		LOGGER.debug("Datasource created for schema:" + schema);
+		return dataSource.getConnection();
 	}
 	
 	public BasicDataSource createDataSource(String schema) {
-		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setUrl(url);
-		dataSource.setUsername(username);
-		dataSource.setPassword(password);
-		dataSource.setDriverClassName(driverClassName);
-		dataSource.setDefaultCatalog(schema);
-		dataSource.setTestOnBorrow(true);
-		dataSource.setTestOnReturn(true);
-		dataSource.setTestWhileIdle(true);
-		dataSource.setValidationQuery("SELECT 1");
-		dataSource.setMinEvictableIdleTimeMillis(1800000);
-		dataSource.setTimeBetweenEvictionRunsMillis(1800000);
+		BasicDataSource newDataSource = new BasicDataSource();
+		newDataSource.setUrl(dataSource.getUrl());
+		newDataSource.setUsername(dataSource.getUsername());
+		newDataSource.setPassword(dataSource.getPassword());
+		newDataSource.setDriverClassName(dataSource.getDriverClassName());
+		newDataSource.setDefaultCatalog(schema);
+		newDataSource.setTestOnBorrow(true);
+		newDataSource.setTestOnReturn(true);
+		newDataSource.setTestWhileIdle(true);
+		newDataSource.setValidationQuery("SELECT 1");
+		newDataSource.setMinEvictableIdleTimeMillis(1800000);
+		newDataSource.setTimeBetweenEvictionRunsMillis(1800000);
 		//READ_COMMITTED
-		dataSource.setDefaultTransactionIsolation(2);
-		return dataSource;
+		newDataSource.setDefaultTransactionIsolation(2);
+		return newDataSource;
 	}
-
 
 	public void close( String schema) {
 		if ( schema != null) {
@@ -84,9 +72,5 @@ public class RvfDynamicDataSource {
 			schemaDatasourceMap.remove(schema);
 			LOGGER.debug("Close and remove datasource from map for schema:" + schema);
 		}
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
 	}
 }

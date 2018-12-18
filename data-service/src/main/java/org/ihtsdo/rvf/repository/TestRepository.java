@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.dao;
+package org.ihtsdo.rvf.repository;
 
 import org.ihtsdo.rvf.entity.Test;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -90,7 +90,7 @@ public class ReleaseFileDataLoader {
 							+ " ignore 1 lines";
 					LOGGER.info(loadFile);
 					
-					try (Connection connection =dataSource.getConnection(schemaName); 
+					try (Connection connection = dataSource.getConnection(schemaName); 
 						Statement statement = connection.createStatement()) {
 						statement.execute(configStr);
 						statement.execute(disableIndex);

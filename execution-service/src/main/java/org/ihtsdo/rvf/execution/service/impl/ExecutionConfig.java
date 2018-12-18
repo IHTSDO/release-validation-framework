@@ -113,4 +113,29 @@ public class ExecutionConfig {
 	public void setDependencyEffectiveTime(String dependencyEffectiveTime) {
 		this.dependencyEffectiveTime = dependencyEffectiveTime;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("ExecutionConfig [");
+		if (prospectiveVersion != null)
+			builder.append("prospectiveVersion=").append(prospectiveVersion).append(", ");
+		if (previousVersion != null)
+			builder.append("previousVersion=").append(previousVersion).append(", ");
+		if (executionId != null)
+			builder.append("executionId=").append(executionId).append(", ");
+		if (groupNames != null)
+			builder.append("groupNames=").append(groupNames).append(", ");
+		builder.append("failureExportMax=").append(failureExportMax).append(", firstTimeRelease=")
+				.append(firstTimeRelease).append(", extensionValidation=").append(extensionValidation)
+				.append(", isReleaseValidation=").append(isReleaseValidation).append(", ");
+		if (extensionDependencyVersion != null)
+			builder.append("extensionDependencyVersion=").append(extensionDependencyVersion).append(", ");
+		if (effectiveTime != null)
+			builder.append("effectiveTime=").append(effectiveTime).append(", ");
+		if (dependencyEffectiveTime != null)
+			builder.append("dependencyEffectiveTime=").append(dependencyEffectiveTime);
+		builder.append("]");
+		return builder.toString();
+	}
 }

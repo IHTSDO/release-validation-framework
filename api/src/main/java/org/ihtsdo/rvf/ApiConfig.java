@@ -20,7 +20,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 @SpringBootApplication
 @Configuration
 @PropertySources({
-	@PropertySource(value = "api-defaults.properties"),
+	@PropertySource(value = "classpath:api-defaults.properties"),
 	@PropertySource(value = "file:${rvfConfigLocation}/api.properties", ignoreResourceNotFound=true)})
 @EnableConfigurationProperties
 //@ComponentScan(basePackages = {"org.ihtsdo.snomed.rvf"})

@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.dao;
+package org.ihtsdo.rvf.repository;
 
 import java.util.List;
 

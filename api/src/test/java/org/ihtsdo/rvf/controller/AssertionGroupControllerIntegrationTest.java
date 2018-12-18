@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.rvf.dao.AssertionGroupRepository;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
+import org.ihtsdo.rvf.repository.AssertionGroupRepository;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.After;
 import org.junit.Before;

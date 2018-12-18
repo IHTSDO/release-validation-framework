@@ -52,19 +52,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingBean {
 
+	private static final String VERSION_NOT_FOUND = "Version not found in RVF database ";
 	private static final String ZIP_FILE_EXTENSION = ".zip";
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManagerImpl.class);
 	private static final String RVF_DB_PREFIX = "rvf_";
 	private String sctDataLocation;
 	private File sctDataFolder;
-	@Resource(name = "dataSource")
-	private BasicDataSource snomedDataSource;
+	
+	@Value("${rvf.master.schema.name}")
+	private String masterSchema;
 	
 	@Value("${rvf.jdbc.data.myisam.folder}")
 	private String mysqlDataDir;
 	
+	
+    @Resource(name = "dataSource")
+	private BasicDataSource dataSource;
+	
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
+	
 	private final Map<String, String> releaseSchemaNameLookup = new ConcurrentHashMap<>();
 	
 	@Autowired
@@ -110,7 +117,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 */
 	protected void populateLookupMap() {
 		// now get list of existing RVF_INT like databases
-		try ( ResultSet catalogs = snomedDataSource.getConnection().getMetaData().getCatalogs()) {
+		try ( ResultSet catalogs = rvfDynamicDataSource.getConnection(masterSchema).getMetaData().getCatalogs()) {
 			while (catalogs.next()) {
 				final String schemaName = catalogs.getString(1);
 				if (schemaName.startsWith(RVF_DB_PREFIX)) {
@@ -167,7 +174,6 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		releaseSchemaNameLookup.put(rvfVersion, schemaName);
 		return true;
 	}
-	
 	
 	
 	@Override
@@ -244,10 +250,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	private String loadSnomedData(final String versionName, boolean isAppendToVersion, List<String> rf2FilesLoaded, final File... zipDataFile) throws BusinessServiceException {
 		File outputFolder = null;
-		final String createdSchemaName = RVF_DB_PREFIX + versionName;
+		final String createdSchemaName = versionName.startsWith("rvf_") ? versionName : RVF_DB_PREFIX + versionName;
 		final long startTime = Calendar.getInstance().getTimeInMillis();
 		try {
-			outputFolder = new File(FileUtils.getTempDirectoryPath(), "rvf_loader_data_" + versionName);
+			outputFolder = new File(FileUtils.getTempDirectoryPath(), createdSchemaName);
 			logger.info("Setting output folder location = " + outputFolder.getAbsolutePath());
 			if (outputFolder.exists()) {
 				logger.info("Output folder already exists and will be deleted before recreating.");
@@ -260,10 +266,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 				ZipFileUtils.extractFilesFromZipToOneFolder(zipFile, outputFolder.getAbsolutePath());
 			}
 			if (!isAppendToVersion) {
-				try (Connection connection = snomedDataSource.getConnection()) {
-					connection.setAutoCommit(true);
-					createDBAndTables(createdSchemaName, connection);
-				}
+				createSchema(createdSchemaName);
 			}
 			
 			loadReleaseFilesToDB(outputFolder,rvfDynamicDataSource,rf2FilesLoaded, createdSchemaName);
@@ -280,22 +283,6 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime) / 1000) + " seconds.");
 		return createdSchemaName;
-	}
-
-	private void createDBAndTables(final String schemaName, final Connection connection) throws SQLException, IOException {
-		//clean and create database
-		String dropStr = "drop database if exists " + schemaName + ";";
-		String createDbStr = "create database if not exists "+ schemaName + ";";
-		String  useStr = "use " + schemaName + ";";
-		try(Statement statement = connection.createStatement()) {
-			statement.execute(dropStr);
-			statement.execute(createDbStr);
-			statement.execute(useStr);
-		}
-		try (InputStream input = getClass().getResourceAsStream("/sql/create-tables-mysql.sql")) {
-			final ScriptRunner runner = new ScriptRunner(connection);
-			runner.runScript(new InputStreamReader(input));
-		}
 	}
 
 	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final RvfDynamicDataSource dataSource, List<String> rf2FilesLoaded, String schemaName) throws SQLException, FileNotFoundException {
@@ -321,7 +308,11 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	 */
 	@Override
 	public boolean isKnownRelease(final String releaseVersion) {
-		return releaseSchemaNameLookup.containsKey(releaseVersion);
+		if (!releaseVersion.startsWith(RVF_DB_PREFIX)) {
+			return releaseSchemaNameLookup.containsKey(releaseVersion);
+		}
+		return releaseSchemaNameLookup.values().contains(releaseVersion);
+		
 	}
 
 	/**
@@ -345,10 +336,12 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	@Override
 	public String getSchemaForRelease(final String releaseVersion) {
 		if (releaseVersion != null) {
-			return releaseSchemaNameLookup.get(releaseVersion);
+			if (!releaseVersion.startsWith(RVF_DB_PREFIX)) {
+				return releaseSchemaNameLookup.get(releaseVersion);
+			}
+			return releaseVersion;
 		}
 		return null;
-		
 	}
 
 	/**
@@ -386,10 +379,9 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		boolean isFailed = false;
 		//create db schema for the combined version
 		final String schemaName = RVF_DB_PREFIX + combinedVersionName;
-		try (Connection connection = snomedDataSource.getConnection()) {
-			createDBAndTables(schemaName, connection);
-			releaseSchemaNameLookup.put(combinedVersionName, schemaName);
-		} catch (SQLException | IOException e) {
+		try {
+			createSchema(schemaName);
+		} catch (Exception e) {
 			isFailed = true;
 			logger.error("Failed to create db schema and tables for version:" + combinedVersionName +" due to " + e.fillInStackTrace());
 		}
@@ -439,7 +431,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		
 		final String insertSql = "insert into " + targetSchema + "." + tableName  + " ";
 		logger.debug("Copying table {}", tableName);
-		try (Connection connection = snomedDataSource.getConnection();
+		try (Connection connection = rvfDynamicDataSource.getConnection(targetSchema);
 			Statement statement = connection.createStatement() ) {
 			statement.execute(disableIndex);
 			statement.execute(insertSql + selectDataFromASql);
@@ -462,7 +454,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
 		final String sql = "insert into " + targetSchema + "." + tableName  + " select * from " + sourceSchema + "." + tableName;
 		logger.debug("Copying table {} with sql {} ", tableName, sql);
-		try (Connection connection = snomedDataSource.getConnection();
+		try (Connection connection = rvfDynamicDataSource.getConnection(targetSchema);
 			Statement statement = connection.createStatement() ) {
 			statement.execute(disableIndex);
 			statement.execute(sql);
@@ -479,7 +471,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	private List<String> getValidTableNamesFromSchema(String schemaName, String tableNamePattern) {
 		List<String> result = new ArrayList<>();
 		Collection<String> mappedTables = RF2FileTableMapper.getAllTableNames();
-		try (Connection connection = snomedDataSource.getConnection();
+		try (Connection connection = rvfDynamicDataSource.getConnection(schemaName);
 				Statement statement = connection.createStatement() ) {
 			String sql = "select table_name from INFORMATION_SCHEMA.TABLES WHERE table_schema ='" + schemaName + "'";
 			if ( tableNamePattern != null) {
@@ -500,18 +492,18 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	@Override
 	public void dropVersion(String version) {
-		if (version != null && releaseSchemaNameLookup.containsKey(version)) {
-			String schema = releaseSchemaNameLookup.get(version);
-			try (Connection connection = rvfDynamicDataSource.getConnection(schema)) {
-				String dropSchemaSQL = "drop database "  + schema;
-				try( PreparedStatement statement = connection.prepareStatement(dropSchemaSQL)) {
-					statement.execute();
-				}
-			} catch(SQLException e) {
-				logger.error("Failed to drop schema " + schema);
-			}
-			releaseSchemaNameLookup.remove(version);
-		}
+//		if (version != null && releaseSchemaNameLookup.containsKey(version)) {
+//			String schema = releaseSchemaNameLookup.get(version);
+//			try (Connection connection = rvfDynamicDataSource.getConnection(schema)) {
+//				String dropSchemaSQL = "drop database "  + schema;
+//				try( PreparedStatement statement = connection.prepareStatement(dropSchemaSQL)) {
+//					statement.execute();
+//				}
+//			} catch(SQLException e) {
+//				logger.error("Failed to drop schema " + schema);
+//			}
+//			releaseSchemaNameLookup.remove(version);
+//		}
 	}
 
 	@Override
@@ -522,10 +514,10 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		if (sourceSchema == null || destinationSchema == null) {
 			StringBuilder errorMsg = new StringBuilder();
 			if (sourceSchema == null) {
-				errorMsg.append("No version found in the db for " + sourceVersion); 
+				errorMsg.append(VERSION_NOT_FOUND + sourceVersion); 
 			}
 			if (destinationSchema == null) {
-				errorMsg.append("No version found in the db for " + destinationVersion); 
+				errorMsg.append(VERSION_NOT_FOUND + destinationVersion); 
 			}
 			throw new BusinessServiceException(errorMsg.toString());
 		}
@@ -549,7 +541,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			logger.debug("Delete data from snapshot table sql:" + deleteSql);
 			final String insertSql = "insert into " + schema + "." + snapshotTbl  + " select * from " + schema + "." + deltaTbl;
 			logger.debug("Insert delta into snapshot table sql:" + insertSql);
-			try (Connection connection = snomedDataSource.getConnection();
+			try (Connection connection = rvfDynamicDataSource.getConnection(schema);
 					Statement statement = connection.createStatement() ) {
 				statement.execute(deleteSql);
 				statement.execute(insertSql);
@@ -575,13 +567,13 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		if (sourceSchemaA == null || destinationSchema == null || sourceSchemaB ==null) {
 			StringBuilder errorMsg = new StringBuilder();
 			if (sourceSchemaA == null) {
-				errorMsg.append("No version found in the db for " + sourceVersionA); 
+				errorMsg.append(VERSION_NOT_FOUND + sourceVersionA); 
 			}
 			if (sourceSchemaA == null) {
-				errorMsg.append("No version found in the db for " + sourceVersionB); 
+				errorMsg.append(VERSION_NOT_FOUND + sourceVersionB); 
 			}
 			if (destinationSchema == null) {
-				errorMsg.append("No version found in the db for " + destinationVersion); 
+				errorMsg.append(VERSION_NOT_FOUND + destinationVersion); 
 			}
 			throw new BusinessServiceException(errorMsg.toString());
 		}
@@ -596,22 +588,38 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 
 	@Override
-	public String createSchema(String version) {
-		String schemaName = RVF_DB_PREFIX + version;
-		try (Connection connection = snomedDataSource.getConnection()) {
-			createDBAndTables(schemaName, connection);
-			releaseSchemaNameLookup.put(version, schemaName);
-		} catch (SQLException | IOException e) {
-			logger.error("Failed to create db schema and tables for:" + version  + " due to " + e.fillInStackTrace());
-			schemaName = null;
+	public String createSchema(String version) throws BusinessServiceException {
+		String schemaName = version.startsWith(RVF_DB_PREFIX) ? version : RVF_DB_PREFIX + version;
+		logger.info("Creating db schema " + schemaName);
+		//clean and create database
+		String dropStr = "drop database if exists " + schemaName + ";";
+		String createDbStr = "create database if not exists "+ schemaName + ";";
+		try (Statement statement = dataSource.getConnection().createStatement()) {
+			statement.execute(dropStr);
+			statement.execute(createDbStr);
+		} catch (SQLException e) {
+			throw new BusinessServiceException("Failed to create schema " + schemaName, e);
 		}
+
+		try {
+			try (Statement statement = rvfDynamicDataSource.getConnection(schemaName).createStatement()) {
+				statement.execute("use " + schemaName + ";");
+			} 
+			try (InputStream input = getClass().getResourceAsStream("/sql/create-tables-mysql.sql")) {
+				ScriptRunner runner = new ScriptRunner(rvfDynamicDataSource.getConnection(schemaName));
+				runner.runScript(new InputStreamReader(input));
+			} 
+		} catch (Exception e) {
+			throw new BusinessServiceException("Failed to create tables for schema " + schemaName, e);
+		}
+		logger.info(schemaName + " is created successfully.");
 		return schemaName;
 	}
 
 	@Override
 	public void clearQAResult(Long runId) {
 		String deleteQaResultSQL = " delete from rvf_master.qa_result where run_id = " + runId;
-		try (Connection connection = snomedDataSource.getConnection();
+		try (Connection connection = rvfDynamicDataSource.getConnection(masterSchema);
 				Statement statement = connection.createStatement() ) {
 			statement.execute(deleteQaResultSQL);
 		} catch (final SQLException e) {
@@ -621,12 +629,11 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	
 	@Override
 	public String generateBinaryArchive(String schemaName) throws BusinessServiceException {
-		String schema = getSchemaForRelease(schemaName);
-		if (schema == null) {
+		if (schemaName == null || !releaseSchemaNameLookup.values().contains(schemaName)) {
 			throw new IllegalArgumentException("No schema found for " + schemaName);
 		}
-		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schema + ZIP_FILE_EXTENSION);
-		File binaryFile = new File(mysqlDataDir, schema);
+		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schemaName + ZIP_FILE_EXTENSION);
+		File binaryFile = new File(mysqlDataDir, schemaName);
 		if (!binaryFile.exists()) {
 			throw new BusinessServiceException("No mysql binary file found for " + binaryFile.getPath());
 		}
@@ -643,17 +650,29 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 	}
 
 	@Override
-	public void restoreReleaseFromBinaryArchive(String archiveFileName, String schemaName) throws IOException {
-		File outputDir = new File(mysqlDataDir + schemaName);
+	public boolean restoreReleaseFromBinaryArchive(String archiveFileName) throws IOException {
+		
+		ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
+		InputStream inputStream = resourceManager.readResourceStreamOrNullIfNotExists(archiveFileName);
+		if (inputStream == null) {
+			return false;
+		}
+		
+		File outputFile = downloadFile(inputStream, archiveFileName);
+		if (outputFile == null) {
+			return false;
+		}
+		File outputDir = new File(mysqlDataDir + archiveFileName.replace(".zip", ""));
 		if (outputDir.exists()) {
 			outputDir.delete();
 		}
 		outputDir.mkdir();
-		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(new File(archiveFileName), outputDir.getAbsolutePath());
+		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
+		return true;
 	}
 
 	@Override
-	public boolean uploadReleaseViaS3(String releaseFilename, String schemaName)
+	public boolean uploadRelease(String releaseFilename, String schemaName)
 			throws BusinessServiceException {
 		
 		InputStream inputStream;
@@ -665,5 +684,24 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		}
 		uploadReleaseDataIntoDB(inputStream, releaseFilename, schemaName);
 		return true;
+	}
+	
+
+	private File downloadFile(InputStream input, String outputFilename) {
+		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), outputFilename);
+		OutputStream out = null;
+		try {
+			out = new FileOutputStream(fileDestination);
+			IOUtils.copy(input, out);
+			logger.info("Release file copied to : " + fileDestination.getAbsolutePath());
+			return fileDestination;
+		} catch (final IOException e) {
+			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
+			return null;
+			
+		} finally {
+			IOUtils.closeQuietly(input);
+			IOUtils.closeQuietly(out);
+		}
 	}
 }

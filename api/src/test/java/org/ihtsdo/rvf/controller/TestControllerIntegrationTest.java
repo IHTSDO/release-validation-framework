@@ -13,9 +13,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.nio.charset.Charset;
 
 import org.hamcrest.Matchers;
-import org.ihtsdo.rvf.dao.TestRepository;
+import org.ihtsdo.rvf.ApiConfig;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.TestType;
+import org.ihtsdo.rvf.repository.TestRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -23,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * A test case for {@link org.ihtsdo.rvf.controller.TestController}.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = ApiConfig.class)
 @WebAppConfiguration
 @Transactional
 public class TestControllerIntegrationTest {

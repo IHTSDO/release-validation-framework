@@ -42,16 +42,16 @@ public interface ReleaseDataManager {
 	
 	String loadSnomedDataIntoExistingDb(String productVersion,List<String> rf2FilesLoaded,File ... zipDataFile) throws BusinessServiceException;
 
-	String createSchema(String versionName);
+	String createSchema(String versionName) throws BusinessServiceException;
 
 	void clearQAResult(Long runId);
 
-	void restoreReleaseFromBinaryArchive(String archiveFileName, String schemaName) throws IOException;
+	boolean restoreReleaseFromBinaryArchive(String archiveFileName) throws IOException;
 
 	String generateBinaryArchive(String schemaName) throws BusinessServiceException;
 
 	boolean uploadReleaseDataIntoDB(InputStream inputStream, String fileName, String schemaName)
 			throws BusinessServiceException;
 
-	boolean uploadReleaseViaS3(String releaseFilename, String schemaName) throws BusinessServiceException;
+	boolean uploadRelease(String releaseFilename, String schemaName) throws BusinessServiceException;
 }

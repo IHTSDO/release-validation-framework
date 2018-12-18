@@ -21,8 +21,6 @@ public interface AssertionService {
 	
 	Assertion find(Long id);
 	
-	Collection<Assertion> find (List<Long> ids);
-
 	Assertion findAssertionByUUID(UUID uuid);
 
 	//Assertion Test
@@ -56,9 +54,6 @@ public interface AssertionService {
 
 	List<AssertionGroup> getAssertionGroupsByNames(List<String> groupNames);
 	List<AssertionGroup> getAllAssertionGroups();
-
-	//specific 
-	List<Assertion> getResourceAssertions();
 
 	Assertion getAssertionByUuid(UUID assertionUUID);
 	

@@ -308,4 +308,16 @@ public class ValidationRunConfig {
 	public void setDroolsRulesGroupList(List<String> droolsRulesGroupList) {
 		this.droolsRulesGroupList = droolsRulesGroupList;
 	}
+	public ValidationRunConfig addPreviousRelease(String previousRelease) {
+		if (this.extensionDependency != null) {
+			this.previousExtVersion = previousRelease;
+		} else {
+			this.prevIntReleaseVersion = previousRelease;
+		}
+		return this;
+	}
+	public ValidationRunConfig addDependencyRelease(String dependencyRelease) {
+		this.extensionDependency = dependencyRelease;
+		return this;
+	}
 }
