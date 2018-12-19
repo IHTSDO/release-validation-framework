@@ -94,7 +94,8 @@ public class InstanceManager {
 	
 	@Value("${rvf.autoscaling.ec2Endpoint}")
 	private String serviceEndpoint;
-	@Value("us-east-1")
+	
+	@Value("${rvf.autoscaling.ec2SigningRegion}")
 	private String signingRegion;
 	
 	@PostConstruct

@@ -680,6 +680,7 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			ResourceManager resourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
 			inputStream = resourceManager.readResourceStream(releaseFilename);
 		} catch (IOException e) {
+			logger.error("Error while reading release package " + releaseFilename + " due to " + e.fillInStackTrace());
 			throw new BusinessServiceException("Failed to read file " + releaseFilename + " via " + releaseStorageConfig.toString(), e);
 		}
 		uploadReleaseDataIntoDB(inputStream, releaseFilename, schemaName);

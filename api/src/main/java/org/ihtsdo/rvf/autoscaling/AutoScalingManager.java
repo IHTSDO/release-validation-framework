@@ -32,9 +32,6 @@ public class AutoScalingManager {
 	@Autowired
 	private InstanceManager instanceManager;
 	
-	@Autowired
-	private ActiveMQConnectionFactory connectionFactory;
-	
 	@Value("${rvf.execution.isAutoScalingEnabled}")
 	private boolean isAutoScallingEnabled;
 	
@@ -46,9 +43,18 @@ public class AutoScalingManager {
 	@Value("${rvf.autoscaling.maxInstances}")
 	private int maxRunningInstance;
 
+	@Value("${orchestration.jms.url}")
+	private String brokerURL;
+	
+	@Value("${orchestration.jms.username}")
+	private String userName;
+	
+	@Value("${orchestration.jms.password}")
+	private String password;
+	
 	private ExecutorService executorService;
 	
-//	private PooledConnectionFactory pooledConnectionFactory;
+	private ActiveMQConnectionFactory connectionFactory;
 	
 	private final static AtomicBoolean shutDown = new AtomicBoolean(false);
 
@@ -56,10 +62,7 @@ public class AutoScalingManager {
 	public void init() {
 		logger.info("isAutoScalingEnabled:" + isAutoScallingEnabled);
 		if (isAutoScallingEnabled) {
-//			pooledConnectionFactory = new PooledConnectionFactory(connectionFactory);
-//			pooledConnectionFactory.setMaxConnections(2);
-//			pooledConnectionFactory.setMaximumActiveSessionPerConnection(1);
-//			pooledConnectionFactory.start();
+			connectionFactory = new ActiveMQConnectionFactory(userName, password, brokerURL);
 			executorService = Executors.newSingleThreadExecutor();
 			executorService.submit(new Runnable() {
 				@Override
@@ -153,7 +156,6 @@ public class AutoScalingManager {
 			if (shutDown.get()) {
 				return counter;
 			}
-//			connection = pooledConnectionFactory.createConnection();
 			connection = connectionFactory.createConnection();
 			connection.start();
 			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -184,8 +186,5 @@ public class AutoScalingManager {
 	  if (executorService != null) {
 		  executorService.shutdownNow();
 	  }
-//	  if (pooledConnectionFactory != null) {
-//		  pooledConnectionFactory.stop();
-//	  }
 	}
 }
