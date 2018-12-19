@@ -77,8 +77,8 @@ public class ApiConfig {
 		public ActiveMQConnectionFactory connectionFactory() {
 		    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
 		    connectionFactory.setBrokerURL(brokerUrl);
-		    connectionFactory.setPassword(userName);
-		    connectionFactory.setUserName(password);
+		    connectionFactory.setPassword(password);
+		    connectionFactory.setUserName(userName);
 		    return connectionFactory;
 		}
 
