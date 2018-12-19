@@ -8,7 +8,6 @@ import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -17,6 +16,7 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.ihtsdo.rvf.autoscaling.InstanceManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
@@ -46,8 +46,9 @@ public class RvfValidationMessageConsumer {
 	@Autowired
 	private ValidationRunner runner;
 	private Logger logger = LoggerFactory.getLogger(getClass());
+	
 	@Autowired
-	private ConnectionFactory connectionFactory;
+	private ActiveMQConnectionFactory connectionFactory;
 	@Autowired
 	private InstanceManager instanceManager;
 	

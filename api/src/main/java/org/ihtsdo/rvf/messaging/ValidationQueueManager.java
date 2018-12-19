@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.jms.Destination;
 
 import org.apache.commons.codec.DecoderException;
 import org.ihtsdo.otf.dao.s3.S3Client;
