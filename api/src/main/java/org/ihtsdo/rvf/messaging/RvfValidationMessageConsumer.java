@@ -72,19 +72,13 @@ public class RvfValidationMessageConsumer {
 
 	@PostConstruct
 	public void init() {
-		logger.info("isRvfWorker ec2 instance:" + isWorker);
-		if (isEc2Instance && isWorker) {
+		logger.info("isRvfWorker " + isWorker);
+		if (isWorker) {
 			executorService = Executors.newSingleThreadExecutor();
 			executorService.execute(new Runnable() {
 				@Override
 				public void run() {
-					while (!shutDown()) {
-						try {
-							Thread.sleep(30000);
-						} catch (InterruptedException e) {
-							logger.error("Consumer thread is interupted", e);
-						}
-					}
+					consumeMessage();
 				}
 			});
 			executorService.shutdown();
@@ -92,13 +86,6 @@ public class RvfValidationMessageConsumer {
 		}
 	}
 
-	@JmsListener(destination = "${rvf.validation.queue.name}")
-	public void receiveMessage(final TextMessage incomingMessage) {
-		logger.info("Validation message received {}", incomingMessage);
-		runValidation(incomingMessage);
-	}
-	
-	//TODO to remove this when new implmentaion is working
 	private void consumeMessage() {
 		Connection connection = null;
 		MessageConsumer consumer = null;
