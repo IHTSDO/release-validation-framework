@@ -9,6 +9,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -633,7 +642,26 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 			throw new IllegalArgumentException("No schema found for " + schemaName);
 		}
 		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schemaName + ZIP_FILE_EXTENSION);
+		Path mysqlBinaryPath = Paths.get(mysqlDataDir, schemaName);
+		
+		if (Files.exists(mysqlBinaryPath,  LinkOption.NOFOLLOW_LINKS)) {
+			logger.info("Schema binary path exists " + mysqlBinaryPath);
+		} else {
+			logger.info("Schema binary path doesn't exist " + mysqlBinaryPath);
+		}
+		
+		File dataDir = new File(mysqlDataDir);
 		File binaryFile = new File(mysqlDataDir, schemaName);
+		if (dataDir.isDirectory() && dataDir.canRead()) {
+			try {
+				GroupPrincipal group = Files.readAttributes(dataDir.toPath(), PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS).group();
+				Files.getFileAttributeView(binaryFile.toPath(), PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS).setGroup(group);
+			} catch (IOException e) {
+				throw new BusinessServiceException("Failed to fetch group principal for folder " + dataDir);
+			}
+		} else {
+			throw new BusinessServiceException("Can't access directory " + dataDir.getPath());
+		}
 		if (!binaryFile.exists()) {
 			throw new BusinessServiceException("No mysql binary file found for " + binaryFile.getPath());
 		}

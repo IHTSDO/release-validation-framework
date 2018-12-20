@@ -12,12 +12,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class AutoScalingManager {
 	private ExecutorService executorService;
 	
 	@Autowired
-	private ActiveMQConnectionFactory connectionFactory;
+	private ConnectionFactory connectionFactory;
 	
 	private final static AtomicBoolean shutDown = new AtomicBoolean(false);
 

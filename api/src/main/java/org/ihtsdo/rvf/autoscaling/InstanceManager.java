@@ -121,6 +121,7 @@ public class InstanceManager {
 				.withSecurityGroupIds(securityGroupId)
 				.withUserData(ec2InstanceStartupScript)
 				.withSubnetId(ec2SubnetId);
+		
 		List<String> ids = new ArrayList<>();
 		try {
 			RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);

@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -16,7 +17,6 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.ihtsdo.rvf.autoscaling.InstanceManager;
 import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -42,39 +43,48 @@ public class RvfValidationMessageConsumer {
 	private static final long HOUR_IN_MILLIS = 60 * 60 * 1000;
 	private static final long ONE_MINUTE_IN_MILLIS = 60 * 1000;
 	
-	private String queueName;
 	@Autowired
 	private ValidationRunner runner;
+	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
-	private ActiveMQConnectionFactory connectionFactory;
+	private ConnectionFactory connectionFactory;
+	
 	@Autowired
 	private InstanceManager instanceManager;
 	
+	@Value("${rvf.execution.isWorker}")
 	private boolean isWorker;
+	
+	@Value("${rvf.autoscaling.isEc2Instance}")
 	private boolean isEc2Instance;
+	
+	@Value("${rvf.validation.queue.name}")
+	private String queueName;
+	
 	private Instance instance;
+	
 	private boolean isValidationRunning = false;
+	
 	private ExecutorService executorService;
 
-	public RvfValidationMessageConsumer(@Value("${rvf.validation.queue.name}") String queueName, 
-			@Value("${rvf.execution.isWorker}") Boolean isRvfWorker,
-			@Value("${rvf.autoscaling.isEc2Instance}") Boolean ec2Instance) {
-		isWorker = isRvfWorker.booleanValue();
-		this.queueName = queueName;
-		this.isEc2Instance = ec2Instance.booleanValue();
-	}
 
 	@PostConstruct
 	public void init() {
-		logger.info("isRvfWorker instance:" + isWorker);
-		if (isWorker) {
+		logger.info("isRvfWorker ec2 instance:" + isWorker);
+		if (isEc2Instance && isWorker) {
 			executorService = Executors.newSingleThreadExecutor();
 			executorService.execute(new Runnable() {
 				@Override
 				public void run() {
-					consumeMessage();
+					while (!shutDown()) {
+						try {
+							Thread.sleep(30000);
+						} catch (InterruptedException e) {
+							logger.error("Consumer thread is interupted", e);
+						}
+					}
 				}
 			});
 			executorService.shutdown();
@@ -82,6 +92,13 @@ public class RvfValidationMessageConsumer {
 		}
 	}
 
+	@JmsListener(destination = "${rvf.validation.queue.name}")
+	public void receiveMessage(final TextMessage incomingMessage) {
+		logger.info("Validation message received {}", incomingMessage);
+		runValidation(incomingMessage);
+	}
+	
+	//TODO to remove this when new implmentaion is working
 	private void consumeMessage() {
 		Connection connection = null;
 		MessageConsumer consumer = null;

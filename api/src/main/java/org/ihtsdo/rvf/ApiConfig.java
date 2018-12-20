@@ -2,8 +2,11 @@ package org.ihtsdo.rvf;
 import static com.google.common.base.Predicates.not;
 import static springfox.documentation.builders.PathSelectors.regex;
 
+import javax.jms.ConnectionFactory;
+
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +14,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.annotation.Order;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
@@ -30,18 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 	@PropertySource(value = "classpath:api-defaults.properties"),
 	@PropertySource(value = "file:${rvfConfigLocation}/api.properties", ignoreResourceNotFound=true)})
 @EnableConfigurationProperties
-public class ApiConfig {	
-	
-	//TODO change these parameters to spring.activemq.* 
-	@Value("${orchestration.jms.url}") 
-	private String brokerUrl;
-	
-	@Value("${orchestration.jms.username}") 
-	private String userName;
-	 
-	@Value("${orchestration.jms.password}")
-	private String password;
-	
+public class ApiConfig {		
 	// Swagger Config
 		@Bean
 		public Docket api() {
@@ -70,38 +63,5 @@ public class ApiConfig {
 //				http.addFilterAfter(new RequestHeaderAuthenticationDecorator(), BasicAuthenticationFilter.class);
 			}
 
-		}
-	
-		//JMS config
-		@Bean
-		public ActiveMQConnectionFactory connectionFactory() {
-		    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-		    connectionFactory.setBrokerURL(brokerUrl);
-		    connectionFactory.setPassword(password);
-		    connectionFactory.setUserName(userName);
-		    return connectionFactory;
-		}
-
-		@Bean
-		public JmsTemplate jmsTemplate(){
-		    JmsTemplate template = new JmsTemplate();
-		    template.setConnectionFactory(connectionFactory());
-		    return template;
-		}
-
-		@Bean
-		public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
-		    DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-		    factory.setConnectionFactory(connectionFactory());
-		    factory.setConcurrency("1-1");
-		    return factory;
-		}
-		
-		@Bean
-		public MessageConverter jacksonJmsMessageConverter() {
-			MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-			converter.setTargetType(MessageType.TEXT);
-			converter.setTypeIdPropertyName("_type");
-			return converter;
-		}
+		}		
 }
