@@ -3,8 +3,10 @@ import static com.google.common.base.Predicates.not;
 import static springfox.documentation.builders.PathSelectors.regex;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.ihtsdo.rvf.messaging.ValidationMessageListener;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -63,5 +65,13 @@ public class ApiConfig {
 //				http.addFilterAfter(new RequestHeaderAuthenticationDecorator(), BasicAuthenticationFilter.class);
 			}
 
-		}		
+		}
+		
+		@Bean
+		public ValidationMessageListener createMessageListener(@Value("${rvf.execution.isWorker}") boolean isWorker) {
+			if (isWorker) {
+				new ValidationMessageListener();
+			}
+			return null;
+		}
 }

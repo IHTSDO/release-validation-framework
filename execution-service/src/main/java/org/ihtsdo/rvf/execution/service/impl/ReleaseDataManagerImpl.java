@@ -652,15 +652,20 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		
 		File dataDir = new File(mysqlDataDir);
 		File binaryFile = new File(mysqlDataDir, schemaName);
-		if (dataDir.isDirectory() && dataDir.canRead()) {
+		if (!dataDir.canRead()) {
+			logger.info("Can't access directory " + dataDir.getPath());
 			try {
 				GroupPrincipal group = Files.readAttributes(dataDir.toPath(), PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS).group();
+				logger.info("group principal:" + group.getName() + group.toString());
 				Files.getFileAttributeView(binaryFile.toPath(), PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS).setGroup(group);
+				if (binaryFile.canRead()) {
+					logger.info("can read from" + binaryFile.getAbsolutePath());
+				} else {
+					logger.info("can't read from" + binaryFile.getAbsolutePath());
+				}
 			} catch (IOException e) {
 				throw new BusinessServiceException("Failed to fetch group principal for folder " + dataDir);
 			}
-		} else {
-			throw new BusinessServiceException("Can't access directory " + dataDir.getPath());
 		}
 		if (!binaryFile.exists()) {
 			throw new BusinessServiceException("No mysql binary file found for " + binaryFile.getPath());

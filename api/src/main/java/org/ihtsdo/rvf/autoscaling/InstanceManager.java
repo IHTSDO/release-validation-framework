@@ -100,15 +100,19 @@ public class InstanceManager {
 	@Value("${rvf.execution.isAutoScalingEnabled}")
 	private boolean isAutoScallingEnabled;
 	
+	@Value("${rvf.autoscaling.isEc2Instance}")
+	private boolean isEc2Instance;
+	
 	@PostConstruct
 	public void init() {
-		if (isAutoScallingEnabled) {
+		if (isAutoScallingEnabled || isEc2Instance) {
 			AWSCredentials credentials = new BasicAWSCredentials(awsPubicKey, awsPrivateKey);
 			amazonEC2Client = (AmazonEC2Client) AmazonEC2ClientBuilder.standard()
 					.withCredentials(new AWSStaticCredentialsProvider(credentials))
 					.withEndpointConfiguration(new EndpointConfiguration(serviceEndpoint, signingRegion)).build();
+		}
+		if (isAutoScallingEnabled) {
 			ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
-
 		}
 	}
 

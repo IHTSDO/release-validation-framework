@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -73,19 +72,27 @@ public class RvfValidationMessageConsumer {
 	@PostConstruct
 	public void init() {
 		logger.info("isRvfWorker " + isWorker);
-		if (isWorker) {
+		if (isWorker && isEc2Instance) {
 			executorService = Executors.newSingleThreadExecutor();
 			executorService.execute(new Runnable() {
 				@Override
 				public void run() {
-					consumeMessage();
+//					consumeMessage();
+					while (!shutDown()) {
+						try {
+							Thread.sleep(30000);
+						} catch (InterruptedException e) {
+							logger.error("Consumer thread is interupted", e);
+						}
+					}
 				}
 			});
 			executorService.shutdown();
 			logger.info("RvfWorker instance started at:" + Calendar.getInstance().getTime());
 		}
 	}
-
+	
+	
 	private void consumeMessage() {
 		Connection connection = null;
 		MessageConsumer consumer = null;

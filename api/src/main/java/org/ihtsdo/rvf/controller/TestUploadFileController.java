@@ -289,12 +289,10 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to false") @RequestParam(value = "enableDrools", required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = "effectiveTime", required = false) final String effectiveTime,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = "releaseAsAnEdition", required = false) final boolean releaseAsAnEdition,
-			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = "includedModules", required = false) final String includedModules,
-			final HttpServletRequest request) throws IOException {
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = "includedModules", required = false) final String includedModules
+			) throws IOException {
 
-		final String requestUrl = String.valueOf(request.getRequestURL());
-		final String urlPrefix = requestUrl.substring(0,
-				requestUrl.lastIndexOf(request.getPathInfo()));
+		final String urlPrefix = getRequestUrlPrefix();
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
 		vrConfig.addProspectiveFileFullPath(releaseFileS3Path)
 				.addRF2DeltaOnly(isRf2DeltaOnly)
