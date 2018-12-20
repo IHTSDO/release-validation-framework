@@ -6,7 +6,10 @@ import javax.jms.ConnectionFactory;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.ihtsdo.rvf.autoscaling.AutoScalingManager;
 import org.ihtsdo.rvf.messaging.ValidationMessageListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -36,7 +39,9 @@ import org.springframework.beans.factory.annotation.Value;
 	@PropertySource(value = "classpath:api-defaults.properties"),
 	@PropertySource(value = "file:${rvfConfigLocation}/api.properties", ignoreResourceNotFound=true)})
 @EnableConfigurationProperties
-public class ApiConfig {		
+public class ApiConfig {	
+	
+	private Logger logger = LoggerFactory.getLogger(ApiConfig.class);
 	// Swagger Config
 		@Bean
 		public Docket api() {
@@ -65,13 +70,5 @@ public class ApiConfig {
 //				http.addFilterAfter(new RequestHeaderAuthenticationDecorator(), BasicAuthenticationFilter.class);
 			}
 
-		}
-		
-		@Bean
-		public ValidationMessageListener createMessageListener(@Value("${rvf.execution.isWorker}") boolean isWorker) {
-			if (isWorker) {
-				new ValidationMessageListener();
-			}
-			return null;
 		}
 }

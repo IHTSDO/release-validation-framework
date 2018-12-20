@@ -10,11 +10,15 @@ import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+@Service
+@ConditionalOnProperty(name = "rvf.execution.isWorker", havingValue = "true")
 public class ValidationMessageListener {
 	
 	private static AtomicBoolean isRunning = new AtomicBoolean(false);
