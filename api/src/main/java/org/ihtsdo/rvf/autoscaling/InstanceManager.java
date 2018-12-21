@@ -107,6 +107,9 @@ public class InstanceManager {
 	@Value("${rvf.autoscaling.profile.roleName}")
 	private String instanceProfileRoleName;
 	
+	@Value("${rvf.autoscaling.profile.arn}")
+	private String instanceProfileArn;
+	
 	@PostConstruct
 	public void init() {
 		if (isAutoScallingEnabled || isEc2Instance) {
@@ -129,8 +132,8 @@ public class InstanceManager {
 				.withSecurityGroupIds(securityGroupId)
 				.withUserData(ec2InstanceStartupScript)
 				.withSubnetId(ec2SubnetId)
-				.withIamInstanceProfile( new IamInstanceProfileSpecification()
-						.withName(instanceProfileRoleName));
+				.withIamInstanceProfile(new IamInstanceProfileSpecification()
+						.withArn(instanceProfileArn));
 		
 		List<String> ids = new ArrayList<>();
 		try {
