@@ -23,8 +23,8 @@ import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 public class RvfWorkerLifecycleManager {
 
 	private static final String EC2_INSTANCE_ID_URL = "http://169.254.169.254/latest/meta-data/instance-id";
-	private static final long FITY_NINE_MINUTES = 59 * 60 * 1000;
-	private static final long HOUR_IN_MILLIS = 60 * 60 * 1000;
+	private static final long TWENTY_NINE_MINUTES = 29 * 60 * 1000;
+	private static final long HALF_HOUR_IN_MILLIS = 30 * 60 * 1000;
 	private static final long ONE_MINUTE_IN_MILLIS = 60 * 1000;
 	
 	private Logger logger = LoggerFactory.getLogger(RvfWorkerLifecycleManager.class);
@@ -52,8 +52,8 @@ public class RvfWorkerLifecycleManager {
 				public void run() {
 					while (!shutDown()) {
 						try {
-							Thread.sleep(60000);
-							logger.info("Check time for RVF worker to shutdown.");
+							Thread.sleep(5 * ONE_MINUTE_IN_MILLIS);
+							logger.info("Checking time...");
 						} catch (InterruptedException e) {
 							logger.error("Consumer thread is interupted", e);
 							executorService.shutdown();
@@ -74,7 +74,7 @@ public class RvfWorkerLifecycleManager {
 			if (!ValidationMessageListener.isValidationRunning()) {
 				// only shutdown when no message to process and close to the hourly mark
 				long timeTaken = Calendar.getInstance().getTimeInMillis() - instance.getLaunchTime().getTime();
-				if ((timeTaken % HOUR_IN_MILLIS) >= FITY_NINE_MINUTES) {
+				if ((timeTaken % HALF_HOUR_IN_MILLIS) >= TWENTY_NINE_MINUTES) {
 					logger.info("Shut down instance message consumer as no messages left to process in queue and it is approaching to hourly mark.");
 					logger.info("Instance total running time in minutes:" + (timeTaken / ONE_MINUTE_IN_MILLIS));
 					logger.info("Instance will be terminated with id:" + instance.getInstanceId());
@@ -102,8 +102,6 @@ public class RvfWorkerLifecycleManager {
 			return false;
 		}
 	}
-	
-	
 
 	private String getInstanceId() {
 		String instanceId = null;

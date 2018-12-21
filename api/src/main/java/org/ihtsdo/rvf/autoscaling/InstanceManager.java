@@ -31,6 +31,7 @@ import com.amazonaws.services.ec2.model.CreateTagsRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.Filter;
+import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
 import com.amazonaws.services.ec2.model.InstanceStateChange;
@@ -103,6 +104,9 @@ public class InstanceManager {
 	@Value("${rvf.autoscaling.isEc2Instance}")
 	private boolean isEc2Instance;
 	
+	@Value("${rvf.autoscaling.profile.roleName}")
+	private String instanceProfileRoleName;
+	
 	@PostConstruct
 	public void init() {
 		if (isAutoScallingEnabled || isEc2Instance) {
@@ -124,7 +128,9 @@ public class InstanceManager {
 				.withInstanceInitiatedShutdownBehavior(TERMINATE)
 				.withSecurityGroupIds(securityGroupId)
 				.withUserData(ec2InstanceStartupScript)
-				.withSubnetId(ec2SubnetId);
+				.withSubnetId(ec2SubnetId)
+				.withIamInstanceProfile( new IamInstanceProfileSpecification()
+						.withName(instanceProfileRoleName));
 		
 		List<String> ids = new ArrayList<>();
 		try {

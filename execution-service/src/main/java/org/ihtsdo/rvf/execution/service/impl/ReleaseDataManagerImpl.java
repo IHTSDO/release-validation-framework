@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -641,38 +642,38 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		if (schemaName == null || !releaseSchemaNameLookup.values().contains(schemaName)) {
 			throw new IllegalArgumentException("No schema found for " + schemaName);
 		}
-		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schemaName + ZIP_FILE_EXTENSION);
-		Path mysqlBinaryPath = Paths.get(mysqlDataDir, schemaName);
-		
-		if (Files.exists(mysqlBinaryPath,  LinkOption.NOFOLLOW_LINKS)) {
-			logger.info("Schema binary path exists " + mysqlBinaryPath);
-		} else {
-			logger.info("Schema binary path doesn't exist " + mysqlBinaryPath);
-		}
-		
 		File dataDir = new File(mysqlDataDir);
 		File binaryFile = new File(mysqlDataDir, schemaName);
 		if (!dataDir.canRead()) {
 			logger.info("Can't access directory " + dataDir.getPath());
 			try {
 				GroupPrincipal group = Files.readAttributes(dataDir.toPath(), PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS).group();
-				logger.info("group principal:" + group.getName() + group.toString());
+				UserPrincipal owner = Files.readAttributes(dataDir.toPath(), PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS).owner();
+				logger.info("user group:" + group.toString());
+				logger.info("owner :" + owner.toString());
+				Files.setOwner(binaryFile.toPath(), owner);
 				Files.getFileAttributeView(binaryFile.toPath(), PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS).setGroup(group);
+				Files.getFileAttributeView(binaryFile.toPath(), PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS).setOwner(owner);
+				if (binaryFile.exists()) {
+					logger.info("File exists " + binaryFile.getPath());
+				}
 				if (binaryFile.canRead()) {
 					logger.info("can read from" + binaryFile.getAbsolutePath());
 				} else {
 					logger.info("can't read from" + binaryFile.getAbsolutePath());
 				}
 			} catch (IOException e) {
-				throw new BusinessServiceException("Failed to fetch group principal for folder " + dataDir);
+				throw new BusinessServiceException("Failed to fetch group principal for folder " + dataDir, e.fillInStackTrace());
 			}
 		}
 		if (!binaryFile.exists()) {
 			throw new BusinessServiceException("No mysql binary file found for " + binaryFile.getPath());
 		}
+	
+		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schemaName + ZIP_FILE_EXTENSION);
 		try {
 			ZipFileUtils.zip(binaryFile.getAbsolutePath(), archiveFile.getAbsolutePath());
-			logger.info("Mysql binary archive file is created " + archiveFile.getName());
+			logger.info("Mysql binary archive file is created " + archiveFile.getPath());
 			ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
 			resourceManager.writeResource(archiveFile.getName(), new FileInputStream(archiveFile));
 			logger.info("Mysql binary archive file " + archiveFile.getName() + " is loaded to " + mysqlBinaryStorageConfig.toString());
@@ -684,23 +685,24 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 
 	@Override
 	public boolean restoreReleaseFromBinaryArchive(String archiveFileName) throws IOException {
-		
 		ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
 		InputStream inputStream = resourceManager.readResourceStreamOrNullIfNotExists(archiveFileName);
 		if (inputStream == null) {
+			logger.info("No resource avaiable for " + archiveFileName + " via " + mysqlBinaryStorageConfig.toString());
 			return false;
 		}
-		
 		File outputFile = downloadFile(inputStream, archiveFileName);
 		if (outputFile == null) {
+			logger.error("Failed to download " + archiveFileName + " via " + mysqlBinaryStorageConfig.toString());
 			return false;
 		}
-		File outputDir = new File(mysqlDataDir + archiveFileName.replace(".zip", ""));
+		File outputDir = new File(mysqlDataDir, archiveFileName.replace(".zip", ""));
 		if (outputDir.exists()) {
 			outputDir.delete();
 		}
 		outputDir.mkdir();
 		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
+		logger.info("Mysql binary files are restored sucessfully in " +  outputDir.getPath());
 		return true;
 	}
 
@@ -732,7 +734,6 @@ public class ReleaseDataManagerImpl implements ReleaseDataManager, InitializingB
 		} catch (final IOException e) {
 			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
 			return null;
-			
 		} finally {
 			IOUtils.closeQuietly(input);
 			IOUtils.closeQuietly(out);

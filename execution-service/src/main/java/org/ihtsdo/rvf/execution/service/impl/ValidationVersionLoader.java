@@ -94,7 +94,8 @@ public class ValidationVersionLoader {
 			String schemaName = generator.generate(previousVersion);
 			if (!releaseDataManager.isKnownRelease(schemaName)) {
 				if (!releaseDataManager.restoreReleaseFromBinaryArchive(schemaName + ZIP_FILE_EXTENSION)) {
-					releaseDataManager.uploadRelease(previousVersion, schemaName);
+					logger.info("No existing mysql binary release available.");
+					releaseDataManager.uploadRelease(previousVersion, previousVersion);
 					String archiveFilename = releaseDataManager.generateBinaryArchive(schemaName);
 					logger.info("Release mysql binary archive is generated:" + archiveFilename);
 				} 
