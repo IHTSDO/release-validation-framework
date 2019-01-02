@@ -23,7 +23,6 @@ import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 public class RvfWorkerLifecycleManager {
 
 	private static final String EC2_INSTANCE_ID_URL = "http://169.254.169.254/latest/meta-data/instance-id";
-	private static final long TWENTY_NINE_MINUTES = 29 * 60 * 1000;
 	private static final long HALF_HOUR_IN_MILLIS = 30 * 60 * 1000;
 	private static final long ONE_MINUTE_IN_MILLIS = 60 * 1000;
 	
@@ -74,8 +73,8 @@ public class RvfWorkerLifecycleManager {
 			if (!ValidationMessageListener.isValidationRunning()) {
 				// only shutdown when no message to process and close to the hourly mark
 				long timeTaken = Calendar.getInstance().getTimeInMillis() - instance.getLaunchTime().getTime();
-				if ((timeTaken % HALF_HOUR_IN_MILLIS) >= TWENTY_NINE_MINUTES) {
-					logger.info("Shut down instance message consumer as no messages left to process in queue and it is approaching to hourly mark.");
+				if (timeTaken >= HALF_HOUR_IN_MILLIS) {
+					logger.info("Shut down instance message consumer as no messages left to process in queue.");
 					logger.info("Instance total running time in minutes:" + (timeTaken / ONE_MINUTE_IN_MILLIS));
 					logger.info("Instance will be terminated with id:" + instance.getInstanceId());
 					boolean isTerminated = false;
