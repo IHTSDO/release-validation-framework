@@ -42,6 +42,10 @@ public class MysqlConfig {
     	basicDataSource.setPassword(password);
     	basicDataSource.setDriverClassName(driverClassName);
     	basicDataSource.setDefaultCatalog(defaultSchemaName);
+    	basicDataSource.setTestOnBorrow(true);
+    	basicDataSource.setTestWhileIdle(true);
+    	basicDataSource.setValidationQuery("SELECT 1");
+    	basicDataSource.setDefaultTransactionIsolation(2);
         return basicDataSource;
     }
 }

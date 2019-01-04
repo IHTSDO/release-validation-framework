@@ -100,7 +100,8 @@ public class ValidationRunner {
 	@Autowired
 	private ValidationVersionLoader releaseVersionLoader;
 	
-	@Autowired DroolsRulesValidationService droolsValidationService;
+	@Autowired 
+	private DroolsRulesValidationService droolsValidationService;
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	

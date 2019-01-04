@@ -52,10 +52,7 @@ public class RvfDynamicDataSource {
 		newDataSource.setTestOnReturn(true);
 		newDataSource.setTestWhileIdle(true);
 		newDataSource.setValidationQuery("SELECT 1");
-		newDataSource.setMinEvictableIdleTimeMillis(1800000);
-		newDataSource.setTimeBetweenEvictionRunsMillis(1800000);
-		//READ_COMMITTED
-		newDataSource.setDefaultTransactionIsolation(2);
+		newDataSource.setDefaultTransactionIsolation(dataSource.getDefaultTransactionIsolation());
 		return newDataSource;
 	}
 

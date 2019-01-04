@@ -28,8 +28,9 @@ import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
+import org.ihtsdo.rvf.execution.service.config.ExecutionServiceEndToEndTestConfig;
+import org.ihtsdo.rvf.execution.service.config.ExecutionServiceTestConfig;
 import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
-import org.ihtsdo.rvf.execution.service.impl.ExecutionServiceTestConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.After;
@@ -53,7 +54,7 @@ import com.google.gson.Gson;
  *
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = ExecutionServiceTestConfig.class)
+@ContextConfiguration(classes = ExecutionServiceEndToEndTestConfig.class)
 public class RVFAssertionsRegressionTestHarnesss {
 	
 	public static final String DIFF = "*** Difference explained: ";

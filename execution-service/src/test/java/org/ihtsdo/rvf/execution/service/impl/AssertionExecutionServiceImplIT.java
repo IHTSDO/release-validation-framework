@@ -13,6 +13,7 @@ import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.config.ExecutionServiceTestConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.Before;
 import org.junit.Test;

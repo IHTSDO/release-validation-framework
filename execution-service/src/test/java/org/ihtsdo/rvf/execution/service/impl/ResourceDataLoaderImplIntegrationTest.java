@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
+import org.ihtsdo.rvf.execution.service.config.ExecutionServiceTestConfig;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service;
+package org.ihtsdo.rvf.execution.service.config;
 
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
