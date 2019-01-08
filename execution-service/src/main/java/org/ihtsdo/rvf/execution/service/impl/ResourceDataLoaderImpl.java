@@ -13,39 +13,43 @@ import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import javax.annotation.Resource;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
-import org.ihtsdo.otf.dao.s3.S3Client;
+import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
+import org.ihtsdo.rvf.execution.service.config.ValidationResourceConfig;
 import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
 import org.springframework.stereotype.Service;
 
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.AnonymousAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 @Service
 public class ResourceDataLoaderImpl implements ResourceDataLoader {
 	private static final String US_TO_GB_TERMS_MAP_FILENAME = "us-to-gb-terms-map.txt";
 	private static final String UTF_8 = "UTF-8";
+	
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	
-	@Value("${rvf.validation.resources}")
-	private String validationResourcePath;
-
-	@Resource
-	private S3Client s3Client;
+	@Autowired
+	private ValidationResourceConfig testResourceConfig;
+	
+	@Value("${cloud.aws.region.static}")
+	private String region;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResourceDataLoaderImpl.class);
 	private File localResourceDir;
+
 	
 	private void init() throws BusinessServiceException {
 		//check whether the resources are available from given path in S3
@@ -58,33 +62,20 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 			throw new BusinessServiceException(errorMsg, e);
 		}
 		try {
-			LOGGER.info("validationResourcePath:" + validationResourcePath);
-			int index = validationResourcePath.indexOf("/");
-			String bucketname = validationResourcePath;
-			String prefix = US_TO_GB_TERMS_MAP_FILENAME;
-			if (index != -1) {
-				 bucketname = validationResourcePath.substring(0,index);
-				 prefix = validationResourcePath.substring(index+1);
-				 if (!prefix.isEmpty() && !prefix.endsWith("/")) {
-					 prefix += "/" + US_TO_GB_TERMS_MAP_FILENAME;
-				 } else {
-					 prefix += US_TO_GB_TERMS_MAP_FILENAME;
-				 }
-			}
-			LOGGER.info("The bucket name extracted from validationResourcePath:" + bucketname);
-			LOGGER.info("The prefix constructed from validationResourcePath:" + prefix);
-			ObjectListing listing = s3Client.listObjects(bucketname, prefix);
-			if (!listing.getObjectSummaries().isEmpty()) {
-				S3Object termFileObj = s3Client.getObject(bucketname, prefix);
-				LOGGER.info("External configuration file {} found at {}", US_TO_GB_TERMS_MAP_FILENAME, validationResourcePath);
-				File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
-				try (InputStream input = termFileObj.getObjectContent();
+			AmazonS3 anonymousClient = AmazonS3ClientBuilder.standard()
+					.withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
+					.withRegion(region)
+					.build();
+			ResourceManager resourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
+			File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
+			try (InputStream input = resourceManager.readResourceStreamOrNullIfNotExists(US_TO_GB_TERMS_MAP_FILENAME);
 					OutputStream out = new FileOutputStream(localMapFile);) {
+				if (input != null) {
 					IOUtils.copy(input, out);
 				}
 			}
 		} catch (Throwable  t) {
-			final String errorMsg = "Error when trying to download the us-to-gb-terms-map.txt file from S3 at path:" + validationResourcePath;
+			final String errorMsg = "Error when trying to download the us-to-gb-terms-map.txt file from S3 via :" +  testResourceConfig;
 			LOGGER.error(errorMsg, t);
 		} 
 		boolean isExternalConfigFound = false;
@@ -97,7 +88,7 @@ public class ResourceDataLoaderImpl implements ResourceDataLoader {
 			}
 		}
 		if (!isExternalConfigFound) {
-			LOGGER.info("No external configuration file {} found at {} therefore the default file will be used", US_TO_GB_TERMS_MAP_FILENAME, validationResourcePath);
+			LOGGER.info("No external configuration file {} found and the default file will be used", US_TO_GB_TERMS_MAP_FILENAME);
 			try {
 				copyDefaultDataFiles(localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
 			} catch (IOException e) {

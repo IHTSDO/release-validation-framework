@@ -49,8 +49,7 @@ public class ResultController {
 				storageLocation);
 		final HttpStatus returnStatus = HttpStatus.OK;
 		if (state == null) {
-			responseMap.put(MESSAGE, "No validation state found at "
-					+ storageLocation);
+			responseMap.put(MESSAGE, "No validation state found at " + storageLocation);
 		} else {
 			responseMap.put("status", state.toString());
 			switch (state) {
@@ -60,18 +59,15 @@ public class ResultController {
 						"Validation hasn't started running yet!");
 				break;
 			case RUNNING:
-				final String progress = reportService
-						.recoverProgress(storageLocation);
+				 String progress = reportService.recoverProgress(storageLocation);
 				responseMap.put(MESSAGE, "Validation is still running.");
 				responseMap.put("Progress", progress);
 				break;
 			case FAILED:
-				reportService
-						.recoverResult(responseMap, runId, storageLocation);
+				reportService.recoverResult(responseMap, runId, storageLocation);
 				break;
 			case COMPLETE:
-				reportService
-						.recoverResult(responseMap, runId, storageLocation);
+				reportService.recoverResult(responseMap, runId, storageLocation);
 				break;
 			}
 		}

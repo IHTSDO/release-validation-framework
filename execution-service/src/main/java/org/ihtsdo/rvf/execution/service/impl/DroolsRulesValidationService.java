@@ -19,8 +19,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.response.Severity;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
-import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
-import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
@@ -29,13 +27,16 @@ import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
+import org.ihtsdo.rvf.execution.service.config.ValidationResourceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
 import org.springframework.stereotype.Service;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.AnonymousAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.google.common.collect.Sets;
 
 @Service
@@ -44,11 +45,8 @@ public class DroolsRulesValidationService {
 	@Value("${rvf.drools.rule.directory}")
 	private String droolsRuleDirectoryPath;
 	
-	@Value("${test-resources.cloud.bucket}")
-	private String testResourceBucket;
-
-	@Value("${test-resources.cloud.path}")
-	private String testResourcePath;
+	@Autowired
+	private ValidationResourceConfig testResourceConfig;
 	
 	@Autowired
 	private ValidationVersionLoader releaseVersionLoader;
@@ -92,9 +90,10 @@ public class DroolsRulesValidationService {
 						modulesSet = Sets.newHashSet(moduleIds.split(","));
 					}
 				}
-
-				ResourceConfiguration manualResourceConfiguration = new ManualResourceConfiguration(true,true,null,new ResourceConfiguration.Cloud(testResourceBucket,testResourcePath));
-				ResourceManager resourceManager = new ResourceManager(manualResourceConfiguration, new SimpleStorageResourceLoader(new AmazonS3Client(new AnonymousAWSCredentials())));
+				AmazonS3 anonymousClient = AmazonS3ClientBuilder.standard()
+						.withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
+						.build();
+				ResourceManager resourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
 				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, resourceManager);
 				String effectiveTime = validationConfig.getEffectiveTime();
 				if (StringUtils.isNotBlank(effectiveTime)) {

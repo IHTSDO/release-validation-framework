@@ -33,5 +33,4 @@ public class RvfAssertionsDatabasePrimerService {
 		//create assertion group
 		assertionGroupImporter.importAssertionGroups();
 	}
-
 }

@@ -10,14 +10,11 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
-import org.ihtsdo.rvf.service.AssertionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AssertionHelper {
-	@Autowired
-	private AssertionService assertionService;
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 
@@ -29,8 +26,7 @@ public class AssertionHelper {
 		for (final Assertion assertion : assertions) {
 			try {
 				final List<TestRunItem> items = new ArrayList<>(
-						assertionExecutionService.executeAssertion(assertion,
-								config));
+						assertionExecutionService.executeAssertion(assertion, config));
 				for (final TestRunItem item : items) {
 					if (item.getFailureCount() != 0) {
 						failedAssertionCount++;

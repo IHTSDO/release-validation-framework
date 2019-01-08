@@ -27,11 +27,13 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.ihtsdo.otf.dao.s3.S3Client;
 import org.ihtsdo.otf.dao.s3.helper.FileHelper;
+import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
+import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
+import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.util.RvfReleaseDbSchemaNameGenerator;
 import org.ihtsdo.rvf.util.ZipFileUtils;
@@ -39,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -66,13 +69,19 @@ public class ValidationVersionLoader {
 	private static final String FULL_TABLE = "%_f";
 
 	@Autowired
+	private ValidationReleaseStorageConfig releaseStorageConfig;
+	
+	@Autowired
+	private ValidationJobResourceConfig jobResourceConfig;
+	
+	@Autowired
+	private ResourceLoader cloudResourceLoader;
+	
+	@Autowired
 	private ReleaseDataManager releaseDataManager;
 
 	@Autowired
 	private ValidationReportService reportService;
-
-	@Resource
-	private S3Client s3Client;
 
 	@Autowired
 	private ResourceDataLoader resourceLoader;
@@ -109,12 +118,11 @@ public class ValidationVersionLoader {
 		boolean isSucessful = true;
 		if (validationConfig.getExtensionDependency() != null && validationConfig.getExtensionDependency().endsWith(ZIP_FILE_EXTENSION)) {
 			//load dependency release
-			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
 			String extensionDependencyVersion = getVersion(validationConfig.getExtensionDependency(), false);
 			executionConfig.setExtensionDependencyVersion(extensionDependencyVersion);
 			try {
 				if(!databaseExists(RVF_PREFIX + executionConfig.getExtensionDependencyVersion())){
-					loadPublishedVersionIntoDatabase(s3PublishFileHelper, validationConfig.getExtensionDependency(), executionConfig.getExtensionDependencyVersion());
+					loadPublishedVersionIntoDB(validationConfig.getExtensionDependency(), executionConfig.getExtensionDependencyVersion());
 				}
 			} catch (Exception e) {
 				throw new BusinessServiceException("Failed to load dependency release from S3.", e);
@@ -230,8 +238,8 @@ public class ValidationVersionLoader {
 		if (validationConfig.isProspectiveFilesInS3()) {
 			//streaming file from S3 to local
 			long s3StreamingStart = System.currentTimeMillis();
-			FileHelper s3Helper = new FileHelper(validationConfig.getS3ExecutionBucketName(), s3Client);
-			InputStream input = s3Helper.getFileStream(validationConfig.getProspectiveFileFullPath());
+			ResourceManager jobResource = new ResourceManager(jobResourceConfig, cloudResourceLoader);
+			InputStream input = jobResource.readResourceStreamOrNullIfNotExists(validationConfig.getProspectiveFileFullPath());
 			File prospectiveFile = File.createTempFile(validationConfig.getRunId() + "_" + validationConfig.getTestFileName(), ZIP_FILE_EXTENSION);
 			OutputStream out = new FileOutputStream(prospectiveFile);
 			IOUtils.copy(input, out);
@@ -239,8 +247,9 @@ public class ValidationVersionLoader {
 			IOUtils.closeQuietly(out);
 			logger.debug("local prospective file" + prospectiveFile.getAbsolutePath());
 			validationConfig.setLocalProspectiveFile(prospectiveFile);
+			//TODO refactor this 
 			if (validationConfig.getManifestFileFullPath() != null) {
-				InputStream manifestInput = s3Helper.getFileStream(validationConfig.getManifestFileFullPath());
+				InputStream manifestInput = jobResource.readResourceStreamOrNullIfNotExists(validationConfig.getManifestFileFullPath());
 				File manifestFile = File.createTempFile("manifest_" + validationConfig.getRunId(), ".xml");
 				Writer output = new FileWriter(manifestFile);
 				IOUtils.copy(manifestInput, output, UTF_8);
@@ -262,8 +271,7 @@ public class ValidationVersionLoader {
 		String extensionDependencyVersion = validationConfig.getExtensionDependency();
 		if (StringUtils.isNotBlank(extensionDependencyVersion) && extensionDependencyVersion.endsWith(ZIP_FILE_EXTENSION)) {
 			String publishedFileS3Path = getPublishedFilePath(validationConfig.getExtensionDependency());
-			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
-			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
+			InputStream publishedFileInput = getPublishedResource(publishedFileS3Path);
 			if (publishedFileInput != null) {
 				File dependencyFile = File.createTempFile(DEPENDENCY +validationConfig.getRunId(), ZIP_FILE_EXTENSION);
 				OutputStream out = new FileOutputStream(dependencyFile);
@@ -280,12 +288,17 @@ public class ValidationVersionLoader {
 		}
 	}
 
+	
+	private InputStream getPublishedResource(String resourcePath) throws IOException {
+		ResourceManager publishedResource = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
+		return publishedResource.readResourceStreamOrNullIfNotExists(resourcePath);
+	}
+	
 	public void downloadPreviousVersion(ValidationRunConfig validationConfig) throws IOException, BusinessServiceException {
 		String previousVersion = StringUtils.isNotBlank(validationConfig.getPreviousExtVersion()) ? validationConfig.getPreviousExtVersion() : validationConfig.getPrevIntReleaseVersion();
 		if (StringUtils.isNotBlank(previousVersion) && previousVersion.endsWith(ZIP_FILE_EXTENSION)) {
 			String publishedFileS3Path = getPublishedFilePath(previousVersion);
-			FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
-			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
+			InputStream publishedFileInput = getPublishedResource(publishedFileS3Path);
 			if (publishedFileInput != null) {
 				File previousDependency = File.createTempFile(PREVIOUS +validationConfig.getRunId(), ZIP_FILE_EXTENSION);
 				OutputStream out = new FileOutputStream(previousDependency);
@@ -329,9 +342,9 @@ public class ValidationVersionLoader {
 		return true;
 	}
 	
-	private void loadPublishedVersionIntoDB( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
+	private void loadPublishedVersionIntoDB(String publishedReleaseFilename, String rvfVersion) throws Exception {
 		String publishedFileS3Path = getPublishedFilePath(publishedReleaseFilename);
-		InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
+		InputStream publishedFileInput = getPublishedResource(publishedFileS3Path);
 		if (publishedFileInput != null) {
 			File tempFile = File.createTempFile(publishedReleaseFilename, ZIP_FILE_EXTENSION);
 			OutputStream out = new FileOutputStream(tempFile);
@@ -343,29 +356,6 @@ public class ValidationVersionLoader {
 			String msg = "Previous release not found in the published bucket:" + publishedFileS3Path;
 			logger.error(msg);
 			throw new BusinessServiceException(msg);
-		}
-	}
-
-	private void loadPublishedVersionIntoDatabase( FileHelper s3PublishFileHelper, String publishedReleaseFilename, String rvfVersion) throws Exception {
-		//Try to restore schema from S3 if there is MyISAM backup, otherwise load data from published package
-		if(!downloadMyISAMOnS3AndRestore(s3PublishFileHelper, rvfVersion)) {
-			String publishedFileS3Path = getPublishedFilePath(publishedReleaseFilename);
-			logger.debug("downloading published file from s3: " + publishedFileS3Path); //download previous ZIP file from S3
-			InputStream publishedFileInput = s3PublishFileHelper.getFileStream(publishedFileS3Path);
-			if (publishedFileInput != null) {
-				File tempFile = File.createTempFile(publishedReleaseFilename, ZIP_FILE_EXTENSION);
-				OutputStream out = new FileOutputStream(tempFile);
-				IOUtils.copy(publishedFileInput,out);
-				IOUtils.closeQuietly(publishedFileInput);
-				IOUtils.closeQuietly(out);
-				String createdSchemaName = releaseDataManager.loadSnomedData(rvfVersion, new ArrayList<String>(),tempFile);
-				//Backup database to S3 for faster loading
-				backupDatabaseToS3(rvfVersion, createdSchemaName, s3PublishFileHelper);
-			} else {
-				String msg = "Previous release not found in the published bucket:" + publishedFileS3Path;
-				logger.error(msg);
-				//throw new BusinessServiceException(msg);
-			}
 		}
 	}
 
@@ -415,19 +405,18 @@ public class ValidationVersionLoader {
 	}
 
 	private boolean prepareVersionsFromS3FilesForPreviousVersion(ValidationRunConfig validationConfig, String reportStorage, Map<String, Object> responseMap,List<String> rf2FilesLoaded, ExecutionConfig executionConfig) throws Exception {
-		FileHelper s3PublishFileHelper = new FileHelper(validationConfig.getS3PublishBucketName(), s3Client);
 		if (!validationConfig.isFirstTimeRelease()) {
 			if (isExtension(validationConfig)) {
 				if (validationConfig.getPreviousExtVersion() != null && validationConfig.getPreviousExtVersion().endsWith(ZIP_FILE_EXTENSION)) {
 					if(!databaseExists(RVF_PREFIX + executionConfig.getPreviousVersion())){
-						loadPublishedVersionIntoDatabase(s3PublishFileHelper, validationConfig.getPreviousExtVersion(),  executionConfig.getPreviousVersion());
+						loadPublishedVersionIntoDB(validationConfig.getPreviousExtVersion(),  executionConfig.getPreviousVersion());
 					}
 				}
 			} else {
 				if (validationConfig.getPrevIntReleaseVersion() != null && validationConfig.getPrevIntReleaseVersion().endsWith(ZIP_FILE_EXTENSION)) {
 					//check database exist or not
 					if(!databaseExists(RVF_PREFIX + executionConfig.getPreviousVersion())){
-						loadPublishedVersionIntoDatabase(s3PublishFileHelper, validationConfig.getPrevIntReleaseVersion(), executionConfig.getPreviousVersion());
+						loadPublishedVersionIntoDB(validationConfig.getPrevIntReleaseVersion(), executionConfig.getPreviousVersion());
 					}
 				}
 			}

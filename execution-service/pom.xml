@@ -36,7 +36,7 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>importer</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency> 
 		
 		<!--Utility -->
 		<dependency>

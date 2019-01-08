@@ -6,8 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix="rvf.validation.job.storage")
+@ConfigurationProperties(prefix="test-resources")
 @EnableAutoConfiguration
-public class ValidationJobResourceConfig extends ResourceConfiguration {
-	
+public class ValidationResourceConfig extends ResourceConfiguration {
 }
