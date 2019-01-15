@@ -102,6 +102,9 @@ public class ValidationQueueManager {
 				config.setManifestFileFullPath(manifestS3Path);
 			}
 			config.setProspectiveFilesInS3(jobResourceConfig.isUseCloud());
+			if (jobResourceConfig.isUseCloud()) {
+				config.setBucketName(jobResourceConfig.getCloud().getBucketName());
+			}
 		} 
 		return true;
 	}

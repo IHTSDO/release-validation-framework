@@ -278,4 +278,9 @@ public class ValidationRunConfig {
 	public String getBucketName() {
 		return this.bucketName;
 	}
+	
+	public void setBucketName(String bucketName) {
+		this.bucketName = bucketName;
+		
+	}
 }

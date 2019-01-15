@@ -7,39 +7,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.ihtsdo.otf.dao.s3.helper.FileHelper;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration.Cloud;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
-import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.util.RvfReleaseDbSchemaNameGenerator;
-import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,26 +40,13 @@ public class ValidationVersionLoader {
 
 	private static final String COMBINED = "_combined";
 	private static final String RELATIONSHIP_SNAPSHOT_TABLE = "relationship_s";
-	private static final String PREVIOUS = "previous_";
-	private static final String DEPENDENCY = "dependency_";
 	private static final String SNAPSHOT_TABLE = "%_s";
-	private static final String SEPARATOR = "/";
-
-	private static final String RVF_PREFIX = "rvf_";
-
-	private static final String INTERNATIONAL = "international";
-	private static final String INT = "int";
 
 	private static final String ZIP_FILE_EXTENSION = ".zip";
-
-	public static final String FAILURE_MESSAGE = "failureMessage";
 
 	private static final String UTF_8 = "UTF-8";
 	private static final String DELTA_TABLE = "%_d";
 	private static final String FULL_TABLE = "%_f";
-
-	@Autowired
-	private ValidationReleaseStorageConfig releaseStorageConfig;
 	
 	@Autowired
 	private ValidationJobResourceConfig jobResourceConfig;
@@ -203,7 +178,7 @@ public class ValidationVersionLoader {
 		if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
 			if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
 				ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
-						new Cloud(validationConfig.getBucketName(), null));
+						new Cloud(validationConfig.getBucketName(), ""));
 				ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
 				prospectiveInput = manualResource.readResourceStreamOrNullIfNotExists(validationConfig.getProspectiveFileFullPath());
 				if (validationConfig.getManifestFileFullPath() != null) {
@@ -342,5 +317,4 @@ public class ValidationVersionLoader {
 			}
 		} 
 	}
-
 }
