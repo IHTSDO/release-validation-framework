@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -11,7 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.ihtsdo.rvf.execution.service.util.RvfDynamicDataSource;
+import org.ihtsdo.rvf.execution.service.util.MySqlDataTypeConverter;
+import org.ihtsdo.rvf.execution.service.util.RF2FileTableMapper;
 import org.ihtsdo.snomed.util.rf2.schema.ComponentType;
 import org.ihtsdo.snomed.util.rf2.schema.DataType;
 import org.ihtsdo.snomed.util.rf2.schema.Field;

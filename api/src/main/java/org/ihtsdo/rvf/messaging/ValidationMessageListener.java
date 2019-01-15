@@ -5,8 +5,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
-import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
-import org.ihtsdo.rvf.execution.service.impl.ValidationRunner;
+import org.ihtsdo.rvf.execution.service.ValidationRunner;
+import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

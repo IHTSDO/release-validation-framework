@@ -1,6 +1,5 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service;
 
-import org.ihtsdo.rvf.execution.service.ExecutionServiceTestConfig;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,8 +9,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExecutionServiceTestConfig.class})
-public class ResourceDataLoaderImplIntegrationTest {
+//@ContextConfiguration(classes = {ExecutionServiceTestConfig.class})
+public class ResourceDataLoaderIntegrationTest {
 	
 	@Autowired
 	private ResourceDataLoader resourceDataLoader;

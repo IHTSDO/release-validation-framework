@@ -9,10 +9,10 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.codec.DecoderException;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.rvf.execution.service.ValidationReportService;
+import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
-import org.ihtsdo.rvf.execution.service.impl.ValidationReportService;
-import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
-import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
+import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +57,7 @@ public class ValidationQueueManager {
 		validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
 	}
 
-	public void queueValidationRequest(ValidationRunConfig config,
-			Map<String, String> responseMap) {
+	public void queueValidationRequest(ValidationRunConfig config, Map<String, String> responseMap) {
 		try {
 			if (saveUploadedFiles(config, responseMap)) {
 				Gson gson = new Gson();
@@ -68,14 +67,11 @@ public class ValidationQueueManager {
 				reportService.writeState(State.QUEUED, config.getStorageLocation());
 			}
 		} catch (IOException e) {
-			responseMap.put(FAILURE_MESSAGE,
-					"Failed to save uploaded prospective release file due to " + e.getMessage());
+			responseMap.put(FAILURE_MESSAGE, "Failed to save uploaded prospective release file due to " + e.getMessage());
 		} catch (JmsException e) {
-			responseMap.put(FAILURE_MESSAGE,
-					"Failed to send queueing message due to " + e.getMessage());
+			responseMap.put(FAILURE_MESSAGE, "Failed to send queueing message due to " + e.getMessage());
 		} catch (NoSuchAlgorithmException | DecoderException e) {
-			responseMap.put(FAILURE_MESSAGE,
-					"Failed to write Queued State to Storage Location due to " + e.getMessage());
+			responseMap.put(FAILURE_MESSAGE, "Failed to write Queued State to Storage Location due to " + e.getMessage());
 		}
 	}
 
@@ -85,45 +81,28 @@ public class ValidationQueueManager {
 	 * thread to finish.
 	 */
 	private boolean saveUploadedFiles(final ValidationRunConfig config,
-			final Map<String, String> responseMap) throws IOException {
-
-		if (!config.isProspectiveFilesInS3()) {
-			final String filename = config.getFile().getOriginalFilename();
-			if (!isAutoScalingEnabled.booleanValue()) {
-				LOGGER.info("Autoscaling is not enabled. RVF will tansfer files locally");
-				// temp file will be deleted when validation is done.
-				final File tempFile = File.createTempFile(filename, ".zip");
-				if (!filename.endsWith(".zip")) {
-					responseMap.put(FAILURE_MESSAGE, "Post condition test package has to be zipped up");
-					return false;
-				}
-				config.getFile().transferTo(tempFile);
-				config.setTestFileName(filename);
-				config.setProspectiveFileFullPath(tempFile.getAbsolutePath());
-				File manifestLocalFile = null;
-				if (config.getManifestFile() != null) {
-					manifestLocalFile = File.createTempFile(config.getManifestFile().getOriginalFilename()
-									+ config.getRunId(), ".xml");
-					config.getManifestFile().transferTo(manifestLocalFile);
-					config.setLocalManifestFile(manifestLocalFile);
-					config.setManifestFileFullPath(manifestLocalFile.getAbsolutePath());
-				}
-
-			} else {
-				LOGGER.info("Autoscaling is enabled. RVF needs to save files to S3 for ec2 worker");
-				config.setProspectiveFilesInS3(true);
-				String s3StoragePath = config.getStorageLocation() + File.separator + FILES_TO_VALIDATE + File.separator;
-				String targetFilePath = s3StoragePath + filename;
-				validationJobResourceManager.writeResource(targetFilePath, config.getFile().getInputStream());
-				config.setProspectiveFileFullPath(targetFilePath);
-				config.setTestFileName(filename);
-				if (config.getManifestFile() != null) {
-					String manifestS3Path = s3StoragePath + config.getManifestFile().getOriginalFilename();
-					validationJobResourceManager.writeResource(manifestS3Path, config.getManifestFile().getInputStream());
-					config.setManifestFileFullPath(manifestS3Path);
-				}
-			}
+			final Map<String, String> responseMap) throws IOException, NoSuchAlgorithmException, DecoderException {
+		
+		if (!jobResourceConfig.isUseCloud() && config.isProspectiveFileInS3()) {
+			responseMap.put(FAILURE_MESSAGE, "Can't process files from S3 as validation resource config is configured to use local files "
+					+ jobResourceConfig.toString());
+			reportService.writeState(State.FAILED, config.getStorageLocation());
+			return false;
 		}
+		if (!config.isProspectiveFileInS3()) {
+			String filename = config.getFile().getOriginalFilename();
+			String jobStoragePath = config.getStorageLocation() + File.separator + FILES_TO_VALIDATE + File.separator;
+			String targetFilePath = jobStoragePath + filename;
+			validationJobResourceManager.writeResource(targetFilePath, config.getFile().getInputStream());
+			config.setProspectiveFileFullPath(targetFilePath);
+			config.setTestFileName(filename);
+			if (config.getManifestFile() != null) {
+				String manifestS3Path = jobStoragePath + config.getManifestFile().getOriginalFilename();
+				validationJobResourceManager.writeResource(manifestS3Path, config.getManifestFile().getInputStream());
+				config.setManifestFileFullPath(manifestS3Path);
+			}
+			config.setProspectiveFilesInS3(jobResourceConfig.isUseCloud());
+		} 
 		return true;
 	}
 }

@@ -2,9 +2,9 @@ package org.ihtsdo.rvf;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
@@ -15,9 +15,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 	@PropertySource(value = "classpath:data-service-defaults.properties"),
 	@PropertySource(value = "file:${rvfConfigLocation}/data-service.properties", ignoreResourceNotFound=true)})
 @EntityScan("org.ihtsdo.rvf.entity")
-@EnableAutoConfiguration
 @EnableJpaRepositories
-public class MysqlConfig {
+public class DataServiceConfig {
 	
 	@Value("${rvf.jdbc.driverClassName}") 
 	private String driverClassName;

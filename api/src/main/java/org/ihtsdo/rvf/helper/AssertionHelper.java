@@ -9,7 +9,7 @@ import java.util.Map;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

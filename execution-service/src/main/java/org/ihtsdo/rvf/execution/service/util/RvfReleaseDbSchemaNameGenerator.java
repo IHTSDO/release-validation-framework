@@ -3,9 +3,6 @@ package org.ihtsdo.rvf.execution.service.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
-
-@Service
 public class RvfReleaseDbSchemaNameGenerator {
 	
 	private static final Map<String,String> REPLACEMENTS = new HashMap<>();
@@ -18,7 +15,7 @@ public class RvfReleaseDbSchemaNameGenerator {
 		REPLACEMENTS.put("-", "");
 		
 	}
-	public String generate(String releaseFilename) {
+	public static String generate(String releaseFilename) {
 		if (releaseFilename != null && !releaseFilename.endsWith(".zip")) {
 			return releaseFilename.replaceAll("-", "_");
 		}

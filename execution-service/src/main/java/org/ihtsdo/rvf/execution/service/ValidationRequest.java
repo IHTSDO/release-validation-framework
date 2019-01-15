@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 

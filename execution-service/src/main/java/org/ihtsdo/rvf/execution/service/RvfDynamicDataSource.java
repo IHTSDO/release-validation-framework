@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.util;
+package org.ihtsdo.rvf.execution.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;

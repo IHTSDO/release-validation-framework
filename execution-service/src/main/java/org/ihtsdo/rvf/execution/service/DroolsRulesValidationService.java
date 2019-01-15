@@ -1,7 +1,6 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,10 +28,15 @@ import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
+import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
+import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationResourceConfig;
+import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -49,9 +55,25 @@ public class DroolsRulesValidationService {
 	private ValidationResourceConfig testResourceConfig;
 	
 	@Autowired
-	private ValidationVersionLoader releaseVersionLoader;
+	private ValidationJobResourceConfig jobResourceConfig;
+	
+	@Autowired
+	private ValidationReleaseStorageConfig releaseStorageConfig;
+	
+	@Autowired
+	private ResourceLoader cloudResourceLoader;
+	
+	private ResourceManager validationJobResourceManager;
+	
+	private ResourceManager releaseSourceManager;
 
-	public void runDroolsAssertions(Map<String, Object> responseMap, ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws RVFExecutionException {
+	@PostConstruct
+	public void init() {
+		validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
+		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
+	}
+	
+	public void runDroolsAssertions(ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws RVFExecutionException {
 		long timeStart = new Date().getTime();
 		//Filter only Drools rules set from all the assertion groups
 		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
@@ -62,13 +84,11 @@ public class DroolsRulesValidationService {
 			List<InvalidContent> invalidContents;
 			try {
 				Set<InputStream> snapshotsInputStream = new HashSet<>();
+				InputStream testedReleaseFileStream = validationJobResourceManager.readResourceStream(validationConfig.getProspectiveFileFullPath());
 				InputStream deltaInputStream = null;
-
-				InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile());
 				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 				if(validationConfig.isRf2DeltaOnly()) {
-					releaseVersionLoader.downloadPreviousVersion(validationConfig);
-					InputStream previousStream = new FileInputStream(validationConfig.getLocalPreviousFile());
+					InputStream previousStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
 					snapshotsInputStream.add(previousStream);
 					deltaInputStream = testedReleaseFileStream;
 				} else {
@@ -80,8 +100,7 @@ public class DroolsRulesValidationService {
 				//If the package is an MS edition, it is not necessary to load the dependency
 				Set<String> modulesSet = null;
 				if(executionConfig.isExtensionValidation() && !validationConfig.isReleaseAsAnEdition()) {
-					releaseVersionLoader.downloadDependencyVersion(validationConfig);
-					InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyFile());
+					InputStream dependencyStream = releaseSourceManager.readResourceStream(validationConfig.getExtensionDependency());
 					snapshotsInputStream.add(dependencyStream);
 
 					//Will filter the results based on component's module IDs if the package is an extension only
@@ -176,13 +195,13 @@ public class DroolsRulesValidationService {
 			validationReport.addWarningAssertions(warningAssertions);
 			validationReport.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
 		} catch (Exception ex) {
-			final DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
+			DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
 			report.setRuleSetExecuted(String.join(",", droolsRulesSets));
 			report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
 			report.setExecutionId(executionConfig.getExecutionId());
 			report.setMessage(ExceptionUtils.getStackTrace(ex));
 			report.setCompleted(false);
-			responseMap.put(report.getTestType().toString() + "TestResult", report);
+			//TODO add failure report to status report
 		} finally {
 			for (String directoryPath : directoryPaths) {
 				FileUtils.deleteQuietly(new File(directoryPath));
@@ -193,7 +212,9 @@ public class DroolsRulesValidationService {
 
 	private Set<String> getDroolsRulesSetFromAssertionGroups(Set<String> assertionGroups) throws RVFExecutionException {
 		File droolsRuleDir = new File(droolsRuleDirectoryPath);
-		if(!droolsRuleDir.isDirectory()) throw new RVFExecutionException("Drools rules directory path " + droolsRuleDirectoryPath + " is not a directory or inaccessible");
+		if (!droolsRuleDir.isDirectory()) {
+			throw new RVFExecutionException("Drools rules directory path " + droolsRuleDirectoryPath + " is not a directory or inaccessible");
+		}
 		Set<String> droolsRulesModules = new HashSet<>();
 		File[] droolsRulesSubfiles = droolsRuleDir.listFiles();
 		for (File droolsRulesSubfile : droolsRulesSubfiles) {

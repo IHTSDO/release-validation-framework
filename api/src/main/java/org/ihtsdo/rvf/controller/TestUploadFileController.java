@@ -17,10 +17,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.execution.service.impl.DroolsRulesValidationRequest;
-import org.ihtsdo.rvf.execution.service.impl.RVFMysqlValidationRequest;
-import org.ihtsdo.rvf.execution.service.impl.ValidationRequest;
-import org.ihtsdo.rvf.execution.service.impl.ValidationRunConfig;
+import org.ihtsdo.rvf.execution.service.DroolsRulesValidationRequest;
+import org.ihtsdo.rvf.execution.service.RVFMysqlValidationRequest;
+import org.ihtsdo.rvf.execution.service.ValidationRequest;
+import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.messaging.ValidationQueueManager;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
@@ -179,14 +179,14 @@ public class TestUploadFileController {
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = "includedModules", required = false) final String includedModules
 			) throws IOException, URISyntaxException {
 
-		final ValidationRunConfig vrConfig = new ValidationRunConfig();
+		ValidationRunConfig vrConfig = new ValidationRunConfig();
 		String urlPrefix = getRequestUrlPrefix();
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFile(manifestFile)
-				.addPrevIntReleaseVersion(prevIntReleaseVersion)
-				.addPreviousExtVersion(previousExtVersion)
-				.addExtensionDependencyVersion(extensionDependency)
+				.addPreviousRelease(prevIntReleaseVersion)
+				.addPreviousRelease(previousExtVersion)
+				.addDependencyRelease(extensionDependency)
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax).addUrl(urlPrefix)
 				.addProspectiveFilesInS3(false)
@@ -274,7 +274,8 @@ public class TestUploadFileController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(position = 4, value = "Run validations for the release files stored in AWS S3", notes = "This api is mainly used by the RVF autoscalling instances to validate release files stored in AWS S3.")
 	public ResponseEntity<Map<String, String>> runPostTestPackageViaS3(
-			@ApiParam(value = "Release zip file path in AWS S3 bucket") @RequestParam(value = "releaseFileS3Path") final String releaseFileS3Path,
+			@ApiParam(value = "S3 bucket name") @RequestParam(value = "bucketName") String bucketName,
+			@ApiParam(value = "Release zip file path in S3") @RequestParam(value = "releaseFileS3Path") String releaseFileS3Path,
 			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = "rf2DeltaOnly", required = false) final boolean isRf2DeltaOnly,
 			@ApiParam(value = "Defaults to false to reduce the size of report file") @RequestParam(value = "writeSuccesses", required = false) final boolean writeSucceses,
 			@ApiParam(value = "manifest.xml file path in AWS S3") @RequestParam(value = "manifestFileS3Path", required = false) final String manifestFileS3Path,
@@ -294,15 +295,20 @@ public class TestUploadFileController {
 
 		final String urlPrefix = getRequestUrlPrefix();
 		final ValidationRunConfig vrConfig = new ValidationRunConfig();
-		vrConfig.addProspectiveFileFullPath(releaseFileS3Path)
+		vrConfig.addBucketName(bucketName)
+				.addProspectiveFileFullPath(releaseFileS3Path)
 				.addRF2DeltaOnly(isRf2DeltaOnly)
-				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
+				.addWriteSucceses(writeSucceses)
+				.addGroupsList(groupsList)
+				.addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFileFullPath(manifestFileS3Path)
-				.addPrevIntReleaseVersion(prevIntReleaseVersion)
-				.addPreviousExtVersion(previousExtVersion)
-				.addExtensionDependencyVersion(extensionDependency)
-				.addRunId(runId).addStorageLocation(storageLocation)
-				.addFailureExportMax(exportMax).addUrl(urlPrefix)
+				.addPreviousRelease(prevIntReleaseVersion)
+				.addPreviousRelease(previousExtVersion)
+				.addDependencyRelease(extensionDependency)
+				.addRunId(runId)
+				.addStorageLocation(storageLocation)
+				.addFailureExportMax(exportMax)
+				.addUrl(urlPrefix)
 				.addProspectiveFilesInS3(true)
 				.setEnableDrools(enableDrools)
 				.setEffectiveTime(effectiveTime)

@@ -9,8 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.ihtsdo.rvf.execution.service.impl.ValidationReportService;
-import org.ihtsdo.rvf.execution.service.impl.ValidationReportService.State;
+import org.ihtsdo.rvf.execution.service.ValidationReportService;
+import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;

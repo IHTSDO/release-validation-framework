@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -12,7 +12,6 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.ihtsdo.rvf.execution.service.ExecutionServiceTestConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.junit.Test;
 import org.junit.runner.RunWith;

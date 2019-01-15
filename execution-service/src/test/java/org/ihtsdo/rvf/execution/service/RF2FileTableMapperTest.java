@@ -1,5 +1,6 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service;
 
+import org.ihtsdo.rvf.execution.service.util.RF2FileTableMapper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

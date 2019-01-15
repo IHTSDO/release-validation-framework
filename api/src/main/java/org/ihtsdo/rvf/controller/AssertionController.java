@@ -14,7 +14,7 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
 import org.ihtsdo.rvf.helper.AssertionHelper;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.springframework.beans.factory.annotation.Autowired;

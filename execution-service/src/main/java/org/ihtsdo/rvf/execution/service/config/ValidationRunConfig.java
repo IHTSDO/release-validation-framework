@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service.config;
 
 import java.io.File;
 import java.util.List;
@@ -12,27 +12,23 @@ public class ValidationRunConfig {
 	private boolean writeSucceses;
 	private transient MultipartFile manifestFile;
 	private List<String> groupsList;
-	private String prevIntReleaseVersion;
-	private String previousExtVersion;
-	private String extensionDependency;
+	private String previousRelease;
+	private String dependencyRelease;
 	private String storageLocation;
 	private String url;
 	private Integer failureExportMax;
 	private String manifestFileFullPath;
-	private String s3ExecutionBucketName;
 	private String prospectiveFileFullPath;
-	private boolean isProspectiveFilesInS3;
+	private boolean isProspectiveFileInS3;
 	private transient File localProspectiveFile;
 	private transient File localManifestFile;
-	private transient File localDependencyFile;
-	private transient File localPreviousFile;
-	private String s3PublishBucketName;
 	private boolean isRf2DeltaOnly;
 	private boolean enableDrools;
 	private String effectiveTime;
 	private boolean releaseAsAnEdition;
 	private String includedModules;
 	private List<String> droolsRulesGroupList;
+	private String bucketName;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -66,24 +62,7 @@ public class ValidationRunConfig {
 		this.droolsRulesGroupList = droolsRulesGroupList;
 		return this;
 	}
-	public String getPrevIntReleaseVersion() {
-		return prevIntReleaseVersion;
-	}
-	public ValidationRunConfig addPrevIntReleaseVersion(final String prevIntReleaseVersion) {
-		this.prevIntReleaseVersion = prevIntReleaseVersion;
-		return this;
-	}
-	public String getPreviousExtVersion() {
-		return previousExtVersion;
-	}
-	public ValidationRunConfig addPreviousExtVersion(final String previousExtVersion) {
-		this.previousExtVersion = previousExtVersion;
-		return this;
-	}
-	public ValidationRunConfig addExtensionDependencyVersion(final String extensionDependency) {
-		this.extensionDependency = extensionDependency;
-		return this;
-	}
+	
 	public ValidationRunConfig addFailureExportMax(final Integer exportMax) {
 		this.failureExportMax = exportMax;
 		return this;
@@ -134,12 +113,7 @@ public class ValidationRunConfig {
 	public void setGroupsList(List<String> groupsList) {
 		this.groupsList = groupsList;
 	}
-	public void setPrevIntReleaseVersion(String prevIntReleaseVersion) {
-		this.prevIntReleaseVersion = prevIntReleaseVersion;
-	}
-	public void setPreviousExtVersion(String previousExtVersion) {
-		this.previousExtVersion = previousExtVersion;
-	}
+
 	public void setStorageLocation(String storageLocation) {
 		this.storageLocation = storageLocation;
 	}
@@ -151,9 +125,8 @@ public class ValidationRunConfig {
 		return "ValidationRunConfig [testFileName=" + testFileName
 				+ ", writeSucceses=" + writeSucceses
 				+ ", groupsList=" + groupsList
-				+ ", prevIntReleaseVersion="+ prevIntReleaseVersion
-				+ ", previousExtVersion="+ previousExtVersion
-				+ ", extensionDependency="+ extensionDependency
+				+ ", previousRelease=" + previousRelease
+				+ ", dependencyRelease=" + dependencyRelease
 				+ ", drools=" + enableDrools
 				+ ", runId=" + runId 
 				+ ", url=" + url + "]";
@@ -165,16 +138,11 @@ public class ValidationRunConfig {
 	public void setManifestFileFullPath(String manifestFileFullPath) {
 		this.manifestFileFullPath = manifestFileFullPath;
 	}
+	
 	public boolean isFirstTimeRelease() {
-		
-		if (prevIntReleaseVersion == null && previousExtVersion == null) {
-			return true;
-		}
-		
-		return prevIntReleaseVersion != null && prevIntReleaseVersion.trim().isEmpty()
-				&& previousExtVersion != null && previousExtVersion.trim().isEmpty();
-
+		return previousRelease == null ? true : false;
 	}
+	
 	public ValidationRunConfig addProspectiveFileFullPath(String s3File) {
 		this.prospectiveFileFullPath = s3File;
 		String[] parts = s3File.split("/");
@@ -186,53 +154,26 @@ public class ValidationRunConfig {
 		this.manifestFileFullPath = manifestFileFullPath;
 		return this;
 	}
-	public void setS3ExecutionBucketName(String bucketName) {
-		s3ExecutionBucketName = bucketName;
-	}
 	
-	public void setProspectiveFileFullPath(String targetFilePath) {
-		this.prospectiveFileFullPath = targetFilePath;
-	}
-	public String getS3ExecutionBucketName() {
-		return s3ExecutionBucketName;
-	}
 	public String getProspectiveFileFullPath() {
 		return this.prospectiveFileFullPath;
 	}
 	
-	public boolean isProspectiveFilesInS3() {
-		return isProspectiveFilesInS3;
+	public boolean isProspectiveFileInS3() {
+		return isProspectiveFileInS3;
 	}
 	public void setProspectiveFilesInS3(boolean isProspectiveFilesInS3) {
-		this.isProspectiveFilesInS3 = isProspectiveFilesInS3;
-	}
-	public void setLocalProspectiveFile(File localProspectiveFile) {
-		this.localProspectiveFile = localProspectiveFile;
-	}
-	public File getLocalProspectiveFile() {
-		return this.localProspectiveFile;
-	}
-	public void setLocalManifestFile(File manifestLocalFile) {
-		this.localManifestFile = manifestLocalFile;
-	}
-	public File getLocalManifestFile() {
-		return this.localManifestFile;
+		this.isProspectiveFileInS3 = isProspectiveFilesInS3;
 	}
 	
 	public ValidationRunConfig addProspectiveFilesInS3(boolean isFileInS3) {
-		this.isProspectiveFilesInS3 = isFileInS3;
+		this.isProspectiveFileInS3 = isFileInS3;
 		return this;
 	}
 
 	public ValidationRunConfig addRF2DeltaOnly(boolean isRf2DeltaOnly) {
 		this.isRf2DeltaOnly = isRf2DeltaOnly;
 		return this;
-	}
-	public String getS3PublishBucketName() {
-		return s3PublishBucketName;
-	}
-	public void setS3PublishBucketName(String s3PublishBucketName) {
-		this.s3PublishBucketName = s3PublishBucketName;
 	}
 	
 	public boolean isRf2DeltaOnly() {
@@ -242,10 +183,10 @@ public class ValidationRunConfig {
 		this.isRf2DeltaOnly = isRf2DeltaOnly;
 	}
 	public String getExtensionDependency() {
-		return extensionDependency;
+		return dependencyRelease;
 	}
 	public void setExtensionDependency(String extensionDependency) {
-		this.extensionDependency = extensionDependency;
+		this.dependencyRelease = extensionDependency;
 	}
 
 	public boolean isEnableDrools() {
@@ -266,22 +207,6 @@ public class ValidationRunConfig {
 		return this;
 	}
 
-	public File getLocalDependencyFile() {
-		return localDependencyFile;
-	}
-
-	public ValidationRunConfig setLocalDependencyFile(File localDependencyFile) {
-		this.localDependencyFile = localDependencyFile;
-		return this;
-	}
-
-	public File getLocalPreviousFile() {
-		return localPreviousFile;
-	}
-
-	public void setLocalPreviousFile(File localPreviousFile) {
-		this.localPreviousFile = localPreviousFile;
-	}
 
 	public boolean isReleaseAsAnEdition() {
 		return releaseAsAnEdition;
@@ -308,16 +233,49 @@ public class ValidationRunConfig {
 	public void setDroolsRulesGroupList(List<String> droolsRulesGroupList) {
 		this.droolsRulesGroupList = droolsRulesGroupList;
 	}
+	
 	public ValidationRunConfig addPreviousRelease(String previousRelease) {
-		if (this.extensionDependency != null) {
-			this.previousExtVersion = previousRelease;
-		} else {
-			this.prevIntReleaseVersion = previousRelease;
+		if (previousRelease != null && !previousRelease.isEmpty()) {
+			this.previousRelease = previousRelease;
 		}
 		return this;
 	}
+	
 	public ValidationRunConfig addDependencyRelease(String dependencyRelease) {
-		this.extensionDependency = dependencyRelease;
+		this.dependencyRelease = dependencyRelease;
 		return this;
+	}
+	public void setPreviousRelease(String previousRelease) {
+		this.previousRelease = previousRelease;
+	}
+	
+	public void setProspectiveFileFullPath(String prospectiveFileFullPath) {
+		this.prospectiveFileFullPath = prospectiveFileFullPath;
+	}
+	
+	public String getPreviousRelease() {
+		return this.previousRelease;
+	}
+	
+	public File getLocalProspectiveFile() {
+		return this.localProspectiveFile;
+	}
+	public void setLocalProspectiveFile(File prospectiveFile) {
+		this.localProspectiveFile = prospectiveFile;
+	}
+	public File getLocalManifestFile() {
+		return localManifestFile;
+	}
+	public void setLocalManifestFile(File localManifestFile) {
+		this.localManifestFile = localManifestFile;
+	}
+	
+	public ValidationRunConfig addBucketName(String bucketName) {
+		this.bucketName = bucketName;
+		return this;
+	}
+	
+	public String getBucketName() {
+		return this.bucketName;
 	}
 }

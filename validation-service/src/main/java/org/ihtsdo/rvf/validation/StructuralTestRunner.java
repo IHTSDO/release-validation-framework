@@ -31,13 +31,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StructuralTestRunner {
-
+	
 	private final Logger logger = LoggerFactory.getLogger(StructuralTestRunner.class);
+	
 	protected String reportFolderLocation;
+	
 	@Value("${rvf.test.report.folder.location}")
 	protected File reportDataFolder;
+	
 	@Value("${rvf.validation.failure.threshold}")
 	protected int failureThreshold;
+	
 	private String structureTestReportPath;
 
 	@Autowired
@@ -193,10 +197,9 @@ public class StructuralTestRunner {
 
 		reportDataFolder = new File(reportFolderLocation);
 		if(!reportDataFolder.exists()){
-			if(reportDataFolder.mkdirs()){
+			if (reportDataFolder.mkdirs()){
 				logger.info("Created report folder at : " + reportFolderLocation);
-			}
-			else{
+			} else{
 				logger.error("Unable to create data folder at path : " + reportFolderLocation);
 				throw new IllegalArgumentException("Bailing out because report folder location can not be set to : " + reportFolderLocation);
 			}

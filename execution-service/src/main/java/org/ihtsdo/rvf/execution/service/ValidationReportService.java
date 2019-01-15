@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,6 +16,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,12 +62,12 @@ public class ValidationReportService {
 		resourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
 	}
 	
-	public void writeResults(final Map<String , Object> responseMap, final State state, String storageLocation) throws BusinessServiceException {
+	public void writeResults(ValidationStatusReport statusReport, State state, String storageLocation) throws BusinessServiceException {
 		File temp = null;
 		try {
 			temp = File.createTempFile("resultJson", ".tmp");
-			try (final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp),Charset.forName(UTF_8)))) {
-				prettyGson.toJson(responseMap, bw);
+			try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp), Charset.forName(UTF_8)))) {
+				prettyGson.toJson(statusReport, bw);
 				//Now copy to our S3 Location
 			} 
 			resourceManager.writeResource(storageLocation + resultsFilePath, new FileInputStream(temp));
@@ -139,30 +140,30 @@ public class ValidationReportService {
 				jsonResults = new String("Failed to recover results in " + filePath);
 			}
 			responseMap.put("rvfValidationResult", jsonResults);
-		}
+	}
 	 
 	 
 	 public State getCurrentState(Long runId, String storageLocation) {
-			State currentState = null;
-			String filePath = storageLocation + stateFilePath;
-			try {
-				InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath);
-				if (is == null) {
-					logger.warn("Failed to find state file {}, via resource config {}", filePath, jobResourceConfig);
-				}
-				final String stateStr = IOUtils.toString(is, UTF_8);
-				currentState = State.valueOf(stateStr);
-			} catch (final Exception e) {
-				logger.warn("Failed to determine validation run state in file {} due to {}", filePath, e.toString());
-			}
-			return currentState;
-		}
+		 State currentState = null;
+		 String filePath = storageLocation + stateFilePath;
+		 try {
+			 InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath);
+			 if (is == null) {
+				 logger.warn("Failed to find state file {}, via resource config {}", filePath, jobResourceConfig);
+			 }
+			 final String stateStr = IOUtils.toString(is, UTF_8);
+			 currentState = State.valueOf(stateStr);
+		 } catch (final Exception e) {
+			 logger.warn("Failed to determine validation run state in file {} due to {}", filePath, e.toString());
+		 }
+		 return currentState;
+	}
 
 	public void putFileIntoS3(String reportStorage, File file) throws NoSuchAlgorithmException, IOException, DecoderException {
 		resourceManager.writeResource(reportStorage + structureTestReportPath, new FileInputStream(file));
-		}
+	}
 	
 	public InputStream getStructureReport( Long runId, String storageLocation) throws IOException {
 			return resourceManager.readResourceStreamOrNullIfNotExists(storageLocation + structureTestReportPath);
-		}
+	}
 }

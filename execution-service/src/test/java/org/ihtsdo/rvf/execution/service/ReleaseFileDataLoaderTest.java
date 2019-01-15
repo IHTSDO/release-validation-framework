@@ -1,6 +1,8 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service;
 
 
+import org.ihtsdo.rvf.execution.service.ReleaseFileDataLoader;
+import org.ihtsdo.rvf.execution.service.util.MySqlDataTypeConverter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

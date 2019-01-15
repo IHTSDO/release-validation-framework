@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,9 +39,6 @@ public class ReleaseController {
 			.getLogger(ReleaseController.class);
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
-	
-	@Autowired
-	private RvfReleaseDbSchemaNameGenerator generator;
 	
 	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
 	@ResponseBody
@@ -82,7 +78,7 @@ public class ReleaseController {
 	@ApiOperation(value = "Upload a previous release package and generate an MySQL binary archive for RVF validation.")
 	public ResponseEntity genereateReleaseBinaryArchive(@PathVariable final String releasePackage) {
 		try {
-			String dbSchemaName = generator.generate(releasePackage);
+			String dbSchemaName = RvfReleaseDbSchemaNameGenerator.generate(releasePackage);
 			 boolean isSuccessful = releaseDataManager.uploadRelease(releasePackage, dbSchemaName);
 			 if (isSuccessful) {
 				 String archiveFile = releaseDataManager.generateBinaryArchive(dbSchemaName);
@@ -106,7 +102,6 @@ public class ReleaseController {
 	@ApiOperation(value = "Get all versions that are loaded in the RVF database", 
 	notes = "Gets all versions that are loaded in the RVF database. Published versions are loaded in the format of {product}_{releaseDate} e.g int_20170131.")
 	public java.util.Set<String> getAllKnownReleases() {
-		
 		return releaseDataManager.getAllKnownReleases();
 	}
 }

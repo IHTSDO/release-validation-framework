@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.execution.service.impl;
+package org.ihtsdo.rvf.execution.service;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -12,8 +12,8 @@ import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.ExecutionServiceTestConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,14 +23,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @ContextConfiguration(classes = ExecutionServiceTestConfig.class)
 @Transactional
-public class AssertionExecutionServiceImplIT {
-	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceImplIT.class);
+public class AssertionExecutionServiceIntegrationTest {
 	
+	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceIntegrationTest.class);
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	
