@@ -96,7 +96,7 @@ public class ValidationVersionLoader {
 		statusReport.setTotalRF2FilesLoaded(rf2FilesLoaded.size());
 		Collections.sort(rf2FilesLoaded);
 		statusReport.setRF2Files(rf2FilesLoaded);
-		String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveVersion);
+		String prospectiveSchema = executionConfig.getPreviousVersion();
 		if (prospectiveSchema != null) {
 			reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveSchema, reportStorage);
 			resourceLoader.loadResourceData(prospectiveSchema);

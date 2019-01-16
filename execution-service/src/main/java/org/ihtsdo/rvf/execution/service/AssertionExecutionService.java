@@ -37,14 +37,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class AssertionExecutionService {
 
+	private static final String FAILED_TO_FIND_RVF_DB_SCHEMA = "Failed to find rvf db schema for ";
 	@Autowired
 	private AssertionService assertionService;
 	@Resource(name = "dataSource")
 	private BasicDataSource dataSource;
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
-	@Autowired
-	private ReleaseDataManager releaseDataManager;
 	@Value("${rvf.qa.result.table.name}")
 	private String qaResulTableName;
 	private String deltaTableSuffix = "d";
@@ -145,9 +144,6 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 
 		long timeStart = System.currentTimeMillis();
 		logger.debug("Start executing assertion:" + assertion.getUuid());
-		// set prospective version as default schema to use since SQL has calls that do not specify schema name
-		final String prospectiveSchemaName = releaseDataManager.getSchemaForRelease(config.getProspectiveVersion());
-
 		final TestRunItem runItem = new TestRunItem();
 		runItem.setTestCategory(assertion.getKeywords());
 		runItem.setAssertionText(assertion.getAssertionText());
@@ -160,7 +156,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		{
 			// execute sql and get result
 			// create a single connection for entire test and close it after running test - avoid creating too many connections
-			try (Connection connection = rvfDynamicDataSource.getConnection(prospectiveSchemaName)) {
+			try (Connection connection = rvfDynamicDataSource.getConnection(config.getProspectiveVersion())) {
 				executeCommand(assertion, config, command, connection);
 				long timeEnd = System.currentTimeMillis();
 				runItem.setRunTime((timeEnd - timeStart));
@@ -202,7 +198,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			parts = command.getStatements().toArray(new String[command.getStatements().size()]);
 		}
 		// parse sql to get select statement
-		final List<String> sqlStatements = transformSql(parts,assertion, config);
+		final List<String> sqlStatements = transformSql(parts, assertion, config);
 		for (String sqlStatement: sqlStatements)
 		{
 			// remove any leading and train white space
@@ -250,21 +246,18 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 	}
 
 	private List<String> transformSql(String[] parts, Assertion assertion, ExecutionConfig config) throws ConfigurationException {
-		final List<String> result = new ArrayList<>();
-		final String defaultCatalog = dataSource.getDefaultCatalog();
-		
-		final String prospectiveRelease = config.getProspectiveVersion();
-		final String previousRelease = config.getPreviousVersion();
-		final String prospectiveSchema = releaseDataManager.getSchemaForRelease(prospectiveRelease);
-		final String previousReleaseSchema = releaseDataManager.getSchemaForRelease(previousRelease);
+		List<String> result = new ArrayList<>();
+		String defaultCatalog = dataSource.getDefaultCatalog();
+		String prospectiveSchema = config.getProspectiveVersion();
+		String previousReleaseSchema = config.getPreviousVersion();
 		
 		//We need both these schemas to exist
 		if (prospectiveSchema == null) {
-			throw new ConfigurationException ("Failed to determine a prospective schema for release " + prospectiveRelease);
+			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + prospectiveSchema);
 		}
 		
 		if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
-			throw new ConfigurationException ("Failed to determine a schema for previous release " + previousRelease);
+			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + previousReleaseSchema);
 		}
 		for( String part : parts) {
 			logger.debug("Original sql statement: {}", part);

@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -73,7 +75,7 @@ public class ReleaseDataManager {
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	
-	private final Map<String, String> releaseSchemaNameLookup = new ConcurrentHashMap<>();
+	private final Set<String> releaseSchemaNameLookup = new HashSet<>();
 	
 	@Autowired
 	private ResourceLoader cloudResourceLoader;
@@ -108,10 +110,9 @@ public class ReleaseDataManager {
 		// now get list of existing RVF_INT like databases
 		try ( ResultSet catalogs = rvfDynamicDataSource.getConnection(masterSchema).getMetaData().getCatalogs()) {
 			while (catalogs.next()) {
-				final String schemaName = catalogs.getString(1);
+				 String schemaName = catalogs.getString(1);
 				if (schemaName.startsWith(RVF_DB_PREFIX)) {
-					final String version = schemaName.substring(RVF_DB_PREFIX.length());
-						releaseSchemaNameLookup.put(version, schemaName);
+					releaseSchemaNameLookup.add(schemaName);
 				}
 			}
 		} catch (final SQLException e) {
@@ -121,7 +122,7 @@ public class ReleaseDataManager {
 	}
 	
 	public String getRVFVersion(String product, String releaseVersion) {
-		return product + "_" + releaseVersion;
+		return RVF_DB_PREFIX + product + "_" + releaseVersion;
 	}
 
 	/**
@@ -147,19 +148,15 @@ public class ReleaseDataManager {
 			IOUtils.closeQuietly(inputStream);
 			IOUtils.closeQuietly(out);
 		}
-		// if we are here then release date is a valid date format
-		// now call loadSnomedData method passing release zip, if there is no matching database
 		String rvfVersion = getRVFVersion(product, version);
 		logger.info("RVF release version:" + rvfVersion);
-		if (releaseSchemaNameLookup.keySet().contains(rvfVersion) ) {
+		if (releaseSchemaNameLookup.contains(rvfVersion) ) {
 			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: " + rvfVersion);
 		}
-		logger.info("Loading data into schema " + RVF_DB_PREFIX + rvfVersion);
 		List<String> rf2FilesLoaded = new ArrayList<>();
-		final String schemaName = loadSnomedData(rvfVersion, rf2FilesLoaded, fileDestination);
+		String schemaName = loadSnomedData(rvfVersion, rf2FilesLoaded, fileDestination);
 		logger.info("schemaName = " + schemaName);
-		// now add to releaseSchemaNameLookup
-		releaseSchemaNameLookup.put(rvfVersion, schemaName);
+		releaseSchemaNameLookup.add(schemaName);
 		return true;
 	}
 	
@@ -182,15 +179,13 @@ public class ReleaseDataManager {
 			IOUtils.closeQuietly(out);
 		}
 		
-		if (releaseSchemaNameLookup.keySet().contains(schemaName)) {
+		if (releaseSchemaNameLookup.contains(schemaName)) {
 			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: " + schemaName);
 		}
 		logger.info("Loading data into schema " + schemaName);
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		loadSnomedData(schemaName, rf2FilesLoaded, fileDestination);
 		logger.info("schemaName = " + schemaName);
-		// now add to releaseSchemaNameLookup
-		releaseSchemaNameLookup.put(schemaName, schemaName);
 		return true;
 	}
 
@@ -253,11 +248,7 @@ public class ReleaseDataManager {
 			if (!isAppendToVersion) {
 				createSchema(createdSchemaName);
 			}
-			
 			loadReleaseFilesToDB(outputFolder,rvfDynamicDataSource,rf2FilesLoaded, createdSchemaName);
-			
-			// add schema name to look up map
-			releaseSchemaNameLookup.put(versionName, createdSchemaName);
 		} catch (final SQLException | IOException e) {
 			final String errorMsg = String.format("Error while loading file %s into version %s", zipDataFile, versionName);
 			logger.error(errorMsg,e);
@@ -291,12 +282,8 @@ public class ReleaseDataManager {
 	 * @param releaseVersion the release date as a yyyymmdd string (e.g. 20140731)
 	 * @return if a schema for the version already exists
 	 */
-	public boolean isKnownRelease(final String releaseVersion) {
-		if (!releaseVersion.startsWith(RVF_DB_PREFIX)) {
-			return releaseSchemaNameLookup.containsKey(releaseVersion);
-		}
-		return releaseSchemaNameLookup.values().contains(releaseVersion);
-		
+	public boolean isKnownRelease(String releaseVersion) {
+		return releaseSchemaNameLookup.contains(releaseVersion);
 	}
 
 	/**
@@ -304,38 +291,12 @@ public class ReleaseDataManager {
 	 * @return set of all releases
 	 */
 	public Set<String> getAllKnownReleases() {
-		return releaseSchemaNameLookup.keySet();
+		return this.releaseSchemaNameLookup;
 	}
 
 	public void setSctDataLocation(final String sctDataLocationX) {
 		sctDataLocation = sctDataLocationX;
 	}
-
-	/**
-	 * Returns the schema name that corresponds to  the given release.
-	 * @param releaseVersion the product name and release date as a yyyymmdd string (e.g. int_20140731)
-	 * @return the corresponding schema name
-	 */
-	public String getSchemaForRelease(final String releaseVersion) {
-		if (releaseVersion != null) {
-			if (!releaseVersion.startsWith(RVF_DB_PREFIX)) {
-				return releaseSchemaNameLookup.get(releaseVersion);
-			}
-			return releaseVersion;
-		}
-		return null;
-	}
-
-	/**
-	 * Sets the schema name that corresponds to  the given release.
-	 * @param releaseVersion the product name and release date as a yyyymmdd string (e.g. int_20140731)
-	 * @param schemaName the corresponding schema name
-	 */
-	
-	public void setSchemaForRelease(final String releaseVersion, final String schemaName) {
-		releaseSchemaNameLookup.put(releaseVersion, schemaName);
-	}
-
 	
 	public List<File> getZipFileForKnownRelease(final String knownVersion) {
 		List<File> filesFound = new ArrayList<>();
@@ -368,14 +329,13 @@ public class ReleaseDataManager {
 			logger.error("Failed to create db schema and tables for version:" + combinedVersionName +" due to " + e.fillInStackTrace());
 		}
 		//select data from known version schema and insert into the new schema
-		for (final String known : knownVersions) {
-			final String knownSchema = releaseSchemaNameLookup.get(known);
-			if (knownSchema == null) {
+		for (String knownSchema : knownVersions) {
+			if (isKnownRelease(knownSchema)) {
 				isFailed = true;
-				logger.error("Known schema doesn't exist for:" + known);
+				logger.error("Known schema doesn't exist for:" + knownSchema);
 				break;
 			}
-			logger.info("Adding known version {} to schema {}", known, combinedVersionName);
+			logger.info("Adding known version {} to schema {}", knownSchema, combinedVersionName);
 			for (final String tableName : getValidTableNamesFromSchema(knownSchema, null)) {
 				try {
 					copyData(tableName, knownSchema, schemaName);
@@ -472,32 +432,31 @@ public class ReleaseDataManager {
 		return result;
 	}
 
-	public void copyTableData(String sourceVersion, String destinationVersion, String tableNamePattern, List<String> excludeTableNames) throws BusinessServiceException {
+	public void copyTableData(String sourceVersion, String destinationVersion, 
+			String tableNamePattern, List<String> excludeTableNames) throws BusinessServiceException {
 		final long startTime = System.currentTimeMillis();
-		String sourceSchema = releaseSchemaNameLookup.get(sourceVersion);
-		String destinationSchema = releaseSchemaNameLookup.get(destinationVersion);
-		if (sourceSchema == null || destinationSchema == null) {
-			StringBuilder errorMsg = new StringBuilder();
-			if (sourceSchema == null) {
-				errorMsg.append(VERSION_NOT_FOUND + sourceVersion); 
-			}
-			if (destinationSchema == null) {
-				errorMsg.append(VERSION_NOT_FOUND + destinationVersion); 
-			}
+		StringBuilder errorMsg = new StringBuilder();;
+		if (!isKnownRelease(sourceVersion)) {
+			errorMsg.append(VERSION_NOT_FOUND + sourceVersion); 
+		}
+		if (!isKnownRelease(destinationVersion)) {
+			errorMsg.append(VERSION_NOT_FOUND + destinationVersion); 
+		}
+		if (errorMsg.length() > 0) {
 			throw new BusinessServiceException(errorMsg.toString());
 		}
-		for (final String tableName : getValidTableNamesFromSchema(sourceSchema, tableNamePattern)) {
+		for (final String tableName : getValidTableNamesFromSchema(sourceVersion, tableNamePattern)) {
 			if (excludeTableNames != null && excludeTableNames.contains(tableName)) {
 				continue;
 			}
-			copyData(tableName, sourceSchema, destinationSchema);
+			copyData(tableName, sourceVersion, destinationVersion);
 		}
 		final long endTime = System.currentTimeMillis();
-		logger.info("Copy data with table name like {} from {} into {} completed in seconds {} ", tableNamePattern, sourceSchema, destinationSchema, (endTime-startTime)/1000);
+		logger.info("Copy data with table name like {} from {} into {} completed in seconds {} ", 
+				tableNamePattern, sourceVersion, destinationVersion, (endTime-startTime)/1000);
 	}
 
-	public void updateSnapshotTableWithDataFromDelta(String prospectiveVersion) {
-		String schema = releaseSchemaNameLookup.get(prospectiveVersion);
+	public void updateSnapshotTableWithDataFromDelta(String schema) {
 		List<String> deltaTableNames = getValidTableNamesFromSchema(schema, "%_d");
 		for (String deltaTbl : deltaTableNames) {
 			String snapshotTbl = deltaTbl.replace("_d", "_s");
@@ -522,26 +481,23 @@ public class ReleaseDataManager {
 	}
 
 	
-	public void copyTableData(String sourceVersionA, String sourceVersionB, String destinationVersion, String tableNamePattern,
+	public void copyTableData(String sourceSchemaA, String sourceSchemaB, String destinationSchema, String tableNamePattern,
 			List<String> excludeTableNames) throws BusinessServiceException {
 		final long startTime = System.currentTimeMillis();
-		String sourceSchemaA = releaseSchemaNameLookup.get(sourceVersionA);
-		String sourceSchemaB = releaseSchemaNameLookup.get(sourceVersionB);
-		String destinationSchema = releaseSchemaNameLookup.get(destinationVersion);
-		if (sourceSchemaA == null || destinationSchema == null || sourceSchemaB ==null) {
-			StringBuilder errorMsg = new StringBuilder();
-			if (sourceSchemaA == null) {
-				errorMsg.append(VERSION_NOT_FOUND + sourceVersionA); 
-			}
-			if (sourceSchemaA == null) {
-				errorMsg.append(VERSION_NOT_FOUND + sourceVersionB); 
-			}
-			if (destinationSchema == null) {
-				errorMsg.append(VERSION_NOT_FOUND + destinationVersion); 
-			}
+		StringBuilder errorMsg = new StringBuilder();
+		if (!isKnownRelease(sourceSchemaA)) {
+			errorMsg.append(VERSION_NOT_FOUND + sourceSchemaA); 
+		}
+		if (!isKnownRelease(sourceSchemaB)) {
+			errorMsg.append(VERSION_NOT_FOUND + sourceSchemaB); 
+		}
+		if (!isKnownRelease(destinationSchema)) {
+			errorMsg.append(VERSION_NOT_FOUND + destinationSchema); 
+		}
+		if (errorMsg.length() > 0) {
 			throw new BusinessServiceException(errorMsg.toString());
 		}
-		for (final String tableName : getValidTableNamesFromSchema(sourceSchemaA, tableNamePattern)) {
+		for (String tableName : getValidTableNamesFromSchema(sourceSchemaA, tableNamePattern)) {
 			if (excludeTableNames != null && excludeTableNames.contains(tableName)) {
 				continue;
 			}
@@ -591,7 +547,7 @@ public class ReleaseDataManager {
 	}
 	
 	public String generateBinaryArchive(String schemaName) throws BusinessServiceException {
-		if (schemaName == null || !releaseSchemaNameLookup.values().contains(schemaName)) {
+		if (schemaName == null || !isKnownRelease(schemaName)) {
 			throw new IllegalArgumentException("No schema found for " + schemaName);
 		}
 		File dataDir = new File(mysqlDataDir);

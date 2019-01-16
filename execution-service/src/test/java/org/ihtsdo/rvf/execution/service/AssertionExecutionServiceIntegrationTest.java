@@ -56,11 +56,9 @@ public class AssertionExecutionServiceIntegrationTest {
 		assertNotNull(releaseDataManager);
 
 		// register releases with release manager, since they will be used during SQL replacement
-		releaseDataManager.setSchemaForRelease("int_20140731", "rvf_int_20140731");
-		releaseDataManager.setSchemaForRelease("int_20140131", "rvf_int_20140131");
 		config = new ExecutionConfig(12345L);
-		config.setPreviousVersion("int_20140131");
-		config.setProspectiveVersion("int_20140731");
+		config.setPreviousVersion("rvf_int_20140131");
+		config.setProspectiveVersion("rvf_int_20140731");
 		config.setExecutionId(1L);
 
 		assertion  = new Assertion();

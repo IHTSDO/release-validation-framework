@@ -33,6 +33,7 @@ import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +61,9 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private static final String FILE_CENTRIC_VALIDATION = "file-centric-validation";
 	private static final String COMPONENT_CENTRIC_VALIDATION = "component-centric-validation";
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
-	private static final String PROSPECTIVE_RELEASE = "regression_test_prospective";
+	private static final String PROSPECTIVE_RELEASE = "rvf_regression_test_prospective";
 	
-	private static final String PREVIOUS_RELEASE = "regression_test_previous";
+	private static final String PREVIOUS_RELEASE = "rvf_regression_test_previous";
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	@Autowired
@@ -77,14 +78,14 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private URL fileCentricExpected;
 	private ExecutionConfig config;
 	private final ObjectMapper mapper = new ObjectMapper();
-	private  List<String> rf2FilesLoaded = new ArrayList<>();
+	private List<String> rf2FilesLoaded = new ArrayList<>();
 	
 	@Before
 	public void setUp() throws IOException, SQLException, BusinessServiceException {
 		//load previous and prospective versions if not loaded already
 		assertNotNull(releaseDataManager);
 		if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
-			if (!releaseDataManager.restoreReleaseFromBinaryArchive("rvf_" + PREVIOUS_RELEASE + ".zip")) {
+			if (!releaseDataManager.restoreReleaseFromBinaryArchive(PREVIOUS_RELEASE + ".zip")) {
 				URL previousReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130131");
 				assertNotNull("Must not be null", previousReleaseUrl);
 				File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
@@ -94,32 +95,28 @@ public class RVFAssertionsRegressionTestHarnesss {
 				System.out.println("Mysql binary file is archvied at " + archiveFileName);
 			}
 		}
-		if(!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
+		if (!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
 			final URL prospectiveReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130731");
 			assertNotNull("Must not be null", prospectiveReleaseUrl);
 			final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
 			releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE,rf2FilesLoaded, prospectiveFile);
+			resourceDataLoader.loadResourceData(PROSPECTIVE_RELEASE);
+			assertNotNull("Must not be null", fileCentricExpected);
+			List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource",true);
+			assertNotNull(assertions);
+			assertTrue(!assertions.isEmpty());
+			assertionExecutionService.executeAssertions(assertions, config);
 		}
-
 		releaseTypeExpectedResults = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
 		assertNotNull("Must not be null", releaseTypeExpectedResults);
 		componentCentrilExpected = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/componentCentricRegressionExpected.json");
 		assertNotNull("Must not be null", componentCentrilExpected);
 		fileCentricExpected = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
-		assertNotNull("Must not be null", fileCentricExpected);
-		releaseDataManager.setSchemaForRelease(PREVIOUS_RELEASE, "rvf_" + PREVIOUS_RELEASE);
-		releaseDataManager.setSchemaForRelease(PROSPECTIVE_RELEASE, "rvf_"+ PROSPECTIVE_RELEASE);
-		resourceDataLoader.loadResourceData(releaseDataManager.getSchemaForRelease(PROSPECTIVE_RELEASE));
-		List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource",true);
-		assertNotNull(assertions);
-		assertTrue(!assertions.isEmpty());
 		config = new ExecutionConfig(System.currentTimeMillis());
 		config.setPreviousVersion(PREVIOUS_RELEASE);
 		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
 		config.setFailureExportMax(10);
-		assertionExecutionService.executeAssertions(assertions, config);
-		
 	}
 	
 	@Test
@@ -177,7 +174,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("84335167-9105-4377-beca-b80b0d5dff83");
+		runAssertionsTest("48118153-d32a-4d1c-bfbc-23ed953e9991");
 	}
 	
 	
