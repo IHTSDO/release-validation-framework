@@ -65,7 +65,9 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 	public void testConstructIntProspectiveVersionWithRF2DeltaOnly() throws BusinessServiceException {
 		validationConfig.setRf2DeltaOnly(true);
 		prospectiveVersion = validationConfig.getRunId().toString();
-		List<String> filesLoaded = dataLoader.loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,null);
+		ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId());
+		executionConfig.setProspectiveVersion(prospectiveVersion);
+		List<String> filesLoaded = dataLoader.loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(executionConfig, validationConfig, null);
 		Assert.assertEquals(1, filesLoaded.size());
 		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
 	}

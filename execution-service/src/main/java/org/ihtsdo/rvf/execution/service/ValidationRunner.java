@@ -56,8 +56,6 @@ public class ValidationRunner {
 	
 	private void runValidations(ValidationRunConfig validationConfig) throws Exception {
 		Calendar startTime = Calendar.getInstance();
-		//download prospective version
-		//load previous published version
 		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		releaseVersionLoader.downloadProspectiveFiles(validationConfig);
 		if (validationConfig.getLocalProspectiveFile() == null) {

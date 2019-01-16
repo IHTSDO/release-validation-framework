@@ -52,7 +52,7 @@ public class MysqlValidationService {
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
-	public void runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationReport report) throws BusinessServiceException {
+	public void runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationReport report) throws BusinessServiceException{
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		String reportStorage = validationConfig.getStorageLocation();
@@ -76,8 +76,8 @@ public class MysqlValidationService {
 			LOGGER.error(msg, e);
 			statusReport.setFailureMessage(msg);
 			reportService.writeResults(statusReport, State.FAILED, reportStorage);
+			return;
 		}
-		
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
 			LOGGER.info("Run extension release validation with config " +  executionConfig);
 			runExtensionReleaseValidation(report, validationConfig, executionConfig);
@@ -170,7 +170,7 @@ public class MysqlValidationService {
 		if (batchSize == 0) {
 			items.addAll(executeAssertions(executionConfig, assertions, reportStorage));
 		} else {
-			items.addAll(executeAssertionsConcurrently(executionConfig,assertions, batchSize, reportStorage));
+			items.addAll(executeAssertionsConcurrently(executionConfig, assertions, batchSize, reportStorage));
 		}
 		constructTestReport(report, executionConfig, timeStart, items);
 		

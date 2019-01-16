@@ -25,10 +25,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -46,7 +43,6 @@ import org.ihtsdo.rvf.execution.service.util.RF2FileTableMapper;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
@@ -55,10 +51,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReleaseDataManager {
 
+	public static final String RVF_DB_PREFIX = "rvf_";
 	private static final String VERSION_NOT_FOUND = "Version not found in RVF database ";
 	private static final String ZIP_FILE_EXTENSION = ".zip";
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManager.class);
-	private static final String RVF_DB_PREFIX = "rvf_";
 	private String sctDataLocation;
 	private File sctDataFolder;
 	
@@ -230,7 +226,7 @@ public class ReleaseDataManager {
 
 	private String loadSnomedData(final String versionName, boolean isAppendToVersion, List<String> rf2FilesLoaded, final File... zipDataFile) throws BusinessServiceException {
 		File outputFolder = null;
-		final String createdSchemaName = versionName.startsWith("rvf_") ? versionName : RVF_DB_PREFIX + versionName;
+		final String createdSchemaName = versionName.startsWith(RVF_DB_PREFIX) ? versionName : RVF_DB_PREFIX + versionName;
 		final long startTime = Calendar.getInstance().getTimeInMillis();
 		try {
 			outputFolder = new File(FileUtils.getTempDirectoryPath(), createdSchemaName);
@@ -249,6 +245,7 @@ public class ReleaseDataManager {
 				createSchema(createdSchemaName);
 			}
 			loadReleaseFilesToDB(outputFolder,rvfDynamicDataSource,rf2FilesLoaded, createdSchemaName);
+			releaseSchemaNameLookup.add(createdSchemaName);
 		} catch (final SQLException | IOException e) {
 			final String errorMsg = String.format("Error while loading file %s into version %s", zipDataFile, versionName);
 			logger.error(errorMsg,e);
@@ -275,14 +272,10 @@ public class ReleaseDataManager {
 		}
 	}
 
-
-	/**
-	 * Verifies if the given releaseVersion has already been loaded into a database.
-	 *
-	 * @param releaseVersion the release date as a yyyymmdd string (e.g. 20140731)
-	 * @return if a schema for the version already exists
-	 */
 	public boolean isKnownRelease(String releaseVersion) {
+		if (releaseVersion == null || releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
+			return false;
+		}
 		return releaseSchemaNameLookup.contains(releaseVersion);
 	}
 

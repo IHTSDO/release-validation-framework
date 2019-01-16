@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration.Cloud;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import static org.ihtsdo.rvf.execution.service.ReleaseDataManager.*;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
@@ -70,25 +71,44 @@ public class ValidationVersionLoader {
 	private String mysqlMyISamDataFolder;
 
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
-		
+	
 	public void loadPreviousVersion(ExecutionConfig executionConfig) throws Exception {
-		String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion());
-		executionConfig.setPreviousVersion(rvfDbSchema);
+		String schemaName = constructRVFSchema(executionConfig.getPreviousVersion());
+		if (!releaseDataManager.isKnownRelease(schemaName)) {
+			if (executionConfig.getPreviousVersion().endsWith(ZIP_FILE_EXTENSION)) {
+				String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion());
+				executionConfig.setPreviousVersion(rvfDbSchema);
+			} else {
+				throw new BusinessServiceException("Previous release specified is not found " + executionConfig.getPreviousVersion());
+			}
+		} else {
+			logger.info("Previous release exists already " + schemaName);
+			executionConfig.setPreviousVersion(schemaName);
+		}
 	}
 		
 	public void loadDependncyVersion(ExecutionConfig executionConfig) throws IOException, BusinessServiceException {
-		String dependencyVersion = loadRelease(executionConfig.getExtensionDependencyVersion());
-		executionConfig.setExtensionDependencyVersion(dependencyVersion);
+		String schemaName = constructRVFSchema(executionConfig.getExtensionDependencyVersion());
+		if (!releaseDataManager.isKnownRelease(schemaName)) {
+			if (executionConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
+				String dependencyVersion = loadRelease(executionConfig.getExtensionDependencyVersion());
+				executionConfig.setExtensionDependencyVersion(dependencyVersion);
+			} else {
+				throw new BusinessServiceException("Dependency release specified is not found " + executionConfig.getPreviousVersion());
+			}
+		} else {
+			logger.info("Dependency release exists already " + schemaName);
+			executionConfig.setExtensionDependencyVersion(schemaName);
+		}
 	}
 	
 	public void loadProspectiveVersion(ValidationStatusReport statusReport, ExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws Exception {
-		String prospectiveVersion = executionConfig.getExecutionId().toString();
-		executionConfig.setProspectiveVersion(prospectiveVersion);
+		String prospectiveVersion = executionConfig.getProspectiveVersion();
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		String reportStorage = validationConfig.getStorageLocation();
 		if (validationConfig.isRf2DeltaOnly()) {
 			List<String> excludeTables = Arrays.asList(RELATIONSHIP_SNAPSHOT_TABLE);
-			rf2FilesLoaded.addAll(loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(prospectiveVersion, validationConfig,excludeTables));
+			rf2FilesLoaded.addAll(loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(executionConfig, validationConfig, excludeTables));
 		} else {
 			//load prospective version alone now as used to combine with dependency for extension testing
 			uploadReleaseFileIntoDB(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
@@ -96,12 +116,20 @@ public class ValidationVersionLoader {
 		statusReport.setTotalRF2FilesLoaded(rf2FilesLoaded.size());
 		Collections.sort(rf2FilesLoaded);
 		statusReport.setRF2Files(rf2FilesLoaded);
-		String prospectiveSchema = executionConfig.getPreviousVersion();
-		if (prospectiveSchema != null) {
-			reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveSchema, reportStorage);
-			resourceLoader.loadResourceData(prospectiveSchema);
-			logger.info("completed loading resource data for schema:" + prospectiveSchema);
+		reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveVersion, reportStorage);
+		resourceLoader.loadResourceData(prospectiveVersion);
+		logger.info("completed loading resource data for schema:" + prospectiveVersion);
+	}
+	
+	
+	private String constructRVFSchema(String releaseVersion) {
+		if (releaseVersion != null) {
+			if (releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
+				return RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
+			}
+			return releaseVersion.startsWith(RVF_DB_PREFIX) ? releaseVersion : RVF_DB_PREFIX + releaseVersion;
 		}
+		return releaseVersion;
 	}
 	
 	private String loadRelease(String releaseVersion) throws IOException, BusinessServiceException {
@@ -115,19 +143,20 @@ public class ValidationVersionLoader {
 					logger.info("Release mysql binary archive is generated:" + archiveFilename);
 				} 
 			} 
-			return schemaName;
+			return schemaName;	
 		}
 		return releaseVersion;
 	}
 
 	public ExecutionConfig createExecutionConfig(ValidationRunConfig validationConfig) {
 		ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
+		executionConfig.setProspectiveVersion(RVF_DB_PREFIX + executionConfig.getExecutionId().toString());
 		executionConfig.setGroupNames(validationConfig.getGroupsList());
 		executionConfig.setExtensionValidation( isExtension(validationConfig));
-		executionConfig.setExtensionDependencyVersion(validationConfig.getExtensionDependency());
 		executionConfig.setFirstTimeRelease(validationConfig.isFirstTimeRelease());
 		executionConfig.setEffectiveTime(validationConfig.getEffectiveTime());
 		executionConfig.setPreviousVersion(validationConfig.getPreviousRelease());
+		executionConfig.setExtensionDependencyVersion(validationConfig.getExtensionDependency());
 		if(validationConfig.getExtensionDependency() != null) {
 			executionConfig.setDependencyEffectiveTime(extractEffetiveTimeFromDepedencyVersion(validationConfig.getExtensionDependency()));
 		}
@@ -140,16 +169,17 @@ public class ValidationVersionLoader {
 		return executionConfig;
 	}
 
-	public List<String> loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(String prospectiveVersion, ValidationRunConfig validationConfig,
+	public List<String> loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(ExecutionConfig executionConfig, ValidationRunConfig validationConfig,
 				List<String> excludeTableNames) throws BusinessServiceException {
 		List<String> filesLoaded = new ArrayList<>();
+		String prospectiveVersion = executionConfig.getProspectiveVersion();
 		if (validationConfig.isRf2DeltaOnly()) {
 			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, validationConfig.getLocalProspectiveFile());
 			if (isExtension(validationConfig)) {
-				String previousVersion = validationConfig.getPreviousRelease();
-				String extensionDependencyVersion = validationConfig.getExtensionDependency();
+				String previousVersion = executionConfig.getPreviousVersion();
+				String extensionDependencyVersion = executionConfig.getExtensionDependencyVersion();
 				if (!validationConfig.isFirstTimeRelease()) {
-					releaseDataManager.copyTableData(previousVersion,extensionDependencyVersion, prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
+					releaseDataManager.copyTableData(previousVersion, extensionDependencyVersion, prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				} else {
 					releaseDataManager.copyTableData(extensionDependencyVersion, prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				}
