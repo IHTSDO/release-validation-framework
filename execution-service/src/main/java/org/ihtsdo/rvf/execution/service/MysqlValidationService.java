@@ -72,10 +72,12 @@ public class MysqlValidationService {
 			//load prospective version
 			releaseVersionLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
 		} catch (Exception e) {
-			String msg = "Failed to prepare versions for mysql validation.";
+			String msg = "Failed to prepare versions for mysql validation";
+			msg = e.getMessage()!= null ? msg + " Due to " + e.getMessage() : msg;
 			LOGGER.error(msg, e);
 			statusReport.setFailureMessage(msg);
 			reportService.writeResults(statusReport, State.FAILED, reportStorage);
+			report.addFailureMessage(msg);
 			return;
 		}
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
@@ -115,6 +117,7 @@ public class MysqlValidationService {
 			releaseVersionLoader.combineCurrenExtensionWithDependencySnapshot(executionConfig, validationConfig);
 		} catch (BusinessServiceException e) {
 			String msg = "Failed to prepare data for extension testing due to " + e.getMessage();
+			report.addFailureMessage(msg);
 			LOGGER.error(msg, e);
 			ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 			statusReport.setResultReport(report);

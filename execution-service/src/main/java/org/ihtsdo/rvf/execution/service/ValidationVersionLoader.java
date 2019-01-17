@@ -79,7 +79,8 @@ public class ValidationVersionLoader {
 				String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion());
 				executionConfig.setPreviousVersion(rvfDbSchema);
 			} else {
-				throw new BusinessServiceException("Previous release specified is not found " + executionConfig.getPreviousVersion());
+				throw new BusinessServiceException("Previous release specified is not found " 
+						+ executionConfig.getPreviousVersion());
 			}
 		} else {
 			logger.info("Previous release exists already " + schemaName);
@@ -94,7 +95,8 @@ public class ValidationVersionLoader {
 				String dependencyVersion = loadRelease(executionConfig.getExtensionDependencyVersion());
 				executionConfig.setExtensionDependencyVersion(dependencyVersion);
 			} else {
-				throw new BusinessServiceException("Dependency release specified is not found " + executionConfig.getPreviousVersion());
+				throw new BusinessServiceException("Dependency release specified is not found " 
+						+ executionConfig.getExtensionDependencyVersion());
 			}
 		} else {
 			logger.info("Dependency release exists already " + schemaName);
