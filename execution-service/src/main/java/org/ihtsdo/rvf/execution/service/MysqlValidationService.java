@@ -73,7 +73,7 @@ public class MysqlValidationService {
 			releaseVersionLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
 		} catch (Exception e) {
 			String msg = "Failed to prepare versions for mysql validation";
-			msg = e.getMessage()!= null ? msg + " Due to " + e.getMessage() : msg;
+			msg = e.getMessage()!= null ? msg + " due to " + e.getMessage() : msg;
 			LOGGER.error(msg, e);
 			statusReport.setFailureMessage(msg);
 			reportService.writeResults(statusReport, State.FAILED, reportStorage);

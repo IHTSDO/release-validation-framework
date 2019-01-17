@@ -207,24 +207,35 @@ public class ValidationVersionLoader {
 		InputStream manifestInput = null;
 		//streaming file from S3 to local
 		long s3StreamingStart = System.currentTimeMillis();
+		String prospectiveFileFullPath = validationConfig.getProspectiveFileFullPath();
+		String manifestFileFullPath = validationConfig.getManifestFileFullPath();
 		if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
 			if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
 				ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
 						new Cloud(validationConfig.getBucketName(), ""));
 				ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
-				prospectiveInput = manualResource.readResourceStreamOrNullIfNotExists(validationConfig.getProspectiveFileFullPath());
-				if (validationConfig.getManifestFileFullPath() != null) {
-					manifestInput = manualResource.readResourceStreamOrNullIfNotExists(validationConfig.getManifestFileFullPath());
+				prospectiveInput = manualResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
+				if (manifestFileFullPath != null) {
+					manifestInput = manualResource.readResourceStreamOrNullIfNotExists(manifestFileFullPath);
+				}
+			} else {
+				//update s3 path if required when full path containing job resource path already
+				if (prospectiveFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
+					prospectiveFileFullPath = prospectiveFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
+				}
+				if (manifestFileFullPath != null && manifestFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
+					manifestFileFullPath = manifestFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
 				}
 			}
 		}
-		prospectiveInput = jobResource.readResourceStreamOrNullIfNotExists(validationConfig.getProspectiveFileFullPath());
-		
-		if (validationConfig.getManifestFileFullPath() != null) {
-			manifestInput = jobResource.readResourceStreamOrNullIfNotExists(validationConfig.getManifestFileFullPath());
+		if (prospectiveInput == null) {
+			prospectiveInput = jobResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
 		}
-		
-		if (prospectiveFile != null) {
+		if (manifestInput == null && manifestFileFullPath != null) {
+			manifestInput = jobResource.readResourceStreamOrNullIfNotExists(manifestFileFullPath);
+		}
+
+		if (prospectiveInput != null && prospectiveFile != null) {
 			OutputStream out = new FileOutputStream(prospectiveFile);
 			IOUtils.copy(prospectiveInput, out);
 			IOUtils.closeQuietly(prospectiveInput);
@@ -240,7 +251,7 @@ public class ValidationVersionLoader {
 			validationConfig.setLocalManifestFile(manifestFile);
 		}
 		logger.info("Time taken {} seconds to download files {} from s3", (System.currentTimeMillis()-s3StreamingStart)/1000 ,
-				validationConfig.getProspectiveFileFullPath());
+				prospectiveFileFullPath);
 	}
 	
 	private boolean isExtension(final ValidationRunConfig runConfig) {
