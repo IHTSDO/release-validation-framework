@@ -44,7 +44,7 @@ public class ValidationRunner {
 			t.printStackTrace(new PrintWriter(errors));
 			String failureMsg = "System Failure: " + t.getMessage() + " : " + errors.toString();
 			ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
-			statusReport.setfailureMessage(failureMsg);
+			statusReport.addFailureMessage(failureMsg);
 			logger.error("Exception thrown, writing as result",t);
 			try {
 				reportService.writeResults(statusReport, State.FAILED, validationConfig.getStorageLocation());
@@ -68,7 +68,9 @@ public class ValidationRunner {
 		report.setExecutionId(executionConfig.getExecutionId());
 		report.setReportUrl(validationConfig.getUrl());
 		runRF2StructureTests(validationConfig, report);
-		mysqlValidationService.runRF2MysqlValidations(validationConfig, report);
+		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
+		statusReport.setResultReport(report);
+		mysqlValidationService.runRF2MysqlValidations(validationConfig, statusReport);
 		if (validationConfig.isEnableDrools()) {
 			// Run Drools validations
 			String droolsTestStartMsg = "Start drools validation for release file:" + validationConfig.getTestFileName();
@@ -77,14 +79,13 @@ public class ValidationRunner {
 			droolsValidationService.runDroolsAssertions(report, validationConfig);
 		}
 		report.sortAssertionLists();
-		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
-		statusReport.setResultReport(report);
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
 		statusReport.setStartTime(startTime.getTime());
 		statusReport.setEndTime(endTime.getTime());
-		reportService.writeResults(statusReport, State.COMPLETE, validationConfig.getStorageLocation());
+		State state = statusReport.getFailureMessages().isEmpty() ? State.COMPLETE : State.FAILED;
+		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
 	}
 	
 	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationReport report) throws Exception{

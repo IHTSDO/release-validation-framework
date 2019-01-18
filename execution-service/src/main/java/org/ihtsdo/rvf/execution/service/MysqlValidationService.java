@@ -52,8 +52,7 @@ public class MysqlValidationService {
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	
-	public void runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationReport report) throws BusinessServiceException{
-		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
+	public void runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException{
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		String reportStorage = validationConfig.getStorageLocation();
 		try {
@@ -65,27 +64,24 @@ public class MysqlValidationService {
 			if (executionConfig.isExtensionValidation()) {
 				releaseVersionLoader.loadDependncyVersion(executionConfig);
 				if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion())) {
-					statusReport.setFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
-					reportService.writeResults(statusReport, State.FAILED, reportStorage);
+					statusReport.addFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
 				}
 			}
 			//load prospective version
 			releaseVersionLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
 		} catch (Exception e) {
 			String msg = "Failed to prepare versions for mysql validation";
-			msg = e.getMessage()!= null ? msg + " due to " + e.getMessage() : msg;
+			msg = e.getMessage()!= null ? msg + " due to error: " + e.getMessage() : msg;
 			LOGGER.error(msg, e);
-			statusReport.setFailureMessage(msg);
-			reportService.writeResults(statusReport, State.FAILED, reportStorage);
-			report.addFailureMessage(msg);
+			statusReport.addFailureMessage(msg);
 			return;
 		}
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
 			LOGGER.info("Run extension release validation with config " +  executionConfig);
-			runExtensionReleaseValidation(report, validationConfig, executionConfig);
+			runExtensionReleaseValidation(statusReport, validationConfig, executionConfig);
 		} else {
 			LOGGER.info("Run international release validation with config " + executionConfig);
-			runAssertionTests(report, executionConfig, reportStorage);
+			runAssertionTests(statusReport, executionConfig, reportStorage);
 		}
 	}
 
@@ -93,12 +89,12 @@ public class MysqlValidationService {
 	/** For extension release validation we need to test the release-type validations first using previous extension against current extension
 	 * first then loading the international snapshot for the file-centric and component-centric validations.
 	 * load previous published version
-	 * @param report
+	 * @param statusReport
 	 * @param validationConfig
 	 * @param executionConfig
 	 * @throws BusinessServiceException
 	 */
-	private void runExtensionReleaseValidation(ValidationReport report, ValidationRunConfig validationConfig, MysqlExecutionConfig executionConfig) throws BusinessServiceException {
+	private void runExtensionReleaseValidation(ValidationStatusReport statusReport, ValidationRunConfig validationConfig, MysqlExecutionConfig executionConfig) throws BusinessServiceException {
 		final long timeStart = System.currentTimeMillis();
 		//run release-type validations
 		List<Assertion> assertions = getAssertions(executionConfig.getGroupNames());
@@ -116,17 +112,14 @@ public class MysqlValidationService {
 		try {
 			releaseVersionLoader.combineCurrenExtensionWithDependencySnapshot(executionConfig, validationConfig);
 		} catch (BusinessServiceException e) {
-			String msg = "Failed to prepare data for extension testing due to " + e.getMessage();
-			report.addFailureMessage(msg);
+			String msg = "Failed to prepare data for extension testing due to error:" + e.getMessage();
+			statusReport.addFailureMessage(msg);
 			LOGGER.error(msg, e);
-			ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
-			statusReport.setResultReport(report);
-			reportService.writeResults(statusReport, State.FAILED, validationConfig.getStorageLocation());
 		}
 		//remove already run release-type validations 
 		assertions.removeAll(releaseTypeAssertions);
 		testItems.addAll(runAssertionTests(executionConfig, assertions, reportStorage, true));
-		constructTestReport(report, executionConfig, timeStart, testItems);
+		constructTestReport(statusReport.getResultReport(), executionConfig, timeStart, testItems);
 	}
 	
 	private List<Assertion> getAssertions(List<String> groupNames) {
@@ -157,7 +150,7 @@ public class MysqlValidationService {
 		return result;
 	}
 
-	private void runAssertionTests( ValidationReport report, MysqlExecutionConfig executionConfig, String reportStorage) {
+	private void runAssertionTests( ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, String reportStorage) {
 		long timeStart = System.currentTimeMillis();
 		List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
@@ -175,7 +168,7 @@ public class MysqlValidationService {
 		} else {
 			items.addAll(executeAssertionsConcurrently(executionConfig, assertions, batchSize, reportStorage));
 		}
-		constructTestReport(report, executionConfig, timeStart, items);
+		constructTestReport(statusReport.getResultReport(), executionConfig, timeStart, items);
 		
 	}
 

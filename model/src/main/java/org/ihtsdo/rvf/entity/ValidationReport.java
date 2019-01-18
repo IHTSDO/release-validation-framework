@@ -19,14 +19,12 @@ public class ValidationReport {
 	private List<TestRunItem> assertionsWarning;
 	private List<TestRunItem> assertionsSkipped;
 	private List<TestRunItem> assertionsPassed;
-	private List<String> failureMessages;
 
 	public ValidationReport() {
 		assertionsFailed = new ArrayList<>();
 		assertionsWarning = new ArrayList<>();
 		assertionsSkipped = new ArrayList<>();
 		assertionsPassed = new ArrayList<>();
-		failureMessages = new ArrayList<>();
 		totalTestsRun = 0;
 		totalSkips = 0;
 		totalWarnings = 0;
@@ -124,14 +122,6 @@ public class ValidationReport {
 		timeTakenInSeconds += seconds;
 	}
 	
-	public List<String> getFailureMessages() {
-		return failureMessages;
-	}
-
-	public void addFailureMessage(String failureMsg) {
-		this.failureMessages.add(failureMsg);
-	}
-
 	public void sortAssertionLists() {
 		Collections.sort(assertionsFailed);
 		Collections.sort(assertionsWarning);

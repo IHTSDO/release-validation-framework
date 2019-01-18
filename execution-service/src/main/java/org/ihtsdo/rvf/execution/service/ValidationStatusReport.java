@@ -13,10 +13,10 @@ public class ValidationStatusReport {
 	private ValidationRunConfig validationConfig;
 	@SerializedName("TestResult")
 	private ValidationReport resultReport;
-	private String failureMessage;
 	private Date startTime;
 	private Date endTime;
 	private int totalRF2FilesLoaded;
+	private List<String> failureMessages;
 	
 	@SerializedName("rf2Files")
 	private List<String> rf2FilesLoaded;
@@ -25,10 +25,7 @@ public class ValidationStatusReport {
 		this.validationConfig = validationConfig;
 		totalRF2FilesLoaded = -1;
 		rf2FilesLoaded = new ArrayList<>();
-	}
-
-	public void setfailureMessage(String failureMsg) {
-		this.failureMessage = failureMsg;
+		failureMessages = new ArrayList<>();
 	}
 
 	public ValidationReport getResultReport() {
@@ -39,12 +36,12 @@ public class ValidationStatusReport {
 		this.resultReport = resultReport;
 	}
 
-	public String getFailureMessage() {
-		return failureMessage;
+	public List<String> getFailureMessages() {
+		return this.failureMessages;
 	}
 
-	public void setFailureMessage(String failureMessage) {
-		this.failureMessage = failureMessage;
+	public void addFailureMessage(String failureMessage) {
+		this.failureMessages.add(failureMessage);
 	}
 
 	public Date getStartTime() {
