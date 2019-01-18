@@ -25,7 +25,7 @@ import org.ihtsdo.otf.resourcemanager.ResourceConfiguration.Cloud;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import static org.ihtsdo.rvf.execution.service.ReleaseDataManager.*;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.util.RvfReleaseDbSchemaNameGenerator;
@@ -72,7 +72,7 @@ public class ValidationVersionLoader {
 
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
 	
-	public void loadPreviousVersion(ExecutionConfig executionConfig) throws Exception {
+	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws Exception {
 		String schemaName = constructRVFSchema(executionConfig.getPreviousVersion());
 		if (!releaseDataManager.isKnownRelease(schemaName)) {
 			if (executionConfig.getPreviousVersion().endsWith(ZIP_FILE_EXTENSION)) {
@@ -88,7 +88,7 @@ public class ValidationVersionLoader {
 		}
 	}
 		
-	public void loadDependncyVersion(ExecutionConfig executionConfig) throws IOException, BusinessServiceException {
+	public void loadDependncyVersion(MysqlExecutionConfig executionConfig) throws IOException, BusinessServiceException {
 		String schemaName = constructRVFSchema(executionConfig.getExtensionDependencyVersion());
 		if (!releaseDataManager.isKnownRelease(schemaName)) {
 			if (executionConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
@@ -104,7 +104,7 @@ public class ValidationVersionLoader {
 		}
 	}
 	
-	public void loadProspectiveVersion(ValidationStatusReport statusReport, ExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws Exception {
+	public void loadProspectiveVersion(ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws Exception {
 		String prospectiveVersion = executionConfig.getProspectiveVersion();
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		String reportStorage = validationConfig.getStorageLocation();
@@ -150,8 +150,8 @@ public class ValidationVersionLoader {
 		return releaseVersion;
 	}
 
-	public ExecutionConfig createExecutionConfig(ValidationRunConfig validationConfig) {
-		ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
+	public MysqlExecutionConfig createExecutionConfig(ValidationRunConfig validationConfig) {
+		MysqlExecutionConfig executionConfig = new MysqlExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
 		executionConfig.setProspectiveVersion(RVF_DB_PREFIX + executionConfig.getExecutionId().toString());
 		executionConfig.setGroupNames(validationConfig.getGroupsList());
 		executionConfig.setExtensionValidation( isExtension(validationConfig));
@@ -171,7 +171,7 @@ public class ValidationVersionLoader {
 		return executionConfig;
 	}
 
-	public List<String> loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(ExecutionConfig executionConfig, ValidationRunConfig validationConfig,
+	public List<String> loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(MysqlExecutionConfig executionConfig, ValidationRunConfig validationConfig,
 				List<String> excludeTableNames) throws BusinessServiceException {
 		List<String> filesLoaded = new ArrayList<>();
 		String prospectiveVersion = executionConfig.getProspectiveVersion();
@@ -189,8 +189,7 @@ public class ValidationVersionLoader {
 			} else {
 				//copy snapshot from previous release
 				if (!validationConfig.isFirstTimeRelease()) {
-					String previousVersion = validationConfig.getPreviousRelease();
-					releaseDataManager.copyTableData(previousVersion, prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
+					releaseDataManager.copyTableData(executionConfig.getPreviousVersion(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 				}
 			}
 			releaseDataManager.updateSnapshotTableWithDataFromDelta(prospectiveVersion);
@@ -334,7 +333,7 @@ public class ValidationVersionLoader {
 	 * @throws IOException 
 	 * @throws SQLException 
 	 */
-	public void combineCurrenExtensionWithDependencySnapshot(ExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws BusinessServiceException {
+	public void combineCurrenExtensionWithDependencySnapshot(MysqlExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws BusinessServiceException {
 		String extensionVersion = executionConfig.getProspectiveVersion();
 		String combinedVersion = executionConfig.getProspectiveVersion() + COMBINED;
 		executionConfig.setProspectiveVersion(combinedVersion);

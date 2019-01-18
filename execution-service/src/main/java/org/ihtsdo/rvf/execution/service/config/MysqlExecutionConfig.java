@@ -2,7 +2,7 @@ package org.ihtsdo.rvf.execution.service.config;
 
 import java.util.List;
 
-public class ExecutionConfig {
+public class MysqlExecutionConfig {
 
 	private String prospectiveVersion;
 	private String previousVersion;
@@ -16,11 +16,11 @@ public class ExecutionConfig {
 	private String effectiveTime;
 	private String dependencyEffectiveTime;
 
-	public ExecutionConfig(final Long runId) {
+	public MysqlExecutionConfig(final Long runId) {
 		this(runId,false);
 	}
 
-	public ExecutionConfig(Long runId, boolean firstTimeRelease) {
+	public MysqlExecutionConfig(Long runId, boolean firstTimeRelease) {
 		executionId = runId;
 		this.firstTimeRelease = firstTimeRelease;
 	}

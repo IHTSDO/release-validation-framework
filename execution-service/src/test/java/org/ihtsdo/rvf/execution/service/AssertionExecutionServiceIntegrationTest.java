@@ -13,7 +13,7 @@ import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class AssertionExecutionServiceIntegrationTest {
 	private AssertionTest assertionTest;
 	private org.ihtsdo.rvf.entity.Test test;
 
-	private ExecutionConfig config;
+	private MysqlExecutionConfig config;
 
 	@Before
 	public void setUp() {
@@ -56,7 +56,7 @@ public class AssertionExecutionServiceIntegrationTest {
 		assertNotNull(releaseDataManager);
 
 		// register releases with release manager, since they will be used during SQL replacement
-		config = new ExecutionConfig(12345L);
+		config = new MysqlExecutionConfig(12345L);
 		config.setPreviousVersion("rvf_int_20140131");
 		config.setProspectiveVersion("rvf_int_20140731");
 		config.setExecutionId(1L);

@@ -21,7 +21,7 @@ import org.ihtsdo.rvf.execution.service.ExecutionServiceConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ValidationStatusReport;
 import org.ihtsdo.rvf.execution.service.ValidationVersionLoader;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
@@ -65,7 +65,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 	public void testConstructIntProspectiveVersionWithRF2DeltaOnly() throws BusinessServiceException {
 		validationConfig.setRf2DeltaOnly(true);
 		prospectiveVersion = validationConfig.getRunId().toString();
-		ExecutionConfig executionConfig = new ExecutionConfig(validationConfig.getRunId());
+		MysqlExecutionConfig executionConfig = new MysqlExecutionConfig(validationConfig.getRunId());
 		executionConfig.setProspectiveVersion(prospectiveVersion);
 		List<String> filesLoaded = dataLoader.loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(executionConfig, validationConfig, null);
 		Assert.assertEquals(1, filesLoaded.size());
@@ -79,7 +79,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 		validationConfig.addDependencyRelease("int_20160131");
 		validationConfig.addPreviousRelease("dk_20160215");
 		validationConfig.setRf2DeltaOnly(true);
-		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		dataLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
 		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
@@ -89,7 +89,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 	@Test
 	public void testProspectiveVersion() throws Exception {
 		prospectiveVersion = validationConfig.getRunId().toString();
-		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		dataLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
 		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
@@ -102,7 +102,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 		prospectiveVersion = validationConfig.getRunId().toString();
 		validationConfig.addDependencyRelease("int_20160131");
 		validationConfig.addPreviousRelease("dk_20160215");
-		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		executionConfig.setReleaseValidation(false);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		dataLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
@@ -112,7 +112,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 	@Test
 	public void testLoadPreviousVersion() throws Exception {
 		validationConfig.setPreviousRelease("SnomedCT_RF2Release_INT_20130131.zip");
-		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		Map<String, Object> responseMap = new HashMap<>();
 		dataLoader.loadPreviousVersion(executionConfig);
 		System.out.println(responseMap.get(FAILURE_MESSAGE));
@@ -125,7 +125,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 		
 		validationConfig.setExtensionDependency("int_20160131");
 		validationConfig.setPreviousRelease("SnomedCT_GPFPICPC2_Production_INT_20160731.zip");
-		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		Map<String, Object> responseMap = new HashMap<>();
 		dataLoader.loadPreviousVersion(executionConfig);
 		System.out.println(responseMap.get(FAILURE_MESSAGE));
@@ -137,7 +137,7 @@ public class ValidationVersionLoaderIntegrationTestHarness {
 	public void testLoadPreviousExtensionVersion() throws Exception {
 		validationConfig.setExtensionDependency("int_20160131");
 		validationConfig.setPreviousRelease("SnomedCT_RF2Release_SE1000052_20160531.zip");
-		ExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		dataLoader.loadPreviousVersion(executionConfig);
 	}
 	

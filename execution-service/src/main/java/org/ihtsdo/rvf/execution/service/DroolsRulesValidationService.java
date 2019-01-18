@@ -28,11 +28,12 @@ import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
@@ -66,6 +67,8 @@ public class DroolsRulesValidationService {
 	private ResourceManager validationJobResourceManager;
 	
 	private ResourceManager releaseSourceManager;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(DroolsRulesValidationService.class);
 
 	@PostConstruct
 	public void init() {
@@ -73,21 +76,25 @@ public class DroolsRulesValidationService {
 		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
 	}
 	
-	public void runDroolsAssertions(ValidationReport validationReport, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws RVFExecutionException {
+	public void runDroolsAssertions(ValidationReport validationReport, ValidationRunConfig validationConfig) throws RVFExecutionException {
 		long timeStart = new Date().getTime();
 		//Filter only Drools rules set from all the assertion groups
 		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
 		Set<String> directoryPaths = new HashSet<>();
 		//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
-		if(droolsRulesSets.isEmpty()) return;
+		if (droolsRulesSets.isEmpty()) {
+			LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
+			return;
+		}
 		try {
-			List<InvalidContent> invalidContents;
+			List<InvalidContent> invalidContents = null;
 			try {
+				//TODO need to check and validate validation config to make sure previous release and dependency release are zip files.
 				Set<InputStream> snapshotsInputStream = new HashSet<>();
 				InputStream testedReleaseFileStream = validationJobResourceManager.readResourceStream(validationConfig.getProspectiveFileFullPath());
 				InputStream deltaInputStream = null;
 				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
-				if(validationConfig.isRf2DeltaOnly()) {
+				if (validationConfig.isRf2DeltaOnly()) {
 					InputStream previousStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
 					snapshotsInputStream.add(previousStream);
 					deltaInputStream = testedReleaseFileStream;
@@ -99,7 +106,7 @@ public class DroolsRulesValidationService {
 				//Load the dependency package from S3 to snapshot files list before validating if the package is a MS extension and not an edition release
 				//If the package is an MS edition, it is not necessary to load the dependency
 				Set<String> modulesSet = null;
-				if(executionConfig.isExtensionValidation() && !validationConfig.isReleaseAsAnEdition()) {
+				if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
 					InputStream dependencyStream = releaseSourceManager.readResourceStream(validationConfig.getExtensionDependency());
 					snapshotsInputStream.add(dependencyStream);
 
@@ -198,7 +205,7 @@ public class DroolsRulesValidationService {
 			DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
 			report.setRuleSetExecuted(String.join(",", droolsRulesSets));
 			report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-			report.setExecutionId(executionConfig.getExecutionId());
+			report.setExecutionId(validationConfig.getRunId());
 			report.setMessage(ExceptionUtils.getStackTrace(ex));
 			report.setCompleted(false);
 			//TODO add failure report to status report
@@ -225,8 +232,8 @@ public class DroolsRulesValidationService {
 		return droolsRulesModules;
 	}
 
-	private Map<String, List<InvalidContent>> groupDroolsRules(Map<String, List<InvalidContent>> groupedRules, String rule, List<InvalidContent> invalidContents,
-															   int failureMaxExport) {
+	private Map<String, List<InvalidContent>> groupDroolsRules(Map<String, List<InvalidContent>> groupedRules, 
+			String rule, List<InvalidContent> invalidContents, int failureMaxExport) {
 		if(!groupedRules.containsKey(rule)) {
 			groupedRules.put(rule, new ArrayList<>());
 		}

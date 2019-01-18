@@ -19,7 +19,7 @@ import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class MysqlValidationService {
 	
 	public void runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationReport report) throws BusinessServiceException{
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
-		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		String reportStorage = validationConfig.getStorageLocation();
 		try {
 			//prepare release data for testing
@@ -98,7 +98,7 @@ public class MysqlValidationService {
 	 * @param executionConfig
 	 * @throws BusinessServiceException
 	 */
-	private void runExtensionReleaseValidation(ValidationReport report, ValidationRunConfig validationConfig, ExecutionConfig executionConfig) throws BusinessServiceException {
+	private void runExtensionReleaseValidation(ValidationReport report, ValidationRunConfig validationConfig, MysqlExecutionConfig executionConfig) throws BusinessServiceException {
 		final long timeStart = System.currentTimeMillis();
 		//run release-type validations
 		List<Assertion> assertions = getAssertions(executionConfig.getGroupNames());
@@ -138,7 +138,7 @@ public class MysqlValidationService {
 		return new ArrayList<Assertion>(assertions);
 	}
 
-	private List<TestRunItem> runAssertionTests(ExecutionConfig executionConfig, List<Assertion> assertions,
+	private List<TestRunItem> runAssertionTests(MysqlExecutionConfig executionConfig, List<Assertion> assertions,
 			String reportStorage, boolean runResourceAssertions) {
 		List<TestRunItem> result = new ArrayList<>();
 		if (runResourceAssertions) {
@@ -157,7 +157,7 @@ public class MysqlValidationService {
 		return result;
 	}
 
-	private void runAssertionTests( ValidationReport report, ExecutionConfig executionConfig, String reportStorage) {
+	private void runAssertionTests( ValidationReport report, MysqlExecutionConfig executionConfig, String reportStorage) {
 		long timeStart = System.currentTimeMillis();
 		List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
@@ -179,7 +179,7 @@ public class MysqlValidationService {
 		
 	}
 
-	private List<TestRunItem> executeAssertionsConcurrently(ExecutionConfig executionConfig, Collection<Assertion> assertions,
+	private List<TestRunItem> executeAssertionsConcurrently(MysqlExecutionConfig executionConfig, Collection<Assertion> assertions,
 			int batchSize, String reportStorage) {
 		List<Future<Collection<TestRunItem>>> tasks = new ArrayList<>();
 		List<TestRunItem> results = new ArrayList<>();
@@ -220,7 +220,7 @@ public class MysqlValidationService {
 		return results;
 	}
 
-	private List<TestRunItem> executeAssertions(ExecutionConfig executionConfig, Collection<Assertion> assertions, String reportStorage) {
+	private List<TestRunItem> executeAssertions(MysqlExecutionConfig executionConfig, Collection<Assertion> assertions, String reportStorage) {
 		
 		List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
@@ -242,7 +242,7 @@ public class MysqlValidationService {
 		return results;
 	}
 	
-	private void constructTestReport(ValidationReport report, ExecutionConfig executionConfig,
+	private void constructTestReport(ValidationReport report, MysqlExecutionConfig executionConfig,
 			long timeStart, List<TestRunItem> items) {
 		final long timeEnd = System.currentTimeMillis();
 		report.addTimeTaken((timeEnd - timeStart) / 1000);

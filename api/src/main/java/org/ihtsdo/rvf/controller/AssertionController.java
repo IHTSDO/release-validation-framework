@@ -14,7 +14,7 @@ import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.helper.AssertionHelper;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -239,7 +239,7 @@ public class AssertionController {
 		final Collection<Assertion> assertions = new ArrayList<Assertion>(
 				Arrays.asList(assertion));
 
-		final ExecutionConfig config = new ExecutionConfig(runId);
+		final MysqlExecutionConfig config = new MysqlExecutionConfig(runId);
 		Map<String, Object> failures = new HashMap<String, Object>();
 
 		if ((prospectiveReleaseVersion != null)

@@ -7,7 +7,7 @@ import java.util.Calendar;
 
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class ValidationRunner {
 	
 	private void runValidations(ValidationRunConfig validationConfig) throws Exception {
 		Calendar startTime = Calendar.getInstance();
-		ExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		releaseVersionLoader.downloadProspectiveFiles(validationConfig);
 		if (validationConfig.getLocalProspectiveFile() == null) {
 			reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
@@ -71,10 +71,10 @@ public class ValidationRunner {
 		mysqlValidationService.runRF2MysqlValidations(validationConfig, report);
 		if (validationConfig.isEnableDrools()) {
 			// Run Drools validations
-			String droolsTestStartMsg = "Start Drools validation for release file:" + validationConfig.getTestFileName();
+			String droolsTestStartMsg = "Start drools validation for release file:" + validationConfig.getTestFileName();
 			logger.info(droolsTestStartMsg);
 			reportService.writeProgress(droolsTestStartMsg, validationConfig.getStorageLocation());
-			droolsValidationService.runDroolsAssertions(report, validationConfig, executionConfig);
+			droolsValidationService.runDroolsAssertions(report, validationConfig);
 		}
 		report.sortAssertionLists();
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);

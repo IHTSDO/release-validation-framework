@@ -28,7 +28,7 @@ import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.After;
@@ -76,7 +76,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private URL releaseTypeExpectedResults;
 	private URL componentCentrilExpected;
 	private URL fileCentricExpected;
-	private ExecutionConfig config;
+	private MysqlExecutionConfig config;
 	private final ObjectMapper mapper = new ObjectMapper();
 	private List<String> rf2FilesLoaded = new ArrayList<>();
 	
@@ -113,7 +113,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		componentCentrilExpected = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/componentCentricRegressionExpected.json");
 		assertNotNull("Must not be null", componentCentrilExpected);
 		fileCentricExpected = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
-		config = new ExecutionConfig(System.currentTimeMillis());
+		config = new MysqlExecutionConfig(System.currentTimeMillis());
 		config.setPreviousVersion(PREVIOUS_RELEASE);
 		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
 		config.setFailureExportMax(10);

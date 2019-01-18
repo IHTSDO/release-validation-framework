@@ -9,7 +9,7 @@ import java.util.Map;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class AssertionHelper {
 	private AssertionExecutionService assertionExecutionService;
 
 	public Map<String, Object> assertAssertions(
-			final Collection<Assertion> assertions, final ExecutionConfig config) {
+			final Collection<Assertion> assertions, final MysqlExecutionConfig config) {
 		final Collection<TestRunItem> allTestRunItems = new ArrayList<>();
 		final Map<String, Object> responseMap = new LinkedHashMap<>();
 		int failedAssertionCount = 0;

@@ -26,7 +26,7 @@ import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestRunItem;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,12 +54,12 @@ public class AssertionExecutionService {
 
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionService.class);
 
-	public TestRunItem executeAssertionTest(final AssertionTest assertionTest, final ExecutionConfig config) {
+	public TestRunItem executeAssertionTest(final AssertionTest assertionTest, final MysqlExecutionConfig config) {
 
 		return executeTest(assertionTest.getAssertion(), assertionTest.getTest(), config);
 	}
 
-	public Collection<TestRunItem> executeAssertionTests(final Collection<AssertionTest> assertionTests, final ExecutionConfig config) {
+	public Collection<TestRunItem> executeAssertionTests(final Collection<AssertionTest> assertionTests, final MysqlExecutionConfig config) {
 		final Collection<TestRunItem> items = new ArrayList<>();
 		for(final AssertionTest at: assertionTests){
 			items.add(executeAssertionTest(at, config));
@@ -68,7 +68,7 @@ public class AssertionExecutionService {
 		return items;
 	}
 
-	public Collection<TestRunItem> executeAssertion(final Assertion assertion, final ExecutionConfig config) {
+	public Collection<TestRunItem> executeAssertion(final Assertion assertion, final MysqlExecutionConfig config) {
 
 		final Collection<TestRunItem> runItems = new ArrayList<>();
 		//get tests for given assertion
@@ -80,7 +80,7 @@ public class AssertionExecutionService {
 		return runItems;
 	}
 
-	public Collection<TestRunItem> executeAssertions(final Collection<Assertion> assertions, final ExecutionConfig config) {
+	public Collection<TestRunItem> executeAssertions(final Collection<Assertion> assertions, final MysqlExecutionConfig config) {
 		final Collection<TestRunItem> items = new ArrayList<>();
 		for(final Assertion assertion : assertions){
 			items.addAll(executeAssertion(assertion, config));
@@ -89,7 +89,7 @@ public class AssertionExecutionService {
 		return items;
 	}
 	
-public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertions, final ExecutionConfig executionConfig) {
+public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertions, final MysqlExecutionConfig executionConfig) {
 		
 		final List<Future<Collection<TestRunItem>>> concurrentTasks = new ArrayList<>();
 		final List<TestRunItem> results = new ArrayList<>();
@@ -140,7 +140,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		}
 	}
 
-	public TestRunItem executeTest(final Assertion assertion, final Test test, final ExecutionConfig config) {
+	public TestRunItem executeTest(final Assertion assertion, final Test test, final MysqlExecutionConfig config) {
 
 		long timeStart = System.currentTimeMillis();
 		logger.debug("Start executing assertion:" + assertion.getUuid());
@@ -184,7 +184,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		return runItem;
 	}
 
-	private void executeCommand(final Assertion assertion, final ExecutionConfig config,
+	private void executeCommand(final Assertion assertion, final MysqlExecutionConfig config,
 			final ExecutionCommand command, final Connection connection)
 			throws SQLException, ConfigurationException {
 		String[] parts = {""};
@@ -245,7 +245,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		}
 	}
 
-	private List<String> transformSql(String[] parts, Assertion assertion, ExecutionConfig config) throws ConfigurationException {
+	private List<String> transformSql(String[] parts, Assertion assertion, MysqlExecutionConfig config) throws ConfigurationException {
 		List<String> result = new ArrayList<>();
 		String defaultCatalog = dataSource.getDefaultCatalog();
 		String prospectiveSchema = config.getProspectiveVersion();
@@ -284,7 +284,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		return result;
 }
 
-	private void extractTestResult(final Assertion assertion, final TestRunItem runItem, final ExecutionConfig config)
+	private void extractTestResult(final Assertion assertion, final TestRunItem runItem, final MysqlExecutionConfig config)
 			throws SQLException {
 		/*
 		 create a prepared statement for retrieving matching results.
@@ -304,7 +304,6 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 					preparedStatement.setLong(3, config.getFailureExportMax());
 				}
 				try (ResultSet resultSet = preparedStatement.executeQuery()) {
-					
 					while (resultSet.next())
 					{
 						// only get first N failed results
@@ -330,7 +329,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 							runItem.setFailureCount(new Long(resultSet.getInt(1)));
 						}
 					}
-					}
+				}
 			}
 		}
 	}

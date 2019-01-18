@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.execution.service.config.ExecutionConfig;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.helper.AssertionHelper;
 import org.ihtsdo.rvf.repository.AssertionGroupRepository;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -188,7 +188,7 @@ public class AssertionGroupController {
 			@ApiParam(value="Previous release version") @RequestParam final String previousReleaseVersion) {
 
 		AssertionGroup group = (AssertionGroup) assertionGroupRepository.getOne(id);
-		ExecutionConfig config = new ExecutionConfig(runId);
+		MysqlExecutionConfig config = new MysqlExecutionConfig(runId);
 		config.setPreviousVersion(previousReleaseVersion);
 		config.setProspectiveVersion(prospectiveReleaseVersion);
 		config.setFailureExportMax(-1);
