@@ -176,17 +176,6 @@
 									<type>file</type>
 								</data>
 								<data>
-									<src>${basedir}/src/deb/config.properties</src>
-									<dst>/etc/opt/${packageName}/config.properties</dst>
-									<type>file</type>
-									<conffile>true</conffile>
-									<mapper>
-										<type>perm</type>
-										<group>${packageName}</group>
-										<filemode>0640</filemode>
-									</mapper>
-								</data>
-								<data>
 									<type>template</type>
 									<paths>
 										<path>/etc/opt/${packageName}</path>

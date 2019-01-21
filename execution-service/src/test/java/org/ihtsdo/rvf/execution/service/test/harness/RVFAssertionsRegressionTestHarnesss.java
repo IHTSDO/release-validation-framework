@@ -33,7 +33,6 @@ import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

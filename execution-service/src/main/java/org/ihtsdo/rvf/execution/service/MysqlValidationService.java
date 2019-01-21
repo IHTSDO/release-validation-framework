@@ -18,7 +18,6 @@ import org.ihtsdo.rvf.entity.SeverityLevel;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
-import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.service.AssertionService;

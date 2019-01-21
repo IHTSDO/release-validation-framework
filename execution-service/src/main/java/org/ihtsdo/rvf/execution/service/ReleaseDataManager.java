@@ -55,7 +55,10 @@ public class ReleaseDataManager {
 	private static final String VERSION_NOT_FOUND = "version not found in RVF database ";
 	private static final String ZIP_FILE_EXTENSION = ".zip";
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManager.class);
+	
+	@Value("${rvf.data.folder.location}")
 	private String sctDataLocation;
+	
 	private File sctDataFolder;
 	
 	@Value("${rvf.master.schema.name}")
