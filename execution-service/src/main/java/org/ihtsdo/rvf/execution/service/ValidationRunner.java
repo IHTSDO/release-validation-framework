@@ -67,9 +67,10 @@ public class ValidationRunner {
 		ValidationReport report = new ValidationReport();
 		report.setExecutionId(executionConfig.getExecutionId());
 		report.setReportUrl(validationConfig.getUrl());
-		runRF2StructureTests(validationConfig, report);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		statusReport.setResultReport(report);
+		runRF2StructureTests(validationConfig, statusReport);
+		
 		mysqlValidationService.runRF2MysqlValidations(validationConfig, statusReport);
 		if (validationConfig.isEnableDrools()) {
 			// Run Drools validations
@@ -88,7 +89,7 @@ public class ValidationRunner {
 		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
 	}
 	
-	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationReport report) throws Exception{
+	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws Exception{
 		logger.info(String.format("Started execution with runId [%1s] : ", validationConfig.getRunId()));
 		// load the filename
 		String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
@@ -97,7 +98,7 @@ public class ValidationRunner {
 		reportService.writeProgress(structureTestStartMsg, reportStorage);
 		reportService.writeState(State.RUNNING, reportStorage);
 
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(report, 
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(statusReport.getResultReport(), 
 																		validationConfig.getLocalProspectiveFile(),
 																		validationConfig.getRunId(),
 																		validationConfig.getLocalManifestFile(),
@@ -108,8 +109,6 @@ public class ValidationRunner {
 		
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
-			ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
-			statusReport.setResultReport(report);
 			reportService.writeResults(statusReport, State.FAILED, reportStorage);
 		}
 	}
