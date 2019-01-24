@@ -167,9 +167,8 @@ public class TestUploadFileController {
 			@ApiParam(value = "manifest.xml file") @RequestParam(value = "manifest", required = false) final MultipartFile manifestFile,
 			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = "groups") final List<String> groupsList,
 			@ApiParam(value = "Drools rules group names") @RequestParam(value = "droolsRulesGroups", required = false) final List<String> droolsRulesGroupsList,
-			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = "previousIntReleaseVersion", required = false) final String prevIntReleaseVersion,
-			@ApiParam(value = "Required for non-first time extension release testing") @RequestParam(value = "previousExtensionReleaseVersion", required = false) final String previousExtVersion,
-			@ApiParam(value = "Required for extension release testing") @RequestParam(value = "extensionDependencyReleaseVersion", required = false) final String extensionDependency,
+			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = "previousRelease", required = false) final String previousRelease,
+			@ApiParam(value = "Required for extension release testing") @RequestParam(value = "dependencyRelease", required = false) final String extensionDependency,
 			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = "runId") final Long runId,
 			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = "failureExportMax", required = false) final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = "storageLocation") final String storageLocation,
@@ -184,8 +183,7 @@ public class TestUploadFileController {
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFile(manifestFile)
-				.addPreviousRelease(prevIntReleaseVersion)
-				.addPreviousRelease(previousExtVersion)
+				.addPreviousRelease(previousRelease)
 				.addDependencyRelease(extensionDependency)
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax).addUrl(urlPrefix)
