@@ -99,13 +99,13 @@ public class ReleaseDataManager {
 			} 
 		}
 		logger.info("Using data location as :" + sctDataFolder.getAbsolutePath());
-		populateLookupMap();
+		refeshSchemaCache();
 	}
 
 	/**
 	 * Utility method that generates a map of all known releases based on the contents of the data folder.
 	 */
-	protected void populateLookupMap() {
+	protected void refeshSchemaCache() {
 		// now get list of existing RVF_INT like databases
 		try ( ResultSet catalogs = rvfDynamicDataSource.getConnection(masterSchema).getMetaData().getCatalogs()) {
 			while (catalogs.next()) {
@@ -276,6 +276,7 @@ public class ReleaseDataManager {
 	}
 
 	public boolean isKnownRelease(String releaseVersion) {
+		refeshSchemaCache();
 		if (releaseVersion == null || releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
 			return false;
 		}
