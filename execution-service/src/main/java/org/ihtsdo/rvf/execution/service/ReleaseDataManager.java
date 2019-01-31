@@ -288,6 +288,7 @@ public class ReleaseDataManager {
 	 * @return set of all releases
 	 */
 	public Set<String> getAllKnownReleases() {
+		refeshSchemaCache();
 		return this.releaseSchemaNameLookup;
 	}
 

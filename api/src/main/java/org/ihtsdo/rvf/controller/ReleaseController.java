@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.util.RvfReleaseDbSchemaNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,29 +72,6 @@ public class ReleaseController {
 		}
 	}
 
-	@RequestMapping(value = "{releasePackage}/archive", method = RequestMethod.POST)
-	@ResponseBody
-	@ApiOperation(value = "Upload a previous release package and generate an MySQL binary archive for RVF validation.")
-	public ResponseEntity genereateReleaseBinaryArchive(@PathVariable final String releasePackage) {
-		try {
-			String dbSchemaName = RvfReleaseDbSchemaNameGenerator.generate(releasePackage);
-			 boolean isSuccessful = releaseDataManager.uploadRelease(releasePackage, dbSchemaName);
-			 if (isSuccessful) {
-				 String archiveFile = releaseDataManager.generateBinaryArchive(dbSchemaName);
-					return new ResponseEntity<>(archiveFile, HttpStatus.OK);
-			 } else {
-				 return new ResponseEntity<>(isSuccessful, HttpStatus.OK);
-			 }
-			
-		} catch (BusinessServiceException e) {
-			logger.warn("Error getting input stream from upload. Nested exception is : \n"
-					+ e.fillInStackTrace());
-			return new ResponseEntity<>(
-					"Error getting input stream from upload. Nested exception is : "
-							+ e.fillInStackTrace(), HttpStatus.BAD_REQUEST);
-		}
-	}
-	
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)

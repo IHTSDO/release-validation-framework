@@ -78,7 +78,7 @@ public class AutoScalingManager {
 					lastCheckTime = LocalTime.now();
 				} else {
 					int current = getQueueSize();
-					if (current != lastPolledQueueSize || hourElapsedSinceLastCheck(lastCheckTime)) {
+					if (current != lastPolledQueueSize || timeElapsedSinceLastCheck(lastCheckTime)) {
 						logger.info("Total messages in queue:" + current);
 						activeInstances = instanceManager.getActiveInstances();
 						lastCheckTime = LocalTime.now();
@@ -114,8 +114,9 @@ public class AutoScalingManager {
 		}
 	}
 	
-	private boolean hourElapsedSinceLastCheck(LocalTime lastCheckTime) {
-		return Duration.between(lastCheckTime, LocalTime.now()).abs().toHours() >= 1;
+	private boolean timeElapsedSinceLastCheck(LocalTime lastCheckTime) {
+		//Check every 10 minutes
+		return Duration.between(lastCheckTime, LocalTime.now()).abs().toMinutes() >= 10;
 	}
 
 	private int getTotalInstancesToCreate(int currentMsgSize, int currentActiveInstances, int maxRunningInstance) {
