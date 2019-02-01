@@ -19,7 +19,7 @@ api-demo/tmp
 
 */bin/
 
-config_local
+config_local*
 activemq-data/
 
 # Whitelist some files
