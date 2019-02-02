@@ -16,6 +16,7 @@ import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.UserPrincipal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -67,14 +68,13 @@ public class ReleaseDataManager {
 	@Value("${rvf.jdbc.data.myisam.folder}")
 	private String mysqlDataDir;
 	
-	
     @Resource(name = "dataSource")
 	private BasicDataSource dataSource;
 	
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	
-	private final Set<String> releaseSchemaNameLookup = new HashSet<>();
+	private final Set<String> schemaNames = new HashSet<>();
 	
 	@Autowired
 	private ResourceLoader cloudResourceLoader;
@@ -99,25 +99,23 @@ public class ReleaseDataManager {
 			} 
 		}
 		logger.info("Using data location as :" + sctDataFolder.getAbsolutePath());
-		refeshSchemaCache();
+		fetchRvfSchemasFromDb();
 	}
 
 	/**
 	 * Utility method that generates a map of all known releases based on the contents of the data folder.
 	 */
-	protected void refeshSchemaCache() {
-		// now get list of existing RVF_INT like databases
-		try ( ResultSet catalogs = rvfDynamicDataSource.getConnection(masterSchema).getMetaData().getCatalogs()) {
+	private void fetchRvfSchemasFromDb() {
+		try ( ResultSet catalogs = dataSource.getConnection().getMetaData().getCatalogs()) {
 			while (catalogs.next()) {
 				 String schemaName = catalogs.getString(1);
 				if (schemaName.startsWith(RVF_DB_PREFIX)) {
-					releaseSchemaNameLookup.add(schemaName);
+					schemaNames.add(schemaName);
 				}
 			}
 		} catch (final SQLException e) {
 			logger.error("Error getting list of existing schemas. Nested exception is : \n" + e.fillInStackTrace());
 		}
-
 	}
 	
 	public String getRVFVersion(String product, String releaseVersion) {
@@ -149,13 +147,13 @@ public class ReleaseDataManager {
 		}
 		String rvfVersion = getRVFVersion(product, version);
 		logger.info("RVF release version:" + rvfVersion);
-		if (releaseSchemaNameLookup.contains(rvfVersion) ) {
+		if (schemaNames.contains(rvfVersion) ) {
 			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: " + rvfVersion);
 		}
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		String schemaName = loadSnomedData(rvfVersion, rf2FilesLoaded, fileDestination);
 		logger.info("schemaName = " + schemaName);
-		releaseSchemaNameLookup.add(schemaName);
+		schemaNames.add(schemaName);
 		return true;
 	}
 	
@@ -178,7 +176,7 @@ public class ReleaseDataManager {
 			IOUtils.closeQuietly(out);
 		}
 		
-		if (releaseSchemaNameLookup.contains(schemaName)) {
+		if (schemaNames.contains(schemaName)) {
 			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: " + schemaName);
 		}
 		logger.info("Loading data into schema " + schemaName);
@@ -248,7 +246,7 @@ public class ReleaseDataManager {
 				createSchema(createdSchemaName);
 			}
 			loadReleaseFilesToDB(outputFolder,rvfDynamicDataSource,rf2FilesLoaded, createdSchemaName);
-			releaseSchemaNameLookup.add(createdSchemaName);
+			schemaNames.add(createdSchemaName);
 		} catch (final SQLException | IOException e) {
 			final String errorMsg = String.format("Error while loading file %s into version %s", zipDataFile, versionName);
 			logger.error(errorMsg,e);
@@ -276,11 +274,10 @@ public class ReleaseDataManager {
 	}
 
 	public boolean isKnownRelease(String releaseVersion) {
-		refeshSchemaCache();
 		if (releaseVersion == null || releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
 			return false;
 		}
-		return releaseSchemaNameLookup.contains(releaseVersion);
+		return schemaNames.contains(releaseVersion);
 	}
 
 	/**
@@ -288,8 +285,7 @@ public class ReleaseDataManager {
 	 * @return set of all releases
 	 */
 	public Set<String> getAllKnownReleases() {
-		refeshSchemaCache();
-		return this.releaseSchemaNameLookup;
+		return this.schemaNames;
 	}
 
 	public void setSctDataLocation(final String sctDataLocationX) {
@@ -536,7 +532,7 @@ public class ReleaseDataManager {
 
 	public void clearQAResult(Long runId) {
 		String deleteQaResultSQL = " delete from rvf_master.qa_result where run_id = " + runId;
-		try (Connection connection = rvfDynamicDataSource.getConnection(masterSchema);
+		try (Connection connection = dataSource.getConnection();
 				Statement statement = connection.createStatement() ) {
 			statement.execute(deleteQaResultSQL);
 		} catch (final SQLException e) {
@@ -608,6 +604,7 @@ public class ReleaseDataManager {
 		outputDir.mkdir();
 		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
 		logger.info("Mysql binary files are restored sucessfully in " +  outputDir.getPath());
+		fetchRvfSchemasFromDb();
 		return true;
 	}
 

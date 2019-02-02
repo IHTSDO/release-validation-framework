@@ -59,7 +59,6 @@ public class AssertionExecutionServiceIntegrationTest {
 		config = new MysqlExecutionConfig(12345L);
 		config.setPreviousVersion("rvf_int_20140131");
 		config.setProspectiveVersion("rvf_int_20140731");
-		config.setExecutionId(1L);
 
 		assertion  = new Assertion();
 		assertion.setAssertionText("Assertion test");

@@ -21,7 +21,7 @@ public class MysqlExecutionConfig {
 	}
 
 	public MysqlExecutionConfig(Long runId, boolean firstTimeRelease) {
-		executionId = runId;
+		this.executionId = runId;
 		this.firstTimeRelease = firstTimeRelease;
 	}
 
@@ -32,10 +32,6 @@ public class MysqlExecutionConfig {
 	public void setPreviousVersion(final String prevReleaseVersion) {
 		this.previousVersion = prevReleaseVersion;
 		
-	}
-
-	public void setExecutionId(final Long runId) {
-		executionId = runId;
 	}
 
 	public void setGroupNames(final List<String> groupsList) {

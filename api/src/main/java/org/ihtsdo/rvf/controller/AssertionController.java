@@ -242,9 +242,7 @@ public class AssertionController {
 		final MysqlExecutionConfig config = new MysqlExecutionConfig(runId);
 		Map<String, Object> failures = new HashMap<String, Object>();
 
-		if ((prospectiveReleaseVersion != null)
-				&& !releaseDataManager
-						.isKnownRelease(prospectiveReleaseVersion)) {
+		if (prospectiveReleaseVersion != null && !releaseDataManager.isKnownRelease(prospectiveReleaseVersion)) {
 			failures.put("failureMessage", "Release version not found:"
 					+ prospectiveReleaseVersion);
 
@@ -255,8 +253,7 @@ public class AssertionController {
 		config.setProspectiveVersion(prospectiveReleaseVersion);
 		config.setPreviousVersion(previousReleaseVersion);
 
-		if ((previousReleaseVersion != null)
-				&& !releaseDataManager.isKnownRelease(previousReleaseVersion)) {
+		if (previousReleaseVersion != null && !releaseDataManager.isKnownRelease(previousReleaseVersion)) {
 			failures.put("failureMessage", "Release version not found:"
 					+ previousReleaseVersion);
 

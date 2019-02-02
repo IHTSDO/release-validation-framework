@@ -33,6 +33,8 @@ import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,13 +80,23 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private MysqlExecutionConfig config;
 	private final ObjectMapper mapper = new ObjectMapper();
 	private List<String> rf2FilesLoaded = new ArrayList<>();
+	private boolean isRunFirstTime = true;
+	//Reload test data from zip files
+	private boolean reloadTestData = false;
 	
 	@Before
 	public void setUp() throws IOException, SQLException, BusinessServiceException {
+		if (!isRunFirstTime) {
+			return;
+		}
 		//load previous and prospective versions if not loaded already
 		assertNotNull(releaseDataManager);
-		if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
-			if (!releaseDataManager.restoreReleaseFromBinaryArchive(PREVIOUS_RELEASE + ".zip")) {
+		config = new MysqlExecutionConfig(System.currentTimeMillis());
+		config.setPreviousVersion(PREVIOUS_RELEASE);
+		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
+		config.setFailureExportMax(10);
+		if (reloadTestData || !releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
+			if (reloadTestData || !releaseDataManager.restoreReleaseFromBinaryArchive(PREVIOUS_RELEASE + ".zip")) {
 				URL previousReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130131");
 				assertNotNull("Must not be null", previousReleaseUrl);
 				File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
@@ -94,14 +106,13 @@ public class RVFAssertionsRegressionTestHarnesss {
 				System.out.println("Mysql binary file is archvied at " + archiveFileName);
 			}
 		}
-		if (!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
+		if (reloadTestData || !releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
 			final URL prospectiveReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130731");
 			assertNotNull("Must not be null", prospectiveReleaseUrl);
 			final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
 			ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
-			releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE,rf2FilesLoaded, prospectiveFile);
+			releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, rf2FilesLoaded, prospectiveFile);
 			resourceDataLoader.loadResourceData(PROSPECTIVE_RELEASE);
-			assertNotNull("Must not be null", fileCentricExpected);
 			List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource",true);
 			assertNotNull(assertions);
 			assertTrue(!assertions.isEmpty());
@@ -112,10 +123,8 @@ public class RVFAssertionsRegressionTestHarnesss {
 		componentCentrilExpected = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/componentCentricRegressionExpected.json");
 		assertNotNull("Must not be null", componentCentrilExpected);
 		fileCentricExpected = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
-		config = new MysqlExecutionConfig(System.currentTimeMillis());
-		config.setPreviousVersion(PREVIOUS_RELEASE);
-		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
-		config.setFailureExportMax(10);
+		assertNotNull("Must not be null", fileCentricExpected);
+		isRunFirstTime = false;
 	}
 	
 	@Test
@@ -136,11 +145,11 @@ public class RVFAssertionsRegressionTestHarnesss {
 		 final List<Assertion> assertions= assertionService.getAssertionsByKeyWords(groupName, false);
 		 System.out.println("found total assertions:" + assertions.size());
 		 long timeStart = System.currentTimeMillis();
-			final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
-			long timeEnd = System.currentTimeMillis();
-			System.out.println("Time taken:" +(timeEnd-timeStart));
-			releaseDataManager.clearQAResult(config.getExecutionId());
-			assertTestResult(groupName, expectedJsonFile, runItems);
+		 final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
+		 long timeEnd = System.currentTimeMillis();
+		 System.out.println("Time taken:" +(timeEnd-timeStart));
+		 releaseDataManager.clearQAResult(config.getExecutionId());
+		 assertTestResult(groupName, expectedJsonFile, runItems);
 	 }
 	
 	
@@ -164,7 +173,6 @@ public class RVFAssertionsRegressionTestHarnesss {
 		assertEquals(28, group.getAssertions().size());
 	}
 	
-	
 	@Test
 	public void testGetAssertionsForCommonAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
@@ -176,17 +184,12 @@ public class RVFAssertionsRegressionTestHarnesss {
 		runAssertionsTest("48118153-d32a-4d1c-bfbc-23ed953e9991");
 	}
 	
-	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
 		final List<Assertion> assertions= new ArrayList<>();
 		assertions.add(assertionService.getAssertionByUuid(UUID.fromString(assertionUUID)));
 		System.out.println("found total assertions:" + assertions.size());
 		long timeStart = System.currentTimeMillis();
-		final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
-//		final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertions(assertions, config);
-		for (TestRunItem item : runItems) {
-			System.out.println (item.getAssertionUuid() + " failures: " + item.getFailureCount());
-		}
+		Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
 		long timeEnd = System.currentTimeMillis();
 		releaseDataManager.clearQAResult(config.getExecutionId());
 		System.out.println("Time taken:" +(timeEnd-timeStart));
@@ -200,7 +203,6 @@ public class RVFAssertionsRegressionTestHarnesss {
 			result.setAssertonName(item.getAssertionText());
 			result.setFirstNInstances(item.getFirstNInstances());
 			result.setAssertionUuid(item.getAssertionUuid());
-//			assertNull("No failure should have occurred for assertion uuid." + item.getAssertionUuid(), item.getFailureMessage());
 			result.setTotalFailed(item.getFailureCount() != null ? item.getFailureCount() : -1L);
 			results.add(result);
 		
@@ -223,13 +225,6 @@ public class RVFAssertionsRegressionTestHarnesss {
 		FileWriter writer = new FileWriter(tempResult);
 		mapper.writerWithDefaultPrettyPrinter().writeValue(writer,actualReport);
 		System.err.println("Please see " + type + " result in file:" + tempResult.getAbsolutePath());
-		
-		//No need for full result now we just print exact difference
-		System.out.println("Test result");
-		String actualReportStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(actualReport);
-		System.out.println(actualReportStr);
-		
-		
 		final Gson gson = new Gson();
 		final BufferedReader br = new BufferedReader(new FileReader(expectedJsonFileName));
 		final TestReport expectedReport = gson.fromJson(br, TestReport.class);
@@ -456,11 +451,6 @@ public class RVFAssertionsRegressionTestHarnesss {
 		public void setAssertionUuid(final UUID assertionUuid) {
 			this.assertionUuid = assertionUuid;
 		}
-
-		public void setAssertionName(final String assertionName) {
-			this.assertionName = assertionName;
-		}
-		
 		
 		@Override
 		public int hashCode() {

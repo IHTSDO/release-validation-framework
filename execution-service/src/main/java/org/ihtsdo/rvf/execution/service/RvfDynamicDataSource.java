@@ -52,6 +52,8 @@ public class RvfDynamicDataSource {
 		newDataSource.setTestOnReturn(true);
 		newDataSource.setTestWhileIdle(true);
 		newDataSource.setValidationQuery("SELECT 1");
+		newDataSource.setMaxActive(dataSource.getMaxActive());
+		newDataSource.setMaxWait(dataSource.getMaxWait());
 		newDataSource.setDefaultTransactionIsolation(dataSource.getDefaultTransactionIsolation());
 		return newDataSource;
 	}
