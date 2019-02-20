@@ -1,6 +1,8 @@
-package org.ihtsdo.rvf.entity;
+package org.ihtsdo.rvf.execution.service;
 
 import java.util.List;
+
+import org.ihtsdo.rvf.entity.TestType;
 
 public class DroolsRulesValidationReport {
 	private TestType testType;

@@ -49,7 +49,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 	
 		protected ObjectMapper objectMapper = new ObjectMapper();
-		protected Map<String, String> lookupMap = new HashMap<>();
+		private Map<String, String> lookupMap = new HashMap<>();
 		@Autowired
 		AssertionService assertionService;
 		
@@ -118,7 +118,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 					}
 
 					// finally print all lookup map contents for debugging - //todo save somewhere?
-					logger.info("lookupMap = " + lookupMap);
+				logger.debug("lookupMap = " + lookupMap);
 				}
 				else{
 					logger.error("There are no script elements to import in the XML file provided. Please note that the " +

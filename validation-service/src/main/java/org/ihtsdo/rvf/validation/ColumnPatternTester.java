@@ -15,7 +15,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.rvf.validation.log.ValidationLog;
 import org.ihtsdo.rvf.validation.model.ColumnType;
 import org.ihtsdo.rvf.validation.resource.ResourceProvider;
@@ -183,7 +182,7 @@ public class ColumnPatternTester {
 	}
 
 	public boolean validateRow(final Date startTime, final String fileName, final String line, final long lineNumber, final int configColumnCount, final int dataColumnCount) {
-		if (StringUtils.isEmpty(line)) {
+		if (line.isEmpty()) {
 			validationLog.assertionError("Empty line at line {}", lineNumber);
 			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Empty Row", EMPTY_ROW_TEST, "", line, "expected data",lineNumber);
 			return false;
@@ -218,7 +217,7 @@ public class ColumnPatternTester {
 				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(), columnTest.getPatternString());
 			} else {
-				final String testedValue = StringUtils.isNoneEmpty(value) ? value : "No Value";
+				final String testedValue = value.isEmpty() ? "No Value" : value;
 				validationLog.assertionError(columnTest.getMessage(), columnTest.getErrorArgs());
 				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue(),lineNumber);

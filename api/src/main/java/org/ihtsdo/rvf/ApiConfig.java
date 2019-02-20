@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,16 +43,6 @@ import org.springframework.beans.factory.annotation.Value;
 public class ApiConfig {	
 	
 	private Logger logger = LoggerFactory.getLogger(ApiConfig.class);
-	// Swagger Config
-		@Bean
-		public Docket api() {
-			return new Docket(DocumentationType.SWAGGER_2)
-					.select()
-					.apis(RequestHandlerSelectors.any())
-					.paths(not(regex("/error")))
-					.build();
-		}
-
 		// Security
 		@Configuration
 		@EnableWebSecurity

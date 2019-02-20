@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.entity;
+package org.ihtsdo.rvf.execution.service;
 
 import org.ihtsdo.drools.response.InvalidContent;
 
