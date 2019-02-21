@@ -82,6 +82,10 @@ public class ZipFileUtils {
 				final ZipEntry entry = entries.nextElement();
 				final File entryDestination = new File(outputDir,  entry.getName());
 				entryDestination.getParentFile().mkdirs();
+				if (!entryDestination.toPath().normalize().startsWith(outputDir)) {
+					LOGGER.error("Bad zip entry " + entry.getName());
+					continue;
+				}
 				if (entry.isDirectory()) {
 					entryDestination.mkdirs();
 				} else {

@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -186,18 +187,6 @@ public class ReleaseDataManager {
 		return true;
 	}
 
-	/**
-	 * Method that copies a known/published release pack into the data folder. This method is not intended to be used
-	 * for uploading prospective releases since they do not need to be stored for later use.
-	 *
-	 * @param releasePackZip the release as a zip file
-	 * @param overWriteExisting if existing file has to over written
-	 * @param purgeExistingDatabase if existing database must be recreated
-	 * @return result of the copy operation - false if there are errors.
-	 * @throws BusinessServiceException 
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 */
 	public boolean uploadPublishedReleaseData(final File releasePackZip, final String product, final String version) throws BusinessServiceException {
 		boolean result = false;
 		try(InputStream inputStream = new FileInputStream(releasePackZip)) {
@@ -209,18 +198,6 @@ public class ReleaseDataManager {
 	}
 	
 	
-	
-	/**
-	 * Method that loads given SNOMED CT data into a RF2 compliant database. For published release, use the
-	 * uploadPublishedReleaseData method since it stores the data and makes better reuse of existing databases. Use
-	 * this method directly if prospective build data is to be loaded.
-	 *
-	 * @param versionName the version of the data as a yyyymmdd string (e.g. 20140731)
-	 * @param isAppend boolean that controls if existing database needs to be appended
-	 * @param zipDataFile the zip file that contains the release data
-	 * @return the name of the schema to which the data has been loaded.
-	 * @throws BusinessServiceException 
-	 */
 	public String loadSnomedData(final String versionName, List<String> rf2FilesLoaded, final File... zipDataFile) throws BusinessServiceException {
 		return loadSnomedData(versionName, false, rf2FilesLoaded, zipDataFile);
 	}
@@ -248,7 +225,8 @@ public class ReleaseDataManager {
 			loadReleaseFilesToDB(outputFolder,rvfDynamicDataSource,rf2FilesLoaded, createdSchemaName);
 			schemaNames.add(createdSchemaName);
 		} catch (final SQLException | IOException e) {
-			final String errorMsg = String.format("Error while loading file %s into version %s", zipDataFile, versionName);
+			List<String> fileNames = Arrays.asList(zipDataFile).stream().map(file -> file.getName()).collect(Collectors.toList());
+			final String errorMsg = String.format("Error while loading file %s into version %s", Arrays.toString(fileNames.toArray()), versionName);
 			logger.error(errorMsg,e);
 			throw new BusinessServiceException(errorMsg, e);
 		}  finally {
@@ -407,13 +385,17 @@ public class ReleaseDataManager {
 	private List<String> getValidTableNamesFromSchema(String schemaName, String tableNamePattern) {
 		List<String> result = new ArrayList<>();
 		Collection<String> mappedTables = RF2FileTableMapper.getAllTableNames();
+		String sql = "select table_name from INFORMATION_SCHEMA.TABLES WHERE table_schema =?";
+		if (tableNamePattern != null) {
+			sql = sql + " and table_name like ?";
+		}
 		try (Connection connection = rvfDynamicDataSource.getConnection(schemaName);
-				Statement statement = connection.createStatement() ) {
-			String sql = "select table_name from INFORMATION_SCHEMA.TABLES WHERE table_schema ='" + schemaName + "'";
-			if ( tableNamePattern != null) {
-				sql = sql + " and table_name like '" + tableNamePattern + "'";
+			PreparedStatement statement = connection.prepareStatement(sql);) {
+			statement.setString(1, schemaName);
+			if (tableNamePattern != null) {
+				statement.setString(2, tableNamePattern);
 			}
-			ResultSet resultSet = statement.executeQuery(sql);
+			ResultSet resultSet = statement.executeQuery();
 			while( resultSet.next()) {
 				String tableName = resultSet.getString(1);
 				if (mappedTables.contains(tableName)) {
@@ -519,9 +501,10 @@ public class ReleaseDataManager {
 			try (Statement statement = rvfDynamicDataSource.getConnection(schemaName).createStatement()) {
 				statement.execute("use " + schemaName + ";");
 			} 
-			try (InputStream input = getClass().getResourceAsStream("/sql/create-tables-mysql.sql")) {
-				ScriptRunner runner = new ScriptRunner(rvfDynamicDataSource.getConnection(schemaName));
-				runner.runScript(new InputStreamReader(input));
+			try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream("/sql/create-tables-mysql.sql"));
+				 Connection connection = rvfDynamicDataSource.getConnection(schemaName)) {
+				ScriptRunner runner = new ScriptRunner(connection);
+				runner.runScript(reader);
 			} 
 		} catch (Exception e) {
 			throw new BusinessServiceException("Failed to create tables for schema " + schemaName, e);

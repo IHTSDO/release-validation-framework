@@ -16,7 +16,6 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,13 +111,13 @@ public class ValidationReportService {
 	 public String recoverProgress(String storageLocation) {
 		 String filePath = storageLocation + progressFilePath;
 		 String progressMsg = new String("Failed to read from " + filePath);
-		 InputStream is = null;
 		 try {
-			 is = resourceManager.readResourceStreamOrNullIfNotExists(filePath);
-			 if (is != null) {
-				 progressMsg = IOUtils.toString(is, UTF_8);
-			 } else {
-				logger.warn("Failed to find progress file {}, via resource config {}", filePath, jobResourceConfig);
+			 try ( InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath)) {
+				if (is != null) {
+					 progressMsg = IOUtils.toString(is, UTF_8);
+				 } else {
+					logger.warn("Failed to find progress file {}, via resource config {}", filePath, jobResourceConfig);
+				 } 
 			 }
 		 } catch (IOException e) {
 			 logger.error("Failed to read data from progress file {}, via resource config {", filePath, jobResourceConfig);
@@ -128,18 +127,20 @@ public class ValidationReportService {
 	 
 	 public void recoverResult(final Map<String, Object> responseMap, Long runId, String storageLocation) throws IOException {
 			String filePath = storageLocation + resultsFilePath;
-			InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath);
-			Object jsonResults = null;
-			if (is == null) {
-				logger.warn("Failed to find results file {}, via resource config {}", filePath, jobResourceConfig);
-			} else {
-				ObjectMapper mapper = new ObjectMapper();
-				jsonResults  = mapper.readValue(new InputStreamReader(is, Charset.forName(UTF_8)), Map.class);
+			try (InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath);
+				InputStreamReader inputStreamReader = new InputStreamReader(is, Charset.forName(UTF_8))) {
+				Object jsonResults = null;
+				if (is == null) {
+					logger.warn("Failed to find results file {}, via resource config {}", filePath, jobResourceConfig);
+				} else {
+					ObjectMapper mapper = new ObjectMapper();
+					jsonResults  = mapper.readValue(inputStreamReader, Map.class);
+				}
+				if (jsonResults == null) {
+					jsonResults = new String("Failed to recover results in " + filePath);
+				}
+				responseMap.put("rvfValidationResult", jsonResults);
 			}
-			if (jsonResults == null) {
-				jsonResults = new String("Failed to recover results in " + filePath);
-			}
-			responseMap.put("rvfValidationResult", jsonResults);
 	}
 	 
 	 
@@ -147,12 +148,14 @@ public class ValidationReportService {
 		 State currentState = null;
 		 String filePath = storageLocation + stateFilePath;
 		 try {
-			 InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath);
-			 if (is == null) {
-				 logger.warn("Failed to find state file {}, via resource config {}", filePath, jobResourceConfig);
+			 try (InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath)) {
+				 if (is == null) {
+					 logger.warn("Failed to find state file {}, via resource config {}", filePath, jobResourceConfig);
+				 }
+				 String stateStr = IOUtils.toString(is, UTF_8);
+				 currentState = State.valueOf(stateStr);
 			 }
-			 final String stateStr = IOUtils.toString(is, UTF_8);
-			 currentState = State.valueOf(stateStr);
+			 
 		 } catch (final Exception e) {
 			 logger.warn("Failed to determine validation run state in file {} due to {}", filePath, e.toString());
 		 }

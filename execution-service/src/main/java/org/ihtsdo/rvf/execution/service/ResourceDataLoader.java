@@ -102,8 +102,8 @@ public class ResourceDataLoader {
 		if (schemaName != null) {
 			try (final Connection connection = rvfDynamicDataSource.getConnection(schemaName)) {
 				final ScriptRunner runner = new ScriptRunner(connection);
-				try (InputStream input = getClass().getResourceAsStream("/sql/create-resource-tables.sql")) {
-					runner.runScript(new InputStreamReader(input));
+				try (InputStreamReader inputReader = new InputStreamReader(getClass().getResourceAsStream("/sql/create-resource-tables.sql"))) {
+					runner.runScript(inputReader);
 				} 
 				final File temp = File.createTempFile("load-resource-data.txt", null);
 				try {

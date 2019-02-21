@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -321,12 +322,10 @@ public class InstanceManager {
 		if (propertyFiles != null) {
 			for (String fileName : propertyFiles) {
 				List<String> lines = new ArrayList<>();
-				try {
-					lines.addAll(IOUtils.readLines(new FileReader(new File(
-							configDir, fileName))));
+				try (Reader reader = new FileReader(new File(configDir, fileName));) {
+					lines.addAll(IOUtils.readLines(reader));
 				} catch (IOException e) {
-					logger.error("Error when reading proerty file:" + fileName,
-							e);
+					logger.error("Error when reading proerty file:" + fileName, e);
 				}
 				StringBuilder result = new StringBuilder();
 				for (String line : lines) {
