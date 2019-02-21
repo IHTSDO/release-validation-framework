@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
@@ -195,10 +196,15 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
-			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
+			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			final HttpServletRequest request
 			) throws IOException, URISyntaxException {
 
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
+		final String requestUrl = String.valueOf(request.getRequestURL());
+		LOGGER.info("Request URL is:" + requestUrl);
+		LOGGER.info("Request path info is:" + request.getPathInfo());
 		String urlPrefix = getRequestUrlPrefix();
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
@@ -300,8 +306,11 @@ public class TestUploadFileController {
 	
 	private String getRequestUrlPrefix() throws MalformedURLException {
 		String requestUrl = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri().toURL().toString();
+		LOGGER.info("Getting current request URL:" + requestUrl );
 		String contextPath = ServletUriComponentsBuilder.fromCurrentContextPath().build().getPath();
+		LOGGER.info("Getting current context path:" + contextPath);
 		return requestUrl.substring(0, requestUrl.lastIndexOf(contextPath)) + contextPath;
+		
 	}
 	
 	
