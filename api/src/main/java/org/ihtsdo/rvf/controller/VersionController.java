@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,10 +36,11 @@ public class VersionController {
 	@ResponseBody
 	@ApiOperation(value = "Get the RVF api version", notes = "This api is used to get the deployed RVF version. "
 			+ "It looks for the version number stored in /opt/rvf-api/data/version.txt.")
-	public ResponseEntity getVersion(HttpServletRequest request, UriComponentsBuilder uriComponentsBuilder) throws IOException {		
+	public Map<String, String> getVersion(HttpServletRequest request, UriComponentsBuilder uriComponentsBuilder) throws IOException {
 		Map<String, String> entity = new HashMap<>();
 		entity.put("package_version", getVersionString());
-		return ResponseEntity.created(uriComponentsBuilder.path("/version/{package_version}").buildAndExpand(getVersionString()).toUri()).build();
+		entity.put("request_url", URI.create(uriComponentsBuilder.toUriString()).toURL().toString());
+		return entity;
 	}
 
 	private String getVersionString() throws IOException {

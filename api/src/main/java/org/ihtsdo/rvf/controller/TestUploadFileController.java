@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -102,14 +104,11 @@ public class TestUploadFileController {
 		final String filename = file.getOriginalFilename();
 		// must be a zip
 		if (filename.endsWith(ZIP)) {
-			return uploadPostTestPackage(file, writeSucceses, manifestFile,
-					response);
-
+			return uploadPostTestPackage(file, writeSucceses, manifestFile, response);
 		} else if (filename.endsWith(".txt")) {
 			return uploadPreTestPackage(file, writeSucceses, response);
 		} else {
-			throw new IllegalArgumentException(
-					"File should be pre or post and either a .txt or .zip is expected");
+			throw new IllegalArgumentException("File should be pre or post and either a .txt or .zip is expected");
 		}
 	}
 
@@ -123,10 +122,8 @@ public class TestUploadFileController {
 			final HttpServletResponse response) throws IOException {
 		// load the filename
 		final String filename = file.getOriginalFilename();
-
 		if (!filename.endsWith(ZIP)) {
-			throw new IllegalArgumentException(
-					"Post condition test package has to be zipped up");
+			throw new IllegalArgumentException("Post condition test package has to be zipped up");
 		}
 		File tempFile = null;
 		File tempManifestFile = null;
@@ -135,37 +132,28 @@ public class TestUploadFileController {
 			// set up the response in order to strean directly to the response
 			response.setContentType("text/csv;charset=utf-8");
 			response.setHeader("Content-Disposition",
-					"attachment; filename=\"report_" + filename + "_"
-							+ new Date() + "\"");
+					"attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
 			try (PrintWriter writer = response.getWriter()) {
 				// must be a zip
 				file.transferTo(tempFile);
-				final ResourceProvider resourceManager = new ZipFileResourceProvider(
-						tempFile);
-
+				final ResourceProvider resourceManager = new ZipFileResourceProvider(tempFile);
 				TestReportable report;
 
 				if (manifestFile == null) {
-					report = structureTestRunner.execute(resourceManager,
-							writer, writeSucceses);
+					report = structureTestRunner.execute(resourceManager, writer, writeSucceses);
 				} else {
-					final String originalFilename = manifestFile
-							.getOriginalFilename();
-					tempManifestFile = File.createTempFile(originalFilename,
-							".xml");
+					final String originalFilename = manifestFile.getOriginalFilename();
+					tempManifestFile = File.createTempFile(originalFilename, ".xml");
 					manifestFile.transferTo(tempManifestFile);
 					final ManifestFile mf = new ManifestFile(tempManifestFile);
-					report = structureTestRunner.execute(resourceManager,
-							writer, writeSucceses, mf);
+					report = structureTestRunner.execute(resourceManager, writer, writeSucceses, mf);
 				}
 				// store the report to disk for now with a timestamp
 				if (report.getNumErrors() > 0) {
-					LOGGER.error("No Errors expected but got "
-							+ report.getNumErrors() + " errors");
+					LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
 				}
 			}
 		} finally {
-
 			if (tempFile != null) {
 				tempFile.delete();
 			}
@@ -198,38 +186,36 @@ public class TestUploadFileController {
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
-			final HttpServletRequest request
-			) throws IOException, URISyntaxException {
+			UriComponentsBuilder uriComponentsBuilder
+			) throws IOException {
 
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
-		final String requestUrl = String.valueOf(request.getRequestURL());
-		LOGGER.info("Request URL is:" + requestUrl);
-		LOGGER.info("Request path info is:" + request.getPathInfo());
-		String urlPrefix = getRequestUrlPrefix();
+		String urlPrefix = URI.create(uriComponentsBuilder.toUriString()).toURL().toString();
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFile(manifestFile)
 				.addPreviousRelease(previousRelease)
 				.addDependencyRelease(extensionDependency)
 				.addRunId(runId).addStorageLocation(storageLocation)
-				.addFailureExportMax(exportMax).addUrl(urlPrefix)
+				.addFailureExportMax(exportMax)
 				.addProspectiveFilesInS3(false)
 				.setEnableDrools(enableDrools)
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
-				.setIncludedModules(includedModules);
+				.setIncludedModules(includedModules)
+				.addUrl(urlPrefix);
 
 		// Before we start running, ensure that we've made our mark in the
 		// storage location
 		// Init will fail if we can't write the "running" state to storage
 		final Map<String, String> responseMap = new HashMap<>();
 		HttpStatus returnStatus = HttpStatus.OK;
-
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
 			// Queue incoming validation request
 			queueManager.queueValidationRequest(vrConfig, responseMap);
-			final String urlToPoll = urlPrefix + "/result/" + runId
-					+ "?storageLocation=" + storageLocation;
+			String urlToPoll = uriComponentsBuilder.path("/result/{run_id}?storageLocation={storage_location}")
+					.buildAndExpand(runId, storageLocation).toUri().toURL().toString();
+			LOGGER.info("RVF result url:" + urlToPoll);
 			responseMap.put("resultURL", urlToPoll);
 		} else {
 			returnStatus = HttpStatus.PRECONDITION_FAILED;
@@ -261,11 +247,11 @@ public class TestUploadFileController {
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") 
 			@RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
-			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules
+			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
-
-		final String urlPrefix = getRequestUrlPrefix();
-		final ValidationRunConfig vrConfig = new ValidationRunConfig();
+		ValidationRunConfig vrConfig = new ValidationRunConfig();
+		String urlPrefix = URI.create(uriComponentsBuilder.toUriString()).toURL().toString();
 		vrConfig.addBucketName(bucketName)
 				.addProspectiveFileFullPath(releaseFileS3Path)
 				.addRF2DeltaOnly(isRf2DeltaOnly)
@@ -294,26 +280,15 @@ public class TestUploadFileController {
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
 			// Queue incoming validation request
 			queueManager.queueValidationRequest(vrConfig, responseMap);
-			final String urlToPoll = urlPrefix + "/result/" + runId
-					+ "?storageLocation=" + storageLocation;
+			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
 			responseMap.put("resultURL", urlToPoll);
+			LOGGER.info("RVF result url:" + urlToPoll);
 		} else {
 			returnStatus = HttpStatus.PRECONDITION_FAILED;
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}
-
-	
-	private String getRequestUrlPrefix() throws MalformedURLException {
-		String requestUrl = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri().toURL().toString();
-		LOGGER.info("Getting current request URL:" + requestUrl );
-		String contextPath = ServletUriComponentsBuilder.fromCurrentContextPath().build().getPath();
-		LOGGER.info("Getting current context path:" + contextPath);
-		return requestUrl.substring(0, requestUrl.lastIndexOf(contextPath)) + contextPath;
 		
-	}
-	
-	
 	private boolean isAssertionGroupsValid(List<String> validationGroups,
 			Map<String, String> responseMap) {
 		// check assertion groups
@@ -323,12 +298,9 @@ public class TestUploadFileController {
 			for (final AssertionGroup group : groups) {
 				found.add(group.getName());
 			}
-			final String groupNotFoundMsg = String.format(
-					"Assertion groups requested: %s but found in RVF: %s",
-					validationGroups, found);
+			final String groupNotFoundMsg = String.format("Assertion groups requested: %s but found in RVF: %s", validationGroups, found);
 			responseMap.put("failureMessage", groupNotFoundMsg);
-			LOGGER.warn("Invalid assertion groups requested."
-					+ groupNotFoundMsg);
+			LOGGER.warn("Invalid assertion groups requested." + groupNotFoundMsg);
 			return false;
 		}
 		return true;
@@ -358,19 +330,16 @@ public class TestUploadFileController {
 			}
 			response.setContentType("text/csv;charset=utf-8");
 			response.setHeader("Content-Disposition",
-					"attachment; filename=\"report_" + filename + "_"
-							+ new Date() + "\"");
+					"attachment; filename=\"report_" + filename + "_" + new Date() + "\"");
 
 			try (PrintWriter writer = response.getWriter()) {
 				file.transferTo(tempFile);
 				final ResourceProvider resourceManager = new TextFileResourceProvider(
 						tempFile, filename);
-				final TestReportable report = structureTestRunner.execute(
-						resourceManager, writer, writeSucceses, null);
+				final TestReportable report = structureTestRunner.execute(resourceManager, writer, writeSucceses, null);
 				// store the report to disk for now with a timestamp
 				if (report.getNumErrors() > 0) {
-					LOGGER.error("No Errors expected but got "
-							+ report.getNumErrors() + " errors");
+					LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");
 				}
 			}
 			return null;
