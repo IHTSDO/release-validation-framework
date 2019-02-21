@@ -39,7 +39,9 @@ public class VersionController {
 	public Map<String, String> getVersion(HttpServletRequest request, UriComponentsBuilder uriComponentsBuilder) throws IOException {
 		Map<String, String> entity = new HashMap<>();
 		entity.put("package_version", getVersionString());
-		entity.put("request_url", URI.create(uriComponentsBuilder.toUriString()).toURL().toString());
+		String location = ResponseEntity.created(uriComponentsBuilder.path("/version/{release_number}")
+				.buildAndExpand(getVersionString()).toUri()).build().getHeaders().get("location").get(0);
+		entity.put("response_url", location);
 		return entity;
 	}
 

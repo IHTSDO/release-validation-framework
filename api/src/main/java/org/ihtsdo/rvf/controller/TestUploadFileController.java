@@ -213,14 +213,18 @@ public class TestUploadFileController {
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
 			// Queue incoming validation request
 			queueManager.queueValidationRequest(vrConfig, responseMap);
-			String urlToPoll = uriComponentsBuilder.path("/result/{run_id}?storageLocation={storage_location}")
-					.buildAndExpand(runId, storageLocation).toUri().toURL().toString();
+			String urlToPoll = getRvfResultPollUrl(runId, storageLocation, uriComponentsBuilder);
 			LOGGER.info("RVF result url:" + urlToPoll);
 			responseMap.put("resultURL", urlToPoll);
 		} else {
 			returnStatus = HttpStatus.PRECONDITION_FAILED;
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
+	}
+
+	private String getRvfResultPollUrl(final Long runId, final String storageLocation, UriComponentsBuilder uriComponentsBuilder) {
+		return ResponseEntity.created(uriComponentsBuilder.path("/result/{run_id}").query("storageLocation={storage_location}")
+				.buildAndExpand(runId, storageLocation).toUri()).build().getHeaders().get("location").get(0);
 	}
 
 	@RequestMapping(value = "/run-post-via-s3", method = RequestMethod.POST)
@@ -280,7 +284,7 @@ public class TestUploadFileController {
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
 			// Queue incoming validation request
 			queueManager.queueValidationRequest(vrConfig, responseMap);
-			final String urlToPoll = urlPrefix + "/result/" + runId + "?storageLocation=" + storageLocation;
+			String urlToPoll = getRvfResultPollUrl(runId, storageLocation, uriComponentsBuilder);
 			responseMap.put("resultURL", urlToPoll);
 			LOGGER.info("RVF result url:" + urlToPoll);
 		} else {
