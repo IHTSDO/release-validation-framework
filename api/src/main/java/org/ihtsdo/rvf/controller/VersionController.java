@@ -9,11 +9,13 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,12 +34,10 @@ public class VersionController {
 	@ResponseBody
 	@ApiOperation(value = "Get the RVF api version", notes = "This api is used to get the deployed RVF version. "
 			+ "It looks for the version number stored in /opt/rvf-api/data/version.txt.")
-	public Map<String, String> getVersion(HttpServletRequest request)
-			throws IOException {
+	public ResponseEntity getVersion(HttpServletRequest request, UriComponentsBuilder uriComponentsBuilder) throws IOException {		
 		Map<String, String> entity = new HashMap<>();
 		entity.put("package_version", getVersionString());
-		return entity;// hypermediaGenerator.getEntityHypermedia(entity, true,
-						// request, new String[]{});
+		return ResponseEntity.created(uriComponentsBuilder.path("/version/{package_version}").buildAndExpand(getVersionString()).toUri()).build();
 	}
 
 	private String getVersionString() throws IOException {
