@@ -222,8 +222,7 @@ public class ReleaseDataManager {
 			if (!isAppendToVersion) {
 				createSchema(createdSchemaName);
 			}
-			loadReleaseFilesToDB(outputFolder,rvfDynamicDataSource,rf2FilesLoaded, createdSchemaName);
-			schemaNames.add(createdSchemaName);
+			loadReleaseFilesToDB(outputFolder, rvfDynamicDataSource, rf2FilesLoaded, createdSchemaName);
 		} catch (final SQLException | IOException e) {
 			List<String> fileNames = Arrays.asList(zipDataFile).stream().map(file -> file.getName()).collect(Collectors.toList());
 			final String errorMsg = String.format("Error while loading file %s into version %s", Arrays.toString(fileNames.toArray()), versionName);
@@ -509,6 +508,7 @@ public class ReleaseDataManager {
 		} catch (Exception e) {
 			throw new BusinessServiceException("Failed to create tables for schema " + schemaName, e);
 		}
+		schemaNames.add(schemaName);
 		logger.info(schemaName + " is created successfully.");
 		return schemaName;
 	}
