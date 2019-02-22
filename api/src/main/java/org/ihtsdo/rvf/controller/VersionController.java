@@ -4,15 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,13 +30,10 @@ public class VersionController {
 	@ResponseBody
 	@ApiOperation(value = "Get the RVF api version", notes = "This api is used to get the deployed RVF version. "
 			+ "It looks for the version number stored in /opt/rvf-api/data/version.txt.")
-	public Map<String, String> getVersion(HttpServletRequest request, UriComponentsBuilder uriComponentsBuilder) throws IOException {
-		Map<String, String> entity = new HashMap<>();
-		entity.put("package_version", getVersionString());
-		String location = ResponseEntity.created(uriComponentsBuilder.path("/version/{release_number}")
-				.buildAndExpand(getVersionString()).toUri()).build().getHeaders().get("location").get(0);
-		entity.put("response_url", location);
-		return entity;
+	public ResponseEntity<String> getVersion(HttpServletRequest request, UriComponentsBuilder uriComponentsBuilder) throws IOException {
+		return ResponseEntity.created(uriComponentsBuilder.path("/version/{release_number}")
+				.buildAndExpand(getVersionString()).toUri())
+				.body(getVersionString());
 	}
 
 	private String getVersionString() throws IOException {
