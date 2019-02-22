@@ -3,16 +3,13 @@ package org.ihtsdo.rvf.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
@@ -38,7 +35,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.annotations.ApiOperation;
@@ -81,8 +77,7 @@ public class TestUploadFileController {
 
 	private static final String ZIP = ".zip";
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(TestUploadFileController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestUploadFileController.class);
 
 	@Autowired
 	private StructuralTestRunner structureTestRunner;
@@ -161,7 +156,7 @@ public class TestUploadFileController {
 				tempManifestFile.delete();
 			}
 		}
-		return null;
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/run-post", method = RequestMethod.POST)
@@ -205,26 +200,18 @@ public class TestUploadFileController {
 				.setIncludedModules(includedModules)
 				.addUrl(urlPrefix);
 
-		// Before we start running, ensure that we've made our mark in the
-		// storage location
+		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage
 		final Map<String, String> responseMap = new HashMap<>();
-		HttpStatus returnStatus = HttpStatus.OK;
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
 			// Queue incoming validation request
 			queueManager.queueValidationRequest(vrConfig, responseMap);
-			String urlToPoll = getRvfResultPollUrl(runId, storageLocation, uriComponentsBuilder);
-			LOGGER.info("RVF result url:" + urlToPoll);
-			responseMap.put("resultURL", urlToPoll);
+			URI uri = createResultURI(runId, storageLocation, uriComponentsBuilder);
+			LOGGER.info("RVF result url:" + uri.toURL().toString());
+			return ResponseEntity.created(uri).body(responseMap);
 		} else {
-			returnStatus = HttpStatus.PRECONDITION_FAILED;
+			return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
 		}
-		return new ResponseEntity<>(responseMap, returnStatus);
-	}
-
-	private String getRvfResultPollUrl(final Long runId, final String storageLocation, UriComponentsBuilder uriComponentsBuilder) {
-		return ResponseEntity.created(uriComponentsBuilder.path("/result/{run_id}").query("storageLocation={storage_location}")
-				.buildAndExpand(runId, storageLocation).toUri()).build().getHeaders().get("location").get(0);
 	}
 
 	@RequestMapping(value = "/run-post-via-s3", method = RequestMethod.POST)
@@ -275,22 +262,18 @@ public class TestUploadFileController {
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setIncludedModules(includedModules);
 
-		// Before we start running, ensure that we've made our mark in the
-		// storage location
+		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage
 		final Map<String, String> responseMap = new HashMap<>();
-		HttpStatus returnStatus = HttpStatus.OK;
-
 		if (isAssertionGroupsValid(vrConfig.getGroupsList(), responseMap)) {
 			// Queue incoming validation request
 			queueManager.queueValidationRequest(vrConfig, responseMap);
-			String urlToPoll = getRvfResultPollUrl(runId, storageLocation, uriComponentsBuilder);
-			responseMap.put("resultURL", urlToPoll);
-			LOGGER.info("RVF result url:" + urlToPoll);
+			URI uri = createResultURI(runId, storageLocation, uriComponentsBuilder);
+			LOGGER.info("RVF result url:" + uri.toURL().toString());
+			return ResponseEntity.created(uri).body(responseMap);
 		} else {
-			returnStatus = HttpStatus.PRECONDITION_FAILED;
+			return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
 		}
-		return new ResponseEntity<>(responseMap, returnStatus);
 	}
 		
 	private boolean isAssertionGroupsValid(List<String> validationGroups,
@@ -352,4 +335,8 @@ public class TestUploadFileController {
 		}
 	}
 	
+	private URI createResultURI(final Long runId, final String storageLocation, final UriComponentsBuilder uriComponentsBuilder) {
+		return uriComponentsBuilder.path("/result/{run_id}").query("storageLocation={storage_location}")
+				.buildAndExpand(runId, storageLocation).toUri();
+	}
 }

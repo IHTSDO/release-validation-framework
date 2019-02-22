@@ -41,8 +41,7 @@ public class VersionController {
 			String versionString = "";
 			File file = new File(VERSION_FILE_PATH);
 			if (file.isFile()) {
-				try (BufferedReader bufferedReader = new BufferedReader(
-						new FileReader(file))) {
+				try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
 					versionString = bufferedReader.readLine();
 				}
 			} else {
