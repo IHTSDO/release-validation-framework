@@ -446,9 +446,9 @@
 		<script uuid="38b88ff6-7ee3-40a5-b362-98a87e80526e" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-inactive.sql" text="Inactive Non-human refset members refer to inactive components." />
 		-->
 		<script uuid="041dcf55-4c9c-4dd4-baa7-584eb0e53d5a" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-unique-indicator.sql" text="Concept should not have any duplicated historical association indicators." />
-		
 		<script uuid="b72bc5f4-7afb-4a2e-ac3a-e0f4373b03e6" category="component-centric-validation" sqlFile="component-centric-snapshot-active-concept-with-inactivation-reason.sql" text="Active concepts do not have active inactivation indicators" />
 		<script uuid="e2aa5b09-5754-484f-9eb8-bb18732617ef" category="component-centric-validation" sqlFile="component-centric-snapshot-active-description-with-inactivation-reason.sql" text="Active descriptions do not have active inactivation indicators" />
+		<script uuid="96810a5e-d195-43ba-8685-f76b43d25782" category="component-centric-validation" sqlFile="component-centric-snapshot-active-description-with-concept-non-current.sql" text="Active descriptions of an inactive concept should have concept non-current indicators" />
 		<script uuid="638e1194-1934-11e7-819d-3c15c2c6e32e" category="component-centric-validation" sqlFile="component-centric-snapshot-attribute-value-only-one-active-inactivation-reason.sql" text="There is only one active inactivation reason for a given referenced component in the attribute value snapshot" />
 		<script uuid="c82246b1-a137-40c5-8653-554c9ce82c6b" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-description-unique-preferred-terms.sql" text="Active preferred terms for active concepts are unique in the same hierarchy" />
 		<script uuid="5c0186f3-0b72-4685-8aad-eff15a7f8880" category="component-centric-validation" sqlFile="component-centric-snapshot-description-consistent-semantic-tag.sql" text="All active FSNs for a given concept have the same semantic tag."/>
