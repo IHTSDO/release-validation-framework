@@ -87,14 +87,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>1.1.8.RELEASE</version>
-            	<executions>
-               	 <execution>
-                    <goals>
-                        <goal>repackage</goal>
-                    </goals>
-                </execution>
-            	</executions>
 				<configuration>
 					<mainClass>org.ihtsdo.rvf.App</mainClass>
 				</configuration>
