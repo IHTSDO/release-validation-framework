@@ -106,7 +106,7 @@ public class DroolsRulesValidationService {
 				InputStream deltaInputStream = null;
 				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 				if (validationConfig.isRf2DeltaOnly()) {
-					if(StringUtils.isBlank(validationConfig.getPreviousRelease()) || validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
+					if(StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
 						throw new RVFExecutionException("Drools validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
 					}
 					InputStream previousStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
