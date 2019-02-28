@@ -77,7 +77,7 @@ public class ValidationRunner {
 			String droolsTestStartMsg = "Start drools validation for release file:" + validationConfig.getTestFileName();
 			logger.info(droolsTestStartMsg);
 			reportService.writeProgress(droolsTestStartMsg, validationConfig.getStorageLocation());
-			droolsValidationService.runDroolsAssertions(report, validationConfig);
+			droolsValidationService.runDroolsAssertions(statusReport, validationConfig);
 		}
 		report.sortAssertionLists();
 		final Calendar endTime = Calendar.getInstance();

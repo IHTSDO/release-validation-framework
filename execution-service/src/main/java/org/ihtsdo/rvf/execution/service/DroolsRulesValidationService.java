@@ -16,7 +16,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.response.Severity;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
@@ -50,7 +49,10 @@ public class DroolsRulesValidationService {
 	
 	@Value("${rvf.drools.rule.directory}")
 	private String droolsRuleDirectoryPath;
-	
+
+	@Value("${cloud.aws.region.static}")
+	private String awsRegion;
+
 	@Autowired
 	private ValidationResourceConfig testResourceConfig;
 	
@@ -66,20 +68,31 @@ public class DroolsRulesValidationService {
 	private ResourceManager validationJobResourceManager;
 	
 	private ResourceManager releaseSourceManager;
+
+	private ResourceManager testResourceManager;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DroolsRulesValidationService.class);
+
+	private static final String EXT_ZIP = ".zip";
 
 	@PostConstruct
 	public void init() {
 		validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
 		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
+
+		AmazonS3 anonymousClient = AmazonS3ClientBuilder.standard()
+				.withRegion(awsRegion)
+				.withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
+				.build();
+		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
 	}
 	
-	public void runDroolsAssertions(ValidationReport validationReport, ValidationRunConfig validationConfig) throws RVFExecutionException {
+	public void runDroolsAssertions(ValidationStatusReport statusReport, ValidationRunConfig validationConfig) throws RVFExecutionException {
 		long timeStart = new Date().getTime();
 		//Filter only Drools rules set from all the assertion groups
 		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
 		Set<String> directoryPaths = new HashSet<>();
+		ValidationReport validationReport = statusReport.getResultReport();
 		//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
 		if (droolsRulesSets.isEmpty()) {
 			LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
@@ -88,12 +101,14 @@ public class DroolsRulesValidationService {
 		try {
 			List<InvalidContent> invalidContents = null;
 			try {
-				//TODO need to check and validate validation config to make sure previous release and dependency release are zip files.
 				Set<InputStream> snapshotsInputStream = new HashSet<>();
 				InputStream testedReleaseFileStream = validationJobResourceManager.readResourceStream(validationConfig.getProspectiveFileFullPath());
 				InputStream deltaInputStream = null;
 				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 				if (validationConfig.isRf2DeltaOnly()) {
+					if(StringUtils.isBlank(validationConfig.getPreviousRelease()) || validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
+						throw new RVFExecutionException("Drools validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
+					}
 					InputStream previousStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
 					snapshotsInputStream.add(previousStream);
 					deltaInputStream = testedReleaseFileStream;
@@ -106,6 +121,9 @@ public class DroolsRulesValidationService {
 				//If the package is an MS edition, it is not necessary to load the dependency
 				Set<String> modulesSet = null;
 				if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
+					if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
+						throw new RVFExecutionException("Drools validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
+					}
 					InputStream dependencyStream = releaseSourceManager.readResourceStream(validationConfig.getExtensionDependency());
 					snapshotsInputStream.add(dependencyStream);
 
@@ -115,11 +133,8 @@ public class DroolsRulesValidationService {
 						modulesSet = Sets.newHashSet(moduleIds.split(","));
 					}
 				}
-				AmazonS3 anonymousClient = AmazonS3ClientBuilder.standard()
-						.withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
-						.build();
-				ResourceManager resourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
-				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, resourceManager);
+				
+				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, testResourceManager);
 				String effectiveTime = validationConfig.getEffectiveTime();
 				if (StringUtils.isNotBlank(effectiveTime)) {
 					effectiveTime = effectiveTime.replaceAll("-", "");
@@ -162,7 +177,7 @@ public class DroolsRulesValidationService {
 				String groupedRuleName = rule.replaceAll("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}","<UUID>")
 						.replaceAll("\\d{6,20}","<SCTID>");
 				if(groupedRuleName.contains("<UUID>") || groupedRuleName.contains("<SCTID>")) {
-					groupDroolsRules(groupRules, groupedRuleName, invalidContentMap.get(rule), failureExportMax);
+					groupDroolsRules(groupRules, groupedRuleName, invalidContentMap.get(rule));
 				} else {
 					validationRule.setAssertionText(rule);
 					List<InvalidContent> invalidContentList = invalidContentMap.get(rule);
@@ -201,13 +216,10 @@ public class DroolsRulesValidationService {
 			validationReport.addWarningAssertions(warningAssertions);
 			validationReport.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
 		} catch (Exception ex) {
-			DroolsRulesValidationReport report = new DroolsRulesValidationReport(TestType.DROOL_RULES);
-			report.setRuleSetExecuted(String.join(",", droolsRulesSets));
-			report.setTimeTakenInSeconds((System.currentTimeMillis() - timeStart) / 1000);
-			report.setExecutionId(validationConfig.getRunId());
-			report.setMessage(ExceptionUtils.getStackTrace(ex));
-			report.setCompleted(false);
-			//TODO add failure report to status report
+			String message = "Drools validation has stopped";
+			LOGGER.error(message, ex);
+			message = ex.getMessage() != null ? message + " due to error: " + ex.getMessage() : message;
+			statusReport.addFailureMessage(message);
 		} finally {
 			for (String directoryPath : directoryPaths) {
 				FileUtils.deleteQuietly(new File(directoryPath));
@@ -232,7 +244,7 @@ public class DroolsRulesValidationService {
 	}
 
 	private Map<String, List<InvalidContent>> groupDroolsRules(Map<String, List<InvalidContent>> groupedRules, 
-			String rule, List<InvalidContent> invalidContents, int failureMaxExport) {
+			String rule, List<InvalidContent> invalidContents) {
 		if(!groupedRules.containsKey(rule)) {
 			groupedRules.put(rule, new ArrayList<>());
 		}

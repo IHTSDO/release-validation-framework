@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.rvf.controller.VersionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +87,9 @@ public class InstanceManager {
 	
 	@Value("${rvf.drools.rule.repository}")
 	private String droolsRulesRepository;
+
+	@Value("${rvf.drools.rule.branch}")
+	private String droolsRulesBranch;
 	
 	@Value("${aws.key}")
 	private String awsPubicKey;
@@ -369,10 +373,20 @@ public class InstanceManager {
 		}
 		// checkout drools version
 		builder.append("sudo git clone");
-		if (droolsRulesVersion != null && !droolsRulesVersion.isEmpty()) {
-			//git clone -b 'v1.9'
-			builder.append(" -b " +"'v" + droolsRulesVersion + "'");
+		if(StringUtils.isNotBlank(droolsRulesBranch)) {
+			//git clone -b master --single-branch
+			builder.append(" -b " +"'" + droolsRulesBranch + "'");
 			builder.append(" --single-branch");
+		} else {
+			if (StringUtils.isNotBlank(droolsRulesVersion)) {
+				//git clone -b 'v1.9'
+				String tag = droolsRulesVersion.startsWith("v") ? droolsRulesVersion : "v" + droolsRulesVersion;
+				builder.append(" -b " +"'" + tag + "'");
+				builder.append(" --single-branch");
+			} else {
+				//default to master branch if there is no specific configuration
+				builder.append(" -b master --single-branch");
+			}
 		}
 		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
 		builder.append(" " + droolsRulesRepository + " ");
