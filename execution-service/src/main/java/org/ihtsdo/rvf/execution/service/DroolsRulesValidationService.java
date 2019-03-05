@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.response.Severity;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
+import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
+import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
@@ -65,8 +67,6 @@ public class DroolsRulesValidationService {
 	@Autowired
 	private ResourceLoader cloudResourceLoader;
 	
-	private ResourceManager validationJobResourceManager;
-	
 	private ResourceManager releaseSourceManager;
 
 	private ResourceManager testResourceManager;
@@ -77,7 +77,6 @@ public class DroolsRulesValidationService {
 
 	@PostConstruct
 	public void init() {
-		validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
 		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
 
 		AmazonS3 anonymousClient = AmazonS3ClientBuilder.standard()
@@ -101,8 +100,28 @@ public class DroolsRulesValidationService {
 		try {
 			List<InvalidContent> invalidContents = null;
 			try {
+				ResourceManager validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
 				Set<InputStream> snapshotsInputStream = new HashSet<>();
-				InputStream testedReleaseFileStream = validationJobResourceManager.readResourceStream(validationConfig.getProspectiveFileFullPath());
+				String prospectiveFileFullPath = validationConfig.getProspectiveFileFullPath();
+				InputStream testedReleaseFileStream = null;
+				
+				if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
+					if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
+						ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
+								new ResourceConfiguration.Cloud(validationConfig.getBucketName(), ""));
+						ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
+						testedReleaseFileStream = manualResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
+					} else {
+						//update s3 path if required when full path containing job resource path already
+						if (prospectiveFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
+							prospectiveFileFullPath = prospectiveFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
+						}
+					}
+				}
+				if(testedReleaseFileStream == null) {
+					testedReleaseFileStream = validationJobResourceManager.readResourceStream(prospectiveFileFullPath);
+				}
+				
 				InputStream deltaInputStream = null;
 				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 				if (validationConfig.isRf2DeltaOnly()) {
