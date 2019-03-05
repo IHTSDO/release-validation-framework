@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "assertion_group")
-//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = AssertionGroup.class)
 public class AssertionGroup {
 
 	@Id
@@ -76,7 +75,7 @@ public class AssertionGroup {
 	}
 
 	/**
-	 * Adds an assertion to this gruop. Note {@link org.ihtsdo.rvf.entity.AssertionGroup} is always the owner of the bi-directional
+	 * Adds an assertion to this group. Note {@link org.ihtsdo.rvf.entity.AssertionGroup} is always the owner of the bi-directional
 	 * group-assertions link, so there should not be addAssertion method on {@link org.ihtsdo.rvf.entity.Assertion}.
 	 * @param assertion the assertion to be added
 	 */

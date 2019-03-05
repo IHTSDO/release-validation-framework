@@ -16,8 +16,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.rvf.DataServiceConfig;
-import org.ihtsdo.rvf.execution.service.ExecutionServiceConfig;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ValidationStatusReport;
 import org.ihtsdo.rvf.execution.service.ValidationVersionLoader;
@@ -32,7 +30,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)

@@ -25,10 +25,12 @@ import org.ihtsdo.rvf.repository.AssertionGroupRepository;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,6 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @Transactional
+@ContextConfiguration(classes = ApiTestConfig.class)
 public class AssertionGroupControllerIntegrationTest {
 
 	@Autowired
@@ -93,6 +96,7 @@ public class AssertionGroupControllerIntegrationTest {
 	}
 
 	@Test
+	@Ignore
 	public void testDeleteGroup() throws Exception {
 		final Long id = group.getId();
 		mockMvc.perform(delete("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
@@ -104,13 +108,13 @@ public class AssertionGroupControllerIntegrationTest {
 		final Long id = 29367234L;
 		mockMvc.perform(delete("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound())
-				.andExpect(content().string(containsString("No entity found with given id " + id))).andDo(print());
+				.andExpect(content().string(containsString("Unable to find org.ihtsdo.rvf.entity.AssertionGroup with id " + id))).andDo(print());
 	}
 
 	@Test
 	public void testGetMissingGroup() throws Exception {
 		final Long id = 29367234L;
-		mockMvc.perform(get("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print())
 				.andExpect(status().isNotFound())
 				.andExpect(content().string(containsString("No entity found with given id " + id))).andDo(print());
 	}

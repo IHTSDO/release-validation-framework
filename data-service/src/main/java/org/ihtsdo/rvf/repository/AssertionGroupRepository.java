@@ -6,8 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AssertionGroupRepository extends JpaRepository<AssertionGroup, Long> {
-
 	AssertionGroup findByName(String groupName);
 }
-
-

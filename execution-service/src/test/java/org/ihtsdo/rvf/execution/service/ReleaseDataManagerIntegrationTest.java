@@ -55,25 +55,13 @@ public class ReleaseDataManagerIntegrationTest {
 	@Test
 	public void testUploadSctData() throws Exception {
 		assert dataSource != null;
-
 		final File inputFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
 		assertNotNull(inputFile);
-		final boolean writeSucess =releaseDataManager.uploadPublishedReleaseData(inputFile, "INT", "20140131");
+		final boolean writeSucess =releaseDataManager.uploadPublishedReleaseData(inputFile, "int", "20140131");
 		assertTrue("Upload must have been successful", writeSucess);
 
-		assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));
+		assertTrue("Schema name for release 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("rvf_int_20140131"));
 
-		assertTrue("Relese 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("20140131"));
-	}
-	
-	@Test
-	public void testUploadPublishedDataViaS3() throws Exception {
-		assert dataSource != null;
-		final boolean writeSucess =releaseDataManager.uploadRelease("/SnomedCT_Release_INT_20140131.zip","int_20140131");
-		assertTrue("Upload must have been successful", writeSucess);
-
-		assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("20140131"));
-
-		assertTrue("Relese 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("20140131"));
+		assertTrue("Relese 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("rvf_int_20140131"));
 	}
 }

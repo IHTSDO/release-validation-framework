@@ -66,9 +66,9 @@ public class ValidationVersionLoader {
 
 	@Resource(name = "dataSource")
 	private BasicDataSource snomedDataSource;
-
-	@Value("${rvf.jdbc.data.myisam.folder}")
-	private String mysqlMyISamDataFolder;
+	
+	@Value("${rvf.generate.mysql.binary.archive}")
+	private boolean generateBinaryArchive;
 
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
 	
@@ -141,8 +141,10 @@ public class ValidationVersionLoader {
 				if (!releaseDataManager.restoreReleaseFromBinaryArchive(schemaName + ZIP_FILE_EXTENSION)) {
 					logger.info("No existing mysql binary release available.");
 					releaseDataManager.uploadRelease(releaseVersion, schemaName);
-					String archiveFilename = releaseDataManager.generateBinaryArchive(schemaName);
-					logger.info("Release mysql binary archive is generated:" + archiveFilename);
+					if (generateBinaryArchive) {
+						String archiveFilename = releaseDataManager.generateBinaryArchive(schemaName);
+						logger.info("Release mysql binary archive is generated:" + archiveFilename);
+					}
 				} 
 			} 
 			return schemaName;	

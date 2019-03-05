@@ -16,21 +16,21 @@ import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = ExecutionServiceTestConfig.class)
 @Transactional
+@Ignore
 public class AssertionExecutionServiceIntegrationTest {
-	
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceIntegrationTest.class);
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
@@ -67,15 +67,7 @@ public class AssertionExecutionServiceIntegrationTest {
 		test = new org.ihtsdo.rvf.entity.Test();
 		test.setType(TestType.SQL);
 		test.setName("Test 1");
-		assertNotNull(test);
-		assertNotNull(test.getId());
-
-		//create assertion test
-		assertionTest = new AssertionTest();
-		assertionTest.setAssertion(assertion);
-		assertionTest.setTest(test);
-		assertNotNull(assertionTest);
-		assertNotNull(assertionTest.getId());
+		assertionService.addTest(assertion, test);
 	}
 
 	@Test

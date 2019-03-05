@@ -46,7 +46,7 @@ public class AssertionServiceImpl implements AssertionService {
 
 	@Override
 	public Assertion find(final Long id) {
-		return assertionRepo.getOne(id);
+		return assertionRepo.findByAssertionId(id);
 	}
 	
 	@Override

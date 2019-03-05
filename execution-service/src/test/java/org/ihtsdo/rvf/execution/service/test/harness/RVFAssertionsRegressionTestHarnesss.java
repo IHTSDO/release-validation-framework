@@ -81,6 +81,8 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private boolean isRunFirstTime = true;
 	//Reload test data from zip files
 	private boolean reloadTestData = false;
+	//set it to true for testing mysql binary archive
+	private boolean testMysqlBinaryArchive = false;
 	
 	@Before
 	public void setUp() throws IOException, SQLException, BusinessServiceException {
@@ -94,14 +96,18 @@ public class RVFAssertionsRegressionTestHarnesss {
 		config.setProspectiveVersion(PROSPECTIVE_RELEASE);
 		config.setFailureExportMax(10);
 		if (reloadTestData || !releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
-			if (reloadTestData || !releaseDataManager.restoreReleaseFromBinaryArchive(PREVIOUS_RELEASE + ".zip")) {
+			if (testMysqlBinaryArchive && releaseDataManager.restoreReleaseFromBinaryArchive(PREVIOUS_RELEASE + ".zip")) {
+				// do nothing
+			} else {
 				URL previousReleaseUrl = RVFAssertionsRegressionTestHarnesss.class.getResource("/SnomedCT_RegressionTest_20130131");
 				assertNotNull("Must not be null", previousReleaseUrl);
 				File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
 				ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
 				releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
-				String archiveFileName = releaseDataManager.generateBinaryArchive("rvf_regression_test_previous");
-				System.out.println("Mysql binary file is archvied at " + archiveFileName);
+				if (testMysqlBinaryArchive) {
+					String archiveFileName = releaseDataManager.generateBinaryArchive("rvf_regression_test_previous");
+					System.out.println("Mysql binary file is archvied at " + archiveFileName);
+				}
 			}
 		}
 		if (reloadTestData || !releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
@@ -188,6 +194,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		System.out.println("found total assertions:" + assertions.size());
 		long timeStart = System.currentTimeMillis();
 		Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
+		System.out.println("Total tests run:" + runItems.size());
 		long timeEnd = System.currentTimeMillis();
 		releaseDataManager.clearQAResult(config.getExecutionId());
 		System.out.println("Time taken:" +(timeEnd-timeStart));

@@ -62,9 +62,9 @@ public class ReleaseController {
 
 	@RequestMapping(value = "{version}", method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "Check a given release is loaded already", notes = "Checks whether a version is loaded or not. The version format is {product}_{releaseDate} e.g int_20170131")
+	@ApiOperation(value = "Check a given release is loaded already", notes = "Checks whether a version is loaded or not. The version format is rvf_{product}_{releaseDate} e.g rvf_int_20170131")
 	public ResponseEntity getRelease(
-			@ApiParam(value = "The version name e.g int_20170131") @PathVariable final String version) {
+			@ApiParam(value = "The version name e.g rvf_int_20170131") @PathVariable final String version) {
 		if (releaseDataManager.isKnownRelease(version)) {
 			return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
 		} else {
@@ -76,7 +76,7 @@ public class ReleaseController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Get all versions that are loaded in the RVF database", 
-	notes = "Gets all versions that are loaded in the RVF database. Published versions are loaded in the format of {product}_{releaseDate} e.g int_20170131.")
+	notes = "Gets all versions that are loaded in the RVF database. Published versions are loaded in the format of rvf_{product}_{releaseDate} e.g rvf_int_20170131.")
 	public java.util.Set<String> getAllKnownReleases() {
 		return releaseDataManager.getAllKnownReleases();
 	}

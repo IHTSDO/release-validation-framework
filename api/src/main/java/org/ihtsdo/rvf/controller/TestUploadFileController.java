@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
@@ -44,7 +45,7 @@ import io.swagger.annotations.ApiParam;
  * The controller that handles uploaded files for the validation to run
  */
 @RestController
-//@Api(position = 4, value = "Validate release files")
+@Api(position = 4, value = "Validate release files")
 public class TestUploadFileController {
 
 	private static final String INCLUDED_MODULES = "includedModules";

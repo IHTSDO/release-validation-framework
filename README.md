@@ -50,7 +50,7 @@ Sample files for configuring the services can be found in the config folder.
 
 Starting The Application
 ------------------
-Start the stand-alone web application using the executable jar, replacing "{config_dir}" with an absolute path.
+Start the stand-alone application using the executable jar, replacing "{config_dir}" with an absolute path.
 
 `java -Xms512m -Xmx4g -DrvfConfigLocation={config_dir} -jar api/target/api.jar --server.port=8081 --server.servlet.context-path=/api`
 

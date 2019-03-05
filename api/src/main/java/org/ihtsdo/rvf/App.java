@@ -14,14 +14,17 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableJms
 public class App extends ApiConfig {
-	// Swagger Config
+// Swagger Config
 	@Bean
 	public Docket swagger() {
-		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any())
-				.paths(not(regex("/error"))).build();
+		return new Docket(DocumentationType.SWAGGER_2)
+				.select()
+				.apis(RequestHandlerSelectors.any())
+				.paths(not(regex("/error")))
+				.build();
 	}
-
+	
 	public static void main(String[] args) throws Exception {
-        SpringApplication.run(App.class, args);
-    }
+		SpringApplication.run(App.class, args);
+	}
 }

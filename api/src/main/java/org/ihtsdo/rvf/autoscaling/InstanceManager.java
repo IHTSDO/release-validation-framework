@@ -36,7 +36,6 @@ import com.amazonaws.services.ec2.model.Filter;
 import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.InstanceState;
-import com.amazonaws.services.ec2.model.InstanceStateChange;
 import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
@@ -55,7 +54,6 @@ public class InstanceManager {
 	private static final String PENDING = "pending";
 	private static final String RVF_WORKER = "RVF_Worker_";
 	private static final String NAME = "Name";
-	private static final long TIME_TO_DELETE = 56 * 60 * 1000;
 	private Logger logger = LoggerFactory.getLogger(InstanceManager.class);
 	private AmazonEC2Client amazonEC2Client;
 	private static int counter;
@@ -267,32 +265,6 @@ public class InstanceManager {
 		return activeInstances;
 	}
 
-	public void checkAndTerminateInstances(List<Instance> instancesToCheck) {
-		List<Instance> instancesToTerminate = new ArrayList<>();
-		for (Instance instance : instancesToCheck) {
-			if (System.currentTimeMillis() >= (instance.getLaunchTime().getTime() + TIME_TO_DELETE)) {
-				logger.info("Instance id {} was lanched at {} and will be terminated",
-						instance.getInstanceId(), instance.getLaunchTime());
-				instancesToTerminate.add(instance);
-			}
-		}
-		if (!instancesToTerminate.isEmpty()) {
-			List<String> instanceIds = new ArrayList<>();
-			for (Instance instance : instancesToTerminate) {
-				instanceIds.add(instance.getInstanceId());
-			}
-			TerminateInstancesRequest deleteRequest = new TerminateInstancesRequest();
-			deleteRequest.withInstanceIds(instanceIds);
-			TerminateInstancesResult result = amazonEC2Client
-					.terminateInstances(deleteRequest);
-			for (InstanceStateChange state : result.getTerminatingInstances()) {
-				logger.info("Instance id {} current state {}", state
-						.getInstanceId(), state.getCurrentState().getName());
-			}
-			instancesToCheck.removeAll(instancesToTerminate);
-		}
-	}
-
 	public Instance getInstanceById(String instanceId) {
 		if (instanceId == null) {
 			logger.warn("instanceId is null");
@@ -300,8 +272,7 @@ public class InstanceManager {
 		}
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		request.withInstanceIds(instanceId);
-		DescribeInstancesResult result = amazonEC2Client
-				.describeInstances(request);
+		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
 		return result.getReservations().get(0).getInstances().get(0);
 	}
 
@@ -336,8 +307,7 @@ public class InstanceManager {
 					// set ec2 instance worker properties
 					if (line.startsWith("rvf.execution.isWorker")) {
 						result.append("rvf.execution.isWorker=true");
-					} else if (line
-							.startsWith("rvf.execution.isAutoScalingEnabled")) {
+					} else if (line.startsWith("rvf.execution.isAutoScalingEnabled")) {
 						result.append("rvf.execution.isAutoScalingEnabled=false");
 					} else if (line.startsWith("rvf.autoscaling.isEc2Instance")) {
 						result.append("rvf.autoscaling.isEc2Instance=true");

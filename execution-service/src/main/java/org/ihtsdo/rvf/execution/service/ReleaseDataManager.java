@@ -530,7 +530,7 @@ public class ReleaseDataManager {
 		File dataDir = new File(mysqlDataDir);
 		File binaryFile = new File(mysqlDataDir, schemaName);
 		if (!dataDir.canRead()) {
-			logger.info("Can't access directory " + dataDir.getPath());
+			logger.error("Can't access directory " + dataDir.getPath());
 			try {
 				GroupPrincipal group = Files.readAttributes(dataDir.toPath(), PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS).group();
 				UserPrincipal owner = Files.readAttributes(dataDir.toPath(), PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS).owner();
@@ -539,14 +539,6 @@ public class ReleaseDataManager {
 				Files.setOwner(binaryFile.toPath(), owner);
 				Files.getFileAttributeView(binaryFile.toPath(), PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS).setGroup(group);
 				Files.getFileAttributeView(binaryFile.toPath(), PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS).setOwner(owner);
-				if (binaryFile.exists()) {
-					logger.info("File exists " + binaryFile.getPath());
-				}
-				if (binaryFile.canRead()) {
-					logger.info("can read from" + binaryFile.getAbsolutePath());
-				} else {
-					logger.info("can't read from" + binaryFile.getAbsolutePath());
-				}
 			} catch (IOException e) {
 				throw new BusinessServiceException("Failed to fetch group principal for folder " + dataDir, e.fillInStackTrace());
 			}

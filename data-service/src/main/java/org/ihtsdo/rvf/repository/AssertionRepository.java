@@ -11,4 +11,6 @@ public interface AssertionRepository extends JpaRepository<Assertion, Long> {
 	Assertion findByUuid(String uuid);
 
 	List<Assertion> findAssertionsByKeywords(String keyWords);
+	
+	Assertion findByAssertionId(Long assertionId);
 }
