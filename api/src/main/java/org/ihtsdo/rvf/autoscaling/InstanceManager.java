@@ -350,8 +350,7 @@ public class InstanceManager {
 		} else {
 			if (StringUtils.isNotBlank(droolsRulesVersion)) {
 				//git clone -b 'v1.9'
-				String tag = droolsRulesVersion.startsWith("v") ? droolsRulesVersion : "v" + droolsRulesVersion;
-				builder.append(" -b " +"'" + tag + "'");
+				builder.append(" -b " +"'" + droolsRulesVersion + "'");
 				builder.append(" --single-branch");
 			} else {
 				//default to master branch if there is no specific configuration
