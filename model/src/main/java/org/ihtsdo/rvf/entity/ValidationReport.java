@@ -1,7 +1,5 @@
 package org.ihtsdo.rvf.entity;
 
-import org.springframework.util.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,15 +13,15 @@ public class ValidationReport {
 	private int totalSkips;
 	private int totalWarnings;
 	private int totalFailures;
-	private List<TestRunItem> assertionsSkipped;
-	private List<TestRunItem> assertionsWarning;
 	private List<TestRunItem> assertionsFailed;
+	private List<TestRunItem> assertionsWarning;
+	private List<TestRunItem> assertionsSkipped;
 	private List<TestRunItem> assertionsPassed;
 
 	public ValidationReport() {
-		assertionsSkipped = new ArrayList<>();
-		assertionsWarning = new ArrayList<>();
 		assertionsFailed = new ArrayList<>();
+		assertionsWarning = new ArrayList<>();
+		assertionsSkipped = new ArrayList<>();
 		assertionsPassed = new ArrayList<>();
 		totalTestsRun = 0;
 		totalSkips = 0;
@@ -84,7 +82,7 @@ public class ValidationReport {
 	}
 
 	public void addSkippedAssertions(List<TestRunItem> skippedItems){
-		if(!CollectionUtils.isEmpty(skippedItems)) {
+		if (hasItems(skippedItems)) {
 			assertionsSkipped.addAll(skippedItems);
 			int noOfItems = skippedItems.size();
 			totalSkips += noOfItems;
@@ -93,7 +91,7 @@ public class ValidationReport {
 	}
 
 	public void addWarningAssertions(List<TestRunItem> warningItems){
-		if(!CollectionUtils.isEmpty(warningItems)) {
+		if (hasItems(warningItems)) {
 			assertionsWarning.addAll(warningItems);
 			int noOfItems = warningItems.size();
 			totalWarnings += noOfItems;
@@ -102,7 +100,7 @@ public class ValidationReport {
 	}
 
 	public void addFailedAssertions(List<TestRunItem> failedItems){
-		if(!CollectionUtils.isEmpty(failedItems)) {
+		if (hasItems(failedItems)) {
 			assertionsFailed.addAll(failedItems);
 			int noOfItems = failedItems.size();
 			totalFailures += noOfItems;
@@ -111,7 +109,7 @@ public class ValidationReport {
 	}
 
 	public void addPassedAssertions(List<TestRunItem> passedItems){
-		if(!CollectionUtils.isEmpty(passedItems)) {
+		if (hasItems(passedItems)) {
 			assertionsPassed.addAll(passedItems);
 			int noOfItems = passedItems.size();
 			totalTestsRun += noOfItems;
@@ -121,12 +119,15 @@ public class ValidationReport {
 	public void addTimeTaken(long seconds){
 		timeTakenInSeconds += seconds;
 	}
-
+	
 	public void sortAssertionLists() {
-		Collections.sort(assertionsSkipped);
 		Collections.sort(assertionsFailed);
 		Collections.sort(assertionsWarning);
+		Collections.sort(assertionsSkipped);
 		Collections.sort(assertionsPassed);
 	}
 
+	private boolean hasItems(List<TestRunItem> items) {
+		return ((items != null) && (!items.isEmpty()));
+	}
 }

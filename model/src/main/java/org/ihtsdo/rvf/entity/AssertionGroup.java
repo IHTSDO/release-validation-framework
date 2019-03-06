@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -15,29 +16,21 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
- * An entity that reprsents a collection of {@link org.ihtsdo.rvf.entity.Assertion}s. Note that this is deliberately not
+ * An entity that represents a collection of {@link org.ihtsdo.rvf.entity.Assertion}s. Note that this is deliberately not
  * a recursive collection of {@link org.ihtsdo.rvf.entity.Assertion}s.
  */
 @Entity
 @Table(name = "assertion_group")
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = AssertionGroup.class)
-@ApiModel(description="Assertion group model")
 public class AssertionGroup {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "group_id")
-	@ApiModelProperty(value="Auto generated id")
 	private Long id;
 	
-	@ApiModelProperty(value="Assertion group name", required=true)
 	private String name;
 	
 	@ManyToMany( fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -50,7 +43,6 @@ public class AssertionGroup {
 	private Set<Assertion> assertions = new HashSet<>();
 	
 	@Transient
-	@ApiModelProperty(value="Total assertions")
 	private final int total = 0;
 	
 	
@@ -83,7 +75,7 @@ public class AssertionGroup {
 	}
 
 	/**
-	 * Adds an assertion to this gruop. Note {@link org.ihtsdo.rvf.entity.AssertionGroup} is always the owner of the bi-directional
+	 * Adds an assertion to this group. Note {@link org.ihtsdo.rvf.entity.AssertionGroup} is always the owner of the bi-directional
 	 * group-assertions link, so there should not be addAssertion method on {@link org.ihtsdo.rvf.entity.Assertion}.
 	 * @param assertion the assertion to be added
 	 */

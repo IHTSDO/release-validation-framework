@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * A custom Exception for reporting missing entities.
  *
- */
+*/
 public class EntityNotFoundException extends RuntimeException{
 	private static final long serialVersionUID = 1L;
 

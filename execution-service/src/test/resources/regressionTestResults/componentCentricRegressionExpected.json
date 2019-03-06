@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 93,
-  "totalAssertionsFailed" : 93,
+  "totalAssertionsRun" : 95,
+  "totalAssertionsFailed" : 95,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -234,6 +234,17 @@
       "detail" : "MEMBER: id=499c1966-65d3-5384-aafb-28f4a20e34eb: Historical association refset member associates inactive source concept with its stated parent."
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "Active descriptions of an inactive concept should have concept non-current indicators",
+    "assertionUuid" : "96810a5e-d195-43ba-8685-f76b43d25782",
+    "firstNInstances" : [ {
+      "conceptId" : "703649004",
+      "detail" : "Active description 2989770013 is missing concept non-current indicator"
+    }, {
+      "conceptId" : "703649004",
+      "detail" : "Active description 2990804020 is missing concept non-current indicator"
+    } ],
+    "totalFailed" : 2
   }, {
     "assertionName" : "Active VTM simple refset members refer to active components.",
     "assertionUuid" : "9715b1dd-7de5-4f80-ad28-f97ab52b9359",
@@ -545,6 +556,14 @@
     "firstNInstances" : [ {
       "conceptId" : "703672002",
       "detail" : "CONCEPT: id=703672002: Concept contains more than one definition for a given dialect."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Concept should not have any duplicated historical association indicators.",
+    "assertionUuid" : "041dcf55-4c9c-4dd4-baa7-584eb0e53d5a",
+    "firstNInstances" : [ {
+      "conceptId" : "10171006",
+      "detail" : "MEMBER: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb73 in historical association refset member has a duplicated indicator with MEMBER id= fb7f359a-8a7b-5b89-8afc-ed60ba61eb71"
     } ],
     "totalFailed" : 1
   }, {

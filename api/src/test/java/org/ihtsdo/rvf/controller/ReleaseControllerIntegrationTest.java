@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * A test case for {@link AssertionController}.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/testDispatcherServletContext.xml"})
 @WebAppConfiguration
+@ContextConfiguration(classes = ApiTestConfig.class)
 public class ReleaseControllerIntegrationTest {
 
 	@Autowired
@@ -38,7 +38,6 @@ public class ReleaseControllerIntegrationTest {
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
 			MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
@@ -49,8 +48,8 @@ public class ReleaseControllerIntegrationTest {
 		assertNotNull(releaseDataManager);
 		releaseDataManager.uploadPublishedReleaseData(getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip") ,
 				"SnomedCT_Release_INT_20140131.zip", "int","20140131");
-		assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("int_20140131"));
-		assertTrue("Release 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("int_20140131"));
+		assertTrue("Schema name for release data 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("rvf_int_20140131"));
+		assertTrue("Release 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("rvf_int_20140131"));
 	}
 
 	@Test
@@ -62,8 +61,7 @@ public class ReleaseControllerIntegrationTest {
 
 	@Test
 	public void testGetRelease() throws Exception {
-
-		mockMvc.perform(get("/releases/{version}", "int_20140131").accept(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get("/releases/{version}", "rvf_int_20140131").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(APPLICATION_JSON_UTF8));
 	}

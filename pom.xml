@@ -1,24 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.0.1.RELEASE</version>
+	</parent>
+	
 	<groupId>org.ihtsdo.snomed.rvf</groupId>
 	<artifactId>release-validation-framework</artifactId>
-	<version>1.7.0</version>
+	<version>2.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>SNOMED Release Validation Framework</name>
-
+	
 	<properties>
+		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring.version>4.3.5.RELEASE</spring.version>
+		<packageName>${project.artifactId}</packageName>
+		<execFinalName>${project.build.finalName}.jar</execFinalName>
 		<slf4j.version>1.7.5</slf4j.version>
-		<jackson.version>2.6.2</jackson.version>
-		<hibernate.version>3.6.10.Final</hibernate.version>
 		<hsql.version>5.3.0</hsql.version>
 		<skip.integration.tests>true</skip.integration.tests>
 		<mysql.connector.java.version>5.1.20</mysql.connector.java.version>
 		<dbcp.version>1.4</dbcp.version>
 		<snomed.utilities.version>1.2</snomed.utilities.version>
+		<spring-cloud-version>1.2.2.RELEASE</spring-cloud-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<hibernate.version>5.2.17.Final</hibernate.version>
+		<springfox-swagger.version>2.7.0</springfox-swagger.version>
 	</properties>
 
 	<modules>
@@ -37,14 +48,13 @@
 		<url>http://github.com/IHTSDO/release-validation-framework</url>
 		<tag>HEAD</tag>
 	</scm>
-
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.3.176</version>
+			<scope>test</scope>
 		</dependency>
-		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -55,87 +65,37 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
-		<!-- Test -->
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-			<version>3.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.inject</groupId>
-			<artifactId>javax.inject</artifactId>
-			<version>1</version>
-		</dependency>
-		<!-- Swagger lib for api documentation -->
 		<dependency>
 		    <groupId>com.mangofactory</groupId>
 		    <artifactId>swagger-springmvc</artifactId>
 		    <version>1.0.2</version>
 		</dependency>
-		
 		<dependency>
-    		<groupId>joda-time</groupId>
-    		<artifactId>joda-time</artifactId>
-   			 <version>2.8.1</version>
-		</dependency>		
-		
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>swagger-ui</artifactId>
-			<version>2.0.24</version>
-		</dependency>	
-		<dependency>
-			<groupId>org.ihtsdo.otf.common</groupId>
-			<artifactId>otf-common</artifactId>
-			<version>1.4.3</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>spring-beans</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>log4j-over-slf4j</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-starter</artifactId>
+        	<exclusions>
+            	<exclusion>
+                	<groupId>org.springframework.boot</groupId>
+                	<artifactId>spring-boot-starter-logging</artifactId>
+            	</exclusion>
+        	</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20140107</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
 		</dependency>
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+   		 	<artifactId>spring-boot-starter-data-jpa</artifactId>
+	   	</dependency> 
 	</dependencies>
-
+			
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
@@ -151,11 +111,6 @@
 				<artifactId>guava</artifactId>
 				<version>16.0.1</version>
 			</dependency>
-			<dependency>
-				<groupId>com.h2database</groupId>
-				<artifactId>h2</artifactId>
-				<version>1.3.176</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -163,17 +118,8 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.12.4</version>
+				<version>2.22.1</version>
 				<configuration>
 					<excludes>
 						<exclude>**/*IT.java</exclude>
@@ -182,13 +128,11 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<!--
-				To run integration tests use: mvn clean install -Dskip.integration.tests=false
-			-->
+			
+				<!-- To run integration tests use: mvn clean install -Dskip.integration.tests=false -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.19.1</version>
 				<executions>
 					<execution>
 						<id>integration-test</id>
@@ -207,26 +151,8 @@
 				</includes>
 				<skipTests>${skip.integration.tests}</skipTests>
 			 </configuration>
-			</plugin>
-			<plugin>
-				<groupId>external.atlassian.jgitflow</groupId>
-				<artifactId>jgitflow-maven-plugin</artifactId>
-				<version>1.0-m4.3</version>
-				<configuration>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<enableSshAgent>true</enableSshAgent>
-					<noDeploy>true</noDeploy>
-				</configuration>
-			</plugin>
-			<plugin>
-  				<groupId>org.apache.maven.plugins</groupId>
-  				<artifactId>maven-javadoc-plugin</artifactId>
-  				<version>3.0.0</version>
-  				<configuration>
-       				<doclint>none</doclint>
-    			</configuration>
- 		 	</plugin>
-		</plugins>
+			</plugin> 
+    </plugins>
 	</build>
 
 	<repositories>

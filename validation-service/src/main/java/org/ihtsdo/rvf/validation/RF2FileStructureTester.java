@@ -83,8 +83,7 @@ public class RF2FileStructureTester {
 		try (BufferedReader reader = resourceManager.getReader(fileName, Charset.forName(UTF_8));
 			Scanner scanner = new Scanner(resourceManager.getReader(fileName, Charset.forName(UTF_8)))) {
 			scanner.useDelimiter(RF2_LINE_SEPARATOR);
-			String line = null;
-			while ((line = reader.readLine()) != null) {
+			while ((reader.readLine()) != null) {
 				totalLine++;
 			}
 			if (totalLine == 0) {

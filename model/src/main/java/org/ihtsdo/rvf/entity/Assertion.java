@@ -5,17 +5,15 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.hibernate.annotations.Index;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
  * An Assertion represents a truth in snomed, it consists of a number of tests to verify
@@ -25,14 +23,13 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 @Entity
 @XmlRootElement(name = "assertion")
 @Table(name = "assertion",
+	indexes = @Index(columnList = "uuid"),
 	uniqueConstraints = @UniqueConstraint(columnNames={"uuid"}))
-//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id", scope = Assertion.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel( value = "Assertion", description = "Assertion resource representation" )
 public class Assertion {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "assertion_id")
 	private Long assertionId;
 	
@@ -41,7 +38,7 @@ public class Assertion {
 	
 	private String keywords;
 	
-	@Index(name="assertion_uuid_idx",columnNames={"uuid"})
+	@Column(name ="uuid")
 	private String uuid = UUID.randomUUID().toString();
 	
 	@Column(name = "short_name")
@@ -63,7 +60,6 @@ public class Assertion {
 	}
 
 	@XmlElement
-	@ApiModelProperty( position=1, value="Auto generated Assertion Id") 
 	public Long getAssertionId() {
 		return assertionId;
 	}
@@ -73,7 +69,6 @@ public class Assertion {
 	}
 
 	@XmlElement
-	@ApiModelProperty( position=2, value="Assertion text", required=true)
 	public String getAssertionText() {
 		return assertionText;
 	}
@@ -82,7 +77,6 @@ public class Assertion {
 		this.assertionText = assertionText;
 	}
 
-	@ApiModelProperty(position=3, value ="type of assertion", required=true)
 	public String getKeywords() {
 		return keywords;
 	}
@@ -92,7 +86,6 @@ public class Assertion {
 	}
 
 	@XmlElement
-	@ApiModelProperty( position=4, value="UUID", required=true ) 
 	public UUID getUuid() {
 		return UUID.fromString(uuid);
 	}
@@ -102,7 +95,6 @@ public class Assertion {
 	}
 	
 	@XmlElement
-	@ApiModelProperty( position=5, value="severity", required=false ) 
 	public String getSeverity() {
 		return severity;
 	}
@@ -163,7 +155,6 @@ public class Assertion {
 		return true;
 	}
 
-	@ApiModelProperty(hidden=true)
 	public String getShortName() {
 		return shortName;
 	}
@@ -172,7 +163,6 @@ public class Assertion {
 		this.shortName = shortName;
 	}
 
-	@ApiModelProperty(hidden=true)
 	public String getDocRef() {
 		return docRef;
 	}

@@ -1,5 +1,16 @@
 package org.ihtsdo.rvf.validation;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
@@ -14,26 +25,23 @@ import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-@Component
-public class StructuralTestRunner implements InitializingBean{
-
+@Service
+public class StructuralTestRunner {
+	
 	private final Logger logger = LoggerFactory.getLogger(StructuralTestRunner.class);
+	
 	protected String reportFolderLocation;
+	
+	@Value("${rvf.test.report.folder.location}")
 	protected File reportDataFolder;
+	
+	@Value("${rvf.validation.failure.threshold}")
 	protected int failureThreshold;
+	
 	private String structureTestReportPath;
 
 	@Autowired
@@ -180,8 +188,8 @@ public class StructuralTestRunner implements InitializingBean{
 	 * immediately after instantiating this class outside of Spring context.
 	 * //todo move to an async process at some time!
 	 */
-	@Override
-	public void afterPropertiesSet() throws Exception {
+	@PostConstruct
+	public void init() throws Exception {
 		logger.info("Sct Data Location passed = " + reportFolderLocation);
 		if (reportFolderLocation == null || reportFolderLocation.length() == 0) {
 			reportFolderLocation = FileUtils.getTempDirectoryPath() + System.getProperty("file.separator") + "rvf-reports";
@@ -189,10 +197,9 @@ public class StructuralTestRunner implements InitializingBean{
 
 		reportDataFolder = new File(reportFolderLocation);
 		if(!reportDataFolder.exists()){
-			if(reportDataFolder.mkdirs()){
+			if (reportDataFolder.mkdirs()){
 				logger.info("Created report folder at : " + reportFolderLocation);
-			}
-			else{
+			} else{
 				logger.error("Unable to create data folder at path : " + reportFolderLocation);
 				throw new IllegalArgumentException("Bailing out because report folder location can not be set to : " + reportFolderLocation);
 			}

@@ -5,23 +5,43 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.rvf.controller.VersionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.*;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.ec2.model.CreateTagsRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Filter;
+import com.amazonaws.services.ec2.model.IamInstanceProfileSpecification;
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.InstanceState;
+import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.RunInstancesRequest;
+import com.amazonaws.services.ec2.model.RunInstancesResult;
+import com.amazonaws.services.ec2.model.Tag;
+import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import com.amazonaws.services.ec2.model.TerminateInstancesResult;
 @Service
 public class InstanceManager {
 
@@ -34,35 +54,73 @@ public class InstanceManager {
 	private static final String PENDING = "pending";
 	private static final String RVF_WORKER = "RVF_Worker_";
 	private static final String NAME = "Name";
-	private static final long TIME_TO_DELETE = 56 * 60 * 1000;
 	private Logger logger = LoggerFactory.getLogger(InstanceManager.class);
 	private AmazonEC2Client amazonEC2Client;
 	private static int counter;
-	@Autowired
-	private String imageId;
-	@Autowired
-	private String instanceType;
-	@Autowired
-	private String securityGroupId;
-	@Autowired
-	private String keyName;
-	@Autowired
-	private String instanceTagName;
-	@Autowired
-	private String ec2SubnetId;
 	private String ec2InstanceStartupScript;
+	
+	@Value("${rvf.autoscaling.imageId}")
+	private String imageId;
+	
+	@Value("${rvf.autoscaling.instanceType}")
+	private String instanceType;
+	
+	@Value("${rvf.autoscaling.securityGroupId}")
+	private String securityGroupId;
+	
+	@Value("${rvf.autoscaling.keyPairName}")
+	private String keyName;
+	
+	@Value("${rvf.autoscaling.tagName}")
+	private String instanceTagName;
+	
+	@Value("${rvf.autoscaling.ec2SubnetId}")
+	private String ec2SubnetId;
 
+	@Value("${rvf.drools.rule.version}")	 
 	private String droolsRulesVersion;
+	
+	@Value("${rvf.drools.rule.directory}")	 
 	private String droolsRulesDirectory;
+	
+	@Value("${rvf.drools.rule.repository}")
 	private String droolsRulesRepository;
 
-	public InstanceManager(AWSCredentials credentials, String ec2Endpoint, String droolsRulesVersion, String droolsRulesDirectory, String droolsRulesRepository) {
-		amazonEC2Client = new AmazonEC2Client(credentials);
-		amazonEC2Client.setEndpoint(ec2Endpoint);
-		this.droolsRulesVersion = droolsRulesVersion;
-		this.droolsRulesDirectory = droolsRulesDirectory;
-		this.droolsRulesRepository = droolsRulesRepository;
-		ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
+	@Value("${rvf.drools.rule.branch}")
+	private String droolsRulesBranch;
+	
+	@Value("${aws.key}")
+	private String awsPubicKey;
+	
+	@Value("${aws.privateKey}")
+	private String awsPrivateKey;
+	
+	@Value("${rvf.autoscaling.ec2Endpoint}")
+	private String serviceEndpoint;
+	
+	@Value("${rvf.autoscaling.ec2SigningRegion}")
+	private String signingRegion;
+	
+	@Value("${rvf.execution.isAutoScalingEnabled}")
+	private boolean isAutoScallingEnabled;
+	
+	@Value("${rvf.autoscaling.isEc2Instance}")
+	private boolean isEc2Instance;
+	
+	@Value("${rvf.autoscaling.profile.roleName}")
+	private String instanceProfileRoleName;
+	
+	@PostConstruct
+	public void init() {
+		if (isAutoScallingEnabled || isEc2Instance) {
+			AWSCredentials credentials = new BasicAWSCredentials(awsPubicKey, awsPrivateKey);
+			amazonEC2Client = (AmazonEC2Client) AmazonEC2ClientBuilder.standard()
+					.withCredentials(new AWSStaticCredentialsProvider(credentials))
+					.withEndpointConfiguration(new EndpointConfiguration(serviceEndpoint, signingRegion)).build();
+		}
+		if (isAutoScallingEnabled) {
+			ec2InstanceStartupScript = Base64.encodeBase64String(constructStartUpScript().getBytes());
+		}
 	}
 
 	public List<String> createInstance(int totalToCreate) {
@@ -73,7 +131,9 @@ public class InstanceManager {
 				.withInstanceInitiatedShutdownBehavior(TERMINATE)
 				.withSecurityGroupIds(securityGroupId)
 				.withUserData(ec2InstanceStartupScript)
-				.withSubnetId(ec2SubnetId);
+				.withSubnetId(ec2SubnetId)
+				.withIamInstanceProfile(new IamInstanceProfileSpecification().withName(instanceProfileRoleName));
+		
 		List<String> ids = new ArrayList<>();
 		try {
 			RunInstancesResult runInstancesResult = amazonEC2Client.runInstances(runInstancesRequest);
@@ -205,32 +265,6 @@ public class InstanceManager {
 		return activeInstances;
 	}
 
-	public void checkAndTerminateInstances(List<Instance> instancesToCheck) {
-		List<Instance> instancesToTerminate = new ArrayList<>();
-		for (Instance instance : instancesToCheck) {
-			if (System.currentTimeMillis() >= (instance.getLaunchTime().getTime() + TIME_TO_DELETE)) {
-				logger.info("Instance id {} was lanched at {} and will be terminated",
-						instance.getInstanceId(), instance.getLaunchTime());
-				instancesToTerminate.add(instance);
-			}
-		}
-		if (!instancesToTerminate.isEmpty()) {
-			List<String> instanceIds = new ArrayList<>();
-			for (Instance instance : instancesToTerminate) {
-				instanceIds.add(instance.getInstanceId());
-			}
-			TerminateInstancesRequest deleteRequest = new TerminateInstancesRequest();
-			deleteRequest.withInstanceIds(instanceIds);
-			TerminateInstancesResult result = amazonEC2Client
-					.terminateInstances(deleteRequest);
-			for (InstanceStateChange state : result.getTerminatingInstances()) {
-				logger.info("Instance id {} current state {}", state
-						.getInstanceId(), state.getCurrentState().getName());
-			}
-			instancesToCheck.removeAll(instancesToTerminate);
-		}
-	}
-
 	public Instance getInstanceById(String instanceId) {
 		if (instanceId == null) {
 			logger.warn("instanceId is null");
@@ -238,8 +272,7 @@ public class InstanceManager {
 		}
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		request.withInstanceIds(instanceId);
-		DescribeInstancesResult result = amazonEC2Client
-				.describeInstances(request);
+		DescribeInstancesResult result = amazonEC2Client.describeInstances(request);
 		return result.getReservations().get(0).getInstances().get(0);
 	}
 
@@ -264,20 +297,17 @@ public class InstanceManager {
 		if (propertyFiles != null) {
 			for (String fileName : propertyFiles) {
 				List<String> lines = new ArrayList<>();
-				try {
-					lines.addAll(IOUtils.readLines(new FileReader(new File(
-							configDir, fileName))));
+				try (Reader reader = new FileReader(new File(configDir, fileName));) {
+					lines.addAll(IOUtils.readLines(reader));
 				} catch (IOException e) {
-					logger.error("Error when reading proerty file:" + fileName,
-							e);
+					logger.error("Error when reading proerty file:" + fileName, e);
 				}
 				StringBuilder result = new StringBuilder();
 				for (String line : lines) {
 					// set ec2 instance worker properties
 					if (line.startsWith("rvf.execution.isWorker")) {
 						result.append("rvf.execution.isWorker=true");
-					} else if (line
-							.startsWith("rvf.execution.isAutoScalingEnabled")) {
+					} else if (line.startsWith("rvf.execution.isAutoScalingEnabled")) {
 						result.append("rvf.execution.isAutoScalingEnabled=false");
 					} else if (line.startsWith("rvf.autoscaling.isEc2Instance")) {
 						result.append("rvf.autoscaling.isEc2Instance=true");
@@ -313,10 +343,19 @@ public class InstanceManager {
 		}
 		// checkout drools version
 		builder.append("sudo git clone");
-		if (droolsRulesVersion != null && !droolsRulesVersion.isEmpty()) {
-			//git clone -b 'v1.9'
-			builder.append(" -b " +"'v" + droolsRulesVersion + "'");
+		if(StringUtils.isNotBlank(droolsRulesBranch)) {
+			//git clone -b master --single-branch
+			builder.append(" -b " +"'" + droolsRulesBranch + "'");
 			builder.append(" --single-branch");
+		} else {
+			if (StringUtils.isNotBlank(droolsRulesVersion)) {
+				//git clone -b 'v1.9'
+				builder.append(" -b " +"'" + droolsRulesVersion + "'");
+				builder.append(" --single-branch");
+			} else {
+				//default to master branch if there is no specific configuration
+				builder.append(" -b master --single-branch");
+			}
 		}
 		//"--single-branch https://github.com/IHTSDO/snomed-drools-rules.git /opt/snomed-drools-rules/)
 		builder.append(" " + droolsRulesRepository + " ");

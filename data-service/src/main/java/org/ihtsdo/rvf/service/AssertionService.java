@@ -2,7 +2,6 @@ package org.ihtsdo.rvf.service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.ihtsdo.rvf.entity.Assertion;
@@ -10,34 +9,27 @@ import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.Test;
 
-public interface AssertionService extends EntityService<Assertion> {
+public interface AssertionService {
+	//Assertion
+	Assertion create(Assertion assertion);
 
-	Assertion create(Map<String, String> properties);
-
-	Assertion update(Long id, Map<String, String> newValues);
-
-	@Override
+	Assertion save(Assertion assertion);
+	
 	void delete(Assertion assertion);
-
+	
 	List<Assertion> findAll();
-
+	
 	Assertion find(Long id);
 	
-	Collection<Assertion> find (List<Long> ids);
+	Assertion findAssertionByUUID(UUID uuid);
 
-	Assertion find(UUID uuid);
-
+	//Assertion Test
 	List<AssertionTest> getAssertionTests(Assertion assertion);
 
-	List<AssertionTest> getAssertionTests(Long assertionId);
-
-	List<AssertionTest> getAssertionTests(UUID uuid);
-
+	//Test
 	List<Test> getTests(Assertion assertion);
 
-	List<Test> getTests(Long assertionId);
-
-	List<Test> getTests(UUID uuid);
+	List<Test> getTestsByAssertionId(Long assertionId);
 
 	Assertion addTest(Assertion assertion, Test test);
 
@@ -49,23 +41,23 @@ public interface AssertionService extends EntityService<Assertion> {
 
 	Long count();
 
+	//Assertion Group
 	List<AssertionGroup> getGroupsForAssertion(Assertion assertion);
 
 	List<AssertionGroup> getGroupsForAssertion(Long assertionId);
-
-	List<Assertion> getAssertionsForGroup(AssertionGroup group);
-
-	List<Assertion> getAssertionsForGroup(Long groupId);
 
 	AssertionGroup addAssertionToGroup(Assertion assertion, AssertionGroup group);
 
 	AssertionGroup removeAssertionFromGroup(Assertion assertion, AssertionGroup group);
 
-	List<Assertion> getResourceAssertions();
 	AssertionGroup getAssertionGroupByName(String groupName);
 
 	List<AssertionGroup> getAssertionGroupsByNames(List<String> groupNames);
 	List<AssertionGroup> getAllAssertionGroups();
 
-	List<Assertion> getAssertionsByKeyWord(String keyWord, boolean fullyMatched);
+	Assertion getAssertionByUuid(UUID assertionUUID);
+	
+	List<Assertion> getAssertionsByKeyWords(String keyWord, boolean exactMatch);
+
+	AssertionGroup createAssertionGroup(AssertionGroup group);
 }

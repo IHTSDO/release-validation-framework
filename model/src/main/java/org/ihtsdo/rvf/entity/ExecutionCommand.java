@@ -16,8 +16,6 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
 
 /**
  * A class that encapsulate the logic/code that is used to run a {@link org.ihtsdo.rvf.entity.Test}.
@@ -25,7 +23,6 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 //@Embeddable
 @Entity(name = "command")
 @Table(name = "execution_command")
-@ApiModel(description="Assertion test SQL statements")
 public class ExecutionCommand {
 
 	@Id
@@ -33,7 +30,6 @@ public class ExecutionCommand {
 	Long id;
 
 	@Column(columnDefinition = "text")
-	@ApiModelProperty(required=false)
 	String template = null;
 	@JsonBackReference
 	@OneToOne(fetch = FetchType.EAGER, mappedBy = "command")

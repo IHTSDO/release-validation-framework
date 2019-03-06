@@ -4,56 +4,23 @@
     <parent>
         <groupId>org.ihtsdo.snomed.rvf</groupId>
         <artifactId>release-validation-framework</artifactId>
-        <version>1.7.0</version>
+        <version>2.1.0-SNAPSHOT</version>
     </parent>
     <artifactId>model</artifactId>
     <name>model</name>
-
-    <properties>
-        <snomed-drools.version>1.8.0</snomed-drools.version>
-    </properties>
-
     <dependencies>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${hibernate.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
+    	<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <!--Utility -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.ihtsdo.drools</groupId>
-            <artifactId>snomed-drools-engine</artifactId>
-            <version>${snomed-drools.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.collections</groupId>
-                    <artifactId>google-collections</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        	<groupId>javax.persistence</groupId>
+        	<artifactId>javax.persistence-api</artifactId>
+        	<version>2.2</version>
+      	</dependency>
     </dependencies>
-
-    <build>
-        <finalName>${project.artifactId}</finalName>
-    </build>
-
 </project>

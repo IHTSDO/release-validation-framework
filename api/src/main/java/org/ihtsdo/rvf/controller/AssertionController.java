@@ -1,31 +1,5 @@
 package org.ihtsdo.rvf.controller;
 
-import com.wordnik.swagger.annotations.*;
-
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionGroup;
-import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
-import org.ihtsdo.rvf.execution.service.impl.ExecutionConfig;
-import org.ihtsdo.rvf.helper.AssertionHelper;
-import org.ihtsdo.rvf.service.AssertionService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import org.springframework.stereotype.Controller;
-
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,14 +10,37 @@ import java.util.UUID;
 
 import javax.persistence.EntityNotFoundException;
 
-@Controller
+import org.ihtsdo.rvf.entity.Assertion;
+import org.ihtsdo.rvf.entity.AssertionGroup;
+import org.ihtsdo.rvf.entity.Test;
+import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
+import org.ihtsdo.rvf.helper.AssertionHelper;
+import org.ihtsdo.rvf.service.AssertionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+@RestController
 @RequestMapping("/assertions")
 @Api(position = 1, value = "Assertions")
 public class AssertionController {
 	@Autowired
 	private AssertionService assertionService;
-	@Autowired
-	private AssertionExecutionService assertionExecutionService;
 	@Autowired
 	private AssertionHelper assertionHelper;
 	@Autowired
@@ -67,7 +64,7 @@ public class AssertionController {
 	public List<Test> getTestsForAssertion(@PathVariable final String id) {
 		final Assertion assertion = find(id);
 
-		return assertionService.getTests(assertion.getAssertionId());
+		return assertionService.getTestsByAssertionId(assertion.getAssertionId());
 	}
 
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.POST)
@@ -109,7 +106,6 @@ public class AssertionController {
 		if (!toDelete.isEmpty()) {
 			assertionService.deleteTests(assertion, toDelete);
 		}
-
 		return assertion;
 	}
 
@@ -121,35 +117,29 @@ public class AssertionController {
 	public ResponseEntity<Assertion> getAssertion(
 			@ApiParam(value = "Assertion id or uuid", required = true) @PathVariable final String id) {
 		Assertion assertion = null;
-
 		try {
 			assertion = find(id);
 		} catch (IllegalArgumentException e) {
-			return new ResponseEntity<Assertion>((Assertion) null,
-					HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Assertion>((Assertion) null, HttpStatus.BAD_REQUEST);
 		}
-
 		if (assertion == null) {
-			return new ResponseEntity<Assertion>((Assertion) null,
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Assertion>(HttpStatus.NOT_FOUND);
 		}
-
 		return new ResponseEntity<Assertion>(assertion, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Delete an assertion", notes = "Delete an assertion identified by the id.")
-	public ResponseEntity<Assertion> deleteAssertion(
-			@ApiParam(value = "Assertion id or uuid") @PathVariable final String id) {
+	public ResponseEntity<Assertion> deleteAssertion(@ApiParam(value = "Assertion id or uuid") @PathVariable final String id) {
 		final Assertion assertion = find(id);
-		List<AssertionGroup> groups = assertionService
-				.getGroupsForAssertion(assertion);
-
+		if (assertion == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		List<AssertionGroup> groups = assertionService.getGroupsForAssertion(assertion);
 		if ((groups != null) && !groups.isEmpty()) {
 			return new ResponseEntity<Assertion>(assertion, HttpStatus.CONFLICT);
 		}
-
 		assertionService.delete(assertion);
 
 		return new ResponseEntity<Assertion>(assertion, HttpStatus.OK);
@@ -165,21 +155,17 @@ public class AssertionController {
 		// Firstly, the assertion must have a UUID (otherwise malformed request)
 		try {
 			if (assertion.getUuid() == null) {
-				return new ResponseEntity<Assertion>((Assertion) null,
-						HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<Assertion>((Assertion) null, HttpStatus.BAD_REQUEST);
 			}
 		} catch (IllegalArgumentException e) {
-			return new ResponseEntity<Assertion>((Assertion) null,
-					HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Assertion>((Assertion) null, HttpStatus.BAD_REQUEST);
 		}
 
 		// Now make sure we don't already have one of those (otherwise conflict)
-		Assertion existingAssertion = assertionService
-				.find(assertion.getUuid());
+		Assertion existingAssertion = assertionService.findAssertionByUUID(assertion.getUuid());
 
 		if (existingAssertion != null) {
-			return new ResponseEntity<Assertion>((Assertion) null,
-					HttpStatus.CONFLICT);
+			return new ResponseEntity<Assertion>((Assertion) null, HttpStatus.CONFLICT);
 		}
 
 		Assertion newAssertion = assertionService.create(assertion);
@@ -203,7 +189,7 @@ public class AssertionController {
 
 		assertion.setAssertionId(existing.getAssertionId());
 
-		return assertionService.update(assertion);
+		return assertionService.save(assertion);
 	}
 
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.PUT)
@@ -232,49 +218,37 @@ public class AssertionController {
 			@ApiParam("The prospective version to be validated.") @RequestParam final String prospectiveReleaseVersion,
 			@ApiParam("The previous release version. Not required when there is no previous release.") @RequestParam(required = false) final String previousReleaseVersion) {
 		final Assertion assertion = find(id);
-
 		if (assertion == null) {
-			return new ResponseEntity<Map<String, Object>>(
-					(Map<String, Object>) null, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Map<String, Object>>((Map<String, Object>) null, HttpStatus.NOT_FOUND);
 		}
 
 		// Creating a list of 1 here so we can use the same code and receive the
 		// same json as response
-		final Collection<Assertion> assertions = new ArrayList<Assertion>(
-				Arrays.asList(assertion));
+		final Collection<Assertion> assertions = new ArrayList<Assertion>(Arrays.asList(assertion));
 
-		final ExecutionConfig config = new ExecutionConfig(runId);
+		final MysqlExecutionConfig config = new MysqlExecutionConfig(runId);
 		Map<String, Object> failures = new HashMap<String, Object>();
 
-		if ((prospectiveReleaseVersion != null)
-				&& !releaseDataManager
-						.isKnownRelease(prospectiveReleaseVersion)) {
-			failures.put("failureMessage", "Release version not found:"
-					+ prospectiveReleaseVersion);
+		if (prospectiveReleaseVersion != null && !releaseDataManager.isKnownRelease(prospectiveReleaseVersion)) {
+			failures.put("failureMessage", "Release version not found:" + prospectiveReleaseVersion);
 
-			return new ResponseEntity<Map<String, Object>>(failures,
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Map<String, Object>>(failures, HttpStatus.NOT_FOUND);
 		}
 
 		config.setProspectiveVersion(prospectiveReleaseVersion);
 		config.setPreviousVersion(previousReleaseVersion);
 
-		if ((previousReleaseVersion != null)
-				&& !releaseDataManager.isKnownRelease(previousReleaseVersion)) {
-			failures.put("failureMessage", "Release version not found:"
-					+ previousReleaseVersion);
+		if (previousReleaseVersion != null && !releaseDataManager.isKnownRelease(previousReleaseVersion)) {
+			failures.put("failureMessage", "Release version not found:" + previousReleaseVersion);
 
-			return new ResponseEntity<Map<String, Object>>(failures,
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Map<String, Object>>(failures, HttpStatus.NOT_FOUND);
 		}
 
 		if (previousReleaseVersion == null) {
 			config.setFirstTimeRelease(true);
 		}
 
-		return new ResponseEntity<Map<String, Object>>(
-				assertionHelper.assertAssertions(assertions, config),
-				HttpStatus.OK);
+		return new ResponseEntity<Map<String, Object>>(assertionHelper.assertAssertions(assertions, config), HttpStatus.OK);
 	}
 
 	/**
@@ -288,23 +262,19 @@ public class AssertionController {
 		if ((id == null) || id.isEmpty()) {
 			throw new InvalidFormatException("Id can't be null or empty");
 		}
-
 		if (id.contains("-")) {
 			try {
 				UUID uuid = UUID.fromString(id);
-
-				return assertionService.find(uuid);
+				return assertionService.findAssertionByUUID(uuid);
 			} catch (IllegalArgumentException e) {
 				throw new InvalidFormatException("Id is not a valid uuid:" + id);
 			}
 		} else {
 			try {
 				Long longId = new Long(id);
-
 				return assertionService.find(longId);
 			} catch (IllegalArgumentException e) {
-				throw new InvalidFormatException(
-						"Id is not a valid assertion id:" + id);
+				throw new InvalidFormatException("Id is not a valid assertion id:" + id);
 			}
 		}
 	}

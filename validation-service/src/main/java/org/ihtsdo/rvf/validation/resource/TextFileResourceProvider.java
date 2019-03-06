@@ -11,13 +11,11 @@ import java.util.List;
 
 public class TextFileResourceProvider implements ResourceProvider {
 
-	private final String fileName;
 	private File file;
 	private List<String> fileNames;
 
 	public TextFileResourceProvider(File file, String fileName) {
 		this.file = file;
-		this.fileName = fileName;
 		fileNames = new ArrayList<>();
 		fileNames.add(fileName);
 	}

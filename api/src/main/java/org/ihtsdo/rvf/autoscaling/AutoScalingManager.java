@@ -12,16 +12,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueBrowser;
 import javax.jms.Session;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.pool.PooledConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,38 +32,28 @@ public class AutoScalingManager {
 	@Autowired
 	private InstanceManager instanceManager;
 	
-	@Autowired
-	private ActiveMQConnectionFactory connectionFactory;
-	
+	@Value("${rvf.execution.isAutoScalingEnabled}")
 	private boolean isAutoScallingEnabled;
 	
+	@Value("${rvf.validation.queue.name}")
 	private String queueName;
 	
 	private static int lastPolledQueueSize;
 
+	@Value("${rvf.autoscaling.maxInstances}")
 	private int maxRunningInstance;
 
 	private ExecutorService executorService;
 	
-	private PooledConnectionFactory pooledConnectionFactory;
+	@Autowired
+	private ConnectionFactory connectionFactory;
 	
 	private final static AtomicBoolean shutDown = new AtomicBoolean(false);
-
-	public AutoScalingManager(Boolean isAutoScalling, String destinationQueueName, Integer maxRunningInstance) {
-		isAutoScallingEnabled = isAutoScalling.booleanValue();
-		queueName = destinationQueueName;
-		this.maxRunningInstance = maxRunningInstance;
-
-	}
 
 	@PostConstruct
 	public void init() {
 		logger.info("isAutoScalingEnabled:" + isAutoScallingEnabled);
 		if (isAutoScallingEnabled) {
-			pooledConnectionFactory = new PooledConnectionFactory(connectionFactory);
-			pooledConnectionFactory.setMaxConnections(2);
-			pooledConnectionFactory.setMaximumActiveSessionPerConnection(1);
-			pooledConnectionFactory.start();
 			executorService = Executors.newSingleThreadExecutor();
 			executorService.submit(new Runnable() {
 				@Override
@@ -88,7 +78,7 @@ public class AutoScalingManager {
 					lastCheckTime = LocalTime.now();
 				} else {
 					int current = getQueueSize();
-					if (current != lastPolledQueueSize || hourElapsedSinceLastCheck(lastCheckTime)) {
+					if (current != lastPolledQueueSize || timeElapsedSinceLastCheck(lastCheckTime)) {
 						logger.info("Total messages in queue:" + current);
 						activeInstances = instanceManager.getActiveInstances();
 						lastCheckTime = LocalTime.now();
@@ -124,8 +114,9 @@ public class AutoScalingManager {
 		}
 	}
 	
-	private boolean hourElapsedSinceLastCheck(LocalTime lastCheckTime) {
-		return Duration.between(lastCheckTime, LocalTime.now()).abs().toHours() >= 1;
+	private boolean timeElapsedSinceLastCheck(LocalTime lastCheckTime) {
+		//Check every 10 minutes
+		return Duration.between(lastCheckTime, LocalTime.now()).abs().toMinutes() >= 10;
 	}
 
 	private int getTotalInstancesToCreate(int currentMsgSize, int currentActiveInstances, int maxRunningInstance) {
@@ -157,7 +148,7 @@ public class AutoScalingManager {
 			if (shutDown.get()) {
 				return counter;
 			}
-			connection = pooledConnectionFactory.createConnection();
+			connection = connectionFactory.createConnection();
 			connection.start();
 			Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			Queue tempQueue = session.createQueue(queueName);
@@ -186,9 +177,6 @@ public class AutoScalingManager {
 	  shutDown.set(true);
 	  if (executorService != null) {
 		  executorService.shutdownNow();
-	  }
-	  if (pooledConnectionFactory != null) {
-		  pooledConnectionFactory.stop();
 	  }
 	}
 }

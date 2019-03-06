@@ -1,13 +1,12 @@
 package org.ihtsdo.rvf.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-
-import com.wordnik.swagger.annotations.ApiModel;
 
 /**
  * Class represents the association between an assertion and a test, here we determine whether the test is active
@@ -18,17 +17,16 @@ import com.wordnik.swagger.annotations.ApiModel;
 
 @Entity
 @Table(name = "assertion_test")
-@ApiModel(description="AssertionTest model")
 public class AssertionTest {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	private Test test;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	private Assertion assertion;
 
 	private boolean inactive;
