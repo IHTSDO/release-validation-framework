@@ -14,7 +14,8 @@
 		'<ASSERTIONUUID>',
 		a.conceptid,
 		concat('Definition: id=',a.id, ' references a term which is duplicated.') 	
-	from curr_textdefinition_s a 
-	group by a.typeid, a.languagecode, a.conceptid, binary a.term
-	having count(a.id) > 1;
+	from curr_textdefinition_s a,
+	(select b.term from curr_textdefinition_s b group by b.typeid, b.conceptid, b.languagecode, binary b.term having count(b.id) > 1) duplicate
+	where a.term = duplicate.term
+	and a.active = 1;
 	commit;

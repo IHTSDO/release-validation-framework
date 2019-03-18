@@ -1524,10 +1524,19 @@
       "conceptId" : "278512001",
       "detail" : "Definition: id=2995945017 references a term which is duplicated."
     }, {
+      "conceptId" : "278512001",
+      "detail" : "Definition: id=2995945020 references a term which is duplicated."
+    }, {
       "conceptId" : "703672002",
       "detail" : "Definition: id=3005197017 references a term which is duplicated."
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Definition: id=3005197021 references a term which is duplicated."
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Definition: id=3008913022 references a term which is duplicated."
     } ],
-    "totalFailed" : 2
+    "totalFailed" : 5
   }, {
     "assertionName" : "All source ids found in the Inferred Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "72184790-79b9-11e1-b0c4-0800200c9a66",
@@ -1611,5 +1620,5 @@
       "detail" : "CONCEPT: id=702386002: Concept contains two or more versions of the immutable values in Stated Relationships."
     } ],
     "totalFailed" : 1
-  }]
-  }
+  } ]
+}
