@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 82,
-  "totalAssertionsFailed" : 65,
+  "totalAssertionsRun" : 86,
+  "totalAssertionsFailed" : 67,
   "results" : [ {
     "assertionName" : "Every active concept defined in the Norwegian extension has a preferred FSN in the en-US language refset.",
     "assertionUuid" : "853bfc3a-1635-11e8-a510-3c15c2c6e32e",
@@ -513,6 +513,11 @@
     } ],
     "totalFailed" : 14
   }, {
+    "assertionName" : "Every active concept has one active preferred term in the Irish language refset.",
+    "assertionUuid" : "d91e6e62-8195-4655-b7d5-6c44fcfd7490",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Swedish language refset.",
     "assertionUuid" : "dbb49e0c-e5b0-4676-a815-70fb9f3b468e",
     "firstNInstances" : [ {
@@ -608,6 +613,35 @@
     "assertionUuid" : "e2651cd2-cbb1-427e-a444-f9d9ee446b3a",
     "firstNInstances" : null,
     "totalFailed" : 0
+  }, {
+    "assertionName" : "Newly added active concept has one active preferred term in the Estonian language refset.",
+    "assertionUuid" : "e2ff1794-33fd-41db-8f35-38fcb35fd56b",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: is added recently in the international release but has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: is added recently in the international release but has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: is added recently in the international release but has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: is added recently in the international release but has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: is added recently in the international release but has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: is added recently in the international release but has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: is added recently in the international release but has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "733073007",
+      "detail" : "Concept: id=733073007: is added recently in the international release but has no active preferred term in the Estonian language refset"
+    } ],
+    "totalFailed" : 8
   }, {
     "assertionName" : "ReferenceComponentIds refers to valid concepts in the LOINC ExpressionAssociationRefset snapshot file.",
     "assertionUuid" : "e33922c3-5200-458b-b8f3-2cd08252234e",
@@ -757,6 +791,11 @@
       "detail" : "Concept: id=733073007: is added recently in the international release but has no active preferred term in the Belgian French language refset"
     } ],
     "totalFailed" : 8
+  }, {
+    "assertionName" : "Every active concept defined in the Estonian extension has a preferred FSN in the en-US language refset.",
+    "assertionUuid" : "ff94e202-39b9-47a1-bd69-3bd3d1a4210e",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "Every concept's FSN exists exactly once in each language refset.",
     "assertionUuid" : "ffe6c560-7856-11e1-b0c4-0800200c9a66",
@@ -995,6 +1034,11 @@
     } ],
     "totalFailed" : 12
   }, {
+    "assertionName" : "Every active concept defined in the Irish extension has a preferred FSN in the en-US language refset.",
+    "assertionUuid" : "28fbe41f-132b-43b6-a7e2-ee1454dd7736",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Swiss French language refset.",
     "assertionUuid" : "29599632-f175-441a-aac3-ce12d9bee0a9",
     "firstNInstances" : [ {
@@ -1153,10 +1197,80 @@
     } ],
     "totalFailed" : 3
   }, {
+    "assertionName" : "Every active concept from international release is recommended to have one active preferred term in the Estonian language refset.",
+    "assertionUuid" : "3ee04759-fe5e-424b-af4a-693edd09870b",
+    "firstNInstances" : [ {
+      "conceptId" : "138875005",
+      "detail" : "Concept: id=138875005: has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "702850005",
+      "detail" : "Concept: id=702850005: has no active preferred term in the Estonian language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Estonian language refset"
+    } ],
+    "totalFailed" : 12
+  }, {
     "assertionName" : "Every active concept has one active preferred term in the Swiss German language refset.",
     "assertionUuid" : "42927cbf-c914-4bdf-81a9-8934f0f8eb6b",
     "firstNInstances" : null,
     "totalFailed" : 0
+  }, {
+    "assertionName" : "Every active concept from international release is recommended to have one active preferred term in the Irish language refset.",
+    "assertionUuid" : "44eba8c9-2dbd-43b7-9380-3bbbd816828d",
+    "firstNInstances" : [ {
+      "conceptId" : "138875005",
+      "detail" : "Concept: id=138875005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702411003",
+      "detail" : "Concept: id=702411003: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702769005",
+      "detail" : "Concept: id=702769005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Concept: id=703860006: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703155005",
+      "detail" : "Concept: id=703155005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Concept: id=702386002: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703649005",
+      "detail" : "Concept: id=703649005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "703672002",
+      "detail" : "Concept: id=703672002: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "702850005",
+      "detail" : "Concept: id=702850005: has no active preferred term in the Irish language refset"
+    }, {
+      "conceptId" : "700132006",
+      "detail" : "Concept: id=700132006: has no active preferred term in the Irish language refset"
+    } ],
+    "totalFailed" : 12
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the immutable values in the description snapshot.",
     "assertionUuid" : "48118153-d32a-4d1c-bfbc-23ed953e9991",
@@ -1198,6 +1312,32 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
+    "assertionName" : "ConceptId value refers to valid concept identifier in the DEFINITION snapshot.",
+    "assertionUuid" : "5a83783e-3366-48bd-a50d-8f3a53812174",
+    "firstNInstances" : [ {
+      "conceptId" : "703218000",
+      "detail" : "DEFINITION: id=3008054012 refers to an invalid concept id in the Text Definition snapshot."
+    }, {
+      "conceptId" : "700237005",
+      "detail" : "DEFINITION: id=2989691019 refers to an invalid concept id in the Text Definition snapshot."
+    }, {
+      "conceptId" : "3961000119101",
+      "detail" : "DEFINITION: id=2989562013 refers to an invalid concept id in the Text Definition snapshot."
+    }, {
+      "conceptId" : "702316007",
+      "detail" : "DEFINITION: id=3010125011 refers to an invalid concept id in the Text Definition snapshot."
+    }, {
+      "conceptId" : "278512001",
+      "detail" : "DEFINITION: id=2995945017 refers to an invalid concept id in the Text Definition snapshot."
+    }, {
+      "conceptId" : "278512001",
+      "detail" : "DEFINITION: id=2995945020 refers to an invalid concept id in the Text Definition snapshot."
+    }, {
+      "conceptId" : "699220008",
+      "detail" : "DEFINITION: id=2983208019 refers to an invalid concept id in the Text Definition snapshot."
+    } ],
+    "totalFailed" : 7
+  }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Irish language refset.",
     "assertionUuid" : "5afdd601-407e-4955-9a23-9ee0780b231c",
     "firstNInstances" : [ {
@@ -1227,76 +1367,10 @@
     } ],
     "totalFailed" : 8
   }, {
-    "assertionName" : "Every active concept from international release is recommended to have one active preferred term in the Irish language refset.",
-    "assertionUuid" : "44eba8c9-2dbd-43b7-9380-3bbbd816828d",
-    "firstNInstances" : [ {
-      "conceptId" : "138875005",
-      "detail" : "Concept: id=138875005: has no active preferred term in the Irish language refset"
-    }, {
-      "conceptId" : "702411003",
-      "detail" : "Concept: id=702411003: has no active preferred term in the Irish language refset"
-    }, {
-      "conceptId" : "702769005",
-      "detail" : "Concept: id=702769005: has no active preferred term in the Irish language refset"
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Concept: id=703860006: has no active preferred term in the Irish language refset"
-    }, {
-      "conceptId" : "703155005",
-      "detail" : "Concept: id=703155005: has no active preferred term in the Irish language refset"
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "Concept: id=702386002: has no active preferred term in the Irish language refset"
-    }, {
-      "conceptId" : "703649005",
-      "detail" : "Concept: id=703649005: has no active preferred term in the Irish language refset"
-    }, {
-      "conceptId" : "703672002",
-      "detail" : "Concept: id=703672002: has no active preferred term in the Irish language refset"
-    }, {
-      "conceptId" : "702850005",
-      "detail" : "Concept: id=702850005: has no active preferred term in the Irish language refset"
-    }, {
-      "conceptId" : "700132006",
-      "detail" : "Concept: id=700132006: has no active preferred term in the Irish language refset"
-    } ],
-    "totalFailed" : 12
-  },{
-    "assertionName" : "Every active concept has one active preferred term in the Irish language refset.",
-    "assertionUuid" : "d91e6e62-8195-4655-b7d5-6c44fcfd7490",
+    "assertionName" : "Every active concept has one active preferred term in the Estonian language refset.",
+    "assertionUuid" : "5f2d18dd-0507-4ed5-8eac-4f6ca0dd03e1",
     "firstNInstances" : null,
     "totalFailed" : 0
-  },{
-    "assertionName" : "Every active concept defined in the Irish extension has a preferred FSN in the en-US language refset.",
-    "assertionUuid" : "28fbe41f-132b-43b6-a7e2-ee1454dd7736",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "ConceptId value refers to valid concept identifier in the DEFINITION snapshot.",
-    "assertionUuid" : "5a83783e-3366-48bd-a50d-8f3a53812174",
-    "firstNInstances" : [ {
-      "conceptId" : "703218000",
-      "detail" : "DEFINITION: id=3008054012 refers to an invalid concept id in the Text Definition snapshot."
-    }, {
-      "conceptId" : "700237005",
-      "detail" : "DEFINITION: id=2989691019 refers to an invalid concept id in the Text Definition snapshot."
-    }, {
-      "conceptId" : "3961000119101",
-      "detail" : "DEFINITION: id=2989562013 refers to an invalid concept id in the Text Definition snapshot."
-    }, {
-      "conceptId" : "702316007",
-      "detail" : "DEFINITION: id=3010125011 refers to an invalid concept id in the Text Definition snapshot."
-    }, {
-      "conceptId" : "278512001",
-      "detail" : "DEFINITION: id=2995945017 refers to an invalid concept id in the Text Definition snapshot."
-    }, {
-      "conceptId" : "278512001",
-      "detail" : "DEFINITION: id=2995945020 refers to an invalid concept id in the Text Definition snapshot."
-    }, {
-      "conceptId" : "699220008",
-      "detail" : "DEFINITION: id=2983208019 refers to an invalid concept id in the Text Definition snapshot."
-    } ],
-    "totalFailed" : 7
   }, {
     "assertionName" : "The current Inferred Relationship snapshot file does not contain duplicate Relationship Ids.",
     "assertionUuid" : "6336ec40-79b9-11e1-b0c4-0800200c9a66",
@@ -1537,5 +1611,5 @@
       "detail" : "CONCEPT: id=702386002: Concept contains two or more versions of the immutable values in Stated Relationships."
     } ],
     "totalFailed" : 1
-  } ]
-}
+  }]
+  }

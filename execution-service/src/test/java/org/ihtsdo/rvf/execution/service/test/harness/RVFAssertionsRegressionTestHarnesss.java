@@ -80,7 +80,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	private List<String> rf2FilesLoaded = new ArrayList<>();
 	private boolean isRunFirstTime = true;
 	//Reload test data from zip files
-	private boolean reloadTestData = false;
+	private boolean reloadTestData = true;
 	//set it to true for testing mysql binary archive
 	private boolean testMysqlBinaryArchive = false;
 	
@@ -177,6 +177,24 @@ public class RVFAssertionsRegressionTestHarnesss {
 		assertEquals(28, group.getAssertions().size());
 	}
 	
+	
+	@Test
+	public void testTotalAssertions() {
+		assertEquals(284, assertionService.count().longValue());
+	}
+	
+	@Test
+	public void testGetAssertionsForEEAuthoring() {
+		AssertionGroup group = assertionService.getAssertionGroupByName("ee-authoring");
+		assertEquals(4, group.getAssertions().size());
+	}
+	
+	
+	@Test
+	public void testTotalGroups() {
+		assertEquals(29, assertionService.getAllAssertionGroups().size());
+	}
+	
 	@Test
 	public void testGetAssertionsForCommonAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
@@ -185,7 +203,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("48118153-d32a-4d1c-bfbc-23ed953e9991");
+		runAssertionsTest("26c25479-c3ba-47f2-9851-bb05ae42ad48");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
