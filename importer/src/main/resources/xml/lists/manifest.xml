@@ -269,7 +269,7 @@
 			<keywords>There is a 1:1 relationship between the id and the key values in the ASSOCIATION REFSET snapshot file.</keywords>
 		</script>
 		<script uuid="bec23e05-e977-4190-aa6a-137e5742f513" category="file-centric-validation" sqlFile="file-centric-snapshot-association-valid-referencedcomponentid.sql" text="Referencedcomponentid refers to valid concepts in the ASSOCIATION REFSET snapshot file."  >
-			<keywords>Referencedcomponentid refers to valid concepts in the ASSOCIATION REFSET snapshot file.</keywords>
+			<keywords>Referencedcomponentid refers to valid components in the ASSOCIATION REFSET snapshot file.</keywords>
 		</script>
 		<script uuid="35ec824d-b53d-4567-833e-8ce79774acae" category="file-centric-validation" sqlFile="file-centric-snapshot-association-valid-targetcomponentid.sql" text="TargetComponentId refers to valid concepts in the ASSOCIATION REFSET snapshot file."  >
 			<keywords>TargetComponentId refers to valid concepts in the ASSOCIATION REFSET snapshot file.</keywords>
