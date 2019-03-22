@@ -23,6 +23,8 @@
     union 
         select sourceid from curr_stated_relationship_d
     union
+        select referencedcomponentid from curr_owlexpressionrefset_d
+    union
         select b.conceptid from curr_langrefset_d a 
         left join curr_description_s b on a.referencedcomponentid=b.id
     union 
