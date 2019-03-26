@@ -3,4 +3,5 @@
 * text=auto
 
 # Convert to CRLF line endings on checkout
-*.txt text eol=crlf
+sct2*.txt text eol=crlf
+der2*.txt text eol=crlf
