@@ -1,4 +1,6 @@
 # Normalize file endings for all text files detected by Git
 #https://git-scm.com/docs/gitattributes#gitattributes-Settostringvalueauto
-*	text=auto
-*.txt text
+* text=auto
+
+# Convert to CRLF line endings on checkout
+*.txt text eol=crlf
