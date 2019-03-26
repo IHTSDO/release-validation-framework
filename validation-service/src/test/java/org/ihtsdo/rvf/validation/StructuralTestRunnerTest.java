@@ -48,7 +48,7 @@ public class StructuralTestRunnerTest {
 
 	@Test
 	public void testExecute_rel2SimpleRefset() throws Exception {
-		String fileName = "rel2_Refset_SimpleDelta_INT_20140131.txt";
+		String fileName = "der2_Refset_SimpleDelta_INT_20140131.txt";
 		TextFileResourceProvider provider = new TextFileResourceProvider(getFile("/" + fileName), fileName);
 
 		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), true);
