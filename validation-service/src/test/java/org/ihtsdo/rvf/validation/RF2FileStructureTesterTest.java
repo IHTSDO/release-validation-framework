@@ -39,7 +39,7 @@ public class RF2FileStructureTesterTest {
 
 	@Test
 	public void testFileWithoutLineTerminatorForLastLine() throws Exception {
-		executeRun("/der2_Refset_SimpleDelta_INT_20140131_LastLineWithoutTerminator.txt", false);
+		executeRun("/der2_Refset_SimpleDelta_LastLineWithoutTerminator.txt", false);
 		assertEquals("Total errors not matching", 1, testReport.getNumErrors());
 	}
 	
