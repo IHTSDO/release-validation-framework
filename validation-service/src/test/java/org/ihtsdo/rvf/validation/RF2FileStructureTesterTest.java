@@ -33,13 +33,13 @@ public class RF2FileStructureTesterTest {
 	
 	@Test
 	public void testFileWithCRLFAsLineTerminator() throws Exception {
-		executeRun("/rel2_Refset_SimpleDelta_INT_20140131.txt", false);
+		executeRun("/der2_Refset_SimpleDelta_INT_20140131.txt", false);
 		assertEquals("Total errors not matching", 0, testReport.getNumErrors());
 	}
 
 	@Test
 	public void testFileWithoutLineTerminatorForLastLine() throws Exception {
-		executeRun("/rel2_Refset_SimpleDelta_INT_20140131_LastLineWithoutTerminator.txt", false);
+		executeRun("/der2_Refset_SimpleDelta_INT_20140131_LastLineWithoutTerminator.txt", false);
 		assertEquals("Total errors not matching", 1, testReport.getNumErrors());
 	}
 	
