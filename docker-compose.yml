@@ -1,0 +1,43 @@
+version: '2.1'
+
+volumes:
+  mysql:
+    driver: local
+
+services:
+  db:
+    image: webhippie/mariadb:latest
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=snomed
+      - MARIADB_USERNAME=rvf_user
+      - MARIADB_PASSWORD=snomedrvf
+      - MARIADB_DATABASE=rvf_master
+      - MARIADB_MAX_ALLOWED_PACKET=128M
+      - MARIADB_INNODB_LOG_FILE_SIZE=64M
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      rvf_net:
+        aliases:
+         - sql
+    volumes:
+      - mysql:/var/lib/mysql
+
+  rvf:
+    image: snomedinternational/rvf:latest
+    container_name: rvf
+    depends_on:
+      - db
+    entrypoint: java -Xms512m -Xmx4g -DrvfConfigLocation=/app/config -jar api.jar --server.port=8081 --server.servlet.context-path=/api
+    ports:
+      - 8081:8081
+    networks:
+      - rvf_net
+
+
+networks:
+  rvf_net:
