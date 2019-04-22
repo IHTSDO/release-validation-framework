@@ -186,7 +186,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	@Test
 	public void testGetAssertionsForEEAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("ee-authoring");
-		assertEquals(4, group.getAssertions().size());
+		assertEquals(16, group.getAssertions().size());
 	}
 	
 	
@@ -198,7 +198,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	@Test
 	public void testGetAssertionsForCommonAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
-		assertEquals(83, group.getAssertions().size());
+		assertEquals(71, group.getAssertions().size());
 	}
 	
 	@Test
