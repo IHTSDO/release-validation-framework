@@ -2,11 +2,13 @@ package org.ihtsdo.rvf.importer;
 
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.COMPONENT_CENTRIC_VALIDATION;
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.FILE_CENTRIC_VALIDATION;
+import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.INT_AUTHORING;
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.RELEASE_TYPE_VALIDATION;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -271,6 +273,10 @@ public class AssertionGroupImporter {
 				if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
 					continue;
 				}
+				//exclude stated relationship assertions from common-authoring as we only run them for MS products for now
+				if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+					continue;
+				}
 				assertionService.addAssertionToGroup(assertion, group);
 				counter++;
 			}
@@ -283,6 +289,14 @@ public class AssertionGroupImporter {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(groupName.getName());
 		group = assertionService.createAssertionGroup(group);
+		if(!AssertionGroupName.INT_AUTHORING.equals(groupName)) {
+			for (String statedRelationshipAssertionId : STATED_RELATIONSHIP_ASSERTIONS) {
+				Assertion assertion	 = assertionService.getAssertionByUuid(UUID.fromString(statedRelationshipAssertionId));
+				if(!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
+					group.addAssertion(assertion);
+				}
+			}
+		}
 		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWords("," + groupName.getReleaseCenter(), false);
 		for (Assertion assertion : allAssertions) {
 			//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
@@ -293,8 +307,7 @@ public class AssertionGroupImporter {
 			if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
 				continue;
 			}
-			
-			if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
+			if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()))  {
 				assertionService.addAssertionToGroup(assertion, group);
 			}
 			if ( AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
