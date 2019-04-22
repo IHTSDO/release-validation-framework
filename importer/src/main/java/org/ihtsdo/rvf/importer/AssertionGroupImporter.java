@@ -103,18 +103,22 @@ public class AssertionGroupImporter {
 
 	private static final String[] STATED_RELATIONSHIP_ASSERTIONS = {
 			"994b5ff0-79b9-11e1-b0c4-0800200c9a66",
+			"5555c400-7d08-11e1-b0c4-0800200c9a66",
 			"4d32c9d0-7d08-11e1-b0c4-0800200c9a66",
 			"cab60a2f-4239-4933-91d6-dc910a8ac08b",
 			"a4fcd810-79b9-11e1-b0c4-0800200c9a66",
+			"1b21ec4b-b6db-42fe-ae7e-f79e24e25b7f",
 			"b1d75e1c-ea12-4567-a8b9-f69923a57cdf",
 			"6dbaed71-f031-4290-b74f-f35561c2e283",
 			"50e809a0-7d08-11e1-b0c4-0800200c9a66",
+			"49487040-7d08-11e1-b0c4-0800200c9a66",
 			"59b574a0-7d08-11e1-b0c4-0800200c9a66",
 			"89ceaf00-79b9-11e1-b0c4-0800200c9a66",
 			"23f18cc4-d2d7-4759-96e3-c7d0f0b30a3a",
 			"01ce3ac9-d168-4333-99d7-8d2f228f5ec9",
 			"7e453140-79b9-11e1-b0c4-0800200c9a66",
 			"fd8ed390-94e9-4fd9-9e20-902a24273dca",
+			"9f84d9a0-79b9-11e1-b0c4-0800200c9a66",
 			"9074a620-79b9-11e1-b0c4-0800200c9a66",
 			"5d27df10-7d08-11e1-b0c4-0800200c9a66",
 			"2a938c7e-0803-44a1-8358-339daa87ee39"
