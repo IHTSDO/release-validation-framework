@@ -12,3 +12,4 @@ id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignific
 3005197021	20140731	1	900000000000207008	703672002	es	900000000000550004	Arthralgia of knee more than six months.	900000000000017005
 2983208019	20140731	0	900000000000207008	699220008	en	900000000000550004	A common taste disorder where there is a lingering, often unpleasant taste despite the absence of any stimulus to initiate the distorted taste.	900000000000017002
 3008913022	20140731	1	900000000000207008	703672002	en	900000000000550004	Arthralgia of knee less than three months.	900000000000017005
+2983208030	20140731	1	900000000000207008	733073007	en	900000000000550004	Characterized by upper and lower incisors that have emerged forward making the teeth and lips protrude.	900000000000017005

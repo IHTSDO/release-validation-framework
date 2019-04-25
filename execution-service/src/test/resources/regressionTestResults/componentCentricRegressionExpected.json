@@ -1028,8 +1028,8 @@
     "assertionName" : "There is an equivalent definition in the en-us and en-gb language when provided.",
     "assertionUuid" : "7c406d6c-7e30-4aa1-b99d-e00b4e2d52a5",
     "firstNInstances" : [ {
-      "conceptId" : "699683004",
-      "detail" : "ConceptId=699683004 has definition in EN-US but no equivalent found for EN-GB"
+      "conceptId" : "733073007",
+      "detail" : "ConceptId=733073007 has definition in EN-US but no equivalent found for EN-GB"
     } ],
     "totalFailed" : 1
   }, {
