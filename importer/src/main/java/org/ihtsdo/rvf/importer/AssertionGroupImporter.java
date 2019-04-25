@@ -273,10 +273,11 @@ public class AssertionGroupImporter {
 				if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
 					continue;
 				}
+				//Re-enable the Stated relationship assertions for INT on SCA
 				//exclude stated relationship assertions from common-authoring as we only run them for MS products for now
-				if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				/*if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
 					continue;
-				}
+				}*/
 				assertionService.addAssertionToGroup(assertion, group);
 				counter++;
 			}
@@ -289,14 +290,15 @@ public class AssertionGroupImporter {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(groupName.getName());
 		group = assertionService.createAssertionGroup(group);
-		if(!AssertionGroupName.INT_AUTHORING.equals(groupName)) {
+		//Re-enable the Stated relationship assertions for INT on SCA
+		/*if(!AssertionGroupName.INT_AUTHORING.equals(groupName)) {
 			for (String statedRelationshipAssertionId : STATED_RELATIONSHIP_ASSERTIONS) {
 				Assertion assertion	 = assertionService.getAssertionByUuid(UUID.fromString(statedRelationshipAssertionId));
 				if(!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
 					group.addAssertion(assertion);
 				}
 			}
-		}
+		}*/
 		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWords("," + groupName.getReleaseCenter(), false);
 		for (Assertion assertion : allAssertions) {
 			//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
@@ -393,7 +395,7 @@ public class AssertionGroupImporter {
 		int statedRelationshipAssertionCount = statedRelationshipAssertionIds.size();
 		int count = 0;
 		for (Assertion assertion : allAssertions) {
-			if(statedRelationshipAssertionIds.contains(assertion.getUuid())) {
+			if(statedRelationshipAssertionIds.contains(assertion.getUuid().toString())) {
 				assertionService.addAssertionToGroup(assertion, group);
 				count++;
 				if(count == statedRelationshipAssertionCount) break;
