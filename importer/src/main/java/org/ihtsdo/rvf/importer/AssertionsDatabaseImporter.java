@@ -43,10 +43,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 	@Transactional
 	public class AssertionsDatabaseImporter {
 
-		private static final String FILE_SEPARATOR = System.getProperty("file.separator");
 		private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
 		private static final String JSON_EXTENSION = ".json";
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
+		private static final String RESOURCE_PATH_SEPARATOR = "/";
 	
 		protected ObjectMapper objectMapper = new ObjectMapper();
 		private Map<String, String> lookupMap = new HashMap<>();
@@ -95,7 +95,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 								}
 								logger.info("category = " + category);
 
-								String sqlResourceFileName = sqlResourcesFolderLocation+ FILE_SEPARATOR + category + FILE_SEPARATOR + sqlFileName;
+								String sqlResourceFileName = sqlResourcesFolderLocation+ RESOURCE_PATH_SEPARATOR + category + RESOURCE_PATH_SEPARATOR + sqlFileName;
 								InputStream sqlInputStream = getClass().getResourceAsStream( sqlResourceFileName);
 								if (sqlInputStream != null) {
 									final String sqlString = readStream(sqlInputStream);

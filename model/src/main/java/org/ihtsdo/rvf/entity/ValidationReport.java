@@ -81,6 +81,22 @@ public class ValidationReport {
 		return assertionsWarning;
 	}
 
+	public void setTotalTestsRun(int totalTestsRun) {
+		this.totalTestsRun = totalTestsRun;
+	}
+
+	public void setTotalSkips(int totalSkips) {
+		this.totalSkips = totalSkips;
+	}
+
+	public void setTotalWarnings(int totalWarnings) {
+		this.totalWarnings = totalWarnings;
+	}
+
+	public void setTotalFailures(int totalFailures) {
+		this.totalFailures = totalFailures;
+	}
+
 	public void addSkippedAssertions(List<TestRunItem> skippedItems){
 		if (hasItems(skippedItems)) {
 			assertionsSkipped.addAll(skippedItems);
@@ -114,6 +130,10 @@ public class ValidationReport {
 			int noOfItems = passedItems.size();
 			totalTestsRun += noOfItems;
 		}
+	}
+
+	public void setTimeTakenInSeconds(long timeTakenInSeconds) {
+		this.timeTakenInSeconds = timeTakenInSeconds;
 	}
 
 	public void addTimeTaken(long seconds){

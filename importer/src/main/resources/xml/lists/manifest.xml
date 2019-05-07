@@ -195,7 +195,7 @@
 		<script uuid="eff30fb0-7856-11e1-b0c4-0800200c9a66" category="release-type-validation" sqlFile="release-type-snapshot-language-successive-states.sql" text="All language refset members inactivated in current snapshot must have been active in the previous release."/>
 		<script uuid="89ceaf00-79b9-11e1-b0c4-0800200c9a66" category="release-type-validation" sqlFile="release-type-snapshot-stated-relationship-successive-states.sql" text="All stated relationships inactivated in current release must have been active in the previous release."/>
 		<script uuid="5c6b6bc0-79b9-11e1-b0c4-0800200c9a66" category="release-type-validation" sqlFile="release-type-snapshot-inferred-relationship-successive-states.sql" text="All relationships inactivated in current release must have been active in the previous release."/>
-		<script uuid="26c25479-c3ba-47f2-9851-bb05ae42ad48" category="release-type-validation,INT" sqlFile="release-type-snapshot-owl-expression-successive-states.sql" text="All OWL Expression inactivated in current release must have been active in the previous release."/>
+
 		<!-- across multiple files in Current snapshot-->
 		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="release-type-validation" sqlFile="release-type-snapshot-unique-relationship-id.sql" text="The ids should be unique across the stated and inferred relationship snapshot files." />
 		<script uuid="560e6d0c-64e8-4726-9516-ae7a7606b0b3" category="release-type-validation" sqlFile="release-type-snapshot-unique-description-definition-id.sql" text="The ids should be unique across the description and text definition snapshot files." />
@@ -492,6 +492,18 @@
 		<script uuid="22d3065c-98d3-458e-b020-35eec49b4be3" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-association.sql" text="Newly inactive concepts must have an active historical association to an active concept - unless indicator NCEP." />
 		<script uuid="f7bd336c-4ced-48e3-881c-b61e23a19530" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-PT.sql" text="Concepts inactivated in this release cycle must have an active Preferred Term in both US and GB Language Reference Sets." />
 		<script uuid="db3f62b0-b824-463d-8d05-7974c81f3caa" category="component-centric-validation,INT" sqlFile="component-centric-delta-inactive-concepts-must-have-active-FSN.sql" text="Concepts inactivated in this release cycle must have an active FSN, preferred in both US and GB Language Reference Sets." />
+
+
+		<!-- OWL Expression files assertions -->
+		<script uuid="910844a8-97e5-4096-add2-e1734b941e10" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-owl-expression.sql" text="There must be actual changes made to previously published OWL Expression files in order for them to appear in the current delta." />
+		<script uuid="3d21913e-553b-4ce9-8b3b-b46601c60326" category="release-type-validation" sqlFile="release-type-full-delta-validation-owl-expression.sql" text="The current full OWL Expression file consists of the previously published full file and the changes for the current release"  />
+		<script uuid="26c25479-c3ba-47f2-9851-bb05ae42ad48" category="release-type-validation" sqlFile="release-type-snapshot-owl-expression-successive-states.sql" text="All OWL Expression inactivated in current release must have been active in the previous release."/>
+		<script uuid="2cc6624a-159b-4251-96b5-16b13b6bfdb4" category="release-type-validation" sqlFile="release-type-snapshot-validation-owl-expression.sql" text="The current OWL Expression snapshot file is an accurate derivative of the current full file"  />
+		<script uuid="13d797e0-e67d-46a7-96e9-761c3c2c84d5" category="release-type-validation" sqlFile="release-type-snapshot-delta-validation-owl-expression.sql" text="The current data in the OWL Expression snapshot file are the same as the data in the current delta file. "  />
+		<script uuid="3d4342fe-4698-4c6d-b519-d8d649c842e0" category="release-type-validation" sqlFile="release-type-full-validation-owl-expression.sql" text="The current OWL Expression full file contains all previously published data unchanged." />
+		<script uuid="21acfba1-d637-4913-a54d-987f4ac336d1" category="release-type-validation" sqlFile="release-type-delta-validation-owl-expression.sql" text="The current OWL Expression delta file is an accurate derivative of the current full file"  />
+
+		<script uuid="9fc3995b-f84d-46e1-b7cb-88f0fe8564e2" category="file-centric-validation" sqlFile="file-centric-snapshot-owl-expression-unique-id.sql" text="The current OWL Expression snapshot file does not contain duplicate Ids." />
 		
 		<!-- <script uuid="d55eee56-c5f2-44da-971b-86f39378fe38" category="file-centric-validation" sqlFile="file-centric-snapshot-relationship-must-not-be-both-stated-inferred.sql" text="Relationships should not exist in Stated Relationship and Relationship files at the same time" /> -->
 		<!-- rt added this as a template... -->

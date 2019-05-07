@@ -86,7 +86,7 @@ public class DroolsRulesValidationService {
 		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
 	}
 	
-	public void runDroolsAssertions(ValidationStatusReport statusReport, ValidationRunConfig validationConfig) throws RVFExecutionException {
+	public ValidationStatusReport runDroolsAssertions(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws RVFExecutionException {
 		long timeStart = new Date().getTime();
 		//Filter only Drools rules set from all the assertion groups
 		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
@@ -95,7 +95,7 @@ public class DroolsRulesValidationService {
 		//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
 		if (droolsRulesSets.isEmpty()) {
 			LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
-			return;
+			return statusReport;
 		}
 		try {
 			List<InvalidContent> invalidContents = null;
@@ -152,7 +152,8 @@ public class DroolsRulesValidationService {
 						modulesSet = Sets.newHashSet(moduleIds.split(","));
 					}
 				}
-				
+
+				//Get effectiveTime
 				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, testResourceManager);
 				String effectiveTime = validationConfig.getEffectiveTime();
 				if (StringUtils.isNotBlank(effectiveTime)) {
@@ -160,6 +161,8 @@ public class DroolsRulesValidationService {
 				} else {
 					effectiveTime = "";
 				}
+
+				//Unzip the release files
 				for (InputStream inputStream : snapshotsInputStream) {
 					String snapshotDirectoryPath = new ReleaseImporter().unzipRelease(inputStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
 					directoryPaths.add(snapshotDirectoryPath);
@@ -169,6 +172,7 @@ public class DroolsRulesValidationService {
 					deltaDirectoryPath = new ReleaseImporter().unzipRelease(deltaInputStream, ReleaseImporter.ImportType.DELTA).getAbsolutePath();
 				}
 
+				//Run validation
 				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, droolsRulesSets, effectiveTime, modulesSet);
 			} catch (ReleaseImportException | IOException e) {
 				throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
@@ -188,6 +192,8 @@ public class DroolsRulesValidationService {
 			List<TestRunItem> warningAssertions = new ArrayList<>();
 			int failureExportMax = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
 			Map<String, List<InvalidContent>> groupRules = new HashMap<>();
+
+			//Convert the Drools validation report into RVF report format
 			for (String rule : invalidContentMap.keySet()) {
 				TestRunItem validationRule = new TestRunItem();
 				validationRule.setTestType(TestType.DROOL_RULES);
@@ -244,6 +250,7 @@ public class DroolsRulesValidationService {
 				FileUtils.deleteQuietly(new File(directoryPath));
 			}
 		}
+		return statusReport;
 	}
 	
 

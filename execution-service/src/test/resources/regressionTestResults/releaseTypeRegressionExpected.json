@@ -1,7 +1,7 @@
 {
   "assertionType" : "release-type-validation",
-  "totalAssertionsRun" : 97,
-  "totalAssertionsFailed" : 97,
+  "totalAssertionsRun" : 103,
+  "totalAssertionsFailed" : 103,
   "results" : [ {
     "assertionName" : "There must be actual changes made to previously published complex map refset components in order for them to appear in the current delta.",
     "assertionUuid" : "80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
@@ -98,6 +98,14 @@
       "detail" : "Description: id=2989790017 is in SNAPSHOT file, but not in FULL file."
     } ],
     "totalFailed" : 33
+  }, {
+    "assertionName" : "There must be actual changes made to previously published OWL Expression files in order for them to appear in the current delta.",
+    "assertionUuid" : "910844a8-97e5-4096-add2-e1734b941e10",
+    "firstNInstances" : [ {
+      "conceptId" : "781497003",
+      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a97b4 is in the delta file, but no actual changes made since the previous release."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "New inactive states for existing components must have active states in the previous SIMPLE REFSET snapshot.",
     "assertionUuid" : "9190473a-29f7-40fc-b879-9ae0d038b681",
@@ -847,6 +855,14 @@
     } ],
     "totalFailed" : 18
   }, {
+    "assertionName" : "The current data in the OWL Expression snapshot file are the same as the data in the current delta file. ",
+    "assertionUuid" : "13d797e0-e67d-46a7-96e9-761c3c2c84d5",
+    "firstNInstances" : [ {
+      "conceptId" : "781497003",
+      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a97b4 is in delta but not in snapshot file."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "The current data in the Inferred Relationship snapshot file are the same as the data in the current delta file. ",
     "assertionUuid" : "177a7271-7986-433b-8506-fff39e6c1004",
     "firstNInstances" : [ {
@@ -959,6 +975,14 @@
       "detail" : "AtributeValue: id=002c2656-cc9d-5a1f-a6b2-4b3e1182a4d6 is in previous full file, but not in current full file."
     } ],
     "totalFailed" : 9
+  }, {
+    "assertionName" : "The current OWL Expression delta file is an accurate derivative of the current full file",
+    "assertionUuid" : "21acfba1-d637-4913-a54d-987f4ac336d1",
+    "firstNInstances" : [ {
+      "conceptId" : "781497003",
+      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a97b4 is in delta file, but not in FULL file."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "The current stated relationship snapshot file is an accurate derivative of the current full file",
     "assertionUuid" : "23f18cc4-d2d7-4759-96e3-c7d0f0b30a3a",
@@ -1098,6 +1122,26 @@
     } ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "The current OWL Expression snapshot file is an accurate derivative of the current full file",
+    "assertionUuid" : "2cc6624a-159b-4251-96b5-16b13b6bfdb4",
+    "firstNInstances" : [ {
+      "conceptId" : "781497003",
+      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a97c3 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "781497003",
+      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a97c3 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "772725006",
+      "detail" : "OWL Expression: id=809cab7f-dcf5-49b9-8581-a5af8ba41555 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "772599006",
+      "detail" : "OWL Expression: id=80d13eb6-fa6f-4b12-aa93-73a573ee9244 is in SNAPSHOT file, but not in FULL file."
+    }, {
+      "conceptId" : "781497003",
+      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a96c2 is in FULL file, but not in SNAPSHOT file."
+    } ],
+    "totalFailed" : 5
+  }, {
     "assertionName" : "There must be actual changes made to previously published association refset components in order for them to appear in the current delta.",
     "assertionUuid" : "35680574-3ac6-4b68-9efe-de88b677eb35",
     "firstNInstances" : [ {
@@ -1127,6 +1171,22 @@
       "detail" : "Definition: id=2983208019 is in the detla file, but no actual changes made since the previous release."
     } ],
     "totalFailed" : 2
+  }, {
+    "assertionName" : "The current full OWL Expression file consists of the previously published full file and the changes for the current release",
+    "assertionUuid" : "3d21913e-553b-4ce9-8b3b-b46601c60326",
+    "firstNInstances" : [ {
+      "conceptId" : "781497003",
+      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a96c2 is in current full file, but not in prior full or current delta file."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "The current OWL Expression full file contains all previously published data unchanged.",
+    "assertionUuid" : "3d4342fe-4698-4c6d-b519-d8d649c842e0",
+    "firstNInstances" : [ {
+      "conceptId" : "781497003",
+      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3e345d is in prior full file but not in current full file."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "The current description delta file is an accurate derivative of the current full file",
     "assertionUuid" : "3efbc7d7-3485-4f7f-8c07-f1a7c5a0fdf6",
