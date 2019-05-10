@@ -6,15 +6,13 @@ volumes:
 
 services:
   db:
-    image: webhippie/mariadb:latest
+    image: mysql:5.7
     restart: always
     environment:
-      - MARIADB_ROOT_PASSWORD=snomed
-      - MARIADB_USERNAME=rvf_user
-      - MARIADB_PASSWORD=snomedrvf
-      - MARIADB_DATABASE=rvf_master
-      - MARIADB_MAX_ALLOWED_PACKET=128M
-      - MARIADB_INNODB_LOG_FILE_SIZE=64M
+      - MYSQL_ROOT_PASSWORD=snomed
+      - MYSQL_USERNAME=rvf_user
+      - MYSQL_PASSWORD=snomedrvf
+      - MYSQL_DATABASE=rvf_master
     healthcheck:
       test: ["CMD", "/usr/bin/healthcheck"]
       interval: 30s
@@ -26,7 +24,8 @@ services:
          - sql
     volumes:
       - mysql:/var/lib/mysql
-
+    command:
+        mysqld --sql_mode="NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES"
   rvf:
     image: snomedinternational/rvf:latest
     container_name: rvf
