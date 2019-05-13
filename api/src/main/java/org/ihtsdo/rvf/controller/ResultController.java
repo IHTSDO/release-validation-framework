@@ -7,9 +7,6 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import javax.transaction.Transactional;
-
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.rvf.execution.service.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
@@ -31,7 +28,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/result")
-@Api(position = 5, value = "Validation results")
+@Api(tags = "Validation results", description ="-")
 public class ResultController {
 
 	private static final String MESSAGE = "Message";

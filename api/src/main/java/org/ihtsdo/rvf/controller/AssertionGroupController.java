@@ -36,7 +36,7 @@ import io.swagger.annotations.ApiParam;
 
 @RestController
 @RequestMapping("/groups")
-@Api(position = 3, value = "Assertions Groups")
+@Api(tags = "Assertions Groups", description = "-")
 public class AssertionGroupController {
 
 	@Autowired

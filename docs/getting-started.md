@@ -56,11 +56,16 @@ The following parameters should be used:
 |:------------- |:------------- |:------------- |
 | file | `<filename>` | The RF2 zip file containing the content to be validated |
 | rf2DeltaOnly | false | This is set to true when a _delta_ set of content is being validated. Generally this should be false |
-| writeSuccesses | false | This indicates on whether the final report shuold list the successes. Due to the large number of assertions, this should be generally set to false. |
+| writeSuccesses | false | This indicates on whether the final report should list the successes. Due to the large amount of data in the international RF2 files, this should be generally set to false. |
 | groups | first-time-common-edition **or** common-edition | The assertion groups to run as part of the validation. Obviously, you can list a different group if required |
-| previousRelease | `<yyyymmdd>` | If the content has been previously published/released, enter the previous release date |
-| dependencyRelease | `<release_name>` | This is the name of the release first uploaded and listed at http://localhost:8081/api/releases |
-| runId | `<2019-05-01>` | Enter the timestamp for point that this validation is being run to be used as the job id |
-| storageLocation | `<foldername>` | The folder where validation reports will be saved to. This needs to have a value. |
+| previousRelease | `<previous_release>` | Leave it empty when validating without previous release (i.e using assertion group first-time-common-edition) Otherwise enter the previous release version |
+| dependencyRelease | `<dependency_release>` | The dependent international release version (e.g rvf_int_20190131) used for validating extensions only. This is the name of the release first uploaded and listed at http://localhost:8081/api/releases Note: Leave this empty when validating the international release files.|
+| runId | `<201905010901>` | Enter the timestamp for point that this validation is being run to be used as the job id |
+| storageLocation | `<sub_foldername>` | The folder where validation reports will be saved to. This needs to have a value. eg. int/20190131/test|
 
-Once those have been entered, then submit the post and wait. The validation is likely to take some time but the job status can be found at http://localhost:8081/api/result/20190501?storageLocation=test (using the relevant runId and storageLocation parameters).
+Once those have been entered, then submit the post and wait. The validation is likely to take some time but the job status can be found via the results URL.
+
+The RVF validation results polling URL can be found in the response location header parameter.
+
+e.g :"location": "http://localhost:8081/api/result/201905010901?storageLocation=int/20190131/test"
+

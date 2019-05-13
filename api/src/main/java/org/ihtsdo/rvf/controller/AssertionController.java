@@ -37,7 +37,7 @@ import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/assertions")
-@Api(position = 1, value = "Assertions")
+@Api(tags = "Assertions", description = "-")
 public class AssertionController {
 	@Autowired
 	private AssertionService assertionService;

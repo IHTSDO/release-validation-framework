@@ -15,11 +15,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/version")
-@Api(position = 6, value = "RVF api version")
+@Api(tags = "RVF api version")
 public class VersionController {
 
 	public static final String VERSION_FILE_PATH = "/opt/rvf-api/data/version.txt";
@@ -30,6 +30,7 @@ public class VersionController {
 	@ResponseBody
 	@ApiOperation(value = "Get the RVF api version", notes = "This api is used to get the deployed RVF version. "
 			+ "It looks for the version number stored in /opt/rvf-api/data/version.txt.")
+	@ApiIgnore
 	public ResponseEntity<String> getVersion(HttpServletRequest request, UriComponentsBuilder uriComponentsBuilder) throws IOException {
 		return ResponseEntity.created(uriComponentsBuilder.path("/version/{release_number}")
 				.buildAndExpand(getVersionString()).toUri())

@@ -36,16 +36,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * The controller that handles uploaded files for the validation to run
  */
 @RestController
-@Api(position = 4, value = "Validate release files")
+@Api(tags = "Validate", description ="-")
 public class TestUploadFileController {
 
 	private static final String INCLUDED_MODULES = "includedModules";
@@ -89,11 +89,11 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody
-//	@ApiOperation(value = "Structure tests", notes = "Uploaded files should be in RF2 format. Service can accept zip file or txt file. ")
-//	@ApiIgnore
+	@ApiOperation(value = "Structure tests", notes = "Uploaded files should be in RF2 format. Service can accept zip file or txt file. ")
+	@ApiIgnore
 	public ResponseEntity uploadTestPackage(
 			@RequestParam(value = "file") final MultipartFile file,
-			@RequestParam(value = WRITE_SUCCESSES, required = false) final boolean writeSucceses,
+			@RequestParam(value = WRITE_SUCCESSES, required = false, defaultValue = "false") final boolean writeSucceses,
 			@RequestParam(value = MANIFEST, required = false) final MultipartFile manifestFile,
 			final HttpServletResponse response) throws IOException {
 		// load the filename
@@ -111,6 +111,7 @@ public class TestUploadFileController {
 	@RequestMapping(value = "/test-post", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiOperation(position = 2, value = "Structure tests for RF2 release files", notes = "Structure tests for RF2 release files in zip file format. The manifest file is optional.")
+	@ApiIgnore
 	public ResponseEntity uploadPostTestPackage(
 			@ApiParam(value="RF2 release file in zip format")@RequestParam(value = "file") final MultipartFile file,
 			@ApiParam(required = false, value = "Defaults to false when not provided") @RequestParam(value = WRITE_SUCCESSES, required = false) final boolean writeSucceses,
@@ -163,25 +164,26 @@ public class TestUploadFileController {
 	@RequestMapping(value = "/run-post", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(position = 3, value = "Run validations for a RF2 release file package.", notes = "It runs structure tests and assertion validations "
-			+ "specified by the assertion groups. You can specify mutilple assertion group names separated by a comma. e.g common-authoring,int-authoring")
+	@ApiOperation(value = "Run validations for a RF2 release file package.", notes = "It runs structure tests and assertion validations "
+			+ "specified by the assertion groups. You can specify mutilple assertion group names separated by a comma. e.g common-authoring,int-authoring"
+			+ "To run validations for an extension package, you need to select the zip file, use the first-time-common-edition assertion group, and specify the dependent international release version.")
 	public ResponseEntity<Map<String, String>> runPostTestPackage(
 			@ApiParam(value = "RF2 release package in zip file") @RequestParam(value = "file") final MultipartFile file,
-			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = RF2_DELTA_ONLY, required = false) final boolean isRf2DeltaOnly,
-			@ApiParam(value = "Default to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false) final boolean writeSucceses,
-			@ApiParam(value = "manifest.xml file") @RequestParam(value = MANIFEST, required = false) final MultipartFile manifestFile,
+			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = RF2_DELTA_ONLY, required = false, defaultValue = "false") final boolean isRf2DeltaOnly,
+			@ApiParam(value = "Default to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false, defaultValue = "false") final boolean writeSucceses,
+			@ApiParam(value = "manifest.xml file(optional)") @RequestParam(value = MANIFEST, required = false) final MultipartFile manifestFile,
 			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = GROUPS) final List<String> groupsList,
-			@ApiParam(value = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
-			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
-			@ApiParam(value = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
-			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = RUN_ID) final Long runId,
-			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = FAILURE_EXPORT_MAX, required = false) final Integer exportMax,
-			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
-			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
-			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
-			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
-			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
-			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			@ApiParam(value = "Drools rules validation group names(optional)") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
+			@ApiParam(value = "Required for non-first time release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
+			@ApiParam(value = "The dependent international release (required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
+			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = RUN_ID, required = true) final Long runId,
+			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
+			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION, required = true) final String storageLocation,
+			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false, defaultValue = "false") final boolean enableDrools,
+			@ApiParam(value = "Effective time used in drools validation (optional)") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
+			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false, defaultValue ="false") final boolean releaseAsAnEdition,
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma (optional)") 
+			@RequestParam(value = INCLUDED_MODULES, required = false, defaultValue = "") final String includedModules,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
 
@@ -218,12 +220,12 @@ public class TestUploadFileController {
 	@RequestMapping(value = "/run-post-via-s3", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(position = 4, value = "Run validations for the release files stored in AWS S3", notes = "This api is mainly used by the RVF autoscalling "
+	@ApiOperation(value = "Run validations for release files stored in AWS S3", notes = "This api is mainly used by the RVF autoscalling "
 			+ "instances to validate release files stored in AWS S3.")
 	public ResponseEntity<Map<String, String>> runPostTestPackageViaS3(
 			@ApiParam(value = "S3 bucket name") @RequestParam(value = "bucketName") String bucketName,
 			@ApiParam(value = "Release zip file path in S3") @RequestParam(value = "releaseFileS3Path") String releaseFileS3Path,
-			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = RF2_DELTA_ONLY, required = false) final boolean isRf2DeltaOnly,
+			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = RF2_DELTA_ONLY, required = false, defaultValue = "false") final boolean isRf2DeltaOnly,
 			@ApiParam(value = "Defaults to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false) final boolean writeSucceses,
 			@ApiParam(value = "manifest.xml file path in AWS S3") @RequestParam(value = "manifestFileS3Path", required = false) final String manifestFileS3Path,
 			@ApiParam(value = "Assertion group names") @RequestParam(value = GROUPS) final List<String> groupsList,
@@ -231,7 +233,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@ApiParam(value = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
 			@ApiParam(value = "Unique run id e.g Timestamp") @RequestParam(value = RUN_ID) final Long runId,
-			@ApiParam(value = "Defaults to 10") @RequestParam(value = FAILURE_EXPORT_MAX, required = false) final Integer exportMax,
+			@ApiParam(value = "Defaults to 10") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") 
@@ -296,8 +298,9 @@ public class TestUploadFileController {
 
 	@RequestMapping(value = "/test-pre", method = RequestMethod.POST)
 	@ResponseBody
-	@ApiOperation(position = 1, value = "Structure testing for release input files.", notes = "This API is for structure testing the RF2 text "
+	@ApiOperation(value = "Structure testing for release input files.", notes = "This API is for structure testing the RF2 text "
 			+ "files used as inputs for release builds. These RF2 files are prefixed with rel2 e.g rel2_Concept_Delta_INT_20160731.txt")
+	@ApiIgnore
 	public ResponseEntity uploadPreTestPackage(
 			@ApiParam(value = "RF2 input file prefixed with rel2", required = true) @RequestParam(value = "file") final MultipartFile file,
 			@RequestParam(value = WRITE_SUCCESSES, required = false) final boolean writeSucceses,

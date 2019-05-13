@@ -31,11 +31,10 @@ import io.swagger.annotations.ApiParam;
  */
 @RestController
 @RequestMapping("/releases")
-@Api(position = 7, value = "Manage published releases")
+@Api(tags = "Published releases", description = "-")
 public class ReleaseController {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ReleaseController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ReleaseController.class);
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 	
