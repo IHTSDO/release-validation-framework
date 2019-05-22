@@ -87,17 +87,17 @@ public class DroolsRulesValidationService {
 	}
 	
 	public ValidationStatusReport runDroolsAssertions(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws RVFExecutionException {
-		long timeStart = new Date().getTime();
-		//Filter only Drools rules set from all the assertion groups
-		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
 		Set<String> directoryPaths = new HashSet<>();
-		ValidationReport validationReport = statusReport.getResultReport();
-		//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
-		if (droolsRulesSets.isEmpty()) {
-			LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
-			return statusReport;
-		}
 		try {
+			long timeStart = new Date().getTime();
+			//Filter only Drools rules set from all the assertion groups
+			Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
+			ValidationReport validationReport = statusReport.getResultReport();
+			//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
+			if (droolsRulesSets.isEmpty()) {
+				LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
+				return statusReport;
+			}
 			List<InvalidContent> invalidContents = null;
 			try {
 				ResourceManager validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
@@ -174,8 +174,12 @@ public class DroolsRulesValidationService {
 
 				//Run validation
 				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, droolsRulesSets, effectiveTime, modulesSet);
-			} catch (ReleaseImportException | IOException e) {
-				throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
+			} catch (Exception e) {
+				String message = "Drools validation has stopped";
+				LOGGER.error(message, e);
+				message = e.getMessage() != null ? message + " due to error: " + e.getMessage() : message;
+				statusReport.addFailureMessage(message);
+				return statusReport;
 			}
 			HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
 			for (InvalidContent invalidContent : invalidContents) {
