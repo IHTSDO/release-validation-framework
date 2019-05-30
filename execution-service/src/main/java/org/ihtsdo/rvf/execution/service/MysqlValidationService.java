@@ -73,6 +73,7 @@ public class MysqlValidationService {
 			msg = e.getMessage()!= null ? msg + " due to error: " + e.getMessage() : msg;
 			LOGGER.error(msg, e);
 			statusReport.addFailureMessage(msg);
+			statusReport.getReportSummary().put(TestType.SQL.name(), msg);
 			return statusReport;
 		}
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
@@ -115,6 +116,7 @@ public class MysqlValidationService {
 			String msg = "Failed to prepare data for extension testing due to error:" + e.getMessage();
 			statusReport.addFailureMessage(msg);
 			LOGGER.error(msg, e);
+			statusReport.getReportSummary().put(TestType.SQL.name(), msg);
 		}
 		//remove already run release-type validations 
 		assertions.removeAll(releaseTypeAssertions);

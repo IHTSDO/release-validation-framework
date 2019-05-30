@@ -1,7 +1,6 @@
 package org.ihtsdo.rvf.execution.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +21,6 @@ import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
-import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
@@ -96,6 +94,7 @@ public class DroolsRulesValidationService {
 			//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
 			if (droolsRulesSets.isEmpty()) {
 				LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
+				statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),"No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
 				return statusReport;
 			}
 			List<InvalidContent> invalidContents = null;
@@ -179,6 +178,7 @@ public class DroolsRulesValidationService {
 				LOGGER.error(message, e);
 				message = e.getMessage() != null ? message + " due to error: " + e.getMessage() : message;
 				statusReport.addFailureMessage(message);
+				statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),message);
 				return statusReport;
 			}
 			HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
@@ -249,6 +249,7 @@ public class DroolsRulesValidationService {
 			LOGGER.error(message, ex);
 			message = ex.getMessage() != null ? message + " due to error: " + ex.getMessage() : message;
 			statusReport.addFailureMessage(message);
+			statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),message);
 		} finally {
 			for (String directoryPath : directoryPaths) {
 				FileUtils.deleteQuietly(new File(directoryPath));
