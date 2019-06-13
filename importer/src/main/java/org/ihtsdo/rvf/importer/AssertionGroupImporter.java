@@ -55,7 +55,8 @@ public class AssertionGroupImporter {
 		EE_EDITION("EE", "EstonianEdition"),
 		GPFP_ICPC2("GPFP-ICPC2","GPFP-ICPC2"),
 		GMDN("GMDN","GMDN"),
-		STATED_RELATIONSHIPS_VALIDATION("STATED_RELATIONSHIPS","stated-relationships-validation");
+		STATED_RELATIONSHIPS_VALIDATION("STATED_RELATIONSHIPS","stated-relationships-validation"), //Assertions group that contains only stated relationship for file centric and component centric assertions
+		STATED_RELATIONSHIPS_RELEASE_VALIDATION("STATED_RELATIONSHIPS_RELEASE_TYPE","stated-relationships-release-validation"); //Assertion group that contains full list of stated relationship assertions
 		private String name;
 		private String releaseCenter;
 		private AssertionGroupName(String releaseCenter, String name) {
@@ -123,7 +124,8 @@ public class AssertionGroupImporter {
 			"9f84d9a0-79b9-11e1-b0c4-0800200c9a66",
 			"9074a620-79b9-11e1-b0c4-0800200c9a66",
 			"5d27df10-7d08-11e1-b0c4-0800200c9a66",
-			"2a938c7e-0803-44a1-8358-339daa87ee39"
+			"2a938c7e-0803-44a1-8358-339daa87ee39",
+			"f2293d20-7cd6-11e1-b0c4-0800200c9a66"
 	};
 		
 /* the following were included but feel that they should be validated for project level as well.
@@ -219,7 +221,10 @@ public class AssertionGroupImporter {
 				createFirstTimeReleaseGroup(allAssertions, groupName);
 				break;
 			case STATED_RELATIONSHIPS_VALIDATION:
-				createStatedRelationshipGroup(allAssertions, groupName);
+				createStatedRelationshipGroup(allAssertions, groupName, false);
+				break;
+			case STATED_RELATIONSHIPS_RELEASE_VALIDATION:
+				createStatedRelationshipGroup(allAssertions, groupName, true);
 				break;
 			default :
 			  break;
@@ -242,6 +247,11 @@ public class AssertionGroupImporter {
 			if ( Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;
 			}
+			// Exclude stated relationship assertions
+			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				continue;
+			}
+			
 			if (RELEASE_TYPE_VALIDATION.getName().equals(keyWords) || FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)
 					|| keyWords.contains("," + groupName.getReleaseCenter())) {
 				String assertionText = assertion.getAssertionText();
@@ -273,11 +283,10 @@ public class AssertionGroupImporter {
 				if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
 					continue;
 				}
-				//Re-enable the Stated relationship assertions for INT on SCA
-				//exclude stated relationship assertions from common-authoring as we only run them for MS products for now
-				/*if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				// Exclude stated relationship assertions
+				if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
 					continue;
-				}*/
+				}
 				assertionService.addAssertionToGroup(assertion, group);
 				counter++;
 			}
@@ -290,19 +299,14 @@ public class AssertionGroupImporter {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(groupName.getName());
 		group = assertionService.createAssertionGroup(group);
-		//Re-enable the Stated relationship assertions for INT on SCA
-		/*if(!AssertionGroupName.INT_AUTHORING.equals(groupName)) {
-			for (String statedRelationshipAssertionId : STATED_RELATIONSHIP_ASSERTIONS) {
-				Assertion assertion	 = assertionService.getAssertionByUuid(UUID.fromString(statedRelationshipAssertionId));
-				if(!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
-					group.addAssertion(assertion);
-				}
-			}
-		}*/
 		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWords("," + groupName.getReleaseCenter(), false);
 		for (Assertion assertion : allAssertions) {
 			//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
 			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+				continue;
+			}
+			// Exclude stated relationship assertions
+			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;
 			}
 			//exclude simple map file checking as term server extracts don't contain these
@@ -361,11 +365,12 @@ public class AssertionGroupImporter {
 			if ( AssertionGroupName.SPANISH_EDITION.equals(groupName) && Arrays.asList(SPANISH_EXTENSION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
+			// Exclude stated relationship assertions
+			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				continue;
+			}
 			//exclude SNOMED RT assertions
-			//exclude stated relationships
-			if ( AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName)
-					&& (Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())
-					|| Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString()))) {
+			if ( AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;
 			}
 			if ( AssertionGroupName.US_EDITION.equals(groupName) && Arrays.asList(US_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
@@ -387,7 +392,7 @@ public class AssertionGroupImporter {
 		}
 	}
 
-	private void createStatedRelationshipGroup(List<Assertion> allAssertions, AssertionGroupName assertionGroupName) {
+	private void createStatedRelationshipGroup(List<Assertion> allAssertions, AssertionGroupName assertionGroupName, boolean useFullList) {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(assertionGroupName.getName());
 		group = assertionService.createAssertionGroup(group);
@@ -396,7 +401,9 @@ public class AssertionGroupImporter {
 		int count = 0;
 		for (Assertion assertion : allAssertions) {
 			if(statedRelationshipAssertionIds.contains(assertion.getUuid().toString())) {
-				assertionService.addAssertionToGroup(assertion, group);
+				if(useFullList || !(assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()))) {
+					assertionService.addAssertionToGroup(assertion, group);
+				}
 				count++;
 				if(count == statedRelationshipAssertionCount) break;
 			}
