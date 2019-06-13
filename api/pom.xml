@@ -130,6 +130,20 @@
 										<path>/opt/${packageName}</path>
 									</paths>
 								</data>
+								<data>
+									<type>template</type>
+									<paths>
+										<path>/var/opt/${packageName}</path>
+										<path>/var/opt/${packageName}/run</path>
+									</paths>
+									<mapper>
+										<type>perm</type>
+										<user>${packageName}</user>
+										<group>${packageName}</group>
+										<dirmode>0750</dirmode>
+										<filemode>0750</filemode>
+									</mapper>
+								</data>
 							</dataSet>
 						</configuration>
 					</execution>
