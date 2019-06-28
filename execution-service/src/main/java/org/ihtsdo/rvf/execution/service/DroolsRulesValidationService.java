@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.execution.service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -171,8 +172,14 @@ public class DroolsRulesValidationService {
 					deltaDirectoryPath = new ReleaseImporter().unzipRelease(deltaInputStream, ReleaseImporter.ImportType.DELTA).getAbsolutePath();
 				}
 
+				String prevReleasePath = null;
+				if(StringUtils.isNotBlank(validationConfig.getPreviousRelease()) && validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
+					InputStream previousReleaseStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
+					prevReleasePath = new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
+				}
+
 				//Run validation
-				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, droolsRulesSets, effectiveTime, modulesSet);
+				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, prevReleasePath, droolsRulesSets, effectiveTime, modulesSet);
 			} catch (Exception e) {
 				String message = "Drools validation has stopped";
 				LOGGER.error(message, e);
