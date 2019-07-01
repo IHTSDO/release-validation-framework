@@ -29,6 +29,7 @@ public class ValidationRunConfig {
 	private String includedModules;
 	private List<String> droolsRulesGroupList;
 	private String bucketName;
+	private boolean enableMRCMValidation;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -128,6 +129,7 @@ public class ValidationRunConfig {
 				+ ", previousRelease=" + previousRelease
 				+ ", dependencyRelease=" + dependencyRelease
 				+ ", drools=" + enableDrools
+				+ ", mrcm=" + enableMRCMValidation
 				+ ", runId=" + runId 
 				+ ", url=" + url + "]";
 	}
@@ -282,5 +284,14 @@ public class ValidationRunConfig {
 	public void setBucketName(String bucketName) {
 		this.bucketName = bucketName;
 		
+	}
+
+	public boolean isEnableMRCMValidation() {
+		return enableMRCMValidation;
+	}
+
+	public ValidationRunConfig setEnableMRCMValidation(boolean enableMRCMValidation) {
+		this.enableMRCMValidation = enableMRCMValidation;
+		return this;
 	}
 }

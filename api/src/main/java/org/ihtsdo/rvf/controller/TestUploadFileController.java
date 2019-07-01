@@ -48,6 +48,8 @@ import io.swagger.annotations.ApiParam;
 @Api(position = 4, value = "Validate release files")
 public class TestUploadFileController {
 
+	private static final String ENABLE_MRCM_VALIDATION = "enableMRCMValidation";
+
 	private static final String INCLUDED_MODULES = "includedModules";
 
 	private static final String RELEASE_AS_AN_EDITION = "releaseAsAnEdition";
@@ -182,6 +184,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
 
@@ -199,7 +202,8 @@ public class TestUploadFileController {
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setIncludedModules(includedModules)
-				.addUrl(urlPrefix);
+				.addUrl(urlPrefix)
+				.setEnableMRCMValidation(enableMrcmValidation);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage
@@ -240,6 +244,7 @@ public class TestUploadFileController {
 			@RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
@@ -261,7 +266,8 @@ public class TestUploadFileController {
 				.setEnableDrools(enableDrools)
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
-				.setIncludedModules(includedModules);
+				.setIncludedModules(includedModules)
+				.setEnableMRCMValidation(enableMrcmValidation);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage

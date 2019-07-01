@@ -44,6 +44,9 @@ public class ValidationRunner {
 	@Autowired
 	private MysqlValidationService mysqlValidationService;
 
+	@Autowired
+	private MRCMValidationService mrcmValidationService;
+
 	private static final String MSG_VALIDATIONS_RUN = "Validations executed. Failures count: ";
 	private static final String MSG_VALIDATIONS_DISABLED = "Validations are disabled.";
 	
@@ -101,7 +104,8 @@ public class ValidationRunner {
 			droolsValidationStatusReport.setResultReport(new ValidationReport());
 			tasks.add(executorService.submit(() -> droolsValidationService.runDroolsAssertions(validationConfig, droolsValidationStatusReport)));
 		}
-		
+
+
 		for (Future<ValidationStatusReport> task : tasks) {
 			try {
 				mergeValidationStatusReports(statusReport, task.get());
@@ -110,6 +114,14 @@ public class ValidationRunner {
 			}
 		}
 		executorService.shutdown();
+
+		if(validationConfig.isEnableMRCMValidation()) {
+			// Run MRCM validations
+			String mrcmTestStartMsg = "Start MRCM validation for release file: " + validationConfig.getTestFileName();
+			logger.info(mrcmTestStartMsg);
+			reportService.writeProgress(mrcmTestStartMsg, validationConfig.getStorageLocation());
+			mrcmValidationService.runMRCMAssertionTests(statusReport, validationConfig, executionConfig.getEffectiveTime(), executionConfig.getExecutionId());
+		}
 
 		report.sortAssertionLists();
 
@@ -176,6 +188,7 @@ public class ValidationRunner {
 		testTypeFailuresCount.put(TestType.ARCHIVE_STRUCTURAL, 0);
 		testTypeFailuresCount.put(TestType.SQL, 0);
 		testTypeFailuresCount.put(TestType.DROOL_RULES, validationRunConfig.isEnableDrools() ? 0 : -1);
+		testTypeFailuresCount.put(TestType.MRCM, validationRunConfig.isEnableMRCMValidation() ? 0 : -1);
 		for (TestRunItem failure : failures) {
 			TestType testType = failure.getTestType();
 			testTypeFailuresCount.put(testType, testTypeFailuresCount.get(testType)+1);
