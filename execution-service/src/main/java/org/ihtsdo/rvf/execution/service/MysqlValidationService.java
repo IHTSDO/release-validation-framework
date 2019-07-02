@@ -50,8 +50,8 @@ public class MysqlValidationService {
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
 	
 	private ExecutorService executorService = Executors.newCachedThreadPool();
-	
-	public void runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException{
+
+	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException{
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		String reportStorage = validationConfig.getStorageLocation();
 		try {
@@ -73,7 +73,8 @@ public class MysqlValidationService {
 			msg = e.getMessage()!= null ? msg + " due to error: " + e.getMessage() : msg;
 			LOGGER.error(msg, e);
 			statusReport.addFailureMessage(msg);
-			return;
+			statusReport.getReportSummary().put(TestType.SQL.name(), msg);
+			return statusReport;
 		}
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
 			LOGGER.info("Run extension release validation with config " +  executionConfig);
@@ -82,6 +83,7 @@ public class MysqlValidationService {
 			LOGGER.info("Run international release validation with config " + executionConfig);
 			runAssertionTests(statusReport, executionConfig, reportStorage);
 		}
+		return statusReport;
 	}
 
 
@@ -114,6 +116,7 @@ public class MysqlValidationService {
 			String msg = "Failed to prepare data for extension testing due to error:" + e.getMessage();
 			statusReport.addFailureMessage(msg);
 			LOGGER.error(msg, e);
+			statusReport.getReportSummary().put(TestType.SQL.name(), msg);
 		}
 		//remove already run release-type validations 
 		assertions.removeAll(releaseTypeAssertions);

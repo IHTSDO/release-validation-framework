@@ -2,7 +2,9 @@ package org.ihtsdo.rvf.execution.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
@@ -11,6 +13,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class ValidationStatusReport {
 	private ValidationRunConfig validationConfig;
+	private Map<String,String> reportSummary;
 	@SerializedName("TestResult")
 	private ValidationReport resultReport;
 	private Date startTime;
@@ -26,6 +29,7 @@ public class ValidationStatusReport {
 		totalRF2FilesLoaded = -1;
 		rf2FilesLoaded = new ArrayList<>();
 		failureMessages = new ArrayList<>();
+		reportSummary = new HashMap<>();
 	}
 
 	public ValidationReport getResultReport() {
@@ -86,5 +90,12 @@ public class ValidationStatusReport {
 	public void setRf2FilesLoaded(List<String> rf2FilesLoaded) {
 		this.rf2FilesLoaded = rf2FilesLoaded;
 	}
-	
+
+	public Map<String, String> getReportSummary() {
+		return reportSummary;
+	}
+
+	public void setReportSummary(Map<String, String> reportSummary) {
+		this.reportSummary = reportSummary;
+	}
 }

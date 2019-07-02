@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.execution.service;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,7 +22,6 @@ import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
-import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
@@ -86,18 +85,19 @@ public class DroolsRulesValidationService {
 		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
 	}
 	
-	public void runDroolsAssertions(ValidationStatusReport statusReport, ValidationRunConfig validationConfig) throws RVFExecutionException {
-		long timeStart = new Date().getTime();
-		//Filter only Drools rules set from all the assertion groups
-		Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
+	public ValidationStatusReport runDroolsAssertions(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws RVFExecutionException {
 		Set<String> directoryPaths = new HashSet<>();
-		ValidationReport validationReport = statusReport.getResultReport();
-		//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
-		if (droolsRulesSets.isEmpty()) {
-			LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
-			return;
-		}
 		try {
+			long timeStart = new Date().getTime();
+			//Filter only Drools rules set from all the assertion groups
+			Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
+			ValidationReport validationReport = statusReport.getResultReport();
+			//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
+			if (droolsRulesSets.isEmpty()) {
+				LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
+				statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),"No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
+				return statusReport;
+			}
 			List<InvalidContent> invalidContents = null;
 			try {
 				ResourceManager validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
@@ -152,7 +152,8 @@ public class DroolsRulesValidationService {
 						modulesSet = Sets.newHashSet(moduleIds.split(","));
 					}
 				}
-				
+
+				//Get effectiveTime
 				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, testResourceManager);
 				String effectiveTime = validationConfig.getEffectiveTime();
 				if (StringUtils.isNotBlank(effectiveTime)) {
@@ -160,6 +161,8 @@ public class DroolsRulesValidationService {
 				} else {
 					effectiveTime = "";
 				}
+
+				//Unzip the release files
 				for (InputStream inputStream : snapshotsInputStream) {
 					String snapshotDirectoryPath = new ReleaseImporter().unzipRelease(inputStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
 					directoryPaths.add(snapshotDirectoryPath);
@@ -169,9 +172,21 @@ public class DroolsRulesValidationService {
 					deltaDirectoryPath = new ReleaseImporter().unzipRelease(deltaInputStream, ReleaseImporter.ImportType.DELTA).getAbsolutePath();
 				}
 
-				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, droolsRulesSets, effectiveTime, modulesSet);
-			} catch (ReleaseImportException | IOException e) {
-				throw new RVFExecutionException("Failed to load RF2 snapshot for Drools validation.", e);
+				String prevReleasePath = null;
+				if(StringUtils.isNotBlank(validationConfig.getPreviousRelease()) && validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
+					InputStream previousReleaseStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
+					prevReleasePath = new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
+				}
+
+				//Run validation
+				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, prevReleasePath, droolsRulesSets, effectiveTime, modulesSet);
+			} catch (Exception e) {
+				String message = "Drools validation has stopped";
+				LOGGER.error(message, e);
+				message = e.getMessage() != null ? message + " due to error: " + e.getMessage() : message;
+				statusReport.addFailureMessage(message);
+				statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),message);
+				return statusReport;
 			}
 			HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
 			for (InvalidContent invalidContent : invalidContents) {
@@ -188,6 +203,8 @@ public class DroolsRulesValidationService {
 			List<TestRunItem> warningAssertions = new ArrayList<>();
 			int failureExportMax = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
 			Map<String, List<InvalidContent>> groupRules = new HashMap<>();
+
+			//Convert the Drools validation report into RVF report format
 			for (String rule : invalidContentMap.keySet()) {
 				TestRunItem validationRule = new TestRunItem();
 				validationRule.setTestType(TestType.DROOL_RULES);
@@ -239,11 +256,13 @@ public class DroolsRulesValidationService {
 			LOGGER.error(message, ex);
 			message = ex.getMessage() != null ? message + " due to error: " + ex.getMessage() : message;
 			statusReport.addFailureMessage(message);
+			statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),message);
 		} finally {
 			for (String directoryPath : directoryPaths) {
 				FileUtils.deleteQuietly(new File(directoryPath));
 			}
 		}
+		return statusReport;
 	}
 	
 

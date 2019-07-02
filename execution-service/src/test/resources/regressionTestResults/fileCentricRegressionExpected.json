@@ -1,7 +1,7 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 86,
-  "totalAssertionsFailed" : 67,
+  "totalAssertionsRun" : 87,
+  "totalAssertionsFailed" : 68,
   "results" : [ {
     "assertionName" : "Every active concept defined in the Norwegian extension has a preferred FSN in the en-US language refset.",
     "assertionUuid" : "853bfc3a-1635-11e8-a510-3c15c2c6e32e",
@@ -221,6 +221,14 @@
       "detail" : "RELATIONSHIP: id=4768117023: Stated Relationship contains a source id that does not exist in the Concept snapshot file."
     } ],
     "totalFailed" : 7
+  }, {
+    "assertionName" : "The current OWL Expression snapshot file does not contain duplicate Ids.",
+    "assertionUuid" : "9fc3995b-f84d-46e1-b7cb-88f0fe8564e2",
+    "firstNInstances" : [ {
+      "conceptId" : "781497003",
+      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a97c3 is repeated in the OWL Expression snapshot file."
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "All type ids found in the Stated Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "a4fcd810-79b9-11e1-b0c4-0800200c9a66",

@@ -2,11 +2,13 @@ package org.ihtsdo.rvf.importer;
 
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.COMPONENT_CENTRIC_VALIDATION;
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.FILE_CENTRIC_VALIDATION;
+import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.INT_AUTHORING;
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.RELEASE_TYPE_VALIDATION;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -52,7 +54,9 @@ public class AssertionGroupImporter {
 		IE_EDITION("IE", "IrishEdition"),
 		EE_EDITION("EE", "EstonianEdition"),
 		GPFP_ICPC2("GPFP-ICPC2","GPFP-ICPC2"),
-		GMDN("GMDN","GMDN");
+		GMDN("GMDN","GMDN"),
+		STATED_RELATIONSHIPS_VALIDATION("STATED_RELATIONSHIPS","stated-relationships-validation"), //Assertions group that contains only stated relationship for file centric and component centric assertions
+		STATED_RELATIONSHIPS_RELEASE_VALIDATION("STATED_RELATIONSHIPS_RELEASE_TYPE","stated-relationships-release-validation"); //Assertion group that contains full list of stated relationship assertions
 		private String name;
 		private String releaseCenter;
 		private AssertionGroupName(String releaseCenter, String name) {
@@ -99,6 +103,30 @@ public class AssertionGroupImporter {
 	private static final String[] US_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b"};
 	
 	private static final String[] FIRST_TIME_COMMON_ADDITIONAL_EXCLUDE_LIST = {"3cb10511-33b7-4eca-ba0e-93bcccf70d86", "48118153-d32a-4d1c-bfbc-23ed953e9991"};
+
+	private static final String[] STATED_RELATIONSHIP_ASSERTIONS = {
+			"994b5ff0-79b9-11e1-b0c4-0800200c9a66",
+			"5555c400-7d08-11e1-b0c4-0800200c9a66",
+			"4d32c9d0-7d08-11e1-b0c4-0800200c9a66",
+			"cab60a2f-4239-4933-91d6-dc910a8ac08b",
+			"a4fcd810-79b9-11e1-b0c4-0800200c9a66",
+			"1b21ec4b-b6db-42fe-ae7e-f79e24e25b7f",
+			"b1d75e1c-ea12-4567-a8b9-f69923a57cdf",
+			"6dbaed71-f031-4290-b74f-f35561c2e283",
+			"50e809a0-7d08-11e1-b0c4-0800200c9a66",
+			"49487040-7d08-11e1-b0c4-0800200c9a66",
+			"59b574a0-7d08-11e1-b0c4-0800200c9a66",
+			"89ceaf00-79b9-11e1-b0c4-0800200c9a66",
+			"23f18cc4-d2d7-4759-96e3-c7d0f0b30a3a",
+			"01ce3ac9-d168-4333-99d7-8d2f228f5ec9",
+			"7e453140-79b9-11e1-b0c4-0800200c9a66",
+			"fd8ed390-94e9-4fd9-9e20-902a24273dca",
+			"9f84d9a0-79b9-11e1-b0c4-0800200c9a66",
+			"9074a620-79b9-11e1-b0c4-0800200c9a66",
+			"5d27df10-7d08-11e1-b0c4-0800200c9a66",
+			"2a938c7e-0803-44a1-8358-339daa87ee39",
+			"f2293d20-7cd6-11e1-b0c4-0800200c9a66"
+	};
 		
 /* the following were included but feel that they should be validated for project level as well.
 	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
@@ -192,6 +220,12 @@ public class AssertionGroupImporter {
 			case FIRST_TIME_COMMON_EDITION_VALIDATION :
 				createFirstTimeReleaseGroup(allAssertions, groupName);
 				break;
+			case STATED_RELATIONSHIPS_VALIDATION:
+				createStatedRelationshipGroup(allAssertions, groupName, false);
+				break;
+			case STATED_RELATIONSHIPS_RELEASE_VALIDATION:
+				createStatedRelationshipGroup(allAssertions, groupName, true);
+				break;
 			default :
 			  break;
 		}
@@ -213,6 +247,11 @@ public class AssertionGroupImporter {
 			if ( Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;
 			}
+			// Exclude stated relationship assertions
+			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				continue;
+			}
+			
 			if (RELEASE_TYPE_VALIDATION.getName().equals(keyWords) || FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)
 					|| keyWords.contains("," + groupName.getReleaseCenter())) {
 				String assertionText = assertion.getAssertionText();
@@ -244,6 +283,10 @@ public class AssertionGroupImporter {
 				if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
 					continue;
 				}
+				// Exclude stated relationship assertions
+				if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+					continue;
+				}
 				assertionService.addAssertionToGroup(assertion, group);
 				counter++;
 			}
@@ -262,12 +305,15 @@ public class AssertionGroupImporter {
 			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
+			// Exclude stated relationship assertions
+			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				continue;
+			}
 			//exclude simple map file checking as term server extracts don't contain these
 			if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
 				continue;
 			}
-			
-			if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
+			if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()))  {
 				assertionService.addAssertionToGroup(assertion, group);
 			}
 			if ( AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
@@ -319,6 +365,10 @@ public class AssertionGroupImporter {
 			if ( AssertionGroupName.SPANISH_EDITION.equals(groupName) && Arrays.asList(SPANISH_EXTENSION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
+			// Exclude stated relationship assertions
+			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				continue;
+			}
 			//exclude SNOMED RT assertions
 			if ( AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;
@@ -340,6 +390,25 @@ public class AssertionGroupImporter {
 				assertionService.addAssertionToGroup(assertion, group);
 			}
 		}
+	}
+
+	private void createStatedRelationshipGroup(List<Assertion> allAssertions, AssertionGroupName assertionGroupName, boolean useFullList) {
+		AssertionGroup group = new AssertionGroup();
+		group.setName(assertionGroupName.getName());
+		group = assertionService.createAssertionGroup(group);
+		List<String> statedRelationshipAssertionIds = Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS);
+		int statedRelationshipAssertionCount = statedRelationshipAssertionIds.size();
+		int count = 0;
+		for (Assertion assertion : allAssertions) {
+			if(statedRelationshipAssertionIds.contains(assertion.getUuid().toString())) {
+				if(useFullList || !(assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()))) {
+					assertionService.addAssertionToGroup(assertion, group);
+				}
+				count++;
+				if(count == statedRelationshipAssertionCount) break;
+			}
+		}
+		
 	}
 
 }

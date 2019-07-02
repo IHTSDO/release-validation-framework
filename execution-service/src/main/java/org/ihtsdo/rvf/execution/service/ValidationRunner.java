@@ -3,8 +3,18 @@ package org.ihtsdo.rvf.execution.service;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import org.ihtsdo.rvf.entity.TestRunItem;
+import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
@@ -33,6 +43,9 @@ public class ValidationRunner {
 	
 	@Autowired
 	private MysqlValidationService mysqlValidationService;
+
+	private static final String MSG_VALIDATIONS_RUN = "Validations executed. Failures count: ";
+	private static final String MSG_VALIDATIONS_DISABLED = "Validations are disabled.";
 	
 	private Logger logger = LoggerFactory.getLogger(ValidationRunner.class);
 
@@ -70,23 +83,67 @@ public class ValidationRunner {
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		statusReport.setResultReport(report);
 		runRF2StructureTests(validationConfig, statusReport);
-		
-		mysqlValidationService.runRF2MysqlValidations(validationConfig, statusReport);
-		if (validationConfig.isEnableDrools()) {
-			// Run Drools validations
-			String droolsTestStartMsg = "Start drools validation for release file:" + validationConfig.getTestFileName();
-			logger.info(droolsTestStartMsg);
-			reportService.writeProgress(droolsTestStartMsg, validationConfig.getStorageLocation());
-			droolsValidationService.runDroolsAssertions(statusReport, validationConfig);
+
+		List<Future<ValidationStatusReport>> tasks = new ArrayList<>();
+		ExecutorService executorService = Executors.newFixedThreadPool(5);
+		StringBuilder statusMessages = new StringBuilder();
+		statusMessages.append("RVF assertions validation started");
+		reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
+
+		ValidationStatusReport mysqlValidationStatusReport = new ValidationStatusReport(validationConfig);
+		mysqlValidationStatusReport.setResultReport(new ValidationReport());
+		tasks.add(executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
+
+		if(validationConfig.isEnableDrools()) {
+			statusMessages.append("\nDrools rules validation started");
+			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
+			ValidationStatusReport droolsValidationStatusReport = new ValidationStatusReport(validationConfig);
+			droolsValidationStatusReport.setResultReport(new ValidationReport());
+			tasks.add(executorService.submit(() -> droolsValidationService.runDroolsAssertions(validationConfig, droolsValidationStatusReport)));
 		}
+		
+		for (Future<ValidationStatusReport> task : tasks) {
+			try {
+				mergeValidationStatusReports(statusReport, task.get());
+			} catch (ExecutionException | InterruptedException e) {
+				logger.error("Thread interrupted while waiting for future result for run item:" + task , e);
+			}
+		}
+		executorService.shutdown();
+
 		report.sortAssertionLists();
+
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
 		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
 		statusReport.setStartTime(startTime.getTime());
 		statusReport.setEndTime(endTime.getTime());
+		report.setTimeTakenInSeconds(timeTaken*60);
 		State state = statusReport.getFailureMessages().isEmpty() ? State.COMPLETE : State.FAILED;
+		updateExecutionSummary(statusReport, validationConfig);
 		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
+	}
+
+	private void mergeValidationStatusReports(ValidationStatusReport mainValidationReport, ValidationStatusReport validationTaskReport) {
+		ValidationReport mainResult = mainValidationReport.getResultReport();
+		ValidationReport taskResult = validationTaskReport.getResultReport();
+
+		mainResult.getAssertionsFailed().addAll(taskResult.getAssertionsFailed());
+		mainResult.getAssertionsWarning().addAll(taskResult.getAssertionsWarning());
+		mainResult.getAssertionsSkipped().addAll(taskResult.getAssertionsSkipped());
+		mainResult.getAssertionsPassed().addAll(taskResult.getAssertionsPassed());
+		
+		mainResult.setTotalTestsRun(mainResult.getTotalTestsRun() + taskResult.getTotalTestsRun());
+		mainResult.setTotalFailures(mainResult.getTotalFailures() + taskResult.getTotalFailures());
+		mainResult.setTotalWarnings(mainResult.getTotalWarnings() + taskResult.getTotalWarnings());
+		mainResult.setTotalSkips(mainResult.getTotalSkips() + taskResult.getTotalSkips());
+
+		mainValidationReport.getFailureMessages().addAll(validationTaskReport.getFailureMessages());
+		mainValidationReport.getRf2FilesLoaded().addAll(validationTaskReport.getRf2FilesLoaded());
+		mainValidationReport.setTotalRF2FilesLoaded(mainValidationReport.getTotalRF2FilesLoaded());
+
+		mainValidationReport.getReportSummary().putAll(validationTaskReport.getReportSummary());
+		
 	}
 	
 	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws Exception{
@@ -110,6 +167,24 @@ public class ValidationRunner {
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {
 			reportService.writeResults(statusReport, State.FAILED, reportStorage);
+		}
+	}
+
+	private void updateExecutionSummary(ValidationStatusReport statusReport, ValidationRunConfig validationRunConfig) {
+		List<TestRunItem> failures = statusReport.getResultReport().getAssertionsFailed();
+		Map<TestType, Integer> testTypeFailuresCount = new HashMap<>();
+		testTypeFailuresCount.put(TestType.ARCHIVE_STRUCTURAL, 0);
+		testTypeFailuresCount.put(TestType.SQL, 0);
+		testTypeFailuresCount.put(TestType.DROOL_RULES, validationRunConfig.isEnableDrools() ? 0 : -1);
+		for (TestRunItem failure : failures) {
+			TestType testType = failure.getTestType();
+			testTypeFailuresCount.put(testType, testTypeFailuresCount.get(testType)+1);
+		}
+		for (TestType testType : testTypeFailuresCount.keySet()) {
+			if(statusReport.getReportSummary().get(testType.name()) == null) {
+				Integer failuresCount = testTypeFailuresCount.get(testType);
+				statusReport.getReportSummary().put(testType.name(), failuresCount >= 0 ? MSG_VALIDATIONS_RUN + failuresCount : MSG_VALIDATIONS_DISABLED);
+			}
 		}
 	}
 }
