@@ -1138,12 +1138,9 @@
       "detail" : "OWL Expression: id=80d13eb6-fa6f-4b12-aa93-73a573ee9244 is in SNAPSHOT file, but not in FULL file."
     }, {
       "conceptId" : "781497003",
-      "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a97b4 is in FULL file, but not in SNAPSHOT file."
-    }, {
-      "conceptId" : "781497003",
       "detail" : "OWL Expression: id=8016bcd2-83e7-47c1-a998-8f9c6d3a96c2 is in FULL file, but not in SNAPSHOT file."
     } ],
-    "totalFailed" : 6
+    "totalFailed" : 5
   }, {
     "assertionName" : "There must be actual changes made to previously published association refset components in order for them to appear in the current delta.",
     "assertionUuid" : "35680574-3ac6-4b68-9efe-de88b677eb35",

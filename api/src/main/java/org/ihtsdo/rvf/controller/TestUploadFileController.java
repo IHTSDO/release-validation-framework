@@ -48,6 +48,8 @@ import springfox.documentation.annotations.ApiIgnore;
 @Api(tags = "Validate", description ="-")
 public class TestUploadFileController {
 
+	private static final String ENABLE_MRCM_VALIDATION = "enableMRCMValidation";
+
 	private static final String INCLUDED_MODULES = "includedModules";
 
 	private static final String RELEASE_AS_AN_EDITION = "releaseAsAnEdition";
@@ -173,17 +175,18 @@ public class TestUploadFileController {
 			@ApiParam(value = "Default to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false, defaultValue = "false") final boolean writeSucceses,
 			@ApiParam(value = "manifest.xml file(optional)") @RequestParam(value = MANIFEST, required = false) final MultipartFile manifestFile,
 			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = GROUPS) final List<String> groupsList,
-			@ApiParam(value = "Drools rules validation group names(optional)") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
-			@ApiParam(value = "Required for non-first time release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
-			@ApiParam(value = "The dependent international release (required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
-			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = RUN_ID, required = true) final Long runId,
-			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
-			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION, required = true) final String storageLocation,
-			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false, defaultValue = "false") final boolean enableDrools,
-			@ApiParam(value = "Effective time used in drools validation (optional)") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
-			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false, defaultValue ="false") final boolean releaseAsAnEdition,
-			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma (optional)") 
-			@RequestParam(value = INCLUDED_MODULES, required = false, defaultValue = "") final String includedModules,
+			@ApiParam(value = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
+			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
+			@ApiParam(value = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
+			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = RUN_ID) final Long runId,
+			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = FAILURE_EXPORT_MAX, required = false) final Integer exportMax,
+			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
+			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
+			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
+			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
+			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
 
@@ -201,7 +204,8 @@ public class TestUploadFileController {
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setIncludedModules(includedModules)
-				.addUrl(urlPrefix);
+				.addUrl(urlPrefix)
+				.setEnableMRCMValidation(enableMrcmValidation);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage
@@ -242,6 +246,7 @@ public class TestUploadFileController {
 			@RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
@@ -263,7 +268,8 @@ public class TestUploadFileController {
 				.setEnableDrools(enableDrools)
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
-				.setIncludedModules(includedModules);
+				.setIncludedModules(includedModules)
+				.setEnableMRCMValidation(enableMrcmValidation);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage
