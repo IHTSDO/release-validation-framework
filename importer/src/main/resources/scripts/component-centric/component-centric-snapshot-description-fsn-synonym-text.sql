@@ -13,7 +13,8 @@
 	from curr_concept_s a
 	join curr_description_d b
 	on a.id = b.conceptid
-	and a.active = 1;
+	and a.active = 1
+	and a.moduleid = b.moduleid;
 
 /* 	for edited concepts, list all FSNs, with and without semantic tags */
 	create table if not exists tmp_fsn
