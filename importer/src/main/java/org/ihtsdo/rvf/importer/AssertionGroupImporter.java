@@ -214,6 +214,7 @@ public class AssertionGroupImporter {
 			case NO_AUTHORING : 
 			case CH_AUTHORING :
 			case IE_AUTHORING :
+			case NZ_AUTHORING:
 			case EE_AUTHORING :
 				createSnapshotAssertionGroup(groupName);
 				break;
