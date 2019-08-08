@@ -1,11 +1,14 @@
-package org.ihtsdo.rvf;
+package org.ihtsdo.rvf.config;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.annotation.Order;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -16,8 +19,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 	@PropertySource(value = "classpath:api-defaults.properties"),
 	@PropertySource(value = "file:${rvfConfigLocation}/api.properties", ignoreResourceNotFound=true)})
 @EnableConfigurationProperties
+@EnableJms
 public class ApiConfig {
-
+	
 	@Configuration
 	@EnableWebSecurity
 	@Order(1)
@@ -33,4 +37,11 @@ public class ApiConfig {
 			http.csrf().disable();
 		}
 	}
+	
+	@Bean
+	// The default queue prefetch size is 1,000. That prevents auto scaling rvf
+	public ActiveMQConnectionFactoryPrefetchCustomizer queuePrefetchCustomizer(@Value("${spring.activemq.queuePrefetch:1}") int queuePrefetch) {
+		return new ActiveMQConnectionFactoryPrefetchCustomizer(queuePrefetch);
+	}
+	
 }
