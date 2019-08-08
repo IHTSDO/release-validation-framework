@@ -8,7 +8,7 @@ public class ActiveMQConnectionFactoryPrefetchCustomizer implements ActiveMQConn
 	
 	private final int queuePrefetch;
 
-	ActiveMQConnectionFactoryPrefetchCustomizer(int queuePrefetch) {
+	public ActiveMQConnectionFactoryPrefetchCustomizer(int queuePrefetch) {
 		this.queuePrefetch = queuePrefetch;
 	}
 

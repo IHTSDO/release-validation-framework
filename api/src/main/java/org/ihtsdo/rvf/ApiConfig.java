@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.config;
+package org.ihtsdo.rvf;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -35,12 +35,5 @@ public class ApiConfig {
 				.permitAll();
 			http.csrf().disable();
 		}
-	}
-	
-	@Bean
-	// The default queue prefetch size is 1,000. That prevents auto scaling rvf
-	public ActiveMQConnectionFactoryPrefetchCustomizer queuePrefetchCustomizer(@Value("${spring.activemq.queuePrefetch:1}") int queuePrefetch) {
-		return new ActiveMQConnectionFactoryPrefetchCustomizer(queuePrefetch);
-	}
-	
+	}	
 }
