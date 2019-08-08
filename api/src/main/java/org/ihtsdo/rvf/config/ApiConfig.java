@@ -19,7 +19,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 	@PropertySource(value = "classpath:api-defaults.properties"),
 	@PropertySource(value = "file:${rvfConfigLocation}/api.properties", ignoreResourceNotFound=true)})
 @EnableConfigurationProperties
-@EnableJms
 public class ApiConfig {
 	
 	@Configuration
