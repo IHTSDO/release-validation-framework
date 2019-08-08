@@ -42,6 +42,7 @@ public class AssertionGroupImporter {
 		CH_AUTHORING("CH", "ch-authoring"),
 		IE_AUTHORING("IE", "ie-authoring"),
 		EE_AUTHORING("EE", "ee-authoring"),
+		NZ_AUTHORING("NZ", "nz-authoring"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC", "first-time-loinc-validation"),
 		FIRST_TIME_COMMON_EDITION_VALIDATION ("COMMON", "first-time-common-edition"),
 		LOINC_EDITION ("LOINC", "LoincEdition"),
