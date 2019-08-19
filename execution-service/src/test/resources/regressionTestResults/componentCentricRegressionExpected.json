@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 95,
-  "totalAssertionsFailed" : 95,
+  "totalAssertionsRun" : 96,
+  "totalAssertionsFailed" : 96,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -341,14 +341,6 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Terms that contain en-us specific words are in the en-us language refset.",
-    "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: tumour"
-    } ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "Active preferred terms for active concepts are unique in the same hierarchy",
     "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
     "firstNInstances" : [ {
@@ -365,6 +357,22 @@
     "firstNInstances" : [ {
       "conceptId" : "700132006",
       "detail" : "DESCRIPTION: id=3005197021: Synonym is preferred in the en-gb language refset but refers to a word that has en-us spelling: analog"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Terms that contain en-us specific words are in the en-us language refset.",
+    "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : "700132006",
+      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: tumour"
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Core module concepts have core module parents.",
+    "assertionUuid" : "f55ed5ec-fc57-429c-8190-bbd5cbb8343a",
+    "firstNInstances" : [ {
+      "conceptId" : "338875005",
+      "detail" : "Core module concept 338875005 has Model module parent "
     } ],
     "totalFailed" : 1
   }, {
@@ -759,7 +767,7 @@
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship."
     } ],
-    "totalFailed" : 10
+    "totalFailed" : 11
   }, {
     "assertionName" : "Relationship groups contain at least 2 relationships.",
     "assertionUuid" : "411e9840-7d08-11e1-b0c4-0800200c9a66",
@@ -850,8 +858,11 @@
     }, {
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006: Concept does not have a stated is-a relationship."
-    } ],
-    "totalFailed" : 9
+    }, {
+      "conceptId" : "238875005",
+      "detail" : "CONCEPT: id=238875005: Concept does not have a stated is-a relationship."
+    }],
+    "totalFailed" : 11
   }, {
     "assertionName" : "No active Terms contain leading or trailing spaces.",
     "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",

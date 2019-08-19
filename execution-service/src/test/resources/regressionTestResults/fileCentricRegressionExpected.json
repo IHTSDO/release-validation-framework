@@ -194,7 +194,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Swiss French language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "All source ids found in the Stated Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "9f84d9a0-79b9-11e1-b0c4-0800200c9a66",
@@ -314,7 +314,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Swiss German language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "Every active concept has one active preferred term in the en-GB language refset.",
     "assertionUuid" : "b7a09892-7124-4a06-b150-7d86b3a75ce4",
@@ -349,7 +349,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the en-GB language refset"
     } ],
-    "totalFailed" : 11
+    "totalFailed" : 13
   }, {
     "assertionName" : "ID is unique in the LOINC ExpressionAssociationRefset snapshot.",
     "assertionUuid" : "b9b535f0-5b68-4192-81f6-115dea2f49c0",
@@ -442,7 +442,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Belgian French language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the key values in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "c779d282-3c4d-4c16-a8a6-8d1a621b247d",
@@ -692,7 +692,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Danish language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Belgian Dutch language refset.",
     "assertionUuid" : "eef4d352-b7e6-11e7-a7c5-3c15c2c6e32e",
@@ -838,7 +838,7 @@
       "conceptId" : "702386002",
       "detail" : "Concept: id=702386002 does not have an active FSN in any refset."
     } ],
-    "totalFailed" : 25
+    "totalFailed" : 29
   }, {
     "assertionName" : "Preferred Term exists exactly once in each language refset for each concept.",
     "assertionUuid" : "03cf9850-7857-11e1-b0c4-0800200c9a66",
@@ -913,7 +913,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006 does not have an FSN preferred in the en-GB language refset."
     } ],
-    "totalFailed" : 11
+    "totalFailed" : 13
   }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DESCRIPTION snapshot.",
     "assertionUuid" : "1491f72c-cb00-42db-a97b-9c685f4e4cb0",
@@ -1040,7 +1040,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Norwegian language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "Every active concept defined in the Irish extension has a preferred FSN in the en-US language refset.",
     "assertionUuid" : "28fbe41f-132b-43b6-a7e2-ee1454dd7736",
@@ -1125,7 +1125,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Belgian Dutch language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "Every active concept has one active preferred term in the Norwegian language refset.",
     "assertionUuid" : "3539253a-5143-4945-a16c-800e66c6d836",
@@ -1238,7 +1238,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Estonian language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "Every active concept has one active preferred term in the Swiss German language refset.",
     "assertionUuid" : "42927cbf-c914-4bdf-81a9-8934f0f8eb6b",
@@ -1278,7 +1278,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Irish language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "There is a 1:1 relationship between the id and the immutable values in the description snapshot.",
     "assertionUuid" : "48118153-d32a-4d1c-bfbc-23ed953e9991",
@@ -1427,7 +1427,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Swiss Italian language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "Every active concept from the international release is recommended to have one active preferred term in the Swedish language refset.",
     "assertionUuid" : "69500336-2cde-45a5-93b3-1e262069f136",
@@ -1462,7 +1462,7 @@
       "conceptId" : "700132006",
       "detail" : "Concept: id=700132006: has no active preferred term in the Swedish language refset"
     } ],
-    "totalFailed" : 12
+    "totalFailed" : 14
   }, {
     "assertionName" : "Referencedcomponentid refers to valid concepts in the SIMPLE REFSET snapshot.",
     "assertionUuid" : "6a407415-8415-4870-a6ef-b5bc22f73c1f",
@@ -1619,7 +1619,7 @@
       "conceptId" : "703649004",
       "detail" : "RELATIONSHIP: id=1000006026: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
     } ],
-    "totalFailed" : 15
+    "totalFailed" : 16
   }, {
     "assertionName" : "There is a 1-to-1 relationship between the id and the immutable values in STATED RELATIONSHIP snapshot.",
     "assertionUuid" : "7e453140-79b9-11e1-b0c4-0800200c9a66",
