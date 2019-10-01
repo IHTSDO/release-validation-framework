@@ -267,8 +267,11 @@
     "firstNInstances" : [ {
       "conceptId" : "703860006",
       "detail" : "Active description id = 3008366010 and inactive description id = 2984057023 share the same term"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Active description id = 3008366019 and inactive description id = 2984057023 share the same term"
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "All active FSNs have a semantic tag.",
     "assertionUuid" : "a4ed3a89-170e-4d9c-995a-716447c4fe64",
@@ -338,8 +341,11 @@
     "firstNInstances" : [ {
       "conceptId" : "703860006",
       "detail" : "Active description id = 3008366010 and inactive description id = 2984057023 share the same term"
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "Active description id = 3008366019 and inactive description id = 2984057023 share the same term"
     } ],
-    "totalFailed" : 1
+    "totalFailed" : 2
   }, {
     "assertionName" : "Active preferred terms for active concepts are unique in the same hierarchy",
     "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",

@@ -14,7 +14,8 @@
 		'<ASSERTIONUUID>',
 		a.conceptid,
 		concat('Concept:',a.conceptid, ' has multiple description ids for the same term:', a.term) 	
-	from curr_description_d a 
+	from curr_description_d a
+	where a.active = '1'
 	group by a.conceptid, a.moduleid, a.languagecode, binary (a.term)
 	having count(a.id) > 1;
 	commit;
