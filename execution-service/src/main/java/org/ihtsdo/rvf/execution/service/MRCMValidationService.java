@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.execution.service;
 
-import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -86,32 +85,27 @@ public class MRCMValidationService {
 				skippedAssertions.add(testRunItem);
 			}
 
-			final List<TestRunItem> failedAssertions = new ArrayList<>();
-
+			int maxFailureExports = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
+			final List<TestRunItem> warnedAssertions = new ArrayList<>();
 			for(Assertion assertion : validationRun.getFailedAssertions()){
-				int failureCount = assertion.getCurrentViolatedConceptIds().size();
-				if(failureCount == 0) continue;
-				int maxFailuresCount = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
-				int firstNCount = failureCount >= maxFailuresCount? maxFailuresCount : failureCount;
-				testRunItem = new TestRunItem();
-				testRunItem.setTestCategory("");
-				testRunItem.setTestType(TestType.MRCM);
-				testRunItem.setAssertionUuid(assertion.getUuid());
-				testRunItem.setAssertionText(assertion.getAssertionText());
-				testRunItem.setExtractResultInMillis(0L);
-				testRunItem.setFailureCount(Long.valueOf(failureCount));
-				List<FailureDetail> failedDetails = new ArrayList(firstNCount);
-				for(int i = 0; i < firstNCount; i++) {
-					Long conceptId = assertion.getCurrentViolatedConceptIds().get(i);
-					failedDetails.add(new FailureDetail(String.valueOf(conceptId), assertion.getAssertionText()));
+				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
+				if(testRunItem != null) {
+					warnedAssertions.add(testRunItem);
 				}
-				testRunItem.setFirstNInstances(failedDetails);
-				failedAssertions.add(testRunItem);
+			}
+
+			final List<TestRunItem> failedAssertions = new ArrayList<>();
+			for(Assertion assertion : validationRun.getFailedAssertions()){
+				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
+				if(testRunItem != null) {
+					failedAssertions.add(testRunItem);
+				}
 			}
 
 			report.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
-			report.addSkippedAssertions(skippedAssertions);
 			report.addFailedAssertions(failedAssertions);
+			report.addWarningAssertions(warnedAssertions);
+			report.addSkippedAssertions(skippedAssertions);
 			report.addPassedAssertions(passedAssertions);
 		} catch (Exception ex) {
 			String message = "MRCM validation has stopped";
@@ -128,12 +122,26 @@ public class MRCMValidationService {
 
 	private TestRunItem createTestRunItem(Assertion mrcmAssertion) {
 		TestRunItem testRunItem = new TestRunItem();
-		testRunItem.setTestCategory("");
 		testRunItem.setTestType(TestType.MRCM);
 		testRunItem.setAssertionUuid(mrcmAssertion.getUuid());
 		testRunItem.setAssertionText(mrcmAssertion.getAssertionText());
 		testRunItem.setFailureCount(0L);
 		testRunItem.setExtractResultInMillis(0L);
+		return testRunItem;
+	}
+
+	private TestRunItem createTestRunItemWithFailures(Assertion mrcmAssertion, int failureExportMax) {
+		int failureCount = mrcmAssertion.getCurrentViolatedConceptIds().size();
+		if(failureCount == 0) return null;
+		int firstNCount = failureCount >= failureExportMax ? failureExportMax : failureCount;
+		TestRunItem testRunItem = createTestRunItem(mrcmAssertion);
+		testRunItem.setFailureCount(Long.valueOf(failureCount));
+		List<FailureDetail> failedDetails = new ArrayList(firstNCount);
+		for(int i = 0; i < firstNCount; i++) {
+			Long conceptId = mrcmAssertion.getCurrentViolatedConceptIds().get(i);
+			failedDetails.add(new FailureDetail(String.valueOf(conceptId), mrcmAssertion.getAssertionText()));
+		}
+		testRunItem.setFirstNInstances(failedDetails);
 		return testRunItem;
 	}
 
