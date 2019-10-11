@@ -32,6 +32,7 @@ public class AssertionGroupImporter {
 		SPANISH_EDITION ("ES", "SpanishEdition"),
 		INTERNATIONAL_EDITION ("INT", "InternationalEdition"),
 		COMMON_AUTHORING ("COMMON", "common-authoring"),
+		COMMON_AUTHORING_WITHOUT_LANG_REFSETS ("COMMON_AUTHORING_WITHOUT_LANG_REFSETS", "common-authoring-without-lang-refsets"),
 		COMMON_EDITION("COMMON", "common-edition"),
 		INT_AUTHORING ("INT", "int-authoring"),
 		DK_AUTHORING("DK", "dk-authoring"),
@@ -128,6 +129,27 @@ public class AssertionGroupImporter {
 			"2a938c7e-0803-44a1-8358-339daa87ee39",
 			"f2293d20-7cd6-11e1-b0c4-0800200c9a66"
 	};
+
+	private static final String[] COMMON_LANGUAGE_REFSETS_ASSERTIONS = {
+			"bd27d80a-42f1-4412-8111-fdf72fa32904",
+			"73e46e72-6fdb-407b-9d50-d86a36a3a862",
+			"d76f1430-7e9a-11e1-b0c4-0800200c9a66",
+			"28c3a31d-7a9d-48f6-8eb9-18c25b6306fb",
+			"f0b4c712-781a-4ca5-872e-883cf1949f12",
+			"ffe6c560-7856-11e1-b0c4-0800200c9a66",
+			"03cf9850-7857-11e1-b0c4-0800200c9a66",
+			"c3249e80-84f0-11e1-b0c4-0800200c9a66",
+			"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b",
+			"f636b7b0-7e9a-11e1-b0c4-0800200c9a66",
+			"b87c6dfe-c109-4c8d-91f2-a15a17631ad2",
+			"eff30fb0-7856-11e1-b0c4-0800200c9a66",
+			"de0c4d6c-6297-41be-9979-fb1c93717baa",
+			"f5d9ae70-7856-11e1-b0c4-0800200c9a66",
+			"e658fb00-7e9a-11e1-b0c4-0800200c9a66",
+			"91e26b70-ea15-4057-8c31-a1bf91614654",
+			"a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5",
+			"fc24db60-7856-11e1-b0c4-0800200c9a66",
+	};
 		
 /* the following were included but feel that they should be validated for project level as well.
 	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
@@ -205,6 +227,9 @@ public class AssertionGroupImporter {
 				break;
 			case COMMON_AUTHORING :
 				createCommonSnapshotAssertionGroup(allAssertions);
+				break;
+			case COMMON_AUTHORING_WITHOUT_LANG_REFSETS :
+				createCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions);
 				break;
 			case INT_AUTHORING :
 			case DK_AUTHORING :
@@ -287,6 +312,40 @@ public class AssertionGroupImporter {
 				}
 				// Exclude stated relationship assertions
 				if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+					continue;
+				}
+				assertionService.addAssertionToGroup(assertion, group);
+				counter++;
+			}
+		}
+		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
+	}
+
+	private void createCommonSnapshotWithoutLangRefsetsAssertionGroup(List<Assertion> allAssertions) {
+		AssertionGroup group = new AssertionGroup();
+		group.setName(AssertionGroupName.COMMON_AUTHORING_WITHOUT_LANG_REFSETS.getName());
+		group = assertionService.createAssertionGroup(group);
+		int counter = 0;
+		for (Assertion assertion : allAssertions) {
+			String keyWords = assertion.getKeywords();
+			if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
+				continue;
+			}
+			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)) {
+				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
+				if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+					continue;
+				}
+				//exclude simple map file checking as term server extracts don't contain these
+				if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
+					continue;
+				}
+				// Exclude stated relationship assertions
+				if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+					continue;
+				}
+
+				if (Arrays.asList(COMMON_LANGUAGE_REFSETS_ASSERTIONS).contains(assertion.getUuid().toString())) {
 					continue;
 				}
 				assertionService.addAssertionToGroup(assertion, group);

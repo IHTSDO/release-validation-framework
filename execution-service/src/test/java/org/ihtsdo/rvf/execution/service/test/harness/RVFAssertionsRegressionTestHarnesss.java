@@ -192,7 +192,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Test
 	public void testTotalGroups() {
-		assertEquals(32, assertionService.getAllAssertionGroups().size());
+		assertEquals(33, assertionService.getAllAssertionGroups().size());
 	}
 	
 	@Test
