@@ -20,7 +20,7 @@ public class RF2FilesReleaseTypeTesterTest {
         String manifestFilename = "/manifest_20250731.xml";
         File manifestFile = new File(getClass().getResource(manifestFilename).toURI());
         RF2FilesReleaseTypeTester tester = new RF2FilesReleaseTypeTester(new TestValidationLogImpl(RF2FilesReleaseTypeTester.class)
-                , null, new ManifestFile(manifestFile), testReport);
+                , new ManifestFile(manifestFile), testReport);
         tester.runTest();
         assertEquals("Release files are expected to be in correct release folders", 0, testReport.getNumErrors());
     }
@@ -31,7 +31,7 @@ public class RF2FilesReleaseTypeTesterTest {
         String manifestFilename = "/manifest_20250731_Invalid.xml";
         File manifestFile = new File(getClass().getResource(manifestFilename).toURI());
         RF2FilesReleaseTypeTester tester = new RF2FilesReleaseTypeTester(new TestValidationLogImpl(RF2FilesReleaseTypeTester.class)
-                , null, new ManifestFile(manifestFile), testReport);
+                , new ManifestFile(manifestFile), testReport);
         tester.runTest();
         assertEquals("Release files are expected to be in incorrect release folders", 3, testReport.getNumErrors());
     }

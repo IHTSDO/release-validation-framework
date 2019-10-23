@@ -61,6 +61,10 @@ public class StructuralTestRunner {
 		}
 		runColumnTests(resourceManager, testReport, validationLog);
 		runLineFeedTests(resourceManager, testReport);
+
+		if ( manifest != null) {
+			runRF2FileReleaseTypeTester(testReport, manifest);
+		}
 		
 		testReport.getResult();
 		final String summary = testReport.writeSummary();
@@ -85,6 +89,12 @@ public class StructuralTestRunner {
 			final ManifestFile manifest, final ValidationLog validationLog) {
 		final ManifestPatternTester manifestPatternTester = new ManifestPatternTester(validationLog, resourceManager, manifest, report);
 		manifestPatternTester.runTests();
+	}
+
+	private void runRF2FileReleaseTypeTester(final TestReportable report, final ManifestFile manifest) {
+		final RF2FilesReleaseTypeTester rf2FilesReleaseTypeTester = new RF2FilesReleaseTypeTester(
+				validationLogFactory.getValidationLog(RF2FilesReleaseTypeTester.class), manifest, report);
+		rf2FilesReleaseTypeTester.runTest();
 	}
 
 	private void runColumnTests(final ResourceProvider resourceManager, final TestReportable report, final ValidationLog validationLog) {
