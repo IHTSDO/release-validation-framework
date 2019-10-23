@@ -23,6 +23,10 @@ public class FileElement {
 		this.fileName = fileName;
 	}
 
+	public String getName() {
+		return this.fileName;
+	}
+
 	@Override
 	public String toString() {
 		return "FileElement{" +

@@ -30,6 +30,10 @@ public class Folder {
 		return folderName;
 	}
 
+	public String getName() {
+		return folderName;
+	}
+
 	public void setFolderName(String folderName) {
 		this.folderName = folderName;
 	}
