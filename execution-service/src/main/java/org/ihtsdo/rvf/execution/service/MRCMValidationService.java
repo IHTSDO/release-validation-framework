@@ -60,7 +60,7 @@ public class MRCMValidationService {
 			ValidationService validationService = new ValidationService();
 			ValidationRun validationRun = new ValidationRun(
 					StringUtils.isNotBlank(effectiveDate) ? effectiveDate.replaceAll("-","") : effectiveDate
-					, false);
+					, true);
 			try {
 				outputFolder = extractZipFile(validationConfig, executionId);
 
