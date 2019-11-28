@@ -1024,11 +1024,8 @@
     "firstNInstances" : [ {
       "conceptId" : "772725006",
       "detail" : "OWL Expression Refset: id=809cab7f-dcf5-49b9-8581-a5af8ba41555  is inactive but no active state found in previous release."
-    }, {
-      "conceptId" : "772599006",
-      "detail" : "OWL Expression Refset: id=80d13eb6-fa6f-4b12-aa93-73a573ee9244  is inactive but the OWL Expression was changed from previous release"
-    } ],
-    "totalFailed" : 2
+    }],
+    "totalFailed" : 1
   }, {
     "assertionName" : "The current full language refset file consists of the previously published full file and the changes for the current release",
     "assertionUuid" : "28c3a31d-7a9d-48f6-8eb9-18c25b6306fb",
