@@ -1,16 +1,25 @@
 package org.ihtsdo.rvf.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class FailureDetail implements Comparable<FailureDetail>{
 
 	String conceptId;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	String conceptFsn;
 	String detail;
-	
+
 	public FailureDetail(String conceptId, String detail) {
 		this.conceptId = new String (conceptId);
 		this.detail = detail;
 	}
-	
+
+	public FailureDetail(String conceptId, String detail, String conceptFsn) {
+		this.conceptId = conceptId;
+		this.detail = detail;
+		this.conceptFsn = conceptFsn;
+	}
+
 	public String getConceptId() {
 		return conceptId;
 	}
@@ -60,5 +69,13 @@ public class FailureDetail implements Comparable<FailureDetail>{
 	@Override
 	public int compareTo(FailureDetail other) {
 		return ((Integer)hashCode()).compareTo((Integer)other.hashCode());
+	}
+
+	public String getConceptFsn() {
+		return conceptFsn;
+	}
+
+	public void setConceptFsn(String conceptFsn) {
+		this.conceptFsn = conceptFsn;
 	}
 }

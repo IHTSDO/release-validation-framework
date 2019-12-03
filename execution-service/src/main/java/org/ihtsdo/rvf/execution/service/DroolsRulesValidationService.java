@@ -62,7 +62,7 @@ public class DroolsRulesValidationService {
 	
 	@Autowired
 	private ValidationReleaseStorageConfig releaseStorageConfig;
-	
+
 	@Autowired
 	private ResourceLoader cloudResourceLoader;
 	
@@ -219,7 +219,7 @@ public class DroolsRulesValidationService {
 					List<InvalidContent> invalidContentList = invalidContentMap.get(rule);
 					validationRule.setFailureCount((long) invalidContentList.size());
 					validationRule.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
-							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage()))
+							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()))
 							.collect(Collectors.toList()));
 					Severity severity = invalidContentList.get(0).getSeverity();
 					if(Severity.WARNING.equals(severity)) {
@@ -238,7 +238,7 @@ public class DroolsRulesValidationService {
 					List<InvalidContent> invalidContentList = groupRules.get(rule);
 					testRunItem.setFailureCount((long)invalidContentList.size());
 					testRunItem.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
-							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage()))
+							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()))
 							.collect(Collectors.toList()));
 					Severity severity = invalidContentList.get(0).getSeverity();
 					if(Severity.WARNING.equals(severity)) {
