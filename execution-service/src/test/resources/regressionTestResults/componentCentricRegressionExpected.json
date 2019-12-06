@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 96,
-  "totalAssertionsFailed" : 96,
+  "totalAssertionsRun" : 94,
+  "totalAssertionsFailed" : 94,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -775,23 +775,6 @@
     } ],
     "totalFailed" : 11
   }, {
-    "assertionName" : "Relationship groups contain at least 2 relationships.",
-    "assertionUuid" : "411e9840-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "10002003",
-      "detail" : "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member."
-    }, {
-      "conceptId" : "10041001",
-      "detail" : "RELATIONSHIP: id=4969199027: Relationship is in a relationship group with a single active inferred member."
-    }, {
-      "conceptId" : "255135009",
-      "detail" : "RELATIONSHIP: id=1000002029: Relationship is in a relationship group with a single active inferred member."
-    }, {
-      "conceptId" : "280844000",
-      "detail" : "RELATIONSHIP: id=100000028: Relationship is in a relationship group with a single active inferred member."
-    } ],
-    "totalFailed" : 4
-  }, {
     "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
     "assertionUuid" : "4572d730-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -892,26 +875,6 @@
       "detail" : "Description: id=2989770013 has active term with leading or trailing spaces."
     } ],
     "totalFailed" : 6
-  }, {
-    "assertionName" : "Relationship groups contain at least 2 relationships.",
-    "assertionUuid" : "59b574a0-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "109443007",
-      "detail" : "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member."
-    }, {
-      "conceptId" : "128534003",
-      "detail" : "RELATIONSHIP: id=4998022027: Relationship is in a relationship group with a single active inferred member."
-    }, {
-      "conceptId" : "205627002",
-      "detail" : "RELATIONSHIP: id=4994338024: Relationship is in a relationship group with a single active inferred member."
-    }, {
-      "conceptId" : "702411003",
-      "detail" : "RELATIONSHIP: id=4969198024: Relationship is in a relationship group with a single active inferred member."
-    }, {
-      "conceptId" : "703649004",
-      "detail" : "RELATIONSHIP: id=4969200029: Relationship is in a relationship group with a single active inferred member."
-    } ],
-    "totalFailed" : 5
   }, {
     "assertionName" : "All FSNs end in closing parentheses.",
     "assertionUuid" : "5a605c09-db1e-453f-aa4a-064faab2d310",
