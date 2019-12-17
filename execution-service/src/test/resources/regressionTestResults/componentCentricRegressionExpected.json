@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 94,
-  "totalAssertionsFailed" : 94,
+  "totalAssertionsRun" : 95,
+  "totalAssertionsFailed" : 95,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -773,7 +773,7 @@
       "conceptId" : "700132006",
       "detail" : "CONCEPT: id=700132006: Concept does not have an inferred is-a relationship."
     } ],
-    "totalFailed" : 11
+    "totalFailed" : 12
   }, {
     "assertionName" : "No Concept has 2 inferred relationships with the same type, destination and group.",
     "assertionUuid" : "4572d730-7d08-11e1-b0c4-0800200c9a66",
@@ -851,7 +851,7 @@
       "conceptId" : "238875005",
       "detail" : "CONCEPT: id=238875005: Concept does not have a stated is-a relationship."
     }],
-    "totalFailed" : 11
+    "totalFailed" : 14
   }, {
     "assertionName" : "No active Terms contain leading or trailing spaces.",
     "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",
@@ -1135,5 +1135,16 @@
       "detail" : "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term"
     } ],
     "totalFailed" : 4
+  }, {
+    "assertionName" : "Each referenced Structure should only map single Entire.",
+    "assertionUuid" : "25127b5e-a16f-4faf-85a3-9331674792a2",
+    "firstNInstances" : [ {
+      "conceptId" : "822981006",
+      "detail" : "A duplicated 'Entire' concept with id 822981006 is referencing to 'Structure' concept 63337009"
+    }, {
+      "conceptId" : "362662005",
+      "detail" : "A duplicated 'Entire' concept with id 362662005 is referencing to 'Structure' concept 63337009"
+    } ],
+    "totalFailed" : 2
   } ]
 }

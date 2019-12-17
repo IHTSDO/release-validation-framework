@@ -97,7 +97,7 @@
       "conceptId" : "703860006",
       "detail" : "Description: id=2989790017 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 35
+    "totalFailed" : 38
   }, {
     "assertionName" : "There must be actual changes made to previously published OWL Expression files in order for them to appear in the current delta.",
     "assertionUuid" : "910844a8-97e5-4096-add2-e1734b941e10",
@@ -1690,7 +1690,7 @@
       "conceptId" : "238875005",
       "detail" : "CONCEPT: id=238875005 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 19
+    "totalFailed" : 22
   }, {
     "assertionName" : "The current Association refset full file contains all previously published data unchanged.",
     "assertionUuid" : "653ce147-780e-4b3d-8afe-bd8d116c8c17",
@@ -1881,7 +1881,7 @@
       "conceptId" : "703649004",
       "detail" : "Inferred relationship: id=1000006026 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 19
+    "totalFailed" : 21
   }, {
     "assertionName" : "There must be actual changes made to previously published extended map refset components in order for them to appear in the current delta.",
     "assertionUuid" : "7a961c22-3f51-4f72-9b5e-1dc99c298719",
