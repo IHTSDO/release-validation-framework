@@ -447,7 +447,6 @@
 		<script uuid="905122c9-f24f-4d57-b478-435d693ff209" category="component-centric-validation" sqlFile="component-centric-snapshot-descripton-term-length.sql" text="A description should not have more than 255 characters long." />
 		<script uuid="7dd01495-2099-4e7b-9d02-39899bf774f3" category="component-centric-validation" sqlFile="component-centric-snapshot-definition-term-used-in-description-warning.sql" text="A description normally has less than 35 words." />
 		<script uuid="f55ed5ec-fc57-429c-8190-bbd5cbb8343a" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-core-module-concepts-have-core-module-parents.sql" text="Core module concepts have core module parents." />
-		<script uuid="25127b5e-a16f-4faf-85a3-9331674792a2" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-description-each-structure-map-single-entire.sql" text="Each referenced Structure should only map single Entire." />
 		<!-- Exclude these assertion for the time being
 		<script uuid="0a4bba70-85b7-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-navigation.sql" text="targetComponentId in association refset file does not refer to navigation concepts." />
 		<script uuid="38b88ff6-7ee3-40a5-b362-98a87e80526e" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-inactive.sql" text="Inactive Non-human refset members refer to inactive components." />
