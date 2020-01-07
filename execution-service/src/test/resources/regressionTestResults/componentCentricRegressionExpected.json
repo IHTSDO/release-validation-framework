@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 94,
-  "totalAssertionsFailed" : 94,
+  "totalAssertionsRun" : 95,
+  "totalAssertionsFailed" : 95,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -1135,5 +1135,16 @@
       "detail" : "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term"
     } ],
     "totalFailed" : 4
+  }, {
+    "assertionName" : "Active structure concepts are unique in SEP reference sets.",
+    "assertionUuid" : "22405025-d572-4bbb-b0fd-b066ac49b983",
+    "firstNInstances" : [ {
+      "conceptId" : "51289009",
+      "detail" : "Active structure concept: id=51289009 is being referenced by multiple Part concepts id=329256003,609256004."
+    }, {
+      "conceptId" : "85562004",
+      "detail" : "Active structure concept: id=85562004 is being referenced by multiple Entire concepts id=329256001,609256002."
+    } ],
+    "totalFailed" : 2
   } ]
 }

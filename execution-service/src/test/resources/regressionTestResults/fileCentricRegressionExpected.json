@@ -396,13 +396,13 @@
       "conceptId" : "10171006",
       "detail" : "ASSOC RS: id=10171006:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
     }, {
-      "conceptId" : "128534003",
-      "detail" : "ASSOC RS: id=128534003:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
+      "conceptId" : "51289009",
+      "detail" : "ASSOC RS: id=51289009:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
     }, {
-      "conceptId" : "280164007",
-      "detail" : "ASSOC RS: id=280164007:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
+      "conceptId" : "51289009",
+      "detail" : "ASSOC RS: id=51289009:Invalid Referencedcomponentid in ASSOCIATION REFSET snapshot."
     } ],
-    "totalFailed" : 11
+    "totalFailed" : 15
   }, {
     "assertionName" : "Every active concept has one active preferred term in the Swiss Italian language refset.",
     "assertionUuid" : "c6badb72-f9a1-4d78-9aa3-bd9c6a8ae468",
@@ -1165,7 +1165,7 @@
       "conceptId" : "10171006",
       "detail" : "ASSOC RS: Targetcomponentid=239777004:Invalid TargetComponentId."
     } ],
-    "totalFailed" : 13
+    "totalFailed" : 17
   }, {
     "assertionName" : "Every active concept defined in the Swiss extension has a preferred FSN in the en-US language refset.",
     "assertionUuid" : "3ad55905-01fa-4b82-8612-fabfa8603dc7",

@@ -277,7 +277,7 @@
       "conceptId" : "1000004",
       "detail" : "ASSOCIATION REFSET: id=fb7f359a-8a7b-5b89-8afc-ed60ba61eb71 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 22
+    "totalFailed" : 26
   }, {
     "assertionName" : "The current data in the Association refset snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "b808204b-5608-4865-b334-50a6d113b36b",
