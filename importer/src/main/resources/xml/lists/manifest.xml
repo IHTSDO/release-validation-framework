@@ -452,6 +452,8 @@
 		<script uuid="0a4bba70-85b7-11e1-b0c4-0800200c9a66" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-navigation.sql" text="targetComponentId in association refset file does not refer to navigation concepts." />
 		<script uuid="38b88ff6-7ee3-40a5-b362-98a87e80526e" category="component-centric-validation" sqlFile="component-centric-snapshot-nonhuman-inactive.sql" text="Inactive Non-human refset members refer to inactive components." />
 		-->
+		<script uuid="2b166f4e-73ae-4c89-b2bb-bc9ce07fa9d9" category="component-centric-validation" sqlFile="component-centric-snapshot-fully-defined-concept-against-owlexpression.sql" text="Active fully-defined concept must have at least one Axiom record with the words 'EquivalentClasses'." />
+
 		<script uuid="041dcf55-4c9c-4dd4-baa7-584eb0e53d5a" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-unique-indicator.sql" text="Concept should not have any duplicated historical association indicators." />
 		<script uuid="b72bc5f4-7afb-4a2e-ac3a-e0f4373b03e6" category="component-centric-validation" sqlFile="component-centric-snapshot-active-concept-with-inactivation-reason.sql" text="Active concepts do not have active inactivation indicators" />
 		<script uuid="e2aa5b09-5754-484f-9eb8-bb18732617ef" category="component-centric-validation" sqlFile="component-centric-snapshot-active-description-with-inactivation-reason.sql" text="Active descriptions do not have active inactivation indicators" />

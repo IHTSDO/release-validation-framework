@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 95,
-  "totalAssertionsFailed" : 95,
+  "totalAssertionsRun" : 96,
+  "totalAssertionsFailed" : 96,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -1146,5 +1146,13 @@
       "detail" : "Active structure concept: id=85562004 is being referenced by multiple Entire concepts id=329256001,609256002."
     } ],
     "totalFailed" : 2
+  }, {
+    "assertionName" : "Active fully-defined concept must have at least one Axiom record with the words 'EquivalentClasses'.",
+    "assertionUuid" : "2b166f4e-73ae-4c89-b2bb-bc9ce07fa9d9",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Fully defined concept: id=702411003 has no Axiom record with the words EquivalentClasses."
+    } ],
+    "totalFailed" : 1
   } ]
 }
