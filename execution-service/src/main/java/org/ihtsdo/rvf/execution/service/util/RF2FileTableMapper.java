@@ -23,10 +23,10 @@ public class RF2FileTableMapper {
 	private static final String MAP_CORRELATION_ORIGIN_FILE_HEADER = "der2_scccRefset_.*MapCorrelationOrigin";
 	private static final String MODULE_DEPENDENCY_FILE_HEADER = "der2_ssRefset_ModuleDependency";
 	private static final String OWL_EXPRESSION_FILE_HEADER = "sct2_sRefset_OWLExpression";
-	private static final String MRCM_ATTRIBUTE_DOMAIN_FILE_HEADER = "rel2_cissccRefset_MRCMAttributeDomain";
-	private static final String MRCM_MODULE_SCOPE_FILE_HEADER = "rel2_cRefset_MRCMModuleScope";
-	private static final String MRCM_ATTRIBUTE_RANGE_FILE_HEADER = "rel2_ssccRefset_MRCMAttributeRange";
-	private static final String MRCM_DOMAIN_FILE_HEADER = "rel2_sssssssRefset_MRCMDomain";
+	private static final String MRCM_ATTRIBUTE_DOMAIN_FILE_HEADER = "der2_cissccRefset_MRCMAttributeDomain";
+	private static final String MRCM_MODULE_SCOPE_FILE_HEADER = "der2_cRefset_MRCMModuleScope";
+	private static final String MRCM_ATTRIBUTE_RANGE_FILE_HEADER = "der2_ssccRefset_MRCMAttributeRange";
+	private static final String MRCM_DOMAIN_FILE_HEADER = "der2_sssssssRefset_MRCMDomain";
 	private static final Map<String,String> tableNameMap = new HashMap<>();
 	private static final String DELTA = ".*Delta.*_*_\\d{8}.txt";
 	private static final String SNAPSHOT = ".*Snapshot.*_*_\\d{8}.txt";

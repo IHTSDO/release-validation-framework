@@ -1158,24 +1158,21 @@
     "assertionName" : "All referenced concepts in MRCM refsets must be active.",
     "assertionUuid" : "628a8d16-d8ba-405e-b321-1f5f7dd70d91",
     "firstNInstances" : [ {
-      "conceptId" : "774159003",
-      "detail" : "Reference component id:774159003 must be active."
+      "conceptId" : "370129005",
+      "detail" : "Reference component id:370129005 must be active."
     }, {
-      "conceptId" : "774158006",
-      "detail" : "Reference component id:774158006 must be active."
+      "conceptId" : "363713009",
+      "detail" : "Reference component id:363713009 must be active."
     }, {
-        "conceptId" : "246501002",
-        "detail" : "Reference component id:246501002 must be active."
+        "conceptId" : "405814001",
+        "detail" : "Reference component id:405814001 must be active."
     }, {
-        "conceptId" : "363787002",
-        "detail" : "Reference component id:363787002 must be active."
+        "conceptId" : "246090004",
+        "detail" : "Reference component id:246090004 must be active."
     }, {
-        "conceptId" : "373873005",
-        "detail" : "Reference component id:373873005 must be active."
-    }, {
-        "conceptId" : "781405001",
-        "detail" : "Reference component id:781405001 must be active."
+        "conceptId" : "900000000000207008",
+        "detail" : "Reference component id:900000000000207008 must be active."
     }],
-    "totalFailed" : 6
+    "totalFailed" : 5
   } ]
 }

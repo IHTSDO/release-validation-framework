@@ -82,28 +82,28 @@ load data local
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_cRefset_MRCMModuleScopeFull_INT_<release_version>.txt'
+	infile '<data_location>/der2_cRefset_MRCMModuleScopeFull_INT_<release_version>.txt'
 	into table mrcmModuleScopeRefset_f
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_ssccRefset_MRCMAttributeRangeFull_INT_<release_version>.txt'
+	infile '<data_location>/der2_ssccRefset_MRCMAttributeRangeFull_INT_<release_version>.txt'
 	into table mrcmAttributeRangeRefset_f
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_sssssssRefset_MRCMDomainFull_INT_<release_version>.txt'
+	infile '<data_location>/der2_sssssssRefset_MRCMDomainFull_INT_<release_version>.txt'
 	into table mrcmDomainRefset_f
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_ssccRefset_MRCMAttributeDomainFull_INT_<release_version>.txt'
+	infile '<data_location>/der2_ssccRefset_MRCMAttributeDomainFull_INT_<release_version>.txt'
 	into table mrcmAttributeDomainRefset_f
 	columns terminated by '\t'
 	lines terminated by '\r\n'
@@ -188,28 +188,28 @@ load data local
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_cRefset_MRCMModuleScopeSnapshot_INT_<release_version>.txt'
+	infile '<data_location>/der2_cRefset_MRCMModuleScopeSnapshot_INT_<release_version>.txt'
 	into table mrcmModuleScopeRefset_s
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_ssccRefset_MRCMAttributeRangeSnapshot_INT_<release_version>.txt'
+	infile '<data_location>/der2_ssccRefset_MRCMAttributeRangeSnapshot_INT_<release_version>.txt'
 	into table mrcmAttributeRangeRefset_s
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_sssssssRefset_MRCMDomainSnapshot_INT_<release_version>.txt'
+	infile '<data_location>/der2_sssssssRefset_MRCMDomainSnapshot_INT_<release_version>.txt'
 	into table mrcmDomainRefset_s
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_ssccRefset_MRCMAttributeDomainSnapshot_INT_<release_version>.txt'
+	infile '<data_location>/der2_ssccRefset_MRCMAttributeDomainSnapshot_INT_<release_version>.txt'
 	into table mrcmAttributeDomainRefset_s
 	columns terminated by '\t'
 	lines terminated by '\r\n'
@@ -294,28 +294,28 @@ load data local
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_cRefset_MRCMModuleScopeDelta_INT_<release_version>.txt'
+	infile '<data_location>/der2_cRefset_MRCMModuleScopeDelta_INT_<release_version>.txt'
 	into table mrcmModuleScopeRefset_d
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_ssccRefset_MRCMAttributeRangeDelta_INT_<release_version>.txt'
+	infile '<data_location>/der2_ssccRefset_MRCMAttributeRangeDelta_INT_<release_version>.txt'
 	into table mrcmAttributeRangeRefset_d
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_sssssssRefset_MRCMDomainDelta_INT_<release_version>.txt'
+	infile '<data_location>/der2_sssssssRefset_MRCMDomainDelta_INT_<release_version>.txt'
 	into table mrcmDomainRefset_d
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/rel2_ssccRefset_MRCMAttributeDomainDelta_INT_<release_version>.txt'
+	infile '<data_location>/der2_ssccRefset_MRCMAttributeDomainDelta_INT_<release_version>.txt'
 	into table mrcmAttributeDomainRefset_d
 	columns terminated by '\t'
 	lines terminated by '\r\n'

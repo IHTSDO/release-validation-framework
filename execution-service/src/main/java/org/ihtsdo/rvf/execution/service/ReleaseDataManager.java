@@ -242,7 +242,7 @@ public class ReleaseDataManager {
 				
 				@Override
 				public boolean accept(final File dir, final String name) {
-					return name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2") || name.startsWith("rel2"));
+					return name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2"));
 				}
 			});
 			final ReleaseFileDataLoader dataLoader = new ReleaseFileDataLoader(dataSource, schemaName, new MySqlDataTypeConverter());

@@ -1,2 +1,0 @@
-id	effectiveTime	active	moduleId	refsetId	referencedComponentId	rangeConstraint	attributeRule	ruleStrengthId	contentTypeId
-f58d75aa-599a-42e7-9f35-31a9c8a7d6d9	20200131	1	900000000000012004	723562003	246501002	<< 272394005 |Technique (qualifier value)| OR << 273249006 |Assessment scales (assessment scale)|	<< 363787002 |Observable entity (observable entity)|: [0..*] { [0..1] 246501002 |Technique| = (<< 272394005 |Technique (qualifier value)| OR << 273249006 |Assessment scales (assessment scale)|) }	723597001	723596005

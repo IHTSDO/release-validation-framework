@@ -1,0 +1,3 @@
+id	effectiveTime	active	moduleId	refsetId	referencedComponentId	domainId	grouped	attributeCardinality	attributeInGroupCardinality	ruleStrengthId	contentTypeId
+8038688b-80f5-49b3-b3d8-c6fe13f8fb1e	20170731	1	900000000000012004	723561005	370129005	386053000	1	0..*	0..1	723597001	723596005
+81da6aa5-0cb1-463f-88ad-c25a795a211b	20170731	1	900000000000012004	723561005	363713009	404684003	1	0..*	0..1	723597001	723596005
