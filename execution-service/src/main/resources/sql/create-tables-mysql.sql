@@ -253,6 +253,86 @@ create table owlexpressionrefset_f(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
+drop table if exists mrcmAttributeDomainRefset_f;
+create table mrcmAttributeDomainRefset_f(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	domainId bigint(20) not null,
+	grouped  char(1) not null,
+	attributeCardinality text not null,
+	attributeInGroupCardinality text not null,
+	ruleStrengthId bigint(20) not null,
+	contentTypeId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmModuleScopeRefset_f;
+create table mrcmModuleScopeRefset_f(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mrcmRuleRefsetId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmAttributeRangeRefset_f;
+create table mrcmAttributeRangeRefset_f(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	rangeConstraint text not null,
+	attributeRule text not null,
+	ruleStrengthId bigint(20) not null,
+	contentTypeId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmDomainRefset_f;
+create table mrcmDomainRefset_f(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	domainConstraint text not null,
+	parentDomain text not null,
+	proximalPrimitiveConstraint text not null,
+	proximalPrimitiveRefinement text not null,
+	domainTemplateForPrecoordination text not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
 /* create the Snapshot S-CT data tables */
 
 drop table if exists concept_s;
@@ -501,6 +581,86 @@ create table owlexpressionrefset_s(
 	refsetid bigint(20) not null,
 	referencedcomponentid bigint(20) not null,
 	owlexpression text not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmAttributeDomainRefset_s;
+create table mrcmAttributeDomainRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	domainId bigint(20) not null,
+	grouped  char(1) not null,
+	attributeCardinality text not null,
+	attributeInGroupCardinality text not null,
+	ruleStrengthId bigint(20) not null,
+	contentTypeId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmModuleScopeRefset_s;
+create table mrcmModuleScopeRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mrcmRuleRefsetId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmAttributeRangeRefset_s;
+create table mrcmAttributeRangeRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	rangeConstraint text not null,
+	attributeRule text not null,
+	ruleStrengthId bigint(20) not null,
+	contentTypeId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmDomainRefset_s;
+create table mrcmDomainRefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	domainConstraint text not null,
+	parentDomain text not null,
+	proximalPrimitiveConstraint text not null,
+	proximalPrimitiveRefinement text not null,
+	domainTemplateForPrecoordination text not null,
 	key idx_id(id),
 	key idx_effectivetime(effectivetime),
 	key idx_active(active),
@@ -975,4 +1135,83 @@ create table owlexpressionrefset_d(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
+drop table if exists mrcmAttributeDomainRefset_d;
+create table mrcmAttributeDomainRefset_d(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	domainId bigint(20) not null,
+	grouped  char(1) not null,
+	attributeCardinality text not null,
+	attributeInGroupCardinality text not null,
+	ruleStrengthId bigint(20) not null,
+	contentTypeId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmModuleScopeRefset_d;
+create table mrcmModuleScopeRefset_d(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	mrcmRuleRefsetId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmAttributeRangeRefset_d;
+create table mrcmAttributeRangeRefset_d(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	rangeConstraint text not null,
+	attributeRule text not null,
+	ruleStrengthId bigint(20) not null,
+	contentTypeId bigint(20) not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists mrcmDomainRefset_d;
+create table mrcmDomainRefset_d(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	domainConstraint text not null,
+	parentDomain text not null,
+	proximalPrimitiveConstraint text not null,
+	proximalPrimitiveRefinement text not null,
+	domainTemplateForPrecoordination text not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
 

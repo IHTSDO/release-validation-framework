@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 96,
-  "totalAssertionsFailed" : 96,
+  "totalAssertionsRun" : 97,
+  "totalAssertionsFailed" : 97,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -1154,5 +1154,28 @@
       "detail" : "Fully defined concept: id=702411003 has no Axiom record with the words EquivalentClasses."
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "All referenced concepts in MRCM refsets must be active.",
+    "assertionUuid" : "628a8d16-d8ba-405e-b321-1f5f7dd70d91",
+    "firstNInstances" : [ {
+      "conceptId" : "774159003",
+      "detail" : "Reference component id:774159003 must be active."
+    }, {
+      "conceptId" : "774158006",
+      "detail" : "Reference component id:774158006 must be active."
+    }, {
+        "conceptId" : "246501002",
+        "detail" : "Reference component id:246501002 must be active."
+    }, {
+        "conceptId" : "363787002",
+        "detail" : "Reference component id:363787002 must be active."
+    }, {
+        "conceptId" : "373873005",
+        "detail" : "Reference component id:373873005 must be active."
+    }, {
+        "conceptId" : "781405001",
+        "detail" : "Reference component id:781405001 must be active."
+    }],
+    "totalFailed" : 6
   } ]
 }
