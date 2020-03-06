@@ -103,7 +103,7 @@ load data local
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/der2_ssccRefset_MRCMAttributeDomainFull_INT_<release_version>.txt'
+	infile '<data_location>/der2_cissccRefset_MRCMAttributeDomainFull_INT_<release_version>.txt'
 	into table mrcmAttributeDomainRefset_f
 	columns terminated by '\t'
 	lines terminated by '\r\n'
@@ -209,7 +209,7 @@ load data local
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/der2_ssccRefset_MRCMAttributeDomainSnapshot_INT_<release_version>.txt'
+	infile '<data_location>/der2_cissccRefset_MRCMAttributeDomainSnapshot_INT_<release_version>.txt'
 	into table mrcmAttributeDomainRefset_s
 	columns terminated by '\t'
 	lines terminated by '\r\n'
@@ -315,7 +315,7 @@ load data local
 	ignore 1 lines;
 
 load data local
-	infile '<data_location>/der2_ssccRefset_MRCMAttributeDomainDelta_INT_<release_version>.txt'
+	infile '<data_location>/der2_cissccRefset_MRCMAttributeDomainDelta_INT_<release_version>.txt'
 	into table mrcmAttributeDomainRefset_d
 	columns terminated by '\t'
 	lines terminated by '\r\n'
