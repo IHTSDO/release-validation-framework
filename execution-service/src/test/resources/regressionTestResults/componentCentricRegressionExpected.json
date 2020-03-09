@@ -1159,26 +1159,11 @@
     "assertionUuid" : "628a8d16-d8ba-405e-b321-1f5f7dd70d91",
     "firstNInstances" : [ {
       "conceptId" : "414408004",
-      "detail" : "Reference component id:414408004 must be active."
+      "detail" : "Reference component id:414408004 in MRCM module scope refset must be active."
     }, {
       "conceptId" : "51042001",
-      "detail" : "Reference component id:51042001 must be active."
-    }, {
-        "conceptId" : "370129005",
-        "detail" : "Reference component id:370129005 must be active."
-    }, {
-        "conceptId" : "363713009",
-        "detail" : "Reference component id:363713009 must be active."
-    }, {
-        "conceptId" : "732943007",
-        "detail" : "Reference component id:732943007 must be active."
-    }, {
-      "conceptId" : "246075003",
-      "detail" : "Reference component id:246075003 must be active."
-    }, {
-      "conceptId" : "129125009",
-      "detail" : "Reference component id:129125009 must be active."
+      "detail" : "Reference component id:51042001 in MRCM module scope refset must be active."
     }],
-    "totalFailed" : 7
+    "totalFailed" : 2
   } ]
 }
