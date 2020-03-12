@@ -13,7 +13,7 @@ select
     '<ASSERTIONUUID>',
     a.sourceid,
     concat('Role Group number of relationship: id=',a.id, ' is higher than 100.')
-from curr_relationship_s a
+from curr_relationship_d a
 where a.active = '1'
     and relationshipgroup >= 100;
 
@@ -23,7 +23,7 @@ select
     '<ASSERTIONUUID>',
     a.sourceid,
     concat('Role Group number of stated relationship: id=',a.id, ' is higher than 100.')
-from curr_stated_relationship_s a
+from curr_stated_relationship_d a
 where a.active = '1'
     and relationshipgroup >= 100;
 

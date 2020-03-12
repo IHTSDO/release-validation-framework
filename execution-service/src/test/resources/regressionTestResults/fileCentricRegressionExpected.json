@@ -263,7 +263,7 @@
       "conceptId" : "702386002",
       "detail" : "RELATIONSHIP: id=4768117024: Stated Relationship contains a type id that does not exist in the Concept snapshot file."
     } ],
-    "totalFailed" : 14
+    "totalFailed" : 13
   }, {
     "assertionName" : "Every active concept defined in the Swedish extension has a preferred FSN in the en-US language refset.",
     "assertionUuid" : "a733b706-a8f3-4fcf-9686-77abb2c60d64",
@@ -1508,7 +1508,7 @@
       "conceptId" : "703649004",
       "detail" : "RELATIONSHIP: id=1000006026: Inferred Relationship contains a destination id that does not exist in the Concept snapshot file."
     } ],
-    "totalFailed" : 16
+    "totalFailed" : 15
   }, {
     "assertionName" : "ComplexMap refset id is unique in the snapshot file",
     "assertionUuid" : "6e70ea3e-c4dd-4ae3-8b75-0f0567e41b57",
@@ -1619,7 +1619,7 @@
       "conceptId" : "703649004",
       "detail" : "RELATIONSHIP: id=1000006026: Inferred Relationship contains type id that does not exist in the Concept snapshot file."
     } ],
-    "totalFailed" : 17
+    "totalFailed" : 16
   }, {
     "assertionName" : "There is a 1-to-1 relationship between the id and the immutable values in STATED RELATIONSHIP snapshot.",
     "assertionUuid" : "7e453140-79b9-11e1-b0c4-0800200c9a66",
