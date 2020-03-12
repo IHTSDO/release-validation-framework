@@ -454,6 +454,7 @@
 		-->
 		<script uuid="2b166f4e-73ae-4c89-b2bb-bc9ce07fa9d9" category="component-centric-validation" sqlFile="component-centric-snapshot-fully-defined-concept-against-owlexpression.sql" text="Active fully-defined concept must have at least one Axiom record with the words 'EquivalentClasses'." />
 		<script uuid="628a8d16-d8ba-405e-b321-1f5f7dd70d91" category="component-centric-validation" sqlFile="component-centric-snapshot-referenced-concepts-in-mrcm-active.sql" text="All referenced concepts in MRCM refsets must be active." />
+		<script uuid="e82a8211-fac1-4998-b3cb-3db99ee4565c" category="component-centric-validation" sqlFile="component-centric-snapshot-role-group-are-in-double-figures.sql" text="Role Group numbers are in double figures." />
 
 		<script uuid="041dcf55-4c9c-4dd4-baa7-584eb0e53d5a" category="component-centric-validation" sqlFile="component-centric-snapshot-historical-association-unique-indicator.sql" text="Concept should not have any duplicated historical association indicators." />
 		<script uuid="b72bc5f4-7afb-4a2e-ac3a-e0f4373b03e6" category="component-centric-validation" sqlFile="component-centric-snapshot-active-concept-with-inactivation-reason.sql" text="Active concepts do not have active inactivation indicators" />

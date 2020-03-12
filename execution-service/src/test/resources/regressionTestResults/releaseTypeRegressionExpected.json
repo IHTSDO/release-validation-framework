@@ -1017,7 +1017,7 @@
       "conceptId" : "702386002",
       "detail" : "Stated relationship: id=4768117024 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 20
+    "totalFailed" : 21
   }, {
     "assertionName" : "All OWL Expression inactivated in current release must have been active in the previous release.",
     "assertionUuid" : "26c25479-c3ba-47f2-9851-bb05ae42ad48",
@@ -1881,7 +1881,7 @@
       "conceptId" : "703649004",
       "detail" : "Inferred relationship: id=1000006026 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 19
+    "totalFailed" : 20
   }, {
     "assertionName" : "There must be actual changes made to previously published extended map refset components in order for them to appear in the current delta.",
     "assertionUuid" : "7a961c22-3f51-4f72-9b5e-1dc99c298719",

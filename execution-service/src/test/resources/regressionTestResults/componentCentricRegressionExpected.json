@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 97,
-  "totalAssertionsFailed" : 97,
+  "totalAssertionsRun" : 98,
+  "totalAssertionsFailed" : 98,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -1163,6 +1163,17 @@
     }, {
       "conceptId" : "51042001",
       "detail" : "Reference component id:51042001 in MRCM module scope refset must be active."
+    }],
+    "totalFailed" : 2
+  }, {
+    "assertionName" : "Role Group numbers are in double figures.",
+    "assertionUuid" : "e82a8211-fac1-4998-b3cb-3db99ee4565c",
+    "firstNInstances" : [ {
+      "conceptId" : "338875005",
+      "detail" : "Role Group number of stated relationship: id=4800000060 is higher than 100."
+    }, {
+      "conceptId" : "338875005",
+      "detail" : "Role Group number of relationship: id=1000005070 is higher than 100."
     }],
     "totalFailed" : 2
   } ]

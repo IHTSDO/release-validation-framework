@@ -167,7 +167,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
-		assertEquals(190, assertions.size());
+		assertEquals(191, assertions.size());
 		assertEquals(77, releaseTypeAssertions.size());
 	}
 	
@@ -180,7 +180,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Test
 	public void testTotalAssertions() {
-		assertEquals(293, assertionService.count().longValue());
+		assertEquals(294, assertionService.count().longValue());
 	}
 	
 	@Test
@@ -198,12 +198,12 @@ public class RVFAssertionsRegressionTestHarnesss {
 	@Test
 	public void testGetAssertionsForCommonAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
-		assertEquals(72, group.getAssertions().size());
+		assertEquals(73, group.getAssertions().size());
 	}
 	
 	@Test
 	public void testSpecificAssertion() throws Exception {
-		runAssertionsTest("26c25479-c3ba-47f2-9851-bb05ae42ad48");
+		runAssertionsTest("26c25479-c3ba-47f2-9851-bb01835ae42ad48");
 	}
 	
 	private void runAssertionsTest(String assertionUUID) throws Exception {
