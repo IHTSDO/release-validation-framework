@@ -1170,10 +1170,10 @@
     "assertionUuid" : "e82a8211-fac1-4998-b3cb-3db99ee4565c",
     "firstNInstances" : [ {
       "conceptId" : "698412011",
-      "detail" : "Role Group number of stated relationship: id=4793408028 is higher than 100."
+      "detail" : "Role Group number of stated relationship: id=4793408028 should be in double figures."
     }, {
       "conceptId" : "699754008",
-      "detail" : "Role Group number of relationship: id=1000007027 is higher than 100."
+      "detail" : "Role Group number of relationship: id=1000007027 should be in double figures."
     }],
     "totalFailed" : 2
   } ]

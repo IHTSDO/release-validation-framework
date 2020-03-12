@@ -12,7 +12,7 @@ select
     <RUNID>,
     '<ASSERTIONUUID>',
     a.sourceid,
-    concat('Role Group number of relationship: id=',a.id, ' is higher than 100.')
+    concat('Role Group number of relationship: id=',a.id, ' should be in double figures.')
 from curr_relationship_d a
 where a.active = '1'
     and relationshipgroup >= 100;
@@ -22,7 +22,7 @@ select
     <RUNID>,
     '<ASSERTIONUUID>',
     a.sourceid,
-    concat('Role Group number of stated relationship: id=',a.id, ' is higher than 100.')
+    concat('Role Group number of stated relationship: id=',a.id, ' should be in double figures.')
 from curr_stated_relationship_d a
 where a.active = '1'
     and relationshipgroup >= 100;
