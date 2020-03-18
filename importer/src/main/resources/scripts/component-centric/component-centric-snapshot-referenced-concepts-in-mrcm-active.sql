@@ -7,24 +7,15 @@ component-centric-snapshot-referenced-concepts-in-mrcm-active.sql
 	
 
 ********************************************************************************/
-
-    /* 	list of active concepts */
-    drop table if exists tmp_active_concepts;
-    create table if not exists tmp_active_concepts as
-    select a.id as conceptid
-    from curr_concept_s a
-    where a.active = '1';
-    commit;
-
 	insert into qa_result (runid, assertionuuid, concept_id, details)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('Reference component id:',a.referencedcomponentid, ' in MRCM Attribute Domain refset must be active.')
-	from curr_mrcmAttributeDomainRefset_s a left join tmp_active_concepts b on a.referencedcomponentid = b.conceptid
+	from curr_mrcmAttributeDomainRefset_s a left join curr_concept_s b on a.referencedcomponentid = b.id
 	where a.active = '1'
-        and b.conceptid is null;
+        and b.active = '0';
 
     insert into qa_result (runid, assertionuuid, concept_id, details)
     select
@@ -32,9 +23,9 @@ component-centric-snapshot-referenced-concepts-in-mrcm-active.sql
         '<ASSERTIONUUID>',
         a.referencedcomponentid,
         concat('Reference component id:',a.referencedcomponentid, ' in MRCM Attribute Range refset must be active.')
-    from curr_mrcmAttributeRangeRefset_s a left join tmp_active_concepts b on a.referencedcomponentid = b.conceptid
+    from curr_mrcmAttributeRangeRefset_s a left join curr_concept_s b on a.referencedcomponentid = b.id
     where a.active = '1'
-        and b.conceptid is null;
+        and b.active = '0';
 
     insert into qa_result (runid, assertionuuid, concept_id, details)
     select
@@ -42,9 +33,9 @@ component-centric-snapshot-referenced-concepts-in-mrcm-active.sql
         '<ASSERTIONUUID>',
         a.referencedcomponentid,
         concat('Reference component id:',a.referencedcomponentid, ' in MRCM  Domain refset must be active.')
-    from curr_mrcmDomainRefset_s a left join tmp_active_concepts b on a.referencedcomponentid = b.conceptid
+    from curr_mrcmDomainRefset_s a left join curr_concept_s b on a.referencedcomponentid = b.id
     where a.active = '1'
-        and b.conceptid is null;
+        and b.active = '0';
 
     insert into qa_result (runid, assertionuuid, concept_id, details)
     select
@@ -52,9 +43,6 @@ component-centric-snapshot-referenced-concepts-in-mrcm-active.sql
         '<ASSERTIONUUID>',
         a.referencedcomponentid,
         concat('Reference component id:',a.referencedcomponentid, ' in MRCM module scope refset must be active.')
-    from curr_mrcmModuleScopeRefset_s a left join tmp_active_concepts b on a.referencedcomponentid = b.conceptid
+    from curr_mrcmModuleScopeRefset_s a left join curr_concept_s b on a.referencedcomponentid = b.id
     where a.active = '1'
-        and b.conceptid is null;
-
-     /* drop temp tables */
-    drop table tmp_active_concepts;
+        and b.active = '0';
