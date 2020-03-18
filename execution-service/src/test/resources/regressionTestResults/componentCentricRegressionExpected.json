@@ -1140,10 +1140,10 @@
     "assertionUuid" : "22405025-d572-4bbb-b0fd-b066ac49b983",
     "firstNInstances" : [ {
       "conceptId" : "51289009",
-      "detail" : "Active structure concept: id=51289009 is being referenced by multiple Part concepts id=329256003,609256004."
+      "detail" : "Active structure concept: id=51289009 is being referenced by multiple Part concepts id=238875005,338875005."
     }, {
       "conceptId" : "85562004",
-      "detail" : "Active structure concept: id=85562004 is being referenced by multiple Entire concepts id=329256001,609256002."
+      "detail" : "Active structure concept: id=85562004 is being referenced by multiple Entire concepts id=238875005,338875005."
     } ],
     "totalFailed" : 2
   }, {

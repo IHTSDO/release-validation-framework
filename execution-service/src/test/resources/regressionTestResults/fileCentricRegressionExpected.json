@@ -1165,7 +1165,7 @@
       "conceptId" : "10171006",
       "detail" : "ASSOC RS: Targetcomponentid=239777004:Invalid TargetComponentId."
     } ],
-    "totalFailed" : 17
+    "totalFailed" : 13
   }, {
     "assertionName" : "Every active concept defined in the Swiss extension has a preferred FSN in the en-US language refset.",
     "assertionUuid" : "3ad55905-01fa-4b82-8612-fabfa8603dc7",
