@@ -253,8 +253,8 @@ create table owlexpressionrefset_f(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmAttributeDomainRefset_f;
-create table mrcmAttributeDomainRefset_f(
+drop table if exists mrcmattributedomainrefset_f;
+create table mrcmattributedomainrefset_f(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -281,8 +281,8 @@ create table mrcmAttributeDomainRefset_f(
 	key idx_contenttypeid(contenttypeid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmModuleScopeRefset_f;
-create table mrcmModuleScopeRefset_f(
+drop table if exists mrcmmodulescoperefset_f;
+create table mrcmmodulescoperefset_f(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -298,8 +298,8 @@ create table mrcmModuleScopeRefset_f(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmAttributeRangeRefset_f;
-create table mrcmAttributeRangeRefset_f(
+drop table if exists mrcmattributerangerefset_f;
+create table mrcmattributerangerefset_f(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -318,8 +318,8 @@ create table mrcmAttributeRangeRefset_f(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmDomainRefset_f;
-create table mrcmDomainRefset_f(
+drop table if exists mrcmdomainrefset_f;
+create table mrcmdomainrefset_f(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -595,8 +595,8 @@ create table owlexpressionrefset_s(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmAttributeDomainRefset_s;
-create table mrcmAttributeDomainRefset_s(
+drop table if exists mrcmattributedomainrefset_s;
+create table mrcmattributedomainrefset_s(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -623,8 +623,8 @@ create table mrcmAttributeDomainRefset_s(
 	key idx_contenttypeid(contenttypeid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmModuleScopeRefset_s;
-create table mrcmModuleScopeRefset_s(
+drop table if exists mrcmmodulescoperefset_s;
+create table mrcmmodulescoperefset_s(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -640,8 +640,8 @@ create table mrcmModuleScopeRefset_s(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmAttributeRangeRefset_s;
-create table mrcmAttributeRangeRefset_s(
+drop table if exists mrcmattributerangerefset_s;
+create table mrcmattributerangerefset_s(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -660,8 +660,8 @@ create table mrcmAttributeRangeRefset_s(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmDomainRefset_s;
-create table mrcmDomainRefset_s(
+drop table if exists mrcmdomainrefset_s;
+create table mrcmdomainrefset_s(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -1147,8 +1147,8 @@ create table owlexpressionrefset_d(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmAttributeDomainRefset_d;
-create table mrcmAttributeDomainRefset_d(
+drop table if exists mrcmattributedomainrefset_d;
+create table mrcmattributedomainrefset_d(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -1175,8 +1175,8 @@ create table mrcmAttributeDomainRefset_d(
 	key idx_contenttypeid(contenttypeid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmModuleScopeRefset_d;
-create table mrcmModuleScopeRefset_d(
+drop table if exists mrcmmodulescoperefset_d;
+create table mrcmmodulescoperefset_d(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -1192,8 +1192,8 @@ create table mrcmModuleScopeRefset_d(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmAttributeRangeRefset_d;
-create table mrcmAttributeRangeRefset_d(
+drop table if exists mrcmattributerangerefset_d;
+create table mrcmattributerangerefset_d(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -1212,8 +1212,8 @@ create table mrcmAttributeRangeRefset_d(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mrcmDomainRefset_d;
-create table mrcmDomainRefset_d(
+drop table if exists mrcmdomainrefset_d;
+create table mrcmdomainrefset_d(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
