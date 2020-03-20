@@ -1158,13 +1158,16 @@
     "assertionName" : "All referenced concepts in MRCM refsets must be active.",
     "assertionUuid" : "628a8d16-d8ba-405e-b321-1f5f7dd70d91",
     "firstNInstances" : [ {
-      "conceptId" : "414408004",
-      "detail" : "Reference component id:414408004 in MRCM module scope refset must be active."
+      "conceptId" : "231311",
+      "detail" : "Reference component id:231311 in MRCM module scope refset must be active."
     }, {
-      "conceptId" : "51042001",
-      "detail" : "Reference component id:51042001 in MRCM module scope refset must be active."
+      "conceptId" : "4654654",
+      "detail" : "Reference component id:4654654 in MRCM module scope refset must be active."
+    }, {
+      "conceptId" : "699765003",
+      "detail" : "Reference component id:699765003 in MRCM module scope refset must be active."
     }],
-    "totalFailed" : 2
+    "totalFailed" : 3
   }, {
     "assertionName" : "Role Group numbers are in double figures.",
     "assertionUuid" : "e82a8211-fac1-4998-b3cb-3db99ee4565c",
