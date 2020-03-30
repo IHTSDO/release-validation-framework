@@ -1,10 +1,14 @@
 package org.ihtsdo.rvf.execution.service;
 
+import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.otf.snomedboot.ReleaseImportException;
+import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
@@ -27,8 +31,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MRCMValidationService {
@@ -46,6 +53,16 @@ public class MRCMValidationService {
 	private static final String MRCM_PROSPECTIVE_FILE = "mrcm_prospective_file_";
 
 	private static final String MRCM_DEPENDENCY_FILE = "mrcm_dependency_file_";
+
+	private static final String EXT_ZIP = ".zip";
+
+	private static final String SNAPSHOT = "Snapshot.*_*_\\d{8}.txt";
+
+	private static final String DELTA = "Delta.*_*_\\d{8}.txt";
+
+	private static final String ID = "id";
+
+	private static final String LINE_ENDING = "\r\n";
 
 	@PostConstruct
 	public void init() {
@@ -146,7 +163,7 @@ public class MRCMValidationService {
 	}
 
 	private File extractZipFile(ValidationRunConfig validationConfig, Long executionId) throws BusinessServiceException, RVFExecutionException {
-		File outputFolder;
+		File outputFolder, deltaOutputFolder = null, snapshotOutputFolder = null;
 		try{
 			outputFolder = new File(FileUtils.getTempDirectoryPath(), MRCM_PROSPECTIVE_FILE + executionId);
 			LOGGER.info("Unzipped release folder location = " + outputFolder.getAbsolutePath());
@@ -156,13 +173,42 @@ public class MRCMValidationService {
 			}
 			outputFolder.mkdir();
 
-			ZipFileUtils.extractFilesFromZipToOneFolder(validationConfig.getLocalProspectiveFile(), outputFolder.getAbsolutePath());
+			if (validationConfig.isRf2DeltaOnly()) {
+				if(StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
+					throw new RVFExecutionException("MRCM validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
+				}
+				InputStream previousStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getPreviousRelease());
+
+				//Unzip the release files
+				try {
+					String snapshotDirectoryPath  = new ReleaseImporter().unzipRelease(previousStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
+					snapshotOutputFolder = new File(snapshotDirectoryPath);
+					FileUtils.copyDirectory(snapshotOutputFolder, outputFolder);
+
+					deltaOutputFolder = Files.createTempDir();
+					ZipFileUtils.extractFilesFromZipToOneFolder(validationConfig.getLocalProspectiveFile(), deltaOutputFolder.getAbsolutePath());
+					constructSnapshotFiles(outputFolder, deltaOutputFolder);
+				} catch (ReleaseImportException e) {
+					e.printStackTrace();
+				} finally {
+					if(snapshotOutputFolder != null) {
+						FileUtils.deleteQuietly(snapshotOutputFolder);
+					}
+					if(deltaOutputFolder != null) {
+						FileUtils.deleteQuietly(deltaOutputFolder);
+					}
+				}
+			}
+			else {
+				ZipFileUtils.extractFilesFromZipToOneFolder(validationConfig.getLocalProspectiveFile(), outputFolder.getAbsolutePath());
+			}
+
 			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
-				if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(".zip")) {
+				if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
 					throw new RVFExecutionException("MRCM validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 				}
 				InputStream dependencyStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getExtensionDependency());
-				File dependencyFile = File.createTempFile(MRCM_DEPENDENCY_FILE, ".zip");
+				File dependencyFile = File.createTempFile(MRCM_DEPENDENCY_FILE, EXT_ZIP);
 				OutputStream out = new FileOutputStream(dependencyFile);
 				IOUtils.copy(dependencyStream, out);
 				IOUtils.closeQuietly(dependencyStream);
@@ -174,8 +220,58 @@ public class MRCMValidationService {
 			LOGGER.error(errorMsg, ex);
 			throw new BusinessServiceException(errorMsg, ex);
 		}
+
 		return outputFolder;
 	}
 
-	
+	/**
+	 *
+	 * @param snapshotDir
+	 * @param deltaDir
+	 * @throws IOException
+	 */
+	protected void constructSnapshotFiles(File snapshotDir, File deltaDir) throws IOException {
+		for (File deltaFile : deltaDir.listFiles()) {
+			for (File snapshotFile : snapshotDir.listFiles()) {
+				if (deltaFile.exists() && !deltaFile.isDirectory()
+						&& snapshotFile.exists() && !snapshotFile.isDirectory()
+						&& deltaFile.getName().matches(".*" + DELTA)
+						&& snapshotFile.getName().matches(".*" + SNAPSHOT)
+						&& deltaFile.getName().contains(snapshotFile.getName().replaceAll(SNAPSHOT, ""))) {
+
+					List<String> linesInSnapshotFile = FileUtils.readLines(snapshotFile, StandardCharsets.UTF_8);
+					List<String> linesInDeltaFile = FileUtils.readLines(deltaFile, StandardCharsets.UTF_8);
+					Map<String,String> snapshotLineMap = new HashMap<>();
+					Map<String,String> deltaLineMap = new HashMap();
+					List<String> newLines = new ArrayList();
+
+					for (String line : linesInSnapshotFile) {
+						String[] columns = line.split("\t");
+						if (!ID.equalsIgnoreCase(columns[0])) {
+							snapshotLineMap.put(columns[0], line);
+						}
+						else {
+							newLines.add(line);
+						}
+					}
+
+					for (String line : linesInDeltaFile) {
+						String[] columns = line.split("\t");
+						if (!ID.equalsIgnoreCase(columns[0])) {
+							deltaLineMap.put(columns[0], line);
+						}
+					}
+
+					for (String key : deltaLineMap.keySet()) {
+						snapshotLineMap.put(key, deltaLineMap.get(key));
+					}
+
+					newLines.addAll(snapshotLineMap.values());
+					FileUtils.writeLines(snapshotFile, CharEncoding.UTF_8, newLines, LINE_ENDING);
+					break;
+				}
+			}
+		}
+	}
+
 }
