@@ -58,7 +58,8 @@ public class AssertionGroupImporter {
 		GPFP_ICPC2("GPFP-ICPC2","GPFP-ICPC2"),
 		GMDN("GMDN","GMDN"),
 		STATED_RELATIONSHIPS_VALIDATION("STATED_RELATIONSHIPS","stated-relationships-validation"), //Assertions group that contains only stated relationship for file centric and component centric assertions
-		STATED_RELATIONSHIPS_RELEASE_VALIDATION("STATED_RELATIONSHIPS_RELEASE_TYPE","stated-relationships-release-validation"); //Assertion group that contains full list of stated relationship assertions
+		STATED_RELATIONSHIPS_RELEASE_VALIDATION("STATED_RELATIONSHIPS_RELEASE_TYPE","stated-relationships-release-validation"), //Assertion group that contains full list of stated relationship assertions
+		DERIVATIVE_EDITION("DERIVATIVE","DerivativeEdition");
 		private String name;
 		private String releaseCenter;
 		private AssertionGroupName(String releaseCenter, String name) {
@@ -148,6 +149,65 @@ public class AssertionGroupImporter {
 			"a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5",
 			"fc24db60-7856-11e1-b0c4-0800200c9a66",
 	};
+
+	private static final String[] MRCM_REFSETS_ASSERTIONS = {
+			"e968c5d1-e06b-4351-9e96-3f62208d27d4",
+			"413c91cd-4b1a-47cf-a278-3141bea39fde",
+			"292b4427-0cce-493d-b63c-27cd249eafea",
+			"0bd6a234-58f9-424f-84b4-0dc800e5a70b",
+			"0e8e3549-e704-41a2-a853-fd91a60116ee",
+			"338c39ad-6f40-46dc-ad35-b7c697d66a63",
+			"32bc5dc7-192c-441f-9693-6710020a6442",
+			"14e30e46-1e7a-4655-b1ca-48254f8b7071",
+			"c3e6008a-2e9a-4b42-9a37-78ea6a4c7799",
+			"bd129ddf-e7ea-49a4-9e9c-ad790b75331d",
+			"40b0b1f3-7ed0-4074-ab0e-c5abd19f70b8",
+			"907c11ad-5ad7-49ed-b3e8-1149b1e95716",
+			"618115ab-b5bc-4ed3-aaba-fec8536fe498",
+			"b110b8de-53df-4387-b0ac-aecfbc01ed0d",
+			"15a2289d-a160-4faa-b1ea-2f54980b5830",
+			"844f4f15-ac5d-48a6-ba33-f11893cb7a20",
+			"c4920cb7-7e7f-4f3f-ae87-f15b7c8fb1b6",
+			"4fe314dd-6f65-4e9e-8ce1-a4c7db598c0d",
+			"b1ebc4cb-6a86-498f-a3ea-aeef250b9399",
+			"cec2a50e-c04b-4442-a979-e8ad8f83ff91",
+			"8864db45-0f97-4eda-b7ba-414289dd3a99",
+			"d7e12c75-9979-4adb-9b5b-3b8a80ab4fbb",
+			"87af4df0-c506-41ed-9089-6a359f16b34f",
+			"4fdf8c6a-8b58-4bf7-a8b5-71176ede7ac0",
+			"becfbeaa-5eab-4a4a-90ca-7c893b7495b2",
+			"0f7b6979-7a9d-45d4-956b-972d452f1638",
+			"75afe90a-eb1c-4e86-9312-22bc742f5b49",
+			"609ed083-737c-401a-9aa9-5666bbd2aff2",
+			"56c6abd0-11c7-409e-b0ed-f9d0f08f2cd7",
+			"0999e34c-36b5-4d33-951a-8e949a66062e",
+			"501dc4c4-49d4-41d9-9751-271687d54820",
+			"7c87a865-beb5-4e03-a489-2b05a40bd860",
+			"504d10af-deba-46f0-85d5-f792749b0d62",
+			"388b2eff-f8b0-418c-9794-d35aaa4d748b",
+			"7c3fe37c-6ad5-446e-bc82-7c2bc078042a",
+			"ad0f8978-c8a7-4d91-8e3e-a887e4830fec",
+			"43bdeea9-be7b-4235-b58e-8842a8e47793",
+			"054bccb0-c678-4722-94dd-b664e0c6267e",
+			"b205d819-2ef6-48e3-8fe1-1793e83a7b8a",
+			"d182e8d4-c8e1-4e5f-ae17-b2f786f55727",
+			"23a71f2e-5c90-4090-af07-bcb3fa3d5673",
+			"ccd8f56e-45ec-40b7-9404-9b264881e64d",
+			"5d0fdbf5-fef6-44b2-aa42-ebb302132178",
+			"9ece50b0-cafc-4e13-a66a-a59d315e9f2c",
+			"a3e31a6c-0443-46a4-8b18-daad481247ed",
+			"e980e959-943b-4cdc-998b-f91e670a030b",
+			"a48d78fe-8ab5-4705-bbc5-1286fb2a98a2",
+			"d51966ed-e034-4a25-90ef-1eb489c0bd37",
+			"6f4aa58c-cc59-4a51-a630-fe4c69bac53b",
+			"bd3bb9ec-97ae-4c53-9686-9c8c63b8d67b",
+			"f1fc2c4b-9202-4a0b-9c00-49b6de7a7cc5",
+			"ce8f4bae-0c51-4248-9c42-8f05a2cccdb4",
+			"b36b78d8-13c3-4fc7-8632-0a03f725da17",
+			"f47d1537-41dc-4cb5-ad0a-ed4caf993801",
+			"73772817-4654-4abf-b801-e849fbae1ba0",
+			"57ae69cd-26f0-4001-ba2f-ae56129e2e28"
+	};
 		
 /* the following were included but feel that they should be validated for project level as well.
 	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
@@ -221,6 +281,7 @@ public class AssertionGroupImporter {
 			case GMDN :
 			case EE_EDITION :
 			case GPFP_ICPC2 :
+			case DERIVATIVE_EDITION :
 				createReleaseAssertionGroup(allAssertions, groupName);
 				break;
 			case COMMON_AUTHORING :
@@ -433,6 +494,9 @@ public class AssertionGroupImporter {
 				continue;
 			}
 			if ( AssertionGroupName.US_EDITION.equals(groupName) && Arrays.asList(US_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+				continue;
+			}
+			if ( AssertionGroupName.DERIVATIVE_EDITION.equals(groupName) && Arrays.asList(MRCM_REFSETS_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;
 			}
 			assertionService.addAssertionToGroup(assertion, assertionGroup);

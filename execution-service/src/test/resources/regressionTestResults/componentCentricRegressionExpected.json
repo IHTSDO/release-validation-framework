@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 98,
-  "totalAssertionsFailed" : 98,
+  "totalAssertionsRun" : 126,
+  "totalAssertionsFailed" : 97,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -254,6 +254,16 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "Check that the expression constraints, refinements and expression templates in multiple columns in MRCM Attribute Range Refset include only valid SNOMED CT concept identifiers",
+    "assertionUuid" : "9ece50b0-cafc-4e13-a66a-a59d315e9f2c",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Check that the expression constraints, refinements and expression templates in multiple columns in MRCM Attribute Range Refset include only valid SNOMED CT concept identifiers",
+    "assertionUuid" : "9ece50b0-cafc-4e13-a66a-a59d315e9f2c",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
     "assertionName" : "CTV3 simple map refset members are unique.",
     "assertionUuid" : "a2e01ee0-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -261,6 +271,26 @@
       "detail" : "MEMBER: id=82f3de7e-e15a-56c2-80a7-8ba824b9bd8e: CTV3 member key (referencedcomponentid, maptarget) is not unique."
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "Check that the value range is valid in MRCM Refsets Snapshot",
+    "assertionUuid" : "a3e31a6c-0443-46a4-8b18-daad481247ed",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Check that the value range is valid in MRCM Refsets Snapshot",
+    "assertionUuid" : "a3e31a6c-0443-46a4-8b18-daad481247ed",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "ID is unique in MRCM ATTRIBUTE DOMAIN snapshot.",
+    "assertionUuid" : "a48d78fe-8ab5-4705-bbc5-1286fb2a98a2",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "ID is unique in MRCM ATTRIBUTE DOMAIN snapshot.",
+    "assertionUuid" : "a48d78fe-8ab5-4705-bbc5-1286fb2a98a2",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "No new active term matches that of an inactive Description.",
     "assertionUuid" : "a49fabee-0d72-41b0-957d-32983c79f26c",
@@ -295,6 +325,16 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "AttributeCardinality value is in ('0..1','0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionUuid" : "b36b78d8-13c3-4fc7-8632-0a03f725da17",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "AttributeCardinality value is in ('0..1','0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionUuid" : "b36b78d8-13c3-4fc7-8632-0a03f725da17",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
     "assertionName" : "All definitions are case sensitive.",
     "assertionUuid" : "b4930ea7-4078-4599-979c-2dde18164f01",
     "firstNInstances" : [ {
@@ -328,6 +368,16 @@
     } ],
     "totalFailed" : 4
   }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE SNAPSHOT.",
+    "assertionUuid" : "bd3bb9ec-97ae-4c53-9686-9c8c63b8d67b",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE RANGE SNAPSHOT.",
+    "assertionUuid" : "bd3bb9ec-97ae-4c53-9686-9c8c63b8d67b",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
     "assertionName" : "CTV3 simple map refset members are always active.",
     "assertionUuid" : "c0869af0-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -346,6 +396,14 @@
       "detail" : "Active description id = 3008366019 and inactive description id = 2984057023 share the same term"
     } ],
     "totalFailed" : 2
+  }, {
+    "assertionName" : "Terms that contain en-us specific words are in the en-us language refset.",
+    "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
+    "firstNInstances" : [ {
+      "conceptId" : "700132006",
+      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: tumour"
+    } ],
+    "totalFailed" : 1
   }, {
     "assertionName" : "Active preferred terms for active concepts are unique in the same hierarchy",
     "assertionUuid" : "c82246b1-a137-40c5-8653-554c9ce82c6b",
@@ -366,21 +424,25 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Terms that contain en-us specific words are in the en-us language refset.",
-    "assertionUuid" : "c3249e80-84f0-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "700132006",
-      "detail" : "DESCRIPTION: id=2984057019: Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: tumour"
-    } ],
-    "totalFailed" : 1
+    "assertionName" : "Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionUuid" : "ce8f4bae-0c51-4248-9c42-8f05a2cccdb4",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
-    "assertionName" : "Core module concepts have core module parents.",
-    "assertionUuid" : "f55ed5ec-fc57-429c-8190-bbd5cbb8343a",
-    "firstNInstances" : [ {
-      "conceptId" : "338875005",
-      "detail" : "Core module concept 338875005 has Model module parent "
-    } ],
-    "totalFailed" : 1
+    "assertionName" : "Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionUuid" : "ce8f4bae-0c51-4248-9c42-8f05a2cccdb4",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "ID is unique in MRCM ATTRIBUTE RANGE snapshot.",
+    "assertionUuid" : "d51966ed-e034-4a25-90ef-1eb489c0bd37",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "ID is unique in MRCM ATTRIBUTE RANGE snapshot.",
+    "assertionUuid" : "d51966ed-e034-4a25-90ef-1eb489c0bd37",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "Lang refset members are active for inactive descriptions in the language refset snapshot file.",
     "assertionUuid" : "d76f1430-7e9a-11e1-b0c4-0800200c9a66",
@@ -462,6 +524,17 @@
     } ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "Role Group numbers are in double figures.",
+    "assertionUuid" : "e82a8211-fac1-4998-b3cb-3db99ee4565c",
+    "firstNInstances" : [ {
+      "conceptId" : "699754008",
+      "detail" : "Role Group number of relationship: id=1000007027 should be in double figures."
+    }, {
+      "conceptId" : "698412011",
+      "detail" : "Role Group number of stated relationship: id=4793408028 should be in double figures."
+    } ],
+    "totalFailed" : 2
+  }, {
     "assertionName" : "No synonyms have semantic tags.",
     "assertionUuid" : "e95acdbd-0a20-4010-9e78-00e70491e800",
     "firstNInstances" : [ {
@@ -469,6 +542,16 @@
       "detail" : "Concept: id=702386002 has synonym containing a semantic tag (observable entity)"
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "ID is unique in MRCM DOMAIN snapshot.",
+    "assertionUuid" : "e980e959-943b-4cdc-998b-f91e670a030b",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "ID is unique in MRCM DOMAIN snapshot.",
+    "assertionUuid" : "e980e959-943b-4cdc-998b-f91e670a030b",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "Active historical association refset members have active concepts as targets.",
     "assertionUuid" : "eb940ee0-7cd6-11e1-b0c4-0800200c9a66",
@@ -497,6 +580,16 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT",
+    "assertionUuid" : "f1fc2c4b-9202-4a0b-9c00-49b6de7a7cc5",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT",
+    "assertionUuid" : "f1fc2c4b-9202-4a0b-9c00-49b6de7a7cc5",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
     "assertionName" : "The definition status is PRIMITIVE for concepts having only one defining relationship.",
     "assertionUuid" : "f2293d20-7cd6-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -505,11 +598,29 @@
     } ],
     "totalFailed" : 1
   }, {
+    "assertionName" : "AttributeInGroupCardinality value is in ('0..0', '0..1', '0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionUuid" : "f47d1537-41dc-4cb5-ad0a-ed4caf993801",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "AttributeInGroupCardinality value is in ('0..0', '0..1', '0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionUuid" : "f47d1537-41dc-4cb5-ad0a-ed4caf993801",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
     "assertionName" : "Active VMP simple refset members refer to active components.",
     "assertionUuid" : "f5092a2b-8874-4290-ae96-a04bf568b1ab",
     "firstNInstances" : [ {
       "conceptId" : "703649004",
       "detail" : "MEMBER: id=f9732f68-2af3-555a-bc7a-fa4a852caca6: Active VMP refset members refer to inactive components."
+    } ],
+    "totalFailed" : 1
+  }, {
+    "assertionName" : "Core module concepts have core module parents.",
+    "assertionUuid" : "f55ed5ec-fc57-429c-8190-bbd5cbb8343a",
+    "firstNInstances" : [ {
+      "conceptId" : "338875005",
+      "detail" : "Core module concept 338875005 has Model module parent "
     } ],
     "totalFailed" : 1
   }, {
@@ -606,6 +717,17 @@
     } ],
     "totalFailed" : 4
   }, {
+    "assertionName" : "Active structure concepts are unique in SEP reference sets.",
+    "assertionUuid" : "22405025-d572-4bbb-b0fd-b066ac49b983",
+    "firstNInstances" : [ {
+      "conceptId" : "51289009",
+      "detail" : "Active structure concept: id=51289009 is being referenced by multiple Part concepts id=238875005,338875005."
+    }, {
+      "conceptId" : "85562004",
+      "detail" : "Active structure concept: id=85562004 is being referenced by multiple Entire concepts id=238875005,338875005."
+    } ],
+    "totalFailed" : 2
+  }, {
     "assertionName" : "Newly inactive concepts must have an active historical association to an active concept - unless indicator NCEP.",
     "assertionUuid" : "22d3065c-98d3-458e-b020-35eec49b4be3",
     "firstNInstances" : [ {
@@ -617,14 +739,22 @@
     } ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "Active fully-defined concept must have at least one Axiom record with the words 'EquivalentClasses'.",
+    "assertionUuid" : "2b166f4e-73ae-4c89-b2bb-bc9ce07fa9d9",
+    "firstNInstances" : [ {
+      "conceptId" : "702411003",
+      "detail" : "Fully defined concept: id=702411003 has no Axiom record with the words EquivalentClasses."
+    } ],
+    "totalFailed" : 1
+  }, {
     "assertionName" : "No active Terms contain double spaces.",
     "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
     "firstNInstances" : [ {
-      "conceptId" : "703860006",
-      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
-    }, {
       "conceptId" : "702386002",
       "detail" : "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces."
+    }, {
+      "conceptId" : "703860006",
+      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
     }, {
       "conceptId" : "703672002",
       "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
@@ -850,8 +980,18 @@
     }, {
       "conceptId" : "238875005",
       "detail" : "CONCEPT: id=238875005: Concept does not have a stated is-a relationship."
-    }],
+    } ],
     "totalFailed" : 11
+  }, {
+    "assertionName" : "MrcmRuleRefsetId in MRCM MODULE SCOPE SNAPSHOT exists in the RefsetId values of MRCM DOMAIN SNAPSHOT or MRCM ATTRIBUTE DOMAIN SNAPSHOT or MRCM ATTRIBUTE RANGE SNAPSHOT",
+    "assertionUuid" : "57ae69cd-26f0-4001-ba2f-ae56129e2e28",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "MrcmRuleRefsetId in MRCM MODULE SCOPE SNAPSHOT exists in the RefsetId values of MRCM DOMAIN SNAPSHOT or MRCM ATTRIBUTE DOMAIN SNAPSHOT or MRCM ATTRIBUTE RANGE SNAPSHOT",
+    "assertionUuid" : "57ae69cd-26f0-4001-ba2f-ae56129e2e28",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "No active Terms contain leading or trailing spaces.",
     "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",
@@ -907,6 +1047,16 @@
     } ],
     "totalFailed" : 6
   }, {
+    "assertionName" : "Check that the expression constraints, refinements and expression templates in multiple columns in MRCM Domain Refset include only valid SNOMED CT concept identifiers",
+    "assertionUuid" : "5d0fdbf5-fef6-44b2-aa42-ebb302132178",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "Check that the expression constraints, refinements and expression templates in multiple columns in MRCM Domain Refset include only valid SNOMED CT concept identifiers",
+    "assertionUuid" : "5d0fdbf5-fef6-44b2-aa42-ebb302132178",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
     "assertionName" : "No Concept has 2 stated relationships with the same type, destination and group.",
     "assertionUuid" : "5d27df10-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -930,6 +1080,11 @@
       "detail" : "TEXTDEFINITION: id=3008053018 contains a term that the first letter is not capitalized."
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "All referenced concepts in MRCM refsets must be active.",
+    "assertionUuid" : "628a8d16-d8ba-405e-b321-1f5f7dd70d91",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "There is only one active inactivation reason for a given referenced component in the attribute value snapshot",
     "assertionUuid" : "638e1194-1934-11e7-819d-3c15c2c6e32e",
@@ -977,6 +1132,16 @@
     } ],
     "totalFailed" : 2
   }, {
+    "assertionName" : "ID is unique in MRCM MODULE SCOPE snapshot.",
+    "assertionUuid" : "6f4aa58c-cc59-4a51-a630-fe4c69bac53b",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "ID is unique in MRCM MODULE SCOPE snapshot.",
+    "assertionUuid" : "6f4aa58c-cc59-4a51-a630-fe4c69bac53b",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
     "assertionName" : "There is one and only one SNOMED RT simple map refset member per concept.",
     "assertionUuid" : "730720b0-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -993,6 +1158,16 @@
       "detail" : "CONCEPT: id=609452007: Concept does not have an associated SNOMED RT refset member."
     } ],
     "totalFailed" : 4
+  }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE RANGE SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN SNAPSHOT",
+    "assertionUuid" : "73772817-4654-4abf-b801-e849fbae1ba0",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE RANGE SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN SNAPSHOT",
+    "assertionUuid" : "73772817-4654-4abf-b801-e849fbae1ba0",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   }, {
     "assertionName" : "All active definitions are preferred.",
     "assertionUuid" : "73e46e72-6fdb-407b-9d50-d86a36a3a862",
@@ -1135,49 +1310,5 @@
       "detail" : "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term"
     } ],
     "totalFailed" : 4
-  }, {
-    "assertionName" : "Active structure concepts are unique in SEP reference sets.",
-    "assertionUuid" : "22405025-d572-4bbb-b0fd-b066ac49b983",
-    "firstNInstances" : [ {
-      "conceptId" : "51289009",
-      "detail" : "Active structure concept: id=51289009 is being referenced by multiple Part concepts id=238875005,338875005."
-    }, {
-      "conceptId" : "85562004",
-      "detail" : "Active structure concept: id=85562004 is being referenced by multiple Entire concepts id=238875005,338875005."
-    } ],
-    "totalFailed" : 2
-  }, {
-    "assertionName" : "Active fully-defined concept must have at least one Axiom record with the words 'EquivalentClasses'.",
-    "assertionUuid" : "2b166f4e-73ae-4c89-b2bb-bc9ce07fa9d9",
-    "firstNInstances" : [ {
-      "conceptId" : "702411003",
-      "detail" : "Fully defined concept: id=702411003 has no Axiom record with the words EquivalentClasses."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "All referenced concepts in MRCM refsets must be active.",
-    "assertionUuid" : "628a8d16-d8ba-405e-b321-1f5f7dd70d91",
-    "firstNInstances" : [ {
-      "conceptId" : "231311",
-      "detail" : "Reference component id:231311 in MRCM module scope refset must be active."
-    }, {
-      "conceptId" : "4654654",
-      "detail" : "Reference component id:4654654 in MRCM module scope refset must be active."
-    }, {
-      "conceptId" : "699765003",
-      "detail" : "Reference component id:699765003 in MRCM module scope refset must be active."
-    }],
-    "totalFailed" : 3
-  }, {
-    "assertionName" : "Role Group numbers are in double figures.",
-    "assertionUuid" : "e82a8211-fac1-4998-b3cb-3db99ee4565c",
-    "firstNInstances" : [ {
-      "conceptId" : "698412011",
-      "detail" : "Role Group number of stated relationship: id=4793408028 should be in double figures."
-    }, {
-      "conceptId" : "699754008",
-      "detail" : "Role Group number of relationship: id=1000007027 should be in double figures."
-    }],
-    "totalFailed" : 2
   } ]
 }
