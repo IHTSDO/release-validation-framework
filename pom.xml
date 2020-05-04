@@ -70,28 +70,28 @@
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>com.mangofactory</groupId>
-		    <artifactId>swagger-springmvc</artifactId>
-		    <version>1.0.2</version>
-		</dependency>
+			<groupId>com.mangofactory</groupId>
+			<artifactId>swagger-springmvc</artifactId>
+			<version>1.0.2</version>
+			</dependency>
 		<dependency>
-        	<groupId>org.springframework.boot</groupId>
-        	<artifactId>spring-boot-starter</artifactId>
-        	<exclusions>
-            	<exclusion>
-                	<groupId>org.springframework.boot</groupId>
-                	<artifactId>spring-boot-starter-logging</artifactId>
-            	</exclusion>
-        	</exclusions>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 		</dependency>
 		<dependency>
-    		<groupId>org.springframework.boot</groupId>
-   		 	<artifactId>spring-boot-starter-data-jpa</artifactId>
-	   	</dependency> 
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency> 
 	</dependencies>
 			
 	<dependencyManagement>
@@ -137,10 +137,10 @@
 					<execution>
 						<id>integration-test</id>
 						<phase>test</phase>
-                    <goals>
-                        <goal>integration-test</goal>
-                        <goal>verify</goal>
-                    </goals>
+						<goals>
+						<goal>integration-test</goal>
+						<goal>verify</goal>
+						</goals>
 					</execution>
 				</executions>
 				<configuration>
@@ -151,33 +151,34 @@
 				</includes>
 				<skipTests>${skip.integration.tests}</skipTests>
 			 </configuration>
-			</plugin> 
-    </plugins>
+			</plugin>
+			</plugins>
 	</build>
 
 	<repositories>
 		<repository>
-			<id>ihtsdo-public-nexus</id>
+			<id>ihtsdo-releases</id>
 			<name>IHTSDO Public Nexus Releases</name>
-			<url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
+			<url>https://nexus3.ihtsdotools.org/repository/maven-releases/</url>
 		</repository>
 		<repository>
-			<id>ihtsdo-public-nexus-snapshot</id>
+			<id>ihtsdo-snapshots</id>
 			<name>IHTSDO Public Nexus Snapshots</name>
-			<url>https://maven.ihtsdotools.org/content/repositories/snapshots/</url>
+			<url>https://nexus3.ihtsdotools.org/repository/maven-snapshots/</url>
 		</repository>
 	</repositories>
+	
 
 	<distributionManagement>
 		<repository>
 			<id>ihtsdo-public-nexus</id>
 			<name>IHTSDO Public Nexus Releases</name>
-			<url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
+			<url>https://nexus3.ihtsdotools.org/repository/maven-releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>ihtsdo-public-nexus</id>
 			<name>IHTSDO Public Nexus Snapshots</name>
-			<url>https://maven.ihtsdotools.org/content/repositories/snapshots/</url>
+			<url>https://nexus3.ihtsdotools.org/repository/maven-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
