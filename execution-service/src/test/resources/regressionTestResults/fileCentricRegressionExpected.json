@@ -1,13 +1,8 @@
 {
   "assertionType" : "file-centric-validation",
-  "totalAssertionsRun" : 123,
+  "totalAssertionsRun" : 105,
   "totalAssertionsFailed" : 68,
   "results" : [ {
-    "assertionName" : "RefsetId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot",
-    "assertionUuid" : "844f4f15-ac5d-48a6-ba33-f11893cb7a20",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "RefsetId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot",
     "assertionUuid" : "844f4f15-ac5d-48a6-ba33-f11893cb7a20",
     "firstNInstances" : null,
@@ -103,11 +98,6 @@
       "detail" : "RELATIONSHIP: id=4994338024 is repeated in the Stated Relationship snapshot file."
     } ],
     "totalFailed" : 2
-  }, {
-    "assertionName" : "ReferencedComponentId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot",
-    "assertionUuid" : "907c11ad-5ad7-49ed-b3e8-1149b1e95716",
-    "firstNInstances" : null,
-    "totalFailed" : 0
   }, {
     "assertionName" : "ReferencedComponentId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot",
     "assertionUuid" : "907c11ad-5ad7-49ed-b3e8-1149b1e95716",
@@ -341,11 +331,6 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "ContentTypeId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot",
-    "assertionUuid" : "b110b8de-53df-4387-b0ac-aecfbc01ed0d",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "Every active concept has one active preferred term in the en-GB language refset.",
     "assertionUuid" : "b7a09892-7124-4a06-b150-7d86b3a75ce4",
     "firstNInstances" : [ {
@@ -399,11 +384,6 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "ModuleId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot",
-    "assertionUuid" : "bd129ddf-e7ea-49a4-9e9c-ad790b75331d",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "Every active concept defined in the Belgian extension has a preferred FSN in the en-US language refset.",
     "assertionUuid" : "bd17ab04-b7f8-11e7-8f22-3c15c2c6e32e",
     "firstNInstances" : null,
@@ -446,16 +426,6 @@
   }, {
     "assertionName" : "ReferencedComponentId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot",
     "assertionUuid" : "c3e6008a-2e9a-4b42-9a37-78ea6a4c7799",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "ReferencedComponentId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot",
-    "assertionUuid" : "c3e6008a-2e9a-4b42-9a37-78ea6a4c7799",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "ReferencedComponentId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot",
-    "assertionUuid" : "c4920cb7-7e7f-4f3f-ae87-f15b7c8fb1b6",
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
@@ -759,11 +729,6 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "ModuleId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot",
-    "assertionUuid" : "e968c5d1-e06b-4351-9e96-3f62208d27d4",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Belgian Dutch language refset.",
     "assertionUuid" : "eef4d352-b7e6-11e7-a7c5-3c15c2c6e32e",
     "firstNInstances" : [ {
@@ -955,11 +920,6 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "DomainId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot",
-    "assertionUuid" : "0bd6a234-58f9-424f-84b4-0dc800e5a70b",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "Every active concept has a preferred FSN in the en-GB language refset.",
     "assertionUuid" : "0dde2aec-14c0-428b-ba1c-15e483aaa155",
     "firstNInstances" : [ {
@@ -1000,11 +960,6 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "RuleStrengthId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot",
-    "assertionUuid" : "0e8e3549-e704-41a2-a853-fd91a60116ee",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DESCRIPTION snapshot.",
     "assertionUuid" : "1491f72c-cb00-42db-a97b-9c685f4e4cb0",
     "firstNInstances" : [ {
@@ -1024,16 +979,6 @@
   }, {
     "assertionName" : "RefsetId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot",
     "assertionUuid" : "14e30e46-1e7a-4655-b1ca-48254f8b7071",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "RefsetId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot",
-    "assertionUuid" : "14e30e46-1e7a-4655-b1ca-48254f8b7071",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "ModuleId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot",
-    "assertionUuid" : "15a2289d-a160-4faa-b1ea-2f54980b5830",
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
@@ -1162,11 +1107,6 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "ReferencedComponentId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot",
-    "assertionUuid" : "292b4427-0cce-493d-b63c-27cd249eafea",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "Newly added active concept has one active preferred term in the Swiss French language refset.",
     "assertionUuid" : "29599632-f175-441a-aac3-ce12d9bee0a9",
     "firstNInstances" : [ {
@@ -1214,16 +1154,6 @@
   }, {
     "assertionName" : "ModuleId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot",
     "assertionUuid" : "32bc5dc7-192c-441f-9693-6710020a6442",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "ModuleId value refers to valid concept identifier in the MRCM DOMAIN REFSET snapshot",
-    "assertionUuid" : "32bc5dc7-192c-441f-9693-6710020a6442",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "ContentTypeId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot",
-    "assertionUuid" : "338c39ad-6f40-46dc-ad35-b7c697d66a63",
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
@@ -1385,16 +1315,6 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "RefsetId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot",
-    "assertionUuid" : "40b0b1f3-7ed0-4074-ab0e-c5abd19f70b8",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "RefsetId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot",
-    "assertionUuid" : "413c91cd-4b1a-47cf-a278-3141bea39fde",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "RefsetId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot",
     "assertionUuid" : "413c91cd-4b1a-47cf-a278-3141bea39fde",
     "firstNInstances" : null,
@@ -1485,11 +1405,6 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "MrcmRuleRefsetId value refers to valid concept identifier in the MRCM MODULE SCOPE REFSET snapshot",
-    "assertionUuid" : "4fe314dd-6f65-4e9e-8ce1-a4c7db598c0d",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "ConceptId value refers to valid concept identifier in the DEFINITION snapshot.",
     "assertionUuid" : "5a83783e-3366-48bd-a50d-8f3a53812174",
     "firstNInstances" : [ {
@@ -1547,11 +1462,6 @@
   }, {
     "assertionName" : "Every active concept has one active preferred term in the Estonian language refset.",
     "assertionUuid" : "5f2d18dd-0507-4ed5-8eac-4f6ca0dd03e1",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "RuleStrengthId value refers to valid concept identifier in the MRCM ATTRIBUTE RANGE REFSET snapshot",
-    "assertionUuid" : "618115ab-b5bc-4ed3-aaba-fec8536fe498",
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
