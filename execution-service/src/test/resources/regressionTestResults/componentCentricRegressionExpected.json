@@ -1,6 +1,6 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 126,
+  "totalAssertionsRun" : 120,
   "totalAssertionsFailed" : 97,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
@@ -272,16 +272,6 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Check that the value range is valid in MRCM Refsets Snapshot",
-    "assertionUuid" : "a3e31a6c-0443-46a4-8b18-daad481247ed",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "Check that the value range is valid in MRCM Refsets Snapshot",
-    "assertionUuid" : "a3e31a6c-0443-46a4-8b18-daad481247ed",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
     "assertionName" : "ID is unique in MRCM ATTRIBUTE DOMAIN snapshot.",
     "assertionUuid" : "a48d78fe-8ab5-4705-bbc5-1286fb2a98a2",
     "firstNInstances" : null,
@@ -324,16 +314,6 @@
       "detail" : "MapTarget:54320-7 is not unique in the expression association refset snapshot."
     } ],
     "totalFailed" : 1
-  }, {
-    "assertionName" : "AttributeCardinality value is in ('0..1','0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
-    "assertionUuid" : "b36b78d8-13c3-4fc7-8632-0a03f725da17",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
-    "assertionName" : "AttributeCardinality value is in ('0..1','0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
-    "assertionUuid" : "b36b78d8-13c3-4fc7-8632-0a03f725da17",
-    "firstNInstances" : null,
-    "totalFailed" : 0
   }, {
     "assertionName" : "All definitions are case sensitive.",
     "assertionUuid" : "b4930ea7-4078-4599-979c-2dde18164f01",
@@ -598,16 +578,11 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "AttributeInGroupCardinality value is in ('0..0', '0..1', '0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionName" : "The attributeInGroupCardinality value must be '0..0' for ungrouped MRCM attribute domains.",
     "assertionUuid" : "f47d1537-41dc-4cb5-ad0a-ed4caf993801",
     "firstNInstances" : null,
     "totalFailed" : 0
-  }, {
-    "assertionName" : "AttributeInGroupCardinality value is in ('0..0', '0..1', '0..*') in MRCM ATTRIBUTE DOMAIN snapshot file",
-    "assertionUuid" : "f47d1537-41dc-4cb5-ad0a-ed4caf993801",
-    "firstNInstances" : null,
-    "totalFailed" : 0
-  }, {
+  },{
     "assertionName" : "Active VMP simple refset members refer to active components.",
     "assertionUuid" : "f5092a2b-8874-4290-ae96-a04bf568b1ab",
     "firstNInstances" : [ {
@@ -1158,11 +1133,6 @@
       "detail" : "CONCEPT: id=609452007: Concept does not have an associated SNOMED RT refset member."
     } ],
     "totalFailed" : 4
-  }, {
-    "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE RANGE SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN SNAPSHOT",
-    "assertionUuid" : "73772817-4654-4abf-b801-e849fbae1ba0",
-    "firstNInstances" : null,
-    "totalFailed" : 0
   }, {
     "assertionName" : "ReferencedComponentId in MRCM ATTRIBUTE RANGE SNAPSHOT exists in the ReferencedComponentId values of MRCM ATTRIBUTE DOMAIN SNAPSHOT",
     "assertionUuid" : "73772817-4654-4abf-b801-e849fbae1ba0",
