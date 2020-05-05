@@ -577,7 +577,7 @@
 		
 		<script uuid="f1fc2c4b-9202-4a0b-9c00-49b6de7a7cc5" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-mrcm-attribute-domain-domainid-exist-in-domain-refset-referencedcomponentid.sql" text="DomainId in MRCM ATTRIBUTE DOMAIN SNAPSHOT exists in the ReferencedComponentId values of MRCM DOMAIN SNAPSHOT"/>
 		
-		<script uuid="ce8f4bae-0c51-4248-9c42-8f05a2cccdb4" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-mrcm-attribute-domain-valid-grouped.sql" text="Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file"/>
+		<script uuid="ce8f4bae-0c51-4248-9c42-8f05a2cccdb4" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-mrcm-attribute-domain-valid-grouped.sql" text="Grouped value is either 0 or 1 in MRCM ATTRIBUTE DOMAIN snapshot file"/>
 		
 		<script uuid="f47d1537-41dc-4cb5-ad0a-ed4caf993801" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-mrcm-attribute-domain-valid-attributeingroupcardinality.sql" text="The attributeInGroupCardinality value must be '0..0' for ungrouped MRCM attribute domains." />
 		

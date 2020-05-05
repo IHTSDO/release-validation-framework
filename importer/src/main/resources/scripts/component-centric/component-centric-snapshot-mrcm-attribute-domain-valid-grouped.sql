@@ -3,7 +3,7 @@
 	component-centric-snapshot-mrcm-attribute-domain-valid-grouped
 
 	Assertion:
-	Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file
+	Grouped value is either 0 or 1 in MRCM ATTRIBUTE DOMAIN snapshot file
 
 ********************************************************************************/
 	insert into qa_result (runid, assertionuuid, concept_id, details)
@@ -11,7 +11,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MRCM ATTRIBUTE DOMAIN REFSET: id=',a.id,' Grouped value is not in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file') 	
+		concat('MRCM ATTRIBUTE DOMAIN REFSET: id=',a.id,' Grouped value is invalid ', a.grouped) 	
 	from curr_mrcmAttributeDomainRefset_s a	
-	where a.grouped NOT IN (0,1);
+	where a.grouped != '0' or a.grouped != '1';
 	commit;

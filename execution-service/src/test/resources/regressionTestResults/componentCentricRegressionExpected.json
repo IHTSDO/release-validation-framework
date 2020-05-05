@@ -389,7 +389,7 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Grouped value is in (0,1) in MRCM ATTRIBUTE DOMAIN snapshot file",
+    "assertionName" : "Grouped value is either 0 or 1 in MRCM ATTRIBUTE DOMAIN snapshot file",
     "assertionUuid" : "ce8f4bae-0c51-4248-9c42-8f05a2cccdb4",
     "firstNInstances" : null,
     "totalFailed" : 0
