@@ -11,7 +11,7 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MRCM ATTRIBUTE DOMAIN REFSET: id=',a.id,' Grouped value is invalid ', a.grouped) 	
+		concat('MRCM ATTRIBUTE DOMAIN REFSET: id=',a.id,' has an invalid value ', a.grouped, ' for the grouped field.') 	
 	from curr_mrcmAttributeDomainRefset_s a	
-	where a.grouped != '0' or a.grouped != '1';
+	where a.grouped != '0' and a.grouped != '1';
 	commit;
