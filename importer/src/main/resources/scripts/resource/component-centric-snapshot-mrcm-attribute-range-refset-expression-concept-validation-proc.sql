@@ -22,7 +22,7 @@ drop table if exists temp_attr_range_refset_expression_concept_query;
 create table temp_attr_range_refset_expression_concept_query(id varchar(36), insertSql text);
 
 
-set @copyExpressionSql = concat("insert into temp_attr_range_refset_expression_concept_query(id, insertSql) select id,", columnName, " from ", tableName);
+set @copyExpressionSql = concat("insert into temp_attr_range_refset_expression_concept_query(id, insertSql) select id,", columnName, " from ", tableName, " where active = '1'");
 prepare statement from @copyExpressionSql;
 execute statement;
 
@@ -49,10 +49,10 @@ select
 	runId,
 	assertionId,
 	result.conceptId,
-	concat(refsetName,":id=",result.id,":ConceptId=",result.conceptId, " referenced in the column ", columnName ," in SNAPSHOT is invalid.")
+	concat(refsetName,":id=",result.id,":ConceptId=",result.conceptId, " referenced in the column ", columnName ," is not an active concept.")
 	from  (select distinct(a.conceptId), a.id from temp_attr_range_refset_expression_concept_id a left join
-    curr_concept_s b
-    on a.conceptId = b.id where b.id is null or b.id = 0 group by a.id) as result;
+	curr_concept_s b
+	on a.conceptId = b.id where b.id is null or b.active = 0 group by a.id) as result;
 
 
 drop table if exists temp_attr_range_refset_expression_concept_id;
