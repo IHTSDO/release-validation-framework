@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.execution.service;
 
+import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -32,10 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class MRCMValidationService {
@@ -85,8 +83,16 @@ public class MRCMValidationService {
 				LOGGER.error("Error:" + ex);
 			}
 			if(outputFolder != null){
+				Set<String> modules = null;
+				if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
+					//Will filter the results based on component's module IDs if the package is an extension only
+					String moduleIds = validationConfig.getIncludedModules();
+					if(StringUtils.isNotBlank(moduleIds)) {
+						modules = Sets.newHashSet(moduleIds.split(","));
+					}
+				}
 				validationService.loadMRCM(outputFolder, validationRun);
-				validationService.validateRelease(outputFolder, validationRun);
+				validationService.validateRelease(outputFolder, validationRun, modules != null ? modules : Collections.EMPTY_SET);
 			}
 
 			TestRunItem testRunItem;
