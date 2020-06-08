@@ -325,7 +325,7 @@
 		<script uuid="29599632-f175-441a-aac3-ce12d9bee0a9" category="file-centric-validation,CH" sqlFile="file-centric-snapshot-ch-fr-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Swiss French language refset." />
 		<script uuid="8f37a5fd-9a4d-4c91-bac6-a69a70ceaf0b" category="file-centric-validation,CH" sqlFile="file-centric-snapshot-ch-it-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Swiss Italian language refset." />
 
-		<script uuid="e2ff1794-33fd-41db-8f35-38fcb35fd56b" category="file-centric-validation,EE" sqlFile="file-centric-snapshot-ee-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Estonian language refset." />
+		<!--script uuid="e2ff1794-33fd-41db-8f35-38fcb35fd56b" category="file-centric-validation,EE" sqlFile="file-centric-snapshot-ee-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Estonian language refset." / -->
 
 		<script uuid="c71a9b0c-18cf-4a05-8de1-e1f3b9a3fe2f" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-language-pt-translated-be-extension-fr.sql" text="Every active concept from the international release is recommended to have one active preferred term in the Belgian French language refset." />
 		<script uuid="3467c1c8-203f-4161-8af4-a2dc3d641811" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-language-pt-translated-be-extension-nl.sql" text="Every active concept from the international release is recommended to have one active preferred term in the Belgian Dutch language refset." />
@@ -559,7 +559,7 @@
 		<script uuid="23a71f2e-5c90-4090-af07-bcb3fa3d5673" category="release-type-validation,INT" sqlFile="release-type-snapshot-mrcm-domain-refset-successive-states.sql" text="New inactive states follow active states in the MRCM DOMAIN REFSET snapshot." />
 		
 		<script uuid="ccd8f56e-45ec-40b7-9404-9b264881e64d" category="release-type-validation,INT" sqlFile="release-type-snapshot-mrcm-module-scope-refset-successive-states.sql" text="New inactive states follow active states in the MRCM MODULE SCOPE REFSET snapshot." />
-
+		e2ff1794-33fd-41db-8f35-38fcb35fd56b
 		<script uuid="d1417dd6-7a74-4e67-8dc0-156e7c4c489c" category="component-centric-validation" sqlFile="component-centric-snapshot-referenced-refsetId-of-refeset-member-must-be-valid.sql" text="The refsetId of a refset member must be an existing and active concept" />
 		
 		<!-- component-centric-validation-mrcm -->
