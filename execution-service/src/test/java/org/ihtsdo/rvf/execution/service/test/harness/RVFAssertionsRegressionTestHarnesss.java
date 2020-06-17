@@ -167,7 +167,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 				releaseTypeAssertions.add(assertion);
 			}
 		}
-		assertEquals(245, assertions.size());
+		assertEquals(248, assertions.size());
 		assertEquals(101, releaseTypeAssertions.size());
 	}
 	
@@ -180,13 +180,13 @@ public class RVFAssertionsRegressionTestHarnesss {
 	
 	@Test
 	public void testTotalAssertions() {
-		assertEquals(350, assertionService.count().longValue());
+		assertEquals(351, assertionService.count().longValue());
 	}
 	
 	@Test
 	public void testGetAssertionsForEEAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("ee-authoring");
-		assertEquals(4, group.getAssertions().size());
+		assertEquals(2, group.getAssertions().size());
 	}
 	
 	
@@ -198,7 +198,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 	@Test
 	public void testGetAssertionsForCommonAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
-		assertEquals(73, group.getAssertions().size());
+		assertEquals(76, group.getAssertions().size());
 	}
 	
 	@Test

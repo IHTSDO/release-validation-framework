@@ -251,7 +251,8 @@
 		<script uuid="ad7ae768-d14a-4f15-a5cb-4c56b8b4fed6" category="file-centric-validation" sqlFile="file-centric-snapshot-simple-map-unique-id.sql" text="ID is unique in the SIMPLEMAP REFSET snapshot." />
 		
 		<script uuid="3cb10511-33b7-4eca-ba0e-93bcccf70d86" category="file-centric-validation" sqlFile="file-centric-snapshot-simple-map-valid-key.sql" text="There is a 1:1 relationship between the id and the key values in the simple map refset snapshot." />
-		
+
+		<script uuid="50e773f8-072c-4426-a8e3-50b0f942822c" category="file-centric-validation" sqlFile="file-centric-snapshot-description-term-duplicated.sql" text="Same terms but using different cases will be considered as duplicates in the DESCRIPTION snapshot ." />
 
 		<script uuid="1cd8b7f9-5730-4db9-b508-13575825b28f" category="file-centric-validation" sqlFile="file-centric-snapshot-simple-refset-unique-id.sql" text="ID is unique in the SIMPLE REFSET snapshot." />
 		
