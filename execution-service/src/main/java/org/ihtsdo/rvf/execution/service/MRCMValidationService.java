@@ -10,6 +10,7 @@ import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
+import org.ihtsdo.otf.sqs.service.dto.ConceptResult;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
@@ -161,8 +162,8 @@ public class MRCMValidationService {
 		testRunItem.setFailureCount(Long.valueOf(failureCount));
 		List<FailureDetail> failedDetails = new ArrayList(firstNCount);
 		for(int i = 0; i < firstNCount; i++) {
-			Long conceptId = mrcmAssertion.getCurrentViolatedConceptIds().get(i);
-			failedDetails.add(new FailureDetail(String.valueOf(conceptId), mrcmAssertion.getAssertionText()));
+			ConceptResult concept = mrcmAssertion.getCurrentViolatedConcepts().get(i);
+			failedDetails.add(new FailureDetail(concept.getId(), mrcmAssertion.getDetails(), concept.getFsn()));
 		}
 		testRunItem.setFirstNInstances(failedDetails);
 		return testRunItem;
