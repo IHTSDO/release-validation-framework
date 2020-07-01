@@ -179,7 +179,7 @@ public class DroolsRulesValidationService {
 				}
 
 				//Run validation
-				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, prevReleasePath, droolsRulesSets, effectiveTime, modulesSet);
+				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, prevReleasePath, droolsRulesSets, effectiveTime, modulesSet, true);
 			} catch (Exception e) {
 				String message = "Drools validation has stopped";
 				LOGGER.error(message, e);
