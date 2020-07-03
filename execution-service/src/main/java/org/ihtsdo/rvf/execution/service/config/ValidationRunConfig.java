@@ -29,6 +29,7 @@ public class ValidationRunConfig {
 	private boolean releaseAsAnEdition;
 	private String includedModules;
 	private List<String> droolsRulesGroupList;
+	private boolean generateDroolsReport;
 	private String bucketName;
 	private boolean enableMRCMValidation;
 	private CharacteristicType form;
@@ -315,6 +316,15 @@ public class ValidationRunConfig {
 
 	public ValidationRunConfig setEnableMRCMValidation(boolean enableMRCMValidation) {
 		this.enableMRCMValidation = enableMRCMValidation;
+		return this;
+	}
+
+	public boolean isGenerateDroolsReport() {
+		return generateDroolsReport;
+	}
+
+	public ValidationRunConfig setGenerateDroolsReport(boolean generateDroolsReport) {
+		this.generateDroolsReport = generateDroolsReport;
 		return this;
 	}
 }

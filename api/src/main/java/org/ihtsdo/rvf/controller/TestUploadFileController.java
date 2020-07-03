@@ -59,6 +59,8 @@ public class TestUploadFileController {
 
 	private static final String ENABLE_DROOLS = "enableDrools";
 
+	private static final String ENABLE_DROOLS_REPORT = "enableDroolsReport";
+
 	private static final String STORAGE_LOCATION = "storageLocation";
 
 	private static final String FAILURE_EXPORT_MAX = "failureExportMax";
@@ -185,6 +187,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = FAILURE_EXPORT_MAX, required = false) final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
+			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS_REPORT, required = false) final boolean enableDroolsReport,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
@@ -210,6 +213,7 @@ public class TestUploadFileController {
 				.setIncludedModules(includedModules)
 				.addUrl(urlPrefix)
 				.setEnableMRCMValidation(enableMrcmValidation)
+				.setGenerateDroolsReport(enableDroolsReport)
 				.setForm(form);
 
 		// Before we start running, ensure that we've made our mark in the storage location
@@ -245,6 +249,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to 10") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
+			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS_REPORT, required = false) final boolean enableDroolsReport,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") 
 			@RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") 
@@ -277,6 +282,7 @@ public class TestUploadFileController {
 				.setIncludedModules(includedModules)
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setForm(form)
+				.setGenerateDroolsReport(enableDroolsReport)
 				.addResponseQueue(responseQueue);
 
 		// Before we start running, ensure that we've made our mark in the storage location
