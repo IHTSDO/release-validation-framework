@@ -151,7 +151,6 @@
 			<groupId>javax.jms</groupId>
 			<artifactId>javax.jms-api</artifactId>
 		</dependency>
-
 		<!-- Google Sheet API -->
 		<dependency>
 			<groupId>com.google.api-client</groupId>
