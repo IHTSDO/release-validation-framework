@@ -169,7 +169,7 @@ public class MRCMValidationService {
 	}
 
 	private File extractZipFile(ValidationRunConfig validationConfig, Long executionId) throws BusinessServiceException, RVFExecutionException {
-		File outputFolder, deltaOutputFolder = null, snapshotOutputFolder = null;
+		File outputFolder, deltaOutputFolder = null, snapshotOutputFolder = null, dependencyOutputFolder = null;
 		try{
 			outputFolder = new File(FileUtils.getTempDirectoryPath(), MRCM_PROSPECTIVE_FILE + executionId);
 			LOGGER.info("Unzipped release folder location = " + outputFolder.getAbsolutePath());
@@ -193,16 +193,11 @@ public class MRCMValidationService {
 
 					deltaOutputFolder = Files.createTempDir();
 					ZipFileUtils.extractFilesFromZipToOneFolder(validationConfig.getLocalProspectiveFile(), deltaOutputFolder.getAbsolutePath());
-					constructSnapshotFiles(outputFolder, deltaOutputFolder);
+					if (StringUtils.isEmpty(validationConfig.getExtensionDependency()) || validationConfig.isReleaseAsAnEdition()) {
+						constructSnapshotFiles(outputFolder, deltaOutputFolder, null);
+					}
 				} catch (ReleaseImportException e) {
 					e.printStackTrace();
-				} finally {
-					if(snapshotOutputFolder != null) {
-						FileUtils.deleteQuietly(snapshotOutputFolder);
-					}
-					if(deltaOutputFolder != null) {
-						FileUtils.deleteQuietly(deltaOutputFolder);
-					}
 				}
 			}
 			else {
@@ -219,12 +214,28 @@ public class MRCMValidationService {
 				IOUtils.copy(dependencyStream, out);
 				IOUtils.closeQuietly(dependencyStream);
 				IOUtils.closeQuietly(out);
-				ZipFileUtils.extractFilesFromZipToOneFolder(dependencyFile, outputFolder.getAbsolutePath());
+				if (validationConfig.isRf2DeltaOnly()) {
+					dependencyOutputFolder = Files.createTempDir();
+					ZipFileUtils.extractFilesFromZipToOneFolder(dependencyFile, dependencyOutputFolder.getAbsolutePath());
+					constructSnapshotFiles(outputFolder, deltaOutputFolder, dependencyOutputFolder);
+				} else {
+					ZipFileUtils.extractFilesFromZipToOneFolder(dependencyFile, outputFolder.getAbsolutePath());
+				}
 			}
 		} catch (final IOException ex){
 			final String errorMsg = String.format("Error while loading file %s.", validationConfig.getLocalProspectiveFile());
 			LOGGER.error(errorMsg, ex);
 			throw new BusinessServiceException(errorMsg, ex);
+		} finally {
+			if(snapshotOutputFolder != null) {
+				FileUtils.deleteQuietly(snapshotOutputFolder);
+			}
+			if(deltaOutputFolder != null) {
+				FileUtils.deleteQuietly(deltaOutputFolder);
+			}
+			if(dependencyOutputFolder != null) {
+				FileUtils.deleteQuietly(dependencyOutputFolder);
+			}
 		}
 
 		return outputFolder;
@@ -232,50 +243,72 @@ public class MRCMValidationService {
 
 	/**
 	 *
-	 * @param snapshotDir
-	 * @param deltaDir
+	 * @param outputFolder
+	 * @param prospectiveDeltaFolder
+	 * @param dependencySnapshotFolder
 	 * @throws IOException
 	 */
-	protected void constructSnapshotFiles(File snapshotDir, File deltaDir) throws IOException {
-		for (File deltaFile : deltaDir.listFiles()) {
-			for (File snapshotFile : snapshotDir.listFiles()) {
-				if (deltaFile.exists() && !deltaFile.isDirectory()
-						&& snapshotFile.exists() && !snapshotFile.isDirectory()
-						&& deltaFile.getName().matches(".*" + DELTA)
-						&& snapshotFile.getName().matches(".*" + SNAPSHOT)
-						&& deltaFile.getName().contains(snapshotFile.getName().replaceAll(SNAPSHOT, ""))) {
-
-					List<String> linesInSnapshotFile = FileUtils.readLines(snapshotFile, StandardCharsets.UTF_8);
-					List<String> linesInDeltaFile = FileUtils.readLines(deltaFile, StandardCharsets.UTF_8);
-					Map<String,String> snapshotLineMap = new HashMap<>();
-					Map<String,String> deltaLineMap = new HashMap();
-					List<String> newLines = new ArrayList();
-
-					for (String line : linesInSnapshotFile) {
-						String[] columns = line.split("\t");
-						if (!ID.equalsIgnoreCase(columns[0])) {
-							snapshotLineMap.put(columns[0], line);
-						}
-						else {
-							newLines.add(line);
-						}
-					}
-
-					for (String line : linesInDeltaFile) {
-						String[] columns = line.split("\t");
-						if (!ID.equalsIgnoreCase(columns[0])) {
-							deltaLineMap.put(columns[0], line);
-						}
-					}
-
-					for (String key : deltaLineMap.keySet()) {
-						snapshotLineMap.put(key, deltaLineMap.get(key));
-					}
-
-					newLines.addAll(snapshotLineMap.values());
-					FileUtils.writeLines(snapshotFile, CharEncoding.UTF_8, newLines, LINE_ENDING);
-					break;
+	protected void constructSnapshotFiles(File outputFolder, File prospectiveDeltaFolder, File dependencySnapshotFolder) throws IOException {
+		for (File snapshotFile : outputFolder.listFiles()) {
+			addOrReplaceValues(prospectiveDeltaFolder, snapshotFile);
+			if (dependencySnapshotFolder != null) {
+				addOrReplaceValues(dependencySnapshotFolder, snapshotFile);
+			}
+		}
+		if (dependencySnapshotFolder != null) {
+			for (File file : dependencySnapshotFolder.listFiles()) {
+				if (!file.isDirectory() && !findMatchingFile(file.getName(),outputFolder)) {
+					FileUtils.copyFileToDirectory(file, outputFolder);
 				}
+			}
+		}
+	}
+
+	private boolean findMatchingFile(String fileName, File folder) {
+		for (File file : folder.listFiles()) {
+			if (!file.isDirectory() && file.getName().contains(fileName.replaceAll(SNAPSHOT, ""))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void addOrReplaceValues(File folder, File snapshotFile) throws IOException {
+		for (File file : folder.listFiles()) {
+			if (file.exists() && !file.isDirectory()
+					&& snapshotFile.exists() && !snapshotFile.isDirectory()
+					&& snapshotFile.getName().matches(".*" + SNAPSHOT)
+					&& file.getName().contains(snapshotFile.getName().replaceAll(SNAPSHOT, ""))) {
+				List<String> linesInSnapshotFile = FileUtils.readLines(snapshotFile, StandardCharsets.UTF_8);
+				List<String> linesInFile = FileUtils.readLines(file, StandardCharsets.UTF_8);
+				Map<String,String> snapshotLineMap = new HashMap<>();
+				Map<String,String> lineMap = new HashMap();
+				List<String> newLines = new ArrayList();
+
+				for (String line : linesInSnapshotFile) {
+					String[] columns = line.split("\t");
+					if (!ID.equalsIgnoreCase(columns[0])) {
+						snapshotLineMap.put(columns[0], line);
+					}
+					else {
+						newLines.add(line);
+					}
+				}
+
+				for (String line : linesInFile) {
+					String[] columns = line.split("\t");
+					if (!ID.equalsIgnoreCase(columns[0])) {
+						lineMap.put(columns[0], line);
+					}
+				}
+
+				for (String key : lineMap.keySet()) {
+					snapshotLineMap.put(key, lineMap.get(key));
+				}
+
+				newLines.addAll(snapshotLineMap.values());
+				FileUtils.writeLines(snapshotFile, CharEncoding.UTF_8, newLines, LINE_ENDING);
+				break;
 			}
 		}
 	}
