@@ -250,12 +250,23 @@ public class MRCMValidationService {
 	 * @throws IOException
 	 */
 	protected void constructSnapshotFiles(File outputFolder, File prospectiveDeltaFolder, File dependencySnapshotFolder) throws IOException {
-		for (File snapshotFile : outputFolder.listFiles()) {
-			addOrReplaceValues(prospectiveDeltaFolder, snapshotFile);
-			if (dependencySnapshotFolder != null) {
-				addOrReplaceValues(dependencySnapshotFolder, snapshotFile);
+		// remove Delta and Full file in dependency package
+		if (dependencySnapshotFolder != null) {
+			for (File file: dependencySnapshotFolder.listFiles()) {
+				if (!file.isDirectory() && !file.getName().matches(".*" + SNAPSHOT)) {
+					file.delete();
+				}
 			}
 		}
+
+		for (File previousSnapshotFile : outputFolder.listFiles()) {
+			addOrReplaceValues(prospectiveDeltaFolder, previousSnapshotFile);
+			if (dependencySnapshotFolder != null) {
+				addOrReplaceValues(dependencySnapshotFolder, previousSnapshotFile);
+			}
+		}
+
+		// Copy MRMC refset if necessary
 		if (dependencySnapshotFolder != null) {
 			for (File file : dependencySnapshotFolder.listFiles()) {
 				if (!file.isDirectory() && !findMatchingFile(file.getName(),outputFolder)) {
@@ -274,13 +285,13 @@ public class MRCMValidationService {
 		return false;
 	}
 
-	private void addOrReplaceValues(File folder, File snapshotFile) throws IOException {
+	private void addOrReplaceValues(File folder, File previousSnapshotFile) throws IOException {
 		for (File file : folder.listFiles()) {
 			if (file.exists() && !file.isDirectory()
-					&& snapshotFile.exists() && !snapshotFile.isDirectory()
-					&& snapshotFile.getName().matches(".*" + SNAPSHOT)
-					&& file.getName().contains(snapshotFile.getName().replaceAll(SNAPSHOT, ""))) {
-				List<String> linesInSnapshotFile = FileUtils.readLines(snapshotFile, StandardCharsets.UTF_8);
+					&& previousSnapshotFile.exists() && !previousSnapshotFile.isDirectory()
+					&& previousSnapshotFile.getName().matches(".*" + SNAPSHOT)
+					&& file.getName().contains(previousSnapshotFile.getName().replaceAll(SNAPSHOT, ""))) {
+				List<String> linesInSnapshotFile = FileUtils.readLines(previousSnapshotFile, StandardCharsets.UTF_8);
 				List<String> linesInFile = FileUtils.readLines(file, StandardCharsets.UTF_8);
 				Map<String,String> snapshotLineMap = new HashMap<>();
 				Map<String,String> lineMap = new HashMap();
@@ -308,7 +319,7 @@ public class MRCMValidationService {
 				}
 
 				newLines.addAll(snapshotLineMap.values());
-				FileUtils.writeLines(snapshotFile, CharEncoding.UTF_8, newLines, LINE_ENDING);
+				FileUtils.writeLines(previousSnapshotFile, CharEncoding.UTF_8, newLines, LINE_ENDING);
 				break;
 			}
 		}
