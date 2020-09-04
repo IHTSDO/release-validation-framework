@@ -301,6 +301,7 @@
 		<script uuid="b7a09892-7124-4a06-b150-7d86b3a75ce4" category="file-centric-validation,INT" sqlFile="file-centric-snapshot-language-unique-pt-gb.sql" text="Every active concept has one active preferred term in the en-GB language refset." />
 		<script uuid="4ea5e02b-9364-4326-9082-816edb950dbf" category="file-centric-validation,SE" sqlFile="file-centric-snapshot-language-unique-pt-se.sql" text="Every active concept has one active preferred term in the Swedish language refset." />
 		<script uuid="d91e6e62-8195-4655-b7d5-6c44fcfd7490" category="file-centric-validation,IE" sqlFile="file-centric-snapshot-language-unique-pt-ie.sql" text="Every active concept has one active preferred term in the Irish language refset." />
+		<script uuid="3fa5d7a8-1ead-4525-9b2c-a30ddd5ba1dc" category="file-centric-validation,ZH" sqlFile="file-centric-snapshot-language-unique-pt-zh.sql" text="Every active concept has one active preferred term in the ZH dialect." />
 		<!-- Belgium extension -->
 		<script uuid="cfcdf49a-b7e6-11e7-a396-3c15c2c6e32e" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-language-unique-pt-be-fr.sql" text="Every active concept has one active preferred term in the Belgian French language refset." />
 		<script uuid="e14d8118-b7e6-11e7-8bc8-3c15c2c6e32e" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-language-unique-pt-be-nl.sql" text="Every active concept has one active preferred term in the Belgian Dutch language refset." />
