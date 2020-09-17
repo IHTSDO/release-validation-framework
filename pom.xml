@@ -162,6 +162,11 @@
 			<url>https://nexus3.ihtsdotools.org/repository/maven-releases/</url>
 		</repository>
 		<repository>
+			<id>ihtsdo-old-public-nexus</id>
+			<name>OLD IHTSDO Public Nexus Releases</name>
+			<url>https://maven.ihtsdotools.org/content/repositories/releases/</url>
+		</repository>
+		<repository>
 			<id>ihtsdo-snapshots</id>
 			<name>IHTSDO Public Nexus Snapshots</name>
 			<url>https://nexus3.ihtsdotools.org/repository/maven-snapshots/</url>
