@@ -30,6 +30,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<hibernate.version>5.2.17.Final</hibernate.version>
 		<springfox-swagger.version>2.7.0</springfox-swagger.version>
+		<docker.image.prefix>snomedinternational</docker.image.prefix>
 	</properties>
 
 	<modules>
@@ -152,7 +153,19 @@
 				<skipTests>${skip.integration.tests}</skipTests>
 			 </configuration>
 			</plugin>
-			</plugins>
+			<!-- Docker Image Build -->
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.4.13</version>
+				<configuration>
+					<repository>${docker.image.prefix}/${project.artifactId}</repository>
+					<buildArgs>
+						<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+					</buildArgs>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 	<repositories>

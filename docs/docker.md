@@ -17,9 +17,22 @@ Starting the application
 Clone the project then start using docker-compose:
 
 ```bash
-> git clone https://github.com/IHTSDO/release-validation-framework.git
-> cd release-validation-framework
-> docker-compose up -d
+git clone https://github.com/IHTSDO/release-validation-framework.git
+cd release-validation-framework
+docker-compose up -d
 ```
 
-That's it.
+Go to <http://localhost:8081/api/swagger-ui.html> and you should see the Swagger API documentation page.
+
+For more information on what to do next, go to the [getting started page](getting-started.md).
+
+You can use the same to restart the application by using `docker-compose up -d` as specific docker volumes are used in to ensure that the data survives across docker image changes. 
+
+If you want to recreate a fresh install, look for the `release-validation-framework_mysql` docker volume on your docker server, delete it and then restart the docker containers
+
+Stopping the application
+------------------------
+
+```bash
+docker-compose stop
+```

@@ -27,7 +27,7 @@ services:
     command:
         mysqld --sql_mode="NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES"
   rvf:
-    image: snomedinternational/rvf:latest
+    image: snomedinternational/release-validation-framework:latest
     container_name: rvf
     depends_on:
       - db

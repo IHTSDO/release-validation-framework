@@ -39,6 +39,24 @@ GRANT ALL PRIVILEGES ON *.* TO 'rvf_user'@'localhost';
 Be sure to include details of the connection in the execution-service.properties file mentioned below.
 The privileges of the user 'rvf_user' should not be restricted to the 'rvf_master' database because additional databases will be generated for each SNOMED release.
 
+Unit Testing
+--------------------
+
+To run unit tests use:
+
+``` bash
+mvn clean test
+```
+
+Integration Testing
+-------------------
+
+Integration tests require a MySQL database containing SNOMED CT data. To run integration tests once this is in place, use:
+
+``` bash
+mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation={config_dir}
+```
+
 Configuration
 -------------
 
@@ -59,20 +77,3 @@ Starting The Application
 Start the stand-alone application using the executable jar, replacing "{config_dir}" with an absolute path.
 
 `java -Xms512m -Xmx4g -DrvfConfigLocation={config_dir} -jar api/target/api.jar --server.port=8081 --server.servlet.context-path=/api`
-
-Testing Instructions
-
---------------------
-To run unit tests use: 
-```
-mvn clean test
-```
-
-Integration Testing
--------------------
-
-Integration tests require a MySQL database containing SNOMED CT data. To run integration tests once this is in place, use: 
-```
-mvn clean integration-test -Dskip.integration.tests=false -DrvfConfigLocation={config_dir}
-
-```
