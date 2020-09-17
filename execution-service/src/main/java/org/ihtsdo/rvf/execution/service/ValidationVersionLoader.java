@@ -88,7 +88,7 @@ public class ValidationVersionLoader {
 		}
 	}
 		
-	public void loadDependncyVersion(MysqlExecutionConfig executionConfig) throws IOException, BusinessServiceException {
+	public void loadDependencyVersion(MysqlExecutionConfig executionConfig) throws IOException, BusinessServiceException {
 		String schemaName = constructRVFSchema(executionConfig.getExtensionDependencyVersion());
 		if (!releaseDataManager.isKnownRelease(schemaName)) {
 			if (executionConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
@@ -140,7 +140,7 @@ public class ValidationVersionLoader {
 			if (!releaseDataManager.isKnownRelease(schemaName)) {
 				if (!releaseDataManager.restoreReleaseFromBinaryArchive(schemaName + ZIP_FILE_EXTENSION)) {
 					logger.info("No existing mysql binary release available.");
-					releaseDataManager.uploadRelease(releaseVersion, schemaName);
+					releaseDataManager.uploadPublishedReleaseFromStore(releaseVersion, schemaName);
 					if (generateBinaryArchive) {
 						String archiveFilename = releaseDataManager.generateBinaryArchive(schemaName);
 						logger.info("Release mysql binary archive is generated:" + archiveFilename);
@@ -291,7 +291,7 @@ public class ValidationVersionLoader {
 										 final List<String> rf2FilesLoaded) throws ConfigurationException, BusinessServiceException {
 
 		if (knownVersion != null && !knownVersion.trim().isEmpty()) {
-			logger.info(String.format("Baseline verison: [%1s] will be combined with prospective release file: [%2s]", knownVersion, tempFile.getName()));
+			logger.info(String.format("Baseline version: [%1s] will be combined with prospective release file: [%2s]", knownVersion, tempFile.getName()));
 			//load them together here as opposed to clone the existing DB so that to make sure it is clean.
 			String versionDate = knownVersion;
 			if (knownVersion.length() > 8) {

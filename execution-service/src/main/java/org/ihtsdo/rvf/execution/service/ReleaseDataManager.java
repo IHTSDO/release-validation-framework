@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.Paths;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
@@ -564,7 +565,7 @@ public class ReleaseDataManager {
 		ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
 		InputStream inputStream = resourceManager.readResourceStreamOrNullIfNotExists(archiveFileName);
 		if (inputStream == null) {
-			logger.info("No resource avaiable for " + archiveFileName + " via " + mysqlBinaryStorageConfig.toString());
+			logger.info("No resource available for " + archiveFileName + " via " + mysqlBinaryStorageConfig.toString());
 			return false;
 		}
 		File outputFile = downloadFile(inputStream, archiveFileName);
@@ -578,13 +579,20 @@ public class ReleaseDataManager {
 		}
 		outputDir.mkdir();
 		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
-		logger.info("Mysql binary files are restored sucessfully in " +  outputDir.getPath());
+		logger.info("Mysql binary files are restored successfully in " +  outputDir.getPath());
 		fetchRvfSchemasFromDb();
 		return true;
 	}
 
-	public boolean uploadRelease(String releaseFilename, String schemaName) throws BusinessServiceException {
-		
+	public boolean uploadPublishedReleaseFromStore(String releaseFilename, String schemaName) throws BusinessServiceException {
+		// check local disk first
+		if (!releaseStorageConfig.isUseCloud()) {
+			File uploadedFile = new File(sctDataFolder, releaseFilename);
+			if (uploadedFile.exists() && uploadedFile.canRead()) {
+				loadSnomedData(schemaName, new ArrayList<>(), uploadedFile);
+				return true;
+			}
+		}
 		InputStream inputStream = null;
 		try {
 			ResourceManager resourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);

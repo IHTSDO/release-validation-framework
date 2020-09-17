@@ -46,9 +46,7 @@ public class ReleaseController {
 			@ApiParam(value = "The short product name e.g int for international RF2 release") @PathVariable final String product,
 			@ApiParam(value = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
 		try {
-			final boolean result = releaseDataManager
-					.uploadPublishedReleaseData(file.getInputStream(),
-							file.getOriginalFilename(), product, version);
+			final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), product, version);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (final IOException | BusinessServiceException e) {
 			logger.warn("Error getting input stream from upload. Nested exception is : \n"
