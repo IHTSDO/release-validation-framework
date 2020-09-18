@@ -566,7 +566,7 @@
 		<script uuid="23a71f2e-5c90-4090-af07-bcb3fa3d5673" category="release-type-validation,INT" sqlFile="release-type-snapshot-mrcm-domain-refset-successive-states.sql" text="New inactive states follow active states in the MRCM DOMAIN REFSET snapshot." />
 		
 		<script uuid="ccd8f56e-45ec-40b7-9404-9b264881e64d" category="release-type-validation,INT" sqlFile="release-type-snapshot-mrcm-module-scope-refset-successive-states.sql" text="New inactive states follow active states in the MRCM MODULE SCOPE REFSET snapshot." />
-		<script uuid="d1417dd6-7a74-4e67-8dc0-156e7c4c489c" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-referenced-refsetId-of-refeset-member-must-be-valid.sql" text="The refsetId of a refset member must be an existing and active concept" />
+		<script uuid="d1417dd6-7a74-4e67-8dc0-156e7c4c489c" category="component-centric-validation" sqlFile="component-centric-snapshot-referenced-refsetId-of-refeset-member-must-be-valid.sql" text="The refsetId of a refset member must be an existing and active concept" />
 
 		<script uuid="1a4e40a9-cf14-4703-b206-9f2fbeb56c7f" category="component-centric-validation" sqlFile="component-centric-snapshot-referencedComponentID-of-refeset-member-must-be-valid.sql" text="All active Refset records are valid." />
 		
