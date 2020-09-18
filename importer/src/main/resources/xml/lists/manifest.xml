@@ -568,7 +568,7 @@
 		<script uuid="ccd8f56e-45ec-40b7-9404-9b264881e64d" category="release-type-validation,INT" sqlFile="release-type-snapshot-mrcm-module-scope-refset-successive-states.sql" text="New inactive states follow active states in the MRCM MODULE SCOPE REFSET snapshot." />
 		<script uuid="d1417dd6-7a74-4e67-8dc0-156e7c4c489c" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-referenced-refsetId-of-refeset-member-must-be-valid.sql" text="The refsetId of a refset member must be an existing and active concept" />
 
-		<script uuid="1a4e40a9-cf14-4703-b206-9f2fbeb56c7f" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-referencedComponentID-of-refeset-member-must-be-valid.sql" text="All active Refset records are valid." />
+		<script uuid="1a4e40a9-cf14-4703-b206-9f2fbeb56c7f" category="component-centric-validation" sqlFile="component-centric-snapshot-referencedComponentID-of-refeset-member-must-be-valid.sql" text="All active Refset records are valid." />
 		
 		<!-- component-centric-validation-mrcm -->
 		<script uuid="5d0fdbf5-fef6-44b2-aa42-ebb302132178" category="component-centric-validation,INT" sqlFile="component-centric-snapshot-mrcm-domain-refset-validate-concept-ids.sql" text="Check that the expression constraints, refinements and expression templates in multiple columns in MRCM Domain Refset include only valid SNOMED CT concept identifiers" />
