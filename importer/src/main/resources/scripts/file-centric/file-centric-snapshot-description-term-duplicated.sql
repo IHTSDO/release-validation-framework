@@ -14,6 +14,6 @@
 		concat('DESCRIPTION : ids =', GROUP_CONCAT(DISTINCT a.id ORDER BY a.id ASC SEPARATOR ', '), ' : Duplicated terms in DESCRIPTION snapshot.')
 	from curr_description_s a
 	where a.active = '1' and casesignificanceid = 900000000000448009
-	group by LOWER(a.term), a.conceptid, a.typeid
+	group by LOWER(a.term), a.conceptid, a.typeid, a.languagecode
 	having COUNT(*) > 1;
 	commit;
