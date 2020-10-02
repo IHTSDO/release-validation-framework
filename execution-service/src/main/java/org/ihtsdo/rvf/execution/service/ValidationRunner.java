@@ -105,6 +105,13 @@ public class ValidationRunner {
 			tasks.add(executorService.submit(() -> droolsValidationService.runDroolsAssertions(validationConfig, droolsValidationStatusReport)));
 		}
 
+		if(validationConfig.isEnableMRCMValidation()) {
+			statusMessages.append("\nMRCM validation started");
+			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
+			ValidationStatusReport mrcmValidationStatusReport = new ValidationStatusReport(validationConfig);
+			mrcmValidationStatusReport.setResultReport(new ValidationReport());
+			tasks.add(executorService.submit(() -> mrcmValidationService.runMRCMAssertionTests(mrcmValidationStatusReport, validationConfig, executionConfig.getEffectiveTime(), executionConfig.getExecutionId())));
+		}
 
 		for (Future<ValidationStatusReport> task : tasks) {
 			try {
@@ -115,13 +122,7 @@ public class ValidationRunner {
 		}
 		executorService.shutdown();
 
-		if(validationConfig.isEnableMRCMValidation()) {
-			// Run MRCM validations
-			String mrcmTestStartMsg = "Start MRCM validation for release file: " + validationConfig.getTestFileName();
-			logger.info(mrcmTestStartMsg);
-			reportService.writeProgress(mrcmTestStartMsg, validationConfig.getStorageLocation());
-			mrcmValidationService.runMRCMAssertionTests(statusReport, validationConfig, executionConfig.getEffectiveTime(), executionConfig.getExecutionId());
-		}
+
 
 		report.sortAssertionLists();
 

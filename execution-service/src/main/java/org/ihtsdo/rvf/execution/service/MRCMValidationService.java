@@ -68,7 +68,7 @@ public class MRCMValidationService {
 		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
 	}
 
-	public void runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig, String effectiveDate, Long executionId) {
+	public ValidationStatusReport runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig, String effectiveDate, Long executionId) {
 		File outputFolder = null;
 		try {
 			final long timeStart = System.currentTimeMillis();
@@ -141,7 +141,7 @@ public class MRCMValidationService {
 				FileUtils.deleteQuietly(outputFolder);
 			}
 		}
-
+		return  statusReport;
 	}
 
 	private TestRunItem createTestRunItem(Assertion mrcmAssertion) {
