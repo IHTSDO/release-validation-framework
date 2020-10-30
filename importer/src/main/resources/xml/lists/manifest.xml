@@ -20,6 +20,8 @@
 		<script uuid="fd8ed390-94e9-4fd9-9e20-902a24273dca" category="release-type-validation" sqlFile="release-type-full-validation-stated-relationship.sql" text="The current Stated Relationship full file contains all previously published data unchanged."/>
 		
 		<script uuid="b46ec8df-1bfd-4825-be49-f09ed8a0076b" category="release-type-validation" sqlFile="release-type-full-validation-inferred-relationship.sql" text="The current Inferred Relationship full file contains all previously published data unchanged."/>
+
+		<script uuid="7d105b20-ce21-49c2-b16d-b49df13fdfea" category="release-type-validation" sqlFile="release-type-full-validation-relationship-concrete-values.sql" text="The current Relationship Concrete Values full file contains all previously published data unchanged."/>
 		
 		<script uuid="433adc93-fdd5-462a-b1fa-11fb4045a9ec" category="release-type-validation" sqlFile="release-type-full-validation-definition.sql" text="The current Definition full file contains all previously published data unchanged." />
 		
@@ -37,9 +39,11 @@
 		
 		<script uuid="073832f4-6dc5-4781-9e56-9c3bc45d01bd" category="release-type-validation" sqlFile="release-type-snapshot-delta-validation-description.sql" text="The current data in the Description snapshot file are the same as the data in the current delta file." />
 		
-		<script uuid="01ce3ac9-d168-4333-99d7-8d2f228f5ec9" category="release-type-validation" sqlFile="release-type-snapshot-delta-validation-stated-relationship.sql" text="The current data in the Stated Relationship snapshot file are the same as the data in the current delta file. " />
+		<script uuid="01ce3ac9-d168-4333-99d7-8d2f228f5ec9" category="release-type-validation" sqlFile="release-type-snapshot-delta-validation-stated-relationship.sql" text="The current data in the Stated Relationship snapshot file are the same as the data in the current delta file." />
 		
-		<script uuid="177a7271-7986-433b-8506-fff39e6c1004" category="release-type-validation" sqlFile="release-type-snapshot-delta-validation-inferred-relationship.sql" text="The current data in the Inferred Relationship snapshot file are the same as the data in the current delta file. " />
+		<script uuid="177a7271-7986-433b-8506-fff39e6c1004" category="release-type-validation" sqlFile="release-type-snapshot-delta-validation-inferred-relationship.sql" text="The current data in the Inferred Relationship snapshot file are the same as the data in the current delta file." />
+
+		<script uuid="c0812d7e-b0a2-460d-a1bd-1292c07a7516" category="release-type-validation" sqlFile="release-type-snapshot-delta-validation-relationship-concrete-values.sql" text="The current data in the Relationship Concrete Values snapshot file are the same as the data in the current delta file." />
 		
 		<script uuid="c837a6f8-f06a-4599-944c-eaa3a6d68c18" category="release-type-validation" sqlFile="release-type-snapshot-delta-validation-definition.sql" text="The current data in the Definition snapshot file are the same as the data in the current delta file." />
 			
@@ -70,6 +74,8 @@
 			
 		
 		<script uuid="dfbab5f4-8b72-4cd3-abe9-2cf5b5f76e5b" category="release-type-validation" sqlFile="release-type-delta-validation-inferred-relationship.sql" text="The current inferred relationship delta file is an accurate derivative of the current full file" />
+
+		<script uuid="e74e3b12-6bf8-4d58-9117-a03d4b3b4d17" category="release-type-validation" sqlFile="release-type-delta-validation-relationship-concrete-values.sql" text="The current relationship concrete values delta file is an accurate derivative of the current full file" />
 			
 		
 		<script uuid="2a938c7e-0803-44a1-8358-339daa87ee39" category="release-type-validation" sqlFile="release-type-delta-validation-stated-relationship.sql" text="The current stated relationship delta file is an accurate derivative of the current full file" />
@@ -104,7 +110,8 @@
 			
 		
 		<script uuid="5c37bee7-62ad-41f9-93e3-12eb4803e626" category="release-type-validation" sqlFile="release-type-full-delta-validation-inferred-relationship.sql" text="The current full inferred relationship file consists of the previously published full file and the changes for the current release" />
-			
+
+		<script uuid="1b9e2371-1b0a-46d4-ac9d-fd222329ad9d" category="release-type-validation" sqlFile="release-type-full-delta-validation-relationship-concrete-values.sql" text="The current full relationship concrete values file consists of the previously published full file and the changes for the current release" />
 		
 		<script uuid="28c3a31d-7a9d-48f6-8eb9-18c25b6306fb" category="release-type-validation" sqlFile="release-type-full-delta-validation-language-refset.sql" text="The current full language refset file consists of the previously published full file and the changes for the current release" />
 			
@@ -135,7 +142,8 @@
 			
 		
 		<script uuid="79582950-bf7a-4f63-92cf-7809a29b5dc3" category="release-type-validation" sqlFile="release-type-snapshot-validation-inferred-relationship.sql" text="The current inferred relationship snapshot file is an accurate derivative of the current full file" />
-			
+
+		<script uuid="61e574b6-e38b-4561-9240-5169ab9d88db" category="release-type-validation" sqlFile="release-type-snapshot-validation-relationship-concrete-values.sql" text="The current relationship concrete values snapshot file is an accurate derivative of the current full file" />
 		
 		<script uuid="91e26b70-ea15-4057-8c31-a1bf91614654" category="release-type-validation" sqlFile="release-type-snapshot-validation-language-refset.sql" text="The current language refset snapshot file is an accurate derivative of the current full file" />
 			
@@ -162,6 +170,7 @@
 		<script uuid="8592c910-f2b1-4573-a9da-3c8931e759b2" category="release-type-validation,LOINC" sqlFile="release-type-delta-previous-snapshot-validation-expression-association-refset.sql" text="There must be actual changes made to previously published expression association refset components in order for them to appear in the current delta" />
 		<script uuid="7a961c22-3f51-4f72-9b5e-1dc99c298719" category="release-type-validation,ICD-MAP,INT,US,GPFP-ICPC2" sqlFile="release-type-delta-previous-snapshot-validation-extendedmap-refset.sql" text="There must be actual changes made to previously published extended map refset components in order for them to appear in the current delta." />
 		<script uuid="44916964-5b78-4842-81d8-e8293ee93bea" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-inferred-relationship.sql" text="There must be actual changes made to previously published inferred relationships in order for them to appear in the current delta." />
+		<script uuid="fbfc4fd1-f10d-4fc2-889f-df0e089df4b7" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-relationship-concrete-values.sql" text="There must be actual changes made to previously published relationship concrete values in order for them to appear in the current delta." />
 		<script uuid="a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-language-refset.sql" text="There must be actual changes made to previously published language refset components in order for them to appear in the current delta." />
 		<script uuid="e77a45db-d2d7-4d48-9420-0b97579582fc" category="release-type-validation,LOINC" sqlFile="release-type-delta-previous-snapshot-validation-mapCorrelationOrigin-refset.sql" text="There must be actual changes made to previously published mapcorrelationOriginRefset components in order for them to appear in the current delta." />
 		<script uuid="9912342f-5010-40fd-9bea-301b737973a1" category="release-type-validation" sqlFile="release-type-delta-previous-snapshot-validation-simple-refset.sql" text="There must be actual changes made to previously published simple refset components in order for them to appear in the current delta." />
@@ -179,6 +188,7 @@
 		<script uuid="eff30fb0-7856-11e1-b0c4-0800200c9a66" category="release-type-validation" sqlFile="release-type-snapshot-language-successive-states.sql" text="All language refset members inactivated in current snapshot must have been active in the previous release."/>
 		<script uuid="89ceaf00-79b9-11e1-b0c4-0800200c9a66" category="release-type-validation" sqlFile="release-type-snapshot-stated-relationship-successive-states.sql" text="All stated relationships inactivated in current release must have been active in the previous release."/>
 		<script uuid="5c6b6bc0-79b9-11e1-b0c4-0800200c9a66" category="release-type-validation" sqlFile="release-type-snapshot-inferred-relationship-successive-states.sql" text="All relationships inactivated in current release must have been active in the previous release."/>
+		<script uuid="4deb9274-d923-4f84-b0dc-c4dab0c2fc4c" category="release-type-validation" sqlFile="release-type-snapshot-relationship-concrete-values-successive-states.sql" text="All relationship concrete values inactivated in current release must have been active in the previous release."/>
 
 		<!-- across multiple files in Current snapshot-->
 		<script uuid="6dbaed71-f031-4290-b74f-f35561c2e283" category="release-type-validation" sqlFile="release-type-snapshot-unique-relationship-id.sql" text="The ids should be unique across the stated and inferred relationship snapshot files." />
@@ -281,6 +291,9 @@
 		<script uuid="6e70ea3e-c4dd-4ae3-8b75-f0567e41b57" category="file-centric-validation,ICD-9-CM" sqlFile="file-centric-snapshot-complexmap-unique-id.sql" text="ComplexMap refset id is unique in the snapshot file" />
 		<script uuid="6e70ea3e-c4dd-4ae3-8b75-f0567e42c62" category="file-centric-validation,ICD-MAP,INT,US,GPFP-ICPC2" sqlFile="file-centric-snapshot-extendedmap-unique-id.sql" text="Extendedmap refset id must be unique in the snapshot file" />
 		<script uuid="bb88a465-3f40-4890-b5be-14f94632c3a9" category="file-centric-validation,INT" sqlFile="file-centric-snapshot-simple-map-module-id.sql" text="The module id of all SimpleMap members should be the core module id." />
+		<script uuid="46853429-e7ff-41db-a8b3-3b0f738a8117" category="file-centric-validation" sqlFile="file-centric-snapshot-relationship-concrete-values-unique-id.sql" text="The current Relationship Concrete Values snapshot file does not contain duplicate Ids."/>
+		<script uuid="1e6a0403-f276-44fc-8c90-da1bff1651f4" category="file-centric-validation" sqlFile="file-centric-snapshot-relationship-concrete-values-valid-sourceid.sql" text="All source ids found in the Relationship Concrete Values snapshot file exist in the Concept snapshot file." />
+		<script uuid="6a7f2569-a5b9-447c-a067-51e894c20c30" category="file-centric-validation" sqlFile="file-centric-snapshot-relationship-concrete-values-valid-typeid.sql" text="All type ids found in the Relationship Concrete Values snapshot file exist in the Concept snapshot file." />
 
 		<!-- LOINC <script uuid="" category="file-centric-validation" sqlFile="" text="" />-->
 		<script uuid="E33922C3-5200-458B-B8F3-2CD08252234E" category="file-centric-validation,LOINC" sqlFile="file-centric-snapshot-association-expression-valid-referencecomponentid.sql" text="ReferenceComponentIds refers to valid concepts in the LOINC ExpressionAssociationRefset snapshot file." />

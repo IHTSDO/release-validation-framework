@@ -12,6 +12,7 @@ public class RF2FileTableMapper {
 	private static final String SIMPLE_FILE_HEADER = "der2_Refset_.*Simple";
 	private static final String SIMPLE_MAP_FILE_HEADER = "der2_sRefset_.*SimpleMap";
 	private static final String RELATIONSHIP_FILE_HEADER = "sct2_Relationship";
+	private static final String RELATIONSHIP_CONCRETE_VALUES_FILE_HEADER = "sct2_RelationshipConcreteValues";
 	private static final String LANGUAGE_FILE_HEADER = "der2_cRefset_.*Language";
 	private static final String COMPLEX_MAP_FILE_HEADER = "der2_iissscRefset_.*ComplexMap";
 	private static final String EXTENDED_MAP_FILE_HEADER = "der2_iisssccRefset_.*ExtendedMap";
@@ -42,6 +43,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(EXTENDED_MAP_FILE_HEADER + DELTA, "extendedmaprefset_d");
 		tableNameMap.put(LANGUAGE_FILE_HEADER + DELTA, "langrefset_d");
 		tableNameMap.put(RELATIONSHIP_FILE_HEADER + DELTA, "relationship_d");
+		tableNameMap.put(RELATIONSHIP_CONCRETE_VALUES_FILE_HEADER + DELTA, "relationship_concrete_values_d");
 		tableNameMap.put(SIMPLE_MAP_FILE_HEADER + DELTA, "simplemaprefset_d");
 		tableNameMap.put(SIMPLE_FILE_HEADER + DELTA, "simplerefset_d");
 		tableNameMap.put(STATED_RELATIONSHIP_FILE_HEADER + DELTA, "stated_relationship_d");
@@ -64,6 +66,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(EXTENDED_MAP_FILE_HEADER + FULL, "extendedmaprefset_f");
 		tableNameMap.put(LANGUAGE_FILE_HEADER + FULL, "langrefset_f");
 		tableNameMap.put(RELATIONSHIP_FILE_HEADER + FULL, "relationship_f");
+		tableNameMap.put(RELATIONSHIP_CONCRETE_VALUES_FILE_HEADER + FULL, "relationship_concrete_values_f");
 		tableNameMap.put(SIMPLE_MAP_FILE_HEADER + FULL, "simplemaprefset_f");
 		tableNameMap.put(SIMPLE_FILE_HEADER + FULL, "simplerefset_f");
 		tableNameMap.put(STATED_RELATIONSHIP_FILE_HEADER + FULL, "stated_relationship_f");
@@ -86,6 +89,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(EXTENDED_MAP_FILE_HEADER + SNAPSHOT, "extendedmaprefset_s");
 		tableNameMap.put(LANGUAGE_FILE_HEADER + SNAPSHOT, "langrefset_s");
 		tableNameMap.put(RELATIONSHIP_FILE_HEADER + SNAPSHOT, "relationship_s");
+		tableNameMap.put(RELATIONSHIP_CONCRETE_VALUES_FILE_HEADER + SNAPSHOT, "relationship_concrete_values_s");
 		tableNameMap.put(SIMPLE_MAP_FILE_HEADER + SNAPSHOT, "simplemaprefset_s");
 		tableNameMap.put(SIMPLE_FILE_HEADER + SNAPSHOT, "simplerefset_s");
 		tableNameMap.put(STATED_RELATIONSHIP_FILE_HEADER + SNAPSHOT, "stated_relationship_s");

@@ -105,6 +105,30 @@ key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
 ) engine=myisam default charset=utf8;
 
+drop table if exists relationship_concrete_values_f;
+create table relationship_concrete_values_f(
+id bigint(20) not null,
+effectivetime char(8) not null,
+active char(1) not null,
+moduleid bigint(20) not null,
+sourceid bigint(20) not null,
+value varchar(1024) not null,
+relationshipgroup bigint(20) not null,
+typeid bigint(20) not null,
+characteristictypeid bigint(20) not null,
+modifierid bigint(20) not null,
+key idx_id(id),
+key idx_effectivetime(effectivetime),
+key idx_active(active),
+key idx_moduleid(moduleid),
+key idx_sourceid(sourceid),
+key idx_value(value),
+key idx_relationshipgroup(relationshipgroup),
+key idx_typeid(typeid),
+key idx_characteristictypeid(characteristictypeid),
+key idx_modifierid(modifierid)
+) engine=myisam default charset=utf8;
+
 drop table if exists langrefset_f;
 create table langrefset_f(
 id varchar(36) not null,
@@ -449,6 +473,30 @@ key idx_characteristictypeid(characteristictypeid),
 key idx_modifierid(modifierid)
 ) engine=myisam default charset=utf8;
 
+drop table if exists relationship_concrete_values_s;
+create table relationship_concrete_values_s(
+id bigint(20) not null,
+effectivetime char(8) not null,
+active char(1) not null,
+moduleid bigint(20) not null,
+sourceid bigint(20) not null,
+value varchar(1024) not null,
+relationshipgroup bigint(20) not null,
+typeid bigint(20) not null,
+characteristictypeid bigint(20) not null,
+modifierid bigint(20) not null,
+key idx_id(id),
+key idx_effectivetime(effectivetime),
+key idx_active(active),
+key idx_moduleid(moduleid),
+key idx_sourceid(sourceid),
+key idx_value(value),
+key idx_relationshipgroup(relationshipgroup),
+key idx_typeid(typeid),
+key idx_characteristictypeid(characteristictypeid),
+key idx_modifierid(modifierid)
+) engine=myisam default charset=utf8;
+
 drop table if exists langrefset_s;
 create table langrefset_s(
 id varchar(36) not null,
@@ -787,6 +835,30 @@ key idx_active(active),
 key idx_moduleid(moduleid),
 key idx_sourceid(sourceid),
 key idx_destinationid(destinationid),
+key idx_relationshipgroup(relationshipgroup),
+key idx_typeid(typeid),
+key idx_characteristictypeid(characteristictypeid),
+key idx_modifierid(modifierid)
+) engine=myisam default charset=utf8;
+
+drop table if exists relationship_concrete_values_d;
+create table relationship_concrete_values_d(
+id bigint(20) not null,
+effectivetime char(8) not null,
+active char(1) not null,
+moduleid bigint(20) not null,
+sourceid bigint(20) not null,
+value varchar(1024) not null,
+relationshipgroup bigint(20) not null,
+typeid bigint(20) not null,
+characteristictypeid bigint(20) not null,
+modifierid bigint(20) not null,
+key idx_id(id),
+key idx_effectivetime(effectivetime),
+key idx_active(active),
+key idx_moduleid(moduleid),
+key idx_sourceid(sourceid),
+key idx_value(value),
 key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
