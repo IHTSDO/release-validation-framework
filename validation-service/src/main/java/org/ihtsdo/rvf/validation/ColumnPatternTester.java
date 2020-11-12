@@ -45,6 +45,7 @@ public class ColumnPatternTester {
 	private static final String COLUMN_VALUE_TEST_TYPE = "ColumnValuesTest";
 	private static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
 	private static final String COLUMN_BOOLEAN_TEST_TYPE = "ColumnBooleanTest";
+	public static final String COMPLIANT_FILENAME = "RF2 Compliant filename";
 
 	private final ValidationLog validationLog;
 	private final ResourceProvider resourceManager;
@@ -104,7 +105,8 @@ public class ColumnPatternTester {
 			return linesTested;
 		}
 		if (!fileName.endsWith("txt")) {
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "Incorrect file extension, should end with a .txt",null);
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, COMPLIANT_FILENAME,
+					"Incorrect file extension, should end with a .txt", fileName,null);
 			return linesTested;
 		}
 
@@ -113,12 +115,12 @@ public class ColumnPatternTester {
 			tableSchema = schemaFactory.createSchemaBean(fileName);
 		} catch (final FileRecognitionException e) {
 			// log the problem and continue to the next file
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, e.getMessage(),null);
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, COMPLIANT_FILENAME, e.getMessage(), fileName, null);
 			return linesTested;
 		}
 		if (tableSchema == null) {
 			// log the problem and continue to the next file
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "RF2 Compilant filename", fileName, "unexpected filename format.",null);
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, COMPLIANT_FILENAME, "unrecognized filename", fileName,null);
 			return linesTested;
 		}
 
@@ -161,12 +163,13 @@ public class ColumnPatternTester {
 				}
 			} catch (final IOException e) {
 				validationLog.executionError("Problem reading file {}", fileName, e);
-				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", fileName, "Unable to read the file",null);
+				testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), null, FILE_NAME_TEST_TYPE, "", "Unable to read the file", null,null);
 			}
 
 		} else {
-			validationLog.executionError("Invalid fileName {} does not match the expected pattern ", fileName);
-			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "", fileName, "valid release 2 filename",null);
+			String errorMsg = String.format("Invalid fileName {} does not match the expected pattern", fileName);
+			validationLog.executionError(errorMsg);
+			testReport.addError("0-0", startTime, fileName, resourceManager.getFilePath(), "", FILE_NAME_TEST_TYPE, "", errorMsg, null,null);
 		}
 		return linesTested;
 		
@@ -188,7 +191,8 @@ public class ColumnPatternTester {
 			return false;
 		}
 		if (dataColumnCount != configColumnCount) {
-			validationLog.assertionError("Column count on line {} does not match expectation: expected {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
+			validationLog.assertionError("Column count on line {} does not match expectation: " +
+					" {}, actual {}", lineNumber, configColumnCount, dataColumnCount);
 			testReport.addError(lineNumber + "-0", startTime, fileName, resourceManager.getFilePath(), "Column Count Mismatch", COLUMN_COUNT_TEST_TYPE, "", String.valueOf(dataColumnCount), String.valueOf(configColumnCount),lineNumber);
 			// cannot continue at this point as any validation will be off
 			return false;

@@ -159,13 +159,21 @@ public class ColumnPatternTesterTest {
 		assertEquals("1 blank row ", 1, testReport.getNumErrors());
 	}
 
-	public void executeRun(final String filename, final boolean writeSucceses) throws URISyntaxException {
+
+	@Test
+	public void testRelationshipConcreteValuesFile() throws Exception {
+		final String filename = "/sct2_RelationshipConcreteValues_Delta_INT_20210131.txt";
+		executeRun(filename, false);
+		assertEquals(6, testReport.getNumErrors());
+	}
+
+	public void executeRun(final String filename, final boolean writeSuccess) throws URISyntaxException {
 		final File f = new File(getClass().getResource(filename).toURI());
 
 		final ResourceProvider resourceManager = new TestFileResourceProvider(f);
 		//testReport = new TestReport(new CsvResultFormatter());
 
-		testReport = new StreamTestReport(new CsvResultFormatter(), new TestWriterDelegate(new StringWriter()), writeSucceses);
+		testReport = new StreamTestReport(new CsvResultFormatter(), new TestWriterDelegate(new StringWriter()), writeSuccess);
 		tester = new ColumnPatternTester(new TestValidationLogImpl(ColumnPatternTester.class), resourceManager, testReport);
 
 		tester.runTests();
