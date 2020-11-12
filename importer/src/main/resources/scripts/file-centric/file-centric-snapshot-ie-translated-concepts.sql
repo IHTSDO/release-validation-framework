@@ -3,7 +3,7 @@
 	file-centric-snapshot-ie-translated-concepts.sql
 
 	Assertion:
-	Newly added active concept has one active preferred term in the Irish language refset.
+	Newly added active International concept must have at least one active preferred term in the Irish language refset RF2 file.
 
 ********************************************************************************/
 
@@ -32,7 +32,7 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ': is added recently in the international release but has no active preferred term in the Irish language refset')
+		concat('Concept: id=',a.id, ': has recently been added to the International Edition release, but has no active preferred term in the Irish language refset RF2 files.  Please check termServer to confirm whether or not a preferred term exists in the source content, and has just failed to be exported into the Irish release files?')
 	from curr_concept_s a
 	where
 	 a.active=1
