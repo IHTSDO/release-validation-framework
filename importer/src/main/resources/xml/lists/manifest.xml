@@ -320,6 +320,7 @@
 		<script uuid="eef4d352-b7e6-11e7-a7c5-3c15c2c6e32e" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-be-dutch-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Belgian Dutch language refset." />
 		<script uuid="ff33e7f8-b7e6-11e7-9e35-3c15c2c6e32e" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-be-french-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Belgian French language refset." />
 		<script uuid="17d0297b-7a61-43c5-814b-532df4691ddd" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-be-translated-concepts.sql" text="Newly translated concepts must have preferred terms in Dutch and French." />
+		<script uuid="2ecc6223-25a5-4543-a102-62f958e5745e" category="file-centric-validation,BE" sqlFile="file-centric-snapshot-be-translated-descriptions-both-french-dutch.sql" text="An active description must not have preferred term in both Dutch and French language refset." />
 		<!--script uuid="88d0de42-0c5a-4382-82e5-45601c7c3f74" category="file-centric-validation,NO" sqlFile="file-centric-snapshot-no-translated-concepts.sql" text="Newly added active concept has one active preferred term in the Norwegian language refset." /-->
 
 		<!-- Swiss extension (CH) -->
