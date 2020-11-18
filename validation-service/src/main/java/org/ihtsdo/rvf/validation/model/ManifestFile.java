@@ -16,8 +16,10 @@ public class ManifestFile {
 	private  final Logger logger = LoggerFactory.getLogger(ManifestFile.class);
 
 	private Listing listing;
+	private File file;
 
 	public ManifestFile(File manifestFile) {
+		this.file = manifestFile;
 		this.listing = createListing(manifestFile);
 	}
 
@@ -42,4 +44,7 @@ public class ManifestFile {
 		this.listing = listing;
 	}
 
+	public File getFile() {
+		return file;
+	}
 }
