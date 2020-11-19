@@ -11,7 +11,7 @@ public class RF2FileTableMapper {
 	private static final String STATED_RELATIONSHIP_FILE_HEADER = "sct2_StatedRelationship_";
 	private static final String SIMPLE_FILE_HEADER = "der2_Refset_.*Simple";
 	private static final String SIMPLE_MAP_FILE_HEADER = "der2_sRefset_.*SimpleMap";
-	private static final String RELATIONSHIP_FILE_HEADER = "sct2_Relationship";
+	private static final String RELATIONSHIP_FILE_HEADER = "sct2_Relationship_";
 	private static final String RELATIONSHIP_CONCRETE_VALUES_FILE_HEADER = "sct2_RelationshipConcreteValues";
 	private static final String LANGUAGE_FILE_HEADER = "der2_cRefset_.*Language";
 	private static final String COMPLEX_MAP_FILE_HEADER = "der2_iissscRefset_.*ComplexMap";
