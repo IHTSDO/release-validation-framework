@@ -16,6 +16,7 @@ select distinct moduleid from curr_moduledependencyrefset_d
 where active = 1;
 
 insert into module_id(moduleid) values(900000000000207008);
+insert into module_id(moduleid) values(900000000000012004);
 
 call validate_module_id('<PROSPECTIVE>',<RUNID>,'<ASSERTIONUUID>');
 	
