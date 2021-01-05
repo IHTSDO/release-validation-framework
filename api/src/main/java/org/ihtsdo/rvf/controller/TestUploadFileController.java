@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
+import org.ihtsdo.rvf.execution.service.MRCMValidationService.CharacteristicType;
 import org.ihtsdo.rvf.messaging.ValidationQueueManager;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
@@ -49,6 +50,8 @@ import springfox.documentation.annotations.ApiIgnore;
 public class TestUploadFileController {
 
 	private static final String ENABLE_MRCM_VALIDATION = "enableMRCMValidation";
+
+	private static final String MRCM_VALIDATION_FORM = "mrcmValidationForm";
 
 	private static final String INCLUDED_MODULES = "includedModules";
 
@@ -187,6 +190,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
+			@ApiParam(value = "Defaults to stated form.") @RequestParam(value = MRCM_VALIDATION_FORM, required = false, defaultValue = "stated") final CharacteristicType form,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
 
@@ -205,7 +209,8 @@ public class TestUploadFileController {
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setIncludedModules(includedModules)
 				.addUrl(urlPrefix)
-				.setEnableMRCMValidation(enableMrcmValidation);
+				.setEnableMRCMValidation(enableMrcmValidation)
+				.setForm(form);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage
@@ -247,6 +252,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
+			@ApiParam(value = "Defaults to stated form.") @RequestParam(value = MRCM_VALIDATION_FORM, required = false, defaultValue = "stated") final CharacteristicType form,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
@@ -269,7 +275,8 @@ public class TestUploadFileController {
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setIncludedModules(includedModules)
-				.setEnableMRCMValidation(enableMrcmValidation);
+				.setEnableMRCMValidation(enableMrcmValidation)
+				.setForm(form);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage

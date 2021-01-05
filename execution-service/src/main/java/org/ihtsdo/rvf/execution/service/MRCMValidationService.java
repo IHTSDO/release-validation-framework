@@ -63,6 +63,8 @@ public class MRCMValidationService {
 
 	private static final String LINE_ENDING = "\r\n";
 
+    public enum CharacteristicType { inferred, stated }
+
 	@PostConstruct
 	public void init() {
 		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
@@ -76,7 +78,7 @@ public class MRCMValidationService {
 			ValidationService validationService = new ValidationService();
 			ValidationRun validationRun = new ValidationRun(
 					StringUtils.isNotBlank(effectiveDate) ? effectiveDate.replaceAll("-","") : effectiveDate
-					, true);
+					, CharacteristicType.inferred.equals(validationConfig.getForm()) ? false : true);
 			try {
 				outputFolder = extractZipFile(validationConfig, executionId);
 

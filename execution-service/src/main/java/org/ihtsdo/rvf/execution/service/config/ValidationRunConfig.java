@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
+import org.ihtsdo.rvf.execution.service.MRCMValidationService.CharacteristicType;
 
 public class ValidationRunConfig {
 	private String testFileName;
@@ -30,6 +31,7 @@ public class ValidationRunConfig {
 	private List<String> droolsRulesGroupList;
 	private String bucketName;
 	private boolean enableMRCMValidation;
+	private CharacteristicType form;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -121,6 +123,16 @@ public class ValidationRunConfig {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+
+	public CharacteristicType getForm() {
+		return form;
+	}
+
+	public ValidationRunConfig setForm(CharacteristicType form) {
+		this.form = form;
+		return this;
+	}
+
 	@Override
 	public String toString() {
 		return "ValidationRunConfig [testFileName=" + testFileName
