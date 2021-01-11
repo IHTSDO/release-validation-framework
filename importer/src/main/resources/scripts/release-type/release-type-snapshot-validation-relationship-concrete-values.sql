@@ -76,6 +76,6 @@
 	or b.modifierid is null;
 
 commit;
-drop table if exists temp_relationship_view;
+drop table if exists temp_relationship_concrete_values_view;
 
 
