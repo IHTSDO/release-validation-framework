@@ -74,7 +74,7 @@
 		and a.typeid = b.typeid
 		and a.characteristictypeid = b.characteristictypeid
 		and a.modifierid = b.modifierid	
-	left join curr_relationship_d  c
+	left join curr_relationship_concrete_values_d  c
 		on a.id = c.id
 		and a.effectivetime = c.effectivetime
 		and a.active = c.active
