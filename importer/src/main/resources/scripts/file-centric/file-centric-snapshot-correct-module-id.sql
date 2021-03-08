@@ -12,7 +12,7 @@ moduleid bigint(20) not null
 ) engine=myisam default charset=utf8;
 
 insert into module_id
-select distinct moduleid from curr_moduledependencyrefset_d
+select distinct moduleid from curr_moduledependencyrefset_s
 where active = 1;
 
 insert into module_id(moduleid) values(900000000000207008);
