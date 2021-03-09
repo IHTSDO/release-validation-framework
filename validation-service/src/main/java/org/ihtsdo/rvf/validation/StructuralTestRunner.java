@@ -64,7 +64,6 @@ public class StructuralTestRunner {
 
 		if ( manifest != null) {
 			runRF2FileReleaseTypeTester(testReport, manifest);
-			runRefsetStructureTests(resourceManager, testReport, manifest, validationLog);
 		}
 		
 		testReport.getResult();
@@ -102,12 +101,6 @@ public class StructuralTestRunner {
 
 		final ColumnPatternTester columnPatternTest = new ColumnPatternTester(validationLog, resourceManager, report);
 		columnPatternTest.runTests();
-	}
-
-	private void runRefsetStructureTests(final ResourceProvider resourceManager, final TestReportable report,
-										 final ManifestFile manifest, final ValidationLog validationLog) {
-		final ManifestRefsetTester manifestRefsetTester = new ManifestRefsetTester(validationLog, resourceManager, manifest, report);
-		manifestRefsetTester.runTests();
 	}
 	
 	public boolean verifyZipFileStructure(final ValidationReport validationReport, final File tempFile, final Long runId, final File manifestFile,
