@@ -12,6 +12,7 @@
 		<script uuid="dd124acf-52d3-45e6-b5b4-d40454ff1b5e" category="resource" sqlFile="component-centric-snapshot-mrcm-attribute-range-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Domain Refsets." />
 		<script uuid="646390b7-c4aa-4aab-92c0-0031cf2e45ae" category="resource" sqlFile="component-centric-snapshot-mrcm-domain-refset-expression-concept-validation-proc.sql" text="Defines procedure to test the validity of concept ids in the MRCM Attribute Range Refsets." />
 		<script uuid="045b977a-a5cb-49f6-9a80-54ff478062bb" category="resource" sqlFile="file-centric-moduleid-validation-proc.sql" text="Defines procedure to validate module ID in data" />
+		<script uuid="3dc3b12a-642b-406f-a3e7-5ca81a7fc9af" category="resource" sqlFile="file-centric-refsetid-validation-proc.sql" text="Defines procedure to validate refset ID in data" />
 
 		<!-- release-type-full-validation -->
 		<script uuid="84f5edda-1249-4d79-87da-e248e61f06a6" category="release-type-validation" sqlFile="release-type-full-validation-concept.sql" text="The current Concept full file contains all previously published data unchanged."/>
@@ -226,6 +227,8 @@
 
 		<!-- file-centric-snapshot-concept -->
 		<script uuid="0145fbad-f067-41ff-b700-cf54fc639e21" category="file-centric-validation" sqlFile="file-centric-snapshot-correct-module-id.sql" text="The module id of components should be in module dependency list" />
+
+		<script uuid="0e898ae0-15cb-45f9-b032-041193aa79e8" category="file-centric-validation" sqlFile="file-centric-snapshot-correct-refset-id.sql" text="The refset id of components should be in module dependency list" />
 
 		<script uuid="309d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation" sqlFile="file-centric-snapshot-concept-unique-id.sql" text="ID is unique in CONCEPT snapshot." />
 		
