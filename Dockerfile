@@ -1,3 +1,8 @@
+FROM maven:3.3-jdk-8 AS builder
+COPY . /usr/src/app
+WORKDIR /usr/src/app
+RUN mvn clean install -DskipTests=true 
+
 FROM openjdk:8-jdk-alpine
 LABEL maintainer="SNOMED International <tooling@snomed.org>"
 
@@ -30,7 +35,7 @@ RUN mkdir /app/store
 RUN mkdir /app/store/releases
 
 # Copy necessary files
-ADD api/target/api*.jar api.jar
+COPY --from=builder /usr/src/app/api/target/api*.jar api.jar
 
 # Create the rvf user
 RUN addgroup -g $SGID rvf && \
