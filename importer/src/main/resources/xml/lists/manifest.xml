@@ -230,6 +230,12 @@
 
 		<script uuid="0e898ae0-15cb-45f9-b032-041193aa79e8" category="file-centric-validation,ES,DK,SE,US,BE,NO,CH,IE,EE,NZ,LOINC,GPFP-ICPC2,GMDN,DERIVATIVE" sqlFile="file-centric-snapshot-correct-refset-id.sql" text="The refset id of components should be in refset dependency list" />
 
+		<script uuid="119d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation" sqlFile="file-centric-snapshot-mdrs-valid-effectiveTime.sql" text="The MDRS effectiveTime should always equal the sourceEffectiveTime." />
+
+		<script uuid="129d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation" sqlFile="file-centric-snapshot-mdrs-valid-temporal-order.sql" text="The MDRS sourceEffectiveTime should always be equal or greater than the targetEffectiveTime." />
+
+		<script uuid="139d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation" sqlFile="file-centric-snapshot-mdrs-transitively-closed.sql" text="The MDRS dependencies must be transitively closed." />
+
 		<script uuid="309d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation" sqlFile="file-centric-snapshot-concept-unique-id.sql" text="ID is unique in CONCEPT snapshot." />
 		
 		<script uuid="3be8c763-a5bc-404b-af9f-a2cb681f6f3d" category="file-centric-validation" sqlFile="file-centric-snapshot-description-unique-id.sql" text="ID is unique in DESCRIPTION snapshot." />
