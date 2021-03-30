@@ -35,6 +35,7 @@ services:
       - rvf_net
     volumes:
       - rvf-store:/app/store
+    restart: always
 
 networks:
   rvf_net:
