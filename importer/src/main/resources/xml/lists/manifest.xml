@@ -226,7 +226,7 @@
 
 
 		<!-- file-centric-snapshot-concept -->
-		<script uuid="0145fbad-f067-41ff-b700-cf54fc639e21" category="file-centric-validation" sqlFile="file-centric-snapshot-correct-module-id.sql" text="The module id of components should be in module dependency list" />
+		<script uuid="0145fbad-f067-41ff-b700-cf54fc639e21" category="file-centric-validation,ES,DK,SE,US,BE,NO,CH,IE,EE,NZ,LOINC,GPFP-ICPC2,GMDN,DERIVATIVE" sqlFile="file-centric-snapshot-correct-module-id.sql" text="The module id of components should be in module dependency list" />
 
 		<script uuid="0e898ae0-15cb-45f9-b032-041193aa79e8" category="file-centric-validation" sqlFile="file-centric-snapshot-correct-refset-id.sql" text="The refset id of components should be in refset dependency list" />
 
