@@ -11,4 +11,4 @@ file-centric-snapshot-mdrs-correct-refset.sql
         a.referencedcomponentid,
         concat('Dependency from: ', a.moduleid, ' - ', a.sourceeffectivetime, ' to: ', b.referencedcomponentid, ' - ', b.targeteffectivetime, ' is declared in the incorrect refset ', a.refsetId)
     from curr_moduledependencyrefset_s a
-        where a.refsetId != '900000000000534007' 
+        where a.active = '1' and a.refsetId != '900000000000534007' 
