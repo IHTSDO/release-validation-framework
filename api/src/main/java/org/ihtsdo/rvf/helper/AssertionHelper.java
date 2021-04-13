@@ -1,10 +1,6 @@
 package org.ihtsdo.rvf.helper;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -28,7 +24,7 @@ public class AssertionHelper {
 		for (final Assertion assertion : assertions) {
 			try {
 				final List<TestRunItem> items = new ArrayList<>(
-						assertionExecutionService.executeAssertion(assertion, config));
+						assertionExecutionService.executeAssertion(assertion, config, Collections.emptyList()));
 				for (final TestRunItem item : items) {
 					if (item.getFailureCount() != 0) {
 						failedAssertionCount++;

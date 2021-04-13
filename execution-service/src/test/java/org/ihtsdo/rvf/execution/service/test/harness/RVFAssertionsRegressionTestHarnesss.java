@@ -120,7 +120,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 			List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource",true);
 			assertNotNull(assertions);
 			assertTrue(!assertions.isEmpty());
-			assertionExecutionService.executeAssertions(assertions, config);
+			assertionExecutionService.executeAssertions(assertions, config, Collections.EMPTY_MAP);
 		}
 		releaseTypeExpectedResults = RVFAssertionsRegressionTestHarnesss.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
 		assertNotNull("Must not be null", releaseTypeExpectedResults);
@@ -149,7 +149,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		 final List<Assertion> assertions= assertionService.getAssertionsByKeyWords(groupName, false);
 		 System.out.println("found total assertions:" + assertions.size());
 		 long timeStart = System.currentTimeMillis();
-		 final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
+		 final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config, Collections.emptyMap());
 		 long timeEnd = System.currentTimeMillis();
 		 System.out.println("Time taken:" +(timeEnd-timeStart));
 		 releaseDataManager.clearQAResult(config.getExecutionId());
@@ -211,7 +211,7 @@ public class RVFAssertionsRegressionTestHarnesss {
 		assertions.add(assertionService.getAssertionByUuid(UUID.fromString(assertionUUID)));
 		System.out.println("found total assertions:" + assertions.size());
 		long timeStart = System.currentTimeMillis();
-		Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
+		Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config, Collections.emptyMap());
 		System.out.println("Total tests run:" + runItems.size());
 		long timeEnd = System.currentTimeMillis();
 		releaseDataManager.clearQAResult(config.getExecutionId());

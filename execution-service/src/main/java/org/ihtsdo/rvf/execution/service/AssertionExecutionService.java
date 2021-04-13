@@ -1,20 +1,14 @@
 package org.ihtsdo.rvf.execution.service;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.sql.*;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
@@ -28,6 +22,7 @@ import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.importer.AssertionGroupImporter.ProductName;
+import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,43 +50,46 @@ public class AssertionExecutionService {
 
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionService.class);
 
-	public TestRunItem executeAssertionTest(final AssertionTest assertionTest, final MysqlExecutionConfig config) {
+	public TestRunItem executeAssertionTest(final AssertionTest assertionTest, final MysqlExecutionConfig config, final List<WhitelistItem> whitelistedItems) {
 
-		return executeTest(assertionTest.getAssertion(), assertionTest.getTest(), config);
+		return executeTest(assertionTest.getAssertion(), assertionTest.getTest(), config, whitelistedItems);
 	}
 
-	public Collection<TestRunItem> executeAssertionTests(final Collection<AssertionTest> assertionTests, final MysqlExecutionConfig config) {
+	public Collection<TestRunItem> executeAssertionTests(final Collection<AssertionTest> assertionTests, final MysqlExecutionConfig config, final List<WhitelistItem> whitelistedItems) {
 		final Collection<TestRunItem> items = new ArrayList<>();
 		for(final AssertionTest at: assertionTests){
-			items.add(executeAssertionTest(at, config));
+			items.add(executeAssertionTest(at, config, whitelistedItems));
 		}
 
 		return items;
 	}
 
-	public Collection<TestRunItem> executeAssertion(final Assertion assertion, final MysqlExecutionConfig config) {
+	public Collection<TestRunItem> executeAssertion(final Assertion assertion, final MysqlExecutionConfig config, List<WhitelistItem> whitelistedItems) {
 
 		final Collection<TestRunItem> runItems = new ArrayList<>();
 		//get tests for given assertion
 		for(final Test test: assertionService.getTests(assertion))
 		{
-			runItems.add(executeTest(assertion, test, config));
+			runItems.add(executeTest(assertion, test, config, whitelistedItems));
 		}
 
 		return runItems;
 	}
 
-	public Collection<TestRunItem> executeAssertions(final Collection<Assertion> assertions, final MysqlExecutionConfig config) {
+	public Collection<TestRunItem> executeAssertions(final Collection<Assertion> assertions, final MysqlExecutionConfig config, final Map<String, List<WhitelistItem>> assertionIdToWhitelistedItemsMap) {
 		final Collection<TestRunItem> items = new ArrayList<>();
 		for(final Assertion assertion : assertions){
-			items.addAll(executeAssertion(assertion, config));
+			String assertionUuid = assertion.getUuid().toString();
+			List<WhitelistItem> whitelistItems = assertionIdToWhitelistedItemsMap.containsKey(assertionUuid) ? assertionIdToWhitelistedItemsMap.get(assertionUuid) : Collections.emptyList();
+			items.addAll(executeAssertion(assertion, config, whitelistItems));
 		}
 
 		return items;
 	}
 
-public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertions, final MysqlExecutionConfig executionConfig) {
-
+	
+public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertions, final MysqlExecutionConfig executionConfig, final Map<String, List<WhitelistItem>> assertionIdToWhitelistedItemsMap) {
+		
 		final List<Future<Collection<TestRunItem>>> concurrentTasks = new ArrayList<>();
 		final List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
@@ -107,7 +105,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				final Future<Collection<TestRunItem>> future = executorService.submit(new Callable<Collection<TestRunItem>>() {
 					@Override
 					public Collection<TestRunItem> call() throws Exception {
-						return executeAssertions(work, executionConfig);
+						return executeAssertions(work, executionConfig, assertionIdToWhitelistedItemsMap);
 					}
 				});
 				logger.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
@@ -141,7 +139,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		}
 	}
 
-	public TestRunItem executeTest(final Assertion assertion, final Test test, final MysqlExecutionConfig config) {
+	public TestRunItem executeTest(final Assertion assertion, final Test test, final MysqlExecutionConfig config, final List<WhitelistItem> whitelistedItems) {
 
 		long timeStart = System.currentTimeMillis();
 		logger.debug("Start executing assertion:" + assertion.getUuid());
@@ -174,7 +172,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 
 		try {
 			long extractTimeStart = System.currentTimeMillis();
-			extractTestResult(assertion, runItem, config);
+			extractTestResult(assertion, runItem, config, whitelistedItems != null ?  whitelistedItems.stream().map(WhitelistItem::getConceptId).collect(Collectors.toList()) : Collections.emptyList());
 			long extractTimeEnd = System.currentTimeMillis();
 			runItem.setExtractResultInMillis((extractTimeEnd - extractTimeStart));
 		} catch (SQLException e) {
@@ -291,13 +289,20 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		return result;
 }
 
-	private void extractTestResult(final Assertion assertion, final TestRunItem runItem, final MysqlExecutionConfig config)
+	private void extractTestResult(final Assertion assertion, final TestRunItem runItem, final MysqlExecutionConfig config, List<String> whitelistedConceptIds)
 			throws SQLException {
 		/*
 		 create a prepared statement for retrieving matching results.
 		*/
 		String resultSQL = "select concept_id, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
 		//use limit to save memory and improve performance for worst case when containing thousands of errors
+		String sqlIN = null;
+		if (whitelistedConceptIds.size() != 0) {
+			sqlIN = whitelistedConceptIds.stream()
+					.map(x -> String.valueOf(x))
+					.collect(Collectors.joining(",", "(", ")"));
+			resultSQL = resultSQL + " and concept_id not in " + sqlIN;
+		}
 		if (config.getFailureExportMax() > 0) {
 			resultSQL = resultSQL + " limit ?";
 		}
@@ -307,9 +312,10 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				// select results that match execution
 				preparedStatement.setLong(1, assertion.getAssertionId());
 				preparedStatement.setLong(2, config.getExecutionId());
-				if( config.getFailureExportMax() > 0) {
+				if (config.getFailureExportMax() > 0) {
 					preparedStatement.setLong(3, config.getFailureExportMax());
 				}
+
 				try (ResultSet resultSet = preparedStatement.executeQuery()) {
 					while (resultSet.next())
 					{
@@ -327,6 +333,9 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				runItem.setFailureCount(counter);
 			} else {
 				String totalSQL = "select count(*) total from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
+				if (sqlIN != null) {
+					totalSQL = totalSQL + " and concept_id not in " + sqlIN;
+				}
 				try (PreparedStatement preparedStatement = connection.prepareStatement(totalSQL)) {
 					// select results that match execution
 					preparedStatement.setLong(1, assertion.getAssertionId());
