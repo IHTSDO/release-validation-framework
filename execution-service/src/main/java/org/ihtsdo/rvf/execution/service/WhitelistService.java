@@ -1,17 +1,22 @@
 package org.ihtsdo.rvf.execution.service;
 
-import org.ihtsdo.rvf.execution.service.whitelist.WhitelistAdapter;
+import org.ihtsdo.rvf.execution.service.whitelist.AcceptanceGatewayClient;
+import org.ihtsdo.rvf.execution.service.whitelist.AcceptanceGatewayClientFactory;
 import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Set;
 
 @Service
 public class WhitelistService {
-    public  Set<WhitelistItem> detectWhitelistedItems(Set<WhitelistItem> whitelistItems, String assertionType) throws IOException, URISyntaxException {
-        WhitelistAdapter adapter = new WhitelistAdapter(assertionType);
-        return  adapter.detectWhitelistedItems(whitelistItems);
+
+    @Autowired
+    private AcceptanceGatewayClientFactory factory;
+
+    public  List<WhitelistItem> getWhitelistItemsByAssertionIds(Set<String> assertionIds) {
+        AcceptanceGatewayClient client = factory.getClient();
+        return client.getWhitelistItemsByAssertionIds(assertionIds);
     }
 }

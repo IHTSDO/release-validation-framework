@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import org.ihtsdo.otf.rest.client.ExpressiveErrorHandler;
 import org.ihtsdo.otf.rest.client.authoringservices.RestyOverrideAccept;
 import org.ihtsdo.otf.rest.client.ims.IMSRestClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -65,14 +64,22 @@ public class AcceptanceGatewayClient {
         });
     }
 
-    public static AcceptanceGatewayClient createClient(String acceptanceGatewayServiceUrl, String imsUrl, String username, String password) throws URISyntaxException, IOException  {
+    public static AcceptanceGatewayClient createClient(String acceptanceGatewayServiceUrl, String imsUrl, String username, String password) {
         IMSRestClient imsClient = new IMSRestClient(imsUrl);
-        String token = imsClient.loginForceNewSession(username, password);
-        return new AcceptanceGatewayClient(acceptanceGatewayServiceUrl, token);
+        String token = null;
+        try {
+            token = imsClient.loginForceNewSession(username, password);
+            return new AcceptanceGatewayClient(acceptanceGatewayServiceUrl, token);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public List<WhitelistItem> getWhitelistedItems(Set<WhitelistItem> items) {
-        ResponseEntity<List<WhitelistItem>> responseEntity = restTemplate.exchange(acceptanceGatewayServiceUrl + "/bulk-validate", HttpMethod.POST, new org.springframework.http.HttpEntity<>(items), WHITELIST_ITEM_LIST_TYPE_REFERENCE);
+    public List<WhitelistItem> getWhitelistItemsByAssertionIds(Set<String> assertionIds) {
+        ResponseEntity<List<WhitelistItem>> responseEntity = restTemplate.exchange(this.acceptanceGatewayServiceUrl + "/whitelist-items/validation-rules", HttpMethod.POST, new org.springframework.http.HttpEntity<>(assertionIds), WHITELIST_ITEM_LIST_TYPE_REFERENCE);
         return responseEntity.getBody();
     }
 }

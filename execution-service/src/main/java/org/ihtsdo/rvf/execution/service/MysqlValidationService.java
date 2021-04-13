@@ -1,15 +1,12 @@
 package org.ihtsdo.rvf.execution.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.Assertion;
@@ -20,18 +17,23 @@ import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
+import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 public class MysqlValidationService {
 	
 	@Autowired
 	private AssertionService assertionService;
+
+	@Autowired
+	private WhitelistService whitelistService;
 	
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
@@ -144,12 +146,26 @@ public class MysqlValidationService {
 		}
 		reportService.writeProgress("Start executing assertions...", reportStorage);
 		LOGGER.info("Total assertions to run: " + assertions.size());
+
 		if (batchSize == 0) {
 			result.addAll(executeAssertions(executionConfig, assertions, reportStorage));
 		} else {
 			result.addAll(executeAssertionsConcurrently(executionConfig,assertions, batchSize, reportStorage));
 		}
 		return result;
+	}
+
+	private Map<String, List<WhitelistItem>> getAssertionToWhitelistedItemsMap(Collection<Assertion> assertions) {
+		Set<String> assertionIds = new HashSet<>();
+		for (Assertion assertion : assertions) {
+			assertionIds.add(assertion.getUuid().toString());
+		}
+		List<WhitelistItem> whitelistItems = whitelistService.getWhitelistItemsByAssertionIds(assertionIds);
+		Map<String, List<WhitelistItem>> assertionIdToWhitelistedItemsMap = new HashMap<>();
+		if (!CollectionUtils.isEmpty(whitelistItems)) {
+			assertionIdToWhitelistedItemsMap = whitelistItems.stream().collect(Collectors.groupingBy(WhitelistItem::getValidationRuleId));
+		}
+		return assertionIdToWhitelistedItemsMap;
 	}
 
 	private void runAssertionTests( ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, String reportStorage) {
@@ -178,6 +194,7 @@ public class MysqlValidationService {
 			int batchSize, String reportStorage) {
 		List<Future<Collection<TestRunItem>>> tasks = new ArrayList<>();
 		List<TestRunItem> results = new ArrayList<>();
+		Map<String, List<WhitelistItem>> assertionIdToWhitelistedItemsMap = getAssertionToWhitelistedItemsMap(assertions);
 		int counter = 1;
 		List<Assertion> batch = null;
 		for (final Assertion assertion: assertions) {
@@ -191,7 +208,7 @@ public class MysqlValidationService {
 				final Future<Collection<TestRunItem>> future = executorService.submit(new Callable<Collection<TestRunItem>>() {
 					@Override
 					public Collection<TestRunItem> call() throws Exception {
-						return assertionExecutionService.executeAssertions(work, executionConfig);
+						return assertionExecutionService.executeAssertions(work, executionConfig, assertionIdToWhitelistedItemsMap);
 					}
 				});
 				LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
@@ -219,10 +236,13 @@ public class MysqlValidationService {
 		
 		List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
+		Map<String, List<WhitelistItem>> assertionIdToWhitelistedItemsMap = getAssertionToWhitelistedItemsMap(assertions);
 		for (Assertion assertion: assertions) {
+			UUID assertionUUID = assertion.getUuid();
 			LOGGER.info(String.format("Started executing assertion [%1s] of [%2s] with uuid : [%3s]",
-					counter, assertions.size(), assertion.getUuid()));
-			results.addAll(assertionExecutionService.executeAssertion(assertion, executionConfig));
+					counter, assertions.size(), assertionUUID));
+			List<WhitelistItem> whitelistItems = assertionIdToWhitelistedItemsMap.containsKey(assertionUUID.toString()) ? assertionIdToWhitelistedItemsMap.get(assertionUUID.toString()) : Collections.emptyList();
+			results.addAll(assertionExecutionService.executeAssertion(assertion, executionConfig, whitelistItems));
 			LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s] with uuid : [%3s]",
 					counter, assertions.size(), assertion.getUuid()));
 			counter++;

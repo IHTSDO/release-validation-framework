@@ -3,9 +3,6 @@ package org.ihtsdo.rvf.execution.service.whitelist;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @Service
 public class AcceptanceGatewayClientFactory {
 
@@ -21,7 +18,7 @@ public class AcceptanceGatewayClientFactory {
     @Value("${ims.password}")
     private String password;
 
-    public AcceptanceGatewayClient getClient() throws IOException, URISyntaxException {
+    public AcceptanceGatewayClient getClient(){
         return AcceptanceGatewayClient.createClient(acceptanceGatewayServiceUrl, imsUrl, username, password);
     }
 }

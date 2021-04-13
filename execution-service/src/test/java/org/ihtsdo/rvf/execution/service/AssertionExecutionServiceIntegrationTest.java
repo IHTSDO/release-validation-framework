@@ -11,8 +11,6 @@ import org.ihtsdo.rvf.entity.AssertionTest;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.execution.service.AssertionExecutionService;
-import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.junit.Before;
@@ -25,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = ExecutionServiceTestConfig.class)
@@ -93,7 +93,7 @@ public class AssertionExecutionServiceIntegrationTest {
 		assertionTest.setTest(test);
 
 		// set both prospective and previous release
-		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config);
+		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config, Collections.emptyList());
 		assertNotNull(runItem);
 		logger.debug("runItem = " + runItem);
 		assertTrue("Test must have passed", runItem.getFailureCount() == 0);
@@ -126,7 +126,7 @@ public class AssertionExecutionServiceIntegrationTest {
 		assertionTest.setTest(test);
 
 		// set both prospective and previous release
-		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config);
+		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config, Collections.emptyList());
 		assertNotNull(runItem);
 		assertTrue("Test must have passed", runItem.getFailureCount() == 0);
 	}
