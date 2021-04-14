@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.execution.service.whitelist;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class AcceptanceGatewayClientFactory {
@@ -20,6 +21,10 @@ public class AcceptanceGatewayClientFactory {
 
     public AcceptanceGatewayClient getClient(){
         return AcceptanceGatewayClient.createClient(acceptanceGatewayServiceUrl, imsUrl, username, password);
+    }
+
+    public boolean isWhitelistingDisabled() {
+        return StringUtils.isEmpty(acceptanceGatewayServiceUrl);
     }
 }
 

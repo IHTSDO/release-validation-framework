@@ -6,6 +6,7 @@ import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +17,10 @@ public class WhitelistService {
     private AcceptanceGatewayClientFactory factory;
 
     public  List<WhitelistItem> getWhitelistItemsByAssertionIds(Set<String> assertionIds) {
+        if (factory.isWhitelistingDisabled()) {
+            return Collections.emptyList();
+        }
+
         AcceptanceGatewayClient client = factory.getClient();
         return client.getWhitelistItemsByAssertionIds(assertionIds);
     }
