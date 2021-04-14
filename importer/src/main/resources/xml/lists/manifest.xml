@@ -271,6 +271,8 @@
 
 		<script uuid="1491f72c-cb00-42db-a97b-9c685f4e4cb0" category="file-centric-validation" sqlFile="file-centric-snapshot-description-valid-conceptid.sql" text="ConceptId value refers to valid concept identifier in the DESCRIPTION snapshot." />
 		
+		<script uuid="82cc38ce-75d6-429e-bf45-551a100bfc52" category="file-centric-validation" sqlFile="file-centric-snapshot-description-invalid-descriptiontype.sql" text="Unknown description type on snapshot description row." />
+		
 		<script uuid="48118153-d32a-4d1c-bfbc-23ed953e9991" category="file-centric-validation" sqlFile="file-centric-snapshot-description-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in the description snapshot." />
 		
 		<script uuid="4ba823ce-8ae4-4b2e-beb5-e119b822cfe2" category="file-centric-validation" sqlFile="file-centric-snapshot-definition-unique-id.sql" text="ID is unique in the DEFINITION snapshot." />
