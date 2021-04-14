@@ -364,6 +364,27 @@ create table mrcmdomainrefset_f(
 	key idx_referencedcomponentid(referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
+
+drop table if exists descriptiontyperefset_f;
+create table descriptiontyperefset_f(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	descriptionformat bigint(20) not null,
+	descriptionlength int not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_descriptionformat(descriptionformat),
+	key idx_descriptionlength(descriptionlength)
+) engine=myisam default charset=utf8;
+
 /* create the Snapshot S-CT data tables */
 
 drop table if exists concept_s;
@@ -729,6 +750,26 @@ create table mrcmdomainrefset_s(
 	key idx_moduleid(moduleid),
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists descriptiontyperefset_s;
+create table descriptiontyperefset_s(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	descriptionformat bigint(20) not null,
+	descriptionlength int not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_descriptionformat(descriptionformat),
+	key idx_descriptionlength(descriptionlength)
 ) engine=myisam default charset=utf8;
 
 /* create the Delta S-CT data tables */
@@ -1306,5 +1347,25 @@ create table mrcmdomainrefset_d(
 	key idx_moduleid(moduleid),
 	key idx_refsetid(refsetid),
 	key idx_referencedcomponentid(referencedcomponentid)
+) engine=myisam default charset=utf8;
+
+drop table if exists descriptiontyperefset_d;
+create table descriptiontyperefset_d(
+	id varchar(36) not null,
+	effectivetime char(8) not null,
+	active char(1) not null,
+	moduleid bigint(20) not null,
+	refsetid bigint(20) not null,
+	referencedcomponentid bigint(20) not null,
+	descriptionformat bigint(20) not null,
+	descriptionlength int not null,
+	key idx_id(id),
+	key idx_effectivetime(effectivetime),
+	key idx_active(active),
+	key idx_moduleid(moduleid),
+	key idx_refsetid(refsetid),
+	key idx_referencedcomponentid(referencedcomponentid),
+	key idx_descriptionformat(descriptionformat),
+	key idx_descriptionlength(descriptionlength)
 ) engine=myisam default charset=utf8;
 
