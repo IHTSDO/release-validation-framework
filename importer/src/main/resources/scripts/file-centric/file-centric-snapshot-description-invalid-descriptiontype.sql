@@ -12,7 +12,7 @@
 		'<ASSERTIONUUID>',
 		a.id,
 		concat('DESCRIPTION: id=', a.id , ' has unknown description type: ', a.typeid) 	
-		from description_s a
+		from curr_description_s a
 		where a.active = 1
 			and a.typeid not in 
-			(select b.referencedcomponentid from descriptiontyperefset_s b where b.active = 1);
+			(select b.referencedcomponentid from curr_descriptiontyperefset_s b where b.active = 1);
