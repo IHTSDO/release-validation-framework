@@ -13,5 +13,6 @@
 		a.acceptabilityid,
 		concat('Language refset entry: ' , a.id, ' has unknown acceptability id=', a.acceptabilityid) 	
 	from langrefset_s a
-	where a.acceptabilityid != '900000000000548007' 
+	where a.active = 1
+		and a.acceptabilityid != '900000000000548007'
 		and a.acceptabilityid != '900000000000549004';
