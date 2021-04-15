@@ -13,5 +13,6 @@
 		a.id,
 		concat('DESCRIPTION: id=', a.id , ' has unknown description type: ', a.typeid) 	
 		from description_s a
-		where a.typeid not in 
+		where a.active = 1
+			and a.typeid not in 
 			(select b.referencedcomponentid from descriptiontyperefset_s b);
