@@ -15,4 +15,4 @@
 		from description_s a
 		where a.active = 1
 			and a.typeid not in 
-			(select b.referencedcomponentid from descriptiontyperefset_s b);
+			(select b.referencedcomponentid from descriptiontyperefset_s b where b.active = 1);
