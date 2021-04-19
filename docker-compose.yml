@@ -28,6 +28,8 @@ services:
     container_name: rvf
     depends_on:
       - db
+    environment:
+      - rvf.assertion.import.required=true
     entrypoint: java -Xms512m -Xmx4g -DrvfConfigLocation=/app/config -jar api.jar --server.port=8081 --server.servlet.context-path=/api
     ports:
       - 8081:8081
