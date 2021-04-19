@@ -12,5 +12,6 @@ select
   concat('Version skew in dependency on module: ', b.referencedcomponentid, ' - ', a.targeteffectivetime, ' and ', b.targeteffectivetime)
 from curr_moduledependencyrefset_s a, curr_moduledependencyrefset_s b
 where a.active = '1' and b.active = '1'
-  and a.referencedcomponentid = b.referencedcomponentid and a.targeteffectivetime != b.targeteffectivetime;
+  and a.referencedcomponentid = b.referencedcomponentid and a.sourceeffectivetime = b.sourceeffectivetime;
+  and a.targeteffectivetime != b.targeteffectivetime;
 
