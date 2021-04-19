@@ -224,7 +224,7 @@
 
 
 		<!-- file-centric-snapshot-concept -->
-		<script uuid="2edc1f50-fcc7-4b55-acad-56672fefacdf" category="file-centric-validation" sqlFile="file-centric-snapshot-root-concept-has-non-isa-relationships.sql" text="Root concept has non-isa relationships." />
+		<script uuid="2edc1f50-fcc7-4b55-acad-56672fefacdf" category="file-centric-validation" sqlFile="file-centric-snapshot-root-concept-has-non-isa-relationships.sql" text="Root concept has non-isa relationships." severity="WARNING" />
 		
 		<script uuid="309d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation" sqlFile="file-centric-snapshot-concept-unique-id.sql" text="ID is unique in CONCEPT snapshot." />
 		
