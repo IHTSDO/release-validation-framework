@@ -260,7 +260,9 @@
 
 
 		<script uuid="424789d5-8bb4-4036-9123-328085bfde99" category="file-centric-validation" sqlFile="file-centric-snapshot-mdrs-correct-refset.sql" text="All module dependency rows should be in the module dependency refset." />
-		
+
+		<script uuid="2edc1f50-fcc7-4b55-acad-56672fefacdf" category="file-centric-validation" sqlFile="file-centric-snapshot-root-concept-has-non-isa-relationships.sql" text="Root concept has non-isa relationships." severity="WARNING" />
+
 		<script uuid="364416fc-8291-4780-9ccf-3f2afb5b0377" category="file-centric-validation" sqlFile="file-centric-snapshot-mdrs-no-version-skew.sql" text="Target modules in the MDRS must have the same version." />
 
 		<script uuid="2edc1f50-fcc7-4b55-acad-56672fefacdf" category="file-centric-validation" sqlFile="file-centric-snapshot-root-concept-has-non-isa-relationships.sql" text="Root concept has non-isa relationships." />
