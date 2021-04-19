@@ -253,6 +253,10 @@
                 <script uuid="149d0615-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation,mdrs,mdrs-snapshot" sqlFile="file-centric-snapshot-mdrs-violation-textdefinition.sql" text="The textdefinition moduleId,effectiveTime pair should always respect the MDRS." />
 
 
+		<script uuid="424789d5-8bb4-4036-9123-328085bfde99" category="file-centric-validation" sqlFile="file-centric-snapshot-mdrs-correct-refset.sql" text="All module dependency rows should be in the module dependency refset." />
+		
+		<script uuid="364416fc-8291-4780-9ccf-3f2afb5b0377" category="file-centric-validation" sqlFile="file-centric-snapshot-mdrs-no-version-skew.sql" text="Target modules in the MDRS must have the same version." />
+		
 		<script uuid="309d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation" sqlFile="file-centric-snapshot-concept-unique-id.sql" text="ID is unique in CONCEPT snapshot." />
 		
 		<script uuid="3be8c763-a5bc-404b-af9f-a2cb681f6f3d" category="file-centric-validation" sqlFile="file-centric-snapshot-description-unique-id.sql" text="ID is unique in DESCRIPTION snapshot." />
