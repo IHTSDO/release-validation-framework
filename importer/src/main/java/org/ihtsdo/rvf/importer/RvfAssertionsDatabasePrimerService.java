@@ -17,17 +17,17 @@ public class RvfAssertionsDatabasePrimerService {
 	@Autowired
 	private AssertionGroupImporter assertionGroupImporter;
 	private static final String scriptsDir = "/scripts";
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(RvfAssertionsDatabasePrimerService.class);
-	
+
 	@PostConstruct
 	public void importAssertionsAndGroups() {
 		if (dbImporter.isAssertionImportRequired()) {
-			LOGGER.info("No assertons exist and start importing...");
+			LOGGER.info("Import requested or no assertions exist; start importing...");
 			InputStream manifestInputStream = AssertionsDatabaseImporter.class.getResourceAsStream("/xml/lists/manifest.xml");
 			// import content
 			dbImporter.importAssertionsFromFile(manifestInputStream, scriptsDir);
-			
+
 			LOGGER.info("Assertions imported");
 		}
 		//create assertion group
