@@ -27,7 +27,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -619,6 +622,42 @@ public class ReleaseDataManager {
 		} finally {
 			IOUtils.closeQuietly(input);
 			IOUtils.closeQuietly(out);
+		}
+	}
+
+	public String getEditionAndVersion(final File zipDataFile)  throws BusinessServiceException {
+		String editionAndVersion = "";
+		String snomedFile = "";
+		List<String> zipFileList = getFileList(zipDataFile);
+		Optional<String> sctOrDerFile = zipFileList.stream()
+							.filter(file -> ( file.indexOf("sct_") != -1 
+										|| file.indexOf("der2_") != -1)
+										&& file.endsWith(".txt"))
+							.findFirst();
+		if (!sctOrDerFile.isPresent()) {
+			throw new BusinessServiceException("There are no RF2 files in data file: " + zipDataFile);
+		}
+		snomedFile = sctOrDerFile.get();
+		Matcher matcher = Pattern.compile(".*_([]a-zA-Z0-9]+)_([0-9]+)\\.txt").matcher(snomedFile);
+		if (matcher.find() && matcher.groupCount() == 2) {
+			editionAndVersion = 
+				matcher.group(1).toLowerCase() + "_" 
+				+ matcher.group(2);
+		} else {
+			throw new BusinessServiceException(
+				"Could not find RF2 file with standard name in data zip file " 
+				+ zipDataFile.getName());
+		}
+		logger.info ("Identified edition and version " + editionAndVersion + " from zip file " + zipDataFile.getName());
+		return editionAndVersion;
+	}
+
+	private List<String> getFileList(final File dataFile) throws BusinessServiceException {
+		try {
+			List<String> fileList = ZipFileUtils.listFiles(dataFile);
+			return fileList;
+		} catch (IOException e) {
+			throw new BusinessServiceException("Could not get file list from " + dataFile, e);
 		}
 	}
 }

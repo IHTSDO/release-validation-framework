@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -195,4 +196,21 @@ public class ZipFileUtils {
 		}
 		bos.close();
 	}
+
+	/**
+	 * Lists all the files in the Zip file specified by
+	 * zipFile
+	 * @param zipFile
+	 * @throws IOException
+	 */
+	public static List<String> listFiles(final File zipFile) throws IOException {
+		ZipFile zipFileToOpen = new ZipFile(zipFile);
+		List<String> fileList = 
+			zipFileToOpen.stream()
+				.filter(file -> !file.isDirectory())
+				.map(entry -> entry.getName())
+				.collect(Collectors.toList());
+		zipFileToOpen.close();
+		return fileList;
+	}	
 }
