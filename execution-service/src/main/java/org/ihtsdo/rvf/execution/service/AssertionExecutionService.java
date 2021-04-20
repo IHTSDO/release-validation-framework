@@ -251,8 +251,9 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String defaultCatalog = dataSource.getDefaultCatalog();
 		String prospectiveSchema = config.getProspectiveVersion();
 		final String[] nameParts = config.getProspectiveVersion().split("_");
-		String moduleId = ProductName.toModuleId(nameParts[2]);
-		String version = nameParts[2];
+		String moduleId = (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
+		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
+
 		String previousReleaseSchema = config.getPreviousVersion();
 
 		//We need both these schemas to exist
@@ -271,8 +272,8 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			// replace all substitutions for exec
 			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
 			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
-                        part = part.replaceAll("<MODULEID>", moduleId);
-                        part = part.replaceAll("<VERSION>", version);
+			part = part.replaceAll("<MODULEID>", moduleId);
+			part = part.replaceAll("<VERSION>", version);
 			// watch out for any 's that users might have introduced
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
 			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);

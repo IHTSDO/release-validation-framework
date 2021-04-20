@@ -152,9 +152,10 @@ public class ValidationVersionLoader {
 		return releaseVersion;
 	}
 
-	public MysqlExecutionConfig createExecutionConfig(ValidationRunConfig validationConfig) {
+	public MysqlExecutionConfig createExecutionConfig(ValidationRunConfig validationConfig) throws BusinessServiceException {
 		MysqlExecutionConfig executionConfig = new MysqlExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
-		executionConfig.setProspectiveVersion(RVF_DB_PREFIX + executionConfig.getExecutionId().toString());
+		executionConfig.setProspectiveVersion(RVF_DB_PREFIX + getProspectiveVersionFromFileNames(validationConfig) 
+							+ "_" + executionConfig.getExecutionId().toString());
 		executionConfig.setGroupNames(validationConfig.getGroupsList());
 		executionConfig.setExtensionValidation( isExtension(validationConfig));
 		executionConfig.setFirstTimeRelease(validationConfig.isFirstTimeRelease());
@@ -171,6 +172,13 @@ public class ValidationVersionLoader {
 		}
 		executionConfig.setReleaseValidation(!validationConfig.isRf2DeltaOnly());
 		return executionConfig;
+	}
+
+	private String getProspectiveVersionFromFileNames(ValidationRunConfig validationConfig) throws BusinessServiceException {
+		if (validationConfig.getLocalProspectiveFile() == null) {
+			return null;
+		}
+		return releaseDataManager.getEditionAndVersion(validationConfig.getLocalProspectiveFile());
 	}
 
 	public List<String> loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(MysqlExecutionConfig executionConfig, ValidationRunConfig validationConfig,

@@ -226,6 +226,8 @@
 		<!-- file-centric-snapshot-concept -->
 		<script uuid="2edc1f50-fcc7-4b55-acad-56672fefacdf" category="file-centric-validation" sqlFile="file-centric-snapshot-root-concept-has-non-isa-relationships.sql" text="Root concept has non-isa relationships." severity="WARNING" />
 		
+		<script uuid="f2e0cef7-983b-404c-993d-e198f7fec419" category="file-centric-validation,mdrs" sqlFile="file-centric-snapshot-mdrs-no-module-dependencies-for-edition.sql" text="No module dependencies for the edition/version." />
+		
 		<script uuid="119d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation,mdrs" sqlFile="file-centric-snapshot-mdrs-valid-effectiveTime.sql" text="The MDRS effectiveTime should always equal the sourceEffectiveTime." />
 
 		<script uuid="129d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation,mdrs" sqlFile="file-centric-snapshot-mdrs-valid-temporal-order.sql" text="The MDRS sourceEffectiveTime should always be equal or greater than the targetEffectiveTime." />
