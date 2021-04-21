@@ -27,6 +27,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,20 +48,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		private static final String JSON_EXTENSION = ".json";
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 		private static final String RESOURCE_PATH_SEPARATOR = "/";
-	
+
+		@Value("${rvf.assertion.import.required:false}")
+		private boolean assertionImportRequired;
+
 		protected ObjectMapper objectMapper = new ObjectMapper();
 		private Map<String, String> lookupMap = new HashMap<>();
 		@Autowired
 		AssertionService assertionService;
-		
+
 		public boolean isAssertionImportRequired() {
 			List<Assertion> assertions = assertionService.findAll();
-			if (assertions == null || assertions.isEmpty()) {
+			if (assertions == null || assertions.isEmpty() || assertionImportRequired) {
 				return true;
 			}
 			return false;
 		}
-		
+
 		public void importAssertionsFromFile(final InputStream manifestInputStream, final String sqlResourcesFolderLocation){
 			// get JDOM document from given manifest file
 			final Document xmlDocument = getJDomDocumentFromFile(manifestInputStream);
@@ -78,7 +82,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 						if(assertion != null){
 							try
 							{
-								 logger.info("Created assertion id : " + assertion.getAssertionId());
+								logger.info("Created assertion id : " + assertion.getAssertionId());
 								assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
 								// get Sql file name from element and use it to add SQL test
 								final String sqlFileName = element.getAttributeValue("sqlFile");
@@ -144,19 +148,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 			logger.info("severity = " + severity);
 
 			// add entities using rest client
-			final Assertion assertion = new Assertion();
-			assertion.setUuid(UUID.fromString(uuid));
+			final UUID key = UUID.fromString(uuid);
+			final Assertion assertionFromDb = assertionService.findAssertionByUUID(key);
+			final Assertion assertion;
+			if (assertionFromDb != null) {
+			    assertion = assertionFromDb;
+			} else {
+			    assertion = new Assertion();
+			    assertion.setUuid(key);
+			}
 			assertion.setAssertionText(text);
 			assertion.setKeywords(category);
 			assertion.setSeverity(severity);
-			Assertion assertionFromDb = assertionService.findAssertionByUUID(assertion.getUuid());
 			if (assertionFromDb == null) {
-				return assertionService.create(assertion);
-			}
-			return assertionFromDb;
-			}
+			    return assertionService.create(assertion);
+			} else {
 
-			
+			    assertionService.deleteTests(assertionFromDb, assertionService.getTests(assertionFromDb));
+			    return assertionService.save(assertion);
+			}
+		}
+
+
 
 		public void addSqlTestToAssertion(final Assertion assertion, final String sql){
 
@@ -185,14 +198,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 					}
 					final Map<String, String> schemaMapping = getRvfSchemaMapping(token);
 					if(schemaMapping.keySet().size() > 0){
-					   
+
 						lookupMap.put(token, schemaMapping.get(token));
 						// now replace all instances with rvf mapping
 						if (schemaMapping.get(token) != null)
 						{
 							cleanedSql = cleanedSql.replaceAll(token, schemaMapping.get(token));
 						}
-					   
+
 					}
 				}
 				cleanedSql = cleanedSql.replaceAll("runid", "run_id");
@@ -213,7 +226,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 			uploadTest(assertion, sql, statements);
 		}
-		
+
 		private void uploadTest (Assertion assertion, String orignalSql, List<String> sqlStatements) {
 			final ExecutionCommand command = new ExecutionCommand();
 			command.setTemplate(orignalSql);
@@ -232,7 +245,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 //			}
 			logger.debug("Adding tests for assertion id" + assertion.getAssertionId());
 			assertionService.addTests(assertion, tests);
-				
+
 		}
 
 		protected static Document getJDomDocumentFromFile(final InputStream manifestInputStream){
@@ -317,13 +330,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 			}
 
 		}
-		
-		
+
+
 		/**
 		 * Attempts to import any .json file in taretDir and child directories
 		 * @param targetDir
-		 * @param keywords 
-		 * @throws JsonProcessingException 
+		 * @param keywords
+		 * @throws JsonProcessingException
 		 */
 		public void importAssertionsFromDirectory(File targetDir, String keywords) throws JsonProcessingException {
 			logger.info("Loading json files from {}", targetDir);
@@ -349,9 +362,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 					}
 				}
 			}
-			
+
 		}
-		
+
 		@SuppressWarnings("rawtypes")
 		private void createOrUpdateAssertion(SimpleAssertion simpleAssertion) throws JsonProcessingException {
 			Assertion assertion = simpleAssertion.toAssertion();
