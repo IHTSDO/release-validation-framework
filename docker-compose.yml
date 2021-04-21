@@ -22,7 +22,7 @@ services:
     volumes:
       - mysql:/var/lib/mysql
     command:
-        mysqld --sql_mode="NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES"
+        mysqld --sql_mode="NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES" --lower_case_table_names=1
   rvf:
     image: snomedinternational/release-validation-framework:latest
     container_name: rvf
