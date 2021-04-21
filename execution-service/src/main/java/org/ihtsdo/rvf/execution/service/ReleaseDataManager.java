@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -638,11 +640,11 @@ public class ReleaseDataManager {
 			throw new BusinessServiceException("There are no RF2 files in data file: " + zipDataFile);
 		}
 		snomedFile = sctOrDerFile.get();
-		Matcher matcher = Pattern.compile(".*_([]a-zA-Z0-9]+)_([0-9]+)\\.txt").matcher(snomedFile);
-		if (matcher.find() && matcher.groupCount() == 2) {
+		Matcher matcher = Pattern.compile(".*_([0-9]+)\\.txt").matcher(snomedFile);
+		if (matcher.find()) {
 			editionAndVersion = 
-				matcher.group(1).toLowerCase() + "_" 
-				+ matcher.group(2);
+				mapFilnameToEdition(snomedFile).toLowerCase() + "_" 
+				+ matcher.group(1);
 		} else {
 			throw new BusinessServiceException(
 				"Could not find RF2 file with standard name in data zip file " 
@@ -650,6 +652,26 @@ public class ReleaseDataManager {
 		}
 		logger.info ("Identified edition and version " + editionAndVersion + " from zip file " + zipDataFile.getName());
 		return editionAndVersion;
+	}
+
+	private String mapFilnameToEdition(String name) {
+		String edition = "INT";
+		Map<String,String> fileNameToEditionMap = new HashMap<String,String>();
+		fileNameToEditionMap.put("SpanishExtension.*_INT", "ES");
+		fileNameToEditionMap.put("_NL[\\-a-zA-Z]*_[0-9]+\\.txt", "NL");
+		fileNameToEditionMap.put("_AU1000036_[0-9]+\\.txt", "AU");
+		fileNameToEditionMap.put("_NZ1000210_[0-9]+\\.txt", "NZ");
+		fileNameToEditionMap.put("_US1000124_[0-9]+\\.txt", "US");
+		fileNameToEditionMap.put("_INT_[0-9]+\\.txt", "INT");
+		for (String pattern : fileNameToEditionMap.keySet()) {
+			Matcher editionMatcher = Pattern.compile(pattern).matcher(name);
+			if (editionMatcher.find()) {
+				edition = fileNameToEditionMap.get(pattern);
+				break;
+			}
+
+		}
+		return edition;
 	}
 
 	private List<String> getFileList(final File dataFile) throws BusinessServiceException {
