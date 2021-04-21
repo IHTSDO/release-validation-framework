@@ -85,6 +85,7 @@ public class AssertionGroupImporter {
             UKCL("UKCL", "999000011000000103"),
             US("US", "731000124108"),
             NZ("NZ", "21000210109"),
+            ES("ES", "450829007"),
 
 //            DK("DK", "DanishEdition"),
 //            SE("SE", "SwedishEdition"),
