@@ -226,8 +226,12 @@
 
 
 		<!-- file-centric-snapshot-concept -->
+		<script uuid="2edc1f50-fcc7-4b55-acad-56672fefacdf" category="file-centric-validation" sqlFile="file-centric-snapshot-root-concept-has-non-isa-relationships.sql" text="Root concept has non-isa relationships." severity="WARNING" />
+		
 		<script uuid="0145fbad-f067-41ff-b700-cf54fc639e21" category="file-centric-validation,ES,DK,SE,US,BE,NO,CH,IE,EE,NZ,LOINC,GPFP-ICPC2,GMDN,DERIVATIVE" sqlFile="file-centric-snapshot-correct-module-id.sql" text="The module id of components should be in module dependency list" />
 		<script uuid="0e898ae0-15cb-45f9-b032-041193aa79e8" category="file-centric-validation,ES,DK,SE,US,BE,NO,CH,IE,EE,NZ,LOINC,GPFP-ICPC2,GMDN,DERIVATIVE" sqlFile="file-centric-snapshot-correct-refset-id.sql" text="The refset id of components should be in refset dependency list" />
+		<script uuid="f2e0cef7-983b-404c-993d-e198f7fec419" category="file-centric-validation,mdrs" sqlFile="file-centric-snapshot-mdrs-no-module-dependencies-for-edition.sql" text="No module dependencies for the edition/version." />
+		
 
 		<script uuid="129d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation,mdrs" sqlFile="file-centric-snapshot-mdrs-valid-temporal-order.sql" text="The MDRS sourceEffectiveTime should always be equal or greater than the targetEffectiveTime." />
 		<script uuid="119d0620-0a32-43a6-9d08-8e6bdefda3be" category="file-centric-validation,mdrs" sqlFile="file-centric-snapshot-mdrs-valid-effectiveTime.sql" text="The MDRS effectiveTime should always equal the sourceEffectiveTime." />
@@ -268,6 +272,8 @@
 		<script uuid="8ea2e5d9-5c35-4436-b67d-c5268b5da06c" category="file-centric-validation" sqlFile="file-centric-snapshot-description-unique-FSN.sql" text="Active Fully Specified Name associated with active concepts is unique in DESCRIPTION snapshot." />
 
 		<script uuid="1491f72c-cb00-42db-a97b-9c685f4e4cb0" category="file-centric-validation" sqlFile="file-centric-snapshot-description-valid-conceptid.sql" text="ConceptId value refers to valid concept identifier in the DESCRIPTION snapshot." />
+		
+		<script uuid="82cc38ce-75d6-429e-bf45-551a100bfc52" category="file-centric-validation" sqlFile="file-centric-snapshot-description-invalid-descriptiontype.sql" text="Unknown description type on snapshot description row." />
 		
 		<script uuid="48118153-d32a-4d1c-bfbc-23ed953e9991" category="file-centric-validation" sqlFile="file-centric-snapshot-description-immutable.sql" text="There is a 1:1 relationship between the id and the immutable values in the description snapshot." />
 		
