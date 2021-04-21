@@ -662,6 +662,7 @@ public class ReleaseDataManager {
 		fileNameToEditionMap.put("_AU1000036_[0-9]+\\.txt", "AU");
 		fileNameToEditionMap.put("_NZ1000210_[0-9]+\\.txt", "NZ");
 		fileNameToEditionMap.put("_US1000124_[0-9]+\\.txt", "US");
+		fileNameToEditionMap.put("_BE1000172_[0-9]+\\.txt", "BE");
 		fileNameToEditionMap.put("_INT_[0-9]+\\.txt", "INT");
 		for (String pattern : fileNameToEditionMap.keySet()) {
 			Matcher editionMatcher = Pattern.compile(pattern).matcher(name);
