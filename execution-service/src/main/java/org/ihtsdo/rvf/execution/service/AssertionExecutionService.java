@@ -53,7 +53,7 @@ public class AssertionExecutionService {
 		return executeTest(assertionTest.getAssertion(), assertionTest.getTest(), config);
 	}
 
-	public Collection<TestRunItem> executeAssertionTests(final Collection<AssertionTest> assertionTests, final MysqlExecutionConfig config, final List<WhitelistItem> whitelistedItems) {
+	public Collection<TestRunItem> executeAssertionTests(final Collection<AssertionTest> assertionTests, final MysqlExecutionConfig config) {
 		final Collection<TestRunItem> items = new ArrayList<>();
 		for(final AssertionTest at: assertionTests){
 			items.add(executeAssertionTest(at, config));
