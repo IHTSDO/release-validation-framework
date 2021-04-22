@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class WhitelistService {
@@ -16,12 +15,16 @@ public class WhitelistService {
     @Autowired
     private AcceptanceGatewayClientFactory factory;
 
-    public  List<WhitelistItem> getWhitelistItemsByAssertionIds(Set<String> assertionIds) {
-        if (factory.isWhitelistingDisabled()) {
+    public boolean isWhitelistDisabled() {
+        return factory.isWhitelistDisabled();
+    }
+
+    public  List<WhitelistItem> validateAssertions(List<WhitelistItem> assertions) {
+        if (isWhitelistDisabled()) {
             return Collections.emptyList();
         }
 
         AcceptanceGatewayClient client = factory.getClient();
-        return client.getWhitelistItemsByAssertionIds(assertionIds);
+        return client.validateAssertions(assertions);
     }
 }

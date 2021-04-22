@@ -93,7 +93,7 @@ public class AssertionExecutionServiceIntegrationTest {
 		assertionTest.setTest(test);
 
 		// set both prospective and previous release
-		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config, Collections.emptyList());
+		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config);
 		assertNotNull(runItem);
 		logger.debug("runItem = " + runItem);
 		assertTrue("Test must have passed", runItem.getFailureCount() == 0);
@@ -126,7 +126,7 @@ public class AssertionExecutionServiceIntegrationTest {
 		assertionTest.setTest(test);
 
 		// set both prospective and previous release
-		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config, Collections.emptyList());
+		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config);
 		assertNotNull(runItem);
 		assertTrue("Test must have passed", runItem.getFailureCount() == 0);
 	}

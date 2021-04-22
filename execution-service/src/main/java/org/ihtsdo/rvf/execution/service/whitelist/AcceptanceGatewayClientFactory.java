@@ -1,8 +1,13 @@
 package org.ihtsdo.rvf.execution.service.whitelist;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.ihtsdo.sso.integration.SecurityUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AcceptanceGatewayClientFactory {
@@ -13,17 +18,42 @@ public class AcceptanceGatewayClientFactory {
     @Value("${ims.url}")
     private String imsUrl;
 
-    @Value("${ims.username}")
+    @Value("${rvf.ims.username}")
     private String username;
 
-    @Value("${ims.password}")
+    @Value("${rvf.ims.password}")
     private String password;
 
-    public AcceptanceGatewayClient getClient(){
-        return AcceptanceGatewayClient.createClient(acceptanceGatewayServiceUrl, imsUrl, username, password);
+    private final Cache<String, AcceptanceGatewayClient> clientCache;
+
+    public AcceptanceGatewayClientFactory() {
+       this.clientCache = CacheBuilder.newBuilder().expireAfterAccess(5L, TimeUnit.MINUTES).build();
     }
 
-    public boolean isWhitelistingDisabled() {
+    public AcceptanceGatewayClient getClient(){
+        AcceptanceGatewayClient client = null;
+        String authenticationToken = SecurityUtil.getAuthenticationToken();
+        if (!StringUtils.isEmpty(authenticationToken)) {
+            client = this.clientCache.getIfPresent(authenticationToken);
+        }
+        if (client == null) {
+            synchronized(this.clientCache) {
+                authenticationToken = SecurityUtil.getAuthenticationToken();
+                if (!StringUtils.isEmpty(authenticationToken)) {
+                    client = this.clientCache.getIfPresent(authenticationToken);
+                }
+                if (client == null) {
+                    client = AcceptanceGatewayClient.createClient(acceptanceGatewayServiceUrl, imsUrl, username, password);
+                    authenticationToken = SecurityUtil.getAuthenticationToken();
+                    this.clientCache.put(authenticationToken, client);
+                }
+            }
+        }
+
+        return client;
+    }
+
+    public boolean isWhitelistDisabled() {
         return StringUtils.isEmpty(acceptanceGatewayServiceUrl);
     }
 }

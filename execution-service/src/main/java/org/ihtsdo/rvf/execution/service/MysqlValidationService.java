@@ -1,12 +1,12 @@
 package org.ihtsdo.rvf.execution.service;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.Assertion;
@@ -17,14 +17,13 @@ import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
-import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
+import org.ihtsdo.rvf.execution.service.whitelist.RVFAssertionWhitelistFilter;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 @Service
 public class MysqlValidationService {
@@ -33,9 +32,6 @@ public class MysqlValidationService {
 	private AssertionService assertionService;
 
 	@Autowired
-	private WhitelistService whitelistService;
-	
-	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	
 	@Value("${rvf.assertion.execution.BatchSize}")
@@ -43,6 +39,9 @@ public class MysqlValidationService {
 	
 	@Autowired
 	private ValidationReportService reportService;
+
+	@Autowired
+	private RVFAssertionWhitelistFilter rvfAssertionWhitelistFilter;
 	
 	@Autowired
 	private ValidationVersionLoader releaseVersionLoader;
@@ -103,9 +102,12 @@ public class MysqlValidationService {
 		List<Assertion> assertions = getAssertions(executionConfig.getGroupNames());
 		LOGGER.debug("Total assertions found:" + assertions.size());
 		List<Assertion> releaseTypeAssertions = new ArrayList<>();
+		List<Assertion> noneReleaseTypeAssertions = new ArrayList<>();
 		for (Assertion assertion : assertions) {
 			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION)) {
 				releaseTypeAssertions.add(assertion);
+			} else {
+				noneReleaseTypeAssertions.add(assertion);
 			}
 		}
 		LOGGER.debug("Running release-type validations:" + releaseTypeAssertions.size());
@@ -120,10 +122,8 @@ public class MysqlValidationService {
 			LOGGER.error(msg, e);
 			statusReport.getReportSummary().put(TestType.SQL.name(), msg);
 		}
-		//remove already run release-type validations 
-		assertions.removeAll(releaseTypeAssertions);
-		testItems.addAll(runAssertionTests(executionConfig, assertions, reportStorage, true));
-		constructTestReport(statusReport.getResultReport(), executionConfig, timeStart, testItems);
+		testItems.addAll(runAssertionTests(executionConfig, noneReleaseTypeAssertions, reportStorage, true));
+		constructTestReport(statusReport.getResultReport(), executionConfig, timeStart, testItems, assertions);
 	}
 	
 	private List<Assertion> getAssertions(List<String> groupNames) {
@@ -155,19 +155,6 @@ public class MysqlValidationService {
 		return result;
 	}
 
-	private Map<String, List<WhitelistItem>> getAssertionToWhitelistedItemsMap(Collection<Assertion> assertions) {
-		Set<String> assertionIds = new HashSet<>();
-		for (Assertion assertion : assertions) {
-			assertionIds.add(assertion.getUuid().toString());
-		}
-		List<WhitelistItem> whitelistItems = whitelistService.getWhitelistItemsByAssertionIds(assertionIds);
-		Map<String, List<WhitelistItem>> assertionIdToWhitelistedItemsMap = new HashMap<>();
-		if (!CollectionUtils.isEmpty(whitelistItems)) {
-			assertionIdToWhitelistedItemsMap = whitelistItems.stream().collect(Collectors.groupingBy(WhitelistItem::getValidationRuleId));
-		}
-		return assertionIdToWhitelistedItemsMap;
-	}
-
 	private void runAssertionTests( ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, String reportStorage) {
 		long timeStart = System.currentTimeMillis();
 		List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
@@ -186,7 +173,7 @@ public class MysqlValidationService {
 		} else {
 			items.addAll(executeAssertionsConcurrently(executionConfig, assertions, batchSize, reportStorage));
 		}
-		constructTestReport(statusReport.getResultReport(), executionConfig, timeStart, items);
+		constructTestReport(statusReport.getResultReport(), executionConfig, timeStart, items, new ArrayList<>(assertions));
 		
 	}
 
@@ -194,7 +181,6 @@ public class MysqlValidationService {
 			int batchSize, String reportStorage) {
 		List<Future<Collection<TestRunItem>>> tasks = new ArrayList<>();
 		List<TestRunItem> results = new ArrayList<>();
-		Map<String, List<WhitelistItem>> assertionIdToWhitelistedItemsMap = getAssertionToWhitelistedItemsMap(assertions);
 		int counter = 1;
 		List<Assertion> batch = null;
 		for (final Assertion assertion: assertions) {
@@ -208,7 +194,7 @@ public class MysqlValidationService {
 				final Future<Collection<TestRunItem>> future = executorService.submit(new Callable<Collection<TestRunItem>>() {
 					@Override
 					public Collection<TestRunItem> call() throws Exception {
-						return assertionExecutionService.executeAssertions(work, executionConfig, assertionIdToWhitelistedItemsMap);
+						return assertionExecutionService.executeAssertions(work, executionConfig);
 					}
 				});
 				LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
@@ -236,13 +222,11 @@ public class MysqlValidationService {
 		
 		List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
-		Map<String, List<WhitelistItem>> assertionIdToWhitelistedItemsMap = getAssertionToWhitelistedItemsMap(assertions);
 		for (Assertion assertion: assertions) {
 			UUID assertionUUID = assertion.getUuid();
 			LOGGER.info(String.format("Started executing assertion [%1s] of [%2s] with uuid : [%3s]",
 					counter, assertions.size(), assertionUUID));
-			List<WhitelistItem> whitelistItems = assertionIdToWhitelistedItemsMap.containsKey(assertionUUID.toString()) ? assertionIdToWhitelistedItemsMap.get(assertionUUID.toString()) : Collections.emptyList();
-			results.addAll(assertionExecutionService.executeAssertion(assertion, executionConfig, whitelistItems));
+			results.addAll(assertionExecutionService.executeAssertion(assertion, executionConfig));
 			LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s] with uuid : [%3s]",
 					counter, assertions.size(), assertion.getUuid()));
 			counter++;
@@ -254,11 +238,19 @@ public class MysqlValidationService {
 		}
 		reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", 
 				counter, assertions.size()), reportStorage);
+
 		return results;
 	}
 	
 	private void constructTestReport(ValidationReport report, MysqlExecutionConfig executionConfig,
-			long timeStart, List<TestRunItem> items) {
+									 long timeStart, List<TestRunItem> items, List<Assertion> assertions) {
+
+		try {
+			rvfAssertionWhitelistFilter.extractTestResults(items, executionConfig, assertions);
+		} catch (SQLException e) {
+			LOGGER.warn("Failed to extract test result : " + e.fillInStackTrace());
+		}
+
 		final long timeEnd = System.currentTimeMillis();
 		report.addTimeTaken((timeEnd - timeStart) / 1000);
 		//failed tests
