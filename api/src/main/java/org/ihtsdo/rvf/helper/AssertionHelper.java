@@ -24,7 +24,7 @@ public class AssertionHelper {
 		for (final Assertion assertion : assertions) {
 			try {
 				final List<TestRunItem> items = new ArrayList<>(
-						assertionExecutionService.executeAssertion(assertion, config, Collections.emptyList()));
+						assertionExecutionService.executeAssertion(assertion, config));
 				for (final TestRunItem item : items) {
 					if (item.getFailureCount() != 0) {
 						failedAssertionCount++;

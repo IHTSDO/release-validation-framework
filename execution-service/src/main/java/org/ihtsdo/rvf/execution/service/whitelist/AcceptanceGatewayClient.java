@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import org.ihtsdo.otf.rest.client.ExpressiveErrorHandler;
 import org.ihtsdo.otf.rest.client.authoringservices.RestyOverrideAccept;
 import org.ihtsdo.otf.rest.client.ims.IMSRestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -12,15 +14,18 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.client.RestTemplate;
 import us.monoid.web.Resty;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Set;
 
 public class AcceptanceGatewayClient {
+    private static final Logger logger = LoggerFactory.getLogger(AcceptanceGatewayClient.class);
+
     private String acceptanceGatewayServiceUrl;
     private RestTemplate restTemplate;
     private HttpHeaders headers;
@@ -68,18 +73,18 @@ public class AcceptanceGatewayClient {
         IMSRestClient imsClient = new IMSRestClient(imsUrl);
         String token = null;
         try {
-            token = imsClient.loginForceNewSession(username, password);
+            token = imsClient.login(username, password);
+            PreAuthenticatedAuthenticationToken decoratedAuthentication = new PreAuthenticatedAuthenticationToken(username, token);
+            SecurityContextHolder.getContext().setAuthentication(decoratedAuthentication);
             return new AcceptanceGatewayClient(acceptanceGatewayServiceUrl, token);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        } catch (IOException | URISyntaxException e) {
+            logger.error("Error while trying to login. Message: {}", e.getMessage());
         }
         return null;
     }
 
-    public List<WhitelistItem> getWhitelistItemsByAssertionIds(Set<String> assertionIds) {
-        ResponseEntity<List<WhitelistItem>> responseEntity = restTemplate.exchange(this.acceptanceGatewayServiceUrl + "/whitelist-items/validation-rules", HttpMethod.POST, new org.springframework.http.HttpEntity<>(assertionIds), WHITELIST_ITEM_LIST_TYPE_REFERENCE);
+    public List<WhitelistItem> validateAssertions(List<WhitelistItem> assertions) {
+        ResponseEntity<List<WhitelistItem>> responseEntity = restTemplate.exchange(this.acceptanceGatewayServiceUrl + "/whitelist-items/bulk-validate", HttpMethod.POST, new org.springframework.http.HttpEntity<>(assertions), WHITELIST_ITEM_LIST_TYPE_REFERENCE);
         return responseEntity.getBody();
     }
 }
