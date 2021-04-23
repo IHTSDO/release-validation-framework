@@ -658,7 +658,7 @@ public class ReleaseDataManager {
 		String edition = "INT";
 		Map<String,String> fileNameToEditionMap = new HashMap<String,String>();
 		fileNameToEditionMap.put("SpanishExtension.*_INT", "ES");
-		fileNameToEditionMap.put("_NL[\\-a-zA-Z]*_[0-9]+\\.txt", "NL");
+		fileNameToEditionMap.put("_NL_[0-9]+\\.txt", "NL");
 		fileNameToEditionMap.put("_AU1000036_[0-9]+\\.txt", "AU");
 		fileNameToEditionMap.put("_NZ1000210_[0-9]+\\.txt", "NZ");
 		fileNameToEditionMap.put("_US1000124_[0-9]+\\.txt", "US");
