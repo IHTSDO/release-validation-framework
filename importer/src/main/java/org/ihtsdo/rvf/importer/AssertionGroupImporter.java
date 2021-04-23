@@ -87,12 +87,12 @@ public class AssertionGroupImporter {
             NZ("NZ", "21000210109"),
             ES("ES", "450829007"),
 
-//            DK("DK", "DanishEdition"),
-//            SE("SE", "SwedishEdition"),
-//            NO("NO", "NorwegianEdition"),
+            DK("DK", "554471000005108"),
+            SE("SE", "45991000052106"),
+            NO("NO", "51000202101"),
 //            CH("CH", "SwissEdition"),
-//            IE("IE", "IrishEdition"),
-//            EE("EE", "EstonianEdition"),
+            IE("IE", "11000220105"),
+            EE("EE", "11000181102"),
 
 	    SV("SNOVET", "332351000009108");
 
