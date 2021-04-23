@@ -643,7 +643,7 @@ public class ReleaseDataManager {
 		Matcher matcher = Pattern.compile(".*_([0-9]+)\\.txt").matcher(snomedFile);
 		if (matcher.find()) {
 			editionAndVersion = 
-				mapFilnameToEdition(snomedFile).toLowerCase() + "_" 
+				mapFilenameToEdition(snomedFile).toLowerCase() + "_"
 				+ matcher.group(1);
 		} else {
 			throw new BusinessServiceException(
@@ -654,7 +654,7 @@ public class ReleaseDataManager {
 		return editionAndVersion;
 	}
 
-	private String mapFilnameToEdition(String name) {
+	private String mapFilenameToEdition(String name) {
 		String edition = "INT";
 		Map<String,String> fileNameToEditionMap = new HashMap<String,String>();
 		fileNameToEditionMap.put("SpanishExtension.*_INT", "ES");
