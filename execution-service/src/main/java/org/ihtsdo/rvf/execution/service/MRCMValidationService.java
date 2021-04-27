@@ -21,6 +21,7 @@ import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snomed.quality.validator.mrcm.Assertion;
+import org.snomed.quality.validator.mrcm.ContentType;
 import org.snomed.quality.validator.mrcm.ValidationRun;
 import org.snomed.quality.validator.mrcm.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +79,7 @@ public class MRCMValidationService {
 			ValidationService validationService = new ValidationService();
 			ValidationRun validationRun = new ValidationRun(
 					StringUtils.isNotBlank(effectiveDate) ? effectiveDate.replaceAll("-","") : effectiveDate
-					, CharacteristicType.inferred.equals(validationConfig.getForm()) ? false : true);
+					, CharacteristicType.inferred.equals(validationConfig.getForm()) ? ContentType.INFERRED : ContentType.STATED, false);
 			try {
 				outputFolder = extractZipFile(validationConfig, executionId);
 
