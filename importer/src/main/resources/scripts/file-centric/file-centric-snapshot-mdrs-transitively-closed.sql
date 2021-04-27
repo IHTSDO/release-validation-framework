@@ -13,6 +13,7 @@ select
 from curr_moduledependencyrefset_s a, curr_moduledependencyrefset_s b
 where a.active = '1' and b.active = '1'
   and a.referencedcomponentid = b.moduleid and a.targeteffectivetime = b.sourceeffectivetime
+  and not (a.moduleid = b.referencedcomponentid and a.sourceeffectivetime = b.targeteffectivetime)
   and not exists (
     select c.referencedcomponentid from curr_moduledependencyrefset_s c
     where c.active = '1' and a.moduleid = c.moduleid and a.sourceeffectivetime = c.sourceeffectivetime
