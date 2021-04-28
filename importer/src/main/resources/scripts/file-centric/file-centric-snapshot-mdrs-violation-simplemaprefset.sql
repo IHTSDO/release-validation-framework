@@ -26,7 +26,7 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
 select
   <RUNID>,
   '<ASSERTIONUUID>',
-  a.referencedcomponentid,
+  a.moduleid,
   concat('simplemaprefset: Component moduleId: ', a.moduleid, ' is not a dependency of the Edition <MODULEID> as per MDRS')
 from curr_simplemaprefset_s a
 where a.moduleid != '<MODULEID>' and a.moduleid not in (
