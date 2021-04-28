@@ -13,5 +13,5 @@ file-centric-snapshot-mdrs-no-version-skew.sql
 	from curr_moduledependencyrefset_s a, curr_moduledependencyrefset_s b
 	where a.active = '1' and b.active = '1'
 		and a.referencedcomponentid = b.referencedcomponentid
-		and a.targeteffectivetime != b.targeteffectivetime;
-
+		and a.targeteffectivetime != b.targeteffectivetime
+		group by a.referencedcomponentid, a.targeteffectivetime, b.targeteffectivetime;
