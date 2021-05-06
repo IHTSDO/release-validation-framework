@@ -1,9 +1,6 @@
 package org.ihtsdo.rvf.execution.service.whitelist;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.ihtsdo.otf.rest.client.ExpressiveErrorHandler;
-import org.ihtsdo.otf.rest.client.authoringservices.RestyOverrideAccept;
 import org.ihtsdo.otf.rest.client.ims.IMSRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +14,6 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.client.RestTemplate;
-import us.monoid.web.Resty;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,27 +25,10 @@ public class AcceptanceGatewayClient {
     private String acceptanceGatewayServiceUrl;
     private RestTemplate restTemplate;
     private HttpHeaders headers;
-    private Resty resty;
-    private static final String ALL_CONTENT_TYPE = "*/*";
     private static final ParameterizedTypeReference<List<WhitelistItem>> WHITELIST_ITEM_LIST_TYPE_REFERENCE = new ParameterizedTypeReference<List<WhitelistItem>>() {};
-
-    protected static Gson gson;
-    static {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setPrettyPrinting();
-        gsonBuilder.disableHtmlEscaping();
-        gsonBuilder.excludeFieldsWithoutExposeAnnotation();
-        gson = gsonBuilder.create();
-    }
 
     public AcceptanceGatewayClient(String acceptanceGatewayServiceUrl, String authToken) throws URISyntaxException, IOException {
         this.acceptanceGatewayServiceUrl = acceptanceGatewayServiceUrl;
-
-        resty = new Resty(new RestyOverrideAccept(ALL_CONTENT_TYPE));
-        resty.withHeader("Cookie", authToken);
-        resty.withHeader("Connection", "close");
-        resty.authenticate(this.acceptanceGatewayServiceUrl, null,null);
-
         headers = new HttpHeaders();
         headers.add("Cookie", authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);

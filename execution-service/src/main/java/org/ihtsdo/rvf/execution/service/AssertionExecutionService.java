@@ -163,7 +163,6 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			runItem.setFailureMessage("Test does not have any associated execution command:" + test);
 			return runItem;
 		}
-
 		logger.info(runItem.toString());
 		return runItem;
 	}
