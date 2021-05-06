@@ -123,7 +123,7 @@ public class MysqlValidationService {
 			statusReport.getReportSummary().put(TestType.SQL.name(), msg);
 		}
 		testItems.addAll(runAssertionTests(executionConfig, noneReleaseTypeAssertions, reportStorage, true));
-		constructTestReport(statusReport.getResultReport(), executionConfig, timeStart, testItems, assertions);
+		constructTestReport(statusReport, executionConfig, timeStart, testItems, assertions);
 	}
 	
 	private List<Assertion> getAssertions(List<String> groupNames) {
@@ -173,7 +173,7 @@ public class MysqlValidationService {
 		} else {
 			items.addAll(executeAssertionsConcurrently(executionConfig, assertions, batchSize, reportStorage));
 		}
-		constructTestReport(statusReport.getResultReport(), executionConfig, timeStart, items, new ArrayList<>(assertions));
+		constructTestReport(statusReport, executionConfig, timeStart, items, new ArrayList<>(assertions));
 		
 	}
 
@@ -242,35 +242,38 @@ public class MysqlValidationService {
 		return results;
 	}
 	
-	private void constructTestReport(ValidationReport report, MysqlExecutionConfig executionConfig,
+	private void constructTestReport(ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig,
 									 long timeStart, List<TestRunItem> items, List<Assertion> assertions) {
-
+		ValidationReport report = statusReport.getResultReport();
 		try {
 			rvfAssertionWhitelistFilter.extractTestResults(items, executionConfig, assertions);
-		} catch (SQLException e) {
-			LOGGER.warn("Failed to extract test result : " + e.fillInStackTrace());
+
+			//failed tests
+			final List<TestRunItem> failedItems = new ArrayList<>();
+			final List<TestRunItem> warningItems = new ArrayList<>();
+			for (final TestRunItem item : items) {
+				if (item.getFailureCount() != 0 && !SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())) {
+					failedItems.add(item);
+				}
+				if(SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())){
+					warningItems.add(item);
+				}
+				item.setTestType(TestType.SQL);
+			}
+			report.addFailedAssertions(failedItems);
+			report.addWarningAssertions(warningItems);
+
+			items.removeAll(failedItems);
+			items.removeAll(warningItems);
+			report.addPassedAssertions(items);
+		} catch (SQLException exception) {
+			report.addFailedAssertions(Collections.emptyList());
+			report.addWarningAssertions(Collections.emptyList());
+			report.addPassedAssertions(Collections.emptyList());
+			statusReport.addFailureMessage("Failed to extract test results. Error: " + exception.getMessage());
 		}
 
 		final long timeEnd = System.currentTimeMillis();
 		report.addTimeTaken((timeEnd - timeStart) / 1000);
-		//failed tests
-		final List<TestRunItem> failedItems = new ArrayList<>();
-		final List<TestRunItem> warningItems = new ArrayList<>();
-		for (final TestRunItem item : items) {
-			if (item.getFailureCount() != 0 && !SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())) {
-				failedItems.add(item);
-			}
-			if(SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())){
-				warningItems.add(item);
-			}
-			item.setTestType(TestType.SQL);
-		}
-
-		report.addFailedAssertions(failedItems);
-		report.addWarningAssertions(warningItems);
-
-		items.removeAll(failedItems);
-		items.removeAll(warningItems);
-		report.addPassedAssertions(items);
 	}
 }

@@ -165,15 +165,6 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			return runItem;
 		}
 		
-//		try {
-//			long extractTimeStart = System.currentTimeMillis();
-//			extractTestResult(assertion, runItem, config);
-//			long extractTimeEnd = System.currentTimeMillis();
-//			runItem.setExtractResultInMillis((extractTimeEnd - extractTimeStart));
-//		} catch (SQLException e) {
-//			logger.warn("Failed to extract test result : " + e.fillInStackTrace());
-//			runItem.setFailureMessage("Error extracting test result. Nested exception : " + e.fillInStackTrace() + runItem);
-//		}
 		logger.info(runItem.toString());
 		return runItem;
 	}
