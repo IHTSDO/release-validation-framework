@@ -537,6 +537,7 @@
 		<!-- <script uuid="d55eee56-c5f2-44da-971b-86f39378fe38" category="file-centric-validation" sqlFile="file-centric-snapshot-relationship-must-not-be-both-stated-inferred.sql" text="Relationships should not exist in Stated Relationship and Relationship files at the same time" /> -->
 		
 		<!--  MRCM refsets validation -->
+		<script uuid="21f3a8f3-a714-40b6-800e-4eeb0fa9b424" category="file-centric-validation" sqlFile="file-centric-snapshot-mrcm-never-grouped-relationship-grouped.sql" text="Found grouped relationship for attribute marked as never-grouped"/>
 		<!-- file-centric-snapshot-mrcm-refset-attribute-domain -->
 		<script uuid="e968c5d1-e06b-4351-9e96-3f62208d27d4" category="file-centric-validation,INT" sqlFile="file-centric-snapshot-mrcm-attribute-domain-valid-moduleid.sql" text="ModuleId value refers to valid concept identifier in the MRCM ATTRIBUTE DOMAIN REFSET snapshot"/>
 
