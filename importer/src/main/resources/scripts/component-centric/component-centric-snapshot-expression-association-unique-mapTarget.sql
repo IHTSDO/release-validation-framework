@@ -13,7 +13,7 @@ insert into qa_result (runid, assertionuuid, concept_id, details, component_id, 
  	a.referencedcomponentid,
  	concat('MapTarget:',a.mapTarget,' is not unique in the expression association refset snapshot.'),
  	null,
- 	null
+ 	'curr_expressionassociationrefset_s'
  from curr_expressionassociationrefset_s a
 	group by a.mapTarget
 	having count(a.mapTarget) > 1;
