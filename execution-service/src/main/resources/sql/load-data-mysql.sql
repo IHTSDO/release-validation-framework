@@ -109,6 +109,13 @@ load data local
 	lines terminated by '\r\n'
 	ignore 1 lines;
 
+load data local
+	infile '<data_location>/der2_ciRefset_DescriptionTypeFull_INT_<release_version>.txt'
+	into table descriptiontyperefset_f
+	columns terminated by '\t'
+	lines terminated by '\r\n'
+	ignore 1 lines;
+
 /* * * * *  Snapshot * * * * */
 load data local 
 	infile '<data_location>/sct2_Concept_Snapshot_INT_<release_version>.txt' 
@@ -211,6 +218,13 @@ load data local
 load data local
 	infile '<data_location>/der2_cissccRefset_MRCMAttributeDomainSnapshot_INT_<release_version>.txt'
 	into table mrcmattributedomainrefset_s
+	columns terminated by '\t'
+	lines terminated by '\r\n'
+	ignore 1 lines;
+
+load data local
+	infile '<data_location>/der2_ciRefset_DescriptionTypeSnapshot_INT_<release_version>.txt'
+	into table descriptiontyperefset_s
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
@@ -320,4 +334,10 @@ load data local
 	columns terminated by '\t'
 	lines terminated by '\r\n'
 	ignore 1 lines;
-	
+
+load data local
+	infile '<data_location>/der2_ciRefset_DescriptionTypeDelta_INT_<release_version>.txt'
+	into table descriptiontyperefset_d
+	columns terminated by '\t'
+	lines terminated by '\r\n'
+	ignore 1 lines;

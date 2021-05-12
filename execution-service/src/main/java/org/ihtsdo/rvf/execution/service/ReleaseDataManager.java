@@ -25,9 +25,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -619,6 +624,65 @@ public class ReleaseDataManager {
 		} finally {
 			IOUtils.closeQuietly(input);
 			IOUtils.closeQuietly(out);
+		}
+	}
+
+	public String getEditionAndVersion(final File zipDataFile)  throws BusinessServiceException {
+		String editionAndVersion = "";
+		String snomedFile = "";
+		List<String> zipFileList = getFileList(zipDataFile);
+		Optional<String> sctOrDerFile = zipFileList.stream()
+							.filter(file -> ( file.indexOf("sct_") != -1 
+										|| file.indexOf("der2_") != -1)
+										&& file.endsWith(".txt"))
+							.findFirst();
+		if (!sctOrDerFile.isPresent()) {
+			throw new BusinessServiceException("There are no RF2 files in data file: " + zipDataFile);
+		}
+		snomedFile = sctOrDerFile.get();
+		Matcher matcher = Pattern.compile(".*_([0-9]+)\\.txt").matcher(snomedFile);
+		if (matcher.find()) {
+			editionAndVersion = 
+				mapFilenameToEdition(snomedFile).toLowerCase() + "_"
+				+ matcher.group(1);
+		} else {
+			throw new BusinessServiceException(
+				"Could not find RF2 file with standard name in data zip file " 
+				+ zipDataFile.getName());
+		}
+		logger.info ("Identified edition and version " + editionAndVersion + " from zip file " + zipDataFile.getName());
+		return editionAndVersion;
+	}
+
+	private String mapFilenameToEdition(String name) {
+		String edition = "INT";
+		Map<String,String> fileNameToEditionMap = new HashMap<String,String>();
+		fileNameToEditionMap.put("SpanishExtension.*_INT", "ES");
+		fileNameToEditionMap.put("_NL_[0-9]+\\.txt", "NL");
+		fileNameToEditionMap.put("_AU1000036_[0-9]+\\.txt", "AU");
+		fileNameToEditionMap.put("_NZ1000210_[0-9]+\\.txt", "NZ");
+		fileNameToEditionMap.put("_US1000124_[0-9]+\\.txt", "US");
+		fileNameToEditionMap.put("_BE1000172_[0-9]+\\.txt", "BE");
+		fileNameToEditionMap.put("_SE1000052_[0-9]+\\.txt", "SE");
+		fileNameToEditionMap.put("GB1000000_[0-9]+\\.txt", "UK");
+		fileNameToEditionMap.put("_INT_[0-9]+\\.txt", "INT");
+		for (String pattern : fileNameToEditionMap.keySet()) {
+			Matcher editionMatcher = Pattern.compile(pattern).matcher(name);
+			if (editionMatcher.find()) {
+				edition = fileNameToEditionMap.get(pattern);
+				break;
+			}
+
+		}
+		return edition;
+	}
+
+	private List<String> getFileList(final File dataFile) throws BusinessServiceException {
+		try {
+			List<String> fileList = ZipFileUtils.listFiles(dataFile);
+			return fileList;
+		} catch (IOException e) {
+			throw new BusinessServiceException("Could not get file list from " + dataFile, e);
 		}
 	}
 }

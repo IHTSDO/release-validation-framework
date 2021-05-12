@@ -2,13 +2,11 @@ package org.ihtsdo.rvf.importer;
 
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.COMPONENT_CENTRIC_VALIDATION;
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.FILE_CENTRIC_VALIDATION;
-import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.INT_AUTHORING;
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.RELEASE_TYPE_VALIDATION;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -21,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class AssertionGroupImporter {
-	
+
 	 private static final String PREVIOUS = "previous";
 	private static final String NEW_INACTIVE_STATES_FOLLOW_ACTIVE_STATES = "New inactive states follow active states";
 
@@ -29,6 +27,8 @@ public class AssertionGroupImporter {
 		FILE_CENTRIC_VALIDATION ("COMMON", "file-centric-validation"),
 		COMPONENT_CENTRIC_VALIDATION ("COMMON", "component-centric-validation"),
 		RELEASE_TYPE_VALIDATION ("COMMON", "release-type-validation"),
+                MDRS_VALIDATION ("mdrs", "mdrs"),
+                MDRS_SNAPSHOT_VALIDATION ("mdrs", "mdrs-snapshot"),
 		SPANISH_EDITION ("ES", "SpanishEdition"),
 		INTERNATIONAL_EDITION ("INT", "InternationalEdition"),
 		COMMON_AUTHORING ("COMMON", "common-authoring"),
@@ -66,25 +66,68 @@ public class AssertionGroupImporter {
 			this.releaseCenter = releaseCenter;
 			this.name = name;
 		}
-		
+
 		public String getName() {
 			return this.name;
 		}
 		public String getReleaseCenter() {
 			return this.releaseCenter;
 		}
-		
+
 	};
-	
+
+	public enum ProductName {
+            INT("INT", "900000000000207008"),
+            AU("AU", "32506021000036107"),
+            BE("BE", "11000172109"),
+            NL("NL", "11000146104"),
+            UK("UK", "999000041000000102"),
+            UKCL("UKCL", "999000011000000103"),
+            US("US", "731000124108"),
+            NZ("NZ", "21000210109"),
+            ES("ES", "450829007"),
+
+            DK("DK", "554471000005108"),
+            SE("SE", "45991000052106"),
+            NO("NO", "51000202101"),
+//            CH("CH", "SwissEdition"),
+            IE("IE", "11000220105"),
+            EE("EE", "11000181102"),
+
+	    SV("SNOVET", "332351000009108");
+
+            private String name;
+            private String moduleId;
+            private ProductName(String name, String moduleId) {
+                    this.name = name;
+                    this.moduleId = moduleId;
+            }
+
+            public String getName() {
+                    return this.name;
+            }
+            public String getModuleId() {
+                    return this.moduleId;
+            }
+            static public String toModuleId(String name) {
+                for (ProductName pn: ProductName.values()) {
+                    if (name.equalsIgnoreCase(pn.getName())) {
+                        return pn.getModuleId();
+                    }
+                }
+                return name;
+            }
+	}
+
 	private static final String SIMPLE_MAP = "simple map";
 	private static final String RESOURCE = "resource";
 	private static final String LOINC = "LOINC";
 	private static final String ICD_9_COMPLEX_MAP ="ICD-9-CM";
-	@Autowired	
+	@Autowired
 	private AssertionService assertionService;
-	
+
 	private static final String[] SPANISH_EXTENSION_EXCLUDE_LIST = {"dd0d0406-7481-444a-9f04-b6fc7db49039","c3249e80-84f0-11e1-b0c4-0800200c9a66"};
-	
+
 	private static final String[] SNAPSHOT_EXCLUDE_LIST = {"4dbfed80-79b9-11e1-b0c4-0800200c9a66",
 		"6336ec40-79b9-11e1-b0c4-0800200c9a66",
 		"4572d730-7d08-11e1-b0c4-0800200c9a66",
@@ -95,15 +138,15 @@ public class AssertionGroupImporter {
 		"2e4fd620-7d08-11e1-b0c4-0800200c9a66",
 		"6dbaed71-f031-4290-b74f-f35561c2e283",
 		"c2975dd5-3869-4bf7-ac75-53fd53b90144"};
-	
+
 	private static final String[] COMMON_AUTHORING_ONLY_LIST = {"a49fabee-0d72-41b0-957d-32983c79f26c"};
-	
+
 	//SNOMED RT Identifier is deprecated from the international 20170731 release onwards.
 	private static final String[] SNOMED_RT_IDENTIFIER_ASSERTIONS = {"730720b0-7f25-11e1-b0c4-0800200c9a66","83638340-7f25-11e1-b0c4-0800200c9a66",
 																	"5e80ea3e-c4dd-4ae3-8b75-f0567e42b962","695cea40-7f25-11e1-b0c4-0800200c9a66"};
-	
+
 	private static final String[] US_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b"};
-	
+
 	private static final String[] FIRST_TIME_COMMON_ADDITIONAL_EXCLUDE_LIST = {"3cb10511-33b7-4eca-ba0e-93bcccf70d86", "48118153-d32a-4d1c-bfbc-23ed953e9991"};
 
 	private static final String[] STATED_RELATIONSHIP_ASSERTIONS = {
@@ -208,17 +251,17 @@ public class AssertionGroupImporter {
 			"73772817-4654-4abf-b801-e849fbae1ba0",
 			"57ae69cd-26f0-4001-ba2f-ae56129e2e28"
 	};
-		
+
 /* the following were included but feel that they should be validated for project level as well.
 	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
 	"72184790-79b9-11e1-b0c4-0800200c9a66",
 	"77fc7550-79b9-11e1-b0c4-0800200c9a66",
 	"32b41aa0-7d08-11e1-b0c4-0800200c9a66",
 */
-	
-	
+
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AssertionGroupImporter.class);
-	
+
 	public boolean isImportRequired() {
 		List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
 		if (allGroups == null || allGroups.isEmpty()) {
@@ -227,10 +270,10 @@ public class AssertionGroupImporter {
 			return false;
 		}
 	}
-	
+
 	/*
 	 * Create assertion groups
-	 * 
+	 *
 	 * file-centric-validation
 	 * release-type-validation
 	 * component-centric-validation
@@ -238,7 +281,7 @@ public class AssertionGroupImporter {
 	 * InternationalEdition
 	 * SnapshotContentValidation
 	 */
-			
+
 	public void importAssertionGroups() {
 		List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
 		List<String> existingGroups = new ArrayList<>();
@@ -260,13 +303,17 @@ public class AssertionGroupImporter {
 
 
 	private void createAssertionGroup(AssertionGroupName groupName, List<Assertion> allAssertions) {
-		
+
 		switch (groupName) {
 			case FILE_CENTRIC_VALIDATION :
 			case RELEASE_TYPE_VALIDATION :
 			case COMPONENT_CENTRIC_VALIDATION :
 				createAssertionGroupByKeyWord(allAssertions, groupName.getName());
 				break;
+			case MDRS_VALIDATION :
+			case MDRS_SNAPSHOT_VALIDATION :
+			    createAssertionGroup(getReleaseAssertionsByCenter(allAssertions, groupName.getName()), groupName.getName());
+			    break;
 			case LOINC_EDITION :
 			case SPANISH_EDITION :
 			case DANISH_EDITION	:
@@ -295,7 +342,7 @@ public class AssertionGroupImporter {
 			case SE_AUTHORING :
 			case US_AUTHORING :
 			case BE_AUTHORING :
-			case NO_AUTHORING : 
+			case NO_AUTHORING :
 			case CH_AUTHORING :
 			case IE_AUTHORING :
 			case NZ_AUTHORING:
@@ -313,9 +360,10 @@ public class AssertionGroupImporter {
 				createStatedRelationshipGroup(allAssertions, groupName, true);
 				break;
 			default :
+			         LOGGER.warn("unrecognized group: " + groupName.getName());
 			  break;
 		}
-		
+
 	}
 
 	private void createFirstTimeReleaseGroup(List<Assertion> allAssertions, AssertionGroupName groupName) {
@@ -337,7 +385,7 @@ public class AssertionGroupImporter {
 			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;
 			}
-			
+
 			if (RELEASE_TYPE_VALIDATION.getName().equals(keyWords) || FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)
 					|| keyWords.contains("," + groupName.getReleaseCenter())) {
 				String assertionText = assertion.getAssertionText();
@@ -349,7 +397,7 @@ public class AssertionGroupImporter {
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
 	}
-	
+
 	private void createCommonSnapshotAssertionGroup(List<Assertion> allAssertions) {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(AssertionGroupName.COMMON_AUTHORING.getName());
@@ -413,7 +461,7 @@ public class AssertionGroupImporter {
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
 	}
-	
+
 
 	private void createSnapshotAssertionGroup( AssertionGroupName groupName) {
 		AssertionGroup group = new AssertionGroup();
@@ -443,7 +491,7 @@ public class AssertionGroupImporter {
 		LOGGER.info("Total assertions added {} for assertion group {}", allAssertions.size(), group.getName() );
 	}
 
-	
+
 	private List<Assertion> getCommonReleaseAssertions(List<Assertion> allAssertions) {
 		List<Assertion> result = new ArrayList<>();
 		String keywords;
@@ -457,19 +505,19 @@ public class AssertionGroupImporter {
 		LOGGER.info("Total common release assertions:" + result.size());
 		return result;
 	}
-	
+
 	private List<Assertion> getReleaseAssertionsByCenter(List<Assertion> allAssertions, String releaseCenter) {
 		List<Assertion> result = new ArrayList<>();
 		for (Assertion assertion : allAssertions) {
 			String keywords = assertion.getKeywords();
-			if (keywords.contains("," + releaseCenter)) {
+			if (keywords.endsWith("," + releaseCenter) || keywords.contains("," + releaseCenter + ",")) {
 				result.add(assertion);
 			}
 		}
 		LOGGER.info("Total release assertions found :{} for center:{}", result.size(), releaseCenter);
 		return result;
 	}
-	
+
 	private void createReleaseAssertionGroup(List<Assertion> allAssertions, AssertionGroupName groupName) {
 		//create international assertion group
 		AssertionGroup assertionGroup = new AssertionGroup();
@@ -477,7 +525,7 @@ public class AssertionGroupImporter {
 		assertionGroup = assertionService.createAssertionGroup(assertionGroup);
 		List<Assertion> assertionsToBeAdded = getCommonReleaseAssertions(allAssertions);
 		assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()));
-		
+
 		for (Assertion assertion : assertionsToBeAdded) {
 			if (Arrays.asList(COMMON_AUTHORING_ONLY_LIST).contains(assertion.getUuid().toString())) {
 				continue;
@@ -503,7 +551,7 @@ public class AssertionGroupImporter {
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", assertionsToBeAdded.size(), groupName.getName() );
 	}
-	
+
 	private void createAssertionGroupByKeyWord(List<Assertion> allAssertions, String assertionGroupName) {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(assertionGroupName);
@@ -514,6 +562,18 @@ public class AssertionGroupImporter {
 			}
 		}
 	}
+
+        private void createAssertionGroup(List<Assertion> allAssertions, String assertionGroupName) {
+                AssertionGroup group = new AssertionGroup();
+                group.setName(assertionGroupName);
+                group = assertionService.createAssertionGroup(group);
+                int addedAssertions = 0;
+                for (Assertion assertion : allAssertions) {
+                        assertionService.addAssertionToGroup(assertion, group);
+                        addedAssertions++;
+                }
+                LOGGER.info("Total assertions added {} for assertion group {}", addedAssertions, assertionGroupName );
+        }
 
 	private void createStatedRelationshipGroup(List<Assertion> allAssertions, AssertionGroupName assertionGroupName, boolean useFullList) {
 		AssertionGroup group = new AssertionGroup();
@@ -531,7 +591,7 @@ public class AssertionGroupImporter {
 				if(count == statedRelationshipAssertionCount) break;
 			}
 		}
-		
+
 	}
 
 }

@@ -27,6 +27,7 @@ import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.Test;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
+import org.ihtsdo.rvf.importer.AssertionGroupImporter.ProductName;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class AssertionExecutionService {
 	private String deltaTableSuffix = "d";
 	private String snapshotTableSuffix = "s";
 	private String fullTableSuffix = "f";
-	
+
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionService.class);
@@ -88,9 +89,9 @@ public class AssertionExecutionService {
 
 		return items;
 	}
-	
+
 public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertions, final MysqlExecutionConfig executionConfig) {
-		
+
 		final List<Future<Collection<TestRunItem>>> concurrentTasks = new ArrayList<>();
 		final List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
@@ -116,7 +117,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			}
 			counter++;
 		}
-		
+
 		// Wait for all concurrent tasks to finish
 		for (final Future<Collection<TestRunItem>> concurrentTask : concurrentTasks) {
 			try {
@@ -165,12 +166,12 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command.toString());
 				runItem.setFailureMessage("Error executing SQL command object Nested exception : " + e.fillInStackTrace());
 				return runItem;
-			} 
+			}
 		} else {
 			runItem.setFailureMessage("Test does not have any associated execution command:" + test);
 			return runItem;
 		}
-		
+
 		try {
 			long extractTimeStart = System.currentTimeMillis();
 			extractTestResult(assertion, runItem, config);
@@ -249,13 +250,17 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		List<String> result = new ArrayList<>();
 		String defaultCatalog = dataSource.getDefaultCatalog();
 		String prospectiveSchema = config.getProspectiveVersion();
+		final String[] nameParts = config.getProspectiveVersion().split("_");
+		String moduleId = (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
+		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
+
 		String previousReleaseSchema = config.getPreviousVersion();
-		
+
 		//We need both these schemas to exist
 		if (prospectiveSchema == null) {
 			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + prospectiveSchema);
 		}
-		
+
 		if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
 			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + previousReleaseSchema);
 		}
@@ -267,6 +272,8 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			// replace all substitutions for exec
 			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
 			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
+			part = part.replaceAll("<MODULEID>", moduleId);
+			part = part.replaceAll("<VERSION>", version);
 			// watch out for any 's that users might have introduced
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
 			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
@@ -315,7 +322,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 					}
 				}
 			}
-			
+
 			if ( counter < config.getFailureExportMax() ) {
 				runItem.setFailureCount(counter);
 			} else {
