@@ -4,9 +4,11 @@
  * Unless the inactivation reason is "Non-conformance to editorial policy" in which 
  * case no association should be present.
  */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 SELECT <RUNID>, '<ASSERTIONUUID>', c.id,
-concat('Inactive concept (', c.id, '|', IFNULL(d.term, 'NO ACTIVE FSN FOUND'),'|) missing active historical association to active concept.')  
+concat('Inactive concept (', c.id, '|', IFNULL(d.term, 'NO ACTIVE FSN FOUND'),'|) missing active historical association to active concept.') ,
+c.id,
+'curr_concept_d'
 FROM curr_concept_d c
 LEFT JOIN curr_description_s d 
 	ON d.conceptid = c.id 

@@ -15,12 +15,14 @@
 		 where z.id = a.id);
 
 /* in the snapshot; not in the full */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Definition: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
+		concat('Definition: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+		a.id,
+		'curr_textdefinition_s'
 	from curr_textdefinition_s a
 	left join temp_textdefinition_view b
 		on a.id = b.id
@@ -43,12 +45,14 @@
 	or b.casesignificanceid is null;
 
 /* in the full; not in the snapshot */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Definition: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
+		concat('Definition: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.'),
+		a.id,
+		'curr_textdefinition_f'
 	from temp_textdefinition_view a
 	left join curr_textdefinition_s b 
 		on a.id = b.id

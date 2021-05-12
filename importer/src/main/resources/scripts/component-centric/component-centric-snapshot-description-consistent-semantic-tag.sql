@@ -29,12 +29,14 @@
 
 	
 /* 	inserting exceptions in the result table */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('DESC: conceptid=',a.conceptid, ':Active FSN for a given concept with different semantic tag.') 	
+		concat('DESC: conceptid=',a.conceptid, ':Active FSN for a given concept with different semantic tag.'),
+		a.conceptid,
+        'curr_concept_s'
 	from tmp_different_tag a;
 
 	drop table if exists tmp_active_fsn;

@@ -2,12 +2,14 @@
 /*  
 	The current full simple refset file consists of the previously published full file and the changes for the current release
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('SimpleRefsetId=',a.id, ' is in current full file, but not in prior full or current delta file.') 	
+	concat('SimpleRefsetId=',a.id, ' is in current full file, but not in prior full or current delta file.'),
+	a.id,
+	'curr_simplerefset_f'
 	from curr_simplerefset_f a
 	left join curr_simplerefset_d b
 		on a.id = b.id

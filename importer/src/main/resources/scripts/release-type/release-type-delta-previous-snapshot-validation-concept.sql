@@ -1,12 +1,14 @@
 /*  
  * There must be actual changes made to previously published concepts in order for them to appear in the current delta.
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.') 	
+		concat('Concept: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.'),
+		a.id,
+		'curr_concept_d'
 	from curr_concept_d a
 	left join prev_concept_s b
 	on a.id = b.id

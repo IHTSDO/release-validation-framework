@@ -14,12 +14,14 @@
 		 where a.id = z.id);
 
 /* in the snapshot; not in the full */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceid,
-		concat('Relationship Concrete Values: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
+		concat('Relationship Concrete Values: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+		a.id,
+		'curr_relationship_concrete_values_s'
 	from curr_relationship_concrete_values_s a
 	left join temp_relationship_concrete_values_view b
 		on a.id = b.id
@@ -46,12 +48,14 @@
 	commit;
 
 /* in the full; not in the snapshot */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceid,
-		concat('Relationship Concrete Values: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.')
+		concat('Relationship Concrete Values: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.'),
+		a.id,
+		'curr_relationship_concrete_values_f'
 	from temp_relationship_concrete_values_view a
 	left join curr_relationship_concrete_values_s b
 		on a.id = b.id

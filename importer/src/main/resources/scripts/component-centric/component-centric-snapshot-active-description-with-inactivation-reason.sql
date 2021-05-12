@@ -9,12 +9,14 @@ See https://confluence.ihtsdotools.org/display/DOCTSG/4.2.2+Component+Inactivati
 900000000000495008 |Concept non-current (foundation metadata concept)|
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		b.conceptid,
-		concat('Active description ', a.referencedcomponentid, ' has inactivation reason ', a.valueid) 	
+		concat('Active description ', a.referencedcomponentid, ' has inactivation reason ', a.valueid) ,
+		b.id,
+        'curr_description_s'
 	from curr_attributevaluerefset_s a join curr_description_s b 
 	on a.referencedcomponentid=b.id 
 	where a.refsetid='900000000000490003'

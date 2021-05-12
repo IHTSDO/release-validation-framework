@@ -6,12 +6,14 @@
 	There is a 1:1 relationship between the id and the key values in the SIMPLE REFSET snapshot.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Refset id:',a.refsetid, ' and referencedcomponent Id:', a.referencedcomponentid, ' are duplicated in the simple refset snapshot file.') 	
+		concat('Refset id:',a.refsetid, ' and referencedcomponent Id:', a.referencedcomponentid, ' are duplicated in the simple refset snapshot file.'),
+		null,
+		'curr_simplerefset_s'
 	from curr_simplerefset_s a 
 	group by a.refsetid , a.referencedcomponentid
 	having count(a.id) > 1;

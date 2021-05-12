@@ -9,12 +9,14 @@
 	is in binary which is case sensitive but for checking FSN uniquenss it requires case insensitive. 
 ********************************************************************************/
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.conceptid,
-	concat('FSN=',a.term, ' concept=',a.conceptid, ': FSN term is not unique in description snapshot when case is ignored')
+	concat('FSN=',a.term, ' concept=',a.conceptid, ': FSN term is not unique in description snapshot when case is ignored'),
+	a.id,
+    'curr_description_d'
 	from curr_description_d a,
 	(select b.term, count(b.id) as total from curr_description_s b join curr_concept_s c on b.conceptid=c.id
 	where b.active=1 and c.active=1 and b.typeid ='900000000000003001' group by term COLLATE utf8_general_ci having total > 1) result

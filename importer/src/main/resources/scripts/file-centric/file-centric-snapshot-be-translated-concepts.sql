@@ -8,12 +8,14 @@
 ********************************************************************************/
 
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Concept: id=',a.conceptid, ': has preferred term in French but not in Dutch.')
+		concat('Concept: id=',a.conceptid, ': has preferred term in French but not in Dutch.'),
+		a.id,
+		'curr_description_d'
 	from curr_description_d a left join curr_langrefset_s b on a.id= b.referencedcomponentid 
 	where a.languagecode='fr' 
 	and a.moduleid='11000172109'
@@ -36,12 +38,14 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
 			and d.referencedcomponentid is not null);
 
 	
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Concept: id=',a.conceptid, ': has preferred term in Dutch but not in French.')
+		concat('Concept: id=',a.conceptid, ': has preferred term in Dutch but not in French.'),
+		a.id,
+		'curr_description_d'
 	from curr_description_d a left join curr_langrefset_s b on a.id= b.referencedcomponentid 
 	where a.languagecode='nl' 
 	and a.moduleid='11000172109'

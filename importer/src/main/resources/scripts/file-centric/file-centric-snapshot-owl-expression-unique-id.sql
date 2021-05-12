@@ -9,12 +9,14 @@
 ********************************************************************************/
 	
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		referencedcomponentid,
-		concat('OWL Expression: id=',id, ' is repeated in the OWL Expression snapshot file.')
+		concat('OWL Expression: id=',id, ' is repeated in the OWL Expression snapshot file.'),
+		id,
+		'curr_owlexpressionrefset_s'
 	from curr_owlexpressionrefset_s
 	group by id
 	having count(id) > 1;

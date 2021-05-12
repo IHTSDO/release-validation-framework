@@ -38,12 +38,14 @@
 	commit;
 
 /* 	violators are the ones where the term contains the semantic tag */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Concept: id=',a.conceptid, ' has synonym containing a semantic tag ',a.semantictag)  
+		concat('Concept: id=',a.conceptid, ' has synonym containing a semantic tag ',a.semantictag),
+		a.conceptid,
+		'curr_concept_s'
 	from tmp_description_withTag a;
 	commit;
 	

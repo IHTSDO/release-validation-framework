@@ -25,12 +25,14 @@
 	alter table description_tmp add index idx_desc_tmp_active(active);
 	
 	/*  descriptions in the temp table having duplicate language refset members for a given language refset */	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Concept: id=',a.conceptid, ' has duplicate language refsets for descrioption id=',a.id) 
+		concat('Concept: id=',a.conceptid, ' has duplicate language refsets for descrioption id=',a.id),
+		a.conceptid,
+		'curr_concept_s'
 	from description_tmp a
 	join curr_langrefset_s b
 		on a.id = b.referencedcomponentid
@@ -53,36 +55,42 @@
 	alter table tmp_pt add index idx_tmp_pt_cid(conceptid);
 	alter table tmp_pt add index idx_tmp_pt_rid(refsetid);
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' has no active preferred terms in any language refset') 
+		concat('Concept: id=',a.id, ' has no active preferred terms in any language refset'),
+		a.id,
+		'curr_concept_s'
 	from res_edited_active_concepts a
 	left join tmp_pt b
 		on a.id = b.conceptid
 	where b.conceptid is null;
 	
 	/*  descriptions in the temp table having duplicate preferred language refset members */	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Concept: id=',a.conceptid, ' has multiple active preferred terms in language refset=',a.refsetid) 
+		concat('Concept: id=',a.conceptid, ' has multiple active preferred terms in language refset=',a.refsetid),
+		a.conceptid,
+		'curr_concept_s'
 	from tmp_pt a
 	group by a.refsetid, a.conceptid
 	having count(a.id) >1;
 	
 	/*  identify concepts that have been edited this cycle, for which there is no 
 	US preferred term */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' has no active preferred terms in the en-US language refset') 
+		concat('Concept: id=',a.id, ' has no active preferred terms in the en-US language refset'),
+		a.id,
+        'curr_concept_s'
 	from res_edited_active_concepts a
 	left join 
 	(select b.conceptid from tmp_pt b

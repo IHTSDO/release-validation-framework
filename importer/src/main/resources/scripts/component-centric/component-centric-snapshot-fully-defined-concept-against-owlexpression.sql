@@ -7,12 +7,14 @@
 
 ********************************************************************************/
 
-    insert into qa_result (runid, assertionuuid, concept_id, details)
+    insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Fully defined concept: id=',a.id, ' has no Axiom record with the words EquivalentClasses.')
+		concat('Fully defined concept: id=',a.id, ' has no Axiom record with the words EquivalentClasses.'),
+		a.id,
+        'curr_concept_s'
 	from curr_concept_s a
        left join (select distinct referencedcomponentid from curr_owlexpressionrefset_s where active = '1' and owlexpression like '%EquivalentClasses%') b
 	   on a.id = b.referencedcomponentid

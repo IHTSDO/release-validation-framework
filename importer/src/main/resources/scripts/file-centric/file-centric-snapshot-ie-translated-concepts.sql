@@ -8,12 +8,14 @@
 ********************************************************************************/
 
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ': has no active preferred term in the Irish language refset')
+		concat('Concept: id=',a.id, ': has no active preferred term in the Irish language refset'),
+		a.id,
+		'curr_concept_d'
 	from curr_concept_d a
 	where
 	 a.active=1
@@ -27,12 +29,14 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
 			and c.refsetid = '21000220103'
 			and b.conceptid=a.id);
 			
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ': has recently been added to the International Edition release, but has no active preferred term in the Irish language refset RF2 files.  Please check termServer to confirm whether or not a preferred term exists in the source content, and has just failed to be exported into the Irish release files?')
+		concat('Concept: id=',a.id, ': has recently been added to the International Edition release, but has no active preferred term in the Irish language refset RF2 files.  Please check termServer to confirm whether or not a preferred term exists in the source content, and has just failed to be exported into the Irish release files?'),
+		a.id,
+		'curr_concept_s'
 	from curr_concept_s a
 	where
 	 a.active=1

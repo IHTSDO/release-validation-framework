@@ -4,12 +4,14 @@
 /*
  * In in prior full but not current full
  */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedComponentId,
-		concat('ComplexMap: id=',a.id, ' is in prior full file but not in current full file.') 	
+		concat('ComplexMap: id=',a.id, ' is in prior full file but not in current full file.'),
+		a.id,
+		'prev_complexmaprefset_f'
 	from prev_complexmaprefset_f a
 	left join curr_complexmaprefset_f b
 		on a.id = b.id

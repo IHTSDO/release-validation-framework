@@ -8,12 +8,14 @@
 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('CONCEPT: id=',a.id, ' is in delta but not in snapshot file.') 	
+		concat('CONCEPT: id=',a.id, ' is in delta but not in snapshot file.'),
+		a.id,
+		'curr_concept_d'
 	from curr_concept_d a
 	left join curr_concept_s b
 		on a.id = b.id

@@ -7,12 +7,14 @@
 
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		b.id,
-		concat('CONCEPT: id=',b.id, ': Concept contains two or more versions of the immutable values in Stated Relationships.') 	
+		concat('CONCEPT: id=',b.id, ': Concept contains two or more versions of the immutable values in Stated Relationships.'),
+		b.id,
+		'curr_concept_s'
 	from curr_stated_relationship_s a 
 	inner join curr_concept_s b on a.sourceid = b.id
 	where a.active = '1'

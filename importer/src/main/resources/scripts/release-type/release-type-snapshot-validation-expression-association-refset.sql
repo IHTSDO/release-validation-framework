@@ -1,14 +1,16 @@
 /*  
 *	Content in the the current ExpressionAssociationRefset snapshot file must be in the current full file
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('ExpressionAssociationRefset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
-	from curr_expressionAssociationRefset_s a
-	left join curr_expressionAssociationRefset_f b
+		concat('ExpressionAssociationRefset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+		a.id,
+		'curr_expressionassociationrefset_s'
+	from curr_expressionassociationrefset_s a
+	left join curr_expressionassociationrefset_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -35,14 +37,16 @@
 commit;
 
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('ExpressionAssociationRefset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 	
-	from curr_expressionAssociationRefset_f a
-	left join curr_expressionAssociationRefset_s b
+		concat('ExpressionAssociationRefset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.'),
+		a.id,
+		'curr_expressionassociationrefset_f'
+	from curr_expressionassociationrefset_f a
+	left join curr_expressionassociationrefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -57,7 +61,7 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
 	where 
 	 cast(a.effectivetime as datetime) = 
 		(select max(cast(z.effectivetime as datetime))
-		 from curr_expressionAssociationRefset_f z
+		 from curr_expressionassociationrefset_f z
 		 where z.id = a.id)
 	and
 		( b.id is null

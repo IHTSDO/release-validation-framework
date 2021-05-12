@@ -38,12 +38,14 @@
 	alter table tmp_description_syn add index idx_tmp_ds_t (term);
 
 /* 	violators to the results table */	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Preferred term=', a.term, ' is duplicated in hierarchy ', a.semantictag)
+		concat('Preferred term=', a.term, ' is duplicated in hierarchy ', a.semantictag),
+		a.id,
+        'curr_description_s'
 	from tmp_description_syn a,
 	(select a.term, a.semantictag from tmp_description_syn a 
 		group by a.term, a.semantictag

@@ -3,12 +3,14 @@
  *  NOTE the substr is parsing 'IFA 12345 | ... |' into '12345'
  *
  */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
  	a.referencedcomponentid,
- 	concat('ExtendedMap: id=',a.id,' : IFA rule references an inactive concept' )  
+ 	concat('ExtendedMap: id=',a.id,' : IFA rule references an inactive concept' ),
+ 	a.id,
+    'curr_extendedmaprefset_s'
  from curr_extendedmaprefset_s a
 	where a.active = 1
  	 and a.mapRule like 'IFA%'
@@ -22,12 +24,14 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
  * Active extended maps with mapRule starting with IFA have concept id values and expressions matching active concept id and preferred name in the default language configuration
 * NOTE the substr is parsing 'IFA 12345 | abc def ghi |' into 'abc def ghi'
 */ 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  <RUNID>,
  '<ASSERTIONUUID>',
  a.referencedcomponentid,
- concat('ExtendedMap: id=',a.id,' : IFA map rule references an inactive term')       
+ concat('ExtendedMap: id=',a.id,' : IFA map rule references an inactive term'),
+ a.id,
+ 'curr_extendedmaprefset_s'
  from curr_extendedmaprefset_s a
 where a.active = 1
   and a.mapRule like 'IFA%'

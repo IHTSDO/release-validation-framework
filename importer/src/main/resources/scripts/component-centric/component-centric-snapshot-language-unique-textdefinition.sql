@@ -9,13 +9,14 @@
 ********************************************************************************/
 	
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('CONCEPT: id=',a.id, ': Concept contains more than one definition for a given dialect.') 
-	
+		concat('CONCEPT: id=',a.id, ': Concept contains more than one definition for a given dialect.'),
+		a.id,
+        'curr_concept_s'
 	from curr_concept_s a
 	inner join curr_textdefinition_s b on a.id = b.conceptid
 	where a.active = '1' 

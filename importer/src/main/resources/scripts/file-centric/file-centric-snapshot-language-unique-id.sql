@@ -7,12 +7,14 @@
 	Member Ids.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		b.conceptid,
-		concat('MEMBER: id=',c.id, ': is repeated in the language refset snapshot file.') 
+		concat('MEMBER: id=',c.id, ': is repeated in the language refset snapshot file.'),
+		c.id,
+		'curr_langrefset_s'
 	from (select a.id from curr_langrefset_s a group by a.id having count(a.id) > 1) as duplicate,
 	 curr_description_s b,
 	 curr_langrefset_s c

@@ -25,12 +25,14 @@
 				leave validate; 
 			end if; 
 
-			insert into qa_result (runid, assertion_id,concept_id, details)
+			insert into qa_result (runid, assertion_id,concept_id, details, component_id, table_name)
 			select 
 				runid,
 				assertionid,
 				a.conceptid,
-				concat('DESC: id=',a.id, ':Case-sensitive term containing ', thisTerm, ' has inappropriate caseSignificanceId.')
+				concat('DESC: id=',a.id, ':Case-sensitive term containing ', thisTerm, ' has inappropriate caseSignificanceId.'),
+				a.id,
+				'curr_description_d'
 			from curr_description_d a , curr_concept_s b
 			where a.casesignificanceid NOT IN (900000000000017005, 900000000000020002)
 			and a.active = 1

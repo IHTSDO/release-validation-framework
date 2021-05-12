@@ -18,12 +18,14 @@
 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-    	concat('ASSOCIATION: id=',a.id, ': refset member is in prior full file, but not in current full file.') 	        
+    	concat('ASSOCIATION: id=',a.id, ': refset member is in prior full file, but not in current full file.'),
+    	a.id,
+    	'prev_associationrefset_f'
 	from prev_associationrefset_f a
 	left join curr_associationrefset_f b
 		on a.id = b.id

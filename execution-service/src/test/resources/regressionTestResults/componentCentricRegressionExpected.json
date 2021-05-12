@@ -1,7 +1,7 @@
 {
   "assertionType" : "component-centric-validation",
-  "totalAssertionsRun" : 110,
-  "totalAssertionsFailed" : 97,
+  "totalAssertionsRun" : 93,
+  "totalAssertionsFailed" : 79,
   "results" : [ {
     "assertionName" : "Case-sensitive terms that share initial words also share caseSignificanceId value.",
     "assertionUuid" : "805ab37c-33fa-45aa-876b-f86365a828c8",
@@ -40,26 +40,6 @@
       "detail" : "MEMBER: id=65f4359b-bf19-5d99-abc1-7139bbff5d47: Active Non-human simple refset members refer to inactive components."
     } ],
     "totalFailed" : 2
-  }, {
-    "assertionName" : "The FSN term should be unique in active content.",
-    "assertionUuid" : "8d6ab114-caca-4d99-9fec-bb8fd9cea518",
-    "firstNInstances" : [ {
-      "conceptId" : "702411003",
-      "detail" : "FSN=DoloTest profile(observable entity) descriptionid=2990804014: FSN term is not unique in description snapshot"
-    }, {
-      "conceptId" : "703649005",
-      "detail" : "FSN=DoloTest profile(observable entity) descriptionid=2990804019: FSN term is not unique in description snapshot"
-    }, {
-      "conceptId" : "703649004",
-      "detail" : "FSN=DoloTest profile(observable entity) descriptionid=2990804020: FSN term is not unique in description snapshot"
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "FSN=Toxic effect of antimony and/or its compounds (disorder) descriptionid=3008913021: FSN term is not unique in description snapshot"
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "FSN=Toxic effect of antimony and/or its compounds (disorder) descriptionid=3008913022: FSN term is not unique in description snapshot"
-    } ],
-    "totalFailed" : 5
   }, {
     "assertionName" : "Non empty mapTarget should be part of mapAdvice",
     "assertionUuid" : "8e70ea3e-c4dd-4ae3-8b75-0f0567e42f60",
@@ -219,14 +199,6 @@
     } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "A description should not have more than 255 characters long.",
-    "assertionUuid" : "905122c9-f24f-4d57-b478-435d693ff209",
-    "firstNInstances" : [ {
-      "conceptId" : "703860006",
-      "detail" : "Description: id=3008913021 has a term more than 255 characters long."
-    } ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "No active Historical Association member associates an inactive concept with its parent.",
     "assertionUuid" : "90bcb7f0-7f25-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -283,33 +255,11 @@
     } ],
     "totalFailed" : 2
   }, {
-    "assertionName" : "All active FSNs have a semantic tag.",
-    "assertionUuid" : "a4ed3a89-170e-4d9c-995a-716447c4fe64",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "DESC: Term=Epilepsy in mother complicating childbirth(disorder:Fully Specified Name without semantic tag."
-    }, {
-      "conceptId" : "702411003",
-      "detail" : "DESC: Term=DoloTest profile(observable entity):Fully Specified Name without semantic tag."
-    }, {
-      "conceptId" : "703649005",
-      "detail" : "DESC: Term=DoloTest profile(observable entity):Fully Specified Name without semantic tag."
-    } ],
-    "totalFailed" : 3
-  }, {
     "assertionName" : "The mapTarget in LOINC ExpressionAssociationRefset snapshot is unique.",
     "assertionUuid" : "a6f78382-91c4-4e0a-a9d6-6d47b1a16979",
     "firstNInstances" : [ {
       "conceptId" : "705114005",
       "detail" : "MapTarget:54320-7 is not unique in the expression association refset snapshot."
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "All definitions are case sensitive.",
-    "assertionUuid" : "b4930ea7-4078-4599-979c-2dde18164f01",
-    "firstNInstances" : [ {
-      "conceptId" : "699220008",
-      "detail" : "TEXTDEF: id=2983208019:Definitions are not case sensitive."
     } ],
     "totalFailed" : 1
   }, {
@@ -427,20 +377,6 @@
     } ],
     "totalFailed" : 4
   }, {
-    "assertionName" : "No active definitions contain leading or trailing spaces.",
-    "assertionUuid" : "da3ae7c4-6144-4cd5-9530-2a7780c53c9a",
-    "firstNInstances" : [ {
-      "conceptId" : "702411003",
-      "detail" : "TEXTDEF: id=3008053018:Active Terms with leading or trailing spaces."
-    }, {
-      "conceptId" : "702769005",
-      "detail" : "TEXTDEF: id=2989768014:Active Terms with leading or trailing spaces."
-    }, {
-      "conceptId" : "700237005",
-      "detail" : "TEXTDEF: id=2989691019:Active Terms with leading or trailing spaces."
-    } ],
-    "totalFailed" : 3
-  }, {
     "assertionName" : "Concepts inactivated in this release cycle must have an active FSN, preferred in both US and GB Language Reference Sets.",
     "assertionUuid" : "db3f62b0-b824-463d-8d05-7974c81f3caa",
     "firstNInstances" : [ {
@@ -451,14 +387,6 @@
       "detail" : "Inactive concept (71388002|NO ACTIVE FSN FOUND|) missing active FSN preferred in en-gb AND en-us dialects."
     } ],
     "totalFailed" : 2
-  }, {
-    "assertionName" : "The first letter of the FSN should be capitalized.",
-    "assertionUuid" : "dd0d0406-7481-444a-9f04-b6fc7db49039",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "DESC: id=3004397016:First letter of the active FSN of active concept not capitalized."
-    } ],
-    "totalFailed" : 1
   }, {
     "assertionName" : "Active descriptions do not have active inactivation indicators",
     "assertionUuid" : "e2aa5b09-5754-484f-9eb8-bb18732617ef",
@@ -489,14 +417,6 @@
       "detail" : "Role Group number of stated relationship: id=4793408028 should be in double figures."
     } ],
     "totalFailed" : 2
-  }, {
-    "assertionName" : "No synonyms have semantic tags.",
-    "assertionUuid" : "e95acdbd-0a20-4010-9e78-00e70491e800",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "Concept: id=702386002 has synonym containing a semantic tag (observable entity)"
-    } ],
-    "totalFailed" : 1
   }, {
     "assertionName" : "ID is unique in MRCM DOMAIN snapshot.",
     "assertionUuid" : "e980e959-943b-4cdc-998b-f91e670a030b",
@@ -583,21 +503,21 @@
       "detail" : "Active description id=2984057025 has no langrefset member"
     }, {
       "conceptId" : "703860006",
-      "detail" : "Active description id=2989790014 has no langrefset member"
+      "detail" : "Active description id=2989790017 has no langrefset member"
     }, {
       "conceptId" : "703860006",
-      "detail" : "Active description id=2989790014 has no langrefset member"
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Active description id=2989790015 has no langrefset member"
+      "detail" : "Active description id=3008913021 has no langrefset member"
     }, {
       "conceptId" : "702386002",
       "detail" : "Active description id=3004397016 has no langrefset member"
     }, {
       "conceptId" : "702386002",
       "detail" : "Active description id=2989194011 has no langrefset member"
+    }, {
+      "conceptId" : "702386002",
+      "detail" : "Active description id=3008913021 has no langrefset member"
     } ],
-    "totalFailed" : 17
+    "totalFailed" : 19
   }, {
     "assertionName" : "Active historical association refset members have inactive concepts as reference components.",
     "assertionUuid" : "f7117eb0-7cd6-11e1-b0c4-0800200c9a66",
@@ -606,17 +526,6 @@
       "detail" : "MEMBER: id=499c1966-65d3-5384-aafb-28f4a20e34eb:Historical refset member is active, but refers to an active concept."
     } ],
     "totalFailed" : 1
-  }, {
-    "assertionName" : "No active definitions contain double spaces.",
-    "assertionUuid" : "f7b7cefe-858d-4749-ab98-7106700feaee",
-    "firstNInstances" : [ {
-      "conceptId" : "702411003",
-      "detail" : "TEXTDEF : id=3008053018:Active Terms of active concept containing double spaces."
-    }, {
-      "conceptId" : "702769005",
-      "detail" : "TEXTDEF : id=2989768014:Active Terms of active concept containing double spaces."
-    } ],
-    "totalFailed" : 2
   }, {
     "assertionName" : "Concepts inactivated in this release cycle must have an active Preferred Term in both US and GB Language Reference Sets.",
     "assertionUuid" : "f7bd336c-4ced-48e3-881c-b61e23a19530",
@@ -628,25 +537,6 @@
       "detail" : "Inactive concept (71388002|NO ACTIVE FSN FOUND|) missing active Preferred Term in one or more English dialects."
     } ],
     "totalFailed" : 2
-  }, {
-    "assertionName" : "All inactive concepts have definition status of PRIMITIVE.",
-    "assertionUuid" : "fdf6a1b0-7cd6-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "699765003",
-      "detail" : "CONCEPT: id=699765003:There is an inactive concept whose definition status is not Primitive."
-    }, {
-      "conceptId" : "609452007",
-      "detail" : "CONCEPT: id=609452007:There is an inactive concept whose definition status is not Primitive."
-    } ],
-    "totalFailed" : 2
-  }, {
-    "assertionName" : "There is only zero or one active Definition per concept per dialect in the snapshot file.",
-    "assertionUuid" : "00e87310-7e9b-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "703672002",
-      "detail" : "CONCEPT: id=703672002: Concept contains more than one definition for a given dialect."
-    } ],
-    "totalFailed" : 1
   }, {
     "assertionName" : "Concept should not have any duplicated historical association indicators.",
     "assertionUuid" : "041dcf55-4c9c-4dd4-baa7-584eb0e53d5a",
@@ -710,20 +600,6 @@
       "detail" : "Fully defined concept: id=702411003 has no Axiom record with the words EquivalentClasses."
     } ],
     "totalFailed" : 1
-  }, {
-    "assertionName" : "No active Terms contain double spaces.",
-    "assertionUuid" : "2d6c61e5-a04d-4115-be18-eeba2a44b835",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "CONCEPT: Term=  Fracture clinic:Active Terms containing double spaces."
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
-    }, {
-      "conceptId" : "703672002",
-      "detail" : "CONCEPT: Term=Exposure to vibration  :Active Terms containing double spaces."
-    } ],
-    "totalFailed" : 3
   }, {
     "assertionName" : "For a given concept, all description terms are unique.",
     "assertionUuid" : "2e0eb135-fd7d-4f24-83c1-0cba797ee766",
@@ -795,20 +671,6 @@
       "detail" : "Text definition: id=3008913022: has multiple language refset members for a given dialect."
     } ],
     "totalFailed" : 2
-  }, {
-    "assertionName" : "All FSNs have a space before the semantic tag.",
-    "assertionUuid" : "32369add-8d9f-48de-a129-29b32c79a9d7",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "DESCRIPTION: id=3004397016 : The FSN has no space before the semantic tag."
-    }, {
-      "conceptId" : "702411003",
-      "detail" : "DESCRIPTION: id=2990804014 : The FSN has no space before the semantic tag."
-    }, {
-      "conceptId" : "703649005",
-      "detail" : "DESCRIPTION: id=2990804019 : The FSN has no space before the semantic tag."
-    } ],
-    "totalFailed" : 3
   }, {
     "assertionName" : "Inferred relationship modifier is always SOME.",
     "assertionUuid" : "32b41aa0-7d08-11e1-b0c4-0800200c9a66",
@@ -896,14 +758,6 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "Terms contains balanced parentheses.",
-    "assertionUuid" : "50907ee7-ddf6-4cb5-ba8b-be150644430b",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "DESC: Term=Epilepsy in mother complicating childbirth(disorder:Active Terms of active concept without balanced parentheses."
-    } ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "All stated is-a relationships have relationship group of 0.",
     "assertionUuid" : "50e809a0-7d08-11e1-b0c4-0800200c9a66",
     "firstNInstances" : [ {
@@ -912,76 +766,10 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "All concepts have at least one stated is-a relationship.",
-    "assertionUuid" : "5555c400-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "702769005",
-      "detail" : "CONCEPT: id=702769005: Concept does not have a stated is-a relationship."
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "CONCEPT: id=703860006: Concept does not have a stated is-a relationship."
-    }, {
-      "conceptId" : "703155005",
-      "detail" : "CONCEPT: id=703155005: Concept does not have a stated is-a relationship."
-    }, {
-      "conceptId" : "702386002",
-      "detail" : "CONCEPT: id=702386002: Concept does not have a stated is-a relationship."
-    }, {
-      "conceptId" : "703649005",
-      "detail" : "CONCEPT: id=703649005: Concept does not have a stated is-a relationship."
-    }, {
-      "conceptId" : "703672002",
-      "detail" : "CONCEPT: id=703672002: Concept does not have a stated is-a relationship."
-    }, {
-      "conceptId" : "702850005",
-      "detail" : "CONCEPT: id=702850005: Concept does not have a stated is-a relationship."
-    }, {
-      "conceptId" : "700132006",
-      "detail" : "CONCEPT: id=700132006: Concept does not have a stated is-a relationship."
-    }, {
-      "conceptId" : "700132006",
-      "detail" : "CONCEPT: id=700132006: Concept does not have a stated is-a relationship."
-    }, {
-      "conceptId" : "238875005",
-      "detail" : "CONCEPT: id=238875005: Concept does not have a stated is-a relationship."
-    } ],
-    "totalFailed" : 11
-  }, {
     "assertionName" : "MrcmRuleRefsetId in MRCM MODULE SCOPE SNAPSHOT exists in the RefsetId values of MRCM DOMAIN SNAPSHOT or MRCM ATTRIBUTE DOMAIN SNAPSHOT or MRCM ATTRIBUTE RANGE SNAPSHOT",
     "assertionUuid" : "57ae69cd-26f0-4001-ba2f-ae56129e2e28",
     "firstNInstances" : null,
     "totalFailed" : 0
-  }, {
-    "assertionName" : "No active Terms contain leading or trailing spaces.",
-    "assertionUuid" : "57d910b4-b5c9-459e-8bae-ae0ea9035585",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "Description: id=3006276018 has active term with leading or trailing spaces."
-    }, {
-      "conceptId" : "700244001",
-      "detail" : "Description: id=3006191013 has active term with leading or trailing spaces."
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Description: id=2989790014 has active term with leading or trailing spaces."
-    }, {
-      "conceptId" : "703860006",
-      "detail" : "Description: id=2989790017 has active term with leading or trailing spaces."
-    }, {
-      "conceptId" : "703672002",
-      "detail" : "Description: id=2989790015 has active term with leading or trailing spaces."
-    }, {
-      "conceptId" : "703649004",
-      "detail" : "Description: id=2989770013 has active term with leading or trailing spaces."
-    } ],
-    "totalFailed" : 6
-  }, {
-    "assertionName" : "All FSNs end in closing parentheses.",
-    "assertionUuid" : "5a605c09-db1e-453f-aa4a-064faab2d310",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "DESC: Term=Epilepsy in mother complicating childbirth(disorder:Fully Specified Name not ending with closing parantheses."
-    } ],
-    "totalFailed" : 1
   }, {
     "assertionName" : "All active FSNs for a given concept have the same semantic tag.",
     "assertionUuid" : "5c0186f3-0b72-4685-8aad-eff15a7f8880",
@@ -1011,27 +799,11 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "No Concept has 2 stated relationships with the same type, destination and group.",
-    "assertionUuid" : "5d27df10-7d08-11e1-b0c4-0800200c9a66",
-    "firstNInstances" : [ {
-      "conceptId" : "702386002",
-      "detail" : "CONCEPT: id=702386002: Concept has two stated relationships with same typeid and destinationid within a single relationship group."
-    } ],
-    "totalFailed" : 1
-  }, {
     "assertionName" : "SNOMED RT codes are unique in the SNOMED RT simple map refset",
     "assertionUuid" : "5e80ea3e-c4dd-4ae3-8b75-f0567e42b962",
     "firstNInstances" : [ {
       "conceptId" : "700132006",
       "detail" : "C-D1637"
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "The first letter of the active definition should be capitalized.",
-    "assertionUuid" : "6138248d-8cc8-4bc2-8043-cd609fdd640c",
-    "firstNInstances" : [ {
-      "conceptId" : "703166003",
-      "detail" : "TEXTDEFINITION: id=3008053018 contains a term that the first letter is not capitalized."
     } ],
     "totalFailed" : 1
   }, {
@@ -1113,30 +885,11 @@
     "firstNInstances" : null,
     "totalFailed" : 0
   }, {
-    "assertionName" : "All active definitions are preferred.",
-    "assertionUuid" : "73e46e72-6fdb-407b-9d50-d86a36a3a862",
-    "firstNInstances" : [ {
-      "conceptId" : "703672002",
-      "detail" : "CONCEPT: Concept=703672002: concept has definition not \"preferred\"."
-    }, {
-      "conceptId" : "703672002",
-      "detail" : "CONCEPT: Concept=703672002: concept has definition not \"preferred\"."
-    } ],
-    "totalFailed" : 2
-  }, {
     "assertionName" : "There is an equivalent definition in the en-us and en-gb language when provided.",
     "assertionUuid" : "7c406d6c-7e30-4aa1-b99d-e00b4e2d52a5",
     "firstNInstances" : [ {
       "conceptId" : "733073007",
       "detail" : "ConceptId=733073007 has definition in EN-US but no equivalent found for EN-GB"
-    } ],
-    "totalFailed" : 1
-  }, {
-    "assertionName" : "A description normally has less than 35 words.",
-    "assertionUuid" : "7dd01495-2099-4e7b-9d02-39899bf774f3",
-    "firstNInstances" : [ {
-      "conceptId" : "703860006",
-      "detail" : "Description: id=3008913021 has a term more than 35 words."
     } ],
     "totalFailed" : 1
   }, {
@@ -1254,5 +1007,80 @@
       "detail" : "ComplexMap: id=79703317-411e-5d4d-b853-eef523f0109a: IFA rule references missing conceptId and term"
     } ],
     "totalFailed" : 4
-  } ]
+  }, {
+    "assertionName" : "All active Refset records are valid.",
+    "assertionUuid" : "1a4e40a9-cf14-4703-b206-9f2fbeb56c7f",
+    "firstNInstances" : [ {
+      "conceptId" : "280164007",
+      "detail" : "Reference component id:280164007 for refset id: 734138000 in association refset member must be valid."
+    }, {
+      "conceptId" : "85562004",
+      "detail" : "Reference component id:85562004 for refset id: 734138000 in association refset member must be valid."
+    }, {
+      "conceptId" : "85562004",
+      "detail" : "Reference component id:85562004 for refset id: 734138000 in association refset member must be valid."
+    }, {
+      "conceptId" : "51289009",
+      "detail" : "Reference component id:51289009 for refset id: 734139008 in association refset member must be valid."
+    }, {
+      "conceptId" : "51289009",
+      "detail" : "Reference component id:51289009 for refset id: 734139008 in association refset member must be valid."
+    }, {
+      "conceptId" : "109006",
+      "detail" : "Reference component id:109006 for refset id: 447563008 in complex map refset must be valid."
+    }, {
+      "conceptId" : "122003",
+      "detail" : "Reference component id:122003 for refset id: 447563008 in complex map refset must be valid."
+    }, {
+      "conceptId" : "122003",
+      "detail" : "Reference component id:122003 for refset id: 447563008 in complex map refset must be valid."
+    }, {
+      "conceptId" : "127009",
+      "detail" : "Reference component id:127009 for refset id: 447563008 in complex map refset must be valid."
+    }, {
+      "conceptId" : "129007",
+      "detail" : "Reference component id:129007 for refset id: 447563008 in complex map refset must be valid."
+    }],
+    "totalFailed" : 75
+  }, {
+    "assertionName" : "The refsetId of a refset member must be an existing and active concept",
+    "assertionUuid" : "d1417dd6-7a74-4e67-8dc0-156e7c4c489c",
+    "firstNInstances" : [ {
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
+    }, {
+      "conceptId" : "734138000",
+      "detail" : "Refset id:734138000 in association refset member must be an existing and active concept."
+    }, {
+      "conceptId" : "734139008",
+      "detail" : "Refset id:734139008 in association refset member must be an existing and active concept."
+    }, {
+      "conceptId" : "900000000000490003",
+      "detail" : "Refset id:900000000000490003 in attribute value refset member must be an existing and active concept."
+    }, {
+      "conceptId" : "900000000000489007",
+      "detail" : "Refset id:900000000000489007 in attribute value refset member must be an existing and active concept."
+    }, {
+      "conceptId" : "447563008",
+      "detail" : "Refset id:447563008 in complex map refset member must be an existing and active concept."
+    }, {
+      "conceptId" : "447562003",
+      "detail" : "Refset id:447562003 in complex map refset member must be an existing and active concept."
+    }, {
+      "conceptId" : "705110001",
+      "detail" : "Refset id:705110001 in expression association refset member must be an existing and active concept."
+    }, {
+      "conceptId" : "447562003",
+      "detail" : "Refset id:447562003 in extended map refset member must be an existing and active concept."
+    }, {
+      "conceptId" : "900000000000508004",
+      "detail" : "Refset id:900000000000508004 in language refset member must be an existing and active concept."
+    }],
+    "totalFailed" : 19
+  }, {
+    "assertionName" : "Active concepts must have correct definition status according to defined axioms.",
+    "assertionUuid" : "8090d441-7aeb-4a48-bdc3-2545916aa26d",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }]
 }

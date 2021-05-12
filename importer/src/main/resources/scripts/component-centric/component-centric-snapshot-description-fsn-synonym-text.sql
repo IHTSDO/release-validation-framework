@@ -57,12 +57,14 @@
 	and a.termwithouttag = b.term;
 
 /* 	inserting exceptions in the result table */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat(a.conceptid, ' |', a.term, '|')
+		concat(a.conceptid, ' |', a.term, '|'),
+		a.conceptid,
+		'curr_concept_s'
 	from tmp_fsn a
 	left join tmp_termsmatch b
 	on a.conceptid = b.conceptid

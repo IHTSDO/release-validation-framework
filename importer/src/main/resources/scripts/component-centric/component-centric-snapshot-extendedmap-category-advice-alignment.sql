@@ -7,12 +7,14 @@
  
  */
  
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  <RUNID>,
  '<ASSERTIONUUID>',
  a.referencedcomponentid,
- concat('ExtendedMap: id=',a.id,' : misaligned mapCategory and mapAdvice for ambiguous WHO concepts')     
+ concat('ExtendedMap: id=',a.id,' : misaligned mapCategory and mapAdvice for ambiguous WHO concepts'),
+ a.id,
+ 'curr_extendedmaprefset_s'
  from curr_extendedmaprefset_s a
 where a.active = 1
   and (
@@ -21,12 +23,14 @@ where a.active = 1
   and a.refSetId = 447562003;
  commit;
  
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
 	 <RUNID>,
  	'<ASSERTIONUUID>',
  	a.referencedcomponentid,
- concat('ExtendedMap: id=',a.id,' : misaligned mapCategory and mapAdvice for Non Classifiable')
+ concat('ExtendedMap: id=',a.id,' : misaligned mapCategory and mapAdvice for Non Classifiable'),
+ a.id,
+ 'curr_extendedmaprefset_s'
  from curr_extendedmaprefset_s a
 where a.active = 1
   and (
@@ -36,12 +40,14 @@ where a.active = 1
  commit;
  
  
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
  	a.referencedcomponentid,
- 	concat('ExtendedMap: id=',a.id,': misaligned mapCategory and mapAdvice for ambiguous snomed concepts')       
+ 	concat('ExtendedMap: id=',a.id,': misaligned mapCategory and mapAdvice for ambiguous snomed concepts'),
+ 	a.id,
+    'curr_extendedmaprefset_s'
  from curr_extendedmaprefset_s a
 	where a.active = 1
   	and (
@@ -51,12 +57,14 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
  commit;
  
  
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
  	a.referencedcomponentid,
- 	concat('ExtendedMap: id=',a.id,': misaligned mapCategory and mapAdvice for incompletely modeled concepts') 
+ 	concat('ExtendedMap: id=',a.id,': misaligned mapCategory and mapAdvice for incompletely modeled concepts'),
+ 	a.id,
+    'curr_extendedmaprefset_s'
  from curr_extendedmaprefset_s a
 where a.active = 1
   and (

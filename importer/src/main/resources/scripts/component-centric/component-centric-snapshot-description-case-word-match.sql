@@ -38,12 +38,14 @@
 	and BINARY SUBSTRING_INDEX(b.term, ' ', 1) = firstword;	
 	
 /* 	inserting exceptions in the result table */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('DESC: conceptid=',a.conceptid, ':has terms not sharing case-sensitivity.') 	
+		concat('DESC: conceptid=',a.conceptid, ':has terms not sharing case-sensitivity.'),
+		a.conceptid,
+		'curr_concept_s'
 	from tmp_caseSignificanceId_not_match a;
 
 

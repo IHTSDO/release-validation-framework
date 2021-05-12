@@ -13,12 +13,14 @@
 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		c.sourceid,
-		concat('Relationship: id=',c.id, ' is in delta, but not in snapshot file.') 	
+		concat('Relationship: id=',c.id, ' is in delta, but not in snapshot file.'),
+		c.id,
+		'curr_relationship_d'
 	from (select a.* from curr_relationship_d a inner join (select id, MAX(effectivetime) as effectivetime from curr_relationship_d group by id) mostRecent 
 	on a.id = mostRecent.id and a.effectivetime=mostRecent.effectivetime) c 
 	left join curr_relationship_s b
