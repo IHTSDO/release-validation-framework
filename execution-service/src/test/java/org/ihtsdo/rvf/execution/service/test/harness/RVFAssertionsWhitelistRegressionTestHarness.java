@@ -8,7 +8,7 @@ import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
 import org.ihtsdo.rvf.execution.service.ResourceDataLoader;
 import org.ihtsdo.rvf.execution.service.WhitelistService;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
-import org.ihtsdo.rvf.execution.service.whitelist.RVFAssertionWhitelistFilter;
+import org.ihtsdo.rvf.execution.service.MysqlFailuresExtractor;
 import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.util.ZipFileUtils;
@@ -32,8 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
@@ -62,7 +61,7 @@ public class RVFAssertionsWhitelistRegressionTestHarness {
 
 	@Autowired
 	@InjectMocks
-	private RVFAssertionWhitelistFilter rvfAssertionWhitelistFilter;
+	private MysqlFailuresExtractor mysqlFailuresExtractor;
 
 	private MysqlExecutionConfig config;
 	private List<String> rf2FilesLoaded = new ArrayList<>();
@@ -111,23 +110,23 @@ public class RVFAssertionsWhitelistRegressionTestHarness {
 
 		// assert results without validating against whitelisting items
 		when(whitelistService.isWhitelistDisabled()).thenReturn(true);
-		rvfAssertionWhitelistFilter.extractTestResults(testRunItems, config, assertions);
+		mysqlFailuresExtractor.extractTestResults(testRunItems, config, assertions);
 		for (TestRunItem test :testRunItems) {
-			if ("30947783-78f5-4ffc-a22b-b03d83c5909d".equals(test.getAssertionUuid().toString())) {
-				assertTrue(test.getFailureCount() == 50L);
+			if ("31f5e2c8-b0b9-42ee-a9bf-87d95edad83b".equals(test.getAssertionUuid().toString())) {
+				assertEquals(2L, test.getFailureCount().longValue());
 			}
 		}
 
 		// assert results with validating against whitelisting items
 		when(whitelistService.isWhitelistDisabled()).thenReturn(false);
-		List<WhitelistItem> whitelistItems = Collections.singletonList(new WhitelistItem("30947783-78f5-4ffc-a22b-b03d83c5909d", "", "363787002", ""));
+		List<WhitelistItem> whitelistItems = Collections.singletonList(new WhitelistItem("31f5e2c8-b0b9-42ee-a9bf-87d95edad83b", "3008913022", "703672002", "1,900000000000207008,703860006,en,900000000000003001,Toxic effect of antimony and/or its compounds (disorder),900000000000020002"));
 
 		// mock the whitelist items
 		when(whitelistService.validateAssertions(any())).thenReturn(whitelistItems);
-		rvfAssertionWhitelistFilter.extractTestResults(testRunItems, config, assertions);
+		mysqlFailuresExtractor.extractTestResults(testRunItems, config, assertions);
 		for (TestRunItem test :testRunItems) {
-			if ("30947783-78f5-4ffc-a22b-b03d83c5909d".equals(test.getAssertionUuid().toString())) {
-				assertTrue(test.getFailureCount() == 49L);
+			if ("31f5e2c8-b0b9-42ee-a9bf-87d95edad83b".equals(test.getAssertionUuid().toString())) {
+				assertEquals(1L, test.getFailureCount().longValue());
 			}
 		}
 

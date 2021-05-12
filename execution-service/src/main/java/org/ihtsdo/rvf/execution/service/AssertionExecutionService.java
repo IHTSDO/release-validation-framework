@@ -13,11 +13,7 @@ import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionTest;
-import org.ihtsdo.rvf.entity.ExecutionCommand;
-import org.ihtsdo.rvf.entity.Test;
-import org.ihtsdo.rvf.entity.TestRunItem;
+import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.importer.AssertionGroupImporter.ProductName;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -326,17 +322,5 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 
 	public void setQaResulTableName(final String qaResulTableName) {
 		this.qaResulTableName = qaResulTableName;
-	}
-
-	public void setDeltaTableSuffix(final String deltaTableSuffix) {
-		this.deltaTableSuffix = deltaTableSuffix;
-	}
-
-	public void setSnapshotTableSuffix(final String snapshotTableSuffix) {
-		this.snapshotTableSuffix = snapshotTableSuffix;
-	}
-
-	public void setFullTableSuffix(final String fullTableSuffix) {
-		this.fullTableSuffix = fullTableSuffix;
 	}
 }

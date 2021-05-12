@@ -17,7 +17,6 @@ import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
-import org.ihtsdo.rvf.execution.service.whitelist.RVFAssertionWhitelistFilter;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,7 @@ public class MysqlValidationService {
 	private ValidationReportService reportService;
 
 	@Autowired
-	private RVFAssertionWhitelistFilter rvfAssertionWhitelistFilter;
+	private MysqlFailuresExtractor mysqlFailuresExtractor;
 	
 	@Autowired
 	private ValidationVersionLoader releaseVersionLoader;
@@ -246,7 +245,7 @@ public class MysqlValidationService {
 									 long timeStart, List<TestRunItem> items, List<Assertion> assertions) {
 		ValidationReport report = statusReport.getResultReport();
 		try {
-			rvfAssertionWhitelistFilter.extractTestResults(items, executionConfig, assertions);
+			mysqlFailuresExtractor.extractTestResults(items, executionConfig, assertions);
 
 			//failed tests
 			final List<TestRunItem> failedItems = new ArrayList<>();
