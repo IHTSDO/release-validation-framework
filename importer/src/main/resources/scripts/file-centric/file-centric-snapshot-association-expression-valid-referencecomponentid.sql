@@ -10,12 +10,11 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		result.referencedcomponentid,
-		concat('Referencedcomponentid=',result.referencedcomponentid, '  in AssociationExpressionis snapshot not a concept id.'),
-		null,
+		a.referencedcomponentid,
+		concat('Referencedcomponentid=',a.referencedcomponentid, '  in AssociationExpressionis snapshot not a concept id.'),
+		a.id,
         'curr_expressionassociationrefset_s'
-	from (  select distinct a.referencedcomponentid
 	from curr_expressionassociationrefset_s a
-	left join curr_concept_s b
-	on a.referencedcomponentid = b.id
-	where b.id is null ) as result;
+    	left join curr_concept_s b
+    	on a.referencedcomponentid = b.id
+    	where b.id is null;

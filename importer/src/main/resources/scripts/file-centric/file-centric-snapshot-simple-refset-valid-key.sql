@@ -12,7 +12,7 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('Refset id:',a.refsetid, ' and referencedcomponent Id:', a.referencedcomponentid, ' are duplicated in the simple refset snapshot file.'),
-		null,
+		a.id,
 		'curr_simplerefset_s'
 	from curr_simplerefset_s a 
 	group by a.refsetid , a.referencedcomponentid
