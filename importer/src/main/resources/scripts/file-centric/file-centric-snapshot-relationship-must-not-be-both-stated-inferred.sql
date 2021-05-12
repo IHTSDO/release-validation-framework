@@ -14,12 +14,14 @@ create table if not exists tmp_modules_list
 as select m.moduleid from curr_moduledependencyrefset_d m
 where m.active = 1 and m.referencedcomponentid = '900000000000012004';
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		sourceid,
-		concat('RELATIONSHIP : id=',id, ': Relationship Id exists in both Relationship and Stated Relationship files')
+		concat('RELATIONSHIP : id=',id, ': Relationship Id exists in both Relationship and Stated Relationship files'),
+		id,
+		'curr_relationship_s'
 	from curr_relationship_s a
 	where a.moduleid in (select moduleid from tmp_modules_list)
 	and a.id in (select id from curr_stated_relationship_s b where b.moduleid in (select moduleid from tmp_modules_list));

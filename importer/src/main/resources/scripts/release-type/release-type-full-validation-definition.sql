@@ -18,12 +18,14 @@
 
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-    concat('DEFINITION: id=',a.id, ' is in the previous full file, but not in the current full file.')
+    concat('DEFINITION: id=',a.id, ' is in the previous full file, but not in the current full file.'),
+    a.id,
+    'prev_textdefinition_f'
 	from prev_textdefinition_f a
 	left join curr_textdefinition_f b
 		on a.id = b.id
@@ -44,4 +46,6 @@
 	or b.typeid is null
 	or b.term is null
 	or b.casesignificanceid is null;
+
+    commit;
 	

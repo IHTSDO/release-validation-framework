@@ -58,8 +58,8 @@ public class RF2FileTableMapperTest {
 			"relationship_d",
 			"stated_relationship_d",
 			"textdefinition_d",
-			"expressionAssociationRefset_d",
-			"mapCorrelationOriginRefset_d"
+			"expressionassociationrefset_d",
+			"mapcorrelationoriginrefset_d"
 		};
 	
 	private static final String[] EXTENSION_EXPECTED_DELTA = {

@@ -4,12 +4,14 @@
 */
 
 /* in the delta; not in the full */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('SIMPLE REFSET: id=',a.id, ' is in DELTA file, but not in FULL file.')
+		concat('SIMPLE REFSET: id=',a.id, ' is in DELTA file, but not in FULL file.'),
+		a.id,
+		'curr_simplerefset_d'
 	from curr_simplerefset_d a
 	left join curr_simplerefset_f b
 	on a.id = b.id

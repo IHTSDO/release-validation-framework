@@ -1,14 +1,16 @@
 /*  
-*	Changes from the current ExpressionAssociationRefset delta file must be in the current full file
+*	Changes from the current expressionassociationrefset delta file must be in the current full file
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('ExpressionAssociation: id=',a.id, ' is in DELTA file, but not in FULL file.') 	
-	from curr_expressionAssociationRefset_d a
-	left join curr_expressionAssociationRefset_f b
+		concat('ExpressionAssociation: id=',a.id, ' is in DELTA file, but not in FULL file.'),
+		a.id,
+		'curr_expressionassociationrefset_d'
+	from curr_expressionassociationrefset_d a
+	left join curr_expressionassociationrefset_f b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
 	and a.active = b.active

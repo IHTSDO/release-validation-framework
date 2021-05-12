@@ -36,7 +36,13 @@ public class QAResult implements Serializable {
 	
 	@Lob
 	@Column(name ="details")
-	private  String details;
+	private String details;
+
+	@Column(name = "component_id")
+	private String componentId;
+
+	@Column(name ="table_name")
+	private String tableName;
 
 	public String getDetails() {
 		return details;
@@ -69,5 +75,20 @@ public class QAResult implements Serializable {
 	public void setConceptId(Long conceptId) {
 		this.conceptId = conceptId;
 	}
-	
+
+	public String getComponentId() {
+		return componentId;
+	}
+
+	public void setComponentId(String componentId) {
+		this.componentId = componentId;
+	}
+
+	public String getTableName() {
+		return tableName;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
 }

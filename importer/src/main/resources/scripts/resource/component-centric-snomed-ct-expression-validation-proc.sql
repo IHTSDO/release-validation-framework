@@ -10,7 +10,7 @@ begin
 		declare no_more_rows INTEGER DEFAULT 0;
 		declare ids VARCHAR(500); 
 		declare expression_cursor cursor for 
-			select expression from expressionAssociationRefset_s; 
+			select expression from expressionassociationrefset_s;
 
 		declare continue handler for not found set no_more_rows = 1;
 		drop table if exists temp_concept;
@@ -28,12 +28,14 @@ begin
 		PREPARE statement FROM @sqlStr;
 		execute statement;
 		end loop validate; 
-		insert into qa_result (run_id, assertion_id,concept_id, details)
+		insert into qa_result (run_id, assertion_id,concept_id, details, component_id, table_name)
 			select 
 				runId,
 				assertionId,
 				result.conceptId,
-				concat('Concept: id=',result.conceptId, ' referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.') 
+				concat('Concept: id=',result.conceptId, ' referenced in the ExpressionAssociationRefset SNAPSHOT is unknown.'),
+				null,
+				'curr_expressionassociationrefset_s'
 			from  (select distinct(conceptId) from temp_concept a left join curr_concept_s b on a.conceptId = b.id where b.id is null) as result;
 		drop table temp_concept;
 end;

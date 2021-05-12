@@ -8,12 +8,14 @@
 ********************************************************************************/
 	
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceid,
-		concat('Relationship Concrete Values: id=',a.id, ' should not have a new inactive state as it was inactive previously.')
+		concat('Relationship Concrete Values: id=',a.id, ' should not have a new inactive state as it was inactive previously.'),
+		a.id,
+		'curr_relationship_concrete_values_s'
 	from curr_relationship_concrete_values_s a
 	inner join prev_relationship_concrete_values_s b on a.id = b.id
 	where a.active = '0' 
@@ -28,12 +30,14 @@
 	and a.modifierid = b.modifierid;
 	
 	
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceid,
-		concat('Relationship Concrete Values: id=',a.id, ' is inactive in the current release but no active state found in the previous snapshot.')
+		concat('Relationship Concrete Values: id=',a.id, ' is inactive in the current release but no active state found in the previous snapshot.'),
+		a.id,
+		'curr_relationship_concrete_values_s'
 	from curr_relationship_concrete_values_s  a left join prev_relationship_concrete_values_s b
 	on a.id=b.id
 	and a.sourceid=b.sourceid

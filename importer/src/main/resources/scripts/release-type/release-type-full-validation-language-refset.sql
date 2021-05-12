@@ -12,12 +12,14 @@
 	prior.
 ********************************************************************************/
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-    concat('LANGUAGE-REFSET: id=',a.id, ' is in previous full file, but not in current full file.') 	        
+    concat('LANGUAGE-REFSET: id=',a.id, ' is in previous full file, but not in current full file.'),
+    a.id,
+    'prev_langrefset_f'
 	from prev_langrefset_f a
 	left join curr_langrefset_f b
 		on a.id = b.id

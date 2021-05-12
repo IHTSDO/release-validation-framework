@@ -3,12 +3,14 @@
  * is valid for the target terminology (and version)
  * 
  */ 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
 	 a.referencedcomponentid,
- 	concat('ExtendedMap: id=',a.id,' : Higher-level map group with only blank map targets') 
+ 	concat('ExtendedMap: id=',a.id,' : Higher-level map group with only blank map targets'),
+ 	a.id,
+    'curr_extendedmaprefset_s'
  from curr_extendedmaprefset_s a
 	where a.active = 1
   	and a.mapGroup > 1

@@ -1091,8 +1091,8 @@ create table extendedmaprefset_s(
 ) engine=myisam default charset=utf8;
 
 
-drop table if exists expressionAssociationRefset_s;
-create table expressionAssociationRefset_s(
+drop table if exists expressionassociationrefset_s;
+create table expressionassociationrefset_s(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -1114,8 +1114,8 @@ create table expressionAssociationRefset_s(
 ) engine=myisam default charset=utf8;
 
 
-drop table if exists expressionAssociationRefset_d;
-create table expressionAssociationRefset_d(
+drop table if exists expressionassociationrefset_d;
+create table expressionassociationrefset_d(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -1137,8 +1137,8 @@ create table expressionAssociationRefset_d(
 ) engine=myisam default charset=utf8;
 
 
-drop table if exists expressionAssociationRefset_f;
-create table expressionAssociationRefset_f(
+drop table if exists expressionassociationrefset_f;
+create table expressionassociationrefset_f(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -1161,8 +1161,8 @@ create table expressionAssociationRefset_f(
 
 
 
-drop table if exists mapCorrelationOriginRefset_f;
-create table mapCorrelationOriginRefset_f(
+drop table if exists mapcorrelationoriginrefset_f;
+create table mapcorrelationoriginrefset_f(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -1182,8 +1182,8 @@ create table mapCorrelationOriginRefset_f(
 	key idx_mapTarget(mapTarget)
 ) engine=myisam default charset=utf8;
 
-drop table if exists mapCorrelationOriginRefset_s;
-create table mapCorrelationOriginRefset_s(
+drop table if exists mapcorrelationoriginrefset_s;
+create table mapcorrelationoriginrefset_s(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,
@@ -1205,8 +1205,8 @@ create table mapCorrelationOriginRefset_s(
 
 
 
-drop table if exists mapCorrelationOriginRefset_d;
-create table mapCorrelationOriginRefset_d(
+drop table if exists mapcorrelationoriginrefset_d;
+create table mapcorrelationoriginrefset_d(
 	id varchar(36) not null,
 	effectivetime char(8) not null,
 	active char(1) not null,

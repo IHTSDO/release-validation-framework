@@ -15,12 +15,14 @@
 		 where z.id = a.id);
 
 /* in the delta; not in the full */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('ASSOCIATION REFSET: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
+	concat('ASSOCIATION REFSET: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+	a.id,
+	'curr_associationrefset_s'
 	from curr_associationrefset_s a
 	left join temp_associationrefset b
 	on a.id = b.id
@@ -39,12 +41,14 @@
   	or b.targetcomponentid is null;
 
 /* in the full; not in the delta */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('ASSOCIATION REFSET: id=',a.id, '  is in FULL file, but not in SNAPSHOT file.') 
+	concat('ASSOCIATION REFSET: id=',a.id, '  is in FULL file, but not in SNAPSHOT file.'),
+	a.id,
+	'curr_associationrefset_f'
 	from temp_associationrefset a
 	left join curr_associationrefset_s b 
 	on a.id = b.id

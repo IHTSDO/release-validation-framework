@@ -8,14 +8,16 @@ component-centric-snapshot-attribute-value-only-one-active-inactivation-reason.s
 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Reference component id:',a.referencedcomponentid, ' has multiple inactivation reasons') 	
+		concat('Reference component id:',a.referencedcomponentid, ' has multiple inactivation reasons'),
+		null,
+        'curr_attributevaluerefset_s'
 	from curr_attributevaluerefset_s a
 	where a.active=1 
 	group by a.referencedcomponentid,a.refsetid
-	having  count(distinct a.valueid) > 1;
+	having count(distinct a.valueid) > 1;
 	

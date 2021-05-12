@@ -8,12 +8,14 @@
 ********************************************************************************/
 	
 	/* Inactive Source Id */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		b.id,
-		concat('RELATIONSHIP: id=',a.id, ': Active inferred relationship is associated with an inactive sourceid concept.') 	
+		concat('RELATIONSHIP: id=',a.id, ': Active inferred relationship is associated with an inactive sourceid concept.'),
+		a.id,
+        'curr_relationship_s'
 	from curr_relationship_s a
 	inner join curr_concept_s b on a.sourceid = b.id
 	where a.active = '1'
@@ -22,13 +24,14 @@
 
 	
 	/* Inactive Destination Id */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		b.id,
-		concat('RELATIONSHIP: id=',a.id, ': Active inferred relationship is associated with an inactive destinationid concept.') 	
-	
+		concat('RELATIONSHIP: id=',a.id, ': Active inferred relationship is associated with an inactive destinationid concept.'),
+		a.id,
+        'curr_relationship_s'
 	from curr_relationship_s a
 	inner join curr_concept_s b on a.destinationid = b.id
 	where a.active = '1'
@@ -37,13 +40,14 @@
 	
 	
 	/* Inactive Destination Id */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		b.id,
-		concat('RELATIONSHIP: id=',a.id, ': Active inferred relationship is associated with an inactive typeid concept.') 	
-	
+		concat('RELATIONSHIP: id=',a.id, ': Active inferred relationship is associated with an inactive typeid concept.'),
+	    a.id,
+        'curr_relationship_s'
 	from curr_relationship_s a
 	inner join curr_concept_s b on a.typeid = b.id
 	where a.active = '1'

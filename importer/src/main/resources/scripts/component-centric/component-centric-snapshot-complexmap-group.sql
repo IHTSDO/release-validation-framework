@@ -3,12 +3,14 @@
 /*
  * Active complex maps that are rule based have at least one mapGroup
  */
- insert into qa_result (runid, assertionuuid, concept_id, details)
+ insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
  	a.referencedComponentId,
-	 concat('ComplexMap: id=',a.id,': mapGroup is blank')     
+    concat('ComplexMap: id=',a.id,': mapGroup is blank'),
+    a.id,
+    'curr_complexmaprefset_s'
  from curr_complexmaprefset_s a
 	where a.active = 1 
   	and (a.mapGroup is null
@@ -24,12 +26,14 @@
  * 
  *
  */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
  	a.referencedComponentId,
- 	concat('ComplexMap: id=',a.id,': Non-sequential map group:', a.mapGroup)   
+ 	concat('ComplexMap: id=',a.id,': Non-sequential map group:', a.mapGroup),
+ 	a.id,
+    'curr_complexmaprefset_s'
  from curr_complexmaprefset_s a
 	where a.active = 1
   	and a.mapGroup > 1

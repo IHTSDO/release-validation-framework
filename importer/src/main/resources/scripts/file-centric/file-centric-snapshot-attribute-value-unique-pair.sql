@@ -8,12 +8,14 @@
 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Reference component id:',a.referencedcomponentid, ' valueid=', a.valueid, ' pair is not unique in the Attribute Value snapshot') 	
+		concat('Reference component id:',a.referencedcomponentid, ' valueid=', a.valueid, ' pair is not unique in the Attribute Value snapshot'),
+		a.id,
+		'curr_attributevaluerefset_s'
 	from curr_attributevaluerefset_s a,
 		curr_attributevaluerefset_d b
 	where a.referencedcomponentid=b.referencedcomponentid and a.valueid=b.valueid

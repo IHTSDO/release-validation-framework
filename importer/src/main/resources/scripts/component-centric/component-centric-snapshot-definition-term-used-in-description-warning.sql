@@ -4,12 +4,14 @@
 	A description normally has less than 35 words.
 ********************************************************************************/
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		result.conceptid,
-		concat('Description: id=',result.id, ' has a term more than 35 words.') 
+		concat('Description: id=',result.id, ' has a term more than 35 words.') ,
+		result.id,
+        'curr_description_d'
 		from 
 		 (SELECT id, conceptid, (LENGTH(term) - LENGTH(REPLACE(term, ' ', ''))+1) as total from curr_description_d  
 		 where typeid='900000000000013009'

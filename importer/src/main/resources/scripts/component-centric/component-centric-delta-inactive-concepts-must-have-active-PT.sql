@@ -3,9 +3,11 @@
  * Concepts inactivated in this release cycle must have an active Preferred Term
  * in both US and GB Language Reference Sets
  */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 SELECT <RUNID>, '<ASSERTIONUUID>', c.id,  
-concat('Inactive concept (', c.id, '|', IFNULL(d1.term, 'NO ACTIVE FSN FOUND'),'|) missing active Preferred Term in one or more English dialects.') 
+concat('Inactive concept (', c.id, '|', IFNULL(d1.term, 'NO ACTIVE FSN FOUND'),'|) missing active Preferred Term in one or more English dialects.'),
+c.id,
+'curr_concept_d'
 FROM curr_concept_d c LEFT JOIN curr_description_s d1
 	ON d1.conceptid = c.id 
 	AND d1.typeid = 900000000000003001 -- FSN

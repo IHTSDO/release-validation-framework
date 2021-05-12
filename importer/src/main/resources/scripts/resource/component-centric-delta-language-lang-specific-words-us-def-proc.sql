@@ -28,12 +28,14 @@
 				leave validate; 
 			end if; 
 
-			insert into qa_result (runid, assertion_id,concept_id,details)
+			insert into qa_result (runid, assertion_id,concept_id,details, component_id, table_name)
 			select 
 				runid,
 				assertionid,
 				a.conceptid,
-				concat('DESCRIPTION: id=',a.id, ': Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: ',gbTerm) 
+				concat('DESCRIPTION: id=',a.id, ': Synonym is prefered in en-us language refset but refers to a word that has en-gb spelling: ',gbTerm),
+				a.id,
+                'curr_description_s'
 			from v_curr_delta_us a 
 			where MATCH a.term AGAINST (gbTerm IN BOOLEAN MODE);
 		end loop validate; 

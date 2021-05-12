@@ -9,13 +9,14 @@
 	
 	
 	/* Test against Inferred Parents */	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MEMBER: id=',a.id, ': Historical association refset member associates inactive source concept with its stated parent.') 
-	
+		concat('MEMBER: id=',a.id, ': Historical association refset member associates inactive source concept with its stated parent.'),
+	    a.id,
+        'curr_associationrefset_s'
 	from curr_associationrefset_s a, curr_stated_relationship_s b
 	where a.active = '1'
 	and b.active = '1'
@@ -27,13 +28,14 @@
 		
 		
 	/* Test against Stated Parents */	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MEMBER: id=',a.id, ': Historical association refset member associates inactive source concept with its inferred parent.') 
-	
+		concat('MEMBER: id=',a.id, ': Historical association refset member associates inactive source concept with its inferred parent.'),
+		a.id,
+        'curr_associationrefset_s'
 	from curr_associationrefset_s a, curr_relationship_s b
 	where a.active = '1'
 	and b.active = '1'

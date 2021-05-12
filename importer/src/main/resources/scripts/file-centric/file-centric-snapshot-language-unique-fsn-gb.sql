@@ -13,12 +13,14 @@
 	
 	/* TEST: Concept does not have an FSN in each possible refset */
 	/*Only for core module concepts*/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' does not have an FSN preferred in the en-GB language refset.') 
+		concat('Concept: id=',a.id, ' does not have an FSN preferred in the en-GB language refset.') ,
+		a.id,
+		'curr_concept_s'
 	from curr_concept_s a
 	where a.active = '1'
 	and a.moduleid in ('900000000000207008','900000000000012004')

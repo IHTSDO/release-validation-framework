@@ -179,9 +179,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 				while(tokenizer.hasMoreTokens())
 				{
 					String token = tokenizer.nextToken();
-					// we know sometimes tokenizer messed up and leaves a trailing ), so we clena this up
+					// we know sometimes tokenizer messed up and leaves a trailing ), so we clean this up
 					if(token.endsWith(")")){
 						token = token.substring(0, token.length() - 1);
+					}
+					if(token.length() > 2 && token.startsWith("'") && token.endsWith("'")){
+						token = token.substring(1, token.length() - 1);
 					}
 					final Map<String, String> schemaMapping = getRvfSchemaMapping(token);
 					if(schemaMapping.keySet().size() > 0){

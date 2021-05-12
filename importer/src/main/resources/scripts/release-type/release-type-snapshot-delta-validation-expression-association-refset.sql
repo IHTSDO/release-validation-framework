@@ -1,16 +1,18 @@
 
 /*  
-	The current data in the ExpressionAssociationRefset snapshot file are the same as the data in 
+	The current data in the ExpressionAssociationRefset snapshot file are the same as the data in
 	the current delta file. 
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('ExpressionAssociationRefset: id=',a.id, ' is in delta file but not in snapshot file.') 	
-	from curr_expressionAssociationRefset_d a
-	left join curr_expressionAssociationRefset_s b
+	concat('ExpressionAssociationRefset: id=',a.id, ' is in delta file but not in snapshot file.'),
+	a.id,
+	'curr_expressionassociationrefset_d'
+	from curr_expressionassociationrefset_d a
+	left join curr_expressionassociationrefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

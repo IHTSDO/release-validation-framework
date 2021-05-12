@@ -19,12 +19,14 @@
 ********************************************************************************/
 	
 /* rows that were published in the prior simple refset file, that are not among teh prior rows of the current file */    
-    insert into qa_result (runid, assertionuuid, concept_id, details)
+    insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-      	concat('Simple Refset: id=',a.id, ' is in prior full file, but not in current full file.') 	 
+      	concat('Simple Refset: id=',a.id, ' is in prior full file, but not in current full file.'),
+      	a.id,
+      	'prev_simplerefset_f'
 	from prev_simplerefset_f a
 	left join curr_simplerefset_f b
 		on a.id = b.id

@@ -1,14 +1,16 @@
 /*  
 *	Content in the the current mapCorrelationOriginRefset snapshot file must be in the current full file
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('mapCorrelationOriginRefset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
-	from curr_mapCorrelationOriginRefset_s a
-	left join curr_mapCorrelationOriginRefset_f b
+		concat('mapCorrelationOriginRefset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+		a.id,
+		'curr_mapcorrelationoriginrefset_s'
+	from curr_mapcorrelationoriginrefset_s a
+	left join curr_mapcorrelationoriginrefset_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -33,14 +35,16 @@
 commit;
 
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('mapCorrelationOriginRefset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 	
-	from curr_mapCorrelationOriginRefset_f a
-	left join curr_mapCorrelationOriginRefset_s b
+		concat('mapCorrelationOriginRefset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.'),
+		a.id,
+		'curr_mapcorrelationoriginrefset_f'
+	from curr_mapcorrelationoriginrefset_f a
+	left join curr_mapcorrelationoriginrefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -54,7 +58,7 @@ insert into qa_result (runid, assertionuuid, concept_id, details)
 	where 
 	 cast(a.effectivetime as datetime) = 
 		(select max(cast(z.effectivetime as datetime))
-		 from curr_mapCorrelationOriginRefset_f z
+		 from curr_mapcorrelationoriginrefset_f z
 		 where z.id = a.id)
 	and
 		( b.id is null

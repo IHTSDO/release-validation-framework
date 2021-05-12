@@ -9,12 +9,14 @@
 	Note: See another assertion component-centric-snapshot-description-unique-terms
 ********************************************************************************/
 /*  violators have the same term twice within a concept */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Duplicate term=', a.term) 
+		concat('Duplicate term=', a.term),
+		a.conceptid,
+		'curr_concept_s'
 	from curr_description_s a
 	where a.active =1
 	and exists (select id from res_edited_active_concepts where id = a.conceptid)

@@ -1,12 +1,14 @@
 /*  
 *	Content in the the current extended map snapshot file must be in the current full file
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedComponentId,
-		concat('ComplexMap: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.') 	
+		concat('ComplexMap: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+		a.id,
+		'curr_complexmaprefset_s'
 	from curr_complexmaprefset_s a
 	left join curr_complexmaprefset_f b
 	on a.id = b.id
@@ -34,12 +36,14 @@
 commit;
 
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedComponentId,
-		concat('ComplexMap: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 	
+		concat('ComplexMap: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.'),
+		a.id,
+		'curr_complexmaprefset_f'
 	from curr_complexmaprefset_f a
 	left join curr_complexmaprefset_s b
 	on a.id = b.id

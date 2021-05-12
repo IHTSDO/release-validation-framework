@@ -1,12 +1,14 @@
 /*
  * Active extended maps that are rule based have sequentially ordered mapPriority values without gaps within each mapGroup
  */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  	<RUNID>,
 	 '<ASSERTIONUUID>',
  	a.referencedcomponentid,
- 	concat('ExtendedMap: id=',a.id,': Non-sequential mapPriority:', a.mapPriority)   
+ 	concat('ExtendedMap: id=',a.id,': Non-sequential mapPriority:', a.mapPriority),
+ 	a.id,
+    'curr_extendedmaprefset_s'
  from curr_extendedmaprefset_s a
 where a.active = 1
   and a.mapPriority > 1

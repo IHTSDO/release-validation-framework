@@ -4,12 +4,14 @@
 * NOTE the substr is parsing 'IFA 12345 | abc def ghi |' into 'abc def ghi'
 *
  */ 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  <RUNID>,
  '<ASSERTIONUUID>',
  a.referencedComponentId,
- concat('ComplexMap: id=',a.id,': IFA rule references missing conceptId and term')       
+ concat('ComplexMap: id=',a.id,': IFA rule references missing conceptId and term'),
+ a.id,
+ 'curr_complexmaprefset_s'
  from curr_complexmaprefset_s a
 where a.active = 1
   and a.mapRule like 'IFA%'

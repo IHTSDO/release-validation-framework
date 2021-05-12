@@ -1,14 +1,16 @@
 /*  
-*	Changes from the current mapCorrelationOriginRefset delta file must be in the current full file
+*	Changes from the current mapcorrelationoriginrefset delta file must be in the current full file
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('ExpressionAssociation: id=',a.id, ' is in DELTA file, but not in FULL file.') 	
-	from curr_mapCorrelationOriginRefset_d a
-	left join curr_mapCorrelationOriginRefset_f b
+		concat('ExpressionAssociation: id=',a.id, ' is in DELTA file, but not in FULL file.'),
+		a.id,
+		'curr_mapcorrelationoriginrefset_d'
+	from curr_mapcorrelationoriginrefset_d a
+	left join curr_mapcorrelationoriginrefset_f b
 	on a.id = b.id
 	and a.effectivetime = b.effectivetime
 	and a.active = b.active

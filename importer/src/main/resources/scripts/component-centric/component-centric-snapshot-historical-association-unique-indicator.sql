@@ -6,12 +6,14 @@
 	Duplicate historical association indicators.
 
 ********************************************************************************/
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 select distinct
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedComponentId	,
-	concat('MEMBER: id=',a.id, ' in historical association refset member has a duplicated indicator with MEMBER id= ', b.id)
+	concat('MEMBER: id=',a.id, ' in historical association refset member has a duplicated indicator with MEMBER id= ', b.id),
+	a.id,
+    'curr_associationrefset_s'
 from curr_associationrefset_s a inner join (
 											select min(id) id, referencedComponentId, targetcomponentId, refsetid
 											from curr_associationrefset_s 

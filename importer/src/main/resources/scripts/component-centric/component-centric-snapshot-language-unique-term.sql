@@ -24,12 +24,14 @@
 	commit;
 	
 /* 	violators are descriptions that appear more than once per refset & concept */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		conceptid,
-		concat('CONCEPT: id=',conceptid, ': Concept has duplicate terms within a single language refset.')
+		concat('CONCEPT: id=',conceptid, ': Concept has duplicate terms within a single language refset.'),
+		conceptid,
+		'curr_concept_s'
 	from tmp_member
 	group by refsetid, conceptid, referencedcomponentid		
 		having count(refsetid) > 1

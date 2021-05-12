@@ -8,12 +8,14 @@
 ********************************************************************************/
 
 /* 	inserting exceptions in the result table */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Definition: id=',a.id, ' references a term which is duplicated.') 	
+		concat('Definition: id=',a.id, ' references a term which is duplicated.'),
+		a.id,
+		'curr_textdefinition_s'
 	from curr_textdefinition_s a,
 	(select b.term from curr_textdefinition_s b group by b.typeid, b.conceptid, b.languagecode, binary b.term having count(b.id) > 1) duplicate
 	where a.term = duplicate.term
