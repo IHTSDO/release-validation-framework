@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class FailureDetail implements Comparable<FailureDetail>{
@@ -8,6 +9,10 @@ public class FailureDetail implements Comparable<FailureDetail>{
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	String conceptFsn;
 	String detail;
+	String componentId;
+
+	@JsonIgnore
+	String tableName;
 
 	public FailureDetail(String conceptId, String detail) {
 		this.conceptId = new String (conceptId);
@@ -18,6 +23,13 @@ public class FailureDetail implements Comparable<FailureDetail>{
 		this.conceptId = conceptId;
 		this.detail = detail;
 		this.conceptFsn = conceptFsn;
+	}
+
+	public FailureDetail(String conceptId, String detail, String componentId, String tableName) {
+		this.conceptId = new String (conceptId);
+		this.detail = detail;
+		this.componentId = componentId;
+		this.tableName = tableName;
 	}
 
 	public String getConceptId() {
@@ -32,8 +44,7 @@ public class FailureDetail implements Comparable<FailureDetail>{
 	}
 	@Override
 	public String toString() {
-		return "FailureDetail [conceptId=" + conceptId + ", detail=" + detail
-				+ "]";
+		return "FailureDetail [conceptId=" + conceptId + ", detail=" + detail + ", componentId=" + componentId + ", tableName=" + tableName + "]";
 	}
 	@Override
 	public int hashCode() {
@@ -77,5 +88,21 @@ public class FailureDetail implements Comparable<FailureDetail>{
 
 	public void setConceptFsn(String conceptFsn) {
 		this.conceptFsn = conceptFsn;
+	}
+
+	public void setComponentId(String componentId) {
+		this.componentId = componentId;
+	}
+
+	public String getComponentId() {
+		return componentId;
+	}
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+
+	public String getTableName() {
+		return tableName;
 	}
 }

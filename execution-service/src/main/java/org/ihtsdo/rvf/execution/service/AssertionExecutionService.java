@@ -267,72 +267,9 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			result.add(part);
 		}
 		return result;
-}
-
-	private void extractTestResult(final Assertion assertion, final TestRunItem runItem, final MysqlExecutionConfig config)
-			throws SQLException {
-		/*
-		 create a prepared statement for retrieving matching results.
-		*/
-		String resultSQL = "select concept_id, details from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
-		//use limit to save memory and improve performance for worst case when containing thousands of errors
-		if (config.getFailureExportMax() > 0) {
-			resultSQL = resultSQL + " limit ?";
-		}
-		try (Connection connection = dataSource.getConnection()) {
-			long counter = 0;
-			try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
-				// select results that match execution
-				preparedStatement.setLong(1, assertion.getAssertionId());
-				preparedStatement.setLong(2, config.getExecutionId());
-				if (config.getFailureExportMax() > 0) {
-					preparedStatement.setLong(3, config.getFailureExportMax());
-				}
-
-				try (ResultSet resultSet = preparedStatement.executeQuery()) {
-					while (resultSet.next())
-					{
-						// only get first N failed results
-						if (config.getFailureExportMax() < 0 || counter < config.getFailureExportMax()) {
-							FailureDetail detail = new FailureDetail(resultSet.getString(1), resultSet.getString(2));
-							runItem.addFirstNInstance(detail);
-						}
-						counter++;
-					}
-				}
-			}
-			
-			if ( counter < config.getFailureExportMax() ) {
-				runItem.setFailureCount(counter);
-			} else {
-				String totalSQL = "select count(*) total from "+ dataSource.getDefaultCatalog() + "." + qaResulTableName + " where assertion_id = ? and run_id = ?";
-				try (PreparedStatement preparedStatement = connection.prepareStatement(totalSQL)) {
-					// select results that match execution
-					preparedStatement.setLong(1, assertion.getAssertionId());
-					preparedStatement.setLong(2, config.getExecutionId());
-					try (ResultSet resultSet = preparedStatement.executeQuery()) {
-						if (resultSet.next()) {
-							runItem.setFailureCount(new Long(resultSet.getInt(1)));
-						}
-					}
-				}
-			}
-		}
 	}
 
 	public void setQaResulTableName(final String qaResulTableName) {
 		this.qaResulTableName = qaResulTableName;
-	}
-
-	public void setDeltaTableSuffix(final String deltaTableSuffix) {
-		this.deltaTableSuffix = deltaTableSuffix;
-	}
-
-	public void setSnapshotTableSuffix(final String snapshotTableSuffix) {
-		this.snapshotTableSuffix = snapshotTableSuffix;
-	}
-
-	public void setFullTableSuffix(final String fullTableSuffix) {
-		this.fullTableSuffix = fullTableSuffix;
 	}
 }

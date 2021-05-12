@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.execution.service.whitelist;
 
+import java.util.Objects;
+
 public class WhitelistItem {
     private String validationRuleId;
 
@@ -56,5 +58,22 @@ public class WhitelistItem {
 
     public void setAdditionalFields(String additionalFields) {
         this.additionalFields = additionalFields;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WhitelistItem that = (WhitelistItem) o;
+        return Objects.equals(validationRuleId, that.validationRuleId) &&
+                Objects.equals(componentId, that.componentId) &&
+                Objects.equals(conceptId, that.conceptId) &&
+                Objects.equals(branch, that.branch) &&
+                Objects.equals(additionalFields, that.additionalFields);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(validationRuleId, componentId, conceptId, branch, additionalFields);
     }
 }
