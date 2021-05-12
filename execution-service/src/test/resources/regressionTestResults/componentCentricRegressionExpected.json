@@ -1049,34 +1049,34 @@
       "conceptId" : "900000000000523009",
       "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }, {
-      "conceptId" : "734138000",
-      "detail" : "Refset id:734138000 in association refset member must be an existing and active concept."
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }, {
-      "conceptId" : "734139008",
-      "detail" : "Refset id:734139008 in association refset member must be an existing and active concept."
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }, {
-      "conceptId" : "900000000000490003",
-      "detail" : "Refset id:900000000000490003 in attribute value refset member must be an existing and active concept."
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }, {
-      "conceptId" : "900000000000489007",
-      "detail" : "Refset id:900000000000489007 in attribute value refset member must be an existing and active concept."
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }, {
-      "conceptId" : "447563008",
-      "detail" : "Refset id:447563008 in complex map refset member must be an existing and active concept."
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }, {
-      "conceptId" : "447562003",
-      "detail" : "Refset id:447562003 in complex map refset member must be an existing and active concept."
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }, {
-      "conceptId" : "705110001",
-      "detail" : "Refset id:705110001 in expression association refset member must be an existing and active concept."
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }, {
-      "conceptId" : "447562003",
-      "detail" : "Refset id:447562003 in extended map refset member must be an existing and active concept."
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }, {
-      "conceptId" : "900000000000508004",
-      "detail" : "Refset id:900000000000508004 in language refset member must be an existing and active concept."
+      "conceptId" : "900000000000523009",
+      "detail" : "Refset id:900000000000523009 in association refset member must be an existing and active concept."
     }],
-    "totalFailed" : 19
+    "totalFailed" : 143
   }, {
     "assertionName" : "Active concepts must have correct definition status according to defined axioms.",
     "assertionUuid" : "8090d441-7aeb-4a48-bdc3-2545916aa26d",

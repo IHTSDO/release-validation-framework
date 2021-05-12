@@ -12,7 +12,7 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('referencedcomponentId:', a.referencedcomponentid, ' refsetId:', a.refsetid, ' mapTarget:', a.maptarget, ' are duplicated in the simple map fefset snapshot file.'),
-		null,
+		a.id,
 		'curr_simplemaprefset_s'
 	from curr_simplemaprefset_s a 
 	group by a.refsetid, a.referencedcomponentid, a.maptarget

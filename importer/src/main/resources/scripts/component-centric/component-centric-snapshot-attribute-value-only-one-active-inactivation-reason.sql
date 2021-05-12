@@ -14,7 +14,7 @@ component-centric-snapshot-attribute-value-only-one-active-inactivation-reason.s
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('Reference component id:',a.referencedcomponentid, ' has multiple inactivation reasons'),
-		null,
+		a.id,
         'curr_attributevaluerefset_s'
 	from curr_attributevaluerefset_s a
 	where a.active=1 
