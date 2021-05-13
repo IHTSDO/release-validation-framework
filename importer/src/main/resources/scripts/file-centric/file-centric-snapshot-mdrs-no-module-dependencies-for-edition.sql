@@ -7,12 +7,14 @@
 
 ********************************************************************************/
 	
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select distinct
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		'<MODULEID>',
-		'No module dependencies for edition module <MODULEID> with version <VERSION>'
+		'No module dependencies for edition module <MODULEID> with version <VERSION>',
+		a.id,
+		'curr_moduledependencyrefset_s'
 	from curr_moduledependencyrefset_s a
 	where not exists 
 		(select b.moduleid from curr_moduledependencyrefset_s b

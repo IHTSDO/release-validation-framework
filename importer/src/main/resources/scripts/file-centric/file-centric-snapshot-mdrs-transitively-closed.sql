@@ -4,12 +4,14 @@ file-centric-snapshot-mdrs-transitively-closed.sql
         "The dependencies must be transitively closed."
 ********************************************************************************/
 
-insert into qa_result (runid, assertionuuid, concept_id, details) 
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 select
   <RUNID>,
   '<ASSERTIONUUID>',
   a.referencedcomponentid,
-  concat('Missing dependency from: ', a.moduleid, ' - ', a.sourceeffectivetime, ' to: ', b.referencedcomponentid, ' - ', b.targeteffectivetime, ' in module dependency refset.')
+  concat('Missing dependency from: ', a.moduleid, ' - ', a.sourceeffectivetime, ' to: ', b.referencedcomponentid, ' - ', b.targeteffectivetime, ' in module dependency refset.'),
+  a.id,
+  'curr_moduledependencyrefset_s'
 from curr_moduledependencyrefset_s a, curr_moduledependencyrefset_s b
 where a.active = '1' and b.active = '1'
   and a.referencedcomponentid = b.moduleid and a.targeteffectivetime = b.sourceeffectivetime
