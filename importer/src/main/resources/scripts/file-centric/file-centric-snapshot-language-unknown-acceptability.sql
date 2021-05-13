@@ -6,12 +6,14 @@
 	Unknown acceptability for language reference set row
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.acceptabilityid,
-		concat('Language refset entry: ' , a.id, ' has unknown acceptability id=', a.acceptabilityid) 	
+		concat('Language refset entry: ' , a.id, ' has unknown acceptability id=', a.acceptabilityid),
+		a.id,
+		'curr_langrefset_s'
 	from curr_langrefset_s a
 	where a.active = 1
 		and a.acceptabilityid != '900000000000548007'

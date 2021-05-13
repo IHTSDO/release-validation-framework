@@ -7,12 +7,14 @@
 
 ********************************************************************************/
 	
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select distinct
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		r.sourceid,
-		concat('ROOT CONCEPT: ',r.sourceid, ' has non-isa relationship id=', r.id, ' with typeid=', r.typeid)
+		concat('ROOT CONCEPT: ',r.sourceid, ' has non-isa relationship id=', r.id, ' with typeid=', r.typeid),
+		r.id,
+		'curr_relationship_s'
 		from curr_relationship_s r 
 		where r.sourceid in 
 			(select c.id from curr_concept_s c

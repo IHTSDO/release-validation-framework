@@ -1489,7 +1489,7 @@
       "conceptId" : "0",
       "detail" : "associationrefset ::id= fb7f359a-8a7b-5b89-8afc-ed60ba61eb71 ::refset id: 900000000000523009 is not in refset dependency list"
     }],
-    "totalFailed" : 136
+    "totalFailed" : 139
   } ,{
     "assertionName" : "There is a 1-to-1 relationship between the id and the immutable values in STATED RELATIONSHIP snapshot.",
     "assertionUuid" : "7e453140-79b9-11e1-b0c4-0800200c9a66",
