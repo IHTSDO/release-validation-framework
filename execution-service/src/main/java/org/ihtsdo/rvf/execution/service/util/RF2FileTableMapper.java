@@ -29,6 +29,7 @@ public class RF2FileTableMapper {
 	private static final String MRCM_MODULE_SCOPE_FILE_HEADER = "der2_cRefset_.*MRCMModuleScope";
 	private static final String MRCM_ATRRIBUTE_RANGE_FILE_HEADER = "der2_ssccRefset_.*MRCMAttributeRange";
 	private static final String MRCM_DOMAIN_FILE_HEADER = "der2_sssssssRefset_.*MRCMDomain";
+	private static final String DESCRIPTION_TYPE_FILE_HEADER = "der2_ciRefset_.*DescriptionType";
 	private static final Map<String,String> tableNameMap = new HashMap<>();
 	private static final String DELTA = ".*Delta.*_*_\\d{8}.txt";
 	private static final String SNAPSHOT = ".*Snapshot.*_*_\\d{8}.txt";
@@ -58,6 +59,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_MODULE_SCOPE_FILE_HEADER + DELTA, "mrcmmodulescoperefset_d");
 		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + DELTA, "mrcmattributerangerefset_d");
 		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + DELTA, "mrcmdomainrefset_d");
+		tableNameMap.put(DESCRIPTION_TYPE_FILE_HEADER + DELTA, "descriptiontyperefset_d");
 		
 		//Full
 		tableNameMap.put(CONCEPT_FILE_HEADER + FULL, "concept_f");
@@ -82,6 +84,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_MODULE_SCOPE_FILE_HEADER + FULL, "mrcmmodulescoperefset_f");
 		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + FULL, "mrcmattributerangerefset_f");
 		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + FULL, "mrcmdomainrefset_f");
+		tableNameMap.put(DESCRIPTION_TYPE_FILE_HEADER + FULL, "descriptiontyperefset_f");
 		
 		//Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
@@ -106,6 +109,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_MODULE_SCOPE_FILE_HEADER + SNAPSHOT, "mrcmmodulescoperefset_s");
 		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + SNAPSHOT, "mrcmattributerangerefset_s");
 		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + SNAPSHOT, "mrcmdomainrefset_s");
+		tableNameMap.put(DESCRIPTION_TYPE_FILE_HEADER + SNAPSHOT, "descriptiontyperefset_s");
 	}
 	
 	public static String getLegacyTableName(final String filename) {

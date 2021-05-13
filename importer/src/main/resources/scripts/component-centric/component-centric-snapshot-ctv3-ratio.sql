@@ -15,7 +15,7 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('CONCEPT: id=',a.referencedcomponentid, ': Concept has more than one associated CTV3 refset member.'),
-		null,
+		a.id,
 		'curr_simplemaprefset_s'
 	from curr_simplemaprefset_s a
 	where a.refsetid = '900000000000497000'

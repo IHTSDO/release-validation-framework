@@ -12,7 +12,7 @@
 		'<ASSERTIONUUID>',
 		a.sourceid,
 		concat('Source id=', a.sourceid,' has two inferred relationships with same typeid and same destinationid within a single relationship-group.'),
-		null,
+		a.id,
 		'curr_relationship_s'
 	from curr_relationship_s a
 	where a.active = '1'

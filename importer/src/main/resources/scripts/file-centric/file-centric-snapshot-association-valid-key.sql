@@ -12,7 +12,7 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('ReferencedComponentId:', a.referencedcomponentid, ' targetComponentId:', a.targetcomponentid, ' and refsetId:', a.refsetid, ' are duplicated in the association refset snapshot file.'),
-		null,
+		a.id,
 		'curr_associationrefset_s'
 	from curr_associationrefset_s a 
 	group by a.refsetid , a.referencedcomponentid , a.targetcomponentid

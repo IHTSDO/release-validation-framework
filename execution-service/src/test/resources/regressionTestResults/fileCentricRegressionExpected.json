@@ -84,11 +84,11 @@
     "assertionName" : "ReferenceComponentIds refers to valid concepts in the LOINC MapCorrelationOriginRefset snapshot file.",
     "assertionUuid" : "9e113c74-c6a7-4e22-bff5-58827a348a31",
     "firstNInstances" : [ {
-      "conceptId" : "415067009",
-      "detail" : "ReferencedcomponentId=415067009 in MapCorrelationOriginRefset snapshot is not a concept Id"
-    }, {
       "conceptId" : "703064003",
       "detail" : "ReferencedcomponentId=703064003 in MapCorrelationOriginRefset snapshot is not a concept Id"
+    }, {
+      "conceptId" : "415067009",
+      "detail" : "ReferencedcomponentId=415067009 in MapCorrelationOriginRefset snapshot is not a concept Id"
     }, {
       "conceptId" : "707682000",
       "detail" : "ReferencedcomponentId=707682000 in MapCorrelationOriginRefset snapshot is not a concept Id"
@@ -110,8 +110,11 @@
     }, {
       "conceptId" : "707689009",
       "detail" : "ReferencedcomponentId=707689009 in MapCorrelationOriginRefset snapshot is not a concept Id"
+    }, {
+      "conceptId" : "707685003",
+      "detail" : "ReferencedcomponentId=707685003 in MapCorrelationOriginRefset snapshot is not a concept Id"
     } ],
-    "totalFailed" : 9
+    "totalFailed" : 10
   }, {
     "assertionName" : "All source ids found in the Stated Relationship snapshot file exist in the Concept snapshot file.",
     "assertionUuid" : "9f84d9a0-79b9-11e1-b0c4-0800200c9a66",
@@ -500,8 +503,35 @@
     "firstNInstances" : [ {
       "conceptId" : "705114005",
       "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
-    } ],
-    "totalFailed" : 1
+    }, {
+      "conceptId" : "705114005",
+      "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
+    }, {
+      "conceptId" : "705114005",
+      "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
+    }, {
+      "conceptId" : "705114005",
+      "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
+    }, {
+      "conceptId" : "705114005",
+      "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
+    }, {
+      "conceptId" : "705114005",
+      "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
+    }, {
+      "conceptId" : "705114005",
+      "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
+    }, {
+      "conceptId" : "705114005",
+      "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
+    }, {
+      "conceptId" : "705114005",
+      "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
+    }, {
+      "conceptId" : "705114005",
+      "detail" : "Referencedcomponentid=705114005  in AssociationExpressionis snapshot not a concept id."
+    }      ],
+    "totalFailed" : 10
   }, {
     "assertionName" : "Every active concept from the international release is recommended to have one active preferred term in the Danish language refset.",
     "assertionUuid" : "e6f653a1-cac8-43d8-9b4b-00e6e4ab2397",
@@ -1459,7 +1489,7 @@
       "conceptId" : "0",
       "detail" : "associationrefset ::id= fb7f359a-8a7b-5b89-8afc-ed60ba61eb71 ::refset id: 900000000000523009 is not in refset dependency list"
     }],
-    "totalFailed" : 136
+    "totalFailed" : 139
   } ,{
     "assertionName" : "There is a 1-to-1 relationship between the id and the immutable values in STATED RELATIONSHIP snapshot.",
     "assertionUuid" : "7e453140-79b9-11e1-b0c4-0800200c9a66",

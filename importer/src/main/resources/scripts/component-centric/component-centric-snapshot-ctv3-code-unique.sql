@@ -13,7 +13,7 @@
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
 		concat('CTV3 Code = ', a.maptarget, 'is not unique'),
-		null,
+		a.id,
         'curr_simplemaprefset_s'
 	from curr_simplemaprefset_s a
 	inner join curr_concept_s b 

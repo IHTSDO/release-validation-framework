@@ -10,12 +10,11 @@
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
-		result.referencedcomponentid,
-		concat('ReferencedcomponentId=',result.referencedcomponentid, ' in MapCorrelationOriginRefset snapshot is not a concept Id'),
-		null,
+		a.referencedcomponentid,
+		concat('ReferencedcomponentId=',a.referencedcomponentid, ' in MapCorrelationOriginRefset snapshot is not a concept Id'),
+		a.id,
 		'curr_mapcorrelationoriginrefset_s'
-	from ( select distinct a.referencedcomponentid
-		from curr_mapcorrelationoriginrefset_s a
-		left join curr_concept_s b
-		on a.referencedcomponentid = b.id
-		where b.id is null) as result;
+	from curr_mapcorrelationoriginrefset_s a
+    		left join curr_concept_s b
+    		on a.referencedcomponentid = b.id
+    		where b.id is null;
