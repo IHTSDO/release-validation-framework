@@ -6,12 +6,14 @@
 	Every active concept has one active preferred term in the Chinese language refset.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ': has no active preferred term in the Chinese language refset')
+		concat('Concept: id=',a.id, ': has no active preferred term in the Chinese language refset'),
+		a.id,
+		'curr_concept_s'
 	from curr_concept_s a
 	where
 	 a.active=1

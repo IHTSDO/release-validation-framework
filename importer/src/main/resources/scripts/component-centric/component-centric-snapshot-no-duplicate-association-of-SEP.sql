@@ -4,12 +4,14 @@
 	Assertion: There is no duplicate association of "S and E" or "S and P".
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Active structure concept: id=',a.referencedcomponentid, ' is being referenced by multiple ', if(a.refsetid = '734138000', 'Entire', 'Part') , ' concepts id=', group_concat(a.targetcomponentid), '.')
+		concat('Active structure concept: id=',a.referencedcomponentid, ' is being referenced by multiple ', if(a.refsetid = '734138000', 'Entire', 'Part') , ' concepts id=', group_concat(a.targetcomponentid), '.'),
+		a.id,
+		'curr_associationrefset_s'
 	from curr_associationrefset_s a left join curr_concept_s b on a.targetcomponentid = b.id
 	where a.refsetid in ('734138000','734139008')
 	    and a.active = '1'

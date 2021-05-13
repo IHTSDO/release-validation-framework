@@ -17,12 +17,14 @@
 	select * from curr_stated_relationship_f where id = 'a'
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceid,
-		concat('stated relationship: id=',a.id, ' is in prior full file but not in current full file.') 	
+		concat('stated relationship: id=',a.id, ' is in prior full file but not in current full file.'),
+		a.id,
+		'prev_stated_relationship_f'
 	from prev_stated_relationship_f a
 	left join curr_stated_relationship_f b
 		on a.id = b.id

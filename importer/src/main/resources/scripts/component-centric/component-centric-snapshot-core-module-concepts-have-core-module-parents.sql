@@ -4,12 +4,14 @@ Assertion:
 Core module concepts have core module parents.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		child_concept.id,
-		concat('Core module concept ', child_concept.id, ' has Model module parent ')
+		concat('Core module concept ', child_concept.id, ' has Model module parent '),
+		child_concept.id,
+        'curr_concept_s'
     from curr_concept_s child_concept, curr_concept_s parent_concept,
     curr_description_s child_desc, curr_description_s parent_desc,
     curr_relationship_s r

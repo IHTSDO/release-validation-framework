@@ -2,12 +2,14 @@
 /*  
 	The current full description file consists of the previously published full file and the changes for the current release
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.conceptid,
-	concat('Description: id=',a.id, ' is in current full file, but not in prior full or current delta file.') 	
+	concat('Description: id=',a.id, ' is in current full file, but not in prior full or current delta file.'),
+	a.id,
+	'curr_description_f'
 	from curr_description_f a
 	left join curr_description_d b
 		on a.id = b.id

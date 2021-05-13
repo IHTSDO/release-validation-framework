@@ -1,12 +1,14 @@
 /*
  * Active complex maps that are rule based have sequentially ordered mapPriority values without gaps within each mapGroup
  */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  	<RUNID>,
 	 '<ASSERTIONUUID>',
  	a.referencedComponentId,
- 	concat('ComplexMap: id=',a.id,': Non-sequential mapPriority:', a.mapPriority)   
+ 	concat('ComplexMap: id=',a.id,': Non-sequential mapPriority:', a.mapPriority),
+ 	a.id,
+    'curr_complexmaprefset_s'
  from curr_complexmaprefset_s a
 where a.active = 1
   and a.mapPriority > 1

@@ -7,12 +7,14 @@
 
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.sourceId,
-		concat('RELATIONSHIP CONCRETE VALUES: id=',a.id, ': Relationship Concrete Values contains a source id that does not exist in the Concept snapshot file.')
+		concat('RELATIONSHIP CONCRETE VALUES: id=',a.id, ': Relationship Concrete Values contains a source id that does not exist in the Concept snapshot file.'),
+		a.id,
+		'curr_relationship_concrete_values_s'
 	from curr_relationship_concrete_values_s a
 	left join curr_concept_s b on a.sourceid = b.id
 	where b.id is null;

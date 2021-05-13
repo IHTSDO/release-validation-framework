@@ -2,12 +2,14 @@
 /*  
 	The current full stated relationship file consists of the previously published full file and the changes for the current release
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.sourceid,
-	concat('Stated relationship: id=',a.id, ' is in current full file, but not in prior full or current delta file.') 	
+	concat('Stated relationship: id=',a.id, ' is in current full file, but not in prior full or current delta file.'),
+	a.id,
+	'curr_stated_relationship_f'
 	from curr_stated_relationship_f a
 	left join curr_stated_relationship_d b
 		on a.id = b.id

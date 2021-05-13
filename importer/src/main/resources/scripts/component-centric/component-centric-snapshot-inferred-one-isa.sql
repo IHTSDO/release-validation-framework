@@ -14,13 +14,14 @@
 		where active = '1'
 		and typeid = 116680003;
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('CONCEPT: id=',a.id, ': Concept does not have an inferred is-a relationship.') 	
-	
+		concat('CONCEPT: id=',a.id, ': Concept does not have an inferred is-a relationship.'),
+	    a.id,
+        'curr_concept_s'
 	from curr_concept_s a
 	left join v_act_inferred_isa b on a.id = b.sourceid
 	where a.active = '1'

@@ -6,12 +6,14 @@
 	DomainId in MRCM ATTRIBUTE DOMAIN DELTA exists in the ReferencedComponentId values of MRCM DOMAIN DELTA
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.domainId,
-		concat('MRCM ATTRIBUTE DOMAIN REFSET: id=',a.id,' DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA') 	
-	from curr_mrcmAttributeDomainRefset_d a	
-	where a.domainId NOT IN (select b.referencedcomponentid from curr_mrcmDomainRefset_d b);
+		concat('MRCM ATTRIBUTE DOMAIN REFSET: id=',a.id,' DomainId in MRCM ATTRIBUTE DOMAIN DELTA does not exist in the ReferencedComponentId values of MRCM DOMAIN DELTA'),
+		a.id,
+        'curr_mrcmattributedomainrefset_d'
+	from curr_mrcmattributedomainrefset_d a
+	where a.domainId NOT IN (select b.referencedcomponentid from curr_mrcmdomainrefset_d b);
 	commit;

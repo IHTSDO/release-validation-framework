@@ -7,13 +7,14 @@
 
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		b.id,
-		concat('CONCEPT: id=',b.id, ' contains two or more version of the immutable values in Inferred Relationship Snapshot.') 	
-
+		concat('CONCEPT: id=',b.id, ' contains two or more version of the immutable values in Inferred Relationship Snapshot.'),
+        b.id,
+        'curr_concept_s'
 	from curr_relationship_s a 
 	inner join curr_concept_s b on a.sourceid = b.id
 	where a.active = '1'

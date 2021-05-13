@@ -11,12 +11,14 @@
 	
 	/* TEST: Concept does not have an FSN in each refset for us and danish dialect*/
 	/*Only for Swedish module concepts*/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' does not have an FSN preferred in the en-US language refset.') 
+		concat('Concept: id=',a.id, ' does not have an FSN preferred in the en-US language refset.'),
+		a.id,
+		'curr_concept_s'
 	from curr_concept_s a
 	where a.active = '1'
 	and a.moduleid = '45991000052106'

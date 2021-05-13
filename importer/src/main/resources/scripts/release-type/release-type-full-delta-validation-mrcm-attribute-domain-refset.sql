@@ -2,14 +2,16 @@
 /*  
 	The current full MRCM Attribute Domain Refset file consists of the previously published full file and the changes for the current release
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('Mrcm Attribute Domain Refset: id=',a.id, ' is in current full file, but not in prior full or current delta file.')
-	from curr_mrcmAttributeDomainRefset_f a
-	left join curr_mrcmAttributeDomainRefset_d b
+	concat('Mrcm Attribute Domain Refset: id=',a.id, ' is in current full file, but not in prior full or current delta file.'),
+	a.id,
+	'curr_mrcmattributedomainrefset_f'
+	from curr_mrcmattributedomainrefset_f a
+	left join curr_mrcmattributedomainrefset_d b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -22,7 +24,7 @@
 		and a.attributeingroupcardinality = b.attributeingroupcardinality
 		and a.rulestrengthid = b.rulestrengthid
 		and a.contenttypeid = b.contenttypeid
-	left join prev_mrcmAttributeDomainRefset_f c
+	left join prev_mrcmattributedomainrefset_f c
 		on a.id = c.id
 		and a.effectivetime = c.effectivetime
 		and a.active = c.active

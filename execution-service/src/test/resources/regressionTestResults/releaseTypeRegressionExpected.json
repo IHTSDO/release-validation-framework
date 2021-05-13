@@ -1,6 +1,6 @@
 {
   "assertionType" : "release-type-validation",
-  "totalAssertionsRun" : 127,
+  "totalAssertionsRun" : 134,
   "totalAssertionsFailed" : 103,
   "results" : [ {
     "assertionName" : "There must be actual changes made to previously published complex map refset components in order for them to appear in the current delta.",
@@ -735,7 +735,7 @@
     } ],
     "totalFailed" : 3
   }, {
-    "assertionName" : "The current data in the Stated Relationship snapshot file are the same as the data in the current delta file. ",
+    "assertionName" : "The current data in the Stated Relationship snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "01ce3ac9-d168-4333-99d7-8d2f228f5ec9",
     "firstNInstances" : [ {
       "conceptId" : "702411003",
@@ -931,7 +931,7 @@
     } ],
     "totalFailed" : 1
   }, {
-    "assertionName" : "The current data in the Inferred Relationship snapshot file are the same as the data in the current delta file. ",
+    "assertionName" : "The current data in the Inferred Relationship snapshot file are the same as the data in the current delta file.",
     "assertionUuid" : "177a7271-7986-433b-8506-fff39e6c1004",
     "firstNInstances" : [ {
       "conceptId" : "699754008",
@@ -1090,7 +1090,7 @@
       "conceptId" : "702386002",
       "detail" : "Stated relationship: id=4768117024 is in SNAPSHOT file, but not in FULL file."
     } ],
-    "totalFailed" : 20
+    "totalFailed" : 11
   }, {
     "assertionName" : "All OWL Expression inactivated in current release must have been active in the previous release.",
     "assertionUuid" : "26c25479-c3ba-47f2-9851-bb05ae42ad48",
@@ -1641,11 +1641,8 @@
     }, {
       "conceptId" : "702411003",
       "detail" : "Relationship: id=1000000021 is inactive but no active state found in previous release."
-    }, {
-      "conceptId" : "10041001",
-      "detail" : "Relationship: id=1000005027 is inactive but no active state found in previous release."
     } ],
-    "totalFailed" : 3
+    "totalFailed" : 2
   }, {
     "assertionName" : "Changes from the the current extended map delta file must be in the current full file",
     "assertionUuid" : "5e203a1f-2b6d-462a-a6f9-93cbc3893611",
@@ -2083,5 +2080,40 @@
       "detail" : "ExpressionAssociation: id=39761BDC-96AB-47AF-B10F-0A57B6C01278 is in DELTA file, but not in FULL file."
     } ],
     "totalFailed" : 1
+  }, {
+    "assertionName" : "The current data in the Relationship Concrete Values snapshot file are the same as the data in the current delta file.",
+    "assertionUuid" : "c0812d7e-b0a2-460d-a1bd-1292c07a7516",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "The current full relationship concrete values file consists of the previously published full file and the changes for the current release",
+    "assertionUuid" : "1b9e2371-1b0a-46d4-ac9d-fd222329ad9d",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "There must be actual changes made to previously published relationship concrete values in order for them to appear in the current delta.",
+    "assertionUuid" : "fbfc4fd1-f10d-4fc2-889f-df0e089df4b7",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "All relationship concrete values inactivated in current release must have been active in the previous release.",
+    "assertionUuid" : "4deb9274-d923-4f84-b0dc-c4dab0c2fc4c",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "The current relationship concrete values snapshot file is an accurate derivative of the current full file",
+    "assertionUuid" : "61e574b6-e38b-4561-9240-5169ab9d88db",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "The current Relationship Concrete Values full file contains all previously published data unchanged.",
+    "assertionUuid" : "7d105b20-ce21-49c2-b16d-b49df13fdfea",
+    "firstNInstances" : null,
+    "totalFailed" : 0
+  }, {
+    "assertionName" : "The current relationship concrete values delta file is an accurate derivative of the current full file",
+    "assertionUuid" : "e74e3b12-6bf8-4d58-9117-a03d4b3b4d17",
+    "firstNInstances" : null,
+    "totalFailed" : 0
   } ]
 }

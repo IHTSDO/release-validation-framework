@@ -4,23 +4,25 @@
 
 /* 	view of current snapshot, derived from current full */
 	drop table if exists temp_mrcmattributedomainrefset_v;
-  	create table if not exists temp_mrcmattributedomainrefset_v like curr_mrcmAttributeDomainRefset_f;
+  	create table if not exists temp_mrcmattributedomainrefset_v like curr_mrcmattributedomainrefset_f;
   	insert into temp_mrcmattributedomainrefset_v
 	select a.*
-	from curr_mrcmAttributeDomainRefset_f a
+	from curr_mrcmattributedomainrefset_f a
 	where cast(a.effectivetime as datetime) =
 		(select max(cast(z.effectivetime as datetime))
-		 from curr_mrcmAttributeDomainRefset_f z
+		 from curr_mrcmattributedomainrefset_f z
 		 where z.id = a.id);
 
 /* in the snapshot; not in the full */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MRCM Attribute Domain Refset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
-	from curr_mrcmAttributeDomainRefset_s a
+		concat('MRCM Attribute Domain Refset: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+		a.id,
+		'curr_mrcmattributedomainrefset_s'
+	from curr_mrcmattributedomainrefset_s a
 	left join temp_mrcmattributedomainrefset_v b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
@@ -48,14 +50,16 @@
         or b.contenttypeid is null;
 
 /* in the full; not in the snapshot */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MRCM Attribute Domain Refset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.')
+		concat('MRCM Attribute Domain Refset: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.'),
+		a.id,
+		'curr_mrcmattributedomainrefset_f'
 	from temp_mrcmattributedomainrefset_v a
-	left join curr_mrcmAttributeDomainRefset_s b
+	left join curr_mrcmattributedomainrefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

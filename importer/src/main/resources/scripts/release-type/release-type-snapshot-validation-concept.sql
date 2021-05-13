@@ -15,12 +15,14 @@
 		 where z.id = a.id);
 
 /* in the snapshot; not in the full */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('CONCEPT: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
+		concat('CONCEPT: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+		a.id,
+		'curr_concept_s'
 	from curr_concept_s a
 	left join temp_concept_snapshot b
 	on a.id = b.id
@@ -35,12 +37,14 @@
 	or b.definitionstatusid is null;
 
 /* in the full; not in the snapshot */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('CONCEPT: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
+		concat('CONCEPT: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.'),
+		a.id,
+		'curr_concept_f'
 	from temp_concept_snapshot a
 	left join curr_concept_s b 
 		on a.id = b.id

@@ -12,14 +12,16 @@
 	from the current file, it should be identical to the prior version.	
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MRCM MODULE SCOPE REFSET: id=',a.id, ' is in prior full file but not in current full file.') 	
-	from prev_mrcmModuleScopeRefset_f a
-	left join curr_mrcmModuleScopeRefset_f b
+		concat('MRCM MODULE SCOPE REFSET: id=',a.id, ' is in prior full file but not in current full file.'),
+		a.id,
+		'prev_mrcmmodulescoperefset_f'
+	from prev_mrcmmodulescoperefset_f a
+	left join curr_mrcmmodulescoperefset_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

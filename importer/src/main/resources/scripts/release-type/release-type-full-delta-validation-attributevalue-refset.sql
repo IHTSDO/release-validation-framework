@@ -2,12 +2,14 @@
 /*  
 	The current full attributevalue refset file consists of the previously published full file and the changes for the current release
 */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('Attribute value refset: id=',a.id, ' is in current full file, but not in prior full or current delta file.') 	
+	concat('Attribute value refset: id=',a.id, ' is in current full file, but not in prior full or current delta file.'),
+	a.id,
+	'curr_attributevaluerefset_f'
 	from curr_attributevaluerefset_f a
 	left join curr_attributevaluerefset_d b
 		on a.id = b.id

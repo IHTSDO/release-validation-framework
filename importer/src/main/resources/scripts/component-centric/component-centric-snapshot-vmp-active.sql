@@ -7,12 +7,14 @@
 
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('MEMBER: id=',a.id, ': Active VMP refset members refer to inactive components.') 	
+		concat('MEMBER: id=',a.id, ': Active VMP refset members refer to inactive components.'),
+		a.id,
+        'curr_simplerefset_s'
 	from curr_simplerefset_s a
 	inner join curr_concept_s b 
 	on a.referencedcomponentid = b.id

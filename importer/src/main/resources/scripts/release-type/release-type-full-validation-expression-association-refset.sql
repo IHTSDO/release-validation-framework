@@ -2,14 +2,16 @@
  * The current ExpressionAssociationRefset full file contains all previously published data unchanged.
  */
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('ExpressionAssociationRefset: id=',a.id, ' is in previous full file but not in current full file.') 	
-	from prev_expressionAssociationRefset_f a
-	left join curr_expressionAssociationRefset_f b
+		concat('ExpressionAssociationRefset: id=',a.id, ' is in previous full file but not in current full file.'),
+		a.id,
+		'prev_expressionassociationrefset_f'
+	from prev_expressionassociationrefset_f a
+	left join curr_expressionassociationrefset_f b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

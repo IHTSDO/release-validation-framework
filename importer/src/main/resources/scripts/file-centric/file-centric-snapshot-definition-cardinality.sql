@@ -5,12 +5,14 @@
 	There is at most one active definition per concept per dialect.
 
 ********************************************************************************/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Concept id=',a.conceptid, ' has more than one active definitions in dialect:', b.refsetid) 	
+		concat('Concept id=',a.conceptid, ' has more than one active definitions in dialect:', b.refsetid),
+		a.id,
+		'curr_textdefinition_s'
 	from curr_textdefinition_s a,
 	curr_langrefset_s b
 	where a.active = 1 

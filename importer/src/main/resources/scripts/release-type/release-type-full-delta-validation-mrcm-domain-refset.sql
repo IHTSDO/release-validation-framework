@@ -2,14 +2,16 @@
 /*  
 	The current full MRCM Domain Refset file consists of the previously published full file and the changes for the current release
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('Mrcm Domain Refset: id=',a.id, ' is in current full file, but not in prior full or current delta file.')
-	from curr_mrcmDomainRefset_f a
-	left join curr_mrcmDomainRefset_d b
+	concat('Mrcm Domain Refset: id=',a.id, ' is in current full file, but not in prior full or current delta file.'),
+	a.id,
+	'curr_mrcmdomainrefset_f'
+	from curr_mrcmdomainrefset_f a
+	left join curr_mrcmdomainrefset_d b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -23,7 +25,7 @@
 		and a.domaintemplateforprecoordination = b.domaintemplateforprecoordination
 		and a.domaintemplateforpostcoordination = b.domaintemplateforpostcoordination
 		and a.guideurl = b.guideurl
-	left join prev_mrcmDomainRefset_f c
+	left join prev_mrcmdomainrefset_f c
 		on a.id = c.id
 		and a.effectivetime = c.effectivetime
 		and a.active = c.active

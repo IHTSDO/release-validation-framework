@@ -14,12 +14,14 @@
 		 where z.id = a.id);
 
 /* in the snapshot; not in the full */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('OWL Expression: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
+		concat('OWL Expression: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+		a.id,
+		'curr_owlexpressionrefset_s'
 	from curr_owlexpressionrefset_s a
 	left join temp_owlexpressionrefset_v b
 		on a.id = b.id
@@ -38,12 +40,14 @@
 	or b.owlexpression is null;
 
 /* in the full; not in the snapshot */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('OWL Expression: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.')
+		concat('OWL Expression: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.'),
+		a.id,
+		'curr_owlexpressionrefset_f'
 	from temp_owlexpressionrefset_v a
 	left join curr_owlexpressionrefset_s b
 		on a.id = b.id

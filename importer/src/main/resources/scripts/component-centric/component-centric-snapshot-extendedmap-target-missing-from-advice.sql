@@ -6,12 +6,14 @@
 * In a sense this is really like the prior one, ideally there would be a parser for the field that would check correctness (and  it's also very project specific). 
 * One thing we do know, is that any blank mapTarget should also appear in the advice (for ICD10 project)
  */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
  select
  	<RUNID>,
  	'<ASSERTIONUUID>',
  	a.referencedcomponentid,
- concat('ExtendedMap: id=',a.id,' : map target missing from advice:', a.mapTarget)  
+    concat('ExtendedMap: id=',a.id,' : map target missing from advice:', a.mapTarget),
+    a.id,
+    'curr_extendedmaprefset_s'
  from curr_extendedmaprefset_s a
 where a.active = 1
   and a.mapTarget != ''

@@ -16,12 +16,14 @@
 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('CONCEPT: id=',a.id, ' is in previous full but not in current full.') 	
+		concat('CONCEPT: id=',a.id, ' is in previous full but not in current full.'),
+		a.id,
+		'prev_concept_f'
 	from prev_concept_f a
 	left join curr_concept_f b
 	on a.id = b.id
@@ -34,3 +36,5 @@
 	or b.active is null
 	or b.moduleid is null
 	or b.definitionstatusid is null;
+
+    commit;

@@ -15,12 +15,14 @@
 	
 	
 	/* TEST: Recently edited Concept has FSN that is defined 2+ times for a given refset*/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		c.id,
-		concat('Concept: id=',c.id, ' has an FSN that is defined more than one time within a given refset.') 
+		concat('Concept: id=',c.id, ' has an FSN that is defined more than one time within a given refset.'),
+		c.id,
+	    'curr_concept_s'
 	from curr_description_d a 
 	inner join curr_langrefset_s b on a.id = b.referencedcomponentid 
 	inner join curr_concept_s c on a.conceptid = c.id
@@ -40,12 +42,14 @@
 	on a.conceptid = b.id
 	and b.active = 1;
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		b.conceptid,
-		concat('Description: id=',b.id,' is active and appears more than once within a given refset.')
+		concat('Description: id=',b.id,' is active and appears more than once within a given refset.'),
+		b.id,
+		'curr_description_d'
 	from curr_langrefset_s a
 	join tmp_descsedited b
 	on a.referencedcomponentid = b.id
@@ -66,12 +70,14 @@
 		where active = '1'
 		and typeid = '900000000000003001';
 		
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' does not have an FSN defined.') 
+		concat('Concept: id=',a.id, ' does not have an FSN defined.'),
+		a.id,
+		'curr_concept_s'
 	from curr_concept_s a 
 	left join v_curr_fsn  b on b.conceptid = a.id
 	where a.active = '1'
@@ -80,12 +86,14 @@
 	drop table if exists v_curr_fsn;
 	
 	/* TEST: Concept does not have an FSN in any refset */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' does not have an active FSN in any refset.') 
+		concat('Concept: id=',a.id, ' does not have an active FSN in any refset.'),
+		a.id,
+		'curr_concept_s'
 	from curr_concept_s a
 	where a.active = '1'
 	and not exists (select b.id
@@ -99,12 +107,14 @@
 	
 	/* TEST: Concept does not have an FSN in the US language refset */
 	/*Only for core module concepts*/
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.id,
-		concat('Concept: id=',a.id, ' does not have an FSN preferred in the en-US language refset.') 
+		concat('Concept: id=',a.id, ' does not have an FSN preferred in the en-US language refset.'),
+		a.id,
+		'curr_concept_s'
 	from curr_concept_s a
 	where a.active = '1'
 	and a.moduleid in ('900000000000207008','900000000000012004')

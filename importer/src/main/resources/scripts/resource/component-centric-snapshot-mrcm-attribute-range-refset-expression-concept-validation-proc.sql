@@ -44,12 +44,14 @@ insert into temp_attr_range_refset_expression_concept_id(id, conceptId) select i
 
 end loop executeQueries;
 
-insert into qa_result (run_id, assertion_id,concept_id, details)
+insert into qa_result (run_id, assertion_id,concept_id, details, component_id, table_name)
 select
 	runId,
 	assertionId,
 	result.conceptId,
-	concat(refsetName,":id=",result.id,":ConceptId=",result.conceptId, " referenced in the column ", columnName ," is not an active concept.")
+	concat(refsetName,":id=",result.id,":ConceptId=",result.conceptId, " referenced in the column ", columnName ," is not an active concept."),
+	result.id,
+	tableName
 	from  (select distinct(a.conceptId), a.id from temp_attr_range_refset_expression_concept_id a left join
 	curr_concept_s b
 	on a.conceptId = b.id where b.id is null or b.active = 0 group by a.id) as result;

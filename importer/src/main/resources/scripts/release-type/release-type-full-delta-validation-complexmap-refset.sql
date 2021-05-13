@@ -1,12 +1,14 @@
 /*  
 *	Current full complex map refset file consists of the previously published full file and the current delta file
 */
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedComponentId,
-		concat('ComplexMap: id=',a.id, ' is in current full file but not in prior full or current delta file') 	
+		concat('ComplexMap: id=',a.id, ' is in current full file but not in prior full or current delta file'),
+		a.id,
+		'curr_complexmaprefset_f'
 	from curr_complexmaprefset_f a
 	left join curr_complexmaprefset_d b
 		on a.id = b.id

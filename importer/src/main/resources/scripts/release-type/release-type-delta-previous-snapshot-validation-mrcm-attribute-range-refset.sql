@@ -1,14 +1,16 @@
 /*  
  * There must be actual changes made to previously published MRCM Attribute Range Refset in order for them to appear in the current delta.
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Mrcm Attribute Range Refset: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.')
-	from curr_mrcmAttributeRangeRefset_d a
-	left join prev_mrcmAttributeRangeRefset_s b
+		concat('Mrcm Attribute Range Refset: id=',a.id, ' is in the detla file, but no actual changes made since the previous release.'),
+		a.id,
+		'curr_mrcmattributerangerefset_d'
+	from curr_mrcmattributerangerefset_d a
+	left join prev_mrcmattributerangerefset_s b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active

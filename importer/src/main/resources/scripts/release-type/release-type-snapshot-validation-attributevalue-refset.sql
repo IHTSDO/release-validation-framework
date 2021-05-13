@@ -15,12 +15,14 @@
 		 where z.id = a.id);
 
 /* in the delta; not in the full */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('ATTRIBUTE VALUE REFSET: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.')
+	concat('ATTRIBUTE VALUE REFSET: id=',a.id, ' is in SNAPSHOT file, but not in FULL file.'),
+	a.id,
+	'curr_attributevaluerefset_s'
 	from curr_attributevaluerefset_s a
 	left join temp_attributevaluerefset b
 	on a.id = b.id
@@ -39,12 +41,14 @@
   	or b.valueid is null;
 
 /* in the full; not in the delta */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('ATTRIBUTE VALUE REFSET: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') 
+	concat('ATTRIBUTE VALUE REFSET: id=',a.id, ' is in FULL file, but not in SNAPSHOT file.') ,
+	a.id,
+	'curr_attributevaluerefset_f'
 	from temp_attributevaluerefset a
 	left join curr_attributevaluerefset_s b 
 	on a.id = b.id

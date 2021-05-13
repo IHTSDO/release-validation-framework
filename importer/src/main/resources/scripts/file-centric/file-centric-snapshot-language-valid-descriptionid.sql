@@ -8,12 +8,14 @@
 
 ********************************************************************************/
 	
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedcomponentid,
-		concat('Language Refset: ReferencedComponentId =', a.referencedcomponentid, ' is neither in the description nor the definition snapshot file.') 
+		concat('Language Refset: ReferencedComponentId =', a.referencedcomponentid, ' is neither in the description nor the definition snapshot file.'),
+		a.id,
+		'curr_langrefset_s'
 	from curr_langrefset_s a
 	where 
 	a.active=1

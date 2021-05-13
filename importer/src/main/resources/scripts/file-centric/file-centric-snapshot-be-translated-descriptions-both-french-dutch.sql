@@ -8,12 +8,14 @@
 ********************************************************************************/
 
 
-insert into qa_result (runid, assertionuuid, concept_id, details)
+insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select  	
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Description: id=',a.id, ': has preferred term in both French and Dutch language refset.')
+		concat('Description: id=',a.id, ': has preferred term in both French and Dutch language refset.'),
+		a.id,
+		'curr_description_s'
 	from curr_description_s a
         left join curr_langrefset_s b on a.id = b.referencedcomponentid
         left join curr_concept_s c on a.conceptid = c.id

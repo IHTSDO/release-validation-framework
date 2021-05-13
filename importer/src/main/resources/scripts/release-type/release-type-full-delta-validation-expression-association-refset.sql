@@ -2,14 +2,16 @@
 /*  
 	The current full ExpressionAssociationRefset file consists of the previously published full file and the changes for the current release
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 	<RUNID>,
 	'<ASSERTIONUUID>',
 	a.referencedcomponentid,
-	concat('ExpressionAssociationRefset: id=',a.id, ' is in current full file, but not in prior full or current delta file.') 	
-	from curr_expressionAssociationRefset_f a
-	left join curr_expressionAssociationRefset_d b
+	concat('ExpressionAssociationRefset: id=',a.id, ' is in current full file, but not in prior full or current delta file.'),
+	a.id,
+	'curr_expressionassociationrefset_f'
+	from curr_expressionassociationrefset_f a
+	left join curr_expressionassociationrefset_d b
 		on a.id = b.id
 		and a.effectivetime = b.effectivetime
 		and a.active = b.active
@@ -21,7 +23,7 @@
 		and a.definitionStatusId = b.definitionStatusId
 		and a.correlationId = b.correlationId
 		and a.contentOriginId = b.contentOriginId
-	left join prev_expressionAssociationRefset_f c
+	left join prev_expressionassociationrefset_f c
 		on a.id = c.id
 		and a.effectivetime = c.effectivetime
 		and a.active = c.active

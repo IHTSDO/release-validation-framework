@@ -6,12 +6,14 @@
 	the current delta file. 
 ********************************************************************************/
 
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('DESCRIPTION: id=',a.id, ' is in delta file but not in snapshot file.') 	
+		concat('DESCRIPTION: id=',a.id, ' is in delta file but not in snapshot file.'),
+		a.id,
+		'curr_description_d'
 	from curr_description_d a
 	left join curr_description_s b
 		on a.id = b.id

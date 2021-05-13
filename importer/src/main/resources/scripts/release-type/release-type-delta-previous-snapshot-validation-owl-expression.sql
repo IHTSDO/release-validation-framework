@@ -1,12 +1,14 @@
 /*  
  * There must be actual changes made to previously published OWL expressions in order for them to appear in the current delta.
 */
-	insert into qa_result (runid, assertionuuid, concept_id, details)
+	insert into qa_result (runid, assertionuuid, concept_id, details, component_id, table_name)
 	select 
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.referencedComponentid,
-		concat('OWL Expression: id=',a.id, ' is in the delta file, but no actual changes made since the previous release.')
+		concat('OWL Expression: id=',a.id, ' is in the delta file, but no actual changes made since the previous release.'),
+		a.id,
+		'curr_owlexpressionrefset_d'
 	from curr_owlexpressionrefset_d a
 	left join prev_owlexpressionrefset_s b
 		on a.id = b.id
