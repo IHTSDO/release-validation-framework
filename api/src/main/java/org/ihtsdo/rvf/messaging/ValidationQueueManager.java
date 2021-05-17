@@ -1,13 +1,9 @@
 package org.ihtsdo.rvf.messaging;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import org.apache.commons.codec.DecoderException;
+import org.ihtsdo.otf.jms.MessagingHelper;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.rvf.execution.service.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
@@ -22,7 +18,12 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
+import javax.annotation.PostConstruct;
+import javax.jms.JMSException;
+import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 @Service
 public class ValidationQueueManager {
@@ -47,6 +48,9 @@ public class ValidationQueueManager {
 	
 	@Value("${rvf.validation.queue.name}")
 	private String destinationName;
+
+	@Autowired
+	private MessagingHelper messagingHelper;
 	
 	private ResourceManager validationJobResourceManager;
 
@@ -64,6 +68,9 @@ public class ValidationQueueManager {
 				String configJson = gson.toJson(config);
 				LOGGER.info("Send Jms message to queue for validation config json:" + configJson);
 				jmsTemplate.convertAndSend(destinationName, configJson);
+				messagingHelper.send(config.getResponseQueue(),
+						ImmutableMap.of("runId", config.getRunId(),
+								"state", ValidationReportService.State.QUEUED.name()));
 				reportService.writeState(State.QUEUED, config.getStorageLocation());
 			}
 		} catch (IOException e) {
@@ -72,6 +79,8 @@ public class ValidationQueueManager {
 			responseMap.put(FAILURE_MESSAGE, "Failed to send queueing message due to " + e.getMessage());
 		} catch (NoSuchAlgorithmException | DecoderException e) {
 			responseMap.put(FAILURE_MESSAGE, "Failed to write Queued State to Storage Location due to " + e.getMessage());
+		} catch (JMSException e) {
+			responseMap.put(FAILURE_MESSAGE, "Failed to update the RVF state inside the SRS service " + e.getMessage());
 		}
 	}
 

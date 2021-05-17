@@ -1,18 +1,7 @@
 package org.ihtsdo.rvf.execution.service;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
+import com.google.common.collect.ImmutableMap;
+import org.ihtsdo.otf.jms.MessagingHelper;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
@@ -26,9 +15,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 @Service
 @Scope("prototype")
-public class ValidationRunner {	
+public class ValidationRunner {
+
 	@Autowired
 	private StructuralTestRunner structuralTestRunner;
 	
@@ -46,6 +45,9 @@ public class ValidationRunner {
 
 	@Autowired
 	private MRCMValidationService mrcmValidationService;
+
+	@Autowired
+	private MessagingHelper messagingHelper;
 
 	private static final String MSG_VALIDATIONS_RUN = "Validations executed. Failures count: ";
 	private static final String MSG_VALIDATIONS_DISABLED = "Validations are disabled.";
@@ -122,8 +124,6 @@ public class ValidationRunner {
 		}
 		executorService.shutdown();
 
-
-
 		report.sortAssertionLists();
 
 		final Calendar endTime = Calendar.getInstance();
@@ -133,6 +133,9 @@ public class ValidationRunner {
 		statusReport.setEndTime(endTime.getTime());
 		report.setTimeTakenInSeconds(timeTaken*60);
 		State state = statusReport.getFailureMessages().isEmpty() ? State.COMPLETE : State.FAILED;
+		messagingHelper.send(validationConfig.getResponseQueue(),
+				ImmutableMap.of("runId", validationConfig.getRunId(),
+						"state", state.name()));
 		updateExecutionSummary(statusReport, validationConfig);
 		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
 	}

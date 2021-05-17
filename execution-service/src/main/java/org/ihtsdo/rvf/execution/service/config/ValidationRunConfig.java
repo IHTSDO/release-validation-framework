@@ -32,6 +32,7 @@ public class ValidationRunConfig {
 	private String bucketName;
 	private boolean enableMRCMValidation;
 	private CharacteristicType form;
+	private String responseQueue;
 	
 	public MultipartFile getFile() {
 		return file;
@@ -73,6 +74,7 @@ public class ValidationRunConfig {
 	public Integer getFailureExportMax() {
 		return failureExportMax;
 	}
+
 	public void setFailureExportMax(final Integer failureExportMax) {
 		this.failureExportMax = failureExportMax;
 	}
@@ -130,6 +132,15 @@ public class ValidationRunConfig {
 
 	public ValidationRunConfig setForm(CharacteristicType form) {
 		this.form = form;
+		return this;
+	}
+
+	public final String getResponseQueue() {
+		return responseQueue;
+	}
+
+	public final ValidationRunConfig setResponseQueue(final String responseQueue) {
+		this.responseQueue = responseQueue;
 		return this;
 	}
 
