@@ -4,11 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -82,6 +78,8 @@ public class TestUploadFileController {
 	private static final String WRITE_SUCCESSES = "writeSuccesses";
 
 	private static final String RF2_DELTA_ONLY = "rf2DeltaOnly";
+
+	private static final String RESPONSE_QUEUE = "responseQueue";
 
 	private static final String ZIP = ".zip";
 
@@ -258,8 +256,8 @@ public class TestUploadFileController {
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Defaults to stated form.") @RequestParam(value = MRCM_VALIDATION_FORM, required = false, defaultValue = "stated") final CharacteristicType form,
-			UriComponentsBuilder uriComponentsBuilder
-			) throws IOException {
+			@ApiParam(value = "Name of the response queue.") @RequestParam(value = RESPONSE_QUEUE, required = false) final String responseQueue,
+			UriComponentsBuilder uriComponentsBuilder) throws IOException {
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
 		String urlPrefix = URI.create(uriComponentsBuilder.toUriString()).toURL().toString();
 		vrConfig.addBucketName(bucketName)
@@ -282,7 +280,8 @@ public class TestUploadFileController {
 				.setIncludedModules(includedModules)
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setGenerateDroolsReport(enableDroolsReport)
-				.setForm(form);
+				.setForm(form)
+				.setResponseQueue(responseQueue);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage
