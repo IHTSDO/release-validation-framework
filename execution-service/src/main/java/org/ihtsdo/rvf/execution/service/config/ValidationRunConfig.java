@@ -139,7 +139,7 @@ public class ValidationRunConfig {
 		return responseQueue;
 	}
 
-	public final ValidationRunConfig setResponseQueue(final String responseQueue) {
+	public final ValidationRunConfig addResponseQueue(final String responseQueue) {
 		this.responseQueue = responseQueue;
 		return this;
 	}
