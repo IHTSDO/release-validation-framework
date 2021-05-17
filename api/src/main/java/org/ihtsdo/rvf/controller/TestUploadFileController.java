@@ -281,7 +281,7 @@ public class TestUploadFileController {
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setGenerateDroolsReport(enableDroolsReport)
 				.setForm(form)
-				.setResponseQueue(responseQueue);
+				.addResponseQueue(responseQueue);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage

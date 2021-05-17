@@ -59,12 +59,15 @@ public class ValidationMessageListener {
 	}
 
 	private void updateRvfStateToRunning(final ValidationRunConfig config) {
-		try {
-			messagingHelper.send(config.getResponseQueue(),
-					ImmutableMap.of("runId", config.getRunId(),
-							"state", ValidationReportService.State.RUNNING.name()));
-		} catch (JsonProcessingException | JMSException e) {
-			LOGGER.error("Error occurred while trying to update the RVF state to running.", e);
+		final String responseQueue = config.getResponseQueue();
+		if (responseQueue != null) {
+			try {
+				messagingHelper.send(responseQueue,
+						ImmutableMap.of("runId", config.getRunId(),
+								"state", ValidationReportService.State.RUNNING.name()));
+			} catch (JsonProcessingException | JMSException e) {
+				LOGGER.error("Error occurred while trying to update the RVF state to running.", e);
+			}
 		}
 	}
 

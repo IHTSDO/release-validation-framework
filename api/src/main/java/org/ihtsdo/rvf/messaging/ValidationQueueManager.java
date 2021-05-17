@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.messaging;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import org.apache.commons.codec.DecoderException;
@@ -68,9 +69,7 @@ public class ValidationQueueManager {
 				String configJson = gson.toJson(config);
 				LOGGER.info("Send Jms message to queue for validation config json:" + configJson);
 				jmsTemplate.convertAndSend(destinationName, configJson);
-				messagingHelper.send(config.getResponseQueue(),
-						ImmutableMap.of("runId", config.getRunId(),
-								"state", ValidationReportService.State.QUEUED.name()));
+				updateRvfStateToQueued(config);
 				reportService.writeState(State.QUEUED, config.getStorageLocation());
 			}
 		} catch (IOException e) {
@@ -81,6 +80,15 @@ public class ValidationQueueManager {
 			responseMap.put(FAILURE_MESSAGE, "Failed to write Queued State to Storage Location due to " + e.getMessage());
 		} catch (JMSException e) {
 			responseMap.put(FAILURE_MESSAGE, "Failed to update the RVF state inside the SRS service " + e.getMessage());
+		}
+	}
+
+	private void updateRvfStateToQueued(final ValidationRunConfig config) throws JsonProcessingException, JMSException {
+		final String responseQueue = config.getResponseQueue();
+		if (responseQueue != null) {
+			messagingHelper.send(responseQueue,
+					ImmutableMap.of("runId", config.getRunId(),
+							"state", State.QUEUED.name()));
 		}
 	}
 

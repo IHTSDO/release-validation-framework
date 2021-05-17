@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.execution.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
 import org.ihtsdo.otf.jms.MessagingHelper;
 import org.ihtsdo.rvf.entity.TestRunItem;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import javax.jms.JMSException;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -133,11 +135,18 @@ public class ValidationRunner {
 		statusReport.setEndTime(endTime.getTime());
 		report.setTimeTakenInSeconds(timeTaken*60);
 		State state = statusReport.getFailureMessages().isEmpty() ? State.COMPLETE : State.FAILED;
-		messagingHelper.send(validationConfig.getResponseQueue(),
-				ImmutableMap.of("runId", validationConfig.getRunId(),
-						"state", state.name()));
+		updateRvfState(validationConfig, state);
 		updateExecutionSummary(statusReport, validationConfig);
 		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
+	}
+
+	private void updateRvfState(final ValidationRunConfig validationConfig, final State state) throws JsonProcessingException, JMSException {
+		final String responseQueue = validationConfig.getResponseQueue();
+		if (responseQueue != null) {
+			messagingHelper.send(responseQueue,
+					ImmutableMap.of("runId", validationConfig.getRunId(),
+							"state", state.name()));
+		}
 	}
 
 	private void mergeValidationStatusReports(ValidationStatusReport mainValidationReport, ValidationStatusReport validationTaskReport) {
