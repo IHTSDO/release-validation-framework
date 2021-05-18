@@ -1,14 +1,13 @@
 package org.ihtsdo.rvf;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import org.ihtsdo.otf.jms.MessagingHelper;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.annotation.Order;
-import org.springframework.jms.annotation.EnableJms;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -35,5 +34,10 @@ public class ApiConfig {
 				.permitAll();
 			http.csrf().disable();
 		}
-	}	
+	}
+
+	@Bean
+	public MessagingHelper messagingHelper() {
+		return new MessagingHelper();
+	}
 }
