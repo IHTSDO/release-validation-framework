@@ -35,9 +35,4 @@ public class ApiConfig {
 			http.csrf().disable();
 		}
 	}
-
-	@Bean
-	public MessagingHelper messagingHelper() {
-		return new MessagingHelper();
-	}
 }

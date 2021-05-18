@@ -17,7 +17,7 @@ public class ValidationJobResourceConfigTest {
 	
 	@Test
 	public void testUseCloud() {
-		assertEquals(false, jobResourceConfig.isUseCloud());
+		assertFalse(jobResourceConfig.isUseCloud());
 	}
 	
 	@Test
