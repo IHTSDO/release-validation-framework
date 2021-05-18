@@ -143,6 +143,7 @@ public class ValidationRunner {
 	private void updateRvfState(final ValidationRunConfig validationConfig, final State state) throws JsonProcessingException, JMSException {
 		final String responseQueue = validationConfig.getResponseQueue();
 		if (responseQueue != null) {
+			logger.info("Updating RVF state to {}}: {}", state, responseQueue);
 			messagingHelper.send(responseQueue,
 					ImmutableMap.of("runId", validationConfig.getRunId(),
 							"state", state.name()));
