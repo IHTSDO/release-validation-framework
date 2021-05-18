@@ -86,6 +86,7 @@ public class ValidationQueueManager {
 	private void updateRvfStateToQueued(final ValidationRunConfig config) throws JsonProcessingException, JMSException {
 		final String responseQueue = config.getResponseQueue();
 		if (responseQueue != null) {
+			LOGGER.info("Updating RVF state to queued: {}", responseQueue);
 			messagingHelper.send(responseQueue,
 					ImmutableMap.of("runId", config.getRunId(),
 							"state", State.QUEUED.name()));

@@ -62,6 +62,7 @@ public class ValidationMessageListener {
 		final String responseQueue = config.getResponseQueue();
 		if (responseQueue != null) {
 			try {
+				LOGGER.info("Updating RVF state to running: {}", responseQueue);
 				messagingHelper.send(responseQueue,
 						ImmutableMap.of("runId", config.getRunId(),
 								"state", ValidationReportService.State.RUNNING.name()));
