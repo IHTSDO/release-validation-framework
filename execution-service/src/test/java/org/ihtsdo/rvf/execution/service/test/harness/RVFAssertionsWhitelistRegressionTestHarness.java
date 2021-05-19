@@ -122,7 +122,7 @@ public class RVFAssertionsWhitelistRegressionTestHarness {
 		List<WhitelistItem> whitelistItems = Collections.singletonList(new WhitelistItem("31f5e2c8-b0b9-42ee-a9bf-87d95edad83b", "3008913022", "703672002", "1,900000000000207008,703860006,en,900000000000003001,Toxic effect of antimony and/or its compounds (disorder),900000000000020002"));
 
 		// mock the whitelist items
-		when(whitelistService.validateAssertions(any())).thenReturn(whitelistItems);
+		when(whitelistService.checkComponentFailuresAgainstWhitelist(any())).thenReturn(whitelistItems);
 		mysqlFailuresExtractor.extractTestResults(testRunItems, config, assertions);
 		for (TestRunItem test :testRunItems) {
 			if ("31f5e2c8-b0b9-42ee-a9bf-87d95edad83b".equals(test.getAssertionUuid().toString())) {

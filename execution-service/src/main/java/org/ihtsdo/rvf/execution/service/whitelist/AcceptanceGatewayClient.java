@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.execution.service.whitelist;
 
 import org.ihtsdo.otf.rest.client.ExpressiveErrorHandler;
+import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.rest.client.ims.IMSRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -62,8 +65,15 @@ public class AcceptanceGatewayClient {
         return null;
     }
 
-    public List<WhitelistItem> validateAssertions(List<WhitelistItem> assertions) {
-        ResponseEntity<List<WhitelistItem>> responseEntity = restTemplate.exchange(this.acceptanceGatewayServiceUrl + "/whitelist-items/bulk-validate", HttpMethod.POST, new org.springframework.http.HttpEntity<>(assertions), WHITELIST_ITEM_LIST_TYPE_REFERENCE);
+    public List<WhitelistItem> checkComponentFailureAgainstWhitelist(List<WhitelistItem> items) throws RestClientException {
+        ResponseEntity<List<WhitelistItem>> responseEntity = null;
+        try {
+            responseEntity = restTemplate.exchange(this.acceptanceGatewayServiceUrl + "/whitelist-items/bulk-validate", HttpMethod.POST, new org.springframework.http.HttpEntity<>(items), WHITELIST_ITEM_LIST_TYPE_REFERENCE);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            String errorMessage = "Failed to validate the component failures against AAG. Error message: " + e.getMessage();
+            logger.error(errorMessage);
+            throw new RestClientException(errorMessage);
+        }
         return responseEntity.getBody();
     }
 }

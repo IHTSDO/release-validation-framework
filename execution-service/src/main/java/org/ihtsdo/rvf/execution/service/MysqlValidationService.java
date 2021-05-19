@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -265,7 +266,7 @@ public class MysqlValidationService {
 			items.removeAll(failedItems);
 			items.removeAll(warningItems);
 			report.addPassedAssertions(items);
-		} catch (SQLException exception) {
+		} catch (SQLException | RestClientException exception) {
 			report.addFailedAssertions(Collections.emptyList());
 			report.addWarningAssertions(Collections.emptyList());
 			report.addPassedAssertions(Collections.emptyList());
