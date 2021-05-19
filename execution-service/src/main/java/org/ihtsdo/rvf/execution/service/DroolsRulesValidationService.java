@@ -4,22 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
 import com.google.api.services.sheets.v4.model.Spreadsheet;
+import com.google.common.collect.Iterables;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.ihtsdo.drools.domain.Component;
+import org.ihtsdo.drools.domain.*;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.response.Severity;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
@@ -38,6 +32,7 @@ import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
+import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +49,9 @@ import com.google.common.collect.Sets;
 
 @Service
 public class DroolsRulesValidationService {
-	
+
+	private static final String COMMA = ",";
+
 	@Value("${rvf.drools.rule.directory}")
 	private String droolsRuleDirectoryPath;
 
@@ -63,10 +60,10 @@ public class DroolsRulesValidationService {
 
 	@Autowired
 	private ValidationResourceConfig testResourceConfig;
-	
+
 	@Autowired
 	private ValidationJobResourceConfig jobResourceConfig;
-	
+
 	@Autowired
 	private ValidationReleaseStorageConfig releaseStorageConfig;
 
@@ -74,12 +71,15 @@ public class DroolsRulesValidationService {
 	private ResourceLoader cloudResourceLoader;
 
 	@Autowired
+	private WhitelistService whitelistService;
+
+	@Autowired
 	private DroolReportSheetManager droolReportSheetManager;
-	
+
 	private ResourceManager releaseSourceManager;
 
 	private ResourceManager testResourceManager;
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(DroolsRulesValidationService.class);
 
 	private static final String EXT_ZIP = ".zip";
@@ -94,7 +94,7 @@ public class DroolsRulesValidationService {
 				.build();
 		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
 	}
-	
+
 	public ValidationStatusReport runDroolsAssertions(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws RVFExecutionException {
 		Set<String> directoryPaths = new HashSet<>();
 		try {
@@ -130,7 +130,7 @@ public class DroolsRulesValidationService {
 				if(testedReleaseFileStream == null) {
 					testedReleaseFileStream = validationJobResourceManager.readResourceStream(prospectiveFileFullPath);
 				}
-				
+
 				InputStream deltaInputStream = null;
 				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 				if (validationConfig.isRf2DeltaOnly()) {
@@ -189,6 +189,27 @@ public class DroolsRulesValidationService {
 
 				//Run validation
 				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, prevReleasePath, droolsRulesSets, effectiveTime, modulesSet, true);
+
+				if (invalidContents.size() != 0 && !whitelistService.isWhitelistDisabled()) {
+					List<InvalidContent> newInvalidContents = new ArrayList<>();
+					for (List<InvalidContent> invalidContentPartition : Iterables.partition(invalidContents, validationConfig.getFailureExportMax())) {
+						// Convert to WhitelistItem
+						List<WhitelistItem> whitelistItems = invalidContents.stream()
+								.map(invalidContent -> new WhitelistItem(invalidContent.getRuleId(), org.springframework.util.StringUtils.isEmpty(invalidContent.getComponentId())? "" : invalidContent.getComponentId(), invalidContent.getConceptId(), getAdditionalFields(invalidContent.getComponent())))
+								.collect(Collectors.toList());
+
+						// Send to Authoring acceptance gateway
+						List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
+
+						// Find the failures which are not in the whitelisted item
+						newInvalidContents.addAll(invalidContentPartition.stream().filter(invalidContent ->
+								whitelistedItems.stream().noneMatch(whitelistedItem ->
+										invalidContent.getRuleId().equals(whitelistedItem.getValidationRuleId())
+										&& invalidContent.getComponentId().equals(whitelistedItem.getComponentId()))
+						).collect(Collectors.toList())) ;
+					}
+					invalidContents = newInvalidContents;
+				}
 			} catch (Exception e) {
 				String message = "Drools validation has stopped";
 				LOGGER.error(message, e);
@@ -199,12 +220,12 @@ public class DroolsRulesValidationService {
 			}
 			HashMap<String, List<InvalidContent>> invalidContentMap = new HashMap<>();
 			for (InvalidContent invalidContent : invalidContents) {
-				if (!invalidContentMap.containsKey(invalidContent.getMessage())) {
+				if (!invalidContentMap.containsKey(invalidContent.getRuleId())) {
 					List<InvalidContent> invalidContentArrayList = new ArrayList<>();
 					invalidContentArrayList.add(invalidContent);
-					invalidContentMap.put(invalidContent.getMessage(), invalidContentArrayList);
+					invalidContentMap.put(invalidContent.getRuleId(), invalidContentArrayList);
 				} else {
-					invalidContentMap.get(invalidContent.getMessage()).add(invalidContent);
+					invalidContentMap.get(invalidContent.getRuleId()).add(invalidContent);
 				}
 			}
 			invalidContents.clear();
@@ -214,47 +235,23 @@ public class DroolsRulesValidationService {
 			Map<String, List<InvalidContent>> groupRules = new HashMap<>();
 
 			//Convert the Drools validation report into RVF report format
-			for (String rule : invalidContentMap.keySet()) {
+			for (String ruleId : invalidContentMap.keySet()) {
 				TestRunItem validationRule = new TestRunItem();
+				validationRule.setAssertionUuid(UUID.fromString(ruleId));
 				validationRule.setTestType(TestType.DROOL_RULES);
 				validationRule.setTestCategory("");
-				//Some Drools validations message has SCTID, making it is impossible to group the same failures together unless the message is generalized by replacing the SCTID
-				String groupedRuleName = rule.replaceAll("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}","<UUID>")
-						.replaceAll("\\d{6,20}","<SCTID>");
-				if(groupedRuleName.contains("<UUID>") || groupedRuleName.contains("<SCTID>")) {
-					groupDroolsRules(groupRules, groupedRuleName, invalidContentMap.get(rule));
+				List<InvalidContent> invalidContentList = invalidContentMap.get(ruleId);
+				validationRule.setAssertionText(invalidContentList.get(0).getMessage().replaceAll("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}","<UUID>").replaceAll("\\d{6,20}","<SCTID>"));
+
+				validationRule.setFailureCount((long) invalidContentList.size());
+				validationRule.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
+						.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()))
+						.collect(Collectors.toList()));
+				Severity severity = invalidContentList.get(0).getSeverity();
+				if(Severity.WARNING.equals(severity)) {
+					warningAssertions.add(validationRule);
 				} else {
-					validationRule.setAssertionText(rule);
-					List<InvalidContent> invalidContentList = invalidContentMap.get(rule);
-					validationRule.setFailureCount((long) invalidContentList.size());
-					validationRule.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
-							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()))
-							.collect(Collectors.toList()));
-					Severity severity = invalidContentList.get(0).getSeverity();
-					if(Severity.WARNING.equals(severity)) {
-						warningAssertions.add(validationRule);
-					} else {
-						failedAssertions.add(validationRule);
-					}
-				}
-			}
-			if(!groupRules.isEmpty()) {
-				for (String rule : groupRules.keySet()) {
-					TestRunItem testRunItem = new TestRunItem();
-					testRunItem.setTestType(TestType.DROOL_RULES);
-					testRunItem.setTestCategory("");
-					testRunItem.setAssertionText(rule);
-					List<InvalidContent> invalidContentList = groupRules.get(rule);
-					testRunItem.setFailureCount((long)invalidContentList.size());
-					testRunItem.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
-							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()))
-							.collect(Collectors.toList()));
-					Severity severity = invalidContentList.get(0).getSeverity();
-					if(Severity.WARNING.equals(severity)) {
-						warningAssertions.add(testRunItem);
-					} else {
-						failedAssertions.add(testRunItem);
-					}
+					failedAssertions.add(validationRule);
 				}
 			}
 			validationReport.addFailedAssertions(failedAssertions);
@@ -282,7 +279,23 @@ public class DroolsRulesValidationService {
 		}
 		return statusReport;
 	}
-	
+
+	private String getAdditionalFields(Component component) {
+		String additionalFields = (component.isActive() ? "1" : "0") + COMMA + component.getModuleId();
+		if (component instanceof Concept) {
+			return additionalFields + COMMA + ((Concept) component).getDefinitionStatusId();
+		} else if (component instanceof Description) {
+			Description description = (Description) component;
+			return additionalFields + COMMA + description.getConceptId() + COMMA + description.getLanguageCode() + COMMA + description.getTypeId() + COMMA + description.getTerm() + COMMA + description.getCaseSignificanceId();
+		} else if (component instanceof Relationship) {
+			Relationship relationship = (Relationship) component;
+			return additionalFields + COMMA + relationship.getSourceId() + COMMA + relationship.getDestinationId() + COMMA + relationship.getRelationshipGroup() + COMMA + relationship.getTypeId() + COMMA + relationship.getCharacteristicTypeId();
+		} else if (component instanceof OntologyAxiom) {
+			return additionalFields + COMMA + ((OntologyAxiom) component).getReferencedComponentId() + COMMA + ((OntologyAxiom) component).getOwlExpression();
+		}
+		return "";
+	}
+
 
 	private Set<String> getDroolsRulesSetFromAssertionGroups(Set<String> assertionGroups) throws RVFExecutionException {
 		File droolsRuleDir = new File(droolsRuleDirectoryPath);
@@ -297,15 +310,6 @@ public class DroolsRulesValidationService {
 		//Only keep the assertion groups with matching Drools Rule modules in the Drools Directory
 		droolsRulesModules.retainAll(assertionGroups);
 		return droolsRulesModules;
-	}
-
-	private Map<String, List<InvalidContent>> groupDroolsRules(Map<String, List<InvalidContent>> groupedRules, 
-			String rule, List<InvalidContent> invalidContents) {
-		if(!groupedRules.containsKey(rule)) {
-			groupedRules.put(rule, new ArrayList<>());
-		}
-		groupedRules.get(rule).addAll(invalidContents);
-		return groupedRules;
 	}
 
 	private String generateGoogleSheetReport(ValidationRunConfig validationRunConfig, Map<String, List<InvalidContent>> invalidContentsMap, Map<String, List<InvalidContent>> groupRulesMap, List<TestRunItem> failures, List<TestRunItem> warnings) throws GeneralSecurityException, IOException, InterruptedException {
@@ -383,5 +387,5 @@ public class DroolsRulesValidationService {
 		}
 		return Arrays.asList(invalidContent.getSeverity().toString(), invalidContent.getConceptId(), invalidContent.getConceptFsn(), componentId, componentType, componentIsActive,componentDetails,invalidContent.getMessage());
 	}
-	
+
 }
