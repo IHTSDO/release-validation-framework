@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.execution.service;
 
+import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.rvf.execution.service.whitelist.AcceptanceGatewayClient;
 import org.ihtsdo.rvf.execution.service.whitelist.AcceptanceGatewayClientFactory;
 import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
@@ -19,12 +20,17 @@ public class WhitelistService {
         return factory.isWhitelistDisabled();
     }
 
-    public  List<WhitelistItem> validateAssertions(List<WhitelistItem> assertions) {
+    /**
+     * Check which component validation failures are on the AAG whitelist.
+     * @param whitelistItems The list of whitelist item to be checked
+     * @return The list of whitelisted items
+     */
+    public  List<WhitelistItem> checkComponentFailuresAgainstWhitelist(List<WhitelistItem> whitelistItems) throws RestClientException {
         if (isWhitelistDisabled()) {
             return Collections.emptyList();
         }
 
         AcceptanceGatewayClient client = factory.getClient();
-        return client.validateAssertions(assertions);
+        return client.checkComponentFailureAgainstWhitelist(whitelistItems);
     }
 }

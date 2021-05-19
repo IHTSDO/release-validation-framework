@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.execution.service;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
@@ -32,7 +33,7 @@ public class MysqlFailuresExtractor {
     @Autowired
     private WhitelistService whitelistService;
 
-    public void extractTestResults(final List<TestRunItem> items, final MysqlExecutionConfig config, List<Assertion> assertions) throws SQLException {
+    public void extractTestResults(final List<TestRunItem> items, final MysqlExecutionConfig config, List<Assertion> assertions) throws SQLException, RestClientException {
         Map<UUID, Long> uuidToAssertionIdMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, assertion -> assertion.getAssertionId()));
         try (Connection connection = dataSource.getConnection()) {
             Map<String, Integer> assertionIdToTotalFailureMap = getAssertionIdToTotalFailureMap(connection, config);
@@ -57,7 +58,7 @@ public class MysqlFailuresExtractor {
         }
     }
 
-    private void validateFailuresAndExtractTestResults(Connection connection, List<TestRunItem> items, MysqlExecutionConfig config, Map<UUID, Long> uuidToAssertionIdMap, Map<String, Integer> assertionIdToTotalFailureMap) throws SQLException {
+    private void validateFailuresAndExtractTestResults(Connection connection, List<TestRunItem> items, MysqlExecutionConfig config, Map<UUID, Long> uuidToAssertionIdMap, Map<String, Integer> assertionIdToTotalFailureMap) throws SQLException, RestClientException {
         for (TestRunItem item : items) {
             String key = String.valueOf(uuidToAssertionIdMap.get(item.getAssertionUuid()));
             if (assertionIdToTotalFailureMap.containsKey(key)) {
@@ -77,13 +78,11 @@ public class MysqlFailuresExtractor {
                             .collect(Collectors.toList());
 
                     // Send to Authoring acceptance gateway
-                    List<WhitelistItem> whitelistedItems = whitelistService.validateAssertions(whitelistItems);
+                    List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
 
                     // Find the failures which are not in the whitelisted item
                     List<FailureDetail> noneWhitelistedFailures = failureDetails.stream().filter(failureDetail ->
-                        whitelistedItems.stream().noneMatch(whitelistedItem ->
-                                failureDetail.getConceptId().equals(whitelistedItem.getConceptId())
-                             && failureDetail.getComponentId().equals(whitelistedItem.getComponentId()))
+                        whitelistedItems.stream().noneMatch(whitelistedItem -> failureDetail.getComponentId().equals(whitelistedItem.getComponentId()))
                     ).collect(Collectors.toList());
 
                     total_whitelistedItem_extracted += whitelistedItems.size();
