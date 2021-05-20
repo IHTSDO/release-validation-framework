@@ -5,14 +5,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class FailureDetail implements Comparable<FailureDetail>{
 
-	String conceptId;
+	private  String conceptId;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	String conceptFsn;
-	String detail;
-	String componentId;
+	private String conceptFsn;
+	private String detail;
+	private String componentId;
 
-	@JsonIgnore
-	String tableName;
+	private transient String tableName;
 
 	public FailureDetail(String conceptId, String detail) {
 		this.conceptId = new String (conceptId);
@@ -20,14 +19,12 @@ public class FailureDetail implements Comparable<FailureDetail>{
 	}
 
 	public FailureDetail(String conceptId, String detail, String conceptFsn) {
-		this.conceptId = conceptId;
-		this.detail = detail;
+		this(conceptId, detail);
 		this.conceptFsn = conceptFsn;
 	}
 
 	public FailureDetail(String conceptId, String detail, String componentId, String tableName) {
-		this.conceptId = new String (conceptId);
-		this.detail = detail;
+		this(conceptId, detail);
 		this.componentId = componentId;
 		this.tableName = tableName;
 	}
@@ -39,9 +36,12 @@ public class FailureDetail implements Comparable<FailureDetail>{
 	public String getDetail() {
 		return detail;
 	}
-	public void setDetail(String detail) {
+
+	public FailureDetail setDetail(String detail) {
 		this.detail = detail;
+		return this;
 	}
+
 	@Override
 	public String toString() {
 		return "FailureDetail [conceptId=" + conceptId + ", detail=" + detail + ", componentId=" + componentId + ", tableName=" + tableName + "]";
@@ -55,6 +55,7 @@ public class FailureDetail implements Comparable<FailureDetail>{
 		result = prime * result + ((detail == null) ? 0 : detail.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -86,20 +87,23 @@ public class FailureDetail implements Comparable<FailureDetail>{
 		return conceptFsn;
 	}
 
-	public void setConceptFsn(String conceptFsn) {
+	public FailureDetail setConceptFsn(String conceptFsn) {
 		this.conceptFsn = conceptFsn;
+		return this;
 	}
 
-	public void setComponentId(String componentId) {
+	public FailureDetail setComponentId(String componentId) {
 		this.componentId = componentId;
+		return this;
 	}
 
 	public String getComponentId() {
 		return componentId;
 	}
 
-	public void setTableName(String tableName) {
+	public FailureDetail setTableName(String tableName) {
 		this.tableName = tableName;
+		return this;
 	}
 
 	public String getTableName() {

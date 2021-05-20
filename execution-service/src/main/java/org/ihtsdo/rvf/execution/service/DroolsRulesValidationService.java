@@ -245,7 +245,7 @@ public class DroolsRulesValidationService {
 
 				validationRule.setFailureCount((long) invalidContentList.size());
 				validationRule.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
-						.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()))
+						.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()).setComponentId(item.getComponentId()))
 						.collect(Collectors.toList()));
 				Severity severity = invalidContentList.get(0).getSeverity();
 				if(Severity.WARNING.equals(severity)) {
