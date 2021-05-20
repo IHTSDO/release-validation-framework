@@ -17,15 +17,20 @@ import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
+import java.io.Closeable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @ConditionalOnProperty(name = "rvf.execution.isWorker", havingValue = "true")
-public class ValidationMessageListener {
+public class ValidationMessageListener implements Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidationMessageListener.class);
 	
 	private static AtomicBoolean isRunning = new AtomicBoolean(false);
+
+	private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 	
 	@Autowired
 	private ValidationRunner runner;
@@ -51,28 +56,35 @@ public class ValidationMessageListener {
 			LOGGER.error("JMS message listener error:", e);
 		}
 		if (config != null) {
-			updateRvfStateToRunning(config);
+			updateRvfStateToRunningAsync(config);
 			runner.run(config);
 		} else {
 			LOGGER.error("Null validation config found for message: {}", incomingMessage);
 		}
 	}
 
-	private void updateRvfStateToRunning(final ValidationRunConfig config) {
-		final String responseQueue = config.getResponseQueue();
-		if (responseQueue != null) {
-			try {
-				LOGGER.info("Updating RVF state to running: {}", responseQueue);
-				messagingHelper.send(responseQueue,
-						ImmutableMap.of("runId", config.getRunId(),
-								"state", ValidationReportService.State.RUNNING.name()));
-			} catch (JsonProcessingException | JMSException e) {
-				LOGGER.error("Error occurred while trying to update the RVF state to running.", e);
+	private void updateRvfStateToRunningAsync(final ValidationRunConfig config) {
+		EXECUTOR_SERVICE.execute(() -> {
+			final String responseQueue = config.getResponseQueue();
+			if (responseQueue != null) {
+				try {
+					LOGGER.info("Updating RVF state to running: {}", responseQueue);
+					messagingHelper.send(responseQueue,
+							ImmutableMap.of("runId", config.getRunId(),
+									"state", ValidationReportService.State.RUNNING.name()));
+				} catch (JsonProcessingException | JMSException e) {
+					LOGGER.error("Error occurred while trying to update the RVF state to running.", e);
+				}
 			}
-		}
+		});
 	}
 
 	public static boolean isValidationRunning() {
 		return isRunning.get();
+	}
+
+	@Override
+	public void close() {
+		EXECUTOR_SERVICE.shutdown();
 	}
 }
