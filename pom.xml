@@ -14,11 +14,11 @@
 	<name>SNOMED Release Validation Framework</name>
 	
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<packageName>${project.artifactId}</packageName>
 		<execFinalName>${project.build.finalName}.jar</execFinalName>
-		<slf4j.version>1.7.5</slf4j.version>
+		<slf4j.version>1.7.30</slf4j.version>
 		<hsql.version>5.3.0</hsql.version>
 		<skip.integration.tests>true</skip.integration.tests>
 		<mysql.connector.java.version>5.1.20</mysql.connector.java.version>
