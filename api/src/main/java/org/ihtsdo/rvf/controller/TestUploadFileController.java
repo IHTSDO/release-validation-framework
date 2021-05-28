@@ -38,6 +38,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
+import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
+
 /**
  * The controller that handles uploaded files for the validation to run
  */
@@ -284,7 +286,10 @@ public class TestUploadFileController {
 			// Queue incoming validation request
 			queueManager.queueValidationRequest(vrConfig, responseMap);
 			URI uri = createResultURI(runId, storageLocation, uriComponentsBuilder);
-			LOGGER.info("RVF result url:" + uri.toURL().toString());
+			LOGGER.info("RVF result url: {}", uri.toURL());
+			if (responseMap.containsKey("failureMessage")) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
 			return ResponseEntity.created(uri).body(responseMap);
 		} else {
 			return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);

@@ -68,8 +68,8 @@ public class ValidationQueueManager {
 				Gson gson = new Gson();
 				String configJson = gson.toJson(config);
 				LOGGER.info("Send Jms message to queue for validation config json:" + configJson);
+				updateRvfStateTo(config, State.QUEUED);
 				jmsTemplate.convertAndSend(destinationName, configJson);
-				updateRvfStateToQueued(config);
 				reportService.writeState(State.QUEUED, config.getStorageLocation());
 			}
 		} catch (IOException e) {
@@ -80,16 +80,24 @@ public class ValidationQueueManager {
 			responseMap.put(FAILURE_MESSAGE, "Failed to write Queued State to Storage Location due to " + e.getMessage());
 		} catch (JMSException e) {
 			responseMap.put(FAILURE_MESSAGE, "Failed to update the RVF state inside the SRS service " + e.getMessage());
+		} finally {
+			if (responseMap.containsKey(FAILURE_MESSAGE)) {
+				try {
+					updateRvfStateTo(config, State.FAILED);
+				} catch (JsonProcessingException | JMSException e) {
+					LOGGER.error(e.getMessage());
+				}
+			}
 		}
 	}
 
-	private void updateRvfStateToQueued(final ValidationRunConfig config) throws JsonProcessingException, JMSException {
+	private void updateRvfStateTo(final ValidationRunConfig config, final State state) throws JsonProcessingException, JMSException {
 		final String responseQueue = config.getResponseQueue();
 		if (responseQueue != null) {
 			LOGGER.info("Updating RVF state to queued: {}", responseQueue);
 			messagingHelper.send(responseQueue,
 					ImmutableMap.of("runId", config.getRunId(),
-							"state", State.QUEUED.name()));
+							"state", state.name()));
 		}
 	}
 
