@@ -69,7 +69,7 @@ public class ValidationRunner {
 			try {
 				reportService.writeResults(statusReport, State.FAILED, validationConfig.getStorageLocation());
 			} catch (final Exception e) {
-				logger.error("Failed to record failure (which was: " + failureMsg + ") due to " + e.getMessage());
+				throw new RuntimeException("Failed to record failure (which was: " + failureMsg + ")", e);
 			}
 		}
 	}

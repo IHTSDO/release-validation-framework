@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
+import javax.xml.bind.ValidationException;
 import java.io.Closeable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,7 +54,7 @@ public class ValidationMessageListener implements Closeable {
 			config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
 			LOGGER.info("validation config:" + config);
 		} catch (JsonSyntaxException | JMSException e) {
-			LOGGER.error("JMS message listener error:", e);
+			throw new RuntimeException("Error occurred while trying to convert the incoming message.", e);
 		}
 		if (config != null) {
 			updateRvfStateToRunningAsync(config);
@@ -73,7 +74,7 @@ public class ValidationMessageListener implements Closeable {
 							ImmutableMap.of("runId", config.getRunId(),
 									"state", ValidationReportService.State.RUNNING.name()));
 				} catch (JsonProcessingException | JMSException e) {
-					LOGGER.error("Error occurred while trying to update the RVF state to running.", e);
+					throw new RuntimeException("Error occurred while trying to update the RVF state to running.", e);
 				}
 			}
 		});
