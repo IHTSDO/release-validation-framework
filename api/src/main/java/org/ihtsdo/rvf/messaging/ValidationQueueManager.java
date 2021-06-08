@@ -67,7 +67,7 @@ public class ValidationQueueManager {
 			if (saveUploadedFiles(config, responseMap)) {
 				Gson gson = new Gson();
 				String configJson = gson.toJson(config);
-				LOGGER.info("Send Jms message to queue for validation config json:" + configJson);
+				LOGGER.info("Send Jms message to queue for validation config json:{}", configJson);
 				updateRvfStateTo(config, State.QUEUED);
 				jmsTemplate.convertAndSend(destinationName, configJson);
 				reportService.writeState(State.QUEUED, config.getStorageLocation());

@@ -34,7 +34,8 @@ public class ValidationRunConfig {
 	private boolean enableMRCMValidation;
 	private CharacteristicType form;
 	private String responseQueue;
-	
+	private Long contentHeadTimestamp;
+
 	public MultipartFile getFile() {
 		return file;
 	}
@@ -326,5 +327,14 @@ public class ValidationRunConfig {
 	public ValidationRunConfig setGenerateDroolsReport(boolean generateDroolsReport) {
 		this.generateDroolsReport = generateDroolsReport;
 		return this;
+	}
+
+	public ValidationRunConfig setContentHeadTimestamp(Long contentHeadTimestamp) {
+		this.contentHeadTimestamp = contentHeadTimestamp;
+		return this;
+	}
+
+	public Long getContentHeadTimestamp() {
+		return contentHeadTimestamp;
 	}
 }

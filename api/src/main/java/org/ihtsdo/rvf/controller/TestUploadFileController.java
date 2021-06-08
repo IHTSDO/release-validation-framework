@@ -194,6 +194,7 @@ public class TestUploadFileController {
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Defaults to stated form.") @RequestParam(value = MRCM_VALIDATION_FORM, required = false, defaultValue = "stated") final CharacteristicType form,
+			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
 
@@ -214,6 +215,7 @@ public class TestUploadFileController {
 				.addUrl(urlPrefix)
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setGenerateDroolsReport(enableDroolsReport)
+				.setContentHeadTimestamp(contentHeadTimestamp)
 				.setForm(form);
 
 		// Before we start running, ensure that we've made our mark in the storage location
@@ -252,6 +254,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS_REPORT, required = false) final boolean enableDroolsReport,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") 
 			@RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
+			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") 
 			@RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
@@ -283,6 +286,7 @@ public class TestUploadFileController {
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setForm(form)
 				.setGenerateDroolsReport(enableDroolsReport)
+				.setContentHeadTimestamp(contentHeadTimestamp)
 				.addResponseQueue(responseQueue);
 
 		// Before we start running, ensure that we've made our mark in the storage location
