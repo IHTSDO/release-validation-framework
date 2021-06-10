@@ -30,6 +30,8 @@ import java.util.concurrent.Future;
 @Scope("prototype")
 public class ValidationRunner {
 
+	public static final List<String> EMPTY_TEST_ASSERTION_GROUPS = Collections.singletonList("empty-test");
+
 	@Autowired
 	private StructuralTestRunner structuralTestRunner;
 	
@@ -53,8 +55,8 @@ public class ValidationRunner {
 
 	private static final String MSG_VALIDATIONS_RUN = "Validations executed. Failures count: ";
 	private static final String MSG_VALIDATIONS_DISABLED = "Validations are disabled.";
-	
-	private Logger logger = LoggerFactory.getLogger(ValidationRunner.class);
+
+	private final Logger logger = LoggerFactory.getLogger(ValidationRunner.class);
 
 	public void run(ValidationRunConfig validationConfig) {
 		try {
@@ -75,6 +77,7 @@ public class ValidationRunner {
 	}
 	
 	private void runValidations(ValidationRunConfig validationConfig) throws Exception {
+		// Prepare to run validations
 		Calendar startTime = Calendar.getInstance();
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		releaseVersionLoader.downloadProspectiveFiles(validationConfig);
@@ -89,6 +92,27 @@ public class ValidationRunner {
 		report.setReportUrl(validationConfig.getUrl());
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		statusReport.setResultReport(report);
+
+		if (!EMPTY_TEST_ASSERTION_GROUPS.equals(validationConfig.getGroupsList())) {
+			// Actually run validations
+			doRunValidations(validationConfig, executionConfig, statusReport);
+		}
+
+		// Update reports and status after validations run
+		report.sortAssertionLists();
+		final Calendar endTime = Calendar.getInstance();
+		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
+		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
+		statusReport.setStartTime(startTime.getTime());
+		statusReport.setEndTime(endTime.getTime());
+		report.setTimeTakenInSeconds(timeTaken*60);
+		State state = statusReport.getFailureMessages().isEmpty() ? State.COMPLETE : State.FAILED;
+		updateRvfState(validationConfig, state);
+		updateExecutionSummary(statusReport, validationConfig);
+		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
+	}
+
+	private void doRunValidations(ValidationRunConfig validationConfig, MysqlExecutionConfig executionConfig, ValidationStatusReport statusReport) throws Exception {
 		runRF2StructureTests(validationConfig, statusReport);
 
 		List<Future<ValidationStatusReport>> tasks = new ArrayList<>();
@@ -101,7 +125,7 @@ public class ValidationRunner {
 		mysqlValidationStatusReport.setResultReport(new ValidationReport());
 		tasks.add(executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
 
-		if(validationConfig.isEnableDrools()) {
+		if (validationConfig.isEnableDrools()) {
 			statusMessages.append("\nDrools rules validation started");
 			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 			ValidationStatusReport droolsValidationStatusReport = new ValidationStatusReport(validationConfig);
@@ -109,7 +133,7 @@ public class ValidationRunner {
 			tasks.add(executorService.submit(() -> droolsValidationService.runDroolsAssertions(validationConfig, droolsValidationStatusReport)));
 		}
 
-		if(validationConfig.isEnableMRCMValidation()) {
+		if (validationConfig.isEnableMRCMValidation()) {
 			statusMessages.append("\nMRCM validation started");
 			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 			ValidationStatusReport mrcmValidationStatusReport = new ValidationStatusReport(validationConfig);
@@ -121,23 +145,10 @@ public class ValidationRunner {
 			try {
 				mergeValidationStatusReports(statusReport, task.get());
 			} catch (ExecutionException | InterruptedException e) {
-				logger.error("Thread interrupted while waiting for future result for run item:" + task , e);
+				logger.error("Thread interrupted while waiting for future result for run item:" + task, e);
 			}
 		}
 		executorService.shutdown();
-
-		report.sortAssertionLists();
-
-		final Calendar endTime = Calendar.getInstance();
-		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
-		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
-		statusReport.setStartTime(startTime.getTime());
-		statusReport.setEndTime(endTime.getTime());
-		report.setTimeTakenInSeconds(timeTaken*60);
-		State state = statusReport.getFailureMessages().isEmpty() ? State.COMPLETE : State.FAILED;
-		updateRvfState(validationConfig, state);
-		updateExecutionSummary(statusReport, validationConfig);
-		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
 	}
 
 	private void updateRvfState(final ValidationRunConfig validationConfig, final State state) throws JsonProcessingException, JMSException {
