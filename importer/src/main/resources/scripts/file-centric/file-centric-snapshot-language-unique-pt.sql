@@ -30,13 +30,14 @@
 		<RUNID>,
 		'<ASSERTIONUUID>',
 		a.conceptid,
-		concat('Concept: id=',a.conceptid, ' has duplicate language refsets for descrioption id=',a.id),
+		concat('Concept: id=',a.conceptid, ' has duplicate language refsets for description id=',a.id),
 		a.conceptid,
 		'curr_concept_s'
 	from description_tmp a
 	join curr_langrefset_s b
 		on a.id = b.referencedcomponentid
 	where a.active = '1'
+	    and b.active = '1'
 	group by a.conceptid, b.refsetid, b.referencedcomponentid
 	having count(b.referencedcomponentid) >1;
 
