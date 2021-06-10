@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.rvf.entity.AssertionGroup;
+import org.ihtsdo.rvf.execution.service.ValidationRunner;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.MRCMValidationService.CharacteristicType;
 import org.ihtsdo.rvf.messaging.ValidationQueueManager;
@@ -309,6 +310,11 @@ public class TestUploadFileController {
 	private boolean isAssertionGroupsValid(List<String> validationGroups,
 			Map<String, String> responseMap) {
 		// check assertion groups
+
+		if (ValidationRunner.EMPTY_TEST_ASSERTION_GROUPS.equals(validationGroups)) {
+			return true;
+		}
+
 		List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(validationGroups);
 		if (groups.size() != validationGroups.size()) {
 			final List<String> found = new ArrayList<>();
