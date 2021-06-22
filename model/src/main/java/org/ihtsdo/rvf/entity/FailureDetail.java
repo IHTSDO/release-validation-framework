@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class FailureDetail implements Comparable<FailureDetail>{
@@ -10,6 +9,7 @@ public class FailureDetail implements Comparable<FailureDetail>{
 	private String conceptFsn;
 	private String detail;
 	private String componentId;
+	private String fullComponent;
 
 	private transient String tableName;
 
@@ -108,5 +108,14 @@ public class FailureDetail implements Comparable<FailureDetail>{
 
 	public String getTableName() {
 		return tableName;
+	}
+
+	public FailureDetail setFullComponent(String fullComponent) {
+		this.fullComponent = fullComponent;
+		return this;
+	}
+
+	public String getFullComponent() {
+		return fullComponent;
 	}
 }

@@ -9,8 +9,6 @@ public class WhitelistItem {
 
     private String conceptId;
 
-    private String branch;
-
     private String additionalFields;
 
     public WhitelistItem (String validationRuleId, String componentId, String conceptId, String additionalFields) {
@@ -44,14 +42,6 @@ public class WhitelistItem {
         this.conceptId = conceptId;
     }
 
-    public String getBranch() {
-        return branch;
-    }
-
-    public void setBranch(String branch) {
-        this.branch = branch;
-    }
-
     public String getAdditionalFields() {
         return additionalFields;
     }
@@ -68,12 +58,11 @@ public class WhitelistItem {
         return Objects.equals(validationRuleId, that.validationRuleId) &&
                 Objects.equals(componentId, that.componentId) &&
                 Objects.equals(conceptId, that.conceptId) &&
-                Objects.equals(branch, that.branch) &&
                 Objects.equals(additionalFields, that.additionalFields);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(validationRuleId, componentId, conceptId, branch, additionalFields);
+        return Objects.hash(validationRuleId, componentId, conceptId, additionalFields);
     }
 }

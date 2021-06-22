@@ -71,10 +71,13 @@ public class MysqlFailuresExtractor {
                     int startIndex = batch_counter * config.getFailureExportMax();
                     int endIndex = startIndex + config.getFailureExportMax();
                     List<FailureDetail> failureDetails = fetchFailureDetails(connection, config.getExecutionId(), uuidToAssertionIdMap.get(item.getAssertionUuid()), -1, startIndex, endIndex);
+                    failureDetails.stream().forEach(failureDetail -> {
+                        failureDetail.setFullComponent(getAdditionalFields(connection,failureDetail));
+                    });
 
                     // Convert to WhitelistItem
                     List<WhitelistItem> whitelistItems = failureDetails.stream()
-                            .map(failureDetail -> new WhitelistItem(key, StringUtils.isEmpty(failureDetail.getComponentId())? "" : failureDetail.getComponentId(), failureDetail.getConceptId(), getAdditionalFields(connection,failureDetail)))
+                            .map(failureDetail -> new WhitelistItem(key, StringUtils.isEmpty(failureDetail.getComponentId())? "" : failureDetail.getComponentId(), failureDetail.getConceptId(), failureDetail.getFullComponent()))
                             .collect(Collectors.toList());
 
                     // Send to Authoring acceptance gateway

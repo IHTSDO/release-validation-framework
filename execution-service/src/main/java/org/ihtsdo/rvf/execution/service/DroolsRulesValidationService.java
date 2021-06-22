@@ -244,9 +244,16 @@ public class DroolsRulesValidationService {
 				validationRule.setAssertionText(invalidContentList.get(0).getMessage().replaceAll("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}","<UUID>").replaceAll("\\d{6,20}","<SCTID>"));
 
 				validationRule.setFailureCount((long) invalidContentList.size());
-				validationRule.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
-						.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()).setComponentId(item.getComponentId()))
-						.collect(Collectors.toList()));
+				if (!whitelistService.isWhitelistDisabled()) {
+					validationRule.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
+							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()).setComponentId(item.getComponentId()).setFullComponent(getAdditionalFields(item.getComponent())))
+							.collect(Collectors.toList()));
+				} else {
+					validationRule.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
+							.map(item -> new FailureDetail(item.getConceptId(), item.getMessage(), item.getConceptFsn()).setComponentId(item.getComponentId()))
+							.collect(Collectors.toList()));
+				}
+
 				Severity severity = invalidContentList.get(0).getSeverity();
 				if(Severity.WARNING.equals(severity)) {
 					warningAssertions.add(validationRule);
