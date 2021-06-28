@@ -1,7 +1,6 @@
 package org.ihtsdo.rvf.execution.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.*;
@@ -9,7 +8,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.common.collect.Iterables;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,9 +15,6 @@ import org.ihtsdo.drools.domain.*;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.response.Severity;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
-import org.ihtsdo.drools.validator.rf2.domain.DroolsConcept;
-import org.ihtsdo.drools.validator.rf2.domain.DroolsDescription;
-import org.ihtsdo.drools.validator.rf2.domain.DroolsRelationship;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
@@ -73,9 +68,6 @@ public class DroolsRulesValidationService {
 	@Autowired
 	private WhitelistService whitelistService;
 
-	@Autowired
-	private DroolReportSheetManager droolReportSheetManager;
-
 	private ResourceManager releaseSourceManager;
 
 	private ResourceManager testResourceManager;
@@ -114,6 +106,7 @@ public class DroolsRulesValidationService {
 				Set<InputStream> snapshotsInputStream = new HashSet<>();
 				String prospectiveFileFullPath = validationConfig.getProspectiveFileFullPath();
 				InputStream testedReleaseFileStream = null;
+				
 				if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
 					if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
 						ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
@@ -264,15 +257,6 @@ public class DroolsRulesValidationService {
 			validationReport.addFailedAssertions(failedAssertions);
 			validationReport.addWarningAssertions(warningAssertions);
 			validationReport.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
-			if(validationConfig.isGenerateDroolsReport()) {
-				try {
-					String reportUrl = generateGoogleSheetReport(validationConfig, invalidContentMap, groupRules, failedAssertions, warningAssertions);
-					statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),"Validations executed. Failures count: " + validationReport.getAssertionsFailed().size() + ". Google Sheet report: " + reportUrl);
-				} catch (Exception ex) {
-					LOGGER.error("Encountered error when creating Google Sheet report due to {}", ex);
-					statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),"Validations executed. Failures count: " + validationReport.getAssertionsFailed().size() + ". Failed to generate Google Sheet report due to: " + ex);
-				}
-			}
 		} catch (Exception ex) {
 			String message = "Drools validation has stopped";
 			LOGGER.error(message, ex);
@@ -319,80 +303,12 @@ public class DroolsRulesValidationService {
 		return droolsRulesModules;
 	}
 
-	private String generateGoogleSheetReport(ValidationRunConfig validationRunConfig, Map<String, List<InvalidContent>> invalidContentsMap, Map<String, List<InvalidContent>> groupRulesMap, List<TestRunItem> failures, List<TestRunItem> warnings) throws GeneralSecurityException, IOException, InterruptedException {
-		Spreadsheet spreadsheet = null;
-		try {
-			spreadsheet = droolReportSheetManager.createSheet(validationRunConfig.getTestFileName());
-			LOGGER.info("created sheet {}", spreadsheet.getSpreadsheetUrl());
-			List<List<Object>> summaryData = new ArrayList<>();
-			summaryData.add(Arrays.asList("Severity","Assertion","FailuresCount"));
-
-			List<List<Object>> detailsData = new ArrayList<>();
-			detailsData.add( Arrays.asList("Severity","SCTID","FSN","ComponentID","ComponentType","ComponentIsActive","ComponentDetails","Details"));
-
-			// Add failures to report first
-			if(!failures.isEmpty()) {
-				for (TestRunItem failure : failures) {
-					String message = failure.getAssertionText();
-					List<InvalidContent> failureContents = groupRulesMap.get(message) != null ? groupRulesMap.get(message) : invalidContentsMap.get(message);
-					summaryData.add(Arrays.asList(Severity.ERROR.name(), message, failureContents.size()));
-					for (InvalidContent invalidContent : failureContents) {
-						detailsData.add(createContentRow(invalidContent));
-					}
-				}
-			}
-			// Then warnings to report
-			if(!warnings.isEmpty()) {
-				for (TestRunItem warning : warnings) {
-					String message = warning.getAssertionText();
-					List<InvalidContent> warningContents = groupRulesMap.get(message) != null ? groupRulesMap.get(message) : invalidContentsMap.get(message);
-					summaryData.add(Arrays.asList(Severity.WARNING.name(), message, warningContents.size()));
-					for (InvalidContent invalidContent : warningContents) {
-						detailsData.add(createContentRow(invalidContent));
-					}
-				}
-			}
-
-			droolReportSheetManager.writeData(spreadsheet.getSpreadsheetId(),"Summary",summaryData);
-			Thread.sleep(5000);
-			droolReportSheetManager.writeData(spreadsheet.getSpreadsheetId(), "Details", detailsData);
-			return spreadsheet.getSpreadsheetUrl();
-		} catch (Exception ex) {
-			LOGGER.error("Error when creating Google Sheet Report for Drools validation: {}", ex);
-			throw ex;
+	private Map<String, List<InvalidContent>> groupDroolsRules(Map<String, List<InvalidContent>> groupedRules,
+			String rule, List<InvalidContent> invalidContents) {
+		if(!groupedRules.containsKey(rule)) {
+			groupedRules.put(rule, new ArrayList<>());
 		}
+		groupedRules.get(rule).addAll(invalidContents);
+		return groupedRules;
 	}
-
-	private List<Object> createContentRow(InvalidContent invalidContent) {
-		String sctid = invalidContent.getConceptId();
-		String fsn = invalidContent.getConceptFsn();
-		String componentId = "";
-		String componentIsActive = "";
-		String componentType = "";
-		String componentDetails = "";
-		if(invalidContent.getComponent() != null) {
-			Component component = invalidContent.getComponent();
-			componentId = component.getId();
-			componentIsActive = Boolean.toString(component.isActive());
-			if(component instanceof DroolsConcept) {
-				componentType = "Concept";
-				componentDetails = sctid + " |" + fsn + "|";
-			} else if(component instanceof DroolsDescription) {
-				componentType = "Description";
-				componentDetails = ((DroolsDescription) component).getTerm();
-			} else if(component instanceof DroolsRelationship) {
-				DroolsRelationship droolsRelationship = (DroolsRelationship) component;
-				if(droolsRelationship.getAxiomId() != null) {
-					componentId = droolsRelationship.getAxiomId();
-					componentType = "Axiom";
-					componentDetails = "Target: " + droolsRelationship.getDestinationId() + " / Type: " + droolsRelationship.getTypeId();
-				} else {
-					componentType = "Relationship";
-					componentDetails = "Target: " + droolsRelationship.getDestinationId() + " / Type: " + droolsRelationship.getTypeId() + " / Group: " + droolsRelationship.getRelationshipGroup();
-				}
-			}
-		}
-		return Arrays.asList(invalidContent.getSeverity().toString(), invalidContent.getConceptId(), invalidContent.getConceptFsn(), componentId, componentType, componentIsActive,componentDetails,invalidContent.getMessage());
-	}
-
 }
