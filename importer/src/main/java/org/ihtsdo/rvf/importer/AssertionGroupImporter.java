@@ -6,6 +6,7 @@ import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.ihtsdo.rvf.entity.Assertion;
@@ -20,15 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AssertionGroupImporter {
 
-	 private static final String PREVIOUS = "previous";
+	private static final String PREVIOUS = "previous";
 	private static final String NEW_INACTIVE_STATES_FOLLOW_ACTIVE_STATES = "New inactive states follow active states";
+	public static final String MDRS = "mdrs";
 
 	enum AssertionGroupName {
 		FILE_CENTRIC_VALIDATION ("COMMON", "file-centric-validation"),
 		COMPONENT_CENTRIC_VALIDATION ("COMMON", "component-centric-validation"),
 		RELEASE_TYPE_VALIDATION ("COMMON", "release-type-validation"),
-                MDRS_VALIDATION ("mdrs", "mdrs"),
-                MDRS_SNAPSHOT_VALIDATION ("mdrs", "mdrs-snapshot"),
+		MDRS_VALIDATION ("mdrs", "mdrs"),
 		SPANISH_EDITION ("ES", "SpanishEdition"),
 		INTERNATIONAL_EDITION ("INT", "InternationalEdition"),
 		COMMON_AUTHORING ("COMMON", "common-authoring"),
@@ -60,6 +61,8 @@ public class AssertionGroupImporter {
 		STATED_RELATIONSHIPS_VALIDATION("STATED_RELATIONSHIPS","stated-relationships-validation"), //Assertions group that contains only stated relationship for file centric and component centric assertions
 		STATED_RELATIONSHIPS_RELEASE_VALIDATION("STATED_RELATIONSHIPS_RELEASE_TYPE","stated-relationships-release-validation"), //Assertion group that contains full list of stated relationship assertions
 		DERIVATIVE_EDITION("DERIVATIVE","DerivativeEdition");
+
+
 		private String name;
 		private String releaseCenter;
 		private AssertionGroupName(String releaseCenter, String name) {
@@ -77,46 +80,46 @@ public class AssertionGroupImporter {
 	};
 
 	public enum ProductName {
-            INT("INT", "900000000000207008"),
-            AU("AU", "32506021000036107"),
-            BE("BE", "11000172109"),
-            NL("NL", "11000146104"),
-            UK("UK", "999000041000000102"),
-            UKCL("UKCL", "999000011000000103"),
-            US("US", "731000124108"),
-            NZ("NZ", "21000210109"),
-            ES("ES", "450829007"),
+			INT("INT", "900000000000207008"),
+			AU("AU", "32506021000036107"),
+			BE("BE", "11000172109"),
+			NL("NL", "11000146104"),
+			UK("UK", "999000041000000102"),
+			UKCL("UKCL", "999000011000000103"),
+			US("US", "731000124108"),
+			NZ("NZ", "21000210109"),
+			ES("ES", "450829007"),
 
-            DK("DK", "554471000005108"),
-            SE("SE", "45991000052106"),
-            NO("NO", "51000202101"),
+			DK("DK", "554471000005108"),
+			SE("SE", "45991000052106"),
+			NO("NO", "51000202101"),
 //            CH("CH", "SwissEdition"),
-            IE("IE", "11000220105"),
-            EE("EE", "11000181102"),
+			IE("IE", "11000220105"),
+			EE("EE", "11000181102"),
 
-	    SV("SNOVET", "332351000009108");
+		SV("SNOVET", "332351000009108");
 
-            private String name;
-            private String moduleId;
-            private ProductName(String name, String moduleId) {
-                    this.name = name;
-                    this.moduleId = moduleId;
-            }
+			private String name;
+			private String moduleId;
+			private ProductName(String name, String moduleId) {
+					this.name = name;
+					this.moduleId = moduleId;
+			}
 
-            public String getName() {
-                    return this.name;
-            }
-            public String getModuleId() {
-                    return this.moduleId;
-            }
-            static public String toModuleId(String name) {
-                for (ProductName pn: ProductName.values()) {
-                    if (name.equalsIgnoreCase(pn.getName())) {
-                        return pn.getModuleId();
-                    }
-                }
-                return name;
-            }
+			public String getName() {
+					return this.name;
+			}
+			public String getModuleId() {
+					return this.moduleId;
+			}
+			static public String toModuleId(String name) {
+				for (ProductName pn: ProductName.values()) {
+					if (name.equalsIgnoreCase(pn.getName())) {
+						return pn.getModuleId();
+					}
+				}
+				return name;
+			}
 	}
 
 	private static final String SIMPLE_MAP = "simple map";
@@ -311,9 +314,8 @@ public class AssertionGroupImporter {
 				createAssertionGroupByKeyWord(allAssertions, groupName.getName());
 				break;
 			case MDRS_VALIDATION :
-			case MDRS_SNAPSHOT_VALIDATION :
-			    createAssertionGroup(getReleaseAssertionsByCenter(allAssertions, groupName.getName()), groupName.getName());
-			    break;
+				createAssertionGroup(getReleaseAssertionsByCenter(allAssertions, groupName.getName()), groupName.getName());
+				break;
 			case LOINC_EDITION :
 			case SPANISH_EDITION :
 			case DANISH_EDITION	:
@@ -360,7 +362,7 @@ public class AssertionGroupImporter {
 				createStatedRelationshipGroup(allAssertions, groupName, true);
 				break;
 			default :
-			         LOGGER.warn("unrecognized group: " + groupName.getName());
+					 LOGGER.warn("unrecognized group: " + groupName.getName());
 			  break;
 		}
 
@@ -497,7 +499,7 @@ public class AssertionGroupImporter {
 		String keywords;
 		for (Assertion assertion : allAssertions) {
 			 keywords = assertion.getKeywords();
-			if (FILE_CENTRIC_VALIDATION.getName().equals(keywords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keywords)
+			if (keywords.contains(MDRS) || FILE_CENTRIC_VALIDATION.getName().equals(keywords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keywords)
 					|| RELEASE_TYPE_VALIDATION.getName().equals(keywords)) {
 				result.add(assertion);
 			}
@@ -563,17 +565,17 @@ public class AssertionGroupImporter {
 		}
 	}
 
-        private void createAssertionGroup(List<Assertion> allAssertions, String assertionGroupName) {
-                AssertionGroup group = new AssertionGroup();
-                group.setName(assertionGroupName);
-                group = assertionService.createAssertionGroup(group);
-                int addedAssertions = 0;
-                for (Assertion assertion : allAssertions) {
-                        assertionService.addAssertionToGroup(assertion, group);
-                        addedAssertions++;
-                }
-                LOGGER.info("Total assertions added {} for assertion group {}", addedAssertions, assertionGroupName );
-        }
+	private void createAssertionGroup(List<Assertion> allAssertions, String assertionGroupName) {
+		AssertionGroup group = new AssertionGroup();
+		group.setName(assertionGroupName);
+		group = assertionService.createAssertionGroup(group);
+		int addedAssertions = 0;
+		for (Assertion assertion : allAssertions) {
+				assertionService.addAssertionToGroup(assertion, group);
+				addedAssertions++;
+		}
+		LOGGER.info("Total assertions added {} for assertion group {}", addedAssertions, assertionGroupName );
+	}
 
 	private void createStatedRelationshipGroup(List<Assertion> allAssertions, AssertionGroupName assertionGroupName, boolean useFullList) {
 		AssertionGroup group = new AssertionGroup();

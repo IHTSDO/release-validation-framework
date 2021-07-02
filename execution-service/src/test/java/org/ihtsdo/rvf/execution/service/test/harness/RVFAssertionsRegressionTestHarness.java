@@ -64,6 +64,7 @@ public class RVFAssertionsRegressionTestHarness {
 	private static final String PROSPECTIVE_RELEASE = "rvf_regression_test_prospective";
 	
 	private static final String PREVIOUS_RELEASE = "rvf_regression_test_previous";
+	public static final String MDRS = "mdrs";
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
 	@Autowired
@@ -167,11 +168,15 @@ public class RVFAssertionsRegressionTestHarness {
 		AssertionGroup group = assertionService.getAssertionGroupByName("InternationalEdition");
 		Set<Assertion> assertions =  group.getAssertions();
 		List<Assertion> releaseTypeAssertions = new ArrayList<>();
+		List<Assertion> mdrsAssertions = new ArrayList<>();
 		for (Assertion assertion : group.getAssertions()) {
 			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION)) {
 				releaseTypeAssertions.add(assertion);
+			} else if (assertion.getKeywords().contains(MDRS)) {
+				mdrsAssertions.add(assertion);
 			}
 		}
+		assertEquals(30, mdrsAssertions.size());
 		assertEquals(272, assertions.size());
 		assertEquals(108, releaseTypeAssertions.size());
 	}
@@ -197,13 +202,13 @@ public class RVFAssertionsRegressionTestHarness {
 	
 	@Test
 	public void testTotalGroups() {
-		assertEquals(36, assertionService.getAllAssertionGroups().size());
+		assertEquals(35, assertionService.getAllAssertionGroups().size());
 	}
 	
 	@Test
 	public void testGetAssertionsForCommonAuthoring() {
 		AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
-		assertEquals(94, group.getAssertions().size());
+		assertEquals(64, group.getAssertions().size());
 	}
 	
 	@Test
