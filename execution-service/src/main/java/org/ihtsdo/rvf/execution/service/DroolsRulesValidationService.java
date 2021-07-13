@@ -88,7 +88,8 @@ public class DroolsRulesValidationService {
 	}
 
 	public ValidationStatusReport runDroolsAssertions(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws RVFExecutionException {
-		Set<String> directoryPaths = new HashSet<>();
+		Set<String> extractedRF2FilesDirectories = new HashSet<>();
+		Set<String> previousReleaseDirectories = new HashSet<>();
 		try {
 			long timeStart = new Date().getTime();
 			//Filter only Drools rules set from all the assertion groups
@@ -167,21 +168,19 @@ public class DroolsRulesValidationService {
 				//Unzip the release files
 				for (InputStream inputStream : snapshotsInputStream) {
 					String snapshotDirectoryPath = new ReleaseImporter().unzipRelease(inputStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
-					directoryPaths.add(snapshotDirectoryPath);
+					extractedRF2FilesDirectories.add(snapshotDirectoryPath);
 				}
-				String deltaDirectoryPath = null;
 				if(deltaInputStream != null) {
-					deltaDirectoryPath = new ReleaseImporter().unzipRelease(deltaInputStream, ReleaseImporter.ImportType.DELTA).getAbsolutePath();
+					extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(deltaInputStream, ReleaseImporter.ImportType.DELTA).getAbsolutePath());
 				}
 
-				String prevReleasePath = null;
 				if(StringUtils.isNotBlank(validationConfig.getPreviousRelease()) && validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
 					InputStream previousReleaseStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
-					prevReleasePath = new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
+					previousReleaseDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
 				}
 
 				//Run validation
-				invalidContents = droolsRF2Validator.validateSnapshots(directoryPaths, deltaDirectoryPath, prevReleasePath, droolsRulesSets, effectiveTime, modulesSet, true);
+				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, previousReleaseDirectories, droolsRulesSets, effectiveTime, modulesSet, true);
 
 				if (invalidContents.size() != 0 && !whitelistService.isWhitelistDisabled()) {
 					List<InvalidContent> newInvalidContents = new ArrayList<>();
@@ -264,7 +263,10 @@ public class DroolsRulesValidationService {
 			statusReport.addFailureMessage(message);
 			statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),message);
 		} finally {
-			for (String directoryPath : directoryPaths) {
+			for (String directoryPath : extractedRF2FilesDirectories) {
+				FileUtils.deleteQuietly(new File(directoryPath));
+			}
+			for (String directoryPath : previousReleaseDirectories) {
 				FileUtils.deleteQuietly(new File(directoryPath));
 			}
 		}
