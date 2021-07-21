@@ -346,8 +346,9 @@ public class ValidationRunConfig {
 		return contentHeadTimestamp;
 	}
 
-	public void setPackageWithoutDeltaFiles(boolean packageWithoutDeltaFiles) {
+	public ValidationRunConfig setPackageWithoutDeltaFiles(boolean packageWithoutDeltaFiles) {
 		this.packageWithoutDeltaFiles = packageWithoutDeltaFiles;
+		return this;
 	}
 
 	public boolean isPackageWithoutDeltaFiles() {
