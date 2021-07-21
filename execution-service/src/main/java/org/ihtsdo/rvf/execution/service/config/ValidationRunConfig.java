@@ -35,6 +35,7 @@ public class ValidationRunConfig {
 	private boolean enableMRCMValidation;
 	private String responseQueue;
 	private Long contentHeadTimestamp;
+	private boolean packageWithoutDeltaFiles;
 
 	public MultipartFile getFile() {
 		return file;
@@ -343,5 +344,13 @@ public class ValidationRunConfig {
 
 	public Long getContentHeadTimestamp() {
 		return contentHeadTimestamp;
+	}
+
+	public void setPackageWithoutDeltaFiles(boolean packageWithoutDeltaFiles) {
+		this.packageWithoutDeltaFiles = packageWithoutDeltaFiles;
+	}
+
+	public boolean isPackageWithoutDeltaFiles() {
+		return packageWithoutDeltaFiles;
 	}
 }

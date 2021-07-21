@@ -200,7 +200,8 @@ public class ValidationRunner {
 																		validationConfig.isWriteSucceses(),
 																		validationConfig.getUrl(),
 																		validationConfig.getStorageLocation(),
-																		validationConfig.getFailureExportMax());
+																		validationConfig.getFailureExportMax(),
+																		validationConfig.isPackageWithoutDeltaFiles());
 		
 		reportService.putFileIntoS3(reportStorage, new File(structuralTestRunner.getStructureTestReportFullPath()));
 		if (isFailed) {

@@ -49,14 +49,14 @@ public class StructuralTestRunner {
 	
 
 	public TestReportable execute(final ResourceProvider resourceManager, final PrintWriter writer, final boolean writeSuccesses,
-			final ManifestFile manifest) {
+			final ManifestFile manifest, final boolean packageWithoutDeltaFiles) {
 		// the information for the manifest testing
 		long start = System.currentTimeMillis();
 		final StreamTestReport testReport = new StreamTestReport(new CsvMetadataResultFormatter(), writer, writeSuccesses);
 		final ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
 		// run manifest tests
 		if ( manifest != null) {
-			runManifestTests(resourceManager, testReport, manifest, validationLogFactory.getValidationLog(ManifestPatternTester.class));
+			runManifestTests(resourceManager, testReport, manifest, validationLogFactory.getValidationLog(ManifestPatternTester.class), packageWithoutDeltaFiles);
 			testReport.addNewLine();
 		}
 		runColumnTests(resourceManager, testReport, validationLog);
@@ -82,12 +82,12 @@ public class StructuralTestRunner {
 	}
 
 	public TestReportable execute(final ResourceProvider resourceManager, final PrintWriter writer, final boolean writeSuccesses) {
-		return execute(resourceManager, writer, writeSuccesses, null);
+		return execute(resourceManager, writer, writeSuccesses, null, false);
 	}
 
 	private void runManifestTests(final ResourceProvider resourceManager, final TestReportable report,
-			final ManifestFile manifest, final ValidationLog validationLog) {
-		final ManifestPatternTester manifestPatternTester = new ManifestPatternTester(validationLog, resourceManager, manifest, report);
+			final ManifestFile manifest, final ValidationLog validationLog, final boolean packageWithoutDeltaFiles) {
+		final ManifestPatternTester manifestPatternTester = new ManifestPatternTester(validationLog, resourceManager, manifest, report, packageWithoutDeltaFiles);
 		manifestPatternTester.runTests();
 	}
 
@@ -104,7 +104,7 @@ public class StructuralTestRunner {
 	}
 	
 	public boolean verifyZipFileStructure(final ValidationReport validationReport, final File tempFile, final Long runId, final File manifestFile,
-										  final boolean writeSucceses, final String urlPrefix, String storageLocation, Integer maxFailuresExport ) throws IOException {
+										  final boolean writeSucceses, final String urlPrefix, String storageLocation, Integer maxFailuresExport, final boolean packageWithoutDeltaFiles) throws IOException {
 		boolean isFailed = false;
 		final long timeStart = System.currentTimeMillis();
 		if (tempFile != null) {
@@ -120,12 +120,12 @@ public class StructuralTestRunner {
 			TestReportable report;
 
 			if (manifestFile == null) {
-				report = execute(resourceManager, writer, writeSucceses,null);
+				report = execute(resourceManager, writer, writeSucceses,null, false);
 			} else {
 				File tempManifestFile  = null;
 				try {
 					final ManifestFile mf = new ManifestFile(manifestFile);
-					report = execute(resourceManager, writer, writeSucceses, mf);
+					report = execute(resourceManager, writer, writeSucceses, mf, packageWithoutDeltaFiles);
 				} finally {
 					FileUtils.deleteQuietly(tempManifestFile);
 				}
