@@ -81,33 +81,25 @@ public class ValidationVersionLoader {
 	
 	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws Exception {
 		String schemaName = constructRVFSchema(executionConfig.getPreviousVersion());
-		if (!releaseDataManager.isKnownRelease(schemaName)) {
-			if (executionConfig.getPreviousVersion().endsWith(ZIP_FILE_EXTENSION)) {
-				String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion());
-				executionConfig.setPreviousVersion(rvfDbSchema);
-			} else {
-				throw new BusinessServiceException("Previous release specified is not found " 
-						+ executionConfig.getPreviousVersion());
-			}
+		releaseDataManager.dropDatabaseIfExist(schemaName);
+		if (executionConfig.getPreviousVersion().endsWith(ZIP_FILE_EXTENSION)) {
+			String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion());
+			executionConfig.setPreviousVersion(rvfDbSchema);
 		} else {
-			logger.info("Previous release exists already " + schemaName);
-			executionConfig.setPreviousVersion(schemaName);
+			throw new BusinessServiceException("Previous release specified is not found "
+					+ executionConfig.getPreviousVersion());
 		}
 	}
 		
 	public void loadDependencyVersion(MysqlExecutionConfig executionConfig) throws IOException, BusinessServiceException {
 		String schemaName = constructRVFSchema(executionConfig.getExtensionDependencyVersion());
-		if (!releaseDataManager.isKnownRelease(schemaName)) {
-			if (executionConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
-				String dependencyVersion = loadRelease(executionConfig.getExtensionDependencyVersion());
-				executionConfig.setExtensionDependencyVersion(dependencyVersion);
-			} else {
-				throw new BusinessServiceException("Dependency release specified is not found " 
-						+ executionConfig.getExtensionDependencyVersion());
-			}
+		releaseDataManager.dropDatabaseIfExist(schemaName);
+		if (executionConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
+			String dependencyVersion = loadRelease(executionConfig.getExtensionDependencyVersion());
+			executionConfig.setExtensionDependencyVersion(dependencyVersion);
 		} else {
-			logger.info("Dependency release exists already " + schemaName);
-			executionConfig.setExtensionDependencyVersion(schemaName);
+			throw new BusinessServiceException("Dependency release specified is not found "
+					+ executionConfig.getExtensionDependencyVersion());
 		}
 	}
 	

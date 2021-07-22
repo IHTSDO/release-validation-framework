@@ -124,6 +124,18 @@ public class ReleaseDataManager {
 			logger.error("Error getting list of existing schemas. Nested exception is : \n" + e.fillInStackTrace());
 		}
 	}
+
+	public void dropDatabaseIfExist(String schemaName) throws BusinessServiceException{
+		logger.info("Dropping schema: {}", schemaName);
+		//clean database
+		String dropStr = "drop database if exists " + schemaName + ";";
+		try (Statement statement = dataSource.getConnection().createStatement()) {
+			statement.execute(dropStr);
+			schemaNames.remove(schemaName);
+		} catch (SQLException e) {
+			throw new BusinessServiceException("Failed to drop schema " + schemaName, e);
+		}
+	}
 	
 	public String getRVFVersion(String product, String releaseVersion) {
 		return RVF_DB_PREFIX + product + "_" + releaseVersion;
@@ -203,12 +215,7 @@ public class ReleaseDataManager {
 		return result;
 	}
 	
-	
 	public String loadSnomedData(final String versionName, List<String> rf2FilesLoaded, final File... zipDataFile) throws BusinessServiceException {
-		return loadSnomedData(versionName, false, rf2FilesLoaded, zipDataFile);
-	}
-
-	private String loadSnomedData(final String versionName, boolean isAppendToVersion, List<String> rf2FilesLoaded, final File... zipDataFile) throws BusinessServiceException {
 		File outputFolder = null;
 		final String createdSchemaName = versionName.startsWith(RVF_DB_PREFIX) ? versionName : RVF_DB_PREFIX + versionName;
 		final long startTime = Calendar.getInstance().getTimeInMillis();
@@ -225,9 +232,7 @@ public class ReleaseDataManager {
 			for (final File zipFile : zipDataFile) {
 				ZipFileUtils.extractFilesFromZipToOneFolder(zipFile, outputFolder.getAbsolutePath());
 			}
-			if (!isAppendToVersion) {
-				createSchema(createdSchemaName);
-			}
+			createSchema(createdSchemaName);
 			loadReleaseFilesToDB(outputFolder, rvfDynamicDataSource, rf2FilesLoaded, createdSchemaName);
 		} catch (final SQLException | IOException e) {
 			List<String> fileNames = Arrays.asList(zipDataFile).stream().map(file -> file.getName()).collect(Collectors.toList());
@@ -456,12 +461,6 @@ public class ReleaseDataManager {
 		
 	}
 
-	
-	public String loadSnomedDataIntoExistingDb(String productVersion, List<String> rf2FilesLoaded, File... zipDataFile) throws BusinessServiceException {
-		return loadSnomedData(productVersion, true, rf2FilesLoaded, zipDataFile);
-	}
-
-	
 	public void copyTableData(String sourceSchemaA, String sourceSchemaB, String destinationSchema, String tableNamePattern,
 			List<String> excludeTableNames) throws BusinessServiceException {
 		final long startTime = System.currentTimeMillis();
