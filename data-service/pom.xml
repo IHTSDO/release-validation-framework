@@ -37,5 +37,15 @@
 			<artifactId>javassist</artifactId>
 			<version>3.28.0-GA</version>
 		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo.otf.common</groupId>
+			<artifactId>resource-manager</artifactId>
+			<version>4.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo.otf.common</groupId>
+			<artifactId>otf-common</artifactId>
+			<version>4.4.0</version>
+		</dependency>
 	</dependencies>
 </project>

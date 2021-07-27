@@ -1,12 +1,16 @@
 package org.ihtsdo.rvf;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.rvf.config.AssertionsResourceConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -34,6 +38,9 @@ public class DataServiceConfig {
 	@Value("${rvf.master.schema.name}")
 	private String rvfMasterSchemaName;
 
+	@Autowired
+	private AssertionsResourceConfig assertionsResourceConfig;
+	
 	@Bean(name = "dataSource")
 	public BasicDataSource getDataSource() {
 		BasicDataSource basicDataSource = new BasicDataSource();
@@ -49,5 +56,11 @@ public class DataServiceConfig {
 		basicDataSource.setValidationQuery("SELECT 1");
 		basicDataSource.setDefaultTransactionIsolation(2);
 		return basicDataSource;
+	}
+
+
+	@Bean(name = "assertionResourceManager")
+	public ResourceManager assertionResourceManager() {
+		return new ResourceManager(assertionsResourceConfig, null);
 	}
 }

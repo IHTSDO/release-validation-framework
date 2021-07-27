@@ -1,6 +1,6 @@
-	package org.ihtsdo.rvf.importer;
+package org.ihtsdo.rvf.importer;
 
-	import java.io.File;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
+import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.entity.SimpleAssertion;
@@ -27,6 +28,7 @@ import org.jdom2.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +53,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 		@Value("${rvf.assertion.import.required:false}")
 		private boolean assertionImportRequired;
+
+		@Autowired
+		@Qualifier("assertionResourceManager")
+		private ResourceManager assertionResourceManager;
+
+		@Value("${rvf.assertion.externalConfig}")
+		private boolean useExternalAssertionConfigs;
 
 		protected ObjectMapper objectMapper = new ObjectMapper();
 		private Map<String, String> lookupMap = new HashMap<>();
@@ -99,8 +108,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 								}
 								logger.info("category = " + category);
 
-								String sqlResourceFileName = sqlResourcesFolderLocation+ RESOURCE_PATH_SEPARATOR + category + RESOURCE_PATH_SEPARATOR + sqlFileName;
-								InputStream sqlInputStream = getClass().getResourceAsStream( sqlResourceFileName);
+								String sqlResourceFileName = sqlResourcesFolderLocation + RESOURCE_PATH_SEPARATOR + category + RESOURCE_PATH_SEPARATOR + sqlFileName;
+								InputStream sqlInputStream = null;
+								if (useExternalAssertionConfigs) {
+									sqlInputStream = assertionResourceManager.readResourceStream(sqlResourceFileName);
+								} else {
+									sqlInputStream = getClass().getResourceAsStream( sqlResourceFileName);
+								}
 								if (sqlInputStream != null) {
 									final String sqlString = readStream(sqlInputStream);
 									// add test to assertion
