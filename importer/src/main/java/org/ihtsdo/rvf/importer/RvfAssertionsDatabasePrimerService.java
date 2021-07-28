@@ -26,9 +26,6 @@ public class RvfAssertionsDatabasePrimerService {
 	@Qualifier("assertionResourceManager")
 	private ResourceManager assertionResourceManager;
 
-	@Value("${rvf.assertion.externalConfig}")
-	private boolean useExternalAssertionConfigs;
-	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RvfAssertionsDatabasePrimerService.class);
 
 	@PostConstruct
@@ -36,11 +33,7 @@ public class RvfAssertionsDatabasePrimerService {
 		if (dbImporter.isAssertionImportRequired()) {
 			LOGGER.info("No assertons exist and start importing...");
 			InputStream manifestInputStream = null;
-			if (useExternalAssertionConfigs) {
-				manifestInputStream = assertionResourceManager.readResourceStream("manifest.xml");
-			} else {
-				manifestInputStream = AssertionsDatabaseImporter.class.getResourceAsStream("/xml/lists/manifest.xml");
-			}
+			manifestInputStream = assertionResourceManager.readResourceStream("manifest.xml");
 
 			// import content
 			dbImporter.importAssertionsFromFile(manifestInputStream, scriptsDir);

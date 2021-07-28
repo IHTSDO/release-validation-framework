@@ -58,9 +58,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		@Qualifier("assertionResourceManager")
 		private ResourceManager assertionResourceManager;
 
-		@Value("${rvf.assertion.externalConfig}")
-		private boolean useExternalAssertionConfigs;
-
 		protected ObjectMapper objectMapper = new ObjectMapper();
 		private Map<String, String> lookupMap = new HashMap<>();
 		@Autowired
@@ -110,11 +107,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 								String sqlResourceFileName = sqlResourcesFolderLocation + RESOURCE_PATH_SEPARATOR + category + RESOURCE_PATH_SEPARATOR + sqlFileName;
 								InputStream sqlInputStream = null;
-								if (useExternalAssertionConfigs) {
-									sqlInputStream = assertionResourceManager.readResourceStream(sqlResourceFileName);
-								} else {
-									sqlInputStream = getClass().getResourceAsStream( sqlResourceFileName);
-								}
+								sqlInputStream = assertionResourceManager.readResourceStream(sqlResourceFileName);
 								if (sqlInputStream != null) {
 									final String sqlString = readStream(sqlInputStream);
 									// add test to assertion
