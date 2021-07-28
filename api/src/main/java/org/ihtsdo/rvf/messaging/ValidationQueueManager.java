@@ -44,9 +44,6 @@ public class ValidationQueueManager {
 	@Autowired
 	private ResourceLoader cloudResourceLoader;
 	
-	@Value("${rvf.execution.isAutoScalingEnabled}")
-	private Boolean isAutoScalingEnabled;
-	
 	@Value("${rvf.validation.queue.name}")
 	private String destinationName;
 
