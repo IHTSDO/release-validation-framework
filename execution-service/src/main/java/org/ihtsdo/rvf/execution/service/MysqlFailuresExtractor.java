@@ -77,7 +77,7 @@ public class MysqlFailuresExtractor {
 
                     // Convert to WhitelistItem
                     List<WhitelistItem> whitelistItems = failureDetails.stream()
-                            .map(failureDetail -> new WhitelistItem(key, StringUtils.isEmpty(failureDetail.getComponentId())? "" : failureDetail.getComponentId(), failureDetail.getConceptId(), failureDetail.getFullComponent()))
+                            .map(failureDetail -> new WhitelistItem(item.getAssertionUuid().toString(), StringUtils.isEmpty(failureDetail.getComponentId())? "" : failureDetail.getComponentId(), failureDetail.getConceptId(), failureDetail.getFullComponent()))
                             .collect(Collectors.toList());
 
                     // Send to Authoring acceptance gateway
