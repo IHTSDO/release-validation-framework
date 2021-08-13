@@ -14,14 +14,12 @@ import org.ihtsdo.rvf.validation.resource.ResourceProvider;
 
 public class ManifestPatternTester {
 
-	private static final String DELTA = "delta";
 	private static final String MANIFEST_STRUCTURE_TEST = "ManifestPackageStructureTest";
 	private static final String MANIFEST = "manifest.xml";
 	private final ValidationLog validationLog;
 	private final ResourceProvider resourceManager;
 	private final ManifestFile manifestFile;
 	private final TestReportable report;
-	private boolean packageWithoutDeltaFiles;
 
 	public ManifestPatternTester(final ValidationLog validationLog, final ResourceProvider resourceManager, final ManifestFile manifestFile,
 			final TestReportable report) {
@@ -29,12 +27,6 @@ public class ManifestPatternTester {
 		this.resourceManager = resourceManager;
 		this.manifestFile = manifestFile;
 		this.report = report;
-	}
-
-	public ManifestPatternTester(final ValidationLog validationLog, final ResourceProvider resourceManager, final ManifestFile manifestFile,
-								 final TestReportable report, final boolean packageWithoutDeltaFiles) {
-		this(validationLog, resourceManager, manifestFile, report);
-		this.packageWithoutDeltaFiles = packageWithoutDeltaFiles;
 	}
 
 	public void runTests() {
@@ -69,9 +61,6 @@ public class ManifestPatternTester {
 				String filename = file.getFileName();
 				if (!Normalizer.isNormalized(filename, Form.NFC)) {
 					filename = Normalizer.normalize(filename, Form.NFC);
-				}
-				if (this.packageWithoutDeltaFiles && filename.toLowerCase().contains(DELTA)) {
-					continue;
 				}
 				if (!(resourceManager.match(filename))) {
 					validationLog.assertionError("Invalid package structure expected file at {} but found none", filename);
