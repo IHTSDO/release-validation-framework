@@ -48,8 +48,6 @@ import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 @Api(tags = "Validate", description ="-")
 public class TestUploadFileController {
 
-	private static final String PACKAGE_WITHOUT_DELTA_FILES = "packageWithoutDeltaFiles";
-
 	private static final String ENABLE_MRCM_VALIDATION = "enableMRCMValidation";
 
 	private static final String MRCM_VALIDATION_FORM = "mrcmValidationForm";
