@@ -31,7 +31,6 @@ public class ValidationRunConfig {
 	private List<String> droolsRulesGroupList;
 	private String bucketName;
 	private boolean enableMRCMValidation;
-	private CharacteristicType form;
 	private String responseQueue;
 	private Long contentHeadTimestamp;
 
@@ -67,7 +66,7 @@ public class ValidationRunConfig {
 		this.droolsRulesGroupList = droolsRulesGroupList;
 		return this;
 	}
-	
+
 	public ValidationRunConfig addFailureExportMax(final Integer exportMax) {
 		this.failureExportMax = exportMax;
 		return this;
@@ -100,22 +99,24 @@ public class ValidationRunConfig {
 		this.url = url;
 		return this;
 	}
-	
+
 	public void setTestFileName(final String filename) {
 		testFileName = filename;
-		
+
 	}
-	
+
 	public String getTestFileName() {
 		return testFileName;
 	}
-	
+
 	public void setRunId(Long runId) {
 		this.runId = runId;
 	}
+
 	public void setWriteSucceses(boolean writeSucceses) {
 		this.writeSucceses = writeSucceses;
 	}
+
 	public void setGroupsList(List<String> groupsList) {
 		this.groupsList = groupsList;
 	}
@@ -123,17 +124,9 @@ public class ValidationRunConfig {
 	public void setStorageLocation(String storageLocation) {
 		this.storageLocation = storageLocation;
 	}
+
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public CharacteristicType getForm() {
-		return form;
-	}
-
-	public ValidationRunConfig setForm(CharacteristicType form) {
-		this.form = form;
-		return this;
 	}
 
 	public final String getResponseQueue() {
@@ -154,44 +147,46 @@ public class ValidationRunConfig {
 				+ ", dependencyRelease=" + dependencyRelease
 				+ ", drools=" + enableDrools
 				+ ", mrcm=" + enableMRCMValidation
-				+ ", runId=" + runId 
+				+ ", runId=" + runId
 				+ ", url=" + url + "]";
 	}
-	
+
 	public String getManifestFileFullPath() {
 		return this.manifestFileFullPath;
 	}
+
 	public void setManifestFileFullPath(String manifestFileFullPath) {
 		this.manifestFileFullPath = manifestFileFullPath;
 	}
-	
+
 	public boolean isFirstTimeRelease() {
 		return previousRelease == null ? true : false;
 	}
-	
+
 	public ValidationRunConfig addProspectiveFileFullPath(String s3File) {
 		this.prospectiveFileFullPath = s3File;
 		String[] parts = s3File.split("/");
 		testFileName =  parts[parts.length-1];
 		return this;
 	}
-	
+
 	public  ValidationRunConfig addManifestFileFullPath(String manifestFileFullPath) {
 		this.manifestFileFullPath = manifestFileFullPath;
 		return this;
 	}
-	
+
 	public String getProspectiveFileFullPath() {
 		return this.prospectiveFileFullPath;
 	}
-	
+
 	public boolean isProspectiveFileInS3() {
 		return isProspectiveFileInS3;
 	}
+
 	public void setProspectiveFilesInS3(boolean isProspectiveFilesInS3) {
 		this.isProspectiveFileInS3 = isProspectiveFilesInS3;
 	}
-	
+
 	public ValidationRunConfig addProspectiveFilesInS3(boolean isFileInS3) {
 		this.isProspectiveFileInS3 = isFileInS3;
 		return this;
@@ -201,16 +196,19 @@ public class ValidationRunConfig {
 		this.isRf2DeltaOnly = isRf2DeltaOnly;
 		return this;
 	}
-	
+
 	public boolean isRf2DeltaOnly() {
 		return isRf2DeltaOnly;
 	}
+
 	public void setRf2DeltaOnly(boolean isRf2DeltaOnly) {
 		this.isRf2DeltaOnly = isRf2DeltaOnly;
 	}
+
 	public String getExtensionDependency() {
 		return dependencyRelease;
 	}
+
 	public void setExtensionDependency(String extensionDependency) {
 		this.dependencyRelease = extensionDependency;
 	}
@@ -232,7 +230,6 @@ public class ValidationRunConfig {
 		this.effectiveTime = effectiveTime;
 		return this;
 	}
-
 
 	public boolean isReleaseAsAnEdition() {
 		return releaseAsAnEdition;
@@ -259,14 +256,14 @@ public class ValidationRunConfig {
 	public void setDroolsRulesGroupList(List<String> droolsRulesGroupList) {
 		this.droolsRulesGroupList = droolsRulesGroupList;
 	}
-	
+
 	public ValidationRunConfig addPreviousRelease(String previousRelease) {
 		if (previousRelease != null && !previousRelease.isEmpty()) {
 			this.previousRelease = previousRelease;
 		}
 		return this;
 	}
-	
+
 	public ValidationRunConfig addDependencyRelease(String dependencyRelease) {
 		this.dependencyRelease = dependencyRelease;
 		return this;
@@ -274,40 +271,43 @@ public class ValidationRunConfig {
 	public void setPreviousRelease(String previousRelease) {
 		this.previousRelease = previousRelease;
 	}
-	
+
 	public void setProspectiveFileFullPath(String prospectiveFileFullPath) {
 		this.prospectiveFileFullPath = prospectiveFileFullPath;
 	}
-	
+
 	public String getPreviousRelease() {
 		return this.previousRelease;
 	}
-	
+
 	public File getLocalProspectiveFile() {
 		return this.localProspectiveFile;
 	}
+
 	public void setLocalProspectiveFile(File prospectiveFile) {
 		this.localProspectiveFile = prospectiveFile;
 	}
+
 	public File getLocalManifestFile() {
 		return localManifestFile;
 	}
+
 	public void setLocalManifestFile(File localManifestFile) {
 		this.localManifestFile = localManifestFile;
 	}
-	
+
 	public ValidationRunConfig addBucketName(String bucketName) {
 		this.bucketName = bucketName;
 		return this;
 	}
-	
+
 	public String getBucketName() {
 		return this.bucketName;
 	}
-	
+
 	public void setBucketName(String bucketName) {
 		this.bucketName = bucketName;
-		
+
 	}
 
 	public boolean isEnableMRCMValidation() {

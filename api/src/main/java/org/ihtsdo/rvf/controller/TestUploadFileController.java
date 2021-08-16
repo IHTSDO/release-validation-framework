@@ -191,7 +191,6 @@ public class TestUploadFileController {
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
-			@ApiParam(value = "Defaults to stated form.") @RequestParam(value = MRCM_VALIDATION_FORM, required = false, defaultValue = "stated") final CharacteristicType form,
 			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
@@ -212,8 +211,7 @@ public class TestUploadFileController {
 				.setIncludedModules(includedModules)
 				.addUrl(urlPrefix)
 				.setEnableMRCMValidation(enableMrcmValidation)
-				.setContentHeadTimestamp(contentHeadTimestamp)
-				.setForm(form);
+				.setContentHeadTimestamp(contentHeadTimestamp);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage
@@ -256,7 +254,6 @@ public class TestUploadFileController {
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
-			@ApiParam(value = "Defaults to stated form.") @RequestParam(value = MRCM_VALIDATION_FORM, required = false, defaultValue = "stated") final CharacteristicType form,
 			@ApiParam(value = "Name of the response queue.") @RequestParam(value = RESPONSE_QUEUE, required = false) final String responseQueue,
 			UriComponentsBuilder uriComponentsBuilder) throws IOException {
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
@@ -280,7 +277,6 @@ public class TestUploadFileController {
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setIncludedModules(includedModules)
 				.setEnableMRCMValidation(enableMrcmValidation)
-				.setForm(form)
 				.setContentHeadTimestamp(contentHeadTimestamp)
 				.addResponseQueue(responseQueue);
 

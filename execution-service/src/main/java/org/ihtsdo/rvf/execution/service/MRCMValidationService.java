@@ -64,7 +64,7 @@ public class MRCMValidationService {
 
 	private static final String LINE_ENDING = "\r\n";
 
-    public enum CharacteristicType { inferred, stated }
+	public enum CharacteristicType { inferred, stated }
 
 	@PostConstruct
 	public void init() {
@@ -74,12 +74,13 @@ public class MRCMValidationService {
 	public ValidationStatusReport runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig, String effectiveDate, Long executionId) {
 		File outputFolder = null;
 		try {
+			int maxFailureExports = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 100;
 			final long timeStart = System.currentTimeMillis();
 			ValidationReport report = statusReport.getResultReport();
 			ValidationService validationService = new ValidationService();
-			ValidationRun validationRun = new ValidationRun(
-					StringUtils.isNotBlank(effectiveDate) ? effectiveDate.replaceAll("-","") : effectiveDate
-					, CharacteristicType.inferred.equals(validationConfig.getForm()) ? ContentType.INFERRED : ContentType.STATED, false);
+			effectiveDate = StringUtils.isNotBlank(effectiveDate) ? effectiveDate.replaceAll("-","") : effectiveDate;
+			ValidationRun validationRunOnInferredView = new ValidationRun(effectiveDate, ContentType.INFERRED, false);
+			ValidationRun validationRunOnStatedView = new ValidationRun(effectiveDate, ContentType.STATED, false);
 			try {
 				outputFolder = extractZipFile(validationConfig, executionId);
 
@@ -87,7 +88,7 @@ public class MRCMValidationService {
 				LOGGER.error("Error:" + ex);
 			}
 			if(outputFolder != null){
-				Set<String> modules = null;
+				Set<String> modules = Collections.EMPTY_SET;
 				if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
 					//Will filter the results based on component's module IDs if the package is an extension only
 					String moduleIds = validationConfig.getIncludedModules();
@@ -95,26 +96,45 @@ public class MRCMValidationService {
 						modules = Sets.newHashSet(moduleIds.split(","));
 					}
 				}
-				validationService.loadMRCM(outputFolder, validationRun);
-				validationService.validateRelease(outputFolder, validationRun, modules != null ? modules : Collections.EMPTY_SET);
+				validationService.loadMRCM(outputFolder, validationRunOnInferredView);
+				validationService.validateRelease(outputFolder, validationRunOnInferredView, modules);
+				validationService.loadMRCM(outputFolder, validationRunOnStatedView);
+				validationService.validateRelease(outputFolder, validationRunOnStatedView, modules);
 			}
 
 			TestRunItem testRunItem;
 			final List<TestRunItem> passedAssertions = new ArrayList<>();
-			for(Assertion assertion : validationRun.getCompletedAssertions()){
+			for(Assertion assertion : validationRunOnInferredView.getCompletedAssertions()){
 				testRunItem = createTestRunItem(assertion);
 				passedAssertions.add(testRunItem);
 			}
+			for(Assertion assertion : validationRunOnStatedView.getCompletedAssertions()){
+				testRunItem = createTestRunItem(assertion);
+				if(!passedAssertions.contains(testRunItem)) {
+					passedAssertions.add(testRunItem);
+				}
+			}
 
 			final List<TestRunItem> skippedAssertions = new ArrayList<>();
-			for(Assertion assertion : validationRun.getSkippedAssertions()){
+			for(Assertion assertion : validationRunOnInferredView.getSkippedAssertions()){
 				testRunItem = createTestRunItem(assertion);
 				skippedAssertions.add(testRunItem);
 			}
+			for(Assertion assertion : validationRunOnStatedView.getSkippedAssertions()){
+				testRunItem = createTestRunItem(assertion);
+				if(!skippedAssertions.contains(testRunItem)) {
+					skippedAssertions.add(testRunItem);
+				}
+			}
 
-			int maxFailureExports = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
 			final List<TestRunItem> warnedAssertions = new ArrayList<>();
-			for(Assertion assertion : validationRun.getFailedAssertions()){
+			for(Assertion assertion : validationRunOnInferredView.getAssertionsWithWarning()){
+				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
+				if(testRunItem != null) {
+					warnedAssertions.add(testRunItem);
+				}
+			}
+			for(Assertion assertion : validationRunOnStatedView.getAssertionsWithWarning()){
 				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
 				if(testRunItem != null) {
 					warnedAssertions.add(testRunItem);
@@ -122,7 +142,13 @@ public class MRCMValidationService {
 			}
 
 			final List<TestRunItem> failedAssertions = new ArrayList<>();
-			for(Assertion assertion : validationRun.getFailedAssertions()){
+			for(Assertion assertion : validationRunOnInferredView.getFailedAssertions()){
+				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
+				if(testRunItem != null) {
+					failedAssertions.add(testRunItem);
+				}
+			}
+			for(Assertion assertion : validationRunOnStatedView.getFailedAssertions()){
 				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
 				if(testRunItem != null) {
 					failedAssertions.add(testRunItem);
