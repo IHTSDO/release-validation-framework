@@ -36,6 +36,7 @@ public class AssertionGroupImporter {
 		COMMON_AUTHORING_WITHOUT_LANG_REFSETS ("COMMON_AUTHORING_WITHOUT_LANG_REFSETS", "common-authoring-without-lang-refsets"),
 		COMMON_EDITION("COMMON", "common-edition"),
 		INT_AUTHORING ("INT", "int-authoring"),
+		AT_AUTHORING("AT", "at-authoring"),
 		DK_AUTHORING("DK", "dk-authoring"),
 		SE_AUTHORING ("SE", "se-authoring"),
 		US_AUTHORING ("US", "us-authoring"),
@@ -340,6 +341,7 @@ public class AssertionGroupImporter {
 				createCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions);
 				break;
 			case INT_AUTHORING :
+			case AT_AUTHORING:
 			case DK_AUTHORING :
 			case SE_AUTHORING :
 			case US_AUTHORING :
