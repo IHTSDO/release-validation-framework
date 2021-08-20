@@ -23,6 +23,8 @@ public class ValidationRunConfig {
 	private boolean isProspectiveFileInS3;
 	private transient File localProspectiveFile;
 	private transient File localManifestFile;
+	private transient File localDependencyReleaseFile;
+	private transient File localPreviousReleaseFile;
 	private boolean isRf2DeltaOnly;
 	private boolean enableDrools;
 	private String effectiveTime;
@@ -294,6 +296,22 @@ public class ValidationRunConfig {
 
 	public void setLocalManifestFile(File localManifestFile) {
 		this.localManifestFile = localManifestFile;
+	}
+
+	public void setLocalDependencyReleaseFile(File localDependencyReleaseFile) {
+		this.localDependencyReleaseFile = localDependencyReleaseFile;
+	}
+
+	public File getLocalDependencyReleaseFile() {
+		return localDependencyReleaseFile;
+	}
+
+	public void setLocalPreviousReleaseFile(File localPreviousReleaseFile) {
+		this.localPreviousReleaseFile = localPreviousReleaseFile;
+	}
+
+	public File getLocalPreviousReleaseFile() {
+		return localPreviousReleaseFile;
 	}
 
 	public ValidationRunConfig addBucketName(String bucketName) {

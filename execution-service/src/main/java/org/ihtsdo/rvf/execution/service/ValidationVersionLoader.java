@@ -1,32 +1,14 @@
 package org.ihtsdo.rvf.execution.service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.annotation.Resource;
-import javax.naming.ConfigurationException;
-
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration.Cloud;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
-import static org.ihtsdo.rvf.execution.service.ReleaseDataManager.*;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
+import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.util.RvfReleaseDbSchemaNameGenerator;
 import org.slf4j.Logger;
@@ -35,6 +17,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.naming.ConfigurationException;
+import java.io.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.ihtsdo.rvf.execution.service.ReleaseDataManager.RVF_DB_PREFIX;
 
 @Service
 public class ValidationVersionLoader {
@@ -64,6 +60,11 @@ public class ValidationVersionLoader {
 	@Autowired
 	private ResourceDataLoader resourceLoader;
 
+	@Autowired
+	private ValidationReleaseStorageConfig releaseStorageConfig;
+
+	private ResourceManager releaseSourceManager;
+
 	@Resource(name = "dataSource")
 	private BasicDataSource snomedDataSource;
 	
@@ -71,6 +72,11 @@ public class ValidationVersionLoader {
 	private boolean generateBinaryArchive;
 
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
+
+	@PostConstruct
+	public void init() {
+		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
+	}
 	
 	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws Exception {
 		String schemaName = constructRVFSchema(executionConfig.getPreviousVersion());
@@ -262,6 +268,36 @@ public class ValidationVersionLoader {
 		logger.info("Time taken {} seconds to download files {} from s3", (System.currentTimeMillis()-s3StreamingStart)/1000 ,
 				prospectiveFileFullPath);
 	}
+
+	public void downloadPreviousReleaseAndDependencyFiles(ValidationRunConfig validationConfig) throws Exception {
+		if (!StringUtils.isEmpty(validationConfig.getExtensionDependency())) {
+			InputStream dependencyStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getExtensionDependency());
+			if (dependencyStream != null) {
+				File dependencyFile = File.createTempFile(validationConfig.getRunId() + "_DEPENDENCY_RF2", ZIP_FILE_EXTENSION);
+				if (dependencyFile != null) {
+					OutputStream out = new FileOutputStream(dependencyFile);
+					IOUtils.copy(dependencyStream, out);
+					IOUtils.closeQuietly(dependencyStream);
+					IOUtils.closeQuietly(out);
+					validationConfig.setLocalDependencyReleaseFile(dependencyFile);
+				}
+			}
+		}
+
+		if (!StringUtils.isEmpty(validationConfig.getPreviousRelease())) {
+			InputStream previousStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getPreviousRelease());
+			if (previousStream != null) {
+				File previousFile = File.createTempFile(validationConfig.getRunId() + "_PREVIOUS_RF2", ZIP_FILE_EXTENSION);
+				if (previousStream != null) {
+					OutputStream out = new FileOutputStream(previousFile);
+					IOUtils.copy(previousStream, out);
+					IOUtils.closeQuietly(previousStream);
+					IOUtils.closeQuietly(out);
+					validationConfig.setLocalPreviousReleaseFile(previousFile);
+				}
+			}
+		}
+	}
 	
 	private boolean isExtension(final ValidationRunConfig runConfig) {
 		return (runConfig.getExtensionDependency() != null
@@ -336,14 +372,13 @@ public class ValidationVersionLoader {
 
 	/**Current extension is already loaded into the prospective version
 	 * @param executionConfig
-	 * @param responseMap
 	 * @param validationConfig
 	 * @return
 	 * @throws BusinessServiceException 
 	 * @throws IOException 
 	 * @throws SQLException 
 	 */
-	public void combineCurrenExtensionWithDependencySnapshot(MysqlExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws BusinessServiceException {
+	public void combineCurrentExtensionWithDependencySnapshot(MysqlExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws BusinessServiceException {
 		String extensionVersion = executionConfig.getProspectiveVersion();
 		String combinedVersion = executionConfig.getProspectiveVersion() + COMBINED;
 		executionConfig.setProspectiveVersion(combinedVersion);

@@ -81,6 +81,7 @@ public class ValidationRunner {
 		Calendar startTime = Calendar.getInstance();
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		releaseVersionLoader.downloadProspectiveFiles(validationConfig);
+		releaseVersionLoader.downloadPreviousReleaseAndDependencyFiles(validationConfig);
 		if (validationConfig.getLocalProspectiveFile() == null) {
 			reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
 			String errorMsg ="Prospective file can't be null " + validationConfig.getLocalProspectiveFile();
@@ -138,7 +139,7 @@ public class ValidationRunner {
 			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 			ValidationStatusReport mrcmValidationStatusReport = new ValidationStatusReport(validationConfig);
 			mrcmValidationStatusReport.setResultReport(new ValidationReport());
-			tasks.add(executorService.submit(() -> mrcmValidationService.runMRCMAssertionTests(mrcmValidationStatusReport, validationConfig, executionConfig.getEffectiveTime(), executionConfig.getExecutionId())));
+			tasks.add(executorService.submit(() -> mrcmValidationService.runMRCMAssertionTests(mrcmValidationStatusReport, validationConfig)));
 		}
 
 		for (Future<ValidationStatusReport> task : tasks) {

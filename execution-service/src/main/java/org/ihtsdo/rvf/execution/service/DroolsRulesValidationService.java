@@ -1,30 +1,23 @@
 package org.ihtsdo.rvf.execution.service;
 
-import java.io.File;
-import java.io.InputStream;
-import java.security.GeneralSecurityException;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.AnonymousAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.drools.domain.*;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.response.Severity;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
-import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
-import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
-import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
-import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
@@ -33,14 +26,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.AnonymousAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.google.common.collect.Sets;
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DroolsRulesValidationService {
@@ -57,18 +50,7 @@ public class DroolsRulesValidationService {
 	private ValidationResourceConfig testResourceConfig;
 
 	@Autowired
-	private ValidationJobResourceConfig jobResourceConfig;
-
-	@Autowired
-	private ValidationReleaseStorageConfig releaseStorageConfig;
-
-	@Autowired
-	private ResourceLoader cloudResourceLoader;
-
-	@Autowired
 	private WhitelistService whitelistService;
-
-	private ResourceManager releaseSourceManager;
 
 	private ResourceManager testResourceManager;
 
@@ -78,8 +60,6 @@ public class DroolsRulesValidationService {
 
 	@PostConstruct
 	public void init() {
-		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
-
 		AmazonS3 anonymousClient = AmazonS3ClientBuilder.standard()
 				.withRegion(awsRegion)
 				.withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
@@ -92,6 +72,7 @@ public class DroolsRulesValidationService {
 		Set<String> previousReleaseDirectories = new HashSet<>();
 		try {
 			long timeStart = new Date().getTime();
+			String effectiveDate = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replaceAll("-","") : "";
 			//Filter only Drools rules set from all the assertion groups
 			Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
 			ValidationReport validationReport = statusReport.getResultReport();
@@ -103,35 +84,16 @@ public class DroolsRulesValidationService {
 			}
 			List<InvalidContent> invalidContents = null;
 			try {
-				ResourceManager validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
 				Set<InputStream> snapshotsInputStream = new HashSet<>();
-				String prospectiveFileFullPath = validationConfig.getProspectiveFileFullPath();
-				InputStream testedReleaseFileStream = null;
+				InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile());
 				
-				if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
-					if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
-						ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
-								new ResourceConfiguration.Cloud(validationConfig.getBucketName(), ""));
-						ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
-						testedReleaseFileStream = manualResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
-					} else {
-						//update s3 path if required when full path containing job resource path already
-						if (prospectiveFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
-							prospectiveFileFullPath = prospectiveFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
-						}
-					}
-				}
-				if(testedReleaseFileStream == null) {
-					testedReleaseFileStream = validationJobResourceManager.readResourceStream(prospectiveFileFullPath);
-				}
-
 				InputStream deltaInputStream = null;
 				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 				if (validationConfig.isRf2DeltaOnly()) {
 					if(StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
 						throw new RVFExecutionException("Drools validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
 					}
-					InputStream previousStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
+					InputStream previousStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile());
 					snapshotsInputStream.add(previousStream);
 					deltaInputStream = testedReleaseFileStream;
 				} else {
@@ -146,7 +108,7 @@ public class DroolsRulesValidationService {
 					if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
 						throw new RVFExecutionException("Drools validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 					}
-					InputStream dependencyStream = releaseSourceManager.readResourceStream(validationConfig.getExtensionDependency());
+					InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyReleaseFile());
 					snapshotsInputStream.add(dependencyStream);
 
 					//Will filter the results based on component's module IDs if the package is an extension only
@@ -158,12 +120,6 @@ public class DroolsRulesValidationService {
 
 				//Get effectiveTime
 				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, testResourceManager);
-				String effectiveTime = validationConfig.getEffectiveTime();
-				if (StringUtils.isNotBlank(effectiveTime)) {
-					effectiveTime = effectiveTime.replaceAll("-", "");
-				} else {
-					effectiveTime = "";
-				}
 
 				//Unzip the release files
 				for (InputStream inputStream : snapshotsInputStream) {
@@ -175,12 +131,12 @@ public class DroolsRulesValidationService {
 				}
 
 				if(StringUtils.isNotBlank(validationConfig.getPreviousRelease()) && validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
-					InputStream previousReleaseStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
+					InputStream previousReleaseStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile());
 					previousReleaseDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
 				}
 
 				//Run validation
-				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, previousReleaseDirectories, droolsRulesSets, effectiveTime, modulesSet, true);
+				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, previousReleaseDirectories, droolsRulesSets, effectiveDate, modulesSet, true);
 
 				if (invalidContents.size() != 0 && !whitelistService.isWhitelistDisabled()) {
 					List<InvalidContent> newInvalidContents = new ArrayList<>();

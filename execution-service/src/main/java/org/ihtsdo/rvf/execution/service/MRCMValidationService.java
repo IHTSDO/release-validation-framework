@@ -3,17 +3,12 @@ package org.ihtsdo.rvf.execution.service;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
-import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
-import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.otf.sqs.service.dto.ConceptResult;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
-import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
-import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +16,11 @@ import org.snomed.quality.validator.mrcm.Assertion;
 import org.snomed.quality.validator.mrcm.ContentType;
 import org.snomed.quality.validator.mrcm.ValidationRun;
 import org.snomed.quality.validator.mrcm.ValidationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,59 +33,25 @@ import java.util.concurrent.Executors;
 @Service
 public class MRCMValidationService {
 
-	@Autowired
-	private ValidationReleaseStorageConfig releaseStorageConfig;
-
-	@Autowired
-	private ResourceLoader cloudResourceLoader;
-
-	private ResourceManager releaseSourceManager;
-
-	@Autowired
-	private ValidationJobResourceConfig jobResourceConfig;
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(MRCMValidationService.class);
 
 	private static final String EXT_ZIP = ".zip";
 
 	public enum CharacteristicType { inferred, stated }
 
-	@PostConstruct
-	public void init() {
-		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
-	}
-
-	public ValidationStatusReport runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig, String effectiveDate, Long executionId) throws Exception{
+	public ValidationStatusReport runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig) {
 		Set<String> extractedRF2FilesDirectory = new HashSet<>();
 		try {
+			boolean fullSnapshotRelease = !validationConfig.isRf2DeltaOnly() && StringUtils.isEmpty(validationConfig.getExtensionDependency());
 			int maxFailureExports = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 100;
-			effectiveDate = StringUtils.isNotBlank(effectiveDate) ? effectiveDate.replaceAll("-","") : effectiveDate;
+			String effectiveDate = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replaceAll("-","") : "";
 			final long timeStart = System.currentTimeMillis();
 			ValidationReport report = statusReport.getResultReport();
 			ValidationService validationService = new ValidationService();
 
 			Set<InputStream> snapshotsInputStream = new HashSet<>();
 
-			ResourceManager validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
-
-			String prospectiveFileFullPath = validationConfig.getProspectiveFileFullPath();
-			InputStream testedReleaseFileStream = null;
-			if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
-				if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
-					ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
-							new ResourceConfiguration.Cloud(validationConfig.getBucketName(), ""));
-					ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
-					testedReleaseFileStream = manualResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
-				} else {
-					//update s3 path if required when full path containing job resource path already
-					if (prospectiveFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
-						prospectiveFileFullPath = prospectiveFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
-					}
-				}
-			}
-			if(testedReleaseFileStream == null) {
-				testedReleaseFileStream = validationJobResourceManager.readResourceStream(prospectiveFileFullPath);
-			}
+			InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile());
 
 			InputStream deltaInputStream = null;
 			//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
@@ -100,7 +59,7 @@ public class MRCMValidationService {
 				if(StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
 					throw new RVFExecutionException("MRCM validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
 				}
-				InputStream previousStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
+				InputStream previousStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile());
 				snapshotsInputStream.add(previousStream);
 				deltaInputStream = testedReleaseFileStream;
 			} else {
@@ -110,12 +69,19 @@ public class MRCMValidationService {
 
 			//Load the dependency package from S3 to snapshot files list before validating if the package is a MS extension and not an edition release
 			//If the package is an MS edition, it is not necessary to load the dependency
+			Set<String> moduleIds = null;
 			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
 				if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
-					throw new RVFExecutionException("Drools validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
+					throw new RVFExecutionException("MRCM validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 				}
-				InputStream dependencyStream = releaseSourceManager.readResourceStream(validationConfig.getExtensionDependency());
+				InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyReleaseFile());
 				snapshotsInputStream.add(dependencyStream);
+
+				//Will filter the results based on component's module IDs if the package is an extension only
+				String moduleIdStr = validationConfig.getIncludedModules();
+				if(StringUtils.isNotBlank(moduleIdStr)) {
+					moduleIds = Sets.newHashSet(moduleIdStr.split(","));
+				}
 			}
 
 			//Unzip the release files
@@ -128,15 +94,6 @@ public class MRCMValidationService {
 				extractedRF2FilesDirectory.add(deltaDirectory.getPath());
 			}
 
-			boolean fullSnapshotRelease = !validationConfig.isRf2DeltaOnly() && StringUtils.isEmpty(validationConfig.getExtensionDependency());
-			Set<String> moduleIds = null;
-			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
-				//Will filter the results based on component's module IDs if the package is an extension only
-				String moduleIdStr = validationConfig.getIncludedModules();
-				if(StringUtils.isNotBlank(moduleIdStr)) {
-					moduleIds = Sets.newHashSet(moduleIdStr.split(","));
-				}
-			}
 			ValidationRun validationRunner = new ValidationRun(null, null, false);
 			validationRunner.setFullSnapshotRelease(fullSnapshotRelease);
 			validationService.loadMRCM(extractedRF2FilesDirectory, validationRunner);

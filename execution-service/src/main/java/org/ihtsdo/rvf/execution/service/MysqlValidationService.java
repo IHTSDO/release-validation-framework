@@ -115,7 +115,7 @@ public class MysqlValidationService {
 		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage,false);
 		//loading international snapshot
 		try {
-			releaseVersionLoader.combineCurrenExtensionWithDependencySnapshot(executionConfig, validationConfig);
+			releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig, validationConfig);
 		} catch (BusinessServiceException e) {
 			String msg = "Failed to prepare data for extension testing due to error:" + e.getMessage();
 			statusReport.addFailureMessage(msg);
