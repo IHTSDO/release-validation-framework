@@ -1,23 +1,20 @@
 package org.ihtsdo.rvf.execution.service;
 
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
+import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
+import org.ihtsdo.otf.resourcemanager.ResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
-import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.otf.sqs.service.dto.ConceptResult;
 import org.ihtsdo.rvf.entity.FailureDetail;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
+import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
-import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snomed.quality.validator.mrcm.Assertion;
@@ -27,15 +24,18 @@ import org.snomed.quality.validator.mrcm.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class MRCMValidationService {
@@ -48,21 +48,12 @@ public class MRCMValidationService {
 
 	private ResourceManager releaseSourceManager;
 
+	@Autowired
+	private ValidationJobResourceConfig jobResourceConfig;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(MRCMValidationService.class);
 
-	private static final String MRCM_PROSPECTIVE_FILE = "mrcm_prospective_file_";
-
-	private static final String MRCM_DEPENDENCY_FILE = "mrcm_dependency_file_";
-
 	private static final String EXT_ZIP = ".zip";
-
-	private static final String SNAPSHOT = "Snapshot.*_*_\\d{8}.txt";
-
-	private static final String DELTA = "Delta.*_*_\\d{8}.txt";
-
-	private static final String ID = "id";
-
-	private static final String LINE_ENDING = "\r\n";
 
 	public enum CharacteristicType { inferred, stated }
 
@@ -71,124 +62,180 @@ public class MRCMValidationService {
 		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
 	}
 
-	public ValidationStatusReport runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig, String effectiveDate, Long executionId) {
-		File outputFolder = null;
+	public ValidationStatusReport runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig, String effectiveDate, Long executionId) throws Exception{
+		Set<String> extractedRF2FilesDirectory = new HashSet<>();
 		try {
 			int maxFailureExports = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 100;
+			effectiveDate = StringUtils.isNotBlank(effectiveDate) ? effectiveDate.replaceAll("-","") : effectiveDate;
 			final long timeStart = System.currentTimeMillis();
 			ValidationReport report = statusReport.getResultReport();
 			ValidationService validationService = new ValidationService();
-			effectiveDate = StringUtils.isNotBlank(effectiveDate) ? effectiveDate.replaceAll("-","") : effectiveDate;
-			ValidationRun validationRunOnInferredView = new ValidationRun(effectiveDate, ContentType.INFERRED, false);
-			ValidationRun validationRunOnStatedView = new ValidationRun(effectiveDate, ContentType.STATED, false);
-			try {
-				outputFolder = extractZipFile(validationConfig, executionId);
 
-			} catch (BusinessServiceException ex) {
-				LOGGER.error("Error:" + ex);
-			}
-			if(outputFolder != null){
-				Set<String> modules = Collections.EMPTY_SET;
-				if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
-					//Will filter the results based on component's module IDs if the package is an extension only
-					String moduleIds = validationConfig.getIncludedModules();
-					if(StringUtils.isNotBlank(moduleIds)) {
-						modules = Sets.newHashSet(moduleIds.split(","));
+			Set<InputStream> snapshotsInputStream = new HashSet<>();
+
+			ResourceManager validationJobResourceManager = new ResourceManager(jobResourceConfig, cloudResourceLoader);
+
+			String prospectiveFileFullPath = validationConfig.getProspectiveFileFullPath();
+			InputStream testedReleaseFileStream = null;
+			if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
+				if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
+					ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
+							new ResourceConfiguration.Cloud(validationConfig.getBucketName(), ""));
+					ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
+					testedReleaseFileStream = manualResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
+				} else {
+					//update s3 path if required when full path containing job resource path already
+					if (prospectiveFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
+						prospectiveFileFullPath = prospectiveFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
 					}
 				}
-				validationService.loadMRCM(outputFolder, validationRunOnInferredView);
-				validationService.validateRelease(outputFolder, validationRunOnInferredView, modules);
-				validationService.loadMRCM(outputFolder, validationRunOnStatedView);
-				validationService.validateRelease(outputFolder, validationRunOnStatedView, modules);
+			}
+			if(testedReleaseFileStream == null) {
+				testedReleaseFileStream = validationJobResourceManager.readResourceStream(prospectiveFileFullPath);
 			}
 
-			TestRunItem testRunItem;
-			final List<TestRunItem> passedAssertions = new ArrayList<>();
-			for(Assertion assertion : validationRunOnInferredView.getCompletedAssertions()){
-				testRunItem = createTestRunItem(assertion);
-				passedAssertions.add(testRunItem);
-			}
-			for(Assertion assertion : validationRunOnStatedView.getCompletedAssertions()){
-				testRunItem = createTestRunItem(assertion);
-				if(!passedAssertions.contains(testRunItem)) {
-					passedAssertions.add(testRunItem);
+			InputStream deltaInputStream = null;
+			//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
+			if (validationConfig.isRf2DeltaOnly()) {
+				if(StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
+					throw new RVFExecutionException("MRCM validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
 				}
+				InputStream previousStream = releaseSourceManager.readResourceStream(validationConfig.getPreviousRelease());
+				snapshotsInputStream.add(previousStream);
+				deltaInputStream = testedReleaseFileStream;
+			} else {
+				//If the validation is Snapshot validation, current file must be loaded to snapshot files list
+				snapshotsInputStream.add(testedReleaseFileStream);
 			}
 
-			final List<TestRunItem> skippedAssertions = new ArrayList<>();
-			for(Assertion assertion : validationRunOnInferredView.getSkippedAssertions()){
-				testRunItem = createTestRunItem(assertion);
-				skippedAssertions.add(testRunItem);
-			}
-			for(Assertion assertion : validationRunOnStatedView.getSkippedAssertions()){
-				testRunItem = createTestRunItem(assertion);
-				if(!skippedAssertions.contains(testRunItem)) {
-					skippedAssertions.add(testRunItem);
+			//Load the dependency package from S3 to snapshot files list before validating if the package is a MS extension and not an edition release
+			//If the package is an MS edition, it is not necessary to load the dependency
+			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
+				if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
+					throw new RVFExecutionException("Drools validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 				}
+				InputStream dependencyStream = releaseSourceManager.readResourceStream(validationConfig.getExtensionDependency());
+				snapshotsInputStream.add(dependencyStream);
 			}
 
-			final List<TestRunItem> warnedAssertions = new ArrayList<>();
-			for(Assertion assertion : validationRunOnInferredView.getAssertionsWithWarning()){
-				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
-				if(testRunItem != null) {
-					warnedAssertions.add(testRunItem);
-				}
+			//Unzip the release files
+			for (InputStream inputStream : snapshotsInputStream) {
+				File snapshotDirectory = new ReleaseImporter().unzipRelease(inputStream, ReleaseImporter.ImportType.SNAPSHOT);
+				extractedRF2FilesDirectory.add(snapshotDirectory.getPath());
 			}
-			for(Assertion assertion : validationRunOnStatedView.getAssertionsWithWarning()){
-				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
-				if(testRunItem != null) {
-					warnedAssertions.add(testRunItem);
-				}
+			if(deltaInputStream != null) {
+				File deltaDirectory = new ReleaseImporter().unzipRelease(deltaInputStream, ReleaseImporter.ImportType.DELTA);
+				extractedRF2FilesDirectory.add(deltaDirectory.getPath());
 			}
 
-			final List<TestRunItem> failedAssertions = new ArrayList<>();
-			for(Assertion assertion : validationRunOnInferredView.getFailedAssertions()){
-				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
-				if(testRunItem != null) {
-					failedAssertions.add(testRunItem);
+			boolean fullSnapshotRelease = !validationConfig.isRf2DeltaOnly() && StringUtils.isEmpty(validationConfig.getExtensionDependency());
+			Set<String> moduleIds = null;
+			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
+				//Will filter the results based on component's module IDs if the package is an extension only
+				String moduleIdStr = validationConfig.getIncludedModules();
+				if(StringUtils.isNotBlank(moduleIdStr)) {
+					moduleIds = Sets.newHashSet(moduleIdStr.split(","));
 				}
 			}
-			for(Assertion assertion : validationRunOnStatedView.getFailedAssertions()){
-				testRunItem = createTestRunItemWithFailures(assertion, maxFailureExports);
-				if(testRunItem != null) {
-					failedAssertions.add(testRunItem);
-				}
-			}
+			ValidationRun validationRunner = new ValidationRun(null, null, false);
+			validationRunner.setFullSnapshotRelease(fullSnapshotRelease);
+			validationService.loadMRCM(extractedRF2FilesDirectory, validationRunner);
 
+			ValidationRun validationRunnerInferredForm = getValidationRunGivenForm(effectiveDate, validationRunner, fullSnapshotRelease, moduleIds, ContentType.INFERRED);
+			ValidationRun validationRunnerInStatedForm = getValidationRunGivenForm(effectiveDate, validationRunner, fullSnapshotRelease, moduleIds, ContentType.STATED);
+
+			Set<Callable<Void>> callables = new HashSet<>();
+			callables.add(() -> {
+				validationService.validateRelease(extractedRF2FilesDirectory, validationRunnerInferredForm);
+				return null;
+			});
+			callables.add(() -> {
+				validationService.validateRelease(extractedRF2FilesDirectory, validationRunnerInStatedForm);
+				return null;
+			});
+			ExecutorService executorService = Executors.newCachedThreadPool();
+			executorService.invokeAll(callables);
+
+			extractTestResults(maxFailureExports, report, validationRunnerInferredForm, ContentType.INFERRED);
+			extractTestResults(maxFailureExports, report, validationRunnerInStatedForm, ContentType.STATED);
 			report.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
-			report.addFailedAssertions(failedAssertions);
-			report.addWarningAssertions(warnedAssertions);
-			report.addSkippedAssertions(skippedAssertions);
-			report.addPassedAssertions(passedAssertions);
+			executorService.shutdown();
 		} catch (Exception ex) {
 			String message = "MRCM validation has stopped";
 			LOGGER.error(message, ex);
 			message = ex.getMessage() != null ? message + " due to error: " + ex.getMessage() : message;
 			statusReport.addFailureMessage(message);
 		}  finally {
-			if(outputFolder != null) {
-				FileUtils.deleteQuietly(outputFolder);
+			if(!CollectionUtils.isEmpty(extractedRF2FilesDirectory)) {
+				extractedRF2FilesDirectory.forEach(s -> FileUtils.deleteQuietly(new File(s)));
 			}
 		}
 		return  statusReport;
 	}
 
-	private TestRunItem createTestRunItem(Assertion mrcmAssertion) {
+	private ValidationRun getValidationRunGivenForm(String effectiveDate, ValidationRun validationRunner, boolean fullSnapshotRelease, Set<String> moduleIds, ContentType contentType) {
+		ValidationRun validationRun = new ValidationRun(effectiveDate, contentType, false);
+		validationRun.setModuleIds(moduleIds);
+		validationRun.setFullSnapshotRelease(fullSnapshotRelease);
+		validationRun.setMRCMDomains(validationRunner.getMRCMDomains());
+		validationRun.setAttributeRangesMap(validationRunner.getAttributeRangesMap());
+		validationRun.setUngroupedAttributes(validationRunner.getUngroupedAttributes());
+		validationRun.setConceptsUsedInMRCMTemplates(validationRunner.getConceptsUsedInMRCMTemplates());
+		return validationRun;
+	}
+
+	private void extractTestResults(int maxFailureExports, ValidationReport report, ValidationRun validationRun, ContentType contentType) {
+		TestRunItem testRunItem;
+		final List<TestRunItem> passedAssertions = new ArrayList<>();
+		for(Assertion assertion : validationRun.getCompletedAssertions()){
+			testRunItem = createTestRunItem(assertion, contentType);
+			passedAssertions.add(testRunItem);
+		}
+
+		final List<TestRunItem> skippedAssertions = new ArrayList<>();
+		for(Assertion assertion : validationRun.getSkippedAssertions()){
+			testRunItem = createTestRunItem(assertion, contentType);
+			skippedAssertions.add(testRunItem);
+		}
+
+		final List<TestRunItem> warnedAssertions = new ArrayList<>();
+		for(Assertion assertion : validationRun.getAssertionsWithWarning()){
+			testRunItem = createTestRunItemWithFailures(assertion, contentType, maxFailureExports);
+			if(testRunItem != null) {
+				warnedAssertions.add(testRunItem);
+			}
+		}
+
+		final List<TestRunItem> failedAssertions = new ArrayList<>();
+		for(Assertion assertion : validationRun.getFailedAssertions()){
+			testRunItem = createTestRunItemWithFailures(assertion, contentType, maxFailureExports);
+			if(testRunItem != null) {
+				failedAssertions.add(testRunItem);
+			}
+		}
+
+		report.addFailedAssertions(failedAssertions);
+		report.addWarningAssertions(warnedAssertions);
+		report.addSkippedAssertions(skippedAssertions);
+		report.addPassedAssertions(passedAssertions);
+	}
+
+	private TestRunItem createTestRunItem(Assertion mrcmAssertion, ContentType contentType) {
 		TestRunItem testRunItem = new TestRunItem();
 		testRunItem.setTestType(TestType.MRCM);
 		testRunItem.setAssertionUuid(mrcmAssertion.getUuid());
-		testRunItem.setAssertionText(mrcmAssertion.getAssertionText());
+		testRunItem.setAssertionText((ContentType.STATED.equals(contentType) ? "STATED FORM" : "INFERRED FORM") + ": " + mrcmAssertion.getAssertionText());
 		testRunItem.setFailureCount(0L);
 		testRunItem.setExtractResultInMillis(0L);
 		return testRunItem;
 	}
 
-	private TestRunItem createTestRunItemWithFailures(Assertion mrcmAssertion, int failureExportMax) {
+	private TestRunItem createTestRunItemWithFailures(Assertion mrcmAssertion, ContentType contentType, int failureExportMax) {
 		int failureCount = mrcmAssertion.getCurrentViolatedConceptIds().size();
 		if(failureCount == 0) return null;
-		int firstNCount = failureCount >= failureExportMax ? failureExportMax : failureCount;
-		TestRunItem testRunItem = createTestRunItem(mrcmAssertion);
-		testRunItem.setFailureCount(Long.valueOf(failureCount));
+		int firstNCount = Math.min(failureCount, failureExportMax);
+		TestRunItem testRunItem = createTestRunItem(mrcmAssertion, contentType);
+		testRunItem.setFailureCount((long) failureCount);
 		List<FailureDetail> failedDetails = new ArrayList(firstNCount);
 		for(int i = 0; i < firstNCount; i++) {
 			ConceptResult concept = mrcmAssertion.getCurrentViolatedConcepts().get(i);
@@ -197,161 +244,4 @@ public class MRCMValidationService {
 		testRunItem.setFirstNInstances(failedDetails);
 		return testRunItem;
 	}
-
-	private File extractZipFile(ValidationRunConfig validationConfig, Long executionId) throws BusinessServiceException, RVFExecutionException {
-		File outputFolder, deltaOutputFolder = null, snapshotOutputFolder = null, dependencyOutputFolder = null;
-		try{
-			outputFolder = new File(FileUtils.getTempDirectoryPath(), MRCM_PROSPECTIVE_FILE + executionId);
-			LOGGER.info("Unzipped release folder location = " + outputFolder.getAbsolutePath());
-			if (outputFolder.exists()) {
-				LOGGER.info("Unzipped release folder already exists and will be deleted before recreating.");
-				outputFolder.delete();
-			}
-			outputFolder.mkdir();
-
-			if (validationConfig.isRf2DeltaOnly()) {
-				if(StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
-					throw new RVFExecutionException("MRCM validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
-				}
-				InputStream previousStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getPreviousRelease());
-
-				//Unzip the release files
-				try {
-					String snapshotDirectoryPath  = new ReleaseImporter().unzipRelease(previousStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath();
-					snapshotOutputFolder = new File(snapshotDirectoryPath);
-					FileUtils.copyDirectory(snapshotOutputFolder, outputFolder);
-
-					deltaOutputFolder = Files.createTempDir();
-					ZipFileUtils.extractFilesFromZipToOneFolder(validationConfig.getLocalProspectiveFile(), deltaOutputFolder.getAbsolutePath());
-					if (StringUtils.isEmpty(validationConfig.getExtensionDependency()) || validationConfig.isReleaseAsAnEdition()) {
-						constructSnapshotFiles(outputFolder, deltaOutputFolder, null);
-					}
-				} catch (ReleaseImportException e) {
-					e.printStackTrace();
-				}
-			}
-			else {
-				ZipFileUtils.extractFilesFromZipToOneFolder(validationConfig.getLocalProspectiveFile(), outputFolder.getAbsolutePath());
-			}
-
-			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
-				if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
-					throw new RVFExecutionException("MRCM validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
-				}
-				InputStream dependencyStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getExtensionDependency());
-				File dependencyFile = File.createTempFile(MRCM_DEPENDENCY_FILE, EXT_ZIP);
-				OutputStream out = new FileOutputStream(dependencyFile);
-				IOUtils.copy(dependencyStream, out);
-				IOUtils.closeQuietly(dependencyStream);
-				IOUtils.closeQuietly(out);
-				if (validationConfig.isRf2DeltaOnly()) {
-					dependencyOutputFolder = Files.createTempDir();
-					ZipFileUtils.extractFilesFromZipToOneFolder(dependencyFile, dependencyOutputFolder.getAbsolutePath());
-					constructSnapshotFiles(outputFolder, deltaOutputFolder, dependencyOutputFolder);
-				} else {
-					ZipFileUtils.extractFilesFromZipToOneFolder(dependencyFile, outputFolder.getAbsolutePath());
-				}
-			}
-		} catch (final IOException ex){
-			final String errorMsg = String.format("Error while loading file %s.", validationConfig.getLocalProspectiveFile());
-			LOGGER.error(errorMsg, ex);
-			throw new BusinessServiceException(errorMsg, ex);
-		} finally {
-			if(snapshotOutputFolder != null) {
-				FileUtils.deleteQuietly(snapshotOutputFolder);
-			}
-			if(deltaOutputFolder != null) {
-				FileUtils.deleteQuietly(deltaOutputFolder);
-			}
-			if(dependencyOutputFolder != null) {
-				FileUtils.deleteQuietly(dependencyOutputFolder);
-			}
-		}
-
-		return outputFolder;
-	}
-
-	/**
-	 *
-	 * @param outputFolder
-	 * @param prospectiveDeltaFolder
-	 * @param dependencySnapshotFolder
-	 * @throws IOException
-	 */
-	protected void constructSnapshotFiles(File outputFolder, File prospectiveDeltaFolder, File dependencySnapshotFolder) throws IOException {
-		// remove Delta and Full file in dependency package
-		if (dependencySnapshotFolder != null) {
-			for (File file: dependencySnapshotFolder.listFiles()) {
-				if (!file.isDirectory() && !file.getName().matches(".*" + SNAPSHOT)) {
-					file.delete();
-				}
-			}
-		}
-
-		for (File previousSnapshotFile : outputFolder.listFiles()) {
-			addOrReplaceValues(prospectiveDeltaFolder, previousSnapshotFile);
-			if (dependencySnapshotFolder != null) {
-				addOrReplaceValues(dependencySnapshotFolder, previousSnapshotFile);
-			}
-		}
-
-		// Copy MRMC refset if necessary
-		if (dependencySnapshotFolder != null) {
-			for (File file : dependencySnapshotFolder.listFiles()) {
-				if (!file.isDirectory() && !findMatchingFile(file.getName(),outputFolder)) {
-					FileUtils.copyFileToDirectory(file, outputFolder);
-				}
-			}
-		}
-	}
-
-	private boolean findMatchingFile(String fileName, File folder) {
-		for (File file : folder.listFiles()) {
-			if (!file.isDirectory() && file.getName().contains(fileName.replaceAll(SNAPSHOT, ""))) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void addOrReplaceValues(File folder, File previousSnapshotFile) throws IOException {
-		for (File file : folder.listFiles()) {
-			if (file.exists() && !file.isDirectory()
-					&& previousSnapshotFile.exists() && !previousSnapshotFile.isDirectory()
-					&& previousSnapshotFile.getName().matches(".*" + SNAPSHOT)
-					&& file.getName().contains(previousSnapshotFile.getName().replaceAll(SNAPSHOT, ""))) {
-				List<String> linesInSnapshotFile = FileUtils.readLines(previousSnapshotFile, StandardCharsets.UTF_8);
-				List<String> linesInFile = FileUtils.readLines(file, StandardCharsets.UTF_8);
-				Map<String,String> snapshotLineMap = new HashMap<>();
-				Map<String,String> lineMap = new HashMap();
-				List<String> newLines = new ArrayList();
-
-				for (String line : linesInSnapshotFile) {
-					String[] columns = line.split("\t");
-					if (!ID.equalsIgnoreCase(columns[0])) {
-						snapshotLineMap.put(columns[0], line);
-					}
-					else {
-						newLines.add(line);
-					}
-				}
-
-				for (String line : linesInFile) {
-					String[] columns = line.split("\t");
-					if (!ID.equalsIgnoreCase(columns[0])) {
-						lineMap.put(columns[0], line);
-					}
-				}
-
-				for (String key : lineMap.keySet()) {
-					snapshotLineMap.put(key, lineMap.get(key));
-				}
-
-				newLines.addAll(snapshotLineMap.values());
-				FileUtils.writeLines(previousSnapshotFile, CharEncoding.UTF_8, newLines, LINE_ENDING);
-				break;
-			}
-		}
-	}
-
 }
