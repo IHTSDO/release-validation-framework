@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.aws.core.io.s3.SimpleStorageResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -133,6 +134,10 @@ public class DroolsRulesValidationService {
 				if(StringUtils.isNotBlank(validationConfig.getPreviousRelease()) && validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
 					InputStream previousReleaseStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile());
 					previousReleaseDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
+				}
+
+				if (CollectionUtils.isEmpty(previousReleaseDirectories)) {
+					previousReleaseDirectories = null;
 				}
 
 				//Run validation
