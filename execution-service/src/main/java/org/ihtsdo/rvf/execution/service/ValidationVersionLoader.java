@@ -6,6 +6,8 @@ import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration.Cloud;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.otf.snomedboot.ReleaseImportException;
+import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
@@ -23,13 +25,15 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.ihtsdo.rvf.execution.service.ReleaseDataManager.RVF_DB_PREFIX;
 
@@ -113,6 +117,12 @@ public class ValidationVersionLoader {
 			//load prospective version alone now as used to combine with dependency for extension testing
 			uploadReleaseFileIntoDB(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		}
+
+		if (!validationConfig.isRf2DeltaOnly() && !checkDeltaFilesExist(validationConfig.getLocalProspectiveFile())) {
+			final String schemaName = prospectiveVersion.startsWith(RVF_DB_PREFIX) ? prospectiveVersion : RVF_DB_PREFIX + prospectiveVersion;
+			releaseDataManager.insertIntoProspectiveDeltaTablesFromSnapshots(schemaName, executionConfig.getEffectiveTime());
+		}
+
 		statusReport.setTotalRF2FilesLoaded(rf2FilesLoaded.size());
 		Collections.sort(rf2FilesLoaded);
 		statusReport.setRF2Files(rf2FilesLoaded);
@@ -120,8 +130,24 @@ public class ValidationVersionLoader {
 		resourceLoader.loadResourceData(prospectiveVersion);
 		logger.info("completed loading resource data for schema:" + prospectiveVersion);
 	}
-	
-	
+
+	private boolean checkDeltaFilesExist(File localProspectiveFile) throws FileNotFoundException, ReleaseImportException {
+		try {
+			String deltaDirectoryPath = new ReleaseImporter().unzipRelease(new FileInputStream(localProspectiveFile), ReleaseImporter.ImportType.DELTA).getAbsolutePath();
+			final Stream<Path> pathStream = Files.find(new File(deltaDirectoryPath).toPath(), 50,
+					(path, basicFileAttributes) -> path.toFile().getName().matches("x?(sct|rel)2_Concept_[^_]*Delta_.*.txt"));
+			if (pathStream.findFirst().isPresent()) {
+				return true;
+			}
+		} catch (IOException | IllegalStateException e) {
+			if (e.getMessage().contains("No Delta files found")) {
+				return false;
+			}
+			throw new ReleaseImportException("Error while searching input files.", e);
+		}
+		return false;
+	}
+
 	private String constructRVFSchema(String releaseVersion) {
 		if (releaseVersion != null) {
 			if (releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {

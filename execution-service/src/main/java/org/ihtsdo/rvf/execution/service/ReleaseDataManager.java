@@ -16,11 +16,7 @@ import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.UserPrincipal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -41,6 +37,7 @@ import javax.annotation.Resource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
@@ -682,6 +679,28 @@ public class ReleaseDataManager {
 			return fileList;
 		} catch (IOException e) {
 			throw new BusinessServiceException("Could not get file list from " + dataFile, e);
+		}
+	}
+
+	public void insertIntoProspectiveDeltaTablesFromSnapshots(String schemaName, String effectiveTime)  throws SQLException  {
+		effectiveTime = StringUtils.isNotBlank(effectiveTime) ? effectiveTime.replaceAll("-","") : "";
+		try (Connection connection = rvfDynamicDataSource.getConnection(schemaName)) {
+			DatabaseMetaData md = connection.getMetaData();
+			ResultSet rs = md.getTables(null, null, "%", null);
+			List<String> snapShotTables = new ArrayList<>();
+			while (rs.next()) {
+				if (rs.getString(3).endsWith("_s")) {
+					snapShotTables.add(rs.getString(3));
+				}
+			}
+			for (String snapshotTable: snapShotTables) {
+				String insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
+							+ " SELECT * FROM " + snapshotTable
+							+ " WHERE effectivetime IS NULL OR effectivetime='" + effectiveTime + "'";
+				PreparedStatement ps = connection.prepareStatement(insertSQL);
+				logger.info(insertSQL);
+				ps.execute();
+			}
 		}
 	}
 }
