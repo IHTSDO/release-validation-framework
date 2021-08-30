@@ -14,13 +14,13 @@ import com.google.gson.annotations.SerializedName;
 public class ValidationStatusReport {
 	private ValidationRunConfig validationConfig;
 	private Map<String,String> reportSummary;
+	private List<String> failureMessages;
 	@SerializedName("TestResult")
 	private ValidationReport resultReport;
 	private Date startTime;
 	private Date endTime;
 	private int totalRF2FilesLoaded;
-	private List<String> failureMessages;
-	
+
 	@SerializedName("rf2Files")
 	private List<String> rf2FilesLoaded;
 	
