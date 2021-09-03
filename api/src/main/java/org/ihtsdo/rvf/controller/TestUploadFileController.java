@@ -192,6 +192,7 @@ public class TestUploadFileController {
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
+			@ApiParam(value = "Name of the response queue.") @RequestParam(value = RESPONSE_QUEUE, required = false) final String responseQueue,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
 
@@ -211,7 +212,8 @@ public class TestUploadFileController {
 				.setIncludedModules(includedModules)
 				.addUrl(urlPrefix)
 				.setEnableMRCMValidation(enableMrcmValidation)
-				.setContentHeadTimestamp(contentHeadTimestamp);
+				.setContentHeadTimestamp(contentHeadTimestamp)
+				.addResponseQueue(responseQueue);
 
 		// Before we start running, ensure that we've made our mark in the storage location
 		// Init will fail if we can't write the "running" state to storage
