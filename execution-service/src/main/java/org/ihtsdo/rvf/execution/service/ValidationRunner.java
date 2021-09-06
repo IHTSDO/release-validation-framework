@@ -111,6 +111,10 @@ public class ValidationRunner {
 		State state = statusReport.getFailureMessages().isEmpty() ? State.COMPLETE : State.FAILED;
 		updateRvfState(validationConfig, state);
 		updateExecutionSummary(statusReport, validationConfig);
+
+		// Ignore token and user name to be persisted to S3
+		statusReport.getValidationConfig().setAuthenticationToken(null);
+		statusReport.getValidationConfig().setUsername(null);
 		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
 	}
 
@@ -155,13 +159,15 @@ public class ValidationRunner {
 		executorService.shutdown();
 	}
 
-	private void updateRvfState(final ValidationRunConfig validationConfig, final State state) throws JsonProcessingException, JMSException {
-		final String responseQueue = validationConfig.getResponseQueue();
+	private void updateRvfState(final ValidationRunConfig config, final State state) throws JsonProcessingException, JMSException {
+		final String responseQueue = config.getResponseQueue();
 		if (responseQueue != null) {
 			logger.info("Updating RVF state to {}}: {}", state, responseQueue);
 			messagingHelper.send(responseQueue,
-					ImmutableMap.of("runId", validationConfig.getRunId(),
-							"state", state.name()));
+					ImmutableMap.of("runId", config.getRunId(),
+							"state", state.name(),
+							"username", config.getUsername() != null ? config.getUsername() : "",
+							"authenticationToken", config.getAuthenticationToken() != null ? config.getAuthenticationToken() : ""));
 		}
 	}
 

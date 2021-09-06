@@ -72,7 +72,9 @@ public class ValidationMessageListener implements Closeable {
 					LOGGER.info("Updating RVF state to running: {}", responseQueue);
 					messagingHelper.send(responseQueue,
 							ImmutableMap.of("runId", config.getRunId(),
-									"state", ValidationReportService.State.RUNNING.name()));
+									"state", ValidationReportService.State.RUNNING.name(),
+									"username", config.getUsername() != null ? config.getUsername() : "",
+									"authenticationToken", config.getAuthenticationToken() != null ? config.getAuthenticationToken() : ""));
 				} catch (JsonProcessingException | JMSException e) {
 					throw new RuntimeException("Error occurred while trying to update the RVF state to running.", e);
 				}

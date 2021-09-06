@@ -48,7 +48,7 @@ public class ValidationReportService {
 	
 	private static final String UTF_8 = "UTF-8";
 	
-	public enum State { QUEUED, READY, RUNNING, FAILED, COMPLETE,  } 
+	public enum State { QUEUED, READY, RUNNING, FAILED, COMPLETE }
 	
 	@PostConstruct
 	public void init() {

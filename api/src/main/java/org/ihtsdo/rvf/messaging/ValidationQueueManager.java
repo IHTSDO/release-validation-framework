@@ -94,7 +94,9 @@ public class ValidationQueueManager {
 			LOGGER.info("Updating RVF state to queued: {}", responseQueue);
 			messagingHelper.send(responseQueue,
 					ImmutableMap.of("runId", config.getRunId(),
-							"state", state.name()));
+							"state", state.name(),
+							"username", config.getUsername() != null ? config.getUsername() : "",
+							"authenticationToken", config.getAuthenticationToken() != null ? config.getAuthenticationToken() : ""));
 		}
 	}
 

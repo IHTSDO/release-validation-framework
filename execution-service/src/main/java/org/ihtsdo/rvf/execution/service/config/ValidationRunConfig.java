@@ -35,6 +35,8 @@ public class ValidationRunConfig {
 	private boolean enableMRCMValidation;
 	private String responseQueue;
 	private Long contentHeadTimestamp;
+	private String username;
+	private String authenticationToken;
 
 	public MultipartFile getFile() {
 		return file;
@@ -343,5 +345,23 @@ public class ValidationRunConfig {
 
 	public Long getContentHeadTimestamp() {
 		return contentHeadTimestamp;
+	}
+
+	public ValidationRunConfig setUsername(String username) {
+		this.username = username;
+		return this;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public ValidationRunConfig setAuthenticationToken(String authenticationToken) {
+		this.authenticationToken = authenticationToken;
+		return this;
+	}
+
+	public String getAuthenticationToken() {
+		return authenticationToken;
 	}
 }
