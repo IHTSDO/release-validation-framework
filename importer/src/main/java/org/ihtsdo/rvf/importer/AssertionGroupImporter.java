@@ -6,7 +6,6 @@ import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.ihtsdo.rvf.entity.Assertion;
@@ -150,7 +149,13 @@ public class AssertionGroupImporter {
 	private static final String[] SNOMED_RT_IDENTIFIER_ASSERTIONS = {"730720b0-7f25-11e1-b0c4-0800200c9a66","83638340-7f25-11e1-b0c4-0800200c9a66",
 																	"5e80ea3e-c4dd-4ae3-8b75-f0567e42b962","695cea40-7f25-11e1-b0c4-0800200c9a66"};
 
-	private static final String[] US_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b"};
+	private static final String[] US_AUTHORING_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b","6bed3e87-6d20-4b05-81ce-43d359a6f684"};
+
+	private static final String[] US_EDITION_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b","2e2542f9-64a4-43d0-bf4e-9029af8b7cf0"};
+
+	private static final String[] INT_AUTHORING_EXCLUDE_LIST = {"6bed3e87-6d20-4b05-81ce-43d359a6f684"};
+
+	private static final String[] INT_EDITION_EXCLUDE_LIST = {"2e2542f9-64a4-43d0-bf4e-9029af8b7cf0"};
 
 	private static final String[] FIRST_TIME_COMMON_ADDITIONAL_EXCLUDE_LIST = {"3cb10511-33b7-4eca-ba0e-93bcccf70d86", "48118153-d32a-4d1c-bfbc-23ed953e9991"};
 
@@ -487,11 +492,14 @@ public class AssertionGroupImporter {
 			if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
 				continue;
 			}
+			if (AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+				continue;
+			}
+			if (AssertionGroupName.INT_AUTHORING.equals(groupName) && Arrays.asList(INT_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+				continue;
+			}
 			if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()))  {
 				assertionService.addAssertionToGroup(assertion, group);
-			}
-			if ( AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
-				continue;
 			}
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", allAssertions.size(), group.getName() );
@@ -544,10 +552,11 @@ public class AssertionGroupImporter {
 				continue;
 			}
 			//exclude SNOMED RT assertions
-			if ( AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
+			if ( AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && (Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())
+																				|| Arrays.asList(INT_EDITION_EXCLUDE_LIST).contains(assertion.getUuid().toString()))) {
 				continue;
 			}
-			if ( AssertionGroupName.US_EDITION.equals(groupName) && Arrays.asList(US_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+			if ( AssertionGroupName.US_EDITION.equals(groupName) && Arrays.asList(US_EDITION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
 			if ( AssertionGroupName.DERIVATIVE_EDITION.equals(groupName) && Arrays.asList(MRCM_REFSETS_ASSERTIONS).contains(assertion.getUuid().toString())) {
