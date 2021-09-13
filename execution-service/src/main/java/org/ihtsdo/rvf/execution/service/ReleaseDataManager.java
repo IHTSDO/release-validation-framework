@@ -628,7 +628,7 @@ public class ReleaseDataManager {
 		String snomedFile = "";
 		List<String> zipFileList = getFileList(zipDataFile);
 		Optional<String> sctOrDerFile = zipFileList.stream()
-							.filter(file -> ( file.indexOf("sct_") != -1 
+							.filter(file -> ( file.indexOf("sct2_") != -1
 										|| file.indexOf("der2_") != -1)
 										&& file.endsWith(".txt"))
 							.findFirst();
