@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
-import java.nio.file.Paths;
 import java.nio.file.attribute.GroupPrincipal;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFileAttributes;
@@ -60,6 +59,26 @@ public class ReleaseDataManager {
 	private static final String VERSION_NOT_FOUND = "version not found in RVF database ";
 	private static final String ZIP_FILE_EXTENSION = ".zip";
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManager.class);
+	private static final Map<String, String> FILENAME_PATTERN_TO_EDITION_MAP = new HashMap<>();
+	static  {
+		FILENAME_PATTERN_TO_EDITION_MAP.put("SpanishExtension.*_INT", "ES");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_NL_[0-9]+\\.txt", "NL");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("GB1000000_[0-9]+\\.txt", "UK");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_AU1000036_[0-9]+\\.txt", "AU");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_NZ1000210_[0-9]+\\.txt", "NZ");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_US1000124_[0-9]+\\.txt", "US");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_BE1000172_[0-9]+\\.txt", "BE");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_SE1000052_[0-9]+\\.txt", "SE");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_DK1000005_[0-9]+\\.txt", "DK");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_EE1000181_[0-9]+\\.txt", "EE");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_CH1000195_[0-9]+\\.txt", "CH");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_NO1000202_[0-9]+\\.txt", "NO");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_IE1000220_[0-9]+\\.txt", "IE");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_AT1000234_[0-9]+\\.txt", "AT");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_TM_[0-9]+\\.txt", "TM");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_INT_[0-9]+\\.txt", "INT");
+	}
+
 	
 	@Value("${rvf.data.folder.location}")
 	private String sctDataLocation;
@@ -652,23 +671,12 @@ public class ReleaseDataManager {
 
 	private String mapFilenameToEdition(String name) {
 		String edition = "INT";
-		Map<String,String> fileNameToEditionMap = new HashMap<String,String>();
-		fileNameToEditionMap.put("SpanishExtension.*_INT", "ES");
-		fileNameToEditionMap.put("_NL_[0-9]+\\.txt", "NL");
-		fileNameToEditionMap.put("_AU1000036_[0-9]+\\.txt", "AU");
-		fileNameToEditionMap.put("_NZ1000210_[0-9]+\\.txt", "NZ");
-		fileNameToEditionMap.put("_US1000124_[0-9]+\\.txt", "US");
-		fileNameToEditionMap.put("_BE1000172_[0-9]+\\.txt", "BE");
-		fileNameToEditionMap.put("_SE1000052_[0-9]+\\.txt", "SE");
-		fileNameToEditionMap.put("GB1000000_[0-9]+\\.txt", "UK");
-		fileNameToEditionMap.put("_INT_[0-9]+\\.txt", "INT");
-		for (String pattern : fileNameToEditionMap.keySet()) {
+		for (String pattern : FILENAME_PATTERN_TO_EDITION_MAP.keySet()) {
 			Matcher editionMatcher = Pattern.compile(pattern).matcher(name);
 			if (editionMatcher.find()) {
-				edition = fileNameToEditionMap.get(pattern);
+				edition = FILENAME_PATTERN_TO_EDITION_MAP.get(pattern);
 				break;
 			}
-
 		}
 		return edition;
 	}

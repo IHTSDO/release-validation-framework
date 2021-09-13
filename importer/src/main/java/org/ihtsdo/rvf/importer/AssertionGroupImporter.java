@@ -78,9 +78,11 @@ public class AssertionGroupImporter {
 			return this.releaseCenter;
 		}
 
-	};
+	}
 
 	public enum ProductName {
+		// TODO FRI-246
+		// add the new edition to FILENAME_PATTERN_TO_EDITION_MAP as well in ReleaseDataManager.
 			INT("INT", "900000000000207008"),
 			AU("AU", "32506021000036107"),
 			BE("BE", "11000172109"),
@@ -94,11 +96,12 @@ public class AssertionGroupImporter {
 			DK("DK", "554471000005108"),
 			SE("SE", "45991000052106"),
 			NO("NO", "51000202101"),
-//            CH("CH", "SwissEdition"),
+			CH("CH", "2011000195101"),
 			IE("IE", "11000220105"),
 			EE("EE", "11000181102"),
-
-		SV("SNOVET", "332351000009108");
+			AT("AT", "11000234105"),
+			TM("TM", "895344001"),
+			SV("SNOVET", "332351000009108");
 
 			private String name;
 			private String moduleId;
