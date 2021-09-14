@@ -61,7 +61,7 @@ public class ValidationRunner {
 	public void run(ValidationRunConfig validationConfig) {
 		try {
 			runValidations(validationConfig);
-		} catch (final Throwable t) {
+		} catch (final Exception t) {
 			StringWriter errors = new StringWriter();
 			t.printStackTrace(new PrintWriter(errors));
 			String failureMsg = "System Failure: " + t.getMessage() + " : " + errors.toString();
@@ -70,6 +70,7 @@ public class ValidationRunner {
 			logger.error("Exception thrown, writing as result",t);
 			try {
 				reportService.writeResults(statusReport, State.FAILED, validationConfig.getStorageLocation());
+				updateRvfState(validationConfig, State.FAILED);
 			} catch (final Exception e) {
 				throw new RuntimeException("Failed to record failure (which was: " + failureMsg + ")", e);
 			}
@@ -84,7 +85,7 @@ public class ValidationRunner {
 		releaseVersionLoader.downloadPreviousReleaseAndDependencyFiles(validationConfig);
 		if (validationConfig.getLocalProspectiveFile() == null) {
 			reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
-			String errorMsg ="Prospective file can't be null " + validationConfig.getLocalProspectiveFile();
+			String errorMsg = "Prospective file can't be null " + validationConfig.getLocalProspectiveFile();
 			reportService.writeProgress(errorMsg, validationConfig.getStorageLocation());
 			logger.error(errorMsg);
 		}
@@ -146,7 +147,9 @@ public class ValidationRunner {
 			try {
 				mergeValidationStatusReports(statusReport, task.get());
 			} catch (ExecutionException | InterruptedException e) {
-				logger.error("Thread interrupted while waiting for future result for run item:" + task, e);
+				String errorMsg = "Error occurred while merging validation reports";
+				logger.error(errorMsg, e);
+				throw new IllegalStateException(errorMsg, e);
 			}
 		}
 		executorService.shutdown();
