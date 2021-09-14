@@ -233,6 +233,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
 
 		String previousReleaseSchema = config.getPreviousVersion();
+		String dependencyReleaseSchema = config.getExtensionDependencyVersion();
 
 		//We need both these schemas to exist
 		if (prospectiveSchema == null) {
@@ -258,6 +259,9 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = part.replaceAll("<TEMP>", prospectiveSchema);
 			if (previousReleaseSchema != null) {
 				part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
+			}
+			if (dependencyReleaseSchema != null) {
+				part = part.replaceAll("<DEPENDENCY>", dependencyReleaseSchema);
 			}
 			part = part.replaceAll("<DELTA>", deltaTableSuffix);
 			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);

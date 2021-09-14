@@ -301,6 +301,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 				ratSchema = ratSchema.substring("prev_".length());
 				currOrPrevFound = true;
 			}
+			else if(ratSchema.startsWith("dependency_")){
+				rvfSchema = "<DEPENDENCY>";
+				ratSchema = ratSchema.substring("dependency_".length());
+			}
 			else if(ratSchema.startsWith("v_")){
 				// finally process token that represents temp tables - starts with v_
 				ratSchema = ratSchema.substring("v_".length());

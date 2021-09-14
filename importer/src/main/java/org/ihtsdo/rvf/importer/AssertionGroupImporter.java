@@ -1,11 +1,8 @@
 package org.ihtsdo.rvf.importer;
 
-import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.COMPONENT_CENTRIC_VALIDATION;
-import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.FILE_CENTRIC_VALIDATION;
-import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.RELEASE_TYPE_VALIDATION;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.ihtsdo.rvf.entity.Assertion;
@@ -16,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.*;
+
 @Service
 @Transactional
 public class AssertionGroupImporter {
@@ -477,12 +477,18 @@ public class AssertionGroupImporter {
 	}
 
 
-	private void createSnapshotAssertionGroup( AssertionGroupName groupName) {
+	private void createSnapshotAssertionGroup(AssertionGroupName groupName) {
 		AssertionGroup group = new AssertionGroup();
 		group.setName(groupName.getName());
 		group = assertionService.createAssertionGroup(group);
 		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWords("," + groupName.getReleaseCenter(), false);
+		if (!INT_AUTHORING.equals(groupName)) {
+			allAssertions.addAll(assertionService.getAssertionsByKeyWords(",EXTENSION", false));
+		}
 		for (Assertion assertion : allAssertions) {
+			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
+				continue;
+			}
 			//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
 			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
@@ -501,9 +507,7 @@ public class AssertionGroupImporter {
 			if (AssertionGroupName.INT_AUTHORING.equals(groupName) && Arrays.asList(INT_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
-			if (!assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()))  {
-				assertionService.addAssertionToGroup(assertion, group);
-			}
+			assertionService.addAssertionToGroup(assertion, group);
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", allAssertions.size(), group.getName() );
 	}
@@ -542,7 +546,9 @@ public class AssertionGroupImporter {
 		assertionGroup = assertionService.createAssertionGroup(assertionGroup);
 		List<Assertion> assertionsToBeAdded = getCommonReleaseAssertions(allAssertions);
 		assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()));
-
+		if (!AssertionGroupName.COMMON_EDITION.equals(groupName) && !AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName)) {
+			assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, "EXTENSION"));
+		}
 		for (Assertion assertion : assertionsToBeAdded) {
 			if (Arrays.asList(COMMON_AUTHORING_ONLY_LIST).contains(assertion.getUuid().toString())) {
 				continue;
