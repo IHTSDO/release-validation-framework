@@ -252,13 +252,14 @@ public class MysqlValidationService {
 			final List<TestRunItem> failedItems = new ArrayList<>();
 			final List<TestRunItem> warningItems = new ArrayList<>();
 			for (final TestRunItem item : items) {
-				if (item.getFailureCount() != 0 && !SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())) {
-					failedItems.add(item);
-				}
-				if(SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())){
-					warningItems.add(item);
-				}
 				item.setTestType(TestType.SQL);
+				if (item.getFailureCount() != 0) {
+					if (SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())) {
+						warningItems.add(item);
+					} else {
+						failedItems.add(item);
+					}
+				}
 			}
 			report.addFailedAssertions(failedItems);
 			report.addWarningAssertions(warningItems);
