@@ -145,17 +145,18 @@ public class DroolsRulesValidationService {
 
 				if (invalidContents.size() != 0 && !whitelistService.isWhitelistDisabled()) {
 					List<InvalidContent> newInvalidContents = new ArrayList<>();
-					for (List<InvalidContent> invalidContentPartition : Iterables.partition(invalidContents, validationConfig.getFailureExportMax())) {
+					for (List<InvalidContent> batch : Iterables.partition(invalidContents, validationConfig.getFailureExportMax())) {
 						// Convert to WhitelistItem
-						List<WhitelistItem> whitelistItems = invalidContents.stream()
+						List<WhitelistItem> whitelistItems = batch.stream()
 								.map(invalidContent -> new WhitelistItem(invalidContent.getRuleId(), org.springframework.util.StringUtils.isEmpty(invalidContent.getComponentId())? "" : invalidContent.getComponentId(), invalidContent.getConceptId(), getAdditionalFields(invalidContent.getComponent())))
 								.collect(Collectors.toList());
 
 						// Send to Authoring acceptance gateway
+						LOGGER.info("Checking %s whitelist items in batch", whitelistItems.size());
 						List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
 
 						// Find the failures which are not in the whitelisted item
-						newInvalidContents.addAll(invalidContentPartition.stream().filter(invalidContent ->
+						newInvalidContents.addAll(batch.stream().filter(invalidContent ->
 								whitelistedItems.stream().noneMatch(whitelistedItem ->
 										invalidContent.getRuleId().equals(whitelistedItem.getValidationRuleId())
 										&& invalidContent.getComponentId().equals(whitelistedItem.getComponentId()))
