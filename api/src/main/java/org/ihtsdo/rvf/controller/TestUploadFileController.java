@@ -1,18 +1,12 @@
 package org.ihtsdo.rvf.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URI;
-import java.util.*;
-
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.execution.service.ValidationRunner;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
-import org.ihtsdo.rvf.execution.service.MRCMValidationService.CharacteristicType;
 import org.ihtsdo.rvf.messaging.ValidationQueueManager;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.ihtsdo.rvf.validation.StructuralTestRunner;
@@ -26,20 +20,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
-import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URI;
+import java.util.*;
 
 /**
  * The controller that handles uploaded files for the validation to run
@@ -50,7 +41,7 @@ public class TestUploadFileController {
 
 	private static final String ENABLE_MRCM_VALIDATION = "enableMRCMValidation";
 
-	private static final String MRCM_VALIDATION_FORM = "mrcmValidationForm";
+	private static final String ENABLE_TRACEABILITY_VALIDATION = "enableTraceabilityValidation";
 
 	private static final String INCLUDED_MODULES = "includedModules";
 
@@ -67,6 +58,8 @@ public class TestUploadFileController {
 	private static final String RUN_ID = "runId";
 
 	private static final String DEPENDENCY_RELEASE = "dependencyRelease";
+
+	private static final String BRANCH_PATH = "branchPath";
 
 	private static final String PREVIOUS_RELEASE = "previousRelease";
 
@@ -187,7 +180,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@ApiParam(value = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
 			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = RUN_ID) final Long runId,
-			@ApiParam(value = "Defaults to 10 when not set") @RequestParam(value = FAILURE_EXPORT_MAX, required = false) final Integer exportMax,
+			@ApiParam(value = "Defaults to 10 when not set", defaultValue = "10") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
@@ -195,6 +188,8 @@ public class TestUploadFileController {
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
+			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
+			@ApiParam(value = "Terminology Server content branch path, used for traceability check.") @RequestParam(value = BRANCH_PATH, required = false) final String branchPath,
 			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
 			@ApiParam(value = "Name of the response queue.") @RequestParam(value = RESPONSE_QUEUE, required = false) final String responseQueue,
 			@ApiParam(value = "User name.") @RequestParam(value = USER_NAME, required = false) final String username,
@@ -218,6 +213,8 @@ public class TestUploadFileController {
 				.setIncludedModules(includedModules)
 				.addUrl(urlPrefix)
 				.setEnableMRCMValidation(enableMrcmValidation)
+				.setEnableTraceabilityValidation(enableTraceabilityValidation)
+				.setBranchPath(branchPath)
 				.setContentHeadTimestamp(contentHeadTimestamp)
 				.addResponseQueue(responseQueue)
 				.setUsername(username)
@@ -230,7 +227,7 @@ public class TestUploadFileController {
 			// Queue incoming validation request
 			queueManager.queueValidationRequest(vrConfig, responseMap);
 			URI uri = createResultURI(runId, storageLocation, uriComponentsBuilder);
-			LOGGER.info("RVF result url:" + uri.toURL().toString());
+			LOGGER.info("RVF result url:{}", uri.toURL());
 			return ResponseEntity.created(uri).body(responseMap);
 		} else {
 			return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
@@ -253,7 +250,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@ApiParam(value = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
 			@ApiParam(value = "Unique run id e.g Timestamp") @RequestParam(value = RUN_ID) final Long runId,
-			@ApiParam(value = "Defaults to 10") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
+			@ApiParam(value = "Defaults to 10 when not set", defaultValue = "10") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
 			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") 
@@ -264,6 +261,8 @@ public class TestUploadFileController {
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
+			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
+			@ApiParam(value = "Terminology Server content branch path, used for traceability validation.") @RequestParam(value = BRANCH_PATH, required = false) final String branchPath,
 			@ApiParam(value = "Name of the response queue.") @RequestParam(value = RESPONSE_QUEUE, required = false) final String responseQueue,
 			@ApiParam(value = "User name.") @RequestParam(value = USER_NAME, required = false) final String username,
 			@ApiParam(value = "Authentication token.") @RequestParam(value = AUTH_TOKEN, required = false) final String authenticationToken,
@@ -289,6 +288,8 @@ public class TestUploadFileController {
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setIncludedModules(includedModules)
 				.setEnableMRCMValidation(enableMrcmValidation)
+				.setEnableTraceabilityValidation(enableTraceabilityValidation)
+				.setBranchPath(branchPath)
 				.setContentHeadTimestamp(contentHeadTimestamp)
 				.addResponseQueue(responseQueue)
 				.setUsername(username)

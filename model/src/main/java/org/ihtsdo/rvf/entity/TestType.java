@@ -10,6 +10,7 @@ public enum TestType {
 	ARCHIVE_STRUCTURAL("archiveStructural"),
 	MANIFEST("manifest"),
 	MRCM("mrcm"),
+	TRACEABILITY("traceability"),
 	DROOL_RULES("droolsRules"),
 	UNKNOWN("unknown");
 

@@ -33,6 +33,8 @@ public class ValidationRunConfig {
 	private List<String> droolsRulesGroupList;
 	private String bucketName;
 	private boolean enableMRCMValidation;
+	private boolean enableTraceabilityValidation;
+	private String branchPath;
 	private String responseQueue;
 	private Long contentHeadTimestamp;
 	private String username;
@@ -338,6 +340,25 @@ public class ValidationRunConfig {
 		this.enableMRCMValidation = enableMRCMValidation;
 		return this;
 	}
+
+	public boolean isEnableTraceabilityValidation() {
+		return enableTraceabilityValidation;
+	}
+
+	public ValidationRunConfig setEnableTraceabilityValidation(boolean enableTraceabilityValidation) {
+		this.enableTraceabilityValidation = enableTraceabilityValidation;
+		return this;
+	}
+
+	public String getBranchPath() {
+		return branchPath;
+	}
+
+	public ValidationRunConfig setBranchPath(String branchPath) {
+		this.branchPath = branchPath;
+		return this;
+	}
+
 	public ValidationRunConfig setContentHeadTimestamp(Long contentHeadTimestamp) {
 		this.contentHeadTimestamp = contentHeadTimestamp;
 		return this;

@@ -51,6 +51,9 @@ public class ValidationRunner {
 	private MRCMValidationService mrcmValidationService;
 
 	@Autowired
+	private TraceabilityComparisonService traceabilityComparisonService;
+
+	@Autowired
 	private MessagingHelper messagingHelper;
 
 	private static final String MSG_VALIDATIONS_RUN = "Validations executed. Failures count: ";
@@ -147,6 +150,17 @@ public class ValidationRunner {
 			tasks.add(executorService.submit(() -> mrcmValidationService.runMRCMAssertionTests(mrcmValidationStatusReport, validationConfig)));
 		}
 
+		if (validationConfig.isEnableTraceabilityValidation()) {
+			statusMessages.append("\nTraceability comparison validation started");
+			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
+			ValidationStatusReport traceabilityComparisonReport = new ValidationStatusReport(validationConfig);
+			traceabilityComparisonReport.setResultReport(new ValidationReport());
+			tasks.add(executorService.submit(() -> {
+				traceabilityComparisonService.runTraceabilityComparison(traceabilityComparisonReport, validationConfig);
+				return traceabilityComparisonReport;
+			}));
+		}
+
 		for (Future<ValidationStatusReport> task : tasks) {
 			try {
 				mergeValidationStatusReports(statusReport, task.get());
@@ -164,7 +178,7 @@ public class ValidationRunner {
 		if (responseQueue != null) {
 			logger.info("Updating RVF state to {}}: {}", state, responseQueue);
 			messagingHelper.send(responseQueue,
-					ImmutableMap.of("runId", config.getRunId(),
+					Map.of("runId", config.getRunId(),
 							"state", state.name(),
 							"username", config.getUsername() != null ? config.getUsername() : "",
 							"authenticationToken", config.getAuthenticationToken() != null ? config.getAuthenticationToken() : ""));
@@ -219,19 +233,20 @@ public class ValidationRunner {
 
 	private void updateExecutionSummary(ValidationStatusReport statusReport, ValidationRunConfig validationRunConfig) {
 		List<TestRunItem> failures = statusReport.getResultReport().getAssertionsFailed();
-		Map<TestType, Integer> testTypeFailuresCount = new HashMap<>();
+		Map<TestType, Integer> testTypeFailuresCount = new EnumMap<>(TestType.class);
 		testTypeFailuresCount.put(TestType.ARCHIVE_STRUCTURAL, 0);
 		testTypeFailuresCount.put(TestType.SQL, 0);
 		testTypeFailuresCount.put(TestType.DROOL_RULES, validationRunConfig.isEnableDrools() ? 0 : -1);
 		testTypeFailuresCount.put(TestType.MRCM, validationRunConfig.isEnableMRCMValidation() ? 0 : -1);
+		testTypeFailuresCount.put(TestType.TRACEABILITY, validationRunConfig.isEnableTraceabilityValidation() ? 0 : -1);
 		for (TestRunItem failure : failures) {
 			TestType testType = failure.getTestType();
 			testTypeFailuresCount.put(testType, testTypeFailuresCount.get(testType)+1);
 		}
-		for (TestType testType : testTypeFailuresCount.keySet()) {
-			if(statusReport.getReportSummary().get(testType.name()) == null) {
-				Integer failuresCount = testTypeFailuresCount.get(testType);
-				statusReport.getReportSummary().put(testType.name(), failuresCount >= 0 ? MSG_VALIDATIONS_RUN + failuresCount : MSG_VALIDATIONS_DISABLED);
+		for (Map.Entry<TestType, Integer> entry : testTypeFailuresCount.entrySet()) {
+			if(statusReport.getReportSummary().get(entry.getKey().name()) == null) {
+				Integer failuresCount = entry.getValue();
+				statusReport.getReportSummary().put(entry.getKey().name(), failuresCount >= 0 ? MSG_VALIDATIONS_RUN + failuresCount : MSG_VALIDATIONS_DISABLED);
 			}
 		}
 	}

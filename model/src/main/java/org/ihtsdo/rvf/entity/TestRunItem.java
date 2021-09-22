@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,7 +84,7 @@ public class TestRunItem implements Comparable<TestRunItem>{
 
 	
 	public List<FailureDetail> getFirstNInstances() {
-		return firstNInstances;
+		return firstNInstances != null ? firstNInstances : Collections.emptyList();
 	}
 
 	public void setFirstNInstances(final List<FailureDetail> firstNInstances) {
