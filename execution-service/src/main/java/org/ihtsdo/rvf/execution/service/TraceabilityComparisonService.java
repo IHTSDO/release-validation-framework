@@ -205,9 +205,9 @@ public class TraceabilityComparisonService {
 			};
 
 			if (rf2DeltaOnly) {
-				new ReleaseImporter().loadDeltaReleaseFiles(releaseZip, LoadingProfile.complete, componentFactory);
+				new ReleaseImporter().loadDeltaReleaseFiles(releaseZip, LoadingProfile.complete, componentFactory, false);
 			} else {
-				new ReleaseImporter().loadSnapshotReleaseFiles(releaseZip, LoadingProfile.complete, componentFactory);
+				new ReleaseImporter().loadSnapshotReleaseFiles(releaseZip, LoadingProfile.complete, componentFactory, false);
 			}
 
 		}
