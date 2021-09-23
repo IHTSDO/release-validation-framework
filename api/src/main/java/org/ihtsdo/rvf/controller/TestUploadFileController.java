@@ -91,7 +91,7 @@ public class TestUploadFileController {
 	@Autowired
 	private AssertionService assertionService;
 	@Autowired
-	ValidationQueueManager queueManager;
+	private ValidationQueueManager queueManager;
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST)
 	@ResponseBody

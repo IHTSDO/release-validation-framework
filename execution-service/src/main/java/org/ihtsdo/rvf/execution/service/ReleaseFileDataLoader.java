@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ReleaseFileDataLoader {
 
+	private static final int MAX_THREAD_POOL_SIZE = 100;
+	public static final String TERM = "term";
 	private MySqlDataTypeConverter dataTypeConverter;
 	private Connection connection;
 	private final Logger LOGGER = LoggerFactory.getLogger(ReleaseFileDataLoader.class);
@@ -43,7 +45,6 @@ public class ReleaseFileDataLoader {
 		this.dataSource = dataSource;
 		this.schemaName = schemaName;
 		dataTypeConverter = typeConverter;
-		
 	}
 
 
@@ -68,9 +69,10 @@ public class ReleaseFileDataLoader {
 	 * @param rf2FilesLoaded 
 	 * @throws SQLException
 	 */
-	public void loadFilesIntoDB(final String rf2TextFileRootPath, final String[] rf2Files, List<String> rf2FilesLoaded) throws SQLException {
+	public void loadFilesIntoDB(final String rf2TextFileRootPath, final String[] rf2Files, List<String> rf2FilesLoaded) throws RVFExecutionException {
 		final long start = System.currentTimeMillis();
-		ExecutorService executorService =  Executors.newCachedThreadPool();
+		// Use fixed thread pool size to avoid reaching too many mysql connections
+		ExecutorService executorService =  Executors.newFixedThreadPool(MAX_THREAD_POOL_SIZE);
 		List<Future<String>> tasks = new ArrayList<>();
 		for (final String rf2FileName : rf2Files) {
 			final String rvfTableName = RF2FileTableMapper.getLegacyTableName(rf2FileName);
@@ -107,26 +109,15 @@ public class ReleaseFileDataLoader {
 			try {
 				rf2FilesLoaded.add(task.get());
 			} catch (InterruptedException | ExecutionException e) {
-				LOGGER.error("Thread interrupted while waiting for get rf2 file loading result.", e.fillInStackTrace());
+				String errorMsg = "Thread interrupted while waiting for get rf2 file loading result.";
+				LOGGER.error(errorMsg, e.fillInStackTrace());
+				throw new RVFExecutionException(errorMsg, e);
 			}
 		}
 		final long end = System.currentTimeMillis();
 		LOGGER.info("Time taken to load in seconds " + (end-start)/1000);
 	}
-	
-	/* "create table concept_d(\n" + 
-				"id bigint(20) not null,\n" + 
-				"effectivetime char(8) not null,\n" + 
-				"active char(1) not null,\n" + 
-				"moduleid bigint(20) not null,\n" + 
-				"definitionstatusid bigint(20) not null,\n" + 
-				"key idx_id(id),\n" + 
-				"key idx_effectivetime(effectivetime),\n" + 
-				"key idx_active(active),\n" + 
-				"key idx_moduleid(moduleid),\n" + 
-				"key idx_definitionstatusid(definitionstatusid)\n" + 
-				") engine=myisam default charset=utf8;"*/
-	
+
 	private String createTable(final TableSchema tableSchema) throws SQLException {
 		final String rvfTableName = RF2FileTableMapper.getLegacyTableName(tableSchema.getFilename());
 		if (rvfTableName == null) {
@@ -153,9 +144,7 @@ public class ReleaseFileDataLoader {
 					.append( "not null");
 			
 			if (isFieldRequiredIndexing(tableSchema,field)) {
-				if (!firstField) {
-					indexBuilder.append(",\n");
-				}
+				indexBuilder.append(",\n");
 				indexBuilder.append("key idx_")
 				.append(fieldName)
 				.append("(")
@@ -172,7 +161,7 @@ public class ReleaseFileDataLoader {
 
 	private boolean isFieldRequiredIndexing(final TableSchema tableSchema, final Field field) {
 		if (ComponentType.TEXT_DEFINITION == tableSchema.getComponentType()) {
-			if ("term".equals(field.getName())) {
+			if (TERM.equals(field.getName())) {
 				return false;
 			}
 		}

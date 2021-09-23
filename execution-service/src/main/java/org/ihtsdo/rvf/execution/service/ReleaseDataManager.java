@@ -250,7 +250,7 @@ public class ReleaseDataManager {
 			}
 			createSchema(createdSchemaName);
 			loadReleaseFilesToDB(outputFolder, rvfDynamicDataSource, rf2FilesLoaded, createdSchemaName);
-		} catch (final SQLException | IOException e) {
+		} catch (final RVFExecutionException | IOException e) {
 			List<String> fileNames = Arrays.asList(zipDataFile).stream().map(file -> file.getName()).collect(Collectors.toList());
 			final String errorMsg = String.format("Error while loading file %s into version %s", Arrays.toString(fileNames.toArray()), versionName);
 			logger.error(errorMsg,e);
@@ -263,7 +263,7 @@ public class ReleaseDataManager {
 		return createdSchemaName;
 	}
 
-	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final RvfDynamicDataSource dataSource, List<String> rf2FilesLoaded, String schemaName) throws SQLException, FileNotFoundException {
+	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final RvfDynamicDataSource dataSource, List<String> rf2FilesLoaded, String schemaName) throws RVFExecutionException {
 		if (rf2TextFilesDir != null) {
 			final String[] rf2Files = rf2TextFilesDir.list( new FilenameFilter() {
 				

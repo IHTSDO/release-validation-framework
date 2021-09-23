@@ -271,8 +271,7 @@ public class AssertionController {
 			}
 		} else {
 			try {
-				Long longId = new Long(id);
-				return assertionService.find(longId);
+				return assertionService.find(Long.valueOf(id));
 			} catch (IllegalArgumentException e) {
 				throw new InvalidFormatException("Id is not a valid assertion id:" + id);
 			}
