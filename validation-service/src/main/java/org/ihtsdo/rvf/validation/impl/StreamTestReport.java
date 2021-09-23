@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ihtsdo.rvf.validation.ResultFormatter;
 import org.ihtsdo.rvf.validation.StructuralTestRunItem;
@@ -19,8 +20,8 @@ public class StreamTestReport implements TestReportable {
 
 	private final PrintWriter writer;
 	private ResultFormatter formatter;
-	private int numFailures = 0;
-	private int numTestRuns = 0;
+	private AtomicInteger numFailures = new AtomicInteger(0);
+	private AtomicInteger numTestRuns = new AtomicInteger(0);
 	private boolean writeSuccesses;
 	private ConcurrentHashMap<String, TestRunItemCount> errorMap = new ConcurrentHashMap<>();
 	private List<StructuralTestRunItem> failedItems = Collections.synchronizedList(new ArrayList<StructuralTestRunItem>());
@@ -73,8 +74,8 @@ public class StreamTestReport implements TestReportable {
 		} else {
 			errorMap.put(columnName, new TestRunItemCount(item));
 		}
-		numFailures++;
-		numTestRuns++;
+		numFailures.getAndIncrement();
+		numTestRuns.getAndIncrement();
 	}
 
 	@Override
@@ -84,12 +85,12 @@ public class StreamTestReport implements TestReportable {
 			String row = formatter.formatRow(item, 0);
 			writer.write(row);
 		}
-		numTestRuns++;
+		numTestRuns.getAndIncrement();
 	}
 
 	@Override
 	public int getNumErrors() {
-		return numFailures;
+		return numFailures.get();
 	}
 
 	@Override
@@ -99,12 +100,12 @@ public class StreamTestReport implements TestReportable {
 
 	@Override
 	public int getNumSuccesses() {
-		return numTestRuns - numFailures;
+		return numTestRuns.get() - numFailures.get();
 	}
 
 	@Override
 	public int getNumTestRuns() {
-		return numTestRuns;
+		return numTestRuns.get();
 	}
 
 	public void setFormatter(ResultFormatter formatter) {

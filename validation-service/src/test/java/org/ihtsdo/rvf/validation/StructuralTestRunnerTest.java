@@ -62,11 +62,12 @@ public class StructuralTestRunnerTest {
 		String fileName = "/SnomedCT_Release_INT_20140928.zip";
 		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile(fileName));
 
-		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), true);
+		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), false);
 		String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
 
 		assertTrue(response.getResult() != null);
-		assertEquals("There are 3 file names that are not valid plus 4 other erros", 7, response.getNumErrors());
+		assertEquals("There should be 3444 tests in total", 3444, response.getNumTestRuns());
+		assertEquals("There are 3 file names that are not valid plus 4 other errors", 7, response.getNumErrors());
 	}
 
 	@Test
@@ -80,7 +81,6 @@ public class StructuralTestRunnerTest {
 		TestReportable response = validationRunner.execute(provider, bos, false);
 		String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
 		// check bos contains all our info
-		//System.out.println(sw.getBuffer());
 		assertTrue(sw.getBuffer().length() > 0);
 
 		assertTrue(response.getResult() != null);
