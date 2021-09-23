@@ -41,6 +41,9 @@ public class TraceabilityComparisonService {
 
 	private static final ParameterizedTypeReference<ChangeSummaryReport> CHANGE_SUMMARY_REPORT_TYPE_REFERENCE = new ParameterizedTypeReference<>() {};
 
+	// 900000000000534007 | Module dependency reference set (foundation metadata concept) | - Ignore these because they will be generated during the export in Snowstorm.
+	private Set<String> refsetsToIgnore = Sets.newHashSet("900000000000534007");
+
 	public TraceabilityComparisonService(@Value("${traceability-service.url}") String traceabilityServiceUrl) {
 		if (!Strings.isNullOrEmpty(traceabilityServiceUrl)) {
 			traceabilityServiceRestTemplate = new RestTemplateBuilder().rootUri(traceabilityServiceUrl).build();
@@ -197,8 +200,8 @@ public class TraceabilityComparisonService {
 				}
 
 				@Override
-				public void newReferenceSetMemberState(String[] strings, String id, String effectiveTime, String active, String moduleId, String s4, String s5, String... strings1) {
-					if (effectiveTimePredicate.test(effectiveTime)) {
+				public void newReferenceSetMemberState(String[] strings, String id, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String... strings1) {
+					if (effectiveTimePredicate.test(effectiveTime) && !refsetsToIgnore.contains(refsetId)) {
 						refsetMembers.add(id);
 					}
 				}
