@@ -75,13 +75,13 @@ public class TraceabilityComparisonService {
 			AtomicInteger remainingFailureExport = new AtomicInteger(validationConfig.getFailureExportMax());
 
 			diffAndAddFailures(ComponentType.CONCEPT, "Concept change in traceability is missing from RF2 export.",
-					rf2Changes, traceabilityChanges, remainingFailureExport, traceabilityAndDelta);
+					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta);
 			diffAndAddFailures(ComponentType.DESCRIPTION, "Description change in traceability is missing from RF2 export.",
-					rf2Changes, traceabilityChanges, remainingFailureExport, traceabilityAndDelta);
+					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta);
 			diffAndAddFailures(ComponentType.RELATIONSHIP, "Relationship change in traceability is missing from RF2 export.",
-					rf2Changes, traceabilityChanges, remainingFailureExport, traceabilityAndDelta);
+					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta);
 			diffAndAddFailures(ComponentType.REFERENCE_SET_MEMBER, "Refset member change in traceability is missing from RF2 export.",
-					rf2Changes, traceabilityChanges, remainingFailureExport, traceabilityAndDelta);
+					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta);
 
 			if (traceabilityAndDelta.getFirstNInstances().isEmpty()) {
 				report.getResultReport().addPassedAssertions(Collections.singletonList(traceabilityAndDelta));
@@ -98,13 +98,13 @@ public class TraceabilityComparisonService {
 			remainingFailureExport = new AtomicInteger(validationConfig.getFailureExportMax());
 
 			diffAndAddFailures(ComponentType.CONCEPT, "Concept change in RF2 export is missing from traceability.",
-					traceabilityChanges, rf2Changes, remainingFailureExport, deltaAndTraceability);
+					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability);
 			diffAndAddFailures(ComponentType.DESCRIPTION, "Description change in RF2 export is missing from traceability.",
-					traceabilityChanges, rf2Changes, remainingFailureExport, deltaAndTraceability);
+					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability);
 			diffAndAddFailures(ComponentType.RELATIONSHIP, "Relationship change in RF2 export is missing from traceability.",
-					traceabilityChanges, rf2Changes, remainingFailureExport, deltaAndTraceability);
+					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability);
 			diffAndAddFailures(ComponentType.REFERENCE_SET_MEMBER, "Refset member change in RF2 export is missing from traceability.",
-					traceabilityChanges, rf2Changes, remainingFailureExport, deltaAndTraceability);
+					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability);
 
 			if (deltaAndTraceability.getFirstNInstances().isEmpty()) {
 				report.getResultReport().addPassedAssertions(Collections.singletonList(deltaAndTraceability));
