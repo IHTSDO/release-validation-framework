@@ -136,12 +136,8 @@ public class DroolsRulesValidationService {
 					previousReleaseDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
 				}
 
-				if (CollectionUtils.isEmpty(previousReleaseDirectories)) {
-					previousReleaseDirectories = null;
-				}
-
 				//Run validation
-				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, previousReleaseDirectories, droolsRulesSets, effectiveDate, modulesSet, true);
+				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, CollectionUtils.isEmpty(previousReleaseDirectories) ? null : previousReleaseDirectories, droolsRulesSets, effectiveDate, modulesSet, true);
 
 				if (invalidContents.size() != 0 && !whitelistService.isWhitelistDisabled()) {
 					List<InvalidContent> newInvalidContents = new ArrayList<>();
