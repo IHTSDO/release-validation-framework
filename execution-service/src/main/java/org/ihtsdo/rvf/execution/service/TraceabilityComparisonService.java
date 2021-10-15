@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.execution.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.otf.snomedboot.factory.ComponentFactory;
@@ -136,7 +137,7 @@ public class TraceabilityComparisonService {
 	}
 
 	private Map<ComponentType, Set<String>> gatherRF2ComponentChanges(ValidationRunConfig validationConfig) throws IOException, ReleaseImportException {
-		final String releaseEffectiveTime = validationConfig.getEffectiveTime();
+		final String releaseEffectiveTime = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replaceAll("-","") : "";
 
 		logger.info("Collecting component ids from snapshot using effectiveTime filter.");
 
