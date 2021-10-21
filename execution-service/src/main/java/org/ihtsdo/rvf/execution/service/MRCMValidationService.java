@@ -1,8 +1,10 @@
 package org.ihtsdo.rvf.execution.service;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.otf.sqs.service.dto.ConceptResult;
 import org.ihtsdo.rvf.entity.FailureDetail;
@@ -10,12 +12,14 @@ import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
+import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snomed.quality.validator.mrcm.Assertion;
 import org.snomed.quality.validator.mrcm.ContentType;
 import org.snomed.quality.validator.mrcm.ValidationRun;
 import org.snomed.quality.validator.mrcm.ValidationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -29,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Service
 public class MRCMValidationService {
@@ -37,14 +42,17 @@ public class MRCMValidationService {
 
 	private static final String EXT_ZIP = ".zip";
 
-	public enum CharacteristicType { inferred, stated }
+	public enum CharacteristicType {inferred, stated}
+
+	@Autowired
+	private WhitelistService whitelistService;
 
 	public ValidationStatusReport runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig) {
 		Set<String> extractedRF2FilesDirectory = new HashSet<>();
 		try {
 			boolean fullSnapshotRelease = !validationConfig.isRf2DeltaOnly() && StringUtils.isEmpty(validationConfig.getExtensionDependency());
 			int maxFailureExports = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 100;
-			String effectiveDate = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replaceAll("-","") : "";
+			String effectiveDate = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replaceAll("-", "") : "";
 			final long timeStart = System.currentTimeMillis();
 			ValidationReport report = statusReport.getResultReport();
 			ValidationService validationService = new ValidationService();
@@ -56,7 +64,7 @@ public class MRCMValidationService {
 			InputStream deltaInputStream = null;
 			//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 			if (validationConfig.isRf2DeltaOnly()) {
-				if(StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
+				if (StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
 					throw new RVFExecutionException("MRCM validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
 				}
 				InputStream previousStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile());
@@ -71,7 +79,7 @@ public class MRCMValidationService {
 			//If the package is an MS edition, it is not necessary to load the dependency
 			Set<String> moduleIds = null;
 			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
-				if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
+				if (StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
 					throw new RVFExecutionException("MRCM validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 				}
 				InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyReleaseFile());
@@ -79,7 +87,7 @@ public class MRCMValidationService {
 
 				//Will filter the results based on component's module IDs if the package is an extension only
 				String moduleIdStr = validationConfig.getIncludedModules();
-				if(StringUtils.isNotBlank(moduleIdStr)) {
+				if (StringUtils.isNotBlank(moduleIdStr)) {
 					moduleIds = Sets.newHashSet(moduleIdStr.split(","));
 				}
 			}
@@ -89,7 +97,7 @@ public class MRCMValidationService {
 				File snapshotDirectory = new ReleaseImporter().unzipRelease(inputStream, ReleaseImporter.ImportType.SNAPSHOT);
 				extractedRF2FilesDirectory.add(snapshotDirectory.getPath());
 			}
-			if(deltaInputStream != null) {
+			if (deltaInputStream != null) {
 				File deltaDirectory = new ReleaseImporter().unzipRelease(deltaInputStream, ReleaseImporter.ImportType.DELTA);
 				extractedRF2FilesDirectory.add(deltaDirectory.getPath());
 			}
@@ -113,6 +121,11 @@ public class MRCMValidationService {
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			executorService.invokeAll(callables);
 
+			if (!whitelistService.isWhitelistDisabled()) {
+				checkWhitelistItems(validationRunnerInferredForm, maxFailureExports);
+				checkWhitelistItems(validationRunnerInStatedForm, maxFailureExports);
+			}
+
 			extractTestResults(maxFailureExports, report, validationRunnerInferredForm, ContentType.INFERRED);
 			extractTestResults(maxFailureExports, report, validationRunnerInStatedForm, ContentType.STATED);
 			report.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
@@ -122,12 +135,47 @@ public class MRCMValidationService {
 			LOGGER.error(message, ex);
 			message = ex.getMessage() != null ? message + " due to error: " + ex.getMessage() : message;
 			statusReport.addFailureMessage(message);
-		}  finally {
-			if(!CollectionUtils.isEmpty(extractedRF2FilesDirectory)) {
+		} finally {
+			if (!CollectionUtils.isEmpty(extractedRF2FilesDirectory)) {
 				extractedRF2FilesDirectory.forEach(s -> FileUtils.deleteQuietly(new File(s)));
 			}
 		}
-		return  statusReport;
+		return statusReport;
+	}
+
+	private void checkWhitelistItems(ValidationRun report, int maxFailureExports) throws RestClientException {
+		for (final Assertion assertion : report.getAssertionsWithWarning()) {
+			checkWhitelistItemAgainstEachAssertion(assertion, maxFailureExports);
+		}
+		for (final Assertion assertion : report.getFailedAssertions()) {
+			checkWhitelistItemAgainstEachAssertion(assertion, maxFailureExports);
+		}
+	}
+
+	private void checkWhitelistItemAgainstEachAssertion(Assertion assertion, int maxFailureExports) throws RestClientException {
+		// checking whitelist
+		if (assertion.getCurrentViolatedConceptIds().size() != 0) {
+			List<Long> newViolatedConceptIds = new ArrayList<>();
+			List<ConceptResult> newViolatedConcepts = new ArrayList<>();
+			for (List<Long> batch : Iterables.partition(assertion.getCurrentViolatedConceptIds(), maxFailureExports)) {
+				// Convert to WhitelistItem
+				List<WhitelistItem> whitelistItems = batch.stream()
+						.map(conceptId -> new WhitelistItem(assertion.getUuid().toString(), "", String.valueOf(conceptId), ""))
+						.collect(Collectors.toList());
+
+				// Send to Authoring acceptance gateway
+				LOGGER.info("Checking %s whitelist items in batch", whitelistItems.size());
+				List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
+
+				// Find the failures which are not in the whitelisted item
+				newViolatedConceptIds.addAll(batch.stream().filter(conceptId ->
+						whitelistedItems.stream().noneMatch(whitelistedItem -> String.valueOf(conceptId).equals(whitelistedItem.getConceptId()))
+				).collect(Collectors.toList()));
+			}
+			newViolatedConcepts.addAll(assertion.getCurrentViolatedConcepts().stream().filter(concept -> newViolatedConceptIds.contains(Long.valueOf(concept.getId()))).collect(Collectors.toList()));
+			assertion.setCurrentViolatedConceptIds(newViolatedConceptIds);
+			assertion.setCurrentViolatedConcepts(newViolatedConcepts);
+		}
 	}
 
 	private ValidationRun getValidationRunGivenForm(String effectiveDate, ValidationRun validationRunner, boolean fullSnapshotRelease, Set<String> moduleIds, ContentType contentType) {
@@ -144,29 +192,29 @@ public class MRCMValidationService {
 	private void extractTestResults(int maxFailureExports, ValidationReport report, ValidationRun validationRun, ContentType contentType) {
 		TestRunItem testRunItem;
 		final List<TestRunItem> passedAssertions = new ArrayList<>();
-		for(Assertion assertion : validationRun.getCompletedAssertions()){
+		for (Assertion assertion : validationRun.getCompletedAssertions()) {
 			testRunItem = createTestRunItem(assertion, contentType);
 			passedAssertions.add(testRunItem);
 		}
 
 		final List<TestRunItem> skippedAssertions = new ArrayList<>();
-		for(Assertion assertion : validationRun.getSkippedAssertions()){
+		for (Assertion assertion : validationRun.getSkippedAssertions()) {
 			testRunItem = createTestRunItem(assertion, contentType);
 			skippedAssertions.add(testRunItem);
 		}
 
 		final List<TestRunItem> warnedAssertions = new ArrayList<>();
-		for(Assertion assertion : validationRun.getAssertionsWithWarning()){
+		for (Assertion assertion : validationRun.getAssertionsWithWarning()) {
 			testRunItem = createTestRunItemWithFailures(assertion, contentType, maxFailureExports);
-			if(testRunItem != null) {
+			if (testRunItem != null) {
 				warnedAssertions.add(testRunItem);
 			}
 		}
 
 		final List<TestRunItem> failedAssertions = new ArrayList<>();
-		for(Assertion assertion : validationRun.getFailedAssertions()){
+		for (Assertion assertion : validationRun.getFailedAssertions()) {
 			testRunItem = createTestRunItemWithFailures(assertion, contentType, maxFailureExports);
-			if(testRunItem != null) {
+			if (testRunItem != null) {
 				failedAssertions.add(testRunItem);
 			}
 		}
@@ -189,12 +237,12 @@ public class MRCMValidationService {
 
 	private TestRunItem createTestRunItemWithFailures(Assertion mrcmAssertion, ContentType contentType, int failureExportMax) {
 		int failureCount = mrcmAssertion.getCurrentViolatedConceptIds().size();
-		if(failureCount == 0) return null;
+		if (failureCount == 0) return null;
 		int firstNCount = Math.min(failureCount, failureExportMax);
 		TestRunItem testRunItem = createTestRunItem(mrcmAssertion, contentType);
 		testRunItem.setFailureCount((long) failureCount);
 		List<FailureDetail> failedDetails = new ArrayList(firstNCount);
-		for(int i = 0; i < firstNCount; i++) {
+		for (int i = 0; i < firstNCount; i++) {
 			ConceptResult concept = mrcmAssertion.getCurrentViolatedConcepts().get(i);
 			failedDetails.add(new FailureDetail(concept.getId(), mrcmAssertion.getDetails(), concept.getFsn()));
 		}
