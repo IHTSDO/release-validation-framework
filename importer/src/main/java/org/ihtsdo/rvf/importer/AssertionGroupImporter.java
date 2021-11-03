@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -153,6 +154,36 @@ public class AssertionGroupImporter {
 	private static final String[] US_EDITION_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b","2e2542f9-64a4-43d0-bf4e-9029af8b7cf0"};
 
 	private static final String[] INT_AUTHORING_EXCLUDE_LIST = {"6bed3e87-6d20-4b05-81ce-43d359a6f684"};
+
+    private static final String[] INT_AUTHORING_INCLUDE_LIST = {"11735994-4b7f-4e61-9bde-059b7e085031",
+            "26c25479-c3ba-47f2-9851-bb05ae42ad48",
+            "2aa0bea1-b1fa-4543-b277-b4392a6f864d",
+            "2b193a88-8dab-4d19-b995-b556ed59398d",
+            "35680574-3ac6-4b68-9efe-de88b677eb35",
+            "372e59d5-d6f3-4708-93d0-6cb92da69006",
+            "4478a896-2724-4417-8bce-8986ecc53c4e",
+            "44916964-5b78-4842-81d8-e8293ee93bea",
+            "4deb9274-d923-4f84-b0dc-c4dab0c2fc4c",
+            "560e6d0c-64e8-4726-9516-ae7a7606b0b3",
+            "5c6b6bc0-79b9-11e1-b0c4-0800200c9a66",
+            "5f1a51a3-6200-4463-8799-d75998165278",
+            "8864db45-0f97-4eda-b7ba-414289dd3a99",
+            "910844a8-97e5-4096-add2-e1734b941e10",
+            "9190473a-29f7-40fc-b879-9ae0d038b681",
+            "9912342f-5010-40fd-9bea-301b737973a1",
+            "a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5",
+            "b1ebc4cb-6a86-498f-a3ea-aeef250b9399",
+            "b205d819-2ef6-48e3-8fe1-1793e83a7b8a",
+            "b88b9f46-4c33-4d8e-b9ab-ddb87aef3068",
+            "bc055a18-f93e-42fd-8bb2-347f2b2b8976",
+            "ccd8f56e-45ec-40b7-9404-9b264881e64d",
+            "cec2a50e-c04b-4442-a979-e8ad8f83ff91",
+            "d182e8d4-c8e1-4e5f-ae17-b2f786f55727",
+            "d7e12c75-9979-4adb-9b5b-3b8a80ab4fbb",
+            "e6082dc4-c6f4-48c6-afa3-233182336a5c",
+            "eff30fb0-7856-11e1-b0c4-0800200c9a66",
+            "fbfc4fd1-f10d-4fc2-889f-df0e089df4b7"
+    };
 
 	private static final String[] INT_EDITION_EXCLUDE_LIST = {"2e2542f9-64a4-43d0-bf4e-9029af8b7cf0"};
 
@@ -478,15 +509,18 @@ public class AssertionGroupImporter {
 		group.setName(groupName.getName());
 		group = assertionService.createAssertionGroup(group);
 		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWords("," + groupName.getReleaseCenter(), false);
-		if (!INT_AUTHORING.equals(groupName)) {
-			allAssertions.addAll(assertionService.getAssertionsByKeyWords(",EXTENSION", false));
-		}
+		if (INT_AUTHORING.equals(groupName)) {
+            List<Assertion> releaseTypeAssertions = assertionService.getAssertionsByKeyWords(RELEASE_TYPE_VALIDATION.getName(), false);
+            allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())).collect(Collectors.toList()));
+		} else {
+            allAssertions.addAll(assertionService.getAssertionsByKeyWords(",EXTENSION", false));
+        }
 		for (Assertion assertion : allAssertions) {
-			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName())) {
+			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()) && (!AssertionGroupName.INT_AUTHORING.equals(groupName) || !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))) {
 				continue;
 			}
 			//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
-			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString()) && (!AssertionGroupName.INT_AUTHORING.equals(groupName) || !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))) {
 				continue;
 			}
 			// Exclude stated relationship assertions
@@ -494,7 +528,7 @@ public class AssertionGroupImporter {
 				continue;
 			}
 			//exclude simple map file checking as term server extracts don't contain these
-			if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
+			if (assertion.getAssertionText().contains(SIMPLE_MAP) && (!AssertionGroupName.INT_AUTHORING.equals(groupName) || !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))) {
 				continue;
 			}
 			if (AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
