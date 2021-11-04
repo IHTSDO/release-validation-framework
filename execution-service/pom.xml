@@ -12,7 +12,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<snomed-drools.version>3.0.4-SNAPSHOT</snomed-drools.version>
+		<snomed-drools.version>3.1.0</snomed-drools.version>
 	</properties>
 
 	<dependencies>
