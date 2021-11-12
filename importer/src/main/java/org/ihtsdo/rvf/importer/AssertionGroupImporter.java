@@ -47,6 +47,7 @@ public class AssertionGroupImporter {
 		EE_AUTHORING("EE", "ee-authoring"),
 		NZ_AUTHORING("NZ", "nz-authoring"),
 		ZH_AUTHORING("ZH", "zh-authoring"),
+        KR_AUTHORING("KR", "kr-authoring"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC", "first-time-loinc-validation"),
 		FIRST_TIME_COMMON_EDITION_VALIDATION ("COMMON", "first-time-common-edition"),
 		LOINC_EDITION ("LOINC", "LoincEdition"),
@@ -388,6 +389,7 @@ public class AssertionGroupImporter {
 			case NZ_AUTHORING:
 			case ZH_AUTHORING:
 			case EE_AUTHORING :
+            case KR_AUTHORING:
 				createSnapshotAssertionGroup(groupName);
 				break;
 			case FIRST_TIME_LOINC_VALIDATION :
