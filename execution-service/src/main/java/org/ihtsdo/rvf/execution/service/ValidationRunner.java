@@ -124,7 +124,7 @@ public class ValidationRunner {
 	private void doRunValidations(ValidationRunConfig validationConfig, MysqlExecutionConfig executionConfig, ValidationStatusReport statusReport) throws Exception {
 		runRF2StructureTests(validationConfig, statusReport);
 
-		List<Future<ValidationStatusReport>> tasks = new ArrayList<>();
+		Map<String, Future<ValidationStatusReport>> taskMap = new HashMap<>();
 		ExecutorService executorService = Executors.newFixedThreadPool(5);
 		StringBuilder statusMessages = new StringBuilder();
 		statusMessages.append("RVF assertions validation started");
@@ -132,14 +132,14 @@ public class ValidationRunner {
 
 		ValidationStatusReport mysqlValidationStatusReport = new ValidationStatusReport(validationConfig);
 		mysqlValidationStatusReport.setResultReport(new ValidationReport());
-		tasks.add(executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
+		taskMap.put("SQL Assertions", executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
 
 		if (validationConfig.isEnableDrools()) {
 			statusMessages.append("\nDrools rules validation started");
 			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 			ValidationStatusReport droolsValidationStatusReport = new ValidationStatusReport(validationConfig);
 			droolsValidationStatusReport.setResultReport(new ValidationReport());
-			tasks.add(executorService.submit(() -> droolsValidationService.runDroolsAssertions(validationConfig, droolsValidationStatusReport)));
+			taskMap.put("Drools Assertions", executorService.submit(() -> droolsValidationService.runDroolsAssertions(validationConfig, droolsValidationStatusReport)));
 		}
 
 		if (validationConfig.isEnableMRCMValidation()) {
@@ -147,7 +147,7 @@ public class ValidationRunner {
 			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 			ValidationStatusReport mrcmValidationStatusReport = new ValidationStatusReport(validationConfig);
 			mrcmValidationStatusReport.setResultReport(new ValidationReport());
-			tasks.add(executorService.submit(() -> mrcmValidationService.runMRCMAssertionTests(mrcmValidationStatusReport, validationConfig)));
+			taskMap.put("MRCM Validation", executorService.submit(() -> mrcmValidationService.runMRCMAssertionTests(mrcmValidationStatusReport, validationConfig)));
 		}
 
 		if (validationConfig.isEnableTraceabilityValidation()) {
@@ -155,17 +155,17 @@ public class ValidationRunner {
 			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 			ValidationStatusReport traceabilityComparisonReport = new ValidationStatusReport(validationConfig);
 			traceabilityComparisonReport.setResultReport(new ValidationReport());
-			tasks.add(executorService.submit(() -> {
+			taskMap.put("Traceability Comparison", executorService.submit(() -> {
 				traceabilityComparisonService.runTraceabilityComparison(traceabilityComparisonReport, validationConfig);
 				return traceabilityComparisonReport;
 			}));
 		}
 
-		for (Future<ValidationStatusReport> task : tasks) {
+		for (Map.Entry<String, Future<ValidationStatusReport>> entry : taskMap.entrySet()) {
 			try {
-				mergeValidationStatusReports(statusReport, task.get());
+				mergeValidationStatusReports(statusReport, entry.getValue().get());
 			} catch (ExecutionException | InterruptedException e) {
-				String errorMsg = "Error occurred while merging validation reports";
+				String errorMsg = "Error occurred while merging validation report: " + entry.getKey();
 				logger.error(errorMsg, e);
 				throw new IllegalStateException(errorMsg, e);
 			}
