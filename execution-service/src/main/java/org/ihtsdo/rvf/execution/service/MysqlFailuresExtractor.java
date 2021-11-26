@@ -99,7 +99,7 @@ public class MysqlFailuresExtractor {
                     item.setFirstNInstances(null);
                 } else {
                     item.setFailureCount(Long.valueOf(total_failures - total_whitelistedItem_extracted));
-                    item.setFirstNInstances(firstNInstances.size() > config.getFailureExportMax() ? firstNInstances.subList(0, config.getFailureExportMax() - 1) : firstNInstances);
+                    item.setFirstNInstances(firstNInstances.size() > config.getFailureExportMax() ? firstNInstances.subList(0, config.getFailureExportMax()) : firstNInstances);
                 }
             } else {
                 item.setFailureCount(0L);

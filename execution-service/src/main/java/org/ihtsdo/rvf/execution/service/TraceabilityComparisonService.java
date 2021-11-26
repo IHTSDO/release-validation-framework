@@ -129,7 +129,7 @@ public class TraceabilityComparisonService {
 		final Sets.SetView<String> missing = Sets.difference(leftSide.getOrDefault(componentType, Collections.emptySet()), rightSide.getOrDefault(componentType, Collections.emptySet()));
 		for (String inLeftNotRight : missing) {
 			if (remainingFailureExport.get() > 0) {
-				remainingFailureExport.incrementAndGet();
+				remainingFailureExport.decrementAndGet();
 				report.addFirstNInstance(new FailureDetail(null, message).setComponentId(inLeftNotRight));
 			}
 			report.setFailureCount(report.getFailureCount() + 1);
