@@ -515,7 +515,9 @@ public class AssertionGroupImporter {
             List<Assertion> releaseTypeAssertions = assertionService.getAssertionsByKeyWords(RELEASE_TYPE_VALIDATION.getName(), false);
             allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())).collect(Collectors.toList()));
 		} else {
-            allAssertions.addAll(assertionService.getAssertionsByKeyWords(",EXTENSION", false));
+			if (!US_AUTHORING.equals(groupName)) {
+				allAssertions.addAll(assertionService.getAssertionsByKeyWords(",EXTENSION", false));
+			}
         }
 		for (Assertion assertion : allAssertions) {
 			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()) && (!AssertionGroupName.INT_AUTHORING.equals(groupName) || !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))) {
@@ -578,7 +580,7 @@ public class AssertionGroupImporter {
 		assertionGroup = assertionService.createAssertionGroup(assertionGroup);
 		List<Assertion> assertionsToBeAdded = getCommonReleaseAssertions(allAssertions);
 		assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()));
-		if (!AssertionGroupName.COMMON_EDITION.equals(groupName) && !AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName)) {
+		if (!AssertionGroupName.COMMON_EDITION.equals(groupName) && !AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && !AssertionGroupName.US_EDITION.equals(groupName)) {
 			assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, "EXTENSION"));
 		}
 		for (Assertion assertion : assertionsToBeAdded) {
