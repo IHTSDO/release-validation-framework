@@ -379,8 +379,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 		}
 
-		@SuppressWarnings("rawtypes")
-		private void createOrUpdateAssertion(SimpleAssertion simpleAssertion) throws JsonProcessingException {
+		private void createOrUpdateAssertion(SimpleAssertion simpleAssertion) {
 			Assertion assertion = simpleAssertion.toAssertion();
 			//Do we need to create that assertion or does it already exist?
 			if ( assertionService.find(assertion.getAssertionId()) != null) {

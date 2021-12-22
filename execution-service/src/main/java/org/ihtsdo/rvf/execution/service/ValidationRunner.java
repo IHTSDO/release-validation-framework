@@ -1,8 +1,9 @@
 package org.ihtsdo.rvf.execution.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.collect.ImmutableMap;
+import org.apache.commons.codec.DecoderException;
 import org.ihtsdo.otf.jms.MessagingHelper;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.TestRunItem;
 import org.ihtsdo.rvf.entity.TestType;
 import org.ihtsdo.rvf.entity.ValidationReport;
@@ -18,10 +19,11 @@ import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -75,7 +77,7 @@ public class ValidationRunner {
 				reportService.writeResults(statusReport, State.FAILED, validationConfig.getStorageLocation());
 				updateRvfState(validationConfig, State.FAILED);
 			} catch (final Exception e) {
-				throw new RuntimeException("Failed to record failure (which was: " + failureMsg + ")", e);
+				throw new IllegalStateException("Failed to record failure (which was: " + failureMsg + ")", e);
 			}
 		}
 	}
@@ -100,14 +102,14 @@ public class ValidationRunner {
 
 		if (!EMPTY_TEST_ASSERTION_GROUPS.equals(validationConfig.getGroupsList())) {
 			// Actually run validations
-			doRunValidations(validationConfig, executionConfig, statusReport);
+			doRunValidations(validationConfig, statusReport);
 		}
 
 		// Update reports and status after validations run
 		report.sortAssertionLists();
 		final Calendar endTime = Calendar.getInstance();
 		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
-		logger.info(String.format("Finished execution with runId : [%1s] in [%2s] minutes ", validationConfig.getRunId(), timeTaken));
+		logger.info("Finished execution with runId : {} in {} minutes ", validationConfig.getRunId(), timeTaken);
 		statusReport.setStartTime(startTime.getTime());
 		statusReport.setEndTime(endTime.getTime());
 		report.setTimeTakenInSeconds(timeTaken*60);
@@ -121,7 +123,7 @@ public class ValidationRunner {
 		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
 	}
 
-	private void doRunValidations(ValidationRunConfig validationConfig, MysqlExecutionConfig executionConfig, ValidationStatusReport statusReport) throws Exception {
+	private void doRunValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws Exception {
 		runRF2StructureTests(validationConfig, statusReport);
 
 		Map<String, Future<ValidationStatusReport>> taskMap = new HashMap<>();
@@ -162,13 +164,7 @@ public class ValidationRunner {
 		}
 
 		for (Map.Entry<String, Future<ValidationStatusReport>> entry : taskMap.entrySet()) {
-			try {
-				mergeValidationStatusReports(statusReport, entry.getValue().get());
-			} catch (ExecutionException | InterruptedException e) {
-				String errorMsg = "Error occurred while merging validation report: " + entry.getKey();
-				logger.error(errorMsg, e);
-				throw new IllegalStateException(errorMsg, e);
-			}
+			mergeValidationStatusReports(statusReport, entry.getValue().get());
 		}
 		executorService.shutdown();
 	}
@@ -207,8 +203,8 @@ public class ValidationRunner {
 		
 	}
 	
-	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws Exception{
-		logger.info(String.format("Started execution with runId [%1s] : ", validationConfig.getRunId()));
+	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws NoSuchAlgorithmException, IOException, DecoderException, BusinessServiceException {
+		logger.info("Started execution with runId {}", validationConfig.getRunId());
 		// load the filename
 		String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
 		logger.info(structureTestStartMsg);

@@ -19,14 +19,14 @@ public class RvfDynamicDataSource {
 
 	@Resource(name = "dataSource")
 	private BasicDataSource dataSource;
-	private ConcurrentHashMap<String, BasicDataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
-	private final Logger LOGGER = LoggerFactory.getLogger(RvfDynamicDataSource.class);
+	private final ConcurrentHashMap<String, BasicDataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
+	private final static Logger LOGGER = LoggerFactory.getLogger(RvfDynamicDataSource.class);
 
 	/**
 	 * Returns a connection for the given schema. It uses an underlying map to store relevant {@link org.apache.commons.dbcp.BasicDataSource}
 	 * @param schema the schema for which the connection needs to be returned
 	 * @return the connection for this schema
-	 * @throws SQLException
+	 * @throws SQLException sql exception
 	 */
 	public Connection getConnection(String schema) throws SQLException {
 		if(schemaDatasourceMap.containsKey(schema)){

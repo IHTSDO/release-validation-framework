@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -80,28 +79,24 @@ public class ReleaseFileDataLoader {
 				LOGGER.warn("No matching table name found for RF2 file:" + rf2FileName);
 				continue;
 			}
-			final Future<String> future = executorService.submit(new Callable<String>() {
+			final Future<String> future = executorService.submit(() -> {
+				final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
+				final String disableIndex = "ALTER TABLE " + rvfTableName + " DISABLE KEYS;";
+				final String enableIndex = "ALTER TABLE " + rvfTableName + " ENABLE KEYS;";
+				final String loadFile = "load data local infile '" + rf2TextFileRootPath + "/" + rf2FileName + "' into table " + rvfTableName
+						+ " columns terminated by '\\t' "
+						+ " lines terminated by '\\r\\n' "
+						+ " ignore 1 lines";
+				LOGGER.info(loadFile);
 
-				@Override
-				public String call() throws Exception {
-					final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
-					final String disableIndex = "ALTER TABLE " + rvfTableName + " DISABLE KEYS;";
-					final String enableIndex = "ALTER TABLE " + rvfTableName + " ENABLE KEYS;";
-					final String loadFile = "load data local infile '" + rf2TextFileRootPath + "/" + rf2FileName + "' into table " + rvfTableName
-							+ " columns terminated by '\\t' "
-							+ " lines terminated by '\\r\\n' "
-							+ " ignore 1 lines";
-					LOGGER.info(loadFile);
-					
-					try (Connection connection = dataSource.getConnection(schemaName); 
-						Statement statement = connection.createStatement()) {
-						statement.execute(configStr);
-						statement.execute(disableIndex);
-						statement.execute(loadFile);
-						statement.execute(enableIndex);
-					}
-					return rf2FileName;
+				try (Connection connection = dataSource.getConnection(schemaName);
+					Statement statement = connection.createStatement()) {
+					statement.execute(configStr);
+					statement.execute(disableIndex);
+					statement.execute(loadFile);
+					statement.execute(enableIndex);
 				}
+				return rf2FileName;
 			});
 			tasks.add(future);
 		}

@@ -2,12 +2,12 @@ package org.ihtsdo.rvf.execution.service;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.entity.Assertion;
@@ -27,7 +27,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MysqlValidationService {
-	
+
+	public static final String START_EXECUTING_ASSERTIONS = "Start executing assertions...";
 	@Autowired
 	private AssertionService assertionService;
 
@@ -50,38 +51,37 @@ public class MysqlValidationService {
 	
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
 	
-	private ExecutorService executorService = Executors.newCachedThreadPool();
+	private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException{
+	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		String reportStorage = validationConfig.getStorageLocation();
 		try {
-			//prepare release data for testing
+			// prepare release data for testing
 			if (!executionConfig.isFirstTimeRelease()) {
 				releaseVersionLoader.loadPreviousVersion(executionConfig);
 			}
-			//load dependency release
+			// load dependency release
 			if (executionConfig.isExtensionValidation()) {
 				releaseVersionLoader.loadDependencyVersion(executionConfig);
 				if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion())) {
 					statusReport.addFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
 				}
 			}
-			//load prospective version
+			// load prospective version
 			releaseVersionLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
 		} catch (Exception e) {
-			String msg = "Failed to prepare versions for mysql validation";
-			msg = e.getMessage()!= null ? msg + " due to error: " + e.getMessage() : msg;
-			LOGGER.error(msg, e);
-			statusReport.addFailureMessage(msg);
-			statusReport.getReportSummary().put(TestType.SQL.name(), msg);
+			String errorMsg = String.format("Failed to load data into MySql due to %s", ExceptionUtils.getRootCauseMessage(e));
+			LOGGER.error(errorMsg, e);
+			statusReport.addFailureMessage(errorMsg);
+			statusReport.getReportSummary().put(TestType.SQL.name(), errorMsg);
 			return statusReport;
 		}
 		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
-			LOGGER.info("Run extension release validation with config " +  executionConfig);
+			LOGGER.info("Run extension release validation with config {}", executionConfig);
 			runExtensionReleaseValidation(statusReport, validationConfig, executionConfig);
 		} else {
-			LOGGER.info("Run international release validation with config " + executionConfig);
+			LOGGER.info("Run international release validation with config {}", executionConfig);
 			runAssertionTests(statusReport, executionConfig, reportStorage);
 		}
 		return statusReport;
@@ -91,16 +91,15 @@ public class MysqlValidationService {
 	/** For extension release validation we need to test the release-type validations first using previous extension against current extension
 	 * first then loading the international snapshot for the file-centric and component-centric validations.
 	 * load previous published version
-	 * @param statusReport
-	 * @param validationConfig
-	 * @param executionConfig
-	 * @throws BusinessServiceException
+	 * @param statusReport status report
+	 * @param validationConfig validation config
+	 * @param executionConfig execution config
 	 */
-	private void runExtensionReleaseValidation(ValidationStatusReport statusReport, ValidationRunConfig validationConfig, MysqlExecutionConfig executionConfig) throws BusinessServiceException {
+	private void runExtensionReleaseValidation(ValidationStatusReport statusReport, ValidationRunConfig validationConfig, MysqlExecutionConfig executionConfig) throws ExecutionException, InterruptedException {
 		final long timeStart = System.currentTimeMillis();
-		//run release-type validations
+		// run release-type validations
 		List<Assertion> assertions = getAssertions(executionConfig.getGroupNames());
-		LOGGER.debug("Total assertions found:" + assertions.size());
+		LOGGER.debug("Total assertions found {}", assertions.size());
 		List<Assertion> releaseTypeAssertions = new ArrayList<>();
 		List<Assertion> noneReleaseTypeAssertions = new ArrayList<>();
 		for (Assertion assertion : assertions) {
@@ -110,14 +109,14 @@ public class MysqlValidationService {
 				noneReleaseTypeAssertions.add(assertion);
 			}
 		}
-		LOGGER.debug("Running release-type validations:" + releaseTypeAssertions.size());
+		LOGGER.debug("Running release-type validations {}", releaseTypeAssertions.size());
 		String reportStorage = validationConfig.getStorageLocation();
 		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage,false);
 		//loading international snapshot
 		try {
 			releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig, validationConfig);
 		} catch (BusinessServiceException e) {
-			String msg = "Failed to prepare data for extension testing due to error:" + e.getMessage();
+			String msg = String.format("Failed to prepare data for extension testing due to error %s", ExceptionUtils.getRootCauseMessage(e));
 			statusReport.addFailureMessage(msg);
 			LOGGER.error(msg, e);
 			statusReport.getReportSummary().put(TestType.SQL.name(), msg);
@@ -132,21 +131,20 @@ public class MysqlValidationService {
 		for (final AssertionGroup group : groups) {
 			assertions.addAll(group.getAssertions());
 		}
-		return new ArrayList<Assertion>(assertions);
+		return new ArrayList<>(assertions);
 	}
 
 	private List<TestRunItem> runAssertionTests(MysqlExecutionConfig executionConfig, List<Assertion> assertions,
-			String reportStorage, boolean runResourceAssertions) {
+			String reportStorage, boolean runResourceAssertions) throws ExecutionException, InterruptedException {
 		List<TestRunItem> result = new ArrayList<>();
 		if (runResourceAssertions) {
 			final List<Assertion> resourceAssertions = assertionService.getAssertionsByKeyWords("resource", true);
-			LOGGER.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
-			reportService.writeProgress("Start executing assertions...", reportStorage);
+			LOGGER.info("Found total resource assertions need to be run before test {}", resourceAssertions.size());
+			reportService.writeProgress(START_EXECUTING_ASSERTIONS, reportStorage);
 			result.addAll(executeAssertions(executionConfig, resourceAssertions, reportStorage));
 		}
-		reportService.writeProgress("Start executing assertions...", reportStorage);
-		LOGGER.info("Total assertions to run: " + assertions.size());
-
+		reportService.writeProgress(START_EXECUTING_ASSERTIONS, reportStorage);
+		LOGGER.info("Total assertions to run {}", assertions.size());
 		if (batchSize == 0) {
 			result.addAll(executeAssertions(executionConfig, assertions, reportStorage));
 		} else {
@@ -155,19 +153,19 @@ public class MysqlValidationService {
 		return result;
 	}
 
-	private void runAssertionTests( ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, String reportStorage) {
+	private void runAssertionTests( ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, String reportStorage) throws ExecutionException, InterruptedException {
 		long timeStart = System.currentTimeMillis();
 		List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
 		List<Assertion> resourceAssertions = assertionService.getAssertionsByKeyWords("resource", true);
-		LOGGER.info("Found total resource assertions need to be run before test: " + resourceAssertions.size());
-		reportService.writeProgress("Start executing assertions...", reportStorage);
+		LOGGER.info("Found total resource assertions need to be run before test {}", resourceAssertions.size());
+		reportService.writeProgress(START_EXECUTING_ASSERTIONS, reportStorage);
 		List<TestRunItem> items = executeAssertions(executionConfig, resourceAssertions, reportStorage);
 		Set<Assertion> assertions = new HashSet<>();
 		for (final AssertionGroup group : groups) {
 			assertions.addAll(group.getAssertions());
 		}
-		LOGGER.info("Total assertions to run: " + assertions.size());
+		LOGGER.info("Total assertions to run {}", assertions.size());
 		if (batchSize == 0) {
 			items.addAll(executeAssertions(executionConfig, assertions, reportStorage));
 		} else {
@@ -178,29 +176,23 @@ public class MysqlValidationService {
 	}
 
 	private List<TestRunItem> executeAssertionsConcurrently(MysqlExecutionConfig executionConfig, Collection<Assertion> assertions,
-			int batchSize, String reportStorage) {
+			int batchSize, String reportStorage) throws ExecutionException, InterruptedException {
 		List<Future<Collection<TestRunItem>>> tasks = new ArrayList<>();
 		List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
 		List<Assertion> batch = null;
 		for (final Assertion assertion: assertions) {
 			if (batch == null) {
-				batch = new ArrayList<Assertion>();
+				batch = new ArrayList<>();
 			}
 			batch.add(assertion);
 			if (counter % batchSize == 0 || counter == assertions.size()) {
 				final List<Assertion> work = batch;
-				LOGGER.info(String.format("Started executing assertion [%1s] of [%2s]", counter, assertions.size()));
-				final Future<Collection<TestRunItem>> future = executorService.submit(new Callable<Collection<TestRunItem>>() {
-					@Override
-					public Collection<TestRunItem> call() throws Exception {
-						return assertionExecutionService.executeAssertions(work, executionConfig);
-					}
-				});
-				LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
-				//reporting every 10 assertions
-				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are started.", counter,
-						assertions.size()), reportStorage);
+				LOGGER.info("Started executing assertion {} of {}", counter, assertions.size());
+				final Future<Collection<TestRunItem>> future = executorService.submit(() -> assertionExecutionService.executeAssertions(work, executionConfig));
+				LOGGER.info("Finished executing assertion {} of {}", counter, assertions.size());
+				// reporting every 10 assertions
+				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are started.", counter, assertions.size()), reportStorage);
 				tasks.add(future);
 				batch = null;
 			}
@@ -208,12 +200,8 @@ public class MysqlValidationService {
 		}
 		
 		// Wait for all concurrent tasks to finish
-		for (final Future<Collection<TestRunItem>> task : tasks) {
-			try {
-				results.addAll(task.get());
-			} catch (ExecutionException | InterruptedException e) {
-				LOGGER.error("Thread interrupted while waiting for future result for run item:" + task , e);
-			}
+		for (Future<Collection<TestRunItem>> task : tasks) {
+			results.addAll(task.get());
 		}
 		return results;
 	}
@@ -224,21 +212,16 @@ public class MysqlValidationService {
 		int counter = 1;
 		for (Assertion assertion: assertions) {
 			UUID assertionUUID = assertion.getUuid();
-			LOGGER.info(String.format("Started executing assertion [%1s] of [%2s] with uuid : [%3s]",
-					counter, assertions.size(), assertionUUID));
+			LOGGER.info("Started executing assertion {} of {} with uuid : {}", counter, assertions.size(), assertionUUID);
 			results.addAll(assertionExecutionService.executeAssertion(assertion, executionConfig));
-			LOGGER.info(String.format("Finished executing assertion [%1s] of [%2s] with uuid : [%3s]",
-					counter, assertions.size(), assertion.getUuid()));
+			LOGGER.info("Finished executing assertion {} of {} with uuid : {}", counter, assertions.size(), assertion.getUuid());
 			counter++;
 			if (counter % 10 == 0) {
 				//reporting every 10 assertions
-				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", 
-						counter, assertions.size()), reportStorage);
+				reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()), reportStorage);
 			}
 		}
-		reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", 
-				counter, assertions.size()), reportStorage);
-
+		reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()), reportStorage);
 		return results;
 	}
 	
@@ -248,7 +231,7 @@ public class MysqlValidationService {
 		try {
 			mysqlFailuresExtractor.extractTestResults(items, executionConfig, assertions);
 
-			//failed tests
+			// failed tests
 			final List<TestRunItem> failedItems = new ArrayList<>();
 			final List<TestRunItem> warningItems = new ArrayList<>();
 			for (final TestRunItem item : items) {
@@ -271,7 +254,7 @@ public class MysqlValidationService {
 			report.addFailedAssertions(Collections.emptyList());
 			report.addWarningAssertions(Collections.emptyList());
 			report.addPassedAssertions(Collections.emptyList());
-			statusReport.addFailureMessage("Failed to extract test results. Error: " + exception.getMessage());
+			statusReport.addFailureMessage(String.format("Failed to extract test results caused by %s", ExceptionUtils.getRootCauseMessage(exception)));
 		}
 
 		final long timeEnd = System.currentTimeMillis();
