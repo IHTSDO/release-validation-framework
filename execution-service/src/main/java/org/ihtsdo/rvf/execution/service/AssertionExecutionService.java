@@ -244,6 +244,11 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + previousReleaseSchema);
 		}
 		for( String part : parts) {
+			if ((part.contains("<PREVIOUS>") && previousReleaseSchema == null)
+				|| (part.contains("<DEPENDENCY>") && dependencyReleaseSchema == null)) {
+				continue;
+			}
+
 			logger.debug("Original sql statement: {}", part);
 			// remove all SQL comments - //TODO might throw errors for -- style comments
 			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
