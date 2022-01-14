@@ -52,8 +52,13 @@ public class MysqlFailuresExtractor {
                 item.setFailureCount(Long.valueOf(assertionIdToTotalFailureMap.get(key)));
                 item.setFirstNInstances(fetchFailureDetails(connection, config.getExecutionId(), uuidToAssertionIdMap.get(item.getAssertionUuid()), config.getFailureExportMax(), null, null));
             } else {
-                item.setFailureCount(0L);
-                item.setFirstNInstances(null);
+                if (StringUtils.isEmpty(item.getFailureMessage())) {
+                    item.setFailureCount(0L);
+                    item.setFirstNInstances(null);
+                } else {
+                    item.setFailureCount(-1L);
+                    item.setFirstNInstances(null);
+                }
             }
         }
     }
@@ -61,7 +66,10 @@ public class MysqlFailuresExtractor {
     private void validateFailuresAndExtractTestResults(Connection connection, List<TestRunItem> items, MysqlExecutionConfig config, Map<UUID, Long> uuidToAssertionIdMap, Map<String, Integer> assertionIdToTotalFailureMap) throws SQLException, RestClientException {
         for (TestRunItem item : items) {
             String key = String.valueOf(uuidToAssertionIdMap.get(item.getAssertionUuid()));
-            if (assertionIdToTotalFailureMap.containsKey(key)) {
+            if (!StringUtils.isEmpty(item.getFailureMessage())) {
+                item.setFailureCount(-1L);
+                item.setFirstNInstances(null);
+            } else if (assertionIdToTotalFailureMap.containsKey(key)) {
                 int batch_counter = 0;
                 int total_failures_extracted = 0;
                 int total_whitelistedItem_extracted = 0;

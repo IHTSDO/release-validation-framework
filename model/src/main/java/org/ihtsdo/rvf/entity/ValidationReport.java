@@ -13,6 +13,7 @@ public class ValidationReport {
 	private int totalSkips;
 	private int totalWarnings;
 	private int totalFailures;
+	private int totalTestsIncomplete;
 	private List<TestRunItem> assertionsFailed;
 	private List<TestRunItem> assertionsWarning;
 	private List<TestRunItem> assertionsSkipped;
@@ -27,6 +28,7 @@ public class ValidationReport {
 		totalSkips = 0;
 		totalWarnings = 0;
 		totalFailures = 0;
+		totalTestsIncomplete = 0;
 	}
 
 	public Long getExecutionId() {
@@ -59,6 +61,10 @@ public class ValidationReport {
 
 	public int getTotalFailures() {
 		return totalFailures;
+	}
+
+	public int getTotalTestsIncomplete() {
+		return totalTestsIncomplete;
 	}
 
 	public int getTotalWarnings() {
@@ -97,6 +103,10 @@ public class ValidationReport {
 		this.totalFailures = totalFailures;
 	}
 
+	public void setTotalTestsIncomplete(int totalTestsIncomplete) {
+		this.totalTestsIncomplete = totalTestsIncomplete;
+	}
+
 	public void addSkippedAssertions(List<TestRunItem> skippedItems){
 		if (hasItems(skippedItems)) {
 			assertionsSkipped.addAll(skippedItems);
@@ -121,6 +131,13 @@ public class ValidationReport {
 			int noOfItems = failedItems.size();
 			totalFailures += noOfItems;
 			totalTestsRun += noOfItems;
+		}
+	}
+
+	public void addIncompleteAssesrtions(List<TestRunItem> incompleteItems) {
+		if (hasItems(incompleteItems)) {
+			int noOfItems = incompleteItems.size();
+			totalTestsIncomplete += noOfItems;
 		}
 	}
 

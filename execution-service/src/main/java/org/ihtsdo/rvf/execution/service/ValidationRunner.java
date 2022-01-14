@@ -193,6 +193,7 @@ public class ValidationRunner {
 		mainResult.setTotalTestsRun(mainResult.getTotalTestsRun() + taskResult.getTotalTestsRun());
 		mainResult.setTotalFailures(mainResult.getTotalFailures() + taskResult.getTotalFailures());
 		mainResult.setTotalWarnings(mainResult.getTotalWarnings() + taskResult.getTotalWarnings());
+		mainResult.setTotalTestsIncomplete(mainResult.getTotalTestsIncomplete() + taskResult.getTotalTestsIncomplete());
 		mainResult.setTotalSkips(mainResult.getTotalSkips() + taskResult.getTotalSkips());
 
 		mainValidationReport.getFailureMessages().addAll(validationTaskReport.getFailureMessages());
