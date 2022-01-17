@@ -47,6 +47,9 @@ public class DroolsRulesValidationService {
 	@Value("${cloud.aws.region.static}")
 	private String awsRegion;
 
+	@Value("${rvf.assertion.whitelist.batchsize:1000}")
+	private int whitelistBatchSize;
+
 	@Autowired
 	private ValidationResourceConfig testResourceConfig;
 
@@ -141,7 +144,7 @@ public class DroolsRulesValidationService {
 
 				if (invalidContents.size() != 0 && !whitelistService.isWhitelistDisabled()) {
 					List<InvalidContent> newInvalidContents = new ArrayList<>();
-					for (List<InvalidContent> batch : Iterables.partition(invalidContents, validationConfig.getFailureExportMax())) {
+					for (List<InvalidContent> batch : Iterables.partition(invalidContents, whitelistBatchSize)) {
 						// Convert to WhitelistItem
 						List<WhitelistItem> whitelistItems = batch.stream()
 								.map(invalidContent -> new WhitelistItem(invalidContent.getRuleId(), org.springframework.util.StringUtils.isEmpty(invalidContent.getComponentId())? "" : invalidContent.getComponentId(), invalidContent.getConceptId(), getAdditionalFields(invalidContent.getComponent())))

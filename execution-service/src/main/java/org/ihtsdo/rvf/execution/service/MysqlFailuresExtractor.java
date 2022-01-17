@@ -30,6 +30,9 @@ public class MysqlFailuresExtractor {
     @Value("${rvf.qa.result.table.name}")
     private String qaResultTableName;
 
+    @Value("${rvf.assertion.whitelist.batchsize:1000}")
+    private int whitelistBatchSize;
+
     @Autowired
     private WhitelistService whitelistService;
 
@@ -75,9 +78,9 @@ public class MysqlFailuresExtractor {
                 int total_whitelistedItem_extracted = 0;
                 int total_failures = assertionIdToTotalFailureMap.get(key);
                 List<FailureDetail> firstNInstances = new ArrayList<>();
-                while(batch_counter * config.getFailureExportMax() < total_failures && total_failures_extracted < config.getFailureExportMax()) {
-                    int startIndex = batch_counter * config.getFailureExportMax();
-                    int endIndex = startIndex + config.getFailureExportMax();
+                while(batch_counter * whitelistBatchSize < total_failures && total_failures_extracted < whitelistBatchSize) {
+                    int startIndex = batch_counter * whitelistBatchSize;
+                    int endIndex = startIndex + whitelistBatchSize;
                     List<FailureDetail> failureDetails = fetchFailureDetails(connection, config.getExecutionId(), uuidToAssertionIdMap.get(item.getAssertionUuid()), -1, startIndex, endIndex);
                     failureDetails.stream().forEach(failureDetail -> {
                         failureDetail.setFullComponent(getAdditionalFields(connection,failureDetail));

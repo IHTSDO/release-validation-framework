@@ -20,6 +20,7 @@ import org.snomed.quality.validator.mrcm.ContentType;
 import org.snomed.quality.validator.mrcm.ValidationRun;
 import org.snomed.quality.validator.mrcm.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -46,6 +47,9 @@ public class MRCMValidationService {
 
 	@Autowired
 	private WhitelistService whitelistService;
+
+	@Value("${rvf.assertion.whitelist.batchsize:1000}")
+	private int whitelistBatchSize;
 
 	public ValidationStatusReport runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig) {
 		Set<String> extractedRF2FilesDirectory = new HashSet<>();
@@ -157,7 +161,7 @@ public class MRCMValidationService {
 		if (assertion.getCurrentViolatedConceptIds().size() != 0) {
 			List<Long> newViolatedConceptIds = new ArrayList<>();
 			List<ConceptResult> newViolatedConcepts = new ArrayList<>();
-			for (List<Long> batch : Iterables.partition(assertion.getCurrentViolatedConceptIds(), maxFailureExports)) {
+			for (List<Long> batch : Iterables.partition(assertion.getCurrentViolatedConceptIds(), whitelistBatchSize)) {
 				// Convert to WhitelistItem
 				List<WhitelistItem> whitelistItems = batch.stream()
 						.map(conceptId -> new WhitelistItem(assertion.getUuid().toString(), "", String.valueOf(conceptId), ""))
