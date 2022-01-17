@@ -43,7 +43,7 @@ public class TraceabilityComparisonService {
 	private static final ParameterizedTypeReference<ChangeSummaryReport> CHANGE_SUMMARY_REPORT_TYPE_REFERENCE = new ParameterizedTypeReference<>() {};
 
 	// 900000000000534007 | Module dependency reference set (foundation metadata concept) | - Ignore these because they will be generated during the export in Snowstorm.
-	private Set<String> refsetsToIgnore = Sets.newHashSet("900000000000534007");
+	private final Set<String> refsetsToIgnore = Sets.newHashSet("900000000000534007");
 
 	public TraceabilityComparisonService(@Value("${traceability-service.url}") String traceabilityServiceUrl) {
 		if (!Strings.isNullOrEmpty(traceabilityServiceUrl)) {
@@ -68,8 +68,18 @@ public class TraceabilityComparisonService {
 			return;
 		}
 		try {
-			final Map<ComponentType, Set<String>> rf2Changes = gatherRF2ComponentChanges(validationConfig);
-			final Map<ComponentType, Set<String>> traceabilityChanges = getTraceabilityComponentChanges(branchPath);
+			final Map<String, String> rf2ComponentIdToConceptIdMap = new HashMap<>();
+			final Map<ComponentType, Set<String>> rf2Changes = gatherRF2ComponentChanges(validationConfig, rf2ComponentIdToConceptIdMap);
+
+			ChangeSummaryReport summaryReport = getTraceabilityChangeSummaryReport(branchPath);
+			Map<ComponentType, Set<String>> traceabilityChanges = Collections.emptyMap();
+			Map<String, String> traceabilityComponentIdToConceptIdMap = Collections.emptyMap();
+			if (summaryReport != null && summaryReport.getComponentChanges() != null) {
+				traceabilityChanges = summaryReport.getComponentChanges();
+			}
+			if (summaryReport != null && summaryReport.getComponentToConceptIdMap() != null) {
+				traceabilityComponentIdToConceptIdMap = summaryReport.getComponentToConceptIdMap();
+			}
 
 			final TestRunItem traceabilityAndDelta = new TestRunItem();
 			traceabilityAndDelta.setTestType(TestType.TRACEABILITY);
@@ -79,13 +89,13 @@ public class TraceabilityComparisonService {
 			AtomicInteger remainingFailureExport = new AtomicInteger(validationConfig.getFailureExportMax());
 
 			diffAndAddFailures(ComponentType.CONCEPT, "Concept change in traceability is missing from RF2 export.",
-					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta);
+					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta, traceabilityComponentIdToConceptIdMap);
 			diffAndAddFailures(ComponentType.DESCRIPTION, "Description change in traceability is missing from RF2 export.",
-					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta);
+					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta, traceabilityComponentIdToConceptIdMap);
 			diffAndAddFailures(ComponentType.RELATIONSHIP, "Relationship change in traceability is missing from RF2 export.",
-					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta);
+					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta, traceabilityComponentIdToConceptIdMap);
 			diffAndAddFailures(ComponentType.REFERENCE_SET_MEMBER, "Refset member change in traceability is missing from RF2 export.",
-					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta);
+					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta, traceabilityComponentIdToConceptIdMap);
 
 			if (traceabilityAndDelta.getFirstNInstances().isEmpty()) {
 				report.getResultReport().addPassedAssertions(Collections.singletonList(traceabilityAndDelta));
@@ -102,13 +112,13 @@ public class TraceabilityComparisonService {
 			remainingFailureExport = new AtomicInteger(validationConfig.getFailureExportMax());
 
 			diffAndAddFailures(ComponentType.CONCEPT, "Concept change in RF2 export is missing from traceability.",
-					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability);
+					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability, rf2ComponentIdToConceptIdMap);
 			diffAndAddFailures(ComponentType.DESCRIPTION, "Description change in RF2 export is missing from traceability.",
-					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability);
+					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability, rf2ComponentIdToConceptIdMap);
 			diffAndAddFailures(ComponentType.RELATIONSHIP, "Relationship change in RF2 export is missing from traceability.",
-					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability);
+					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability, rf2ComponentIdToConceptIdMap);
 			diffAndAddFailures(ComponentType.REFERENCE_SET_MEMBER, "Refset member change in RF2 export is missing from traceability.",
-					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability);
+					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability, rf2ComponentIdToConceptIdMap);
 
 			if (deltaAndTraceability.getFirstNInstances().isEmpty()) {
 				report.getResultReport().addPassedAssertions(Collections.singletonList(deltaAndTraceability));
@@ -124,19 +134,19 @@ public class TraceabilityComparisonService {
 	}
 
 	private void diffAndAddFailures(ComponentType componentType, String message, Map<ComponentType, Set<String>> leftSide, Map<ComponentType, Set<String>> rightSide,
-			AtomicInteger remainingFailureExport, TestRunItem report) {
+			AtomicInteger remainingFailureExport, TestRunItem report, Map<String, String> componentToConcepIdMap) {
 
 		final Sets.SetView<String> missing = Sets.difference(leftSide.getOrDefault(componentType, Collections.emptySet()), rightSide.getOrDefault(componentType, Collections.emptySet()));
 		for (String inLeftNotRight : missing) {
 			if (remainingFailureExport.get() > 0) {
 				remainingFailureExport.decrementAndGet();
-				report.addFirstNInstance(new FailureDetail(null, message).setComponentId(inLeftNotRight));
+				report.addFirstNInstance(new FailureDetail(componentToConcepIdMap.get(inLeftNotRight), message).setComponentId(inLeftNotRight));
 			}
 			report.setFailureCount(report.getFailureCount() + 1);
 		}
 	}
 
-	private Map<ComponentType, Set<String>> gatherRF2ComponentChanges(ValidationRunConfig validationConfig) throws IOException, ReleaseImportException {
+	private Map<ComponentType, Set<String>> gatherRF2ComponentChanges(ValidationRunConfig validationConfig, Map<String, String> componentIdToConceptIdMap) throws IOException, ReleaseImportException {
 		final String releaseEffectiveTime = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replaceAll("-","") : "";
 
 		logger.info("Collecting component ids from snapshot using effectiveTime filter.");
@@ -176,6 +186,7 @@ public class TraceabilityComparisonService {
 				public void newConceptState(String id, String effectiveTime, String active, String moduleId, String s4) {
 					if (effectiveTimePredicate.test(effectiveTime)) {
 						concepts.add(id);
+						componentIdToConceptIdMap.put(id, id);
 					}
 				}
 
@@ -183,6 +194,7 @@ public class TraceabilityComparisonService {
 				public void newDescriptionState(String id, String effectiveTime, String active, String moduleId, String s4, String s5, String s6, String s7, String s8) {
 					if (effectiveTimePredicate.test(effectiveTime)) {
 						descriptions.add(id);
+						componentIdToConceptIdMap.put(id, s4);
 					}
 				}
 
@@ -190,6 +202,7 @@ public class TraceabilityComparisonService {
 				public void newRelationshipState(String id, String effectiveTime, String active, String moduleId, String s4, String s5, String s6, String s7, String s8, String s9) {
 					if (effectiveTimePredicate.test(effectiveTime)) {
 						relationships.add(id);
+						componentIdToConceptIdMap.put(id, s4);
 					}
 				}
 
@@ -197,6 +210,7 @@ public class TraceabilityComparisonService {
 				public void newConcreteRelationshipState(String id, String effectiveTime, String active, String moduleId, String s4, String s5, String s6, String s7, String s8, String s9) {
 					if (effectiveTimePredicate.test(effectiveTime)) {
 						concreteRelationships.add(id);
+						componentIdToConceptIdMap.put(id, s4);
 					}
 				}
 
@@ -204,6 +218,7 @@ public class TraceabilityComparisonService {
 				public void newReferenceSetMemberState(String[] strings, String id, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String... strings1) {
 					if (effectiveTimePredicate.test(effectiveTime) && !refsetsToIgnore.contains(refsetId)) {
 						refsetMembers.add(id);
+						componentIdToConceptIdMap.put(id, referencedComponentId);
 					}
 				}
 			};
@@ -229,18 +244,12 @@ public class TraceabilityComparisonService {
 		return rf2Changes;
 	}
 
-	private Map<ComponentType, Set<String>> getTraceabilityComponentChanges(String branchPath) throws IOException {
+	private ChangeSummaryReport getTraceabilityChangeSummaryReport(String branchPath) {
 		logger.info("Fetching diff from traceability service..");
 		final String uri = UriComponentsBuilder.fromPath("/change-summary").queryParam("branch", branchPath).toUriString();
 		final ResponseEntity<ChangeSummaryReport> response =
 				traceabilityServiceRestTemplate.exchange(uri, HttpMethod.GET, null, CHANGE_SUMMARY_REPORT_TYPE_REFERENCE);
-
-		final ChangeSummaryReport summaryReport = response.getBody();
-		if (summaryReport == null || summaryReport.getComponentChanges() == null) {
-			throw new IOException("No change report returned from traceability service.");
-		}
-
-		return summaryReport.getComponentChanges();
+		return response.getBody();
 	}
 
 	private boolean inDelta(String effectiveTime, String releaseEffectiveTime) {

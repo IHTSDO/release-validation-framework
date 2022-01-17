@@ -8,6 +8,7 @@ public class ChangeSummaryReport {
 
 	private Map<ComponentType, Set<String>> componentChanges;
 	private List<Activity> changesNotAtTaskLevel;
+	private Map<String, String> componentToConceptIdMap;
 
 	public Map<ComponentType, Set<String>> getComponentChanges() {
 		return componentChanges;
@@ -15,5 +16,9 @@ public class ChangeSummaryReport {
 
 	public List<Activity> getChangesNotAtTaskLevel() {
 		return changesNotAtTaskLevel;
+	}
+
+	public Map<String, String> getComponentToConceptIdMap() {
+		return componentToConceptIdMap;
 	}
 }
