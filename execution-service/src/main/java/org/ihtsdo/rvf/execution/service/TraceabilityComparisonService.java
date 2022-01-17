@@ -88,13 +88,13 @@ public class TraceabilityComparisonService {
 			traceabilityAndDelta.setFailureCount(0L);// Initial value
 			AtomicInteger remainingFailureExport = new AtomicInteger(validationConfig.getFailureExportMax());
 
-			diffAndAddFailures(ComponentType.CONCEPT, "Concept change in traceability is missing from RF2 export.",
+			diffAndAddFailures(ComponentType.CONCEPT, "Concept change for %s in traceability is missing from RF2 export.",
 					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta, traceabilityComponentIdToConceptIdMap);
-			diffAndAddFailures(ComponentType.DESCRIPTION, "Description change in traceability is missing from RF2 export.",
+			diffAndAddFailures(ComponentType.DESCRIPTION, "Description change for %s in traceability is missing from RF2 export.",
 					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta, traceabilityComponentIdToConceptIdMap);
-			diffAndAddFailures(ComponentType.RELATIONSHIP, "Relationship change in traceability is missing from RF2 export.",
+			diffAndAddFailures(ComponentType.RELATIONSHIP, "Relationship change for %s in traceability is missing from RF2 export.",
 					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta, traceabilityComponentIdToConceptIdMap);
-			diffAndAddFailures(ComponentType.REFERENCE_SET_MEMBER, "Refset member change in traceability is missing from RF2 export.",
+			diffAndAddFailures(ComponentType.REFERENCE_SET_MEMBER, "Refset member change for %s in traceability is missing from RF2 export.",
 					traceabilityChanges, rf2Changes, remainingFailureExport, traceabilityAndDelta, traceabilityComponentIdToConceptIdMap);
 
 			if (traceabilityAndDelta.getFirstNInstances().isEmpty()) {
@@ -111,13 +111,13 @@ public class TraceabilityComparisonService {
 			deltaAndTraceability.setFailureCount(0L);// Initial value
 			remainingFailureExport = new AtomicInteger(validationConfig.getFailureExportMax());
 
-			diffAndAddFailures(ComponentType.CONCEPT, "Concept change in RF2 export is missing from traceability.",
+			diffAndAddFailures(ComponentType.CONCEPT, "Concept change for %s in RF2 export is missing from traceability.",
 					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability, rf2ComponentIdToConceptIdMap);
-			diffAndAddFailures(ComponentType.DESCRIPTION, "Description change in RF2 export is missing from traceability.",
+			diffAndAddFailures(ComponentType.DESCRIPTION, "Description change for %s in RF2 export is missing from traceability.",
 					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability, rf2ComponentIdToConceptIdMap);
-			diffAndAddFailures(ComponentType.RELATIONSHIP, "Relationship change in RF2 export is missing from traceability.",
+			diffAndAddFailures(ComponentType.RELATIONSHIP, "Relationship change for %s in RF2 export is missing from traceability.",
 					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability, rf2ComponentIdToConceptIdMap);
-			diffAndAddFailures(ComponentType.REFERENCE_SET_MEMBER, "Refset member change in RF2 export is missing from traceability.",
+			diffAndAddFailures(ComponentType.REFERENCE_SET_MEMBER, "Refset member change for %s in RF2 export is missing from traceability.",
 					rf2Changes, traceabilityChanges, remainingFailureExport, deltaAndTraceability, rf2ComponentIdToConceptIdMap);
 
 			if (deltaAndTraceability.getFirstNInstances().isEmpty()) {
@@ -134,20 +134,21 @@ public class TraceabilityComparisonService {
 	}
 
 	private void diffAndAddFailures(ComponentType componentType, String message, Map<ComponentType, Set<String>> leftSide, Map<ComponentType, Set<String>> rightSide,
-			AtomicInteger remainingFailureExport, TestRunItem report, Map<String, String> componentToConcepIdMap) {
+			AtomicInteger remainingFailureExport, TestRunItem report, Map<String, String> componentToConceptIdMap) {
 
 		final Sets.SetView<String> missing = Sets.difference(leftSide.getOrDefault(componentType, Collections.emptySet()), rightSide.getOrDefault(componentType, Collections.emptySet()));
 		for (String inLeftNotRight : missing) {
 			if (remainingFailureExport.get() > 0) {
 				remainingFailureExport.decrementAndGet();
-				report.addFirstNInstance(new FailureDetail(componentToConcepIdMap.get(inLeftNotRight), message).setComponentId(inLeftNotRight));
+				report.addFirstNInstance(new FailureDetail(componentToConceptIdMap.get(inLeftNotRight), String.format(message, inLeftNotRight))
+						.setComponentId(inLeftNotRight));
 			}
 			report.setFailureCount(report.getFailureCount() + 1);
 		}
 	}
 
 	private Map<ComponentType, Set<String>> gatherRF2ComponentChanges(ValidationRunConfig validationConfig, Map<String, String> componentIdToConceptIdMap) throws IOException, ReleaseImportException {
-		final String releaseEffectiveTime = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replaceAll("-","") : "";
+		final String releaseEffectiveTime = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replace("-","") : "";
 
 		logger.info("Collecting component ids from snapshot using effectiveTime filter.");
 
