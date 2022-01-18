@@ -79,9 +79,8 @@ public class MysqlFailuresExtractor {
                 int total_failures = assertionIdToTotalFailureMap.get(key);
                 List<FailureDetail> firstNInstances = new ArrayList<>();
                 while(batch_counter * whitelistBatchSize < total_failures && total_failures_extracted < whitelistBatchSize) {
-                    int startIndex = batch_counter * whitelistBatchSize;
-                    int endIndex = startIndex + whitelistBatchSize;
-                    List<FailureDetail> failureDetails = fetchFailureDetails(connection, config.getExecutionId(), uuidToAssertionIdMap.get(item.getAssertionUuid()), -1, startIndex, endIndex);
+                    int offset = batch_counter * whitelistBatchSize;
+                    List<FailureDetail> failureDetails = fetchFailureDetails(connection, config.getExecutionId(), uuidToAssertionIdMap.get(item.getAssertionUuid()), -1, offset, whitelistBatchSize);
                     failureDetails.stream().forEach(failureDetail -> {
                         failureDetail.setFullComponent(getAdditionalFields(connection,failureDetail));
                     });
@@ -164,14 +163,14 @@ public class MysqlFailuresExtractor {
         return assertionIdToTotalFailureMap;
     }
 
-    private List<FailureDetail> fetchFailureDetails(Connection connection, Long executionId, Long assertionId, int failureExportMax, Integer startIndex, Integer endIndex)
+    private List<FailureDetail> fetchFailureDetails(Connection connection, Long executionId, Long assertionId, int failureExportMax, Integer offset, Integer rowCount)
             throws SQLException {
         String resultSQL = "select concept_id, details, component_id, table_name from " + dataSource.getDefaultCatalog() + "." + qaResultTableName + " where assertion_id = ? and run_id = ?";
-        if (startIndex != null && endIndex != null && startIndex > 0 && endIndex > 0) {
-            resultSQL = resultSQL + " limit " + startIndex + "," + endIndex;
+        if (offset != null && rowCount != null) {
+            resultSQL += " limit " + offset + "," + rowCount;
         }
         else if (failureExportMax > 0) {
-            resultSQL = resultSQL + " limit ?";
+            resultSQL += " limit ?";
         }
         List<FailureDetail> firstNInstances = new ArrayList();
         long counter = 0;
