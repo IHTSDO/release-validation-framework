@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.ihtsdo.rvf.entity.ValidationReport;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 
@@ -17,13 +19,21 @@ public class ValidationStatusReport {
 	private List<String> failureMessages;
 	@SerializedName("TestResult")
 	private ValidationReport resultReport;
+
+	@JsonIgnore
 	private Date startTime;
+
+	@JsonIgnore
 	private Date endTime;
 	private int totalRF2FilesLoaded;
 
 	@SerializedName("rf2Files")
 	private List<String> rf2FilesLoaded;
-	
+
+	public ValidationStatusReport() {
+
+	}
+
 	public ValidationStatusReport(ValidationRunConfig validationConfig) {
 		this.validationConfig = validationConfig;
 		totalRF2FilesLoaded = -1;
@@ -48,18 +58,22 @@ public class ValidationStatusReport {
 		this.failureMessages.add(failureMessage);
 	}
 
+	@JsonProperty
 	public Date getStartTime() {
 		return startTime;
 	}
 
+	@JsonIgnore
 	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 
+	@JsonProperty
 	public Date getEndTime() {
 		return endTime;
 	}
 
+	@JsonIgnore
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}

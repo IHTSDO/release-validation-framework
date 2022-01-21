@@ -13,6 +13,9 @@ public class FailureDetail implements Comparable<FailureDetail>{
 
 	private transient String tableName;
 
+	public FailureDetail(){
+	}
+
 	public FailureDetail(String conceptId, String detail) {
 		this.conceptId = conceptId;
 		this.detail = detail;
