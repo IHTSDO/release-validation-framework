@@ -46,6 +46,7 @@ public class ValidationStatusReport {
 		return resultReport;
 	}
 
+	@JsonProperty("TestResult")
 	public void setResultReport(ValidationReport resultReport) {
 		this.resultReport = resultReport;
 	}

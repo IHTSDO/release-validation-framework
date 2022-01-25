@@ -223,7 +223,6 @@ public class AutomatedTestService {
 
             String validationReportString = rvfRestTemplate.getForObject(url, String.class);
             if (!StringUtils.isEmpty(validationReportString)) {
-                validationReportString = validationReportString.replace("\"TestResult\"", "\"resultReport\"");
                 final HighLevelValidationReport highLevelValidationReport = objectMapper.readValue(validationReportString, HighLevelValidationReport.class);
                 if (highLevelValidationReport != null && "COMPLETE".equals(highLevelValidationReport.getStatus())) {
                     return highLevelValidationReport.getRvfValidationResult();

@@ -32,7 +32,7 @@
       "SQL" : "Validations executed. Failures count: 14"
     },
     "failureMessages" : [ ],
-    "resultReport" : {
+    "TestResult" : {
       "executionId" : 1642153263730,
       "timeTakenInSeconds" : 960,
       "reportUrl" : "https://dev-rvf.ihtsdotools.org/api",
