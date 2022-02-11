@@ -68,7 +68,7 @@ public class AssertionGroupImporter {
 
 		private String name;
 		private String releaseCenter;
-		private AssertionGroupName(String releaseCenter, String name) {
+		AssertionGroupName(String releaseCenter, String name) {
 			this.releaseCenter = releaseCenter;
 			this.name = name;
 		}
@@ -107,7 +107,7 @@ public class AssertionGroupImporter {
 
 			private String name;
 			private String moduleId;
-			private ProductName(String name, String moduleId) {
+			ProductName(String name, String moduleId) {
 					this.name = name;
 					this.moduleId = moduleId;
 			}
@@ -187,6 +187,32 @@ public class AssertionGroupImporter {
             "fbfc4fd1-f10d-4fc2-889f-df0e089df4b7",
             "202ef495-5f18-4e3e-8129-63759f2bbbd6"
     };
+
+	private static final String[] MS_AUTHORING_INCLUDE_LIST = {"35680574-3ac6-4b68-9efe-de88b677eb35",
+			"11735994-4b7f-4e61-9bde-059b7e085031",
+			"4478a896-2724-4417-8bce-8986ecc53c4e",
+			"372e59d5-d6f3-4708-93d0-6cb92da69006",
+			"0cc708af-6816-4370-91be-dba8da99d227",
+			"44916964-5b78-4842-81d8-e8293ee93bea",
+			"fbfc4fd1-f10d-4fc2-889f-df0e089df4b7",
+			"a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5",
+			"9912342f-5010-40fd-9bea-301b737973a1",
+			"bc055a18-f93e-42fd-8bb2-347f2b2b8976",
+			"cab60a2f-4239-4933-91d6-dc910a8ac08b",
+			"5f1a51a3-6200-4463-8799-d75998165278",
+			"2b193a88-8dab-4d19-b995-b556ed59398d",
+			"e6082dc4-c6f4-48c6-afa3-233182336a5c",
+			"b88b9f46-4c33-4d8e-b9ab-ddb87aef3068",
+			"2aa0bea1-b1fa-4543-b277-b4392a6f864d",
+			"88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
+			"9190473a-29f7-40fc-b879-9ae0d038b681",
+			"eff30fb0-7856-11e1-b0c4-0800200c9a66",
+			"89ceaf00-79b9-11e1-b0c4-0800200c9a66",
+			"4deb9274-d923-4f84-b0dc-c4dab0c2fc4c",
+			"560e6d0c-64e8-4726-9516-ae7a7606b0b3",
+			"910844a8-97e5-4096-add2-e1734b941e10",
+			"26c25479-c3ba-47f2-9851-bb05ae42ad48"
+	};
 
 	private static final String[] INT_EDITION_EXCLUDE_LIST = {"2e2542f9-64a4-43d0-bf4e-9029af8b7cf0"};
 
@@ -513,28 +539,32 @@ public class AssertionGroupImporter {
 		group.setName(groupName.getName());
 		group = assertionService.createAssertionGroup(group);
 		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWords("," + groupName.getReleaseCenter(), false);
+		List<Assertion> releaseTypeAssertions = assertionService.getAssertionsByKeyWords(RELEASE_TYPE_VALIDATION.getName(), false);
 		if (INT_AUTHORING.equals(groupName)) {
-            List<Assertion> releaseTypeAssertions = assertionService.getAssertionsByKeyWords(RELEASE_TYPE_VALIDATION.getName(), false);
             allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())).collect(Collectors.toList()));
 		} else {
 			if (!US_AUTHORING.equals(groupName)) {
 				allAssertions.addAll(assertionService.getAssertionsByKeyWords(",EXTENSION", false));
 			}
+			allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())).collect(Collectors.toList()));
         }
 		for (Assertion assertion : allAssertions) {
-			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()) && (!AssertionGroupName.INT_AUTHORING.equals(groupName) || !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))) {
+			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
+																					|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())))) {
 				continue;
 			}
 			//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
-			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString()) && (!AssertionGroupName.INT_AUTHORING.equals(groupName) || !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))) {
+			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
+																								|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())))) {
 				continue;
 			}
 			// Exclude stated relationship assertions
-			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
+			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString()) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
 			//exclude simple map file checking as term server extracts don't contain these
-			if (assertion.getAssertionText().contains(SIMPLE_MAP) && (!AssertionGroupName.INT_AUTHORING.equals(groupName) || !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))) {
+			if (assertion.getAssertionText().contains(SIMPLE_MAP) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
+																	|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())))) {
 				continue;
 			}
 			if (AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
