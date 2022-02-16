@@ -211,20 +211,9 @@ public class ValidationVersionLoader {
 		String prospectiveVersion = executionConfig.getProspectiveVersion();
 		if (validationConfig.isRf2DeltaOnly()) {
 			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, validationConfig.getLocalProspectiveFile());
-			if (isExtension(validationConfig)) {
-				String previousVersion = executionConfig.getPreviousVersion();
-				String extensionDependencyVersion = executionConfig.getExtensionDependencyVersion();
-				if (!validationConfig.isFirstTimeRelease()) {
-					releaseDataManager.copyTableData(previousVersion, extensionDependencyVersion, prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
-				} else {
-					releaseDataManager.copyTableData(extensionDependencyVersion, prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
-				}
-				
-			} else {
-				//copy snapshot from previous release
-				if (!validationConfig.isFirstTimeRelease()) {
-					releaseDataManager.copyTableData(executionConfig.getPreviousVersion(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
-				}
+			//copy snapshot from previous release
+			if (!validationConfig.isFirstTimeRelease()) {
+				releaseDataManager.copyTableData(executionConfig.getPreviousVersion(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
 			}
 			releaseDataManager.updateSnapshotTableWithDataFromDelta(prospectiveVersion);
 		}

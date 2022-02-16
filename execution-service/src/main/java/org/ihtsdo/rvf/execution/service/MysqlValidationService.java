@@ -77,7 +77,7 @@ public class MysqlValidationService {
 			statusReport.getReportSummary().put(TestType.SQL.name(), errorMsg);
 			return statusReport;
 		}
-		if (executionConfig.isReleaseValidation() && executionConfig.isExtensionValidation()) {
+		if (executionConfig.isExtensionValidation()) {
 			LOGGER.info("Run extension release validation with config {}", executionConfig);
 			runExtensionReleaseValidation(statusReport, validationConfig, executionConfig);
 		} else {
