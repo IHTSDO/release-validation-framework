@@ -122,7 +122,6 @@ public class DroolsRulesValidationService {
 					}
 				}
 
-				//Get effectiveTime
 				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, testResourceManager);
 
 				//Unzip the release files
@@ -190,7 +189,7 @@ public class DroolsRulesValidationService {
 			//Convert the Drools validation report into RVF report format
 			for (String ruleId : invalidContentMap.keySet()) {
 				TestRunItem validationRule = new TestRunItem();
-				validationRule.setAssertionUuid(UUID.fromString(ruleId));
+				validationRule.setAssertionUuid(parseUUID(ruleId));
 				validationRule.setTestType(TestType.DROOL_RULES);
 				validationRule.setTestCategory("");
 				List<InvalidContent> invalidContentList = invalidContentMap.get(ruleId);
@@ -232,6 +231,14 @@ public class DroolsRulesValidationService {
 			}
 		}
 		return statusReport;
+	}
+
+	private UUID parseUUID(String uuid) {
+		try{
+			return UUID.fromString(uuid);
+		} catch (IllegalArgumentException exception){
+			return null;
+		}
 	}
 
 	private String getAdditionalFields(Component component) {
