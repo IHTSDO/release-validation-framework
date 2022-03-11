@@ -15,6 +15,7 @@ public class ValidationRunConfig {
 	private List<String> groupsList;
 	private String previousRelease;
 	private String dependencyRelease;
+	private String previousDependencyEffectiveTime;
 	private String storageLocation;
 	private String url;
 	private Integer failureExportMax;
@@ -219,6 +220,14 @@ public class ValidationRunConfig {
 		this.dependencyRelease = extensionDependency;
 	}
 
+	public String getPreviousDependencyEffectiveTime() {
+		return previousDependencyEffectiveTime;
+	}
+
+	public void setPreviousDependencyEffectiveTime(String previousDependencyEffectiveTime) {
+		this.previousDependencyEffectiveTime = previousDependencyEffectiveTime;
+	}
+
 	public boolean isEnableDrools() {
 		return enableDrools;
 	}
@@ -272,6 +281,10 @@ public class ValidationRunConfig {
 
 	public ValidationRunConfig addDependencyRelease(String dependencyRelease) {
 		this.dependencyRelease = dependencyRelease;
+		return this;
+	}
+	public ValidationRunConfig addPreviousDependencyEffectiveTime(String previousDependencyEffectiveTime) {
+		this.previousDependencyEffectiveTime = previousDependencyEffectiveTime;
 		return this;
 	}
 	public void setPreviousRelease(String previousRelease) {

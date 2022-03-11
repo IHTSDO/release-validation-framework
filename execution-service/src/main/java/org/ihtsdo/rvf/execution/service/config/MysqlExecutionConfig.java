@@ -14,7 +14,9 @@ public class MysqlExecutionConfig {
 	private boolean isReleaseValidation;
 	private String extensionDependencyVersion;
 	private String effectiveTime;
+	private String previousEffectiveTime;
 	private String dependencyEffectiveTime;
+	private String previousDependencyEffectiveTime;
 
 	public MysqlExecutionConfig(final Long runId) {
 		this(runId,false);
@@ -102,12 +104,28 @@ public class MysqlExecutionConfig {
 		this.effectiveTime = effectiveTime;
 	}
 
+	public String getPreviousEffectiveTime() {
+		return previousEffectiveTime;
+	}
+
+	public void setPreviousEffectiveTime(String previousEffectiveTime) {
+		this.previousEffectiveTime = previousEffectiveTime;
+	}
+
 	public String getDependencyEffectiveTime() {
 		return dependencyEffectiveTime;
 	}
 
 	public void setDependencyEffectiveTime(String dependencyEffectiveTime) {
 		this.dependencyEffectiveTime = dependencyEffectiveTime;
+	}
+
+	public String getPreviousDependencyEffectiveTime() {
+		return previousDependencyEffectiveTime;
+	}
+
+	public void setPreviousDependencyEffectiveTime(String previousDependencyEffectiveTime) {
+		this.previousDependencyEffectiveTime = previousDependencyEffectiveTime;
 	}
 
 	@Override

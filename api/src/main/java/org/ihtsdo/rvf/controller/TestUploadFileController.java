@@ -59,6 +59,8 @@ public class TestUploadFileController {
 
 	private static final String DEPENDENCY_RELEASE = "dependencyRelease";
 
+	private static final String PREVIOUS_DEPENDENCY_EFFECTIVE_TIME = "previousDependencyEffectiveTime";
+
 	private static final String BRANCH_PATH = "branchPath";
 
 	private static final String PREVIOUS_RELEASE = "previousRelease";
@@ -179,9 +181,10 @@ public class TestUploadFileController {
 			@ApiParam(value = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@ApiParam(value = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
+			@ApiParam(value = "Required for extension release testing") @RequestParam(value = PREVIOUS_DEPENDENCY_EFFECTIVE_TIME, required = false) final String previousDependencyEffectiveTime,
 			@ApiParam(value = "Unique number e.g Timestamp") @RequestParam(value = RUN_ID) final Long runId,
 			@ApiParam(value = "Defaults to 10 when not set", defaultValue = "10") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
-			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
+			@ApiParam(value = "The sub folder for validation reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
@@ -204,6 +207,7 @@ public class TestUploadFileController {
 				.addManifestFile(manifestFile)
 				.addPreviousRelease(previousRelease)
 				.addDependencyRelease(extensionDependency)
+				.addPreviousDependencyEffectiveTime(previousDependencyEffectiveTime)
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
 				.addProspectiveFilesInS3(false)
@@ -249,9 +253,10 @@ public class TestUploadFileController {
 			@ApiParam(value = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@ApiParam(value = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
+			@ApiParam(value = "Required for extension release testing") @RequestParam(value = PREVIOUS_DEPENDENCY_EFFECTIVE_TIME, required = false) final String previousDependencyEffectiveTime,
 			@ApiParam(value = "Unique run id e.g Timestamp") @RequestParam(value = RUN_ID) final Long runId,
 			@ApiParam(value = "Defaults to 10 when not set", defaultValue = "10") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
-			@ApiParam(value = "The sub folder for validaiton reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
+			@ApiParam(value = "The sub folder for validation reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") 
 			@RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
@@ -278,6 +283,7 @@ public class TestUploadFileController {
 				.addManifestFileFullPath(manifestFileS3Path)
 				.addPreviousRelease(previousRelease)
 				.addDependencyRelease(extensionDependency)
+				.addPreviousDependencyEffectiveTime(previousDependencyEffectiveTime)
 				.addRunId(runId)
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)

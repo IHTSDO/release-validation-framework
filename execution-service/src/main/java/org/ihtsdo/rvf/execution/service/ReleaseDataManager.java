@@ -40,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationMysqlBinaryStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.util.MySqlDataTypeConverter;
@@ -690,8 +691,7 @@ public class ReleaseDataManager {
 		}
 	}
 
-	public void insertIntoProspectiveDeltaTablesFromSnapshots(String schemaName, String effectiveTime)  throws SQLException  {
-		effectiveTime = StringUtils.isNotBlank(effectiveTime) ? effectiveTime.replaceAll("-","") : "";
+	public void insertIntoProspectiveDeltaTables(String schemaName, MysqlExecutionConfig executionConfig)  throws SQLException  {
 		try (Connection connection = rvfDynamicDataSource.getConnection(schemaName)) {
 			DatabaseMetaData md = connection.getMetaData();
 			ResultSet rs = md.getTables(null, null, "%", null);
@@ -701,13 +701,43 @@ public class ReleaseDataManager {
 					snapShotTables.add(rs.getString(3));
 				}
 			}
-			for (String snapshotTable: snapShotTables) {
-				String insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
+			String insertSQL;
+			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
+				String previousDependencyEffectiveTime = executionConfig.getPreviousDependencyEffectiveTime().replaceAll("-", "");
+				for (String snapshotTable : snapShotTables) {
+					insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
+							+ " SELECT * FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f")
+							+ " WHERE cast(effectivetime as datetime) > cast('" + previousDependencyEffectiveTime + "' as datetime)";
+					PreparedStatement ps = connection.prepareStatement(insertSQL);
+					logger.info(insertSQL);
+					ps.execute();
+				}
+			}
+			if (executionConfig.isFirstTimeRelease()) {
+				String effectiveTime = StringUtils.isNotBlank(executionConfig.getEffectiveTime()) ? executionConfig.getEffectiveTime().replaceAll("-","") : "";
+				for (String snapshotTable: snapShotTables) {
+					insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
 							+ " SELECT * FROM " + snapshotTable
-							+ " WHERE effectivetime IS NULL OR effectivetime='" + effectiveTime + "'";
-				PreparedStatement ps = connection.prepareStatement(insertSQL);
-				logger.info(insertSQL);
-				ps.execute();
+							+ " WHERE (effectivetime IS NULL OR effectivetime='" + effectiveTime + "')";
+					if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
+						insertSQL += " AND moduleid NOT IN (SELECT DISTINCT(referencedcomponentid) FROM " + executionConfig.getExtensionDependencyVersion() + ".moduledependencyrefset_s WHERE active = '1')";
+					}
+					PreparedStatement ps = connection.prepareStatement(insertSQL);
+					logger.info(insertSQL);
+					ps.execute();
+				}
+			} else {
+				for (String snapshotTable: snapShotTables) {
+					insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
+							+ " SELECT * FROM " + snapshotTable
+							+ " WHERE (effectivetime IS NULL OR cast(effectivetime as datetime) > cast('" + executionConfig.getPreviousEffectiveTime() + "' as datetime))";
+					if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
+						insertSQL += " AND moduleid NOT IN (SELECT DISTINCT(referencedcomponentid) FROM " + executionConfig.getExtensionDependencyVersion() + ".moduledependencyrefset_s WHERE active = '1')";
+					}
+					PreparedStatement ps = connection.prepareStatement(insertSQL);
+					logger.info(insertSQL);
+					ps.execute();
+				}
 			}
 		}
 	}

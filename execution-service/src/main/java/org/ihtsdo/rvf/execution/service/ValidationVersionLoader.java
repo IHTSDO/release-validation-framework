@@ -120,7 +120,7 @@ public class ValidationVersionLoader {
 
 		if (!validationConfig.isRf2DeltaOnly() && !checkDeltaFilesExist(validationConfig.getLocalProspectiveFile())) {
 			final String schemaName = prospectiveVersion.startsWith(RVF_DB_PREFIX) ? prospectiveVersion : RVF_DB_PREFIX + prospectiveVersion;
-			releaseDataManager.insertIntoProspectiveDeltaTablesFromSnapshots(schemaName, executionConfig.getEffectiveTime());
+			releaseDataManager.insertIntoProspectiveDeltaTables(schemaName, executionConfig);
 		}
 
 		statusReport.setTotalRF2FilesLoaded(rf2FilesLoaded.size());
@@ -181,13 +181,15 @@ public class ValidationVersionLoader {
 		executionConfig.setProspectiveVersion(RVF_DB_PREFIX + getProspectiveVersionFromFileNames(validationConfig) 
 							+ "_" + executionConfig.getExecutionId().toString());
 		executionConfig.setGroupNames(validationConfig.getGroupsList());
-		executionConfig.setExtensionValidation( isExtension(validationConfig));
+		executionConfig.setExtensionValidation(isExtension(validationConfig));
 		executionConfig.setFirstTimeRelease(validationConfig.isFirstTimeRelease());
 		executionConfig.setEffectiveTime(validationConfig.getEffectiveTime());
+		executionConfig.setPreviousEffectiveTime(validationConfig.isFirstTimeRelease() ? null : extractEffectiveTimeFromVersion(validationConfig.getPreviousRelease()));
 		executionConfig.setPreviousVersion(validationConfig.getPreviousRelease());
 		executionConfig.setExtensionDependencyVersion(validationConfig.getExtensionDependency());
+		executionConfig.setPreviousDependencyEffectiveTime(validationConfig.getPreviousDependencyEffectiveTime());
 		if(validationConfig.getExtensionDependency() != null) {
-			executionConfig.setDependencyEffectiveTime(extractEffetiveTimeFromDepedencyVersion(validationConfig.getExtensionDependency()));
+			executionConfig.setDependencyEffectiveTime(extractEffectiveTimeFromVersion(validationConfig.getExtensionDependency()));
 		}
 		//default to 10
 		executionConfig.setFailureExportMax(10);
@@ -315,7 +317,7 @@ public class ValidationVersionLoader {
 		return releaseDataManager.isKnownRelease(vertionToCheck);
 	}
 	
-	private String extractEffetiveTimeFromDepedencyVersion(String dependencyVersion) {
+	private String extractEffectiveTimeFromVersion(String dependencyVersion) {
 		String effectiveTime = null;
 		try {
 			Pattern pattern = null;
