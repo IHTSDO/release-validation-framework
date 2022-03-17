@@ -48,6 +48,7 @@ public class AssertionGroupImporter {
 		NZ_AUTHORING("NZ", "nz-authoring"),
 		ZH_AUTHORING("ZH", "zh-authoring"),
         KR_AUTHORING("KR", "kr-authoring"),
+		NL_AUTHORING("NL", "nl-authoring"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC", "first-time-loinc-validation"),
 		FIRST_TIME_COMMON_EDITION_VALIDATION ("COMMON", "first-time-common-edition"),
 		LOINC_EDITION ("LOINC", "LoincEdition"),
@@ -406,7 +407,7 @@ public class AssertionGroupImporter {
 				createCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions);
 				break;
 			case INT_AUTHORING :
-			case AT_AUTHORING:
+			case AT_AUTHORING :
 			case DK_AUTHORING :
 			case SE_AUTHORING :
 			case US_AUTHORING :
@@ -414,10 +415,11 @@ public class AssertionGroupImporter {
 			case NO_AUTHORING :
 			case CH_AUTHORING :
 			case IE_AUTHORING :
-			case NZ_AUTHORING:
-			case ZH_AUTHORING:
+			case NZ_AUTHORING :
+			case ZH_AUTHORING :
 			case EE_AUTHORING :
-            case KR_AUTHORING:
+            case KR_AUTHORING :
+			case NL_AUTHORING :
 				createSnapshotAssertionGroup(groupName);
 				break;
 			case FIRST_TIME_LOINC_VALIDATION :
