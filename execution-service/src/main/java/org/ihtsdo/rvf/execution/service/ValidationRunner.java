@@ -173,11 +173,7 @@ public class ValidationRunner {
 		final String responseQueue = config.getResponseQueue();
 		if (responseQueue != null) {
 			logger.info("Updating RVF state to {}}: {}", state, responseQueue);
-			messagingHelper.send(responseQueue,
-					Map.of("runId", config.getRunId(),
-							"state", state.name(),
-							"username", config.getUsername() != null ? config.getUsername() : "",
-							"authenticationToken", config.getAuthenticationToken() != null ? config.getAuthenticationToken() : ""));
+			messagingHelper.send(responseQueue, new ValidationStatusResponse(config, state));
 		}
 	}
 

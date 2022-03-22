@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.execution.service.config;
 
 import java.io.File;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.springframework.web.multipart.MultipartFile;
 import org.ihtsdo.rvf.execution.service.MRCMValidationService.CharacteristicType;
@@ -147,15 +148,32 @@ public class ValidationRunConfig {
 
 	@Override
 	public String toString() {
-		return "ValidationRunConfig [testFileName=" + testFileName
-				+ ", writeSucceses=" + writeSucceses
-				+ ", groupsList=" + groupsList
-				+ ", previousRelease=" + previousRelease
-				+ ", dependencyRelease=" + dependencyRelease
-				+ ", drools=" + enableDrools
-				+ ", mrcm=" + enableMRCMValidation
-				+ ", runId=" + runId
-				+ ", url=" + url + "]";
+		return new StringJoiner(", ", ValidationRunConfig.class.getSimpleName() + "[", "]")
+				.add("testFileName='" + testFileName + "'")
+				.add("runId=" + runId)
+				.add("groupsList=" + groupsList)
+				.add("previousRelease='" + previousRelease + "'")
+				.add("dependencyRelease='" + dependencyRelease + "'")
+				.add("previousDependencyEffectiveTime='" + previousDependencyEffectiveTime + "'")
+				.add("storageLocation='" + storageLocation + "'")
+				.add("url='" + url + "'")
+				.add("failureExportMax=" + failureExportMax)
+				.add("prospectiveFileFullPath='" + prospectiveFileFullPath + "'")
+				.add("isProspectiveFileInS3=" + isProspectiveFileInS3)
+				.add("isRf2DeltaOnly=" + isRf2DeltaOnly)
+				.add("enableDrools=" + enableDrools)
+				.add("effectiveTime='" + effectiveTime + "'")
+				.add("releaseAsAnEdition=" + releaseAsAnEdition)
+				.add("includedModules='" + includedModules + "'")
+				.add("droolsRulesGroupList=" + droolsRulesGroupList)
+				.add("bucketName='" + bucketName + "'")
+				.add("enableMRCMValidation=" + enableMRCMValidation)
+				.add("enableTraceabilityValidation=" + enableTraceabilityValidation)
+				.add("branchPath='" + branchPath + "'")
+				.add("responseQueue='" + responseQueue + "'")
+				.add("contentHeadTimestamp=" + contentHeadTimestamp)
+				.add("username='" + username + "'")
+				.add("authenticationToken='" + mask(authenticationToken) + "'").toString();
 	}
 
 	public String getManifestFileFullPath() {
@@ -397,5 +415,24 @@ public class ValidationRunConfig {
 
 	public String getAuthenticationToken() {
 		return authenticationToken;
+	}
+
+	private String mask(String token) {
+		if (token == null) {
+			return null;
+		}
+		int start = 1;
+		if (token.contains("=")) {
+			start = token.indexOf("=");
+		}
+		char[] maskedToken = new char[token.length()];
+		for (int i = 0; i < maskedToken.length; i++) {
+			maskedToken[i] = '*';
+		}
+		for (int j = 0; j < start; j++) {
+			maskedToken[j] = token.charAt(j);
+		}
+		maskedToken[maskedToken.length - 1] = token.charAt(token.length() - 1);
+		return new String(maskedToken);
 	}
 }

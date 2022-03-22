@@ -7,6 +7,7 @@ import com.google.gson.JsonSyntaxException;
 import org.ihtsdo.otf.jms.MessagingHelper;
 import org.ihtsdo.rvf.execution.service.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.ValidationRunner;
+import org.ihtsdo.rvf.execution.service.ValidationStatusResponse;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,11 +71,7 @@ public class ValidationMessageListener implements Closeable {
 			if (responseQueue != null) {
 				try {
 					LOGGER.info("Updating RVF state to running: {}", responseQueue);
-					messagingHelper.send(responseQueue,
-							ImmutableMap.of("runId", config.getRunId(),
-									"state", ValidationReportService.State.RUNNING.name(),
-									"username", config.getUsername() != null ? config.getUsername() : "",
-									"authenticationToken", config.getAuthenticationToken() != null ? config.getAuthenticationToken() : ""));
+					messagingHelper.send(responseQueue, new ValidationStatusResponse(config, ValidationReportService.State.RUNNING));
 				} catch (JsonProcessingException | JMSException e) {
 					throw new RuntimeException("Error occurred while trying to update the RVF state to running.", e);
 				}

@@ -8,6 +8,7 @@ import org.ihtsdo.otf.jms.MessagingHelper;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.rvf.execution.service.ValidationReportService;
 import org.ihtsdo.rvf.execution.service.ValidationReportService.State;
+import org.ihtsdo.rvf.execution.service.ValidationStatusResponse;
 import org.ihtsdo.rvf.execution.service.config.ValidationJobResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class ValidationQueueManager {
 			if (saveUploadedFiles(config, responseMap)) {
 				Gson gson = new Gson();
 				String configJson = gson.toJson(config);
-				LOGGER.info("Send Jms message to queue for validation config json:{}", configJson);
+				LOGGER.info("Send Jms message to queue for validation config {}", config.toString());
 				updateRvfStateTo(config, State.QUEUED);
 				jmsTemplate.convertAndSend(destinationName, configJson);
 				reportService.writeState(State.QUEUED, config.getStorageLocation());
@@ -92,11 +93,7 @@ public class ValidationQueueManager {
 		final String responseQueue = config.getResponseQueue();
 		if (responseQueue != null) {
 			LOGGER.info("Updating RVF state to queued: {}", responseQueue);
-			messagingHelper.send(responseQueue,
-					ImmutableMap.of("runId", config.getRunId(),
-							"state", state.name(),
-							"username", config.getUsername() != null ? config.getUsername() : "",
-							"authenticationToken", config.getAuthenticationToken() != null ? config.getAuthenticationToken() : ""));
+			messagingHelper.send(responseQueue, new ValidationStatusResponse(config, state));
 		}
 	}
 
