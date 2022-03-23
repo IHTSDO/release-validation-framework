@@ -22,10 +22,10 @@ public class RF2FileTableMapper {
 	private static final String CONCEPT_FILE_HEADER = "sct2_Concept_";
 	private static final String EXPRESSION_ASSOCIATION_FILE_HEADER = "der2_sscccRefset_.*ExpressionAssociation";
 	private static final String MAP_CORRELATION_ORIGIN_FILE_HEADER = "der2_scccRefset_.*MapCorrelationOrigin";
-	private static final String MODULE_DEPENDENCY_FILE_HEADER = "der2_ssRefset_ModuleDependency";
-	private static final String REFSET_DESCRIPTOR_FILE_HEADER = "der2_cciRefset_RefsetDescriptor";
-	private static final String OWL_EXPRESSION_FILE_HEADER = "sct2_sRefset_OWLExpression";
-	private static final String MRCM_ATTRIBUTE_DOMAIN_FILE_HEADER = "der2_cissccRefset_MRCMAttributeDomain";
+	private static final String MODULE_DEPENDENCY_FILE_HEADER = "der2_ssRefset_.*ModuleDependency";
+	private static final String REFSET_DESCRIPTOR_FILE_HEADER = "der2_cciRefset_.*RefsetDescriptor";
+	private static final String OWL_EXPRESSION_FILE_HEADER = "sct2_sRefset_.*OWLExpression";
+	private static final String MRCM_ATTRIBUTE_DOMAIN_FILE_HEADER = "der2_cissccRefset_.*MRCMAttributeDomain";
 	private static final String MRCM_MODULE_SCOPE_FILE_HEADER = "der2_cRefset_.*MRCMModuleScope";
 	private static final String MRCM_ATRRIBUTE_RANGE_FILE_HEADER = "der2_ssccRefset_.*MRCMAttributeRange";
 	private static final String MRCM_DOMAIN_FILE_HEADER = "der2_sssssssRefset_.*MRCMDomain";
