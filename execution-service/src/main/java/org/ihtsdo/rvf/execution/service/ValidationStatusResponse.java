@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.execution.service;
 
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
+import org.springframework.util.StringUtils;
 
 import java.util.StringJoiner;
 
@@ -43,7 +44,7 @@ public class ValidationStatusResponse {
 	}
 
 	private String mask(String token) {
-		if (token == null) {
+		if (StringUtils.isEmpty(token)) {
 			return null;
 		}
 		int start = 1;
