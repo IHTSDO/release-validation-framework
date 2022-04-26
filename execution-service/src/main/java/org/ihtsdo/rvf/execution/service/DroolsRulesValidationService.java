@@ -14,10 +14,7 @@ import org.ihtsdo.drools.response.Severity;
 import org.ihtsdo.drools.validator.rf2.DroolsRF2Validator;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
-import org.ihtsdo.rvf.entity.FailureDetail;
-import org.ihtsdo.rvf.entity.TestRunItem;
-import org.ihtsdo.rvf.entity.TestType;
-import org.ihtsdo.rvf.entity.ValidationReport;
+import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.rvf.execution.service.config.ValidationResourceConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
@@ -30,10 +27,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,6 +60,8 @@ public class DroolsRulesValidationService {
 
 	private static final String EXT_ZIP = ".zip";
 
+	private static final List<Assertion> assertions = new ArrayList<>();
+
 	@PostConstruct
 	public void init() {
 		AmazonS3 anonymousClient = AmazonS3ClientBuilder.standard()
@@ -69,6 +69,51 @@ public class DroolsRulesValidationService {
 				.withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
 				.build();
 		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
+
+		File droolsRuleDir = new File(droolsRuleDirectoryPath);
+		if (droolsRuleDir.isDirectory()) {
+			Pattern rulePattern = Pattern.compile("\"(.*?)\"");
+			Pattern uuidPattern = Pattern.compile("([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})");
+			Collection<File> droolsRulesSubfiles = FileUtils.listFiles(droolsRuleDir, new String[] {"drl"}, true);
+			for (File droolsRulesSubfile : droolsRulesSubfiles) {
+				if(!droolsRulesSubfile.isDirectory()) {
+					try (final BufferedReader reader = Files.newBufferedReader(droolsRulesSubfile.toPath());) {
+						String line;
+						Assertion assertion = null;
+						String group = getAssertionGroup(droolsRulesSubfile.getAbsolutePath());
+						while ((line = reader.readLine()) != null) {
+							if (line.startsWith("rule") && !line.isEmpty() && !line.contains("Always passes")) {
+								Matcher matcher = rulePattern.matcher(line);
+								if (matcher.find()) {
+									assertion = new Assertion();
+									assertion.setAssertionText(matcher.group(1));
+									assertion.setType(TestType.DROOL_RULES.name());
+									assertion.addGroup(group);
+									assertions.add(assertion);
+								}
+							}
+							if (line.contains("new InvalidContent")) {
+								Matcher matcher = uuidPattern.matcher(line);
+								if (matcher.find()) {
+									assertion.setUuid(UUID.fromString(matcher.group(1)));
+								}
+							}
+						}
+					} catch (IOException e) {
+						LOGGER.error("Failed to read file " + droolsRulesSubfile.getName());
+					}
+				}
+			}
+		}
+	}
+
+	private String getAssertionGroup(String absolutePath) {
+		String relativePath = absolutePath.substring(droolsRuleDirectoryPath.length() + 1);
+		return relativePath.substring(0, relativePath.indexOf("/"));
+	}
+
+	public List<Assertion> getAssertions() {
+		return assertions;
 	}
 
 	public ValidationStatusReport runDroolsAssertions(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws RVFExecutionException {
@@ -271,14 +316,5 @@ public class DroolsRulesValidationService {
 		//Only keep the assertion groups with matching Drools Rule modules in the Drools Directory
 		droolsRulesModules.retainAll(assertionGroups);
 		return droolsRulesModules;
-	}
-
-	private Map<String, List<InvalidContent>> groupDroolsRules(Map<String, List<InvalidContent>> groupedRules,
-			String rule, List<InvalidContent> invalidContents) {
-		if(!groupedRules.containsKey(rule)) {
-			groupedRules.put(rule, new ArrayList<>());
-		}
-		groupedRules.get(rule).addAll(invalidContents);
-		return groupedRules;
 	}
 }

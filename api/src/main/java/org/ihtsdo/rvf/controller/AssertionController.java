@@ -7,13 +7,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.Test;
+import org.ihtsdo.rvf.execution.service.DroolsRulesValidationService;
 import org.ihtsdo.rvf.execution.service.ReleaseDataManager;
+import org.ihtsdo.rvf.execution.service.TraceabilityComparisonService;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.helper.AssertionHelper;
 import org.ihtsdo.rvf.service.AssertionService;
@@ -46,12 +49,31 @@ public class AssertionController {
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 
+	@Autowired
+	private DroolsRulesValidationService droolsValidationService;
+
+	@Autowired
+	private TraceabilityComparisonService traceabilityComparisonService;
+
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Get all assertions", notes = "Retrieves all assertions available in the system.")
-	public List<Assertion> getAssertions() {
-		return assertionService.findAll();
+	public List<Assertion> getAssertions(@RequestParam(required = false) final boolean includeDroolsRules,
+										 @RequestParam(required = false) final boolean includeTraceabilityAssertions,
+										 @RequestParam(required = false) final boolean ignoreResourceType) {
+		List<Assertion> assertions = getAssertionsAndJoinGroups();
+		if (ignoreResourceType) {
+			assertions = assertions.stream().filter(assertion -> !assertion.getKeywords().equals("resource")).collect(Collectors.toList());
+		}
+		if (includeDroolsRules) {
+			assertions.addAll(droolsValidationService.getAssertions());
+		}
+		if (includeTraceabilityAssertions) {
+			assertions.addAll(traceabilityComparisonService.getAssertions());
+		}
+
+		return assertions;
 	}
 
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.GET)
@@ -276,5 +298,20 @@ public class AssertionController {
 				throw new InvalidFormatException("Id is not a valid assertion id:" + id);
 			}
 		}
+	}
+
+	private List<Assertion> getAssertionsAndJoinGroups() {
+		List<Assertion> assertions = assertionService.findAll();
+		List<AssertionGroup> assertionGroups = assertionService.getAllAssertionGroups();
+		assertionGroups.stream().forEach(assertionGroup -> {
+			assertionGroup.getAssertions().stream().forEach(a -> {
+				assertions.stream().forEach(b -> {
+					if (a.getUuid().toString().equals(b.getUuid().toString())) {
+						b.addGroup(assertionGroup.getName());
+					}
+				});
+			});
+		});
+		return assertions;
 	}
 }

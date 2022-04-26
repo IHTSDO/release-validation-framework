@@ -1,15 +1,8 @@
 package org.ihtsdo.rvf.entity;
 
-import java.util.UUID;
+import java.util.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -49,7 +42,12 @@ public class Assertion {
 	
 	@Column(name = "severity")
 	private String severity;
-	
+
+	@Transient
+	private String type = TestType.SQL.name();
+
+	@Transient
+	private Set<String> groups;
 
 	public Assertion() {
 	}
@@ -101,6 +99,29 @@ public class Assertion {
 
 	public void setSeverity(String severity) {
 		this.severity = severity;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setGroups(Set<String> groups) {
+		this.groups = groups;
+	}
+
+	public Set<String> getGroups() {
+		return groups;
+	}
+
+	public void addGroup(String group) {
+		if (groups == null) {
+			groups = new HashSet<>();
+		}
+		groups.add(group);
 	}
 
 	@Override
