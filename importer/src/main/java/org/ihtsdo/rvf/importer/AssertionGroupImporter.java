@@ -60,6 +60,7 @@ public class AssertionGroupImporter {
 		CH_EDITION("CH", "SwissEdition"),
 		IE_EDITION("IE", "IrishEdition"),
 		EE_EDITION("EE", "EstonianEdition"),
+		AT_EDITION("AT", "AustrianEdition"),
 		GPFP_ICPC2("GPFP-ICPC2","GPFP-ICPC2"),
 		GMDN("GMDN","GMDN"),
 		STATED_RELATIONSHIPS_VALIDATION("STATED_RELATIONSHIPS","stated-relationships-validation"), //Assertions group that contains only stated relationship for file centric and component centric assertions
@@ -396,6 +397,7 @@ public class AssertionGroupImporter {
 			case IE_EDITION :
 			case GMDN :
 			case EE_EDITION :
+			case AT_EDITION :
 			case GPFP_ICPC2 :
 			case DERIVATIVE_EDITION :
 				createReleaseAssertionGroup(allAssertions, groupName);
