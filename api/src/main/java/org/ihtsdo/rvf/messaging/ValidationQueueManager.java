@@ -32,6 +32,9 @@ public class ValidationQueueManager {
 
 	private static final String FILES_TO_VALIDATE = "files_to_validate";
 	private static final String FAILURE_MESSAGE = "failureMessage";
+
+	public static final String QUEUE_SUFFIX_AUTHORING = ".authoring";
+	public static final String QUEUE_SUFFIX_RELEASE = ".release";
 	
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -67,7 +70,13 @@ public class ValidationQueueManager {
 				String configJson = gson.toJson(config);
 				LOGGER.info("Send Jms message to queue for validation config {}", config.toString());
 				updateRvfStateTo(config, State.QUEUED);
-				jmsTemplate.convertAndSend(destinationName, configJson);
+				String queueSuffix = "";
+				if (config.getResponseQueue() != null) {
+					// both response queues are hard-coded in authoring service and release service
+					queueSuffix = config.getResponseQueue().contains("termserver-release-validation.response") ? QUEUE_SUFFIX_AUTHORING :
+							(config.getResponseQueue().contains("srs.build-job-status") ? QUEUE_SUFFIX_RELEASE : "");
+				}
+				jmsTemplate.convertAndSend(destinationName + queueSuffix, configJson);
 				reportService.writeState(State.QUEUED, config.getStorageLocation());
 			}
 		} catch (IOException e) {
