@@ -89,6 +89,7 @@ public class DroolsRulesValidationService {
 									assertion.setAssertionText(matcher.group(1));
 									assertion.setType(TestType.DROOL_RULES.name());
 									assertion.addGroup(group);
+									assertion.setSeverity("ERROR");
 									assertions.add(assertion);
 								}
 							}
@@ -97,6 +98,9 @@ public class DroolsRulesValidationService {
 								if (matcher.find()) {
 									assertion.setUuid(UUID.fromString(matcher.group(1)));
 								}
+							}
+							if (line.contains("Severity.WARNING")) {
+								assertion.setSeverity("WARNING");
 							}
 						}
 					} catch (IOException e) {
@@ -135,7 +139,7 @@ public class DroolsRulesValidationService {
 			try {
 				Set<InputStream> snapshotsInputStream = new HashSet<>();
 				InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile());
-				
+
 				InputStream deltaInputStream = null;
 				//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 				if (validationConfig.isRf2DeltaOnly()) {
@@ -202,7 +206,7 @@ public class DroolsRulesValidationService {
 						newInvalidContents.addAll(batch.stream().filter(invalidContent ->
 								whitelistedItems.stream().noneMatch(whitelistedItem ->
 										invalidContent.getRuleId().equals(whitelistedItem.getValidationRuleId())
-										&& invalidContent.getComponentId().equals(whitelistedItem.getComponentId()))
+												&& invalidContent.getComponentId().equals(whitelistedItem.getComponentId()))
 						).collect(Collectors.toList())) ;
 					}
 					invalidContents = newInvalidContents;
