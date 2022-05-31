@@ -42,17 +42,17 @@ public class TraceabilityComparisonService {
 
 	private static final List<Assertion> assertions = new ArrayList<>();
 	static {
-		Assertion componentInTraceabiltiyAlsoInDelta = new Assertion();
-		componentInTraceabiltiyAlsoInDelta.setUuid(UUID.fromString(ASSERTION_ID_ALL_COMPONENTS_IN_TRACEABILITY_ALSO_IN_DELTA));
-		componentInTraceabiltiyAlsoInDelta.setAssertionText(ASSERTION_ID_ALL_COMPONENTS_IN_TRACEABILITY_ALSO_IN_DELTA_TEXT);
-		componentInTraceabiltiyAlsoInDelta.setType(TestType.TRACEABILITY.name());
-		assertions.add(componentInTraceabiltiyAlsoInDelta);
+		Assertion componentInTraceabilitiyAlsoInDelta = new Assertion();
+		componentInTraceabilitiyAlsoInDelta.setUuid(UUID.fromString(ASSERTION_ID_ALL_COMPONENTS_IN_TRACEABILITY_ALSO_IN_DELTA));
+		componentInTraceabilitiyAlsoInDelta.setAssertionText(ASSERTION_ID_ALL_COMPONENTS_IN_TRACEABILITY_ALSO_IN_DELTA_TEXT);
+		componentInTraceabilitiyAlsoInDelta.setType(TestType.TRACEABILITY.name());
+		assertions.add(componentInTraceabilitiyAlsoInDelta);
 
-		Assertion componentInDeltaAlsoInTraceabiltiy = new Assertion();
-		componentInDeltaAlsoInTraceabiltiy.setUuid(UUID.fromString(ASSERTION_ID_ALL_COMPONENTS_IN_DELTA_ALSO_IN_TRACEABILITY));
-		componentInDeltaAlsoInTraceabiltiy.setAssertionText(ASSERTION_ID_ALL_COMPONENTS_IN_DELTA_ALSO_IN_TRACEABILITY_TEXT);
-		componentInDeltaAlsoInTraceabiltiy.setType(TestType.TRACEABILITY.name());
-		assertions.add(componentInTraceabiltiyAlsoInDelta);
+		Assertion componentInDeltaAlsoInTraceabilitiy = new Assertion();
+		componentInDeltaAlsoInTraceabilitiy.setUuid(UUID.fromString(ASSERTION_ID_ALL_COMPONENTS_IN_DELTA_ALSO_IN_TRACEABILITY));
+		componentInDeltaAlsoInTraceabilitiy.setAssertionText(ASSERTION_ID_ALL_COMPONENTS_IN_DELTA_ALSO_IN_TRACEABILITY_TEXT);
+		componentInDeltaAlsoInTraceabilitiy.setType(TestType.TRACEABILITY.name());
+		assertions.add(componentInDeltaAlsoInTraceabilitiy);
 	}
 
 	// 900000000000534007 | Module dependency reference set (foundation metadata concept) | - Ignore these because they will be generated during the export in Snowstorm.
