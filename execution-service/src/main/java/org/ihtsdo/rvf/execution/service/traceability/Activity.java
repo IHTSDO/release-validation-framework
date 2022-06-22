@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.execution.service.traceability;
 
 import java.util.Date;
+import java.util.Set;
 
 public class Activity {
 
@@ -10,6 +11,7 @@ public class Activity {
 	private Date commitDate;
 	private Date promotionDate;
 	private ActivityType activityType;
+	private Set<ConceptChange> conceptChanges;
 
 	public String getUsername() {
 		return username;
@@ -33,5 +35,9 @@ public class Activity {
 
 	public ActivityType getActivityType() {
 		return activityType;
+	}
+
+	public Set <ConceptChange> getConceptChanges() {
+		return conceptChanges;
 	}
 }
