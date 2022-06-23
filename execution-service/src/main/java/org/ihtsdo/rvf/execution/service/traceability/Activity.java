@@ -37,7 +37,7 @@ public class Activity {
 		return activityType;
 	}
 
-	public Set <ConceptChange> getConceptChanges() {
+	public Set<ConceptChange> getConceptChanges() {
 		return conceptChanges;
 	}
 }
