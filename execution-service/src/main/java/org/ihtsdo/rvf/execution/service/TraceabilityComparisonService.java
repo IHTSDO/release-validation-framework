@@ -28,6 +28,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -74,6 +75,9 @@ public class TraceabilityComparisonService {
 	@Value("${rvf.traceability.ignore.refsets:900000000000497000,900000000000534007}")
 	private String[] refsetsToIgnore;
 
+	@Value("${rvf.traceability.changes-not-at-task-level.ignore.refsets:}")
+	private String[] changesNotAtTaskLevelRefsetsToIgnore;
+
 	@Value("${rvf.assertion.whitelist.batchsize:1000}")
 	private int whitelistBatchSize;
 
@@ -114,7 +118,8 @@ public class TraceabilityComparisonService {
 		}
 		try {
 			final Map<String, String> rf2ComponentIdToConceptIdMap = new HashMap<>();
-			final Map<ComponentType, Set<String>> rf2Changes = gatherRF2ComponentChanges(validationConfig, rf2ComponentIdToConceptIdMap);
+			final Map<String, String> memberIdToRefsetIdMap = new HashMap<>();
+			final Map<ComponentType, Set<String>> rf2Changes = gatherRF2ComponentChanges(validationConfig, rf2ComponentIdToConceptIdMap, memberIdToRefsetIdMap);
 
 			ChangeSummaryReport summaryReport = getTraceabilityChangeSummaryReport(branchPath);
 			Map<ComponentType, Set<String>> traceabilityChanges = Collections.emptyMap();
@@ -180,7 +185,7 @@ public class TraceabilityComparisonService {
 			remainingFailureExport = new AtomicInteger(validationConfig.getFailureExportMax());
 
 			if (summaryReport.getChangesNotAtTaskLevel() != null) {
-				List<WhitelistItem> invalidContents = checkWhitelistItems(ASSERTION_ID_ALL_COMPONENTS_CHANGES_NOT_AT_TASK_LEVEL, summaryReport.getChangesNotAtTaskLevel());
+				List<WhitelistItem> invalidContents = checkWhitelistItems(ASSERTION_ID_ALL_COMPONENTS_CHANGES_NOT_AT_TASK_LEVEL, summaryReport.getChangesNotAtTaskLevel(), memberIdToRefsetIdMap);
 				for(WhitelistItem item : invalidContents) {
 					if (remainingFailureExport.get() > 0) {
 						remainingFailureExport.decrementAndGet();
@@ -204,11 +209,16 @@ public class TraceabilityComparisonService {
 		}
 	}
 
-	private List<WhitelistItem> checkWhitelistItems(String ruleId, List<Activity> activities) throws RestClientException {
+	private List<WhitelistItem> checkWhitelistItems(String ruleId, List <Activity> activities, Map<String, String> memberIdToRefsetIdMap) throws RestClientException {
 		List<WhitelistItem> whitelistItems = new ArrayList<>();
 		for (Activity activity : activities) {
 			for (ConceptChange conceptChange : activity.getConceptChanges()) {
 				for (ComponentChange componentChange : conceptChange.getComponentChanges()) {
+					if (ComponentType.REFERENCE_SET_MEMBER.equals(componentChange.getComponentType())
+						&& changesNotAtTaskLevelRefsetsToIgnore != null && memberIdToRefsetIdMap.containsKey(componentChange.getComponentId())
+						&& Arrays.asList(changesNotAtTaskLevelRefsetsToIgnore).contains(memberIdToRefsetIdMap.get(componentChange.getComponentId()))) {
+						continue;
+					}
 					whitelistItems.add(new WhitelistItem(ruleId, componentChange.getComponentId(), conceptChange.getConceptId(), String.join(",", activity.getBranch(), String.valueOf(activity.getCommitDate().getTime()))));
 				}
 			}
@@ -249,7 +259,7 @@ public class TraceabilityComparisonService {
 		}
 	}
 
-	private Map<ComponentType, Set<String>> gatherRF2ComponentChanges(ValidationRunConfig validationConfig, Map<String, String> componentIdToConceptIdMap) throws IOException, ReleaseImportException {
+	private Map<ComponentType, Set<String>> gatherRF2ComponentChanges(ValidationRunConfig validationConfig, Map<String, String> componentIdToConceptIdMap, Map<String, String> memberIdToRefsetIdMap) throws IOException, ReleaseImportException {
 		final String releaseEffectiveTime = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replace("-","") : "";
 
 		logger.info("Collecting component ids from snapshot using effectiveTime filter.");
@@ -323,6 +333,7 @@ public class TraceabilityComparisonService {
 						refsetMembers.add(id);
 						componentIdToConceptIdMap.put(id, referencedComponentId);
 					}
+					memberIdToRefsetIdMap.put(id, refsetId);
 				}
 			};
 
