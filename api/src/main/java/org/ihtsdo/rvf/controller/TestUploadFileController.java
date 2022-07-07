@@ -63,6 +63,8 @@ public class TestUploadFileController {
 
 	private static final String BRANCH_PATH = "branchPath";
 
+	private static final String EXCLUDED_REFSET_DESCRIPTOR_MEMBERS = "excludedRefsetDescriptorMembers";
+
 	private static final String PREVIOUS_RELEASE = "previousRelease";
 
 	private static final String DROOLS_RULES_GROUPS = "droolsRulesGroups";
@@ -193,6 +195,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
 			@ApiParam(value = "Terminology Server content branch path, used for traceability check.") @RequestParam(value = BRANCH_PATH, required = false) final String branchPath,
+			@ApiParam(value = "Refset Descriptor members are being excluded, used for traceability check.") @RequestParam(value = EXCLUDED_REFSET_DESCRIPTOR_MEMBERS, required = false) final String excludedRefsetDescriptorMembers,
 			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
 			@ApiParam(value = "Name of the response queue.") @RequestParam(value = RESPONSE_QUEUE, required = false) final String responseQueue,
 			@ApiParam(value = "User name.") @RequestParam(value = USER_NAME, required = false) final String username,
@@ -219,6 +222,7 @@ public class TestUploadFileController {
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setEnableTraceabilityValidation(enableTraceabilityValidation)
 				.setBranchPath(branchPath)
+				.setExcludedRefsetDescriptorMembers(excludedRefsetDescriptorMembers)
 				.setContentHeadTimestamp(contentHeadTimestamp)
 				.addResponseQueue(responseQueue)
 				.setUsername(username)
@@ -268,6 +272,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
 			@ApiParam(value = "Terminology Server content branch path, used for traceability validation.") @RequestParam(value = BRANCH_PATH, required = false) final String branchPath,
+			@ApiParam(value = "Refset Descriptor members are being excluded, used for traceability check.") @RequestParam(value = EXCLUDED_REFSET_DESCRIPTOR_MEMBERS, required = false) final String excludedRefsetDescriptorMembers,
 			@ApiParam(value = "Name of the response queue.") @RequestParam(value = RESPONSE_QUEUE, required = false) final String responseQueue,
 			@ApiParam(value = "User name.") @RequestParam(value = USER_NAME, required = false) final String username,
 			@ApiParam(value = "Authentication token.") @RequestParam(value = AUTH_TOKEN, required = false) final String authenticationToken,
@@ -296,6 +301,7 @@ public class TestUploadFileController {
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setEnableTraceabilityValidation(enableTraceabilityValidation)
 				.setBranchPath(branchPath)
+				.setExcludedRefsetDescriptorMembers(excludedRefsetDescriptorMembers)
 				.setContentHeadTimestamp(contentHeadTimestamp)
 				.addResponseQueue(responseQueue)
 				.setUsername(username)

@@ -37,6 +37,7 @@ public class ValidationRunConfig {
 	private boolean enableMRCMValidation;
 	private boolean enableTraceabilityValidation;
 	private String branchPath;
+	private String excludedRefsetDescriptorMembers;
 	private String responseQueue;
 	private Long contentHeadTimestamp;
 	private String username;
@@ -170,6 +171,7 @@ public class ValidationRunConfig {
 				.add("enableMRCMValidation=" + enableMRCMValidation)
 				.add("enableTraceabilityValidation=" + enableTraceabilityValidation)
 				.add("branchPath='" + branchPath + "'")
+				.add("excludedRefsetDescriptorMembers='" + excludedRefsetDescriptorMembers + "'")
 				.add("responseQueue='" + responseQueue + "'")
 				.add("contentHeadTimestamp=" + contentHeadTimestamp)
 				.add("username='" + username + "'")
@@ -387,6 +389,15 @@ public class ValidationRunConfig {
 
 	public ValidationRunConfig setBranchPath(String branchPath) {
 		this.branchPath = branchPath;
+		return this;
+	}
+
+	public String getExcludedRefsetDescriptorMembers() {
+		return excludedRefsetDescriptorMembers;
+	}
+
+	public ValidationRunConfig setExcludedRefsetDescriptorMembers(String excludedRefsetDescriptorMembers) {
+		this.excludedRefsetDescriptorMembers = excludedRefsetDescriptorMembers;
 		return this;
 	}
 

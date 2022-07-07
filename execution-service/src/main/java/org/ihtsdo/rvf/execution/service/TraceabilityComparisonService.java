@@ -126,6 +126,18 @@ public class TraceabilityComparisonService {
 			Map<String, String> traceabilityComponentIdToConceptIdMap = Collections.emptyMap();
 			if (summaryReport != null && summaryReport.getComponentChanges() != null) {
 				traceabilityChanges = summaryReport.getComponentChanges();
+
+				// Filter some refset descriptor members out from change-summary
+				if (!StringUtils.isEmpty(validationConfig.getExcludedRefsetDescriptorMembers())) {
+					Set<String> refsetMemberIds = traceabilityChanges.get(ComponentType.REFERENCE_SET_MEMBER);
+					if (!CollectionUtils.isEmpty(refsetMemberIds)) {
+						String[] excludedRefsetDescriptorMemberArr = Arrays.stream(validationConfig.getExcludedRefsetDescriptorMembers().split(",")).map(String::trim).toArray(String[]::new);
+						traceabilityChanges.put(ComponentType.REFERENCE_SET_MEMBER, refsetMemberIds.stream()
+								.distinct()
+								.filter(i -> !Arrays.asList(excludedRefsetDescriptorMemberArr).contains(i) )
+								.collect(Collectors.toSet()));
+					}
+				}
 			}
 			if (summaryReport != null && summaryReport.getComponentToConceptIdMap() != null) {
 				traceabilityComponentIdToConceptIdMap = summaryReport.getComponentToConceptIdMap();
@@ -152,7 +164,6 @@ public class TraceabilityComparisonService {
 			} else {
 				report.getResultReport().addFailedAssertions(Collections.singletonList(traceabilityAndDelta));
 			}
-
 
 			final TestRunItem deltaAndTraceability = new TestRunItem();
 			deltaAndTraceability.setTestType(TestType.TRACEABILITY);
