@@ -44,6 +44,9 @@ public class Assertion {
 	private String severity;
 
 	@Transient
+	private String url;
+
+	@Transient
 	private String type = TestType.SQL.name();
 
 	@Transient
@@ -99,6 +102,14 @@ public class Assertion {
 
 	public void setSeverity(String severity) {
 		this.severity = severity;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getUrl() {
+		return url;
 	}
 
 	public void setType(String type) {

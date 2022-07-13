@@ -42,6 +42,9 @@ public class DroolsRulesValidationService {
 	@Value("${rvf.drools.rule.directory}")
 	private String droolsRuleDirectoryPath;
 
+	@Value("${rvf.drools.rule.repository.url}")
+	private String droolsRuleRepositoryUrl;
+
 	@Value("${cloud.aws.region.static}")
 	private String awsRegion;
 
@@ -88,6 +91,7 @@ public class DroolsRulesValidationService {
 									assertion = new Assertion();
 									assertion.setAssertionText(matcher.group(1));
 									assertion.setType(TestType.DROOL_RULES.name());
+									assertion.setUrl(droolsRulesSubfile.getAbsolutePath().replace(droolsRuleDirectoryPath, droolsRuleRepositoryUrl));
 									assertion.addGroup(group);
 									assertion.setSeverity("ERROR");
 									assertions.add(assertion);
