@@ -83,6 +83,8 @@ public class DroolsRulesValidationService {
 					try (final BufferedReader reader = Files.newBufferedReader(droolsRulesSubfile.toPath());) {
 						String line;
 						Assertion assertion = null;
+						boolean severityWarning = false;
+						boolean severityError = false;
 						String group = getAssertionGroup(droolsRulesSubfile.getAbsolutePath());
 						while ((line = reader.readLine()) != null) {
 							if (line.startsWith("rule") && !line.isEmpty() && !line.contains("Always passes")) {
@@ -93,18 +95,32 @@ public class DroolsRulesValidationService {
 									assertion.setType(TestType.DROOL_RULES.name());
 									assertion.setUrl(droolsRulesSubfile.getAbsolutePath().replace(droolsRuleDirectoryPath, droolsRuleRepositoryUrl));
 									assertion.addGroup(group);
-									assertion.setSeverity("ERROR");
+									severityWarning = false;
+									severityError = false;
 									assertions.add(assertion);
 								}
 							}
-							if (line.contains("new InvalidContent")) {
+							if (assertion != null && line.contains("new InvalidContent")) {
 								Matcher matcher = uuidPattern.matcher(line);
 								if (matcher.find()) {
 									assertion.setUuid(UUID.fromString(matcher.group(1)));
 								}
 							}
 							if (line.contains("Severity.WARNING")) {
-								assertion.setSeverity("WARNING");
+								severityWarning = true;
+							}
+							if (line.contains("Severity.ERROR")) {
+								severityError = true;
+							}
+							if (assertion != null && "end".equals(line.trim())) {
+								if (severityWarning || severityError) {
+									Set<String> severities = new HashSet<>();
+									if (severityWarning) severities.add("WARNING");
+									if (severityError) severities.add("ERROR");
+									assertion.setSeverity(String.join(",", severities));
+								} else {
+									assertion.setSeverity("ERROR");
+								}
 							}
 						}
 					} catch (IOException e) {
