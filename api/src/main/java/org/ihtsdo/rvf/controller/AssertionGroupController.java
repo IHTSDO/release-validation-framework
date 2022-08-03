@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -67,6 +68,7 @@ public class AssertionGroupController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Get all assertions for a given assertion group", notes = "Retrieves all assertions for a given assertion group identified by the group id.")
+	@Transactional
 	public List<Assertion> getAssertionsForGroup(@ApiParam(value = "Assertion group id") @PathVariable final Long id) {
 
 		AssertionGroup group = assertionGroupRepository.getOne(id);

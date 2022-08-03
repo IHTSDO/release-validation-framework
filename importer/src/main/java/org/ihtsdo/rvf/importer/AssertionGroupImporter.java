@@ -1,9 +1,6 @@
 package org.ihtsdo.rvf.importer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.ihtsdo.rvf.entity.Assertion;
@@ -12,8 +9,10 @@ import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.*;
 
@@ -25,7 +24,13 @@ public class AssertionGroupImporter {
 	private static final String NEW_INACTIVE_STATES_FOLLOW_ACTIVE_STATES = "New inactive states follow active states";
 	public static final String MDRS = "mdrs";
 
+	// The ignored groupnames will be used for some specific purposed. It will not have any impact while adding the assertions to a group.
+	// For example: the "delta-file-required" groupName will be used for excluding the assertions which require the delta files being triggered
+	@Value("${rvf.assertion.import.ignore.groupnames:delta-file-required}")
+	private String[] ignoredGroupNames;
+
 	enum AssertionGroupName {
+		DELTA_FILE_REQUIRED ("DELTA_FILE_REQUIRED", "delta-file-required"),
 		FILE_CENTRIC_VALIDATION ("COMMON", "file-centric-validation"),
 		COMPONENT_CENTRIC_VALIDATION ("COMMON", "component-centric-validation"),
 		RELEASE_TYPE_VALIDATION ("COMMON", "release-type-validation"),
@@ -383,6 +388,7 @@ public class AssertionGroupImporter {
 				createAssertionGroupByKeyWord(allAssertions, groupName.getName());
 				break;
 			case MDRS_VALIDATION :
+			case DELTA_FILE_REQUIRED:
 				createAssertionGroup(getReleaseAssertionsByCenter(allAssertions, groupName.getName()), groupName.getName());
 				break;
 			case LOINC_EDITION :
@@ -453,6 +459,11 @@ public class AssertionGroupImporter {
 				continue;
 			}
 			keyWords=assertion.getKeywords();
+			if (ignoredGroupNames.length != 0) {
+				for (String ignoredGroupName : ignoredGroupNames) {
+					keyWords = keyWords.replace("," + ignoredGroupName, "");
+				}
+			}
 			//exclude SNOMED RT assertions
 			if ( Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;
@@ -481,9 +492,14 @@ public class AssertionGroupImporter {
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
 			String keyWords = assertion.getKeywords();
-			 if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
-				 continue;
-			 }
+			if (ignoredGroupNames.length != 0) {
+				for (String ignoredGroupName : ignoredGroupNames) {
+					keyWords = keyWords.replace("," + ignoredGroupName, "");
+				}
+			}
+			if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
+			 continue;
+			}
 			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)) {
 				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
 				if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
@@ -511,6 +527,11 @@ public class AssertionGroupImporter {
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
 			String keyWords = assertion.getKeywords();
+			if (ignoredGroupNames.length != 0) {
+				for (String ignoredGroupName : ignoredGroupNames) {
+					keyWords = keyWords.replace("," + ignoredGroupName, "");
+				}
+			}
 			if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
 				continue;
 			}
@@ -589,6 +610,11 @@ public class AssertionGroupImporter {
 		String keywords;
 		for (Assertion assertion : allAssertions) {
 			 keywords = assertion.getKeywords();
+			if (ignoredGroupNames.length != 0) {
+				for (String ignoredGroupName : ignoredGroupNames) {
+					keywords = keywords.replace("," + ignoredGroupName, "");
+				}
+			}
 			if (keywords.contains(MDRS) || FILE_CENTRIC_VALIDATION.getName().equals(keywords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keywords)
 					|| RELEASE_TYPE_VALIDATION.getName().equals(keywords)) {
 				result.add(assertion);
@@ -652,7 +678,13 @@ public class AssertionGroupImporter {
 		group.setName(assertionGroupName);
 		group = assertionService.createAssertionGroup(group);
 		for (Assertion assertion : allAssertions) {
-			if (assertion.getKeywords().equals(assertionGroupName)) {
+			String keyWords = assertion.getKeywords();
+			if (ignoredGroupNames.length != 0) {
+				for (String ignoredGroupName : ignoredGroupNames) {
+					keyWords = keyWords.replace("," + ignoredGroupName, "");
+				}
+			}
+			if (keyWords.equals(assertionGroupName)) {
 				assertionService.addAssertionToGroup(assertion, group);
 			}
 		}
