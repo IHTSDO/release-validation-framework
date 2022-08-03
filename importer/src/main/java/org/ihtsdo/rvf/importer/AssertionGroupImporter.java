@@ -348,6 +348,7 @@ public class AssertionGroupImporter {
 	 * file-centric-validation
 	 * release-type-validation
 	 * component-centric-validation
+	 * delta-file-required
 	 * SpanishEdition
 	 * InternationalEdition
 	 * SnapshotContentValidation

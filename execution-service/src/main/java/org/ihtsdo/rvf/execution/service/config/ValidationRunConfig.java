@@ -28,6 +28,7 @@ public class ValidationRunConfig {
 	private transient File localDependencyReleaseFile;
 	private transient File localPreviousReleaseFile;
 	private boolean isRf2DeltaOnly;
+	private boolean missingRf2DeltaFromRelease;
 	private boolean enableDrools;
 	private String effectiveTime;
 	private boolean releaseAsAnEdition;
@@ -230,6 +231,14 @@ public class ValidationRunConfig {
 
 	public void setRf2DeltaOnly(boolean isRf2DeltaOnly) {
 		this.isRf2DeltaOnly = isRf2DeltaOnly;
+	}
+
+	public boolean isMissingRf2DeltaFromRelease() {
+		return missingRf2DeltaFromRelease;
+	}
+
+	public void setMissingRf2DeltaFromRelease(boolean missingRf2DeltaFromRelease) {
+		this.missingRf2DeltaFromRelease = missingRf2DeltaFromRelease;
 	}
 
 	public String getExtensionDependency() {

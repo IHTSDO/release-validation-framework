@@ -82,7 +82,7 @@ public class MysqlValidationService {
 			runExtensionReleaseValidation(statusReport, validationConfig, executionConfig);
 		} else {
 			LOGGER.info("Run international release validation with config {}", executionConfig);
-			runAssertionTests(statusReport, executionConfig, reportStorage);
+			runAssertionTests(statusReport, validationConfig, executionConfig, reportStorage);
 		}
 		return statusReport;
 	}
@@ -99,6 +99,12 @@ public class MysqlValidationService {
 		final long timeStart = System.currentTimeMillis();
 		// run release-type validations
 		List<Assertion> assertions = getAssertions(executionConfig.getGroupNames());
+
+		// filter the delta-file-required assertions out if the release does not contain the delta files
+		if (validationConfig.isMissingRf2DeltaFromRelease()) {
+			List<Assertion> requiredDeltaFilesAssertions = getAssertions(Collections.singletonList("delta-file-required"));
+			assertions.removeAll(requiredDeltaFilesAssertions);
+		}
 		LOGGER.debug("Total assertions found {}", assertions.size());
 		List<Assertion> releaseTypeAssertions = new ArrayList<>();
 		List<Assertion> noneReleaseTypeAssertions = new ArrayList<>();
@@ -153,7 +159,7 @@ public class MysqlValidationService {
 		return result;
 	}
 
-	private void runAssertionTests( ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, String reportStorage) throws ExecutionException, InterruptedException {
+	private void runAssertionTests( ValidationStatusReport statusReport, ValidationRunConfig validationConfig, MysqlExecutionConfig executionConfig, String reportStorage) throws ExecutionException, InterruptedException {
 		long timeStart = System.currentTimeMillis();
 		List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
@@ -165,6 +171,13 @@ public class MysqlValidationService {
 		for (final AssertionGroup group : groups) {
 			assertions.addAll(group.getAssertions());
 		}
+
+		// filter the delta-file-required assertions out if the release does not contain the delta files
+		if (validationConfig.isMissingRf2DeltaFromRelease()) {
+			List<Assertion> requiredDeltaFilesAssertions = getAssertions(Collections.singletonList("delta-file-required"));
+			assertions.removeAll(requiredDeltaFilesAssertions);
+		}
+
 		LOGGER.info("Total assertions to run {}", assertions.size());
 		if (batchSize == 0) {
 			items.addAll(executeAssertions(executionConfig, assertions, reportStorage));

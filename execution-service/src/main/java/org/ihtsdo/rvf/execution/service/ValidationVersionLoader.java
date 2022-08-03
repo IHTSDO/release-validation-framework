@@ -119,8 +119,7 @@ public class ValidationVersionLoader {
 		}
 
 		if (!validationConfig.isRf2DeltaOnly() && !checkDeltaFilesExist(validationConfig.getLocalProspectiveFile())) {
-			final String schemaName = prospectiveVersion.startsWith(RVF_DB_PREFIX) ? prospectiveVersion : RVF_DB_PREFIX + prospectiveVersion;
-			releaseDataManager.insertIntoProspectiveDeltaTables(schemaName, executionConfig);
+			validationConfig.setMissingRf2DeltaFromRelease(true);
 		}
 
 		statusReport.setTotalRF2FilesLoaded(rf2FilesLoaded.size());
