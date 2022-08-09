@@ -101,8 +101,8 @@ public class MysqlValidationService {
 		List<Assertion> assertions = getAssertions(executionConfig.getGroupNames());
 
 		// filter the delta-file-required assertions out if the release does not contain the delta files
-		if (validationConfig.isMissingRf2DeltaFromRelease()) {
-			List<Assertion> requiredDeltaFilesAssertions = getAssertions(Collections.singletonList("delta-file-required"));
+		if (validationConfig.skipValidationForDeltaFiles()) {
+			List<Assertion> requiredDeltaFilesAssertions = assertionService.getAssertionsByKeyWords ("delta-file-required", false);
 			assertions.removeAll(requiredDeltaFilesAssertions);
 		}
 		LOGGER.debug("Total assertions found {}", assertions.size());
@@ -173,8 +173,8 @@ public class MysqlValidationService {
 		}
 
 		// filter the delta-file-required assertions out if the release does not contain the delta files
-		if (validationConfig.isMissingRf2DeltaFromRelease()) {
-			List<Assertion> requiredDeltaFilesAssertions = getAssertions(Collections.singletonList("delta-file-required"));
+		if (validationConfig.skipValidationForDeltaFiles()) {
+			List<Assertion> requiredDeltaFilesAssertions = assertionService.getAssertionsByKeyWords ("delta-file-required", false);
 			assertions.removeAll(requiredDeltaFilesAssertions);
 		}
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.StringJoiner;
 
 import org.springframework.web.multipart.MultipartFile;
-import org.ihtsdo.rvf.execution.service.MRCMValidationService.CharacteristicType;
 
 public class ValidationRunConfig {
 	private String testFileName;
@@ -28,7 +27,7 @@ public class ValidationRunConfig {
 	private transient File localDependencyReleaseFile;
 	private transient File localPreviousReleaseFile;
 	private boolean isRf2DeltaOnly;
-	private boolean missingRf2DeltaFromRelease;
+	private boolean skipValidationForDeltaFiles;
 	private boolean enableDrools;
 	private String effectiveTime;
 	private boolean releaseAsAnEdition;
@@ -233,12 +232,12 @@ public class ValidationRunConfig {
 		this.isRf2DeltaOnly = isRf2DeltaOnly;
 	}
 
-	public boolean isMissingRf2DeltaFromRelease() {
-		return missingRf2DeltaFromRelease;
+	public boolean skipValidationForDeltaFiles() {
+		return skipValidationForDeltaFiles;
 	}
 
-	public void setMissingRf2DeltaFromRelease(boolean missingRf2DeltaFromRelease) {
-		this.missingRf2DeltaFromRelease = missingRf2DeltaFromRelease;
+	public void setSkipValidationForDeltaFiles(boolean skipValidationForDeltaFiles) {
+		this.skipValidationForDeltaFiles = skipValidationForDeltaFiles;
 	}
 
 	public String getExtensionDependency() {

@@ -119,7 +119,7 @@ public class ValidationVersionLoader {
 		}
 
 		if (!validationConfig.isRf2DeltaOnly() && !checkDeltaFilesExist(validationConfig.getLocalProspectiveFile())) {
-			validationConfig.setMissingRf2DeltaFromRelease(true);
+			validationConfig.setSkipValidationForDeltaFiles(true);
 		}
 
 		statusReport.setTotalRF2FilesLoaded(rf2FilesLoaded.size());

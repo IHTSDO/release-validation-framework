@@ -30,7 +30,6 @@ public class AssertionGroupImporter {
 	private String[] ignoredGroupNames;
 
 	enum AssertionGroupName {
-		DELTA_FILE_REQUIRED ("DELTA_FILE_REQUIRED", "delta-file-required"),
 		FILE_CENTRIC_VALIDATION ("COMMON", "file-centric-validation"),
 		COMPONENT_CENTRIC_VALIDATION ("COMMON", "component-centric-validation"),
 		RELEASE_TYPE_VALIDATION ("COMMON", "release-type-validation"),
@@ -353,7 +352,6 @@ public class AssertionGroupImporter {
 	 * file-centric-validation
 	 * release-type-validation
 	 * component-centric-validation
-	 * delta-file-required
 	 * SpanishEdition
 	 * InternationalEdition
 	 * SnapshotContentValidation
@@ -388,7 +386,6 @@ public class AssertionGroupImporter {
 				createAssertionGroupByKeyWord(allAssertions, groupName.getName());
 				break;
 			case MDRS_VALIDATION :
-			case DELTA_FILE_REQUIRED:
 				createAssertionGroup(getReleaseAssertionsByCenter(allAssertions, groupName.getName()), groupName.getName());
 				break;
 			case LOINC_EDITION :
