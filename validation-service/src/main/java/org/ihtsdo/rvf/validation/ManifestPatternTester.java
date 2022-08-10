@@ -102,11 +102,11 @@ public class ManifestPatternTester {
 					.collect(Collectors.toList());
 			for (String filename : missingFilesInFullFolder) {
 				validationLog.assertionError("Invalid file expected file {} in Snapshot folder but not found in Full folder", filename);
-				report.addError(SNAPSHOT + "-" + filename, startTime, filename, filename, filename, MANIFEST_STRUCTURE_TEST, "", "No File Found in Full folder", filename, null);
+				report.addError("0-0", startTime, filename, filename, filename, MANIFEST_STRUCTURE_TEST, "", "No File Found in Full folder", filename, null);
 			}
 			for (String filename : missingFilesInSnapshotFolder) {
 				validationLog.assertionError("Invalid file expected file {} in Full folder but not found in Snapshot folder", filename);
-				report.addError(FULL + "-" + filename, startTime, filename, filename, filename, MANIFEST_STRUCTURE_TEST, "", "No File Found in Snapshot folder", filename, null);
+				report.addError("0-0", startTime, filename, filename, filename, MANIFEST_STRUCTURE_TEST, "", "No File Found in Snapshot folder", filename, null);
 			}
 		}
 	}
