@@ -15,10 +15,7 @@ import org.ihtsdo.rvf.execution.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.execution.service.whitelist.WhitelistItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.snomed.quality.validator.mrcm.Assertion;
-import org.snomed.quality.validator.mrcm.ContentType;
-import org.snomed.quality.validator.mrcm.ValidationRun;
-import org.snomed.quality.validator.mrcm.ValidationService;
+import org.snomed.quality.validator.mrcm.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -196,7 +193,7 @@ public class MRCMValidationService {
 	private void extractTestResults(int maxFailureExports, ValidationReport report, ValidationRun validationRun, ContentType contentType) {
 		TestRunItem testRunItem;
 		final List<TestRunItem> passedAssertions = new ArrayList<>();
-		for (Assertion assertion : validationRun.getCompletedAssertions()) {
+		for (Assertion assertion : validationRun.getPassedAssertions()) {
 			testRunItem = createTestRunItem(assertion, contentType);
 			passedAssertions.add(testRunItem);
 		}
@@ -241,15 +238,34 @@ public class MRCMValidationService {
 
 	private TestRunItem createTestRunItemWithFailures(Assertion mrcmAssertion, ContentType contentType, int failureExportMax) {
 		int failureCount = mrcmAssertion.getCurrentViolatedConceptIds().size();
-		if (failureCount == 0) return null;
+		if (failureCount == 0) {
+			failureCount = mrcmAssertion.getCurrentViolatedReferenceSetMembers().size();
+			if (failureCount == 0) {
+				return null;
+			}
+		}
 		int firstNCount = Math.min(failureCount, failureExportMax);
+
 		TestRunItem testRunItem = createTestRunItem(mrcmAssertion, contentType);
 		testRunItem.setFailureCount((long) failureCount);
 		List<FailureDetail> failedDetails = new ArrayList(firstNCount);
-		for (int i = 0; i < firstNCount; i++) {
-			ConceptResult concept = mrcmAssertion.getCurrentViolatedConcepts().get(i);
-			failedDetails.add(new FailureDetail(concept.getId(), mrcmAssertion.getDetails(), concept.getFsn()));
+		if (LateralizableRefsetValidationService.ASSERTION_ID_MEMBERS_NEED_TO_BE_REMOVED_FROM_LATERALIZABLE_REFSET.equals(mrcmAssertion.getUuid().toString())) {
+			for (int i = 0; i < firstNCount; i++) {
+				String refsetMemberId = mrcmAssertion.getCurrentViolatedReferenceSetMembers().get(i);
+				failedDetails.add(new FailureDetail(null, String.format(mrcmAssertion.getDetails(), refsetMemberId), null));
+			}
+		} else if (LateralizableRefsetValidationService.ASSERTION_ID_CONCEPTS_NEED_TO_BE_ADDED_TO_LATERALIZABLE_REFSET.equals(mrcmAssertion.getUuid().toString())) {
+			for (int i = 0; i < firstNCount; i++) {
+				Long conceptId = mrcmAssertion.getCurrentViolatedConceptIds().get(i);
+				failedDetails.add(new FailureDetail(conceptId.toString(), String.format(mrcmAssertion.getDetails(), conceptId.toString()), null));
+			}
+		} else {
+			for (int i = 0; i < firstNCount; i++) {
+				ConceptResult concept = mrcmAssertion.getCurrentViolatedConcepts().get(i);
+				failedDetails.add(new FailureDetail(concept.getId(), mrcmAssertion.getDetails(), concept.getFsn()));
+			}
 		}
+
 		testRunItem.setFirstNInstances(failedDetails);
 		return testRunItem;
 	}
