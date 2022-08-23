@@ -121,7 +121,7 @@ public class TraceabilityComparisonService {
 			final Map<String, String> memberIdToRefsetIdMap = new HashMap<>();
 			final Map<ComponentType, Set<String>> rf2Changes = gatherRF2ComponentChanges(validationConfig, rf2ComponentIdToConceptIdMap, memberIdToRefsetIdMap);
 
-			ChangeSummaryReport summaryReport = getTraceabilityChangeSummaryReport(branchPath);
+			ChangeSummaryReport summaryReport = getTraceabilityChangeSummaryReport(branchPath, validationConfig.getContentHeadTimestamp());
 			Map<ComponentType, Set<String>> traceabilityChanges = Collections.emptyMap();
 			Map<String, String> traceabilityComponentIdToConceptIdMap = Collections.emptyMap();
 			if (summaryReport != null && summaryReport.getComponentChanges() != null) {
@@ -369,9 +369,9 @@ public class TraceabilityComparisonService {
 		return rf2Changes;
 	}
 
-	private ChangeSummaryReport getTraceabilityChangeSummaryReport(String branchPath) {
+	private ChangeSummaryReport getTraceabilityChangeSummaryReport(String branchPath, Long contentHeadTimestamp) {
 		logger.info("Fetching diff from traceability service..");
-		final String uri = UriComponentsBuilder.fromPath("/change-summary").queryParam("branch", branchPath).toUriString();
+		final String uri = UriComponentsBuilder.fromPath("/change-summary").queryParam("branch", branchPath).queryParam("contentHeadTimestamp", contentHeadTimestamp).toUriString();
 		final ResponseEntity<ChangeSummaryReport> response =
 				traceabilityServiceRestTemplate.exchange(uri, HttpMethod.GET, null, CHANGE_SUMMARY_REPORT_TYPE_REFERENCE);
 		return response.getBody();
