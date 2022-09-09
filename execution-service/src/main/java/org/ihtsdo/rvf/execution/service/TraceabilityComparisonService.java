@@ -188,30 +188,32 @@ public class TraceabilityComparisonService {
 			}
 
 			// Changes not at task level
-			final TestRunItem changesNotAtTaskLevel = new TestRunItem();
-			changesNotAtTaskLevel.setTestType(TestType.TRACEABILITY);
-			changesNotAtTaskLevel.setAssertionUuid(UUID.fromString(ASSERTION_ID_ALL_COMPONENTS_CHANGES_NOT_AT_TASK_LEVEL));
-			changesNotAtTaskLevel.setAssertionText(ASSERTION_ID_ALL_COMPONENTS_CHANGES_NOT_AT_TASK_LEVEL_TEXT);
-			changesNotAtTaskLevel.setFailureCount(0L);// Initial value
-			remainingFailureExport = new AtomicInteger(validationConfig.getFailureExportMax());
+			if (validationConfig.isEnableChangeNotAtTaskLevelValidation()) {
+				final TestRunItem changesNotAtTaskLevel = new TestRunItem();
+				changesNotAtTaskLevel.setTestType(TestType.TRACEABILITY);
+				changesNotAtTaskLevel.setAssertionUuid(UUID.fromString(ASSERTION_ID_ALL_COMPONENTS_CHANGES_NOT_AT_TASK_LEVEL));
+				changesNotAtTaskLevel.setAssertionText(ASSERTION_ID_ALL_COMPONENTS_CHANGES_NOT_AT_TASK_LEVEL_TEXT);
+				changesNotAtTaskLevel.setFailureCount(0L);// Initial value
+				remainingFailureExport = new AtomicInteger(validationConfig.getFailureExportMax());
 
-			if (summaryReport.getChangesNotAtTaskLevel() != null) {
-				List<WhitelistItem> invalidContents = checkWhitelistItems(ASSERTION_ID_ALL_COMPONENTS_CHANGES_NOT_AT_TASK_LEVEL, summaryReport.getChangesNotAtTaskLevel(), memberIdToRefsetIdMap);
-				for(WhitelistItem item : invalidContents) {
-					if (remainingFailureExport.get() > 0) {
-						remainingFailureExport.decrementAndGet();
-						changesNotAtTaskLevel.addFirstNInstance(new FailureDetail(item.getConceptId(), String.format("Component change for %s has been made on a branch that was not task level.", item.getComponentId()))
-								.setComponentId(item.getComponentId())
-								.setFullComponent(item.getAdditionalFields()));
+				if (summaryReport.getChangesNotAtTaskLevel() != null) {
+					List<WhitelistItem> invalidContents = checkWhitelistItems(ASSERTION_ID_ALL_COMPONENTS_CHANGES_NOT_AT_TASK_LEVEL, summaryReport.getChangesNotAtTaskLevel(), memberIdToRefsetIdMap);
+					for(WhitelistItem item : invalidContents) {
+						if (remainingFailureExport.get() > 0) {
+							remainingFailureExport.decrementAndGet();
+							changesNotAtTaskLevel.addFirstNInstance(new FailureDetail(item.getConceptId(), String.format("Component change for %s has been made on a branch that was not task level.", item.getComponentId()))
+									.setComponentId(item.getComponentId())
+									.setFullComponent(item.getAdditionalFields()));
+						}
 					}
+					changesNotAtTaskLevel.setFailureCount(Long.valueOf(invalidContents.size()));
 				}
-				changesNotAtTaskLevel.setFailureCount(Long.valueOf(invalidContents.size()));
-			}
 
-			if (changesNotAtTaskLevel.getFirstNInstances().isEmpty()) {
-				report.getResultReport().addPassedAssertions(Collections.singletonList(changesNotAtTaskLevel));
-			} else {
-				report.getResultReport().addWarningAssertions(Collections.singletonList(changesNotAtTaskLevel));
+				if (changesNotAtTaskLevel.getFirstNInstances().isEmpty()) {
+					report.getResultReport().addPassedAssertions(Collections.singletonList(changesNotAtTaskLevel));
+				} else {
+					report.getResultReport().addWarningAssertions(Collections.singletonList(changesNotAtTaskLevel));
+				}
 			}
 		} catch (IOException | ReleaseImportException | RestClientException e) {
 			String message = "Traceability validation failed";

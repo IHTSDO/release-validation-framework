@@ -36,6 +36,7 @@ public class ValidationRunConfig {
 	private String bucketName;
 	private boolean enableMRCMValidation;
 	private boolean enableTraceabilityValidation;
+	private boolean enableChangeNotAtTaskLevelValidation;
 	private String branchPath;
 	private String excludedRefsetDescriptorMembers;
 	private String responseQueue;
@@ -170,6 +171,7 @@ public class ValidationRunConfig {
 				.add("bucketName='" + bucketName + "'")
 				.add("enableMRCMValidation=" + enableMRCMValidation)
 				.add("enableTraceabilityValidation=" + enableTraceabilityValidation)
+				.add("enableChangeNotAtTaskLevelValidation=" + enableChangeNotAtTaskLevelValidation)
 				.add("branchPath='" + branchPath + "'")
 				.add("excludedRefsetDescriptorMembers='" + excludedRefsetDescriptorMembers + "'")
 				.add("responseQueue='" + responseQueue + "'")
@@ -380,6 +382,15 @@ public class ValidationRunConfig {
 
 	public ValidationRunConfig setEnableTraceabilityValidation(boolean enableTraceabilityValidation) {
 		this.enableTraceabilityValidation = enableTraceabilityValidation;
+		return this;
+	}
+
+	public boolean isEnableChangeNotAtTaskLevelValidation() {
+		return enableChangeNotAtTaskLevelValidation;
+	}
+
+	public ValidationRunConfig setEnableChangeNotAtTaskLevelValidation(boolean enableChangeNotAtTaskLevelValidation) {
+		this.enableChangeNotAtTaskLevelValidation = enableChangeNotAtTaskLevelValidation;
 		return this;
 	}
 

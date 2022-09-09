@@ -42,6 +42,7 @@ public class TestUploadFileController {
 	private static final String ENABLE_MRCM_VALIDATION = "enableMRCMValidation";
 
 	private static final String ENABLE_TRACEABILITY_VALIDATION = "enableTraceabilityValidation";
+	private static final String ENABLE_CHANGE_NOT_AT_TASK_LEVEL_VALIDATION = "enableChangeNotAtTaskLevelValidation";
 
 	private static final String INCLUDED_MODULES = "includedModules";
 
@@ -194,6 +195,7 @@ public class TestUploadFileController {
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
+			@ApiParam(value = "Enable change not at task level validation. This parameter needs to be combined together with enableTraceabilityValidation.", defaultValue = "false") @RequestParam(value = ENABLE_CHANGE_NOT_AT_TASK_LEVEL_VALIDATION, required = false) final boolean enableChangeNotAtTaskLevelValidation,
 			@ApiParam(value = "Terminology Server content branch path, used for traceability check.") @RequestParam(value = BRANCH_PATH, required = false) final String branchPath,
 			@ApiParam(value = "Refset Descriptor members are being excluded, used for traceability check.") @RequestParam(value = EXCLUDED_REFSET_DESCRIPTOR_MEMBERS, required = false) final String excludedRefsetDescriptorMembers,
 			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
@@ -221,6 +223,7 @@ public class TestUploadFileController {
 				.addUrl(urlPrefix)
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setEnableTraceabilityValidation(enableTraceabilityValidation)
+				.setEnableChangeNotAtTaskLevelValidation(enableChangeNotAtTaskLevelValidation)
 				.setBranchPath(branchPath)
 				.setExcludedRefsetDescriptorMembers(excludedRefsetDescriptorMembers)
 				.setContentHeadTimestamp(contentHeadTimestamp)
@@ -271,6 +274,7 @@ public class TestUploadFileController {
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
+			@ApiParam(value = "Enable change not at task level validation. This parameter needs to be combined together with enableTraceabilityValidation.", defaultValue = "false") @RequestParam(value = ENABLE_CHANGE_NOT_AT_TASK_LEVEL_VALIDATION, required = false) final boolean enableChangeNotAtTaskLevelValidation,
 			@ApiParam(value = "Terminology Server content branch path, used for traceability validation.") @RequestParam(value = BRANCH_PATH, required = false) final String branchPath,
 			@ApiParam(value = "Refset Descriptor members are being excluded, used for traceability check.") @RequestParam(value = EXCLUDED_REFSET_DESCRIPTOR_MEMBERS, required = false) final String excludedRefsetDescriptorMembers,
 			@ApiParam(value = "Name of the response queue.") @RequestParam(value = RESPONSE_QUEUE, required = false) final String responseQueue,
@@ -300,6 +304,7 @@ public class TestUploadFileController {
 				.setIncludedModules(includedModules)
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setEnableTraceabilityValidation(enableTraceabilityValidation)
+				.setEnableChangeNotAtTaskLevelValidation(enableChangeNotAtTaskLevelValidation)
 				.setBranchPath(branchPath)
 				.setExcludedRefsetDescriptorMembers(excludedRefsetDescriptorMembers)
 				.setContentHeadTimestamp(contentHeadTimestamp)
