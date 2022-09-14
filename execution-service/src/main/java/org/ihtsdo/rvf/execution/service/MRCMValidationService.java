@@ -187,6 +187,7 @@ public class MRCMValidationService {
 		validationRun.setAttributeRangesMap(validationRunner.getAttributeRangesMap());
 		validationRun.setUngroupedAttributes(validationRunner.getUngroupedAttributes());
 		validationRun.setConceptsUsedInMRCMTemplates(validationRunner.getConceptsUsedInMRCMTemplates());
+		validationRun.setLateralizableRefsetMembers(validationRunner.getLateralizableRefsetMembers());
 		return validationRun;
 	}
 
