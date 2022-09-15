@@ -240,8 +240,12 @@ public class MRCMValidationService {
 	private TestRunItem createTestRunItemWithFailures(Assertion mrcmAssertion, ContentType contentType, int failureExportMax) {
 		int failureCount = mrcmAssertion.getCurrentViolatedConceptIds().size();
 		if (failureCount == 0) {
-			failureCount = mrcmAssertion.getCurrentViolatedReferenceSetMembers().size();
-			if (failureCount == 0) {
+			if (mrcmAssertion.getCurrentViolatedReferenceSetMembers() != null) {
+				failureCount = mrcmAssertion.getCurrentViolatedReferenceSetMembers().size();
+				if (failureCount == 0) {
+					return null;
+				}
+			} else {
 				return null;
 			}
 		}
