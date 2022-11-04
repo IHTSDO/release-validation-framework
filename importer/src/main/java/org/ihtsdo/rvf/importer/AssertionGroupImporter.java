@@ -2,7 +2,6 @@ package org.ihtsdo.rvf.importer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,6 +79,14 @@ public class AssertionGroupImporter {
 		}
 		public String getReleaseCenter() {
 			return this.releaseCenter;
+		}
+
+		public static AssertionGroupName fromName(String name) {
+			if (name == null) {
+				throw new IllegalArgumentException("'name' cannot be null.");
+			}
+
+			return Arrays.stream(AssertionGroupName.values()).filter(type -> type.getName().equals(name)).findFirst().orElse(null);
 		}
 
 	}
@@ -356,33 +363,46 @@ public class AssertionGroupImporter {
 	public void importAssertionGroups() {
 		List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
 		List<String> existingGroups = new ArrayList<>();
+		// remove all assertions from existing group
 		if (allGroups != null) {
 			for (AssertionGroup group : allGroups) {
 				LOGGER.info("Validation group is already created:" + group.getName());
+
+				group.removeAllAssertionsFromGroup();
 				existingGroups.add(group.getName());
 			}
 		}
-		List<Assertion> allAssertions = assertionService.findAll();
-		for ( AssertionGroupName groupName : AssertionGroupName.values()) {
+
+		// create new assertion group if any
+		List<String> allGroupNames = new ArrayList<>();
+		for (AssertionGroupName groupName : AssertionGroupName.values()) {
+			allGroupNames.add(groupName.getName());
 			if (!existingGroups.contains(groupName.getName())) {
 				LOGGER.info("creating assertion group:" + groupName.getName());
-				createAssertionGroup(groupName, allAssertions);
-				LOGGER.info("assertion group created:" + groupName.getName());
+				AssertionGroup group = new AssertionGroup();
+				group.setName(groupName.getName());
+				allGroups.add(assertionService.createAssertionGroup(group));
 			}
+		}
+
+		// add assertions to assertion group
+		List<Assertion> allAssertions = assertionService.findAll();
+		allGroups = allGroups.stream().filter(assertionGroup -> allGroupNames.contains(assertionGroup.getName())).collect(Collectors.toList());
+		for (AssertionGroup group : allGroups) {
+			addAssertionsToAssertionGroup(group, allAssertions);
 		}
 	}
 
-
-	private void createAssertionGroup(AssertionGroupName groupName, List<Assertion> allAssertions) {
-
+	private void addAssertionsToAssertionGroup(AssertionGroup assertionGroup, List<Assertion> allAssertions) {
+		AssertionGroupName groupName = AssertionGroupName.fromName(assertionGroup.getName());
 		switch (groupName) {
 			case FILE_CENTRIC_VALIDATION :
 			case RELEASE_TYPE_VALIDATION :
 			case COMPONENT_CENTRIC_VALIDATION :
-				createAssertionGroupByKeyWord(allAssertions, groupName.getName());
+				addAssertionsByKeyWord(allAssertions, assertionGroup);
 				break;
 			case MDRS_VALIDATION :
-				createAssertionGroup(getReleaseAssertionsByCenter(allAssertions, groupName.getName()), groupName.getName());
+				addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
 				break;
 			case LOINC_EDITION :
 			case SPANISH_EDITION :
@@ -400,13 +420,13 @@ public class AssertionGroupImporter {
 			case AT_EDITION :
 			case GPFP_ICPC2 :
 			case DERIVATIVE_EDITION :
-				createReleaseAssertionGroup(allAssertions, groupName);
+				addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
 				break;
 			case COMMON_AUTHORING :
-				createCommonSnapshotAssertionGroup(allAssertions);
+				addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
 				break;
 			case COMMON_AUTHORING_WITHOUT_LANG_REFSETS :
-				createCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions);
+				addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions, assertionGroup);
 				break;
 			case INT_AUTHORING :
 			case AT_AUTHORING :
@@ -422,29 +442,27 @@ public class AssertionGroupImporter {
 			case EE_AUTHORING :
             case KR_AUTHORING :
 			case NL_AUTHORING :
-				createSnapshotAssertionGroup(groupName);
+				addAssertionToSnapshotAssertionGroup(assertionGroup);
 				break;
 			case FIRST_TIME_LOINC_VALIDATION :
 			case FIRST_TIME_COMMON_EDITION_VALIDATION :
-				createFirstTimeReleaseGroup(allAssertions, groupName);
+				addAssertionsToFirstTimeReleaseGroup(allAssertions, assertionGroup);
 				break;
 			case STATED_RELATIONSHIPS_VALIDATION:
-				createStatedRelationshipGroup(allAssertions, groupName, false);
+				addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, false);
 				break;
 			case STATED_RELATIONSHIPS_RELEASE_VALIDATION:
-				createStatedRelationshipGroup(allAssertions, groupName, true);
+				addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, true);
 				break;
 			default :
-					 LOGGER.warn("unrecognized group: " + groupName.getName());
+					 LOGGER.warn("unrecognized group: " + assertionGroup.getName());
 			  break;
 		}
 
 	}
 
-	private void createFirstTimeReleaseGroup(List<Assertion> allAssertions, AssertionGroupName groupName) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(groupName.getName());
-		group = assertionService.createAssertionGroup(group);
+	private void addAssertionsToFirstTimeReleaseGroup(List<Assertion> allAssertions, AssertionGroup group) {
+		AssertionGroupName groupName = AssertionGroupName.fromName(group.getName());
 		int counter = 0;
 		String keyWords;
 		for (Assertion assertion : allAssertions) {
@@ -473,10 +491,7 @@ public class AssertionGroupImporter {
 		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
 	}
 
-	private void createCommonSnapshotAssertionGroup(List<Assertion> allAssertions) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(AssertionGroupName.COMMON_AUTHORING.getName());
-		group = assertionService.createAssertionGroup(group);
+	private void addAssertionToCommonSnapshotAssertionGroup(List<Assertion> allAssertions, AssertionGroup group) {
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
 			String keyWords = assertion.getKeywords();
@@ -503,10 +518,7 @@ public class AssertionGroupImporter {
 		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
 	}
 
-	private void createCommonSnapshotWithoutLangRefsetsAssertionGroup(List<Assertion> allAssertions) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(AssertionGroupName.COMMON_AUTHORING_WITHOUT_LANG_REFSETS.getName());
-		group = assertionService.createAssertionGroup(group);
+	private void addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(List<Assertion> allAssertions, AssertionGroup group) {
 		int counter = 0;
 		for (Assertion assertion : allAssertions) {
 			String keyWords = assertion.getKeywords();
@@ -538,10 +550,8 @@ public class AssertionGroupImporter {
 	}
 
 
-	private void createSnapshotAssertionGroup(AssertionGroupName groupName) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(groupName.getName());
-		group = assertionService.createAssertionGroup(group);
+	private void addAssertionToSnapshotAssertionGroup(AssertionGroup group) {
+		AssertionGroupName groupName = AssertionGroupName.fromName(group.getName());
 		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWords("," + groupName.getReleaseCenter(), false);
 		List<Assertion> releaseTypeAssertions = assertionService.getAssertionsByKeyWords(RELEASE_TYPE_VALIDATION.getName(), false);
 		if (INT_AUTHORING.equals(groupName)) {
@@ -609,11 +619,9 @@ public class AssertionGroupImporter {
 		return result;
 	}
 
-	private void createReleaseAssertionGroup(List<Assertion> allAssertions, AssertionGroupName groupName) {
+	private void addAssertionsToReleaseAssertionGroup(List<Assertion> allAssertions, AssertionGroup assertionGroup) {
 		//create international assertion group
-		AssertionGroup assertionGroup = new AssertionGroup();
-		assertionGroup.setName(groupName.getName());
-		assertionGroup = assertionService.createAssertionGroup(assertionGroup);
+		AssertionGroupName groupName = AssertionGroupName.fromName(assertionGroup.getName());
 		List<Assertion> assertionsToBeAdded = getCommonReleaseAssertions(allAssertions);
 		assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()));
 		if (!AssertionGroupName.COMMON_EDITION.equals(groupName) && !AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && !AssertionGroupName.US_EDITION.equals(groupName)) {
@@ -646,33 +654,24 @@ public class AssertionGroupImporter {
 		LOGGER.info("Total assertions added {} for assertion group {}", assertionsToBeAdded.size(), groupName.getName() );
 	}
 
-	private void createAssertionGroupByKeyWord(List<Assertion> allAssertions, String assertionGroupName) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(assertionGroupName);
-		group = assertionService.createAssertionGroup(group);
+	private void addAssertionsByKeyWord(List<Assertion> allAssertions, AssertionGroup group) {
 		for (Assertion assertion : allAssertions) {
-			if (assertion.getKeywords().equals(assertionGroupName)) {
+			if (assertion.getKeywords().equals(group.getName())) {
 				assertionService.addAssertionToGroup(assertion, group);
 			}
 		}
 	}
 
-	private void createAssertionGroup(List<Assertion> allAssertions, String assertionGroupName) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(assertionGroupName);
-		group = assertionService.createAssertionGroup(group);
+	private void addAllAssertions(List<Assertion> allAssertions, AssertionGroup group) {
 		int addedAssertions = 0;
 		for (Assertion assertion : allAssertions) {
 				assertionService.addAssertionToGroup(assertion, group);
 				addedAssertions++;
 		}
-		LOGGER.info("Total assertions added {} for assertion group {}", addedAssertions, assertionGroupName );
+		LOGGER.info("Total assertions added {} for assertion group {}", addedAssertions, group.getName());
 	}
 
-	private void createStatedRelationshipGroup(List<Assertion> allAssertions, AssertionGroupName assertionGroupName, boolean useFullList) {
-		AssertionGroup group = new AssertionGroup();
-		group.setName(assertionGroupName.getName());
-		group = assertionService.createAssertionGroup(group);
+	private void addAssertionsToStatedRelationshipAssertionGroup(List<Assertion> allAssertions, AssertionGroup group, boolean useFullList) {
 		List<String> statedRelationshipAssertionIds = Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS);
 		int statedRelationshipAssertionCount = statedRelationshipAssertionIds.size();
 		int count = 0;
