@@ -71,6 +71,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 			return false;
 		}
 
+		public List<Assertion> getAssertionsFromFile(final InputStream manifestInputStream) {
+			final Document xmlDocument = getJDomDocumentFromFile(manifestInputStream);
+			List<Assertion> assertions = new ArrayList<>();
+			if(xmlDocument != null)
+			{
+				final XPathFactory factory = XPathFactory.instance();
+				final XPathExpression expression = factory.compile("//script");
+				final List<Element> scriptElements = expression.evaluate(xmlDocument);
+				if(scriptElements.size() > 0) {
+					// get various values from script element
+					for (final Element element : scriptElements) {
+						assertions.add(createAssertionFromElement(element));
+
+					}
+				}
+			}
+			return assertions;
+		}
+
 		public void importAssertionsFromFile(final InputStream manifestInputStream, final String sqlResourcesFolderLocation){
 			// get JDOM document from given manifest file
 			final Document xmlDocument = getJDomDocumentFromFile(manifestInputStream);
