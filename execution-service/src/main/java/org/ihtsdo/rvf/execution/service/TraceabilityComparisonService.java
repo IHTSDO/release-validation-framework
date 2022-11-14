@@ -2,12 +2,10 @@ package org.ihtsdo.rvf.execution.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.search.Collector;
-import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.otf.rest.client.RestClientException;
+import org.ihtsdo.otf.rest.client.ims.IMSRestClient;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.otf.snomedboot.factory.ComponentFactory;
@@ -23,17 +21,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
@@ -41,7 +36,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class TraceabilityComparisonService {
-
 	public static final String ASSERTION_ID_ALL_COMPONENTS_IN_TRACEABILITY_ALSO_IN_DELTA = "f68c761b-3b5c-4223-bc00-6e181e7f68c3";
 	public static final String ASSERTION_ID_ALL_COMPONENTS_IN_DELTA_ALSO_IN_TRACEABILITY = "b7f727d7-9226-4eef-9a7e-47a8580f6e7a";
 	public static final String ASSERTION_ID_ALL_COMPONENTS_CHANGES_NOT_AT_TASK_LEVEL = "53023a88-ee32-4517-ae4e-9259eef740c6";
@@ -84,26 +78,23 @@ public class TraceabilityComparisonService {
 	@Autowired
 	private WhitelistService whitelistService;
 
+	@Autowired
+	private TraceabilityServiceClientFactory traceabilityServiceClientFactory;
+
+	private String traceabilityServiceUrl;
+
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-
-	private final RestTemplate traceabilityServiceRestTemplate;
-
-	private static final ParameterizedTypeReference<ChangeSummaryReport> CHANGE_SUMMARY_REPORT_TYPE_REFERENCE = new ParameterizedTypeReference<>() {};
-
-	public TraceabilityComparisonService(@Value("${traceability-service.url}") String traceabilityServiceUrl) {
-		if (!Strings.isNullOrEmpty(traceabilityServiceUrl)) {
-			traceabilityServiceRestTemplate = new RestTemplateBuilder().rootUri(traceabilityServiceUrl).build();
-		} else {
-			traceabilityServiceRestTemplate = null;
-		}
-	}
 
 	public List<Assertion> getAssertions() {
 		return assertions;
 	}
 
+	public TraceabilityComparisonService(@Value("${traceability-service.url}") String traceabilityServiceUrl) {
+		this.traceabilityServiceUrl = traceabilityServiceUrl;
+	}
+
 	public void runTraceabilityComparison(ValidationStatusReport report, ValidationRunConfig validationConfig) {
-		if (traceabilityServiceRestTemplate == null) {
+		if (Strings.isNullOrEmpty(traceabilityServiceUrl)) {
 			final String message = "Traceability test requested but service URL not configured.";
 			logger.warn(message);
 			report.addFailureMessage(message);
@@ -120,8 +111,7 @@ public class TraceabilityComparisonService {
 			final Map<String, String> rf2ComponentIdToConceptIdMap = new HashMap<>();
 			final Map<String, String> memberIdToRefsetIdMap = new HashMap<>();
 			final Map<ComponentType, Set<String>> rf2Changes = gatherRF2ComponentChanges(validationConfig, rf2ComponentIdToConceptIdMap, memberIdToRefsetIdMap);
-
-			ChangeSummaryReport summaryReport = getTraceabilityChangeSummaryReport(branchPath, validationConfig.getContentHeadTimestamp());
+			ChangeSummaryReport summaryReport = traceabilityServiceClientFactory.getClient().getTraceabilityChangeSummaryReport(branchPath, validationConfig.getContentHeadTimestamp());
 			Map<ComponentType, Set<String>> traceabilityChanges = Collections.emptyMap();
 			Map<String, String> traceabilityComponentIdToConceptIdMap = Collections.emptyMap();
 			if (summaryReport != null && summaryReport.getComponentChanges() != null) {
@@ -206,7 +196,7 @@ public class TraceabilityComparisonService {
 									.setFullComponent(item.getAdditionalFields()));
 						}
 					}
-					changesNotAtTaskLevel.setFailureCount(Long.valueOf(invalidContents.size()));
+					changesNotAtTaskLevel.setFailureCount((long) invalidContents.size());
 				}
 
 				if (changesNotAtTaskLevel.getFirstNInstances().isEmpty()) {
@@ -259,7 +249,7 @@ public class TraceabilityComparisonService {
 	}
 
 	private void diffAndAddFailures(ComponentType componentType, String message, Map<ComponentType, Set<String>> leftSide, Map<ComponentType, Set<String>> rightSide,
-			AtomicInteger remainingFailureExport, TestRunItem report, Map<String, String> componentToConceptIdMap) {
+									AtomicInteger remainingFailureExport, TestRunItem report, Map<String, String> componentToConceptIdMap) {
 
 		final Sets.SetView<String> missing = Sets.difference(leftSide.getOrDefault(componentType, Collections.emptySet()), rightSide.getOrDefault(componentType, Collections.emptySet()));
 		for (String inLeftNotRight : missing) {
@@ -369,14 +359,6 @@ public class TraceabilityComparisonService {
 		rf2Changes.put(ComponentType.RELATIONSHIP, relationships);
 		rf2Changes.put(ComponentType.REFERENCE_SET_MEMBER, refsetMembers);
 		return rf2Changes;
-	}
-
-	private ChangeSummaryReport getTraceabilityChangeSummaryReport(String branchPath, Long contentHeadTimestamp) {
-		logger.info("Fetching diff from traceability service..");
-		final String uri = UriComponentsBuilder.fromPath("/change-summary").queryParam("branch", branchPath).queryParam("contentHeadTimestamp", contentHeadTimestamp).toUriString();
-		final ResponseEntity<ChangeSummaryReport> response =
-				traceabilityServiceRestTemplate.exchange(uri, HttpMethod.GET, null, CHANGE_SUMMARY_REPORT_TYPE_REFERENCE);
-		return response.getBody();
 	}
 
 	private boolean inDelta(String effectiveTime, String releaseEffectiveTime) {

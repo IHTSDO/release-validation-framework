@@ -80,7 +80,7 @@ public class DroolsRulesValidationService {
 			Collection<File> droolsRulesSubfiles = FileUtils.listFiles(droolsRuleDir, new String[] {"drl"}, true);
 			for (File droolsRulesSubfile : droolsRulesSubfiles) {
 				if(!droolsRulesSubfile.isDirectory()) {
-					try (final BufferedReader reader = Files.newBufferedReader(droolsRulesSubfile.toPath());) {
+					try (final BufferedReader reader = Files.newBufferedReader(droolsRulesSubfile.toPath())) {
 						String line;
 						Assertion assertion = null;
 						boolean severityWarning = false;
@@ -140,7 +140,7 @@ public class DroolsRulesValidationService {
 		return assertions;
 	}
 
-	public ValidationStatusReport runDroolsAssertions(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws RVFExecutionException {
+	public ValidationStatusReport runDroolsAssertions(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) {
 		Set<String> extractedRF2FilesDirectories = new HashSet<>();
 		Set<String> previousReleaseDirectories = new HashSet<>();
 		try {
@@ -155,7 +155,7 @@ public class DroolsRulesValidationService {
 				statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),"No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
 				return statusReport;
 			}
-			List<InvalidContent> invalidContents = null;
+			List<InvalidContent> invalidContents;
 			try {
 				Set<InputStream> snapshotsInputStream = new HashSet<>();
 				InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile());
@@ -174,8 +174,8 @@ public class DroolsRulesValidationService {
 					snapshotsInputStream.add(testedReleaseFileStream);
 				}
 
-				//Load the dependency package from S3 to snapshot files list before validating if the package is a MS extension and not an edition release
-				//If the package is an MS edition, it is not necessary to load the dependency
+				// Load the dependency package from S3 to snapshot files list before validating if the package is an MS extension and not an edition release
+				// If the package is an MS edition, it is not necessary to load the dependency
 				Set<String> modulesSet = null;
 				if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
 					if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
@@ -219,7 +219,7 @@ public class DroolsRulesValidationService {
 								.collect(Collectors.toList());
 
 						// Send to Authoring acceptance gateway
-						LOGGER.info("Checking %s whitelist items in batch", whitelistItems.size());
+						LOGGER.info("Checking {} whitelist items in batch", whitelistItems.size());
 						List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
 
 						// Find the failures which are not in the whitelisted item
@@ -333,11 +333,15 @@ public class DroolsRulesValidationService {
 			throw new RVFExecutionException("Drools rules directory path " + droolsRuleDirectoryPath + " is not a directory or inaccessible");
 		}
 		Set<String> droolsRulesModules = new HashSet<>();
-		File[] droolsRulesSubfiles = droolsRuleDir.listFiles();
-		for (File droolsRulesSubfile : droolsRulesSubfiles) {
-			if(droolsRulesSubfile.isDirectory()) droolsRulesModules.add(droolsRulesSubfile.getName());
+		File[] droolsRuleFiles = droolsRuleDir.listFiles();
+		if (droolsRuleFiles != null) {
+			for (File ruleFile : droolsRuleFiles) {
+				if (ruleFile.isDirectory()) {
+					droolsRulesModules.add(ruleFile.getName());
+				}
+			}
 		}
-		//Only keep the assertion groups with matching Drools Rule modules in the Drools Directory
+		// Only keep the assertion groups with matching Drools Rule modules in the Drools Directory
 		droolsRulesModules.retainAll(assertionGroups);
 		return droolsRulesModules;
 	}
