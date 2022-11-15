@@ -62,6 +62,9 @@ public class ValidationReportService {
 	}
 	
 	public void writeResults(ValidationStatusReport statusReport, State state, String storageLocation) throws BusinessServiceException {
+		// Ignore token and user name to be persisted to S3
+		statusReport.getValidationConfig().setAuthenticationToken(null);
+		statusReport.getValidationConfig().setUsername(null);
 		File temp = null;
 		try {
 			temp = File.createTempFile("resultJson", ".tmp");

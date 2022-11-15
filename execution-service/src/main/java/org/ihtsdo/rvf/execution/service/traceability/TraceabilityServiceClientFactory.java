@@ -37,11 +37,9 @@ public class TraceabilityServiceClientFactory {
         }
         if (client == null) {
             synchronized (clientCache) {
-                client = clientCache.getIfPresent(authenticationToken);
-                if (client == null) {
-                    client = TraceabilityServiceClient.createClient(traceabilityServiceUrl, imsUrl, username, password);
-                    clientCache.put(authenticationToken, client);
-                }
+                client = TraceabilityServiceClient.createClient(traceabilityServiceUrl, imsUrl, username, password);
+                authenticationToken = SecurityUtil.getAuthenticationToken();
+                clientCache.put(authenticationToken, client);
             }
         }
         return client;
