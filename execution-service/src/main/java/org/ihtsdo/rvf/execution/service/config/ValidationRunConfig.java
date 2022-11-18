@@ -41,6 +41,8 @@ public class ValidationRunConfig {
 	private String excludedRefsetDescriptorMembers;
 	private String responseQueue;
 	private Long contentHeadTimestamp;
+
+	private Long contentBaseTimestamp;
 	private String username;
 	private String authenticationToken;
 
@@ -176,6 +178,7 @@ public class ValidationRunConfig {
 				.add("excludedRefsetDescriptorMembers='" + excludedRefsetDescriptorMembers + "'")
 				.add("responseQueue='" + responseQueue + "'")
 				.add("contentHeadTimestamp=" + contentHeadTimestamp)
+				.add("contentBaseTimestamp=" + contentBaseTimestamp)
 				.add("username='" + username + "'")
 				.add("authenticationToken='" + mask(authenticationToken) + "'").toString();
 	}
@@ -419,6 +422,15 @@ public class ValidationRunConfig {
 
 	public Long getContentHeadTimestamp() {
 		return contentHeadTimestamp;
+	}
+
+	public Long getContentBaseTimestamp() {
+		return contentBaseTimestamp;
+	}
+
+	public ValidationRunConfig setContentBaseTimestamp(Long contentBaseTimestamp) {
+		this.contentBaseTimestamp = contentBaseTimestamp;
+		return this;
 	}
 
 	public ValidationRunConfig setUsername(String username) {

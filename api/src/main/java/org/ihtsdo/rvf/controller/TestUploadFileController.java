@@ -198,6 +198,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Enable change not at task level validation. This parameter needs to be combined together with enableTraceabilityValidation.", defaultValue = "false") @RequestParam(value = ENABLE_CHANGE_NOT_AT_TASK_LEVEL_VALIDATION, required = false) final boolean enableChangeNotAtTaskLevelValidation,
 			@ApiParam(value = "Terminology Server content branch path, used for traceability check.") @RequestParam(value = BRANCH_PATH, required = false) final String branchPath,
 			@ApiParam(value = "Refset Descriptor members are being excluded, used for traceability check.") @RequestParam(value = EXCLUDED_REFSET_DESCRIPTOR_MEMBERS, required = false) final String excludedRefsetDescriptorMembers,
+			@ApiParam(value = "Base timestamp of content branch, used for traceability rebase changes summary report.") @RequestParam(required = false) final Long contentBaseTimestamp,
 			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
 			@ApiParam(value = "Name of the response queue.") @RequestParam(value = RESPONSE_QUEUE, required = false) final String responseQueue,
 			@ApiParam(value = "User name.") @RequestParam(value = USER_NAME, required = false) final String username,
@@ -227,6 +228,7 @@ public class TestUploadFileController {
 				.setBranchPath(branchPath)
 				.setExcludedRefsetDescriptorMembers(excludedRefsetDescriptorMembers)
 				.setContentHeadTimestamp(contentHeadTimestamp)
+				.setContentBaseTimestamp(contentBaseTimestamp)
 				.addResponseQueue(responseQueue)
 				.setUsername(username)
 				.setAuthenticationToken(authenticationToken);
@@ -267,6 +269,7 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") 
 			@RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
+			@ApiParam(value = "Base timestamp of content branch, used for traceability rebase changes summary report.") @RequestParam(required = false) final Long contentBaseTimestamp,
 			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") 
 			@RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
@@ -308,6 +311,7 @@ public class TestUploadFileController {
 				.setBranchPath(branchPath)
 				.setExcludedRefsetDescriptorMembers(excludedRefsetDescriptorMembers)
 				.setContentHeadTimestamp(contentHeadTimestamp)
+				.setContentBaseTimestamp(contentBaseTimestamp)
 				.addResponseQueue(responseQueue)
 				.setUsername(username)
 				.setAuthenticationToken(authenticationToken);

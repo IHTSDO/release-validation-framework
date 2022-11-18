@@ -111,7 +111,7 @@ public class TraceabilityComparisonService {
 			final Map<String, String> rf2ComponentIdToConceptIdMap = new HashMap<>();
 			final Map<String, String> memberIdToRefsetIdMap = new HashMap<>();
 			final Map<ComponentType, Set<String>> rf2Changes = gatherRF2ComponentChanges(validationConfig, rf2ComponentIdToConceptIdMap, memberIdToRefsetIdMap);
-			ChangeSummaryReport summaryReport = traceabilityServiceClientFactory.getClient().getTraceabilityChangeSummaryReport(branchPath, validationConfig.getContentHeadTimestamp());
+			ChangeSummaryReport summaryReport = traceabilityServiceClientFactory.getClient().getTraceabilityChangeSummaryReport(branchPath, validationConfig.getContentBaseTimestamp(), validationConfig.getContentHeadTimestamp());
 			Map<ComponentType, Set<String>> traceabilityChanges = Collections.emptyMap();
 			Map<String, String> traceabilityComponentIdToConceptIdMap = Collections.emptyMap();
 			if (summaryReport != null && summaryReport.getComponentChanges() != null) {

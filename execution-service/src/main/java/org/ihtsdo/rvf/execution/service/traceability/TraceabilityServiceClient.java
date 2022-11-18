@@ -62,9 +62,12 @@ public class TraceabilityServiceClient {
         return null;
     }
 
-    public ChangeSummaryReport getTraceabilityChangeSummaryReport(String branchPath, Long contentHeadTimestamp) {
+    public ChangeSummaryReport getTraceabilityChangeSummaryReport(String branchPath, Long contentBaseTimeStamp, Long contentHeadTimestamp) {
         logger.info("Fetching diff from traceability service..");
-        final String uri = UriComponentsBuilder.fromPath("/change-summary").queryParam("branch", branchPath).queryParam("contentHeadTimestamp", contentHeadTimestamp).toUriString();
+        final String uri = UriComponentsBuilder.fromPath("/change-summary")
+                .queryParam("branch", branchPath)
+                .queryParam("contentBaseTimestamp", contentBaseTimeStamp)
+                .queryParam("contentHeadTimestamp", contentHeadTimestamp).toUriString();
         final ResponseEntity<ChangeSummaryReport> response = restTemplate.exchange(uri, HttpMethod.GET, null, CHANGE_SUMMARY_REPORT_TYPE_REFERENCE);
         return response.getBody();
     }
