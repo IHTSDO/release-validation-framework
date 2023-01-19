@@ -36,6 +36,7 @@ public class AssertionGroupImporter {
 		COMMON_EDITION("COMMON", "common-edition"),
 		INT_AUTHORING ("INT", "int-authoring"),
 		AT_AUTHORING("AT", "at-authoring"),
+		AU_AUTHORING("AU", "au-authoring"),
 		DK_AUTHORING("DK", "dk-authoring"),
 		SE_AUTHORING ("SE", "se-authoring"),
 		US_AUTHORING ("US", "us-authoring"),
@@ -60,6 +61,7 @@ public class AssertionGroupImporter {
 		IE_EDITION("IE", "IrishEdition"),
 		EE_EDITION("EE", "EstonianEdition"),
 		AT_EDITION("AT", "AustrianEdition"),
+		AU_EDITION("AU", "AustralianEdition"),
 		GPFP_ICPC2("GPFP-ICPC2","GPFP-ICPC2"),
 		GMDN("GMDN","GMDN"),
 		STATED_RELATIONSHIPS_VALIDATION("STATED_RELATIONSHIPS","stated-relationships-validation"), //Assertions group that contains only stated relationship for file centric and component centric assertions
@@ -418,6 +420,7 @@ public class AssertionGroupImporter {
 			case GMDN :
 			case EE_EDITION :
 			case AT_EDITION :
+			case AU_EDITION :
 			case GPFP_ICPC2 :
 			case DERIVATIVE_EDITION :
 				addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
@@ -430,6 +433,7 @@ public class AssertionGroupImporter {
 				break;
 			case INT_AUTHORING :
 			case AT_AUTHORING :
+			case AU_AUTHORING :
 			case DK_AUTHORING :
 			case SE_AUTHORING :
 			case US_AUTHORING :
