@@ -67,6 +67,7 @@ public class MysqlFailuresExtractor {
 		for (String tableName : tableToFailureMap.keySet()) {
 			List<String> componentIds = tableToFailureMap.get(tableName).stream().map(FailureDetail::getComponentId).collect(Collectors.toList());
 			String resultSQL = "select id from " + dependencySchema + "." + tableName + " where id in (" + org.apache.commons.lang3.StringUtils.join(componentIds, ',') + ")";
+			logger.info(resultSQL);
 			List<String> dependencyComponentIds = new ArrayList();
 			try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
 				try (ResultSet resultSet = preparedStatement.executeQuery()) {
