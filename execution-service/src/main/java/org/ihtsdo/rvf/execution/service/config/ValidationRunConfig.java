@@ -32,6 +32,7 @@ public class ValidationRunConfig {
 	private String effectiveTime;
 	private boolean releaseAsAnEdition;
 	private String includedModules;
+	private boolean excludeDependencyFailures;
 	private List<String> droolsRulesGroupList;
 	private String bucketName;
 	private boolean enableMRCMValidation;
@@ -169,6 +170,7 @@ public class ValidationRunConfig {
 				.add("effectiveTime='" + effectiveTime + "'")
 				.add("releaseAsAnEdition=" + releaseAsAnEdition)
 				.add("includedModules='" + includedModules + "'")
+				.add("excludeDependencyFailures=" + excludeDependencyFailures)
 				.add("droolsRulesGroupList=" + droolsRulesGroupList)
 				.add("bucketName='" + bucketName + "'")
 				.add("enableMRCMValidation=" + enableMRCMValidation)
@@ -287,6 +289,15 @@ public class ValidationRunConfig {
 	public ValidationRunConfig setIncludedModules(String includedModules) {
 		this.includedModules = includedModules;
 		return this;
+	}
+
+	public ValidationRunConfig setExcludeDependencyFailures(boolean excludeDependencyFailures) {
+		this.excludeDependencyFailures = excludeDependencyFailures;
+		return this;
+	}
+
+	public boolean isExcludeDependencyFailures() {
+		return excludeDependencyFailures;
 	}
 
 	public List<String> getDroolsRulesGroupList() {

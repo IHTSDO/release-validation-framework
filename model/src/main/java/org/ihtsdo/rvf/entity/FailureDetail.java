@@ -12,6 +12,7 @@ public class FailureDetail implements Comparable<FailureDetail>{
 	private String fullComponent;
 
 	private transient String tableName;
+	private transient Long assertionId;
 
 	public FailureDetail(){
 	}
@@ -32,10 +33,17 @@ public class FailureDetail implements Comparable<FailureDetail>{
 		this.tableName = tableName;
 	}
 
+	public FailureDetail(String conceptId, String detail, String componentId, String tableName, Long assertionId) {
+		this(conceptId, detail);
+		this.componentId = componentId;
+		this.tableName = tableName;
+		this.assertionId = assertionId;
+	}
+
 	public String getConceptId() {
 		return conceptId;
 	}
-	
+
 	public String getDetail() {
 		return detail;
 	}
@@ -120,5 +128,13 @@ public class FailureDetail implements Comparable<FailureDetail>{
 
 	public String getFullComponent() {
 		return fullComponent;
+	}
+
+	public void setAssertionId(Long assertionId) {
+		this.assertionId = assertionId;
+	}
+
+	public Long getAssertionId() {
+		return assertionId;
 	}
 }

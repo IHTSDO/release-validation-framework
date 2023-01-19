@@ -12,6 +12,7 @@ public class MysqlExecutionConfig {
 	private boolean firstTimeRelease;
 	private boolean extensionValidation;
 	private boolean isReleaseValidation;
+	private boolean excludeDependencyFailures;
 	private String extensionDependencyVersion;
 	private String effectiveTime;
 	private String previousEffectiveTime;
@@ -86,6 +87,14 @@ public class MysqlExecutionConfig {
 
 	public boolean isReleaseValidation() {
 		return this.isReleaseValidation;
+	}
+
+	public void setExcludeDependencyFailures(boolean excludeDependencyFailures) {
+		this.excludeDependencyFailures = excludeDependencyFailures;
+	}
+
+	public boolean isExcludeDependencyFailures() {
+		return excludeDependencyFailures;
 	}
 
 	public String getExtensionDependencyVersion() {

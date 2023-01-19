@@ -48,6 +48,8 @@ public class TestUploadFileController {
 
 	private static final String RELEASE_AS_AN_EDITION = "releaseAsAnEdition";
 
+	private static final String EXCLUDE_DEPENDENCY_FAILURES = "excludeDependencyFailures";
+
 	private static final String EFFECTIVE_TIME = "effectiveTime";
 
 	private static final String ENABLE_DROOLS = "enableDrools";
@@ -193,6 +195,8 @@ public class TestUploadFileController {
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
 			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			@ApiParam(value = "Exclude the failures from dependency package when validating the MS extension. Defaults to true")
+			@RequestParam(value = EXCLUDE_DEPENDENCY_FAILURES, required = false, defaultValue = "true") final boolean excludeDependencyFailures,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
 			@ApiParam(value = "Enable change not at task level validation. This parameter needs to be combined together with enableTraceabilityValidation.", defaultValue = "false") @RequestParam(value = ENABLE_CHANGE_NOT_AT_TASK_LEVEL_VALIDATION, required = false) final boolean enableChangeNotAtTaskLevelValidation,
@@ -221,6 +225,7 @@ public class TestUploadFileController {
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setIncludedModules(includedModules)
+				.setExcludeDependencyFailures(excludeDependencyFailures)
 				.addUrl(urlPrefix)
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setEnableTraceabilityValidation(enableTraceabilityValidation)
@@ -273,8 +278,10 @@ public class TestUploadFileController {
 			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") 
 			@RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
-			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma")
 			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			@ApiParam(value = "Exclude the failures from dependency package when validating the MS extension. Defaults to true")
+			@RequestParam(value = EXCLUDE_DEPENDENCY_FAILURES, required = false, defaultValue = "true") final boolean excludeDependencyFailures,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
 			@ApiParam(value = "Enable change not at task level validation. This parameter needs to be combined together with enableTraceabilityValidation.", defaultValue = "false") @RequestParam(value = ENABLE_CHANGE_NOT_AT_TASK_LEVEL_VALIDATION, required = false) final boolean enableChangeNotAtTaskLevelValidation,
@@ -305,6 +312,7 @@ public class TestUploadFileController {
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setIncludedModules(includedModules)
+				.setExcludeDependencyFailures(excludeDependencyFailures)
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setEnableTraceabilityValidation(enableTraceabilityValidation)
 				.setEnableChangeNotAtTaskLevelValidation(enableChangeNotAtTaskLevelValidation)

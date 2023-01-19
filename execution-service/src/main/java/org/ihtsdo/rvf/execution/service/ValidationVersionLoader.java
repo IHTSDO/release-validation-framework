@@ -82,6 +82,16 @@ public class ValidationVersionLoader {
 	public void init() {
 		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
 	}
+
+	public static String constructRVFSchema(String releaseVersion) {
+		if (releaseVersion != null) {
+			if (releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
+				return RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
+			}
+			return releaseVersion.startsWith(RVF_DB_PREFIX) ? releaseVersion : RVF_DB_PREFIX + releaseVersion;
+		}
+		return null;
+	}
 	
 	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws Exception {
 		String schemaName = constructRVFSchema(executionConfig.getPreviousVersion());
@@ -148,16 +158,6 @@ public class ValidationVersionLoader {
 		return false;
 	}
 
-	private String constructRVFSchema(String releaseVersion) {
-		if (releaseVersion != null) {
-			if (releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
-				return RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
-			}
-			return releaseVersion.startsWith(RVF_DB_PREFIX) ? releaseVersion : RVF_DB_PREFIX + releaseVersion;
-		}
-		return releaseVersion;
-	}
-	
 	private String loadRelease(String releaseVersion) throws IOException, BusinessServiceException {
 		if (releaseVersion != null && releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
 			String schemaName = RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
@@ -182,6 +182,7 @@ public class ValidationVersionLoader {
 							+ "_" + executionConfig.getExecutionId().toString());
 		executionConfig.setGroupNames(validationConfig.getGroupsList());
 		executionConfig.setExtensionValidation(isExtension(validationConfig));
+		executionConfig.setExcludeDependencyFailures(isExtension(validationConfig) && validationConfig.isExcludeDependencyFailures());
 		executionConfig.setFirstTimeRelease(validationConfig.isFirstTimeRelease());
 		executionConfig.setEffectiveTime(validationConfig.getEffectiveTime());
 		executionConfig.setPreviousEffectiveTime(validationConfig.isFirstTimeRelease() ? null : extractEffectiveTimeFromVersion(validationConfig.getPreviousRelease()));
