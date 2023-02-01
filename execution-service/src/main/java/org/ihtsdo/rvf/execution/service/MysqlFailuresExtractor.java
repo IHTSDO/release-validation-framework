@@ -65,16 +65,19 @@ public class MysqlFailuresExtractor {
 		List<FailureDetail> result = new ArrayList<>();
 		Map<String, List<FailureDetail>> tableToFailureMap = failureDetails.stream().collect(Collectors.groupingBy(FailureDetail::getTableName, HashMap::new, Collectors.toCollection(ArrayList::new)));
 		for (String tableName : tableToFailureMap.keySet()) {
-			List<String> componentIds = tableToFailureMap.get(tableName).stream().map(FailureDetail::getComponentId).collect(Collectors.toList());
-			String resultSQL = "select id from " + dependencySchema + "." + (tableName.contains(".") ? tableName.substring(tableName.lastIndexOf(".") + 1) : tableName) + " where id in (" + org.apache.commons.lang3.StringUtils.join(componentIds, ',') + ")";
 			List<String> dependencyComponentIds = new ArrayList();
-			try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
-				try (ResultSet resultSet = preparedStatement.executeQuery()) {
-					while (resultSet.next()) {
-						dependencyComponentIds.add(resultSet.getString(1));
+			List<String> componentIds = tableToFailureMap.get(tableName).stream().map(FailureDetail::getComponentId).collect(Collectors.toList());
+			for (List<String> batch : Iterables.partition(componentIds, 100)) {
+				String resultSQL = "select id from " + dependencySchema + "." + (tableName.contains(".") ? tableName.substring(tableName.lastIndexOf(".") + 1) : tableName) + " where id in (" + org.apache.commons.lang3.StringUtils.join(batch, ',') + ")";
+				try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
+					try (ResultSet resultSet = preparedStatement.executeQuery()) {
+						while (resultSet.next()) {
+							dependencyComponentIds.add(resultSet.getString(1));
+						}
 					}
 				}
 			}
+
 			result.addAll(tableToFailureMap.get(tableName).stream().filter(failureDetail -> !dependencyComponentIds.contains(failureDetail.getComponentId())).collect(Collectors.toList()));
 		}
 
@@ -108,8 +111,8 @@ public class MysqlFailuresExtractor {
 				item.setFirstNInstances(null);
 			} else if (assertionIdToFailuresMap.containsKey(assertionId)) {
 				List<FailureDetail> allFailures = assertionIdToFailuresMap.get(assertionId);
-				int total_extracted_failures = 0;
-				int total_extracted_whitelistedItems = 0;
+				int totalFailures = 0;
+				int totalWhitelistedItems = 0;
 				List<FailureDetail> firstNInstances = new ArrayList<>();
 				for (List<FailureDetail> failures : Iterables.partition(allFailures, whitelistBatchSize)) {
 					failures.stream().forEach(failure -> {
@@ -132,18 +135,18 @@ public class MysqlFailuresExtractor {
 							whitelistedItems.stream().noneMatch(whitelistedItem -> failure.getComponentId().equals(whitelistedItem.getComponentId()))
 					).collect(Collectors.toList());
 
-					total_extracted_whitelistedItems += whitelistedItems.size();
-					total_extracted_failures += validFailures.size();
+					totalWhitelistedItems += whitelistedItems.size();
+					totalFailures += validFailures.size();
 					firstNInstances.addAll(validFailures);
-					if (total_extracted_failures >=  config.getFailureExportMax()) {
+					if (totalFailures >=  config.getFailureExportMax()) {
 						break;
 					}
 				}
-				if (total_extracted_failures == 0) {
+				if (totalFailures == 0) {
 					item.setFailureCount(0L);
 					item.setFirstNInstances(null);
 				} else {
-					item.setFailureCount(Long.valueOf(allFailures.size() - total_extracted_whitelistedItems));
+					item.setFailureCount(Long.valueOf(allFailures.size() - totalWhitelistedItems));
 					item.setFirstNInstances(firstNInstances.size() > config.getFailureExportMax() ? firstNInstances.subList(0, config.getFailureExportMax()) : firstNInstances);
 				}
 			} else {
@@ -199,5 +202,4 @@ public class MysqlFailuresExtractor {
 		}
 		return failureInstances;
 	}
-
 }
