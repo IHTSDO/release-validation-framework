@@ -67,17 +67,19 @@ public class MysqlFailuresExtractor {
 		for (String tableName : tableToFailureMap.keySet()) {
 			List<String> dependencyComponentIds = new ArrayList();
 			List<String> componentIds = tableToFailureMap.get(tableName).stream().map(FailureDetail::getComponentId).collect(Collectors.toList());
-			String componentIdsStr;
-			if (componentIds.get(0).contains("-")) {
-				componentIdsStr = componentIds.stream().map(s -> "'" + s + "'").collect(Collectors.joining(","));
-			} else {
-				componentIdsStr = componentIds.stream().collect(Collectors.joining(","));
-			}
-			String resultSQL = "select id from " + dependencySchema + "." + (tableName.contains(".") ? tableName.substring(tableName.lastIndexOf(".") + 1) : tableName) + " where id in (" + componentIdsStr + ")";
-			try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
-				try (ResultSet resultSet = preparedStatement.executeQuery()) {
-					while (resultSet.next()) {
-						dependencyComponentIds.add(resultSet.getString(1));
+			for (List<String> batch : Iterables.partition(componentIds, 1000)) {
+				String componentIdsStr;
+				if (batch.get(0).contains("-")) {
+					componentIdsStr = batch.stream().map(s -> "'" + s + "'").collect(Collectors.joining(","));
+				} else {
+					componentIdsStr = batch.stream().collect(Collectors.joining(","));
+				}
+				String resultSQL = "select id from " + dependencySchema + "." + (tableName.contains(".") ? tableName.substring(tableName.lastIndexOf(".") + 1) : tableName) + " where id in (" + componentIdsStr + ")";
+				try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
+					try (ResultSet resultSet = preparedStatement.executeQuery()) {
+						while (resultSet.next()) {
+							dependencyComponentIds.add(resultSet.getString(1));
+						}
 					}
 				}
 			}
