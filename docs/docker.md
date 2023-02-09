@@ -18,7 +18,11 @@ Clone the project then start using docker-compose:
 
 ```bash
 git clone https://github.com/IHTSDO/release-validation-framework.git
+```
+```bash
 cd release-validation-framework
+```
+```bash
 docker-compose up -d
 ```
 

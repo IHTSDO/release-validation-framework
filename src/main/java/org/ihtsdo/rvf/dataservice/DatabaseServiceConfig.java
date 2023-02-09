@@ -1,0 +1,59 @@
+package org.ihtsdo.rvf.dataservice;
+
+import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.rvf.dataservice.config.AssertionsResourceConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+@Configuration
+@EntityScan("org.ihtsdo.rvf.entity")
+@EnableJpaRepositories
+@EnableTransactionManagement
+public class DatabaseServiceConfig {
+
+    @Value("${rvf.jdbc.driverClassName}")
+    private String driverClassName;
+
+    @Value("${rvf.jdbc.url}")
+    private String url;
+
+    @Value("${rvf.jdbc.username}")
+    private String username;
+
+    @Value("${rvf.jdbc.password}")
+    private String password;
+
+    @Value("${rvf.master.schema.name}")
+    private String rvfMasterSchemaName;
+
+    @Autowired
+    private AssertionsResourceConfig assertionsResourceConfig;
+
+    @Bean(name = "dataSource")
+    public BasicDataSource getDataSource() {
+        BasicDataSource basicDataSource = new BasicDataSource();
+        basicDataSource.setUrl(url);
+        basicDataSource.setUsername(username);
+        basicDataSource.setPassword(password);
+        basicDataSource.setDriverClassName(driverClassName);
+        basicDataSource.setDefaultCatalog(rvfMasterSchemaName);
+        basicDataSource.setTestOnBorrow(true);
+        basicDataSource.setTestWhileIdle(true);
+        basicDataSource.setMaxActive(200);
+        basicDataSource.setMaxWait(20000);
+        basicDataSource.setValidationQuery("SELECT 1");
+        basicDataSource.setDefaultTransactionIsolation(2);
+        return basicDataSource;
+    }
+
+    @Bean(name = "assertionResourceManager")
+    public ResourceManager assertionResourceManager() {
+        return new ResourceManager(assertionsResourceConfig, null);
+    }
+}
