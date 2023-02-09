@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.core.service.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class MysqlExecutionConfig {
@@ -8,6 +9,7 @@ public class MysqlExecutionConfig {
 	private String previousVersion;
 	private final Long executionId;
 	private List<String> groupNames;
+	private List<String> includedModules;
 	private int failureExportMax = 10;
 	private boolean firstTimeRelease;
 	private boolean extensionValidation;
@@ -42,6 +44,14 @@ public class MysqlExecutionConfig {
 
 	public List<String> getGroupNames() {
 		return groupNames;
+	}
+
+	public List<String> getIncludedModules() {
+		return includedModules;
+	}
+
+	public void setIncludedModules(List<String> includedModules) {
+		this.includedModules = includedModules;
 	}
 
 	public Long getExecutionId() {
@@ -143,6 +153,8 @@ public class MysqlExecutionConfig {
 		builder.append("failureExportMax=").append(failureExportMax).append(", firstTimeRelease=")
 				.append(firstTimeRelease).append(", extensionValidation=").append(extensionValidation)
 				.append(", isReleaseValidation=").append(isReleaseValidation).append(", ");
+		if (includedModules != null)
+			builder.append("includedModules=").append(includedModules).append(", ");
 		if (extensionDependencyVersion != null)
 			builder.append("extensionDependencyVersion=").append(extensionDependencyVersion).append(", ");
 		if (effectiveTime != null)

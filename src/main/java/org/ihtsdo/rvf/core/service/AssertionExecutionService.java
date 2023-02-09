@@ -1,5 +1,16 @@
 package org.ihtsdo.rvf.core.service;
 
+import java.sql.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+import javax.naming.ConfigurationException;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
@@ -10,14 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import javax.naming.ConfigurationException;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.*;
-import java.util.regex.Pattern;
+
 
 @Service
 public class AssertionExecutionService {
@@ -226,6 +233,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String prospectiveSchema = config.getProspectiveVersion();
 		final String[] nameParts = config.getProspectiveVersion().split("_");
 		String moduleId = (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
+		String includedModules = config.getIncludedModules().stream().collect(Collectors.joining(","));
 		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
 
 		String previousReleaseSchema = config.getPreviousVersion();
@@ -253,6 +261,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
 			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
 			part = part.replaceAll("<MODULEID>", moduleId);
+			part = part.replaceAll("<MODULEIDS>", includedModules);
 			part = part.replaceAll("<VERSION>", version);
 			// watch out for any 's that users might have introduced
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);

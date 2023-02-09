@@ -30,10 +30,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.ihtsdo.rvf.core.service.ReleaseDataManager.RVF_DB_PREFIX;
@@ -196,6 +198,14 @@ public class ValidationVersionLoader {
 		if (validationConfig.getFailureExportMax() != null) {
 			executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
 		}
+
+		List<String> includedModules = new ArrayList<>();
+		includedModules.add("900000000000207008"); // Core Module
+		if (validationConfig.getIncludedModules() != null) {
+			includedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).collect(Collectors.toList()));
+		}
+		executionConfig.setIncludedModules(includedModules);
+
 		executionConfig.setReleaseValidation(!validationConfig.isRf2DeltaOnly());
 		return executionConfig;
 	}
