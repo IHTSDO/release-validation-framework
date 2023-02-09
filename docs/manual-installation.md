@@ -63,11 +63,11 @@ Configuration
 There are various services that can be configured. There are default values but these can be overridden using properties files.
 The following is a list of property files that can be used to configure services:
 
-|File name | Description | RVF deployment location |
-|:------------- |:-------------:|:-----|
-data-service.properties | Settings to configure the data store for RVF domain entities (assertions, test, etc) | /etc/opt/rvf-api/ |
-execution-service.properties | Settings to configure the location of SNOMED CT data used by RVF | /etc/opt/rvf-api/ |
-validation-service.properties | Settings to configure structural tests report location and threshold |  /etc/opt/rvf-api/ |
+| File name                     | Description | RVF deployment location |
+|:------------------------------|:-------------:|:-----|
+| data-service.properties       | Settings to configure the data store for RVF domain entities (assertions, test, etc) | /etc/opt/rvf-api/ |
+|  execution-service.properties | Settings to configure the location of SNOMED CT data used by RVF | /etc/opt/rvf-api/ |
+|  execution-service.properties | Settings to configure structural tests report location and threshold |  /etc/opt/rvf-api/ |
 
 Sample files for configuring the services can be found in the config folder.
 

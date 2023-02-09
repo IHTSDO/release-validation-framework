@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 3.14.0
+
+### Breaking
+- A reorganisation of the project structure to make it a simple one level with one pom.xml.
+
 ## 3.1.2
 
 ### Breaking
