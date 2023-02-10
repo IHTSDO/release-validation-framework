@@ -6,9 +6,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.*;
 import org.springframework.context.annotation.PropertySource;
 
-//@ComponentScan(basePackages = "org.ihtsdo.rvf",
-//        excludeFilters = @Filter(type = FilterType.REGEX,
-//                pattern = {"org.ihtsdo.rvf.importer.*", "org.ihtsdo.rvf.executionservice.test.harness.*"}))
 @PropertySource("application.properties")
 @PropertySource("application-test.properties")
 @TestConfiguration

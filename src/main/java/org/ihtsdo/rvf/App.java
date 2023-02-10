@@ -1,6 +1,6 @@
 package org.ihtsdo.rvf;
 
-import org.ihtsdo.rvf.api.config.ActiveMQConnectionFactoryPrefetchCustomizer;
+import org.ihtsdo.rvf.core.messaging.ActiveMQConnectionFactoryPrefetchCustomizer;
 import org.ihtsdo.rvf.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
