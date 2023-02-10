@@ -1,8 +1,8 @@
 package org.ihtsdo.rvf.importer;
 
-import org.ihtsdo.rvf.dataservice.service.AssertionService;
-import org.ihtsdo.rvf.entity.Assertion;
-import org.ihtsdo.rvf.entity.AssertionGroup;
+import org.ihtsdo.rvf.core.service.AssertionService;
+import org.ihtsdo.rvf.core.data.model.Assertion;
+import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

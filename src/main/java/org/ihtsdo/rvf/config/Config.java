@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.config;
 
 import org.ihtsdo.otf.jms.MessagingHelper;
-import org.ihtsdo.rvf.dataservice.DatabaseServiceConfig;
+import org.ihtsdo.rvf.core.service.config.DatabaseServiceConfig;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
