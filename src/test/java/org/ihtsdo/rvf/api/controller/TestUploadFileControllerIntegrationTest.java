@@ -9,14 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
 
-import org.ihtsdo.rvf.AppTestConfig;
+import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
@@ -39,7 +38,7 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = AppTestConfig.class)
+@ContextConfiguration(classes = TestConfig.class)
 @WebAppConfiguration
 public class TestUploadFileControllerIntegrationTest {
 

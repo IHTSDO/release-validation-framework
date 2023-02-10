@@ -7,10 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.ihtsdo.rvf.AppTestConfig;
+import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.executionservice.ReleaseDataManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = AppTestConfig.class)
+@ContextConfiguration(classes = TestConfig.class)
 public class ReleaseControllerIntegrationTest {
 
 	@Autowired

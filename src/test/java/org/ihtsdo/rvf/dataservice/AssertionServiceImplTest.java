@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.dataservice.service.AssertionService;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.AssertionGroup;
@@ -28,7 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {DataServiceTestConfig.class})
+@ContextConfiguration(classes = TestConfig.class)
 @Transactional
 public class AssertionServiceImplTest {
 	@Autowired

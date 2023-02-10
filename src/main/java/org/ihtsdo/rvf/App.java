@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf;
 
 import org.ihtsdo.rvf.api.config.ActiveMQConnectionFactoryPrefetchCustomizer;
+import org.ihtsdo.rvf.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +16,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 
 @EnableSwagger2
 @EnableJms
-public class App extends AppConfig {
+public class App extends Config {
 	
 	// Swagger Config
 	@Bean

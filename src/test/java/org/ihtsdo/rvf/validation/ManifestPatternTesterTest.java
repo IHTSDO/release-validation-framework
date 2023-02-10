@@ -1,7 +1,5 @@
 package org.ihtsdo.rvf.validation;
 
-import org.apache.commons.io.monitor.FileEntry;
-import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.ihtsdo.rvf.validation.impl.CsvMetadataResultFormatter;
 import org.ihtsdo.rvf.validation.impl.StreamTestReport;
 import org.ihtsdo.rvf.validation.log.impl.TestValidationLogImpl;
@@ -9,14 +7,12 @@ import org.ihtsdo.rvf.validation.model.ManifestFile;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
 import org.junit.Test;
 
-import com.google.common.io.Files;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;

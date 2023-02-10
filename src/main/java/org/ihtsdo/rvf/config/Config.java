@@ -1,6 +1,7 @@
-package org.ihtsdo.rvf;
+package org.ihtsdo.rvf.config;
 
 import org.ihtsdo.otf.jms.MessagingHelper;
+import org.ihtsdo.rvf.dataservice.DatabaseServiceConfig;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @SpringBootApplication
 @Configuration
 @EnableConfigurationProperties
-public class AppConfig {
+public class Config extends DatabaseServiceConfig {
 	
 	@Configuration
 	@EnableWebSecurity
