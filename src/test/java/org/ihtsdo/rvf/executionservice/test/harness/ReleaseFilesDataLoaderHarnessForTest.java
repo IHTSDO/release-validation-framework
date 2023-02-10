@@ -12,7 +12,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-import org.ihtsdo.rvf.AppConfig;
+import org.ihtsdo.rvf.config.Config;
 import org.ihtsdo.rvf.dataservice.DatabaseServiceConfig;
 import org.ihtsdo.rvf.executionservice.ExecutionServiceConfig;
 import org.ihtsdo.rvf.executionservice.ReleaseDataManager;
@@ -24,7 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExecutionServiceConfig.class, DatabaseServiceConfig.class, AppConfig.class})
+@ContextConfiguration(classes = {ExecutionServiceConfig.class, DatabaseServiceConfig.class, Config.class})
 @Transactional
 public class ReleaseFilesDataLoaderHarnessForTest {
 	

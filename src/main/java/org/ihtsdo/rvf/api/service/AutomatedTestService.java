@@ -235,6 +235,7 @@ public class AutomatedTestService {
         }
     }
 
+
     public static final class HighLevelValidationReport {
         private String status;
         private ValidationStatusReport rvfValidationResult;

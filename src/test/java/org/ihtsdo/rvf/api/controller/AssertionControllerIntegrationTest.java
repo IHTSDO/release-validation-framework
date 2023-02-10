@@ -11,13 +11,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.rvf.AppTestConfig;
+import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.entity.Assertion;
 import org.ihtsdo.rvf.entity.ExecutionCommand;
 import org.ihtsdo.rvf.dataservice.repository.TestRepository;
@@ -45,7 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @Transactional
-@ContextConfiguration(classes = AppTestConfig.class)
+@ContextConfiguration(classes = TestConfig.class)
 public class AssertionControllerIntegrationTest {
 
 	@Autowired

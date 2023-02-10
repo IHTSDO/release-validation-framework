@@ -13,6 +13,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static org.junit.Assert.assertNotNull;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {AutomatedTestService.class})
 public class AutomatedTestServiceTest {
@@ -27,6 +29,8 @@ public class AutomatedTestServiceTest {
         ValidationComparisonReport report = new ValidationComparisonReport();
         InputStream previousReportStream = getClass().getResourceAsStream("/previous_rvf_results.json");
         InputStream prospectiveReportStream = getClass().getResourceAsStream("/prospective_rvf_results.json");
+        assertNotNull(previousReportStream);
+        assertNotNull(prospectiveReportStream);
         final AutomatedTestService.HighLevelValidationReport leftHighLevelValidationReport = objectMapper.readValue(previousReportStream, AutomatedTestService.HighLevelValidationReport.class);
         final AutomatedTestService.HighLevelValidationReport rightHighLevelValidationReport = objectMapper.readValue(prospectiveReportStream, AutomatedTestService.HighLevelValidationReport.class);
         automatedTestService.compareReports(report, leftHighLevelValidationReport.getRvfValidationResult(), rightHighLevelValidationReport.getRvfValidationResult());
@@ -40,6 +44,8 @@ public class AutomatedTestServiceTest {
         ValidationComparisonReport report = new ValidationComparisonReport();
         InputStream previousReportStream = getClass().getResourceAsStream("/previous_rvf_results.json");
         InputStream prospectiveReportStream = getClass().getResourceAsStream("/previous_rvf_results.json");
+        assertNotNull(previousReportStream);
+        assertNotNull(prospectiveReportStream);
         final AutomatedTestService.HighLevelValidationReport leftHighLevelValidationReport = objectMapper.readValue(previousReportStream, AutomatedTestService.HighLevelValidationReport.class);
         final AutomatedTestService.HighLevelValidationReport rightHighLevelValidationReport = objectMapper.readValue(prospectiveReportStream, AutomatedTestService.HighLevelValidationReport.class);
         automatedTestService.compareReports(report, leftHighLevelValidationReport.getRvfValidationResult(), rightHighLevelValidationReport.getRvfValidationResult());

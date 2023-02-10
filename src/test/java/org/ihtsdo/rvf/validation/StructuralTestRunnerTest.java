@@ -10,7 +10,7 @@ import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.ihtsdo.rvf.AppTestConfig;
+import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.validation.model.ManifestFile;
 import org.ihtsdo.rvf.validation.resource.TextFileResourceProvider;
 import org.ihtsdo.rvf.validation.resource.ZipFileResourceProvider;
@@ -22,7 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {AppTestConfig.class})
+@ContextConfiguration(classes = {TestConfig.class})
 public class StructuralTestRunnerTest {
 
 	@Autowired

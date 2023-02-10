@@ -1,10 +1,9 @@
 package org.ihtsdo.rvf.executionservice.test.harness;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
-import org.ihtsdo.rvf.AppConfig;
+import org.ihtsdo.rvf.config.Config;
 import org.ihtsdo.rvf.dataservice.DatabaseServiceConfig;
 import org.ihtsdo.rvf.executionservice.ExecutionServiceConfig;
 import org.ihtsdo.rvf.executionservice.ValidationRunner;
@@ -16,7 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ExecutionServiceConfig.class, DatabaseServiceConfig.class, AppConfig.class})
+@ContextConfiguration(classes = {ExecutionServiceConfig.class, DatabaseServiceConfig.class, Config.class})
 public class ValidationRunnerHarnessForTest {
 	@Autowired
 	ValidationRunner runner;

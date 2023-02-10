@@ -12,7 +12,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.ihtsdo.rvf.AppConfig;
+import org.ihtsdo.rvf.config.Config;
 import org.ihtsdo.rvf.dataservice.DatabaseServiceConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {DatabaseServiceConfig.class, AppConfig.class})
+@ContextConfiguration(classes = {DatabaseServiceConfig.class, Config.class})
 public class ReleaseDataManagerIntegrationTest {
 	@Resource(name = "dataSource")
 	private BasicDataSource dataSource;
