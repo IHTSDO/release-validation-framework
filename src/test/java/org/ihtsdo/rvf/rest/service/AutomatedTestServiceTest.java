@@ -3,24 +3,23 @@ package org.ihtsdo.rvf.rest.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.rvf.core.data.model.ValidationComparisonReport;
 import org.ihtsdo.rvf.core.service.AutomatedTestService;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AutomatedTestService.class})
 public class AutomatedTestServiceTest {
 
-    private ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().failOnUnknownProperties(false).build();
+    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().failOnUnknownProperties(false).build();
 
     @Autowired
     private AutomatedTestService automatedTestService;
@@ -35,9 +34,9 @@ public class AutomatedTestServiceTest {
         final AutomatedTestService.HighLevelValidationReport leftHighLevelValidationReport = objectMapper.readValue(previousReportStream, AutomatedTestService.HighLevelValidationReport.class);
         final AutomatedTestService.HighLevelValidationReport rightHighLevelValidationReport = objectMapper.readValue(prospectiveReportStream, AutomatedTestService.HighLevelValidationReport.class);
         automatedTestService.compareReports(report, leftHighLevelValidationReport.getRvfValidationResult(), rightHighLevelValidationReport.getRvfValidationResult());
-        Assert.assertTrue(ValidationComparisonReport.Status.FAILED.equals(report.getStatus()));
-        Assert.assertEquals(2, report.getNewAssertions().size());
-        Assert.assertEquals(2, report.getRemovedAssertions().size());
+        assertEquals(ValidationComparisonReport.Status.FAILED, report.getStatus());
+        assertEquals(2, report.getNewAssertions().size());
+        assertEquals(2, report.getRemovedAssertions().size());
     }
 
     @Test
@@ -50,9 +49,9 @@ public class AutomatedTestServiceTest {
         final AutomatedTestService.HighLevelValidationReport leftHighLevelValidationReport = objectMapper.readValue(previousReportStream, AutomatedTestService.HighLevelValidationReport.class);
         final AutomatedTestService.HighLevelValidationReport rightHighLevelValidationReport = objectMapper.readValue(prospectiveReportStream, AutomatedTestService.HighLevelValidationReport.class);
         automatedTestService.compareReports(report, leftHighLevelValidationReport.getRvfValidationResult(), rightHighLevelValidationReport.getRvfValidationResult());
-        Assert.assertTrue(ValidationComparisonReport.Status.PASS.equals(report.getStatus()));
-        Assert.assertEquals(null, report.getNewAssertions());
-        Assert.assertEquals(null, report.getRemovedAssertions());
-        Assert.assertEquals(null, report.getChangedAssertions());
+        assertEquals(ValidationComparisonReport.Status.PASS, report.getStatus());
+        assertNull(report.getNewAssertions());
+        assertNull(report.getRemovedAssertions());
+        assertNull(report.getChangedAssertions());
     }
 }

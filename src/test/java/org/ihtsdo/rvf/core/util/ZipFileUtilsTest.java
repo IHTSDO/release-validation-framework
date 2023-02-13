@@ -1,13 +1,13 @@
 package org.ihtsdo.rvf.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-
 import org.apache.commons.io.FileUtils;
 import org.ihtsdo.rvf.core.service.util.ZipFileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.net.URL;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ZipFileUtilsTest {
 
@@ -17,12 +17,15 @@ public class ZipFileUtilsTest {
 		final File unzippedFolder  = new File(tempDirectory,"testData");
 		try {
 			if (unzippedFolder.exists()) {
-				unzippedFolder.delete();
+				assertTrue(unzippedFolder.delete());
 			}
-			unzippedFolder.mkdir();
-			final File zipFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
+			assertTrue(unzippedFolder.mkdir());
+			URL url = getClass().getResource("/SnomedCT_Release_INT_20140131.zip");
+			assertNotNull(url);
+			final File zipFile = new File(url.toURI());
 			ZipFileUtils.extractFilesFromZipToOneFolder(zipFile, unzippedFolder.getAbsolutePath());
 			final File[] filesUnzipped = unzippedFolder.listFiles();
+			assertNotNull(filesUnzipped);
 			assertEquals(filesUnzipped.length, 3);
 			for( final File file : filesUnzipped) {
 				assertTrue(file.isFile());

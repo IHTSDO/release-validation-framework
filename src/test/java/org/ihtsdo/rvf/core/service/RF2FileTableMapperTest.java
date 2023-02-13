@@ -1,12 +1,13 @@
 package org.ihtsdo.rvf.core.service;
 
 import org.ihtsdo.rvf.core.service.util.RF2FileTableMapper;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@ExtendWith(SpringExtension.class)
 public class RF2FileTableMapperTest {
 	
 	private static final String[] INT_DELTA_FILES = {
@@ -111,10 +112,10 @@ public class RF2FileTableMapperTest {
 	@Test
 	public void testInternationalDeltaFiles() {
 		int i = 0;
-		Assert.assertEquals(INT_DELTA_FILES.length, INT_EXPECTED_DELTA.length);
+		assertEquals(INT_DELTA_FILES.length, INT_EXPECTED_DELTA.length);
 		for (final String fileName : INT_DELTA_FILES) {
 			final String tableName = RF2FileTableMapper.getLegacyTableName(fileName);
-			Assert.assertEquals(INT_EXPECTED_DELTA[i++], tableName);
+			assertEquals(INT_EXPECTED_DELTA[i++], tableName);
 		}
 	}
 	
@@ -133,15 +134,15 @@ public class RF2FileTableMapperTest {
 	@Test
 	public void testSpanishDeltaFiles() {
 
-		Assert.assertEquals(SPANISH_DELTA_FILES.length, EXTENSION_EXPECTED_DELTA.length);
+		assertEquals(SPANISH_DELTA_FILES.length, EXTENSION_EXPECTED_DELTA.length);
 		int i=0;
 		for (final String fileName : SPANISH_DELTA_FILES) {
 			final String tableName = RF2FileTableMapper.getLegacyTableName(fileName);
-			Assert.assertEquals(EXTENSION_EXPECTED_DELTA[i++], tableName);
+			assertEquals(EXTENSION_EXPECTED_DELTA[i++], tableName);
 		}
 	}
 	
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testSpanishSnapshotFiles() {
 		testSnapshot(SPANISH_DELTA_FILES, EXTENSION_EXPECTED_DELTA);
 	}
@@ -151,17 +152,17 @@ public class RF2FileTableMapperTest {
 		testFull(SPANISH_DELTA_FILES, EXTENSION_EXPECTED_DELTA);
 	}
 	
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testGPFPDeltaFiles() {
-		Assert.assertEquals(GPFP_DELTA_FILES.length, GPFP_EXPECTED_DELTA.length);
+		assertEquals(GPFP_DELTA_FILES.length, GPFP_EXPECTED_DELTA.length);
 		int i=0;
 		for (final String fileName : GPFP_DELTA_FILES) {
 			final String tableName = RF2FileTableMapper.getLegacyTableName(fileName);
-			Assert.assertEquals(GPFP_EXPECTED_DELTA[i++], tableName);
+			assertEquals(GPFP_EXPECTED_DELTA[i++], tableName);
 		}
 	}
 	
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testGPFPSnapshotFiles() {
 		testSnapshot(GPFP_DELTA_FILES, GPFP_EXPECTED_DELTA);
 	}
@@ -178,16 +179,16 @@ public class RF2FileTableMapperTest {
 		int i=0;
 		for (final String fileName : dkDeltas) {
 			final String tableName = RF2FileTableMapper.getLegacyTableName(fileName);
-			Assert.assertEquals(expected[i++], tableName);
+			assertEquals(expected[i++], tableName);
 		}
 	}
 	@Test
 	public void tetsTechPreviewFiles() {
-		Assert.assertEquals(INT_PREVIEW_DELTA_FILES.length, EXPECTED_INT_PREVIEW_DELTA.length);
+		assertEquals(INT_PREVIEW_DELTA_FILES.length, EXPECTED_INT_PREVIEW_DELTA.length);
 		int i=0;
 		for (final String fileName : INT_PREVIEW_DELTA_FILES) {
 			final String tableName = RF2FileTableMapper.getLegacyTableName(fileName);
-			Assert.assertEquals(EXPECTED_INT_PREVIEW_DELTA[i++], tableName);
+			assertEquals(EXPECTED_INT_PREVIEW_DELTA[i++], tableName);
 		}
 	}
 	
@@ -201,10 +202,10 @@ public class RF2FileTableMapperTest {
 			expected[i] = expectedDeltaResults[i].replace("_d", "_s");
 		}
 		int i = 0;
-		Assert.assertEquals(snapshotFiles.length, expected.length);
+		assertEquals(snapshotFiles.length, expected.length);
 		for (final String fileName : snapshotFiles) {
 			final String tableName = RF2FileTableMapper.getLegacyTableName(fileName);
-			Assert.assertEquals(expected[i++], tableName);
+			assertEquals(expected[i++], tableName);
 		}
 	}
 	
@@ -218,10 +219,10 @@ public class RF2FileTableMapperTest {
 			expected[i] = expectedDeltaResults[i].replace("_d", "_f");
 		}
 		int i = 0;
-		Assert.assertEquals(snapshotFiles.length, expected.length);
+		assertEquals(snapshotFiles.length, expected.length);
 		for (final String fileName : snapshotFiles) {
 			final String tableName = RF2FileTableMapper.getLegacyTableName(fileName);
-			Assert.assertEquals(expected[i++], tableName);
+			assertEquals(expected[i++], tableName);
 		}
 	}
 

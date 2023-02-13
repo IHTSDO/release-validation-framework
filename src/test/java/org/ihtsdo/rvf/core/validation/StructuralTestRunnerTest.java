@@ -1,8 +1,16 @@
 package org.ihtsdo.rvf.core.validation;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.core.service.structure.pojo.ManifestFile;
+import org.ihtsdo.rvf.core.service.structure.resource.TextFileResourceProvider;
+import org.ihtsdo.rvf.core.service.structure.resource.ZipFileResourceProvider;
+import org.ihtsdo.rvf.core.service.structure.validation.StructuralTestRunner;
+import org.ihtsdo.rvf.core.service.structure.validation.TestReportable;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -10,20 +18,9 @@ import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.ihtsdo.rvf.TestConfig;
-import org.ihtsdo.rvf.core.service.structure.validation.StructuralTestRunner;
-import org.ihtsdo.rvf.core.service.structure.validation.TestReportable;
-import org.ihtsdo.rvf.core.service.structure.pojo.ManifestFile;
-import org.ihtsdo.rvf.core.service.structure.resource.TextFileResourceProvider;
-import org.ihtsdo.rvf.core.service.structure.resource.ZipFileResourceProvider;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.jupiter.api.Assertions.*;
 
-
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
 public class StructuralTestRunnerTest {
 
@@ -47,7 +44,7 @@ public class StructuralTestRunnerTest {
 		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), true);
 
 		assertNotNull(response.getResult());
-		assertEquals("no errors expected", 0, response.getNumErrors());
+		assertEquals(0, response.getNumErrors(), "no errors expected");
 	}
 
 	@Test
@@ -67,11 +64,9 @@ public class StructuralTestRunnerTest {
 		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile(fileName));
 
 		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), false);
-		String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
-
 		assertNotNull(response.getResult());
-		assertEquals("There should be 3444 tests in total", 3444, response.getNumTestRuns());
-		assertEquals("There are 3 file names that are not valid plus 4 other errors", 7, response.getNumErrors());
+		assertEquals(3444, response.getNumTestRuns(), "There should be 3444 tests in total");
+		assertEquals(7, response.getNumErrors(), "There should be 3 file names that are not valid plus 4 other errors");
 	}
 
 	@Test
@@ -83,13 +78,12 @@ public class StructuralTestRunnerTest {
 		PrintWriter bos = new PrintWriter(sw);
 
 		TestReportable response = validationRunner.execute(provider, bos, false);
-		String[] invalidFileNames = {"sct2_Concept_Delta_INT_20140131_10.txt", "sct2_Concept_Full_INT_20140131_test.txt", "sct2_Concept_Full_INT_20140131_UUID.txt"};
 		// check bos contains all our info
 		assertTrue(sw.getBuffer().length() > 0);
 
 		assertNotNull(response.getResult());
 		System.out.println(response.getResult());
-		assertEquals("There are 3 file names that are not valid plus 4 other errors", 7, response.getNumErrors());
+		assertEquals(7, response.getNumErrors(), "There are 3 file names that are not valid plus 4 other errors");
 	}
 
 	@Test
@@ -101,12 +95,12 @@ public class StructuralTestRunnerTest {
 		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), true, manifestFile);
 
 		assertNotNull(response.getResult());
-		assertEquals("should only be manifest errors in this", 54, response.getNumErrors());
+		assertEquals(54, response.getNumErrors(), "Should only be manifest errors in this");
 	}
 
 	private File getFile(String testFileName) throws URISyntaxException {
 		URL zipUrl = StructuralTestRunner.class.getResource(testFileName);
+		assertNotNull(zipUrl);
 		return new File(zipUrl.toURI());
 	}
-
 }

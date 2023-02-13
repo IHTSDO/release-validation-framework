@@ -1,42 +1,30 @@
 package org.ihtsdo.rvf.core.service.harness;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-import javax.sql.DataSource;
-
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.core.service.ReleaseDataManager;
-import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.ValidationVersionLoader;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
+import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.structure.resource.ResourceProvider;
 import org.ihtsdo.rvf.core.service.structure.resource.ZipFileResourceProvider;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
+import java.io.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 @ContextConfiguration(classes = {TestConfig.class})
 public class ValidationVersionLoaderIntegrationHarnessForTest {
-	@Resource(name = "dataSource")
-	private DataSource dataSource;
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 	
@@ -45,17 +33,16 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 	@Autowired
 	private ValidationVersionLoader dataLoader;
 	private String prospectiveVersion;
-	private String previousVersion;
 	private ValidationRunConfig validationConfig;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		long runId = System.currentTimeMillis();
 		validationConfig = new ValidationRunConfig();
 		validationConfig.setFailureExportMax(100);
 		validationConfig.setRunId(runId);
 		validationConfig.setGroupsList(List.of("file-centric-validation"));
-		File localProspectiveFile = new File(ClassLoader.getSystemResource("Daily_Export_Delta.zip").getFile());
+		new File(ClassLoader.getSystemResource("Daily_Export_Delta.zip").getFile());
 	}
 	
 	@Test
@@ -65,11 +52,10 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 		MysqlExecutionConfig executionConfig = new MysqlExecutionConfig(validationConfig.getRunId());
 		executionConfig.setProspectiveVersion(prospectiveVersion);
 		List<String> filesLoaded = dataLoader.loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(executionConfig, validationConfig, null);
-		Assert.assertEquals(1, filesLoaded.size());
-		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
+		assertEquals(1, filesLoaded.size());
+		assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
 	}
-	
-	
+
 	@Test
 	public void testConstructExtensionProspectiveVersionWithRF2DeltaOnly() throws Exception {
 		prospectiveVersion = validationConfig.getRunId().toString();
@@ -79,22 +65,19 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		dataLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
-		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
+		assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
 	}
-	
-	
+
 	@Test
 	public void testProspectiveVersion() throws Exception {
 		prospectiveVersion = validationConfig.getRunId().toString();
 		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		dataLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
-		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
+		assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
 	}
-	
-	
-	
-	@Test
+
+	@org.junit.jupiter.api.Test
 	public void testProspectiveVersionWithExtension() throws Exception {
 		prospectiveVersion = validationConfig.getRunId().toString();
 		validationConfig.addDependencyRelease("int_20160131");
@@ -103,7 +86,7 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 		executionConfig.setReleaseValidation(false);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		dataLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
-		Assert.assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
+		assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
 	} 
 	
 	@Test
@@ -113,11 +96,11 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 		Map<String, Object> responseMap = new HashMap<>();
 		dataLoader.loadPreviousVersion(executionConfig);
 		System.out.println(responseMap.get(FAILURE_MESSAGE));
-		Assert.assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
+		assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
 		
 	}
 	
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testLoadPreviousIntDerivativeVersion() throws Exception {
 		
 		validationConfig.setExtensionDependency("int_20160131");
@@ -126,7 +109,7 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 		Map<String, Object> responseMap = new HashMap<>();
 		dataLoader.loadPreviousVersion(executionConfig);
 		System.out.println(responseMap.get(FAILURE_MESSAGE));
-		Assert.assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
+		assertNotNull(responseMap.get(FAILURE_MESSAGE).toString());
 	}
 	
 	
@@ -138,22 +121,19 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 		dataLoader.loadPreviousVersion(executionConfig);
 	}
 	
-	@After
-	public void tearDown() throws SQLException {
+	@AfterEach
+	public void tearDown() {
 		validationConfig = null;
 	}
-	
-	@Test
+
+	@org.junit.jupiter.api.Test
 	public void testCopyFile() throws IOException {
 		File prospectiveFile = File.createTempFile(validationConfig.getRunId() + "_" + validationConfig.getTestFileName(), ".zip");
-		FileOutputStream out = new FileOutputStream(prospectiveFile);
-		InputStream input = new FileInputStream(ClassLoader.getSystemResource("Daily_Export_Delta.zip").getFile());
-		IOUtils.copy(input,out);
-		IOUtils.closeQuietly(input);
-		IOUtils.closeQuietly(out);
-		Assert.assertTrue(prospectiveFile.isFile());
+		try (FileOutputStream out = new FileOutputStream(prospectiveFile); InputStream input = new FileInputStream(ClassLoader.getSystemResource("Daily_Export_Delta.zip").getFile())) {
+			IOUtils.copy(input, out);
+		}
+		assertTrue(prospectiveFile.isFile());
 		ResourceProvider resourceManager = new ZipFileResourceProvider(prospectiveFile);
-		Assert.assertFalse(resourceManager.getFileNames().isEmpty());
-		
+		assertFalse(resourceManager.getFileNames().isEmpty());
 	}
 }

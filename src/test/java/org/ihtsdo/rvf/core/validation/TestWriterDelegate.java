@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class TestWriterDelegate extends PrintWriter {
-	private StringBuffer buffer = new StringBuffer();
+	private final StringBuffer buffer = new StringBuffer();
 
 	public TestWriterDelegate(StringWriter out) {
 		super(out);

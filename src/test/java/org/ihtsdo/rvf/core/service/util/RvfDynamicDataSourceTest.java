@@ -1,19 +1,19 @@
 package org.ihtsdo.rvf.core.service.util;
 
-import static org.junit.Assert.assertNotNull;
+import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.core.service.RvfDynamicDataSource;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.Connection;
 
-import org.ihtsdo.rvf.TestConfig;
-import org.ihtsdo.rvf.core.service.RvfDynamicDataSource;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
 public class RvfDynamicDataSourceTest {
 
@@ -21,7 +21,7 @@ public class RvfDynamicDataSourceTest {
 	private RvfDynamicDataSource rvfDynamicDataSource;
 
 	@Test
-	@Ignore
+	@Disabled
 	public void testGettingLargeNumberOfConnections() throws Exception {
 		assertNotNull(rvfDynamicDataSource);
 		// try and 10 connections

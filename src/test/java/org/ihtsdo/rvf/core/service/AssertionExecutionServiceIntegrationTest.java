@@ -3,26 +3,25 @@ package org.ihtsdo.rvf.core.service;
 import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-@RunWith(SpringRunner.class)
+
 @ContextConfiguration(classes = TestConfig.class)
 @Transactional
-@Ignore
+@Disabled
 public class AssertionExecutionServiceIntegrationTest {
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionServiceIntegrationTest.class);
 	@Autowired
@@ -36,14 +35,14 @@ public class AssertionExecutionServiceIntegrationTest {
 	
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
-	
-	private Assertion assertion;
-	private AssertionTest assertionTest;
+
+	private Assertion assertion  = new Assertion();
+	private final AssertionTest assertionTest = new AssertionTest();
 	private org.ihtsdo.rvf.core.data.model.Test test;
 
 	private MysqlExecutionConfig config;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		assertNotNull(assertionService);
 		assertNotNull(releaseDataManager);
@@ -53,7 +52,6 @@ public class AssertionExecutionServiceIntegrationTest {
 		config.setPreviousVersion("rvf_int_20140131");
 		config.setProspectiveVersion("rvf_int_20140731");
 
-		assertion  = new Assertion();
 		assertion.setAssertionText("Assertion test");
 		assertion = assertionService.create(assertion);
 		// create test
@@ -64,7 +62,7 @@ public class AssertionExecutionServiceIntegrationTest {
 	}
 
 	@Test
-	public void testExecuteAssertionTest() throws Exception {
+	public void testExecuteAssertionTest() {
 		assert assertionExecutionService != null;
 		assert dataSource != null;
 		// set configuration
@@ -89,11 +87,11 @@ public class AssertionExecutionServiceIntegrationTest {
 		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config);
 		assertNotNull(runItem);
 		logger.debug("runItem = " + runItem);
-		assertEquals("Test must have passed", 0, (long) runItem.getFailureCount());
+		assertEquals("Test must have passed", 0, runItem.getFailureCount());
 	}
 
 	@Test
-	public void testExecuteAssertionTestWithMultipleStatements() throws Exception {
+	public void testExecuteAssertionTestWithMultipleStatements() {
 		assert assertionExecutionService != null;
 		assert dataSource != null;
 		// set configuration
@@ -121,6 +119,6 @@ public class AssertionExecutionServiceIntegrationTest {
 		// set both prospective and previous release
 		final TestRunItem runItem = assertionExecutionService.executeAssertionTest(assertionTest, config);
 		assertNotNull(runItem);
-		assertEquals("Test must have passed", 0, (long) runItem.getFailureCount());
+		assertEquals("Test must have passed", 0, runItem.getFailureCount());
 	}
 }

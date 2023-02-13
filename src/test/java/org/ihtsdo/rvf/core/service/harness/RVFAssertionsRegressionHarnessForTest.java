@@ -1,47 +1,27 @@
 package org.ihtsdo.rvf.core.service.harness;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.FailureDetail;
 import org.ihtsdo.rvf.core.data.model.TestRunItem;
-import org.ihtsdo.rvf.core.service.AssertionExecutionService;
-import org.ihtsdo.rvf.core.service.ReleaseDataManager;
-import org.ihtsdo.rvf.core.service.ResourceDataLoader;
+import org.ihtsdo.rvf.core.service.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
-import org.ihtsdo.rvf.core.service.MysqlFailuresExtractor;
-import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.service.util.ZipFileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
+import java.io.*;
+import java.net.URL;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * To run this test harness successfully with clean data you need to first
@@ -51,7 +31,7 @@ import com.google.gson.Gson;
  * Note: if you have changed the regression test data you need drop the corresponding schema as well.
  * SnomedCT_RegressionTest_20130131 and SnomedCT_RegressionTest_20130731 are made up data for testing purpose.
  */
-@RunWith(SpringRunner.class)
+
 @ContextConfiguration(classes = TestConfig.class)
 public class RVFAssertionsRegressionHarnessForTest {
 
@@ -80,14 +60,10 @@ public class RVFAssertionsRegressionHarnessForTest {
     private URL fileCentricExpected;
     private MysqlExecutionConfig config;
     private final ObjectMapper mapper = new ObjectMapper();
-    private List<String> rf2FilesLoaded = new ArrayList<>();
+    private final List<String> rf2FilesLoaded = new ArrayList<>();
     private boolean isRunFirstTime = true;
-    //Reload test data from zip files
-    private boolean reloadTestData = true;
-    //set it to true for testing mysql binary archive
-    private boolean testMysqlBinaryArchive = false;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, BusinessServiceException {
         if (!isRunFirstTime) {
             return;
@@ -98,12 +74,16 @@ public class RVFAssertionsRegressionHarnessForTest {
         config.setPreviousVersion(PREVIOUS_RELEASE);
         config.setProspectiveVersion(PROSPECTIVE_RELEASE);
         config.setFailureExportMax(10);
+        //Reload test data from zip files
+        boolean reloadTestData = true;
+
         if (reloadTestData || !releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
-            if (testMysqlBinaryArchive && releaseDataManager.restoreReleaseFromBinaryArchive(PREVIOUS_RELEASE + ".zip")) {
-                // do nothing
-            } else {
+            //set it to true for testing mysql binary archive
+            boolean testMysqlBinaryArchive = false;
+
+            if (!testMysqlBinaryArchive || !releaseDataManager.restoreReleaseFromBinaryArchive(PREVIOUS_RELEASE + ".zip")) {
                 URL previousReleaseUrl = RVFAssertionsRegressionHarnessForTest.class.getResource("/SnomedCT_RegressionTest_20130131");
-                assertNotNull("Must not be null", previousReleaseUrl);
+                assertNotNull(previousReleaseUrl, "Must not be null");
                 File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
                 ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
                 releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
@@ -115,22 +95,22 @@ public class RVFAssertionsRegressionHarnessForTest {
         }
         if (reloadTestData || !releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
             final URL prospectiveReleaseUrl = RVFAssertionsRegressionHarnessForTest.class.getResource("/SnomedCT_RegressionTest_20130731");
-            assertNotNull("Must not be null", prospectiveReleaseUrl);
+            assertNotNull(prospectiveReleaseUrl, "Must not be null");
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
             ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
             releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, rf2FilesLoaded, prospectiveFile);
             resourceDataLoader.loadResourceData(PROSPECTIVE_RELEASE);
             List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource", true);
             assertNotNull(assertions);
-            assertTrue(!assertions.isEmpty());
+            assertFalse(assertions.isEmpty());
             assertionExecutionService.executeAssertions(assertions, config);
         }
         releaseTypeExpectedResults = RVFAssertionsRegressionHarnessForTest.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
-        assertNotNull("Must not be null", releaseTypeExpectedResults);
+        assertNotNull(releaseTypeExpectedResults, "Must not be null");
         componentCentrilExpected = RVFAssertionsRegressionHarnessForTest.class.getResource("/regressionTestResults/componentCentricRegressionExpected.json");
-        assertNotNull("Must not be null", componentCentrilExpected);
+        assertNotNull(componentCentrilExpected, "Must not be null");
         fileCentricExpected = RVFAssertionsRegressionHarnessForTest.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
-        assertNotNull("Must not be null", fileCentricExpected);
+        assertNotNull(fileCentricExpected, "Must not be null");
         isRunFirstTime = false;
     }
 
@@ -163,7 +143,7 @@ public class RVFAssertionsRegressionHarnessForTest {
     }
 
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testGetAssertionsByGroup() {
         AssertionGroup group = assertionService.getAssertionGroupByName("InternationalEdition");
         Set<Assertion> assertions = group.getAssertions();
@@ -181,14 +161,14 @@ public class RVFAssertionsRegressionHarnessForTest {
         assertEquals(108, releaseTypeAssertions.size());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testGetAssertionsForIntAuthoring() {
         AssertionGroup group = assertionService.getAssertionGroupByName("int-authoring");
         assertEquals(59, group.getAssertions().size());
     }
 
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testTotalAssertions() {
         assertEquals(371, assertionService.count().longValue());
     }
@@ -200,12 +180,12 @@ public class RVFAssertionsRegressionHarnessForTest {
     }
 
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testTotalGroups() {
         assertEquals(35, assertionService.getAllAssertionGroups().size());
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testGetAssertionsForCommonAuthoring() {
         AssertionGroup group = assertionService.getAssertionGroupByName("common-authoring");
         assertEquals(64, group.getAssertions().size());
@@ -276,30 +256,30 @@ public class RVFAssertionsRegressionHarnessForTest {
         }
 
         for (final UUID uuid : expectedResultByUuidMap.keySet()) {
-            assertTrue(type + " actual test result should have expected assertion but does not: " + expectedResultByUuidMap.get(uuid), actualResultByUuidMap.containsKey(uuid));
+            assertTrue(actualResultByUuidMap.containsKey(uuid), type + " actual test result should have expected assertion but does not: " + expectedResultByUuidMap.get(uuid));
             final RVFTestResult expectedResult = expectedResultByUuidMap.get(uuid);
             final RVFTestResult actualResult = actualResultByUuidMap.get(uuid);
             assertEquals("Assertion name is not the same" + " for assertion: " + actualResult, expectedResult.getAssertionName(), actualResult.getAssertionName());
             if (expectedResult.getTotalFailed() > 0 || actualResult.getTotalFailed() > 0) {
                 explainDifference(uuid, expectedResult, actualResult);
                 if (expectedResult.getFirstNInstances() != null && actualResult.getFirstNInstances() != null) {
-                    assertTrue("First N instances not matching" + " for assertion: " + actualResult, expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()));
+                    assertTrue(expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()), "First N instances not matching" + " for assertion: " + actualResult);
                 }
             }
-            assertEquals(type + " total failures count doesn't match" + " for assertion: " + actualResult, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
+            assertEquals(expectedResult.getTotalFailed(), actualResult.getTotalFailed(), type + " total failures count doesn't match" + " for assertion: " + actualResult);
         }
 
         //And also work through the actual results, in case we have additional items there.
         for (final UUID uuid : actualResultByUuidMap.keySet()) {
-            assertTrue(type + " unexpected test result in actual: " + actualResultByUuidMap.get(uuid), expectedResultByUuidMap.containsKey(uuid));
+            assertTrue(expectedResultByUuidMap.containsKey(uuid), type + " unexpected test result in actual: " + actualResultByUuidMap.get(uuid));
             final RVFTestResult expectedResult = expectedResultByUuidMap.get(uuid);
             final RVFTestResult actualResult = actualResultByUuidMap.get(uuid);
             assertEquals("Assertion name is not the same" + " for assertion: " + actualResult, expectedResult.getAssertionName(), actualResult.getAssertionName());
             if (expectedResult.getTotalFailed() > 0) {
                 explainDifference(uuid, expectedResult, actualResult);
-                assertTrue("First N instances not matching" + " for assertion: " + actualResult, expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()));
+                assertTrue(expectedResult.getFirstNInstances().containsAll(actualResult.getFirstNInstances()), "First N instances not matching" + " for assertion: " + actualResult);
             }
-            assertEquals(type + " total failures count doesn't match" + " for assertion: " + actualResult, expectedResult.getTotalFailed(), actualResult.getTotalFailed());
+            assertEquals(expectedResult.getTotalFailed(), actualResult.getTotalFailed(), type + " total failures count doesn't match" + " for assertion: " + actualResult);
         }
 
         Collections.sort(expected);
@@ -315,7 +295,7 @@ public class RVFAssertionsRegressionHarnessForTest {
             assertEquals(expected.get(i), actual.get(i));
             if (expected.get(i).getTotalFailed() > 0) {
                 for (FailureDetail detail : actual.get(i).getFirstNInstances()) {
-                    assertTrue("ConceptId should not be null", detail.getConceptId() != null);
+                    assertNotNull(detail.getConceptId(), "ConceptId should not be null");
                 }
             }
         }
@@ -345,7 +325,7 @@ public class RVFAssertionsRegressionHarnessForTest {
         }
         int leftSize = left.getFirstNInstances() == null ? 0 : left.getFirstNInstances().size();
         int rightSize = right.getFirstNInstances() == null ? 0 : right.getFirstNInstances().size();
-        int size = leftSize > rightSize ? leftSize : rightSize;
+        int size = Math.max(leftSize, rightSize);
         for (int i = 0; i < size; i++) {
             if (i < leftSize && i < rightSize) {
                 FailureDetail leftFd = left.getFirstNInstances().get(i);
@@ -446,7 +426,7 @@ public class RVFAssertionsRegressionHarnessForTest {
 
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         rf2FilesLoaded.clear();
     }
