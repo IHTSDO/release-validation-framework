@@ -1,50 +1,42 @@
 package org.ihtsdo.rvf.rest.controller;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.ExecutionCommand;
 import org.ihtsdo.rvf.core.data.repository.AssertionGroupRepository;
 import org.ihtsdo.rvf.core.service.AssertionService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * A test case for {@link AssertionGroupController}.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @Transactional
 @ContextConfiguration(classes = TestConfig.class)
@@ -64,15 +56,15 @@ public class AssertionGroupControllerIntegrationTest {
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private AssertionGroup group;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	public void setUp() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
 		group = new AssertionGroup();
 		group.setName("Test group");
 
 		assertNotNull(assertionService);
 		assertNotNull(assertionGroupRepo);
-		group = (AssertionGroup) assertionGroupRepo.save(group);
+		group = assertionGroupRepo.save(group);
 		assertNotNull(group.getId());
 	}
 
@@ -85,7 +77,7 @@ public class AssertionGroupControllerIntegrationTest {
 				.andExpect(content().string(containsString(group.getName()))).andDo(print());
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testGetGroup() throws Exception {
 
 		final Long id = group.getId();
@@ -97,14 +89,14 @@ public class AssertionGroupControllerIntegrationTest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	public void testDeleteGroup() throws Exception {
 		final Long id = group.getId();
 		mockMvc.perform(delete("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk()).andDo(print());
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testDeleteMissingGroup() throws Exception {
 		final Long id = 29367234L;
 		mockMvc.perform(delete("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
@@ -130,7 +122,7 @@ public class AssertionGroupControllerIntegrationTest {
 				.andExpect(jsonPath("id").exists()).andDo(print());
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testUpdateGroup() throws Exception {
 		final Long id = group.getId();
 		final String updatedName = "Updated Assertion Group Name";
@@ -143,7 +135,7 @@ public class AssertionGroupControllerIntegrationTest {
 				.andExpect(jsonPath("name").value(updatedName)).andDo(print());
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testGetAssertionsForGroup() throws Exception {
 		final Long id = group.getId();
 		// create and add some assertions
@@ -179,7 +171,7 @@ public class AssertionGroupControllerIntegrationTest {
 				.andExpect(jsonPath("$[0].assertionText", is("Test assertion")));
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testDeleteTestsForAssertion() throws Exception {
 		final Long id = group.getId();
 		// create and add some assertions
@@ -195,8 +187,8 @@ public class AssertionGroupControllerIntegrationTest {
 	}
 
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterEach
+	public void tearDown() {
 		assert assertionGroupRepo != null;
 		if (group != null) {
 			assertionGroupRepo.delete(group);

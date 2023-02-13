@@ -4,41 +4,31 @@ import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.TestRunItem;
-import org.ihtsdo.rvf.core.service.AssertionExecutionService;
-import org.ihtsdo.rvf.core.service.ReleaseDataManager;
-import org.ihtsdo.rvf.core.service.ResourceDataLoader;
-import org.ihtsdo.rvf.core.service.WhitelistService;
+import org.ihtsdo.rvf.core.service.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
-import org.ihtsdo.rvf.core.service.MysqlFailuresExtractor;
-import org.ihtsdo.rvf.core.service.whitelist.WhitelistItem;
-import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.service.util.ZipFileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.ihtsdo.rvf.core.service.whitelist.WhitelistItem;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-
-@RunWith(SpringRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
 public class RVFAssertionsWhitelistRegressionHarnessForTest {
     private static final String COMPONENT_CENTRIC_VALIDATION = "component-centric-validation";
@@ -65,11 +55,11 @@ public class RVFAssertionsWhitelistRegressionHarnessForTest {
     private MysqlFailuresExtractor mysqlFailuresExtractor;
 
     private MysqlExecutionConfig config;
-    private List<String> rf2FilesLoaded = new ArrayList<>();
+    private final List<String> rf2FilesLoaded = new ArrayList<>();
     private boolean isRunFirstTime = true;
 
-    @Before
-    public void setUp() throws IOException, SQLException, BusinessServiceException {
+    @BeforeEach
+    public void setUp() throws IOException, BusinessServiceException {
         MockitoAnnotations.initMocks(this);
 
         if (!isRunFirstTime) {
@@ -83,21 +73,21 @@ public class RVFAssertionsWhitelistRegressionHarnessForTest {
         config.setFailureExportMax(10);
         if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
             URL previousReleaseUrl = RVFAssertionsWhitelistRegressionHarnessForTest.class.getResource("/SnomedCT_RegressionTest_20130131");
-            assertNotNull("Must not be null", previousReleaseUrl);
+            assertNotNull(previousReleaseUrl, "Must not be null");
             File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
             ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
             releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
         }
         if (!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
             final URL prospectiveReleaseUrl = RVFAssertionsWhitelistRegressionHarnessForTest.class.getResource("/SnomedCT_RegressionTest_20130731");
-            assertNotNull("Must not be null", prospectiveReleaseUrl);
+            assertNotNull(prospectiveReleaseUrl, "Must not be null");
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
             ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
             releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, rf2FilesLoaded, prospectiveFile);
             resourceDataLoader.loadResourceData(PROSPECTIVE_RELEASE);
             List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource", true);
             assertNotNull(assertions);
-            assertTrue(!assertions.isEmpty());
+            assertFalse(assertions.isEmpty());
             assertionExecutionService.executeAssertions(assertions, config);
         }
         isRunFirstTime = false;
@@ -135,12 +125,12 @@ public class RVFAssertionsWhitelistRegressionHarnessForTest {
         releaseDataManager.clearQAResult(config.getExecutionId());
     }
 
-    private List<TestRunItem> runAssertionsTest(final List<Assertion> assertions) throws Exception {
+    private List<TestRunItem> runAssertionsTest(final List<Assertion> assertions) {
         final Collection<TestRunItem> runItems = assertionExecutionService.executeAssertionsConcurrently(assertions, config);
         return new ArrayList<>(runItems);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         rf2FilesLoaded.clear();
     }

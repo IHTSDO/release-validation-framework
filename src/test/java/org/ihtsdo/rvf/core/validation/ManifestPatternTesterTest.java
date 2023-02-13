@@ -3,19 +3,17 @@ package org.ihtsdo.rvf.core.validation;
 import org.ihtsdo.rvf.core.service.structure.pojo.ManifestFile;
 import org.ihtsdo.rvf.core.service.structure.resource.ZipFileResourceProvider;
 import org.ihtsdo.rvf.core.service.structure.validation.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
+import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 public class ManifestPatternTesterTest {
 
@@ -25,8 +23,12 @@ public class ManifestPatternTesterTest {
 		TestReportable testReport = new StreamTestReport(new CsvMetadataResultFormatter(), new TestWriterDelegate(new StringWriter()), true);
 		String manifestFilename = "/manifest_20250731.xml";
 		String packageName = "/SnomedCT_Release_INT_20140831.zip";
-		File f = new File(getClass().getResource(manifestFilename).toURI());
-		File zipFile = new File(getClass().getResource(packageName).toURI());
+		URL url = getClass().getResource(manifestFilename);
+		assertNotNull(url);
+		File f = new File(url.toURI());
+		url = getClass().getResource(packageName);
+		assertNotNull(url);
+		File zipFile = new File(url.toURI());
 		ManifestPatternTester tester = new ManifestPatternTester(new TestValidationLogImpl(ManifestPatternTester.class),
 				new ZipFileResourceProvider(zipFile), new ManifestFile(f), testReport);
 		tester.runTests();
@@ -37,11 +39,13 @@ public class ManifestPatternTesterTest {
 
 	}
 	
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testNormalization() throws Exception {
 		TestReportable testReport = new StreamTestReport(new CsvMetadataResultFormatter(), new TestWriterDelegate(new StringWriter()), false);
 		String manifestFilename = "/manifest_ee_test.xml";
-		File manifestFile = new File(getClass().getResource(manifestFilename).toURI());
+		URL url = getClass().getResource(manifestFilename);
+		assertNotNull(url);
+		File manifestFile = new File(url.toURI());
 		File releasePackage = File.createTempFile("TestRelease", ".zip");
 		try (ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(releasePackage), StandardCharsets.UTF_8);
 			 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
@@ -58,7 +62,7 @@ public class ManifestPatternTesterTest {
 				new ZipFileResourceProvider(releasePackage), new ManifestFile(manifestFile), testReport);
 		tester.runTests();
 		assertEquals("There should be no errors", 0, testReport.getNumErrors());
-		releasePackage.delete();
+		Assertions.assertTrue(releasePackage.delete());
 	}
 
 }

@@ -1,28 +1,25 @@
 package org.ihtsdo.rvf.core.service;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.rvf.TestConfig;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.annotation.Resource;
 import java.io.File;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.ihtsdo.rvf.TestConfig;
-import org.ihtsdo.rvf.config.Config;
-import org.ihtsdo.rvf.core.service.ReleaseDataManager;
-import org.ihtsdo.rvf.core.service.config.DatabaseServiceConfig;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
 public class ReleaseDataManagerIntegrationTest {
 	@Resource(name = "dataSource")
@@ -34,7 +31,9 @@ public class ReleaseDataManagerIntegrationTest {
 	public void testLoadSctData() throws Exception {
 		assert dataSource != null;
 
-		final File inputFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
+		URL url = getClass().getResource("/SnomedCT_Release_INT_20140131.zip");
+		assertNotNull(url);
+		final File inputFile = new File(url.toURI());
 		assertNotNull(inputFile);
 		final String versionName = "20140131";
 		List<String> rf2FilesLoaded = new ArrayList<>();
@@ -50,21 +49,23 @@ public class ReleaseDataManagerIntegrationTest {
 					break;
 				}
 			}
-			assertTrue("Schema name must exist : " + schemaName, exists);
+			assertTrue(exists, "Schema name must exist : " + schemaName);
 			assertNotNull(releaseDataManager.getZipFileForKnownRelease(versionName));
 		}
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testUploadSctData() throws Exception {
 		assert dataSource != null;
-		final File inputFile = new File(getClass().getResource("/SnomedCT_Release_INT_20140131.zip").toURI());
+		URL url = getClass().getResource("/SnomedCT_Release_INT_20140131.zip");
+		assertNotNull(url);
+		final File inputFile = new File(url.toURI());
 		assertNotNull(inputFile);
 		final boolean writeSucess =releaseDataManager.uploadPublishedReleaseData(inputFile, "int", "20140131");
-		assertTrue("Upload must have been successful", writeSucess);
+		assertTrue(writeSucess, "Upload must have been successful");
 
-		assertTrue("Schema name for release 20140131 must be known to data manager ", releaseDataManager.isKnownRelease("rvf_int_20140131"));
+		assertTrue(releaseDataManager.isKnownRelease("rvf_int_20140131"), "Schema name for release 20140131 must be known to data manager ");
 
-		assertTrue("Relese 20140131 must exist in all known releases ", releaseDataManager.getAllKnownReleases().contains("rvf_int_20140131"));
+		assertTrue(releaseDataManager.getAllKnownReleases().contains("rvf_int_20140131"), "Relese 20140131 must exist in all known releases ");
 	}
 }

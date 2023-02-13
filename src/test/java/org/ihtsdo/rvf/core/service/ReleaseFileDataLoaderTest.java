@@ -2,31 +2,28 @@ package org.ihtsdo.rvf.core.service;
 
 
 import org.ihtsdo.rvf.core.service.util.MySqlDataTypeConverter;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@ExtendWith(SpringExtension.class)
 public class ReleaseFileDataLoaderTest {
 	private ReleaseFileDataLoader loader;
-	private MySqlDataTypeConverter dataConverter;
 	private String rf2FileName;
-	@Before
+	@BeforeEach
 	public void setUp() {
-		dataConverter = new MySqlDataTypeConverter();
-		loader = new ReleaseFileDataLoader(null,dataConverter);
+		MySqlDataTypeConverter dataConverter = new MySqlDataTypeConverter();
+		loader = new ReleaseFileDataLoader(null, dataConverter);
 		
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testLoadConceptDeltaFile() throws Exception {
-		
-//		sct2_Concept_SpanishExtensionDelta_INT_20141031.txt
-//		"sct2_Concept_Full_INT_20150131.txt"
 		rf2FileName = "sct2_Concept_SpanishExtensionDelta_INT_20141031.txt";
 		final String expected = "create table concept_d(\n" + 
 				"id bigint(20) not null,\n" + 
@@ -42,13 +39,12 @@ public class ReleaseFileDataLoaderTest {
 				") engine=myisam default charset=utf8;";
 		
 		final String script = loader.createTableSQL(rf2FileName);
-		Assert.assertNotNull(script);
-		Assert.assertEquals(expected, script);
-		
+		assertNotNull(script);
+		assertEquals(expected, script);
 	}
 	
 	@Test
-	@Ignore
+	@Disabled
 	public void testLoadTextDefinition() throws Exception {
 		final String expected = "create table textdefinition_f(\n" + 
 				"id bigint(20) not null,\n" + 
@@ -71,12 +67,7 @@ public class ReleaseFileDataLoaderTest {
 				") engine=myisam default charset=utf8;";
 		rf2FileName = "sct2_TextDefinition_Full-en_INT_20150131.txt";
 		final String script = loader.createTableSQL(rf2FileName);
-		Assert.assertNotNull(script);
-		Assert.assertEquals(expected, script);
-	}
-	
-	@After
-	public void tearDown() {
-		
+		assertNotNull(script);
+		assertEquals(expected, script);
 	}
 }

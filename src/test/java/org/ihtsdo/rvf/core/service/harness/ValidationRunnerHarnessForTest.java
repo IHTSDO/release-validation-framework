@@ -1,18 +1,18 @@
 package org.ihtsdo.rvf.core.service.harness;
 
-import java.io.File;
-import java.util.List;
-
 import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.core.service.ValidationRunner;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+import java.io.File;
+import java.util.List;
+
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
 public class ValidationRunnerHarnessForTest {
 	@Autowired
@@ -33,5 +33,4 @@ public class ValidationRunnerHarnessForTest {
 		validationConfig.setRunId(System.currentTimeMillis());
 		runner.run(validationConfig);
 	}
-
 }

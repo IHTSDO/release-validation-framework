@@ -1,43 +1,37 @@
 package org.ihtsdo.rvf.rest.controller;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-
-import javax.servlet.ServletException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.ExecutionCommand;
 import org.ihtsdo.rvf.core.data.model.TestType;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.ServletException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
 
-@RunWith(SpringRunner.class)
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
 @ContextConfiguration(classes = TestConfig.class)
 @WebAppConfiguration
 public class TestUploadFileControllerIntegrationTest {
@@ -51,12 +45,12 @@ public class TestUploadFileControllerIntegrationTest {
 			MediaType.APPLICATION_JSON.getType(),
 			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 
-	@Before
+	@BeforeEach
 	public void setup() throws ServletException {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testUploadTestPackage() throws Exception {
 		final MvcResult result = mockMvc.perform(
 				multipart("/test-file")
@@ -69,7 +63,7 @@ public class TestUploadFileControllerIntegrationTest {
 		assertTrue(content.length() > 0);
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testPostUploadTestPackage() throws Exception {
 		final MvcResult result = mockMvc.perform(
 				multipart("/test-post")
@@ -93,7 +87,7 @@ public class TestUploadFileControllerIntegrationTest {
 		assertTrue(result.getResponse().getContentAsString().length() > 0);
 	}
 
-	@Test
+	@org.junit.jupiter.api.Test
 	public void testUploadTestDescription() throws Exception {
 		final MvcResult result = mockMvc.perform(
 				multipart("/test-pre")
@@ -117,8 +111,8 @@ public class TestUploadFileControllerIntegrationTest {
 		assertTrue(result.getResponse().getContentAsString().length() > 0);
 	}
 
-	@Test
-	@Ignore
+	@org.junit.jupiter.api.Test
+	@Disabled
 	public void testRunPostTestPackage() throws Exception {
 
 		final Assertion assertion = new Assertion();
@@ -132,8 +126,8 @@ public class TestUploadFileControllerIntegrationTest {
 		MvcResult returnedResponse = mockMvc.perform(post("/assertions").content(paramsString).contentType(MediaType.APPLICATION_JSON)).andReturn();
 
 		final Assertion assertion2 = objectMapper.readValue(returnedResponse.getResponse().getContentAsString(), Assertion.class);
-		assertNotNull("Returned assertion must not be null", assertion2);
-		assertNotNull("Returned assertion must have an id", assertion2.getAssertionId());
+		assertNotNull(assertion2, "Returned assertion must not be null");
+		assertNotNull(assertion2.getAssertionId(), "Returned assertion must have an id");
 		final Long assertionId = assertion2.getAssertionId();
 
 		// set configuration
@@ -149,7 +143,7 @@ public class TestUploadFileControllerIntegrationTest {
 				"having count(*) = 1;";
 		final ExecutionCommand command = new ExecutionCommand();
 		command.setTemplate(template);
-		command.setStatements(Collections.<String>emptyList());
+		command.setStatements(Collections.emptyList());
 
 		final String execTestName = "Real - Concept has 1 defining relationship but is not primitive";
 		final org.ihtsdo.rvf.core.data.model.Test executableTest = new org.ihtsdo.rvf.core.data.model.Test();
@@ -172,8 +166,8 @@ public class TestUploadFileControllerIntegrationTest {
 				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
 				.andExpect(jsonPath("id").exists()).andReturn();
 		final AssertionGroup group = objectMapper.readValue(returnedResponse.getResponse().getContentAsString(), AssertionGroup.class);
-		assertNotNull("Returned group must not be null", group);
-		assertNotNull("Returned group must have an id", group.getId());
+		assertNotNull(group, "Returned group must not be null");
+		assertNotNull(group.getId(), "Returned group must have an id");
 
 		// add assertions to group
 		final List<String> assertionIds= Collections.singletonList(assertionId.toString());

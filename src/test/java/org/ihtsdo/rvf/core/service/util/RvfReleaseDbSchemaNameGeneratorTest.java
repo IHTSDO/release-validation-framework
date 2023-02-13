@@ -1,12 +1,10 @@
 package org.ihtsdo.rvf.core.service.util;
 
-import static org.junit.Assert.*;
-import static org.ihtsdo.rvf.core.service.util.RvfReleaseDbSchemaNameGenerator.*;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
-@RunWith(JUnit4.class)
+import static org.ihtsdo.rvf.core.service.util.RvfReleaseDbSchemaNameGenerator.generate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class RvfReleaseDbSchemaNameGeneratorTest {
 	@Test
 	public void testInternationalMemberRelase() {
