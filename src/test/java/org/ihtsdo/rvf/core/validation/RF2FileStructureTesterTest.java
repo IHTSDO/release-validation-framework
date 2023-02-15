@@ -5,6 +5,7 @@ import org.ihtsdo.rvf.core.service.structure.validation.CsvMetadataResultFormatt
 import org.ihtsdo.rvf.core.service.structure.validation.RF2FileStructureTester;
 import org.ihtsdo.rvf.core.service.structure.validation.StreamTestReport;
 import org.ihtsdo.rvf.core.service.structure.validation.TestValidationLogImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -19,6 +20,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RF2FileStructureTesterTest {
 	private StreamTestReport testReport;
+
+	@BeforeEach
+	void setUp() {
+		testReport = new StreamTestReport(new CsvMetadataResultFormatter(), new TestWriterDelegate(new StringWriter()), false);
+	}
+
+	@BeforeEach
+	void tearDown() {
+		testReport = null;
+	}
 
 	@Test
 	public void testFileWithLFOnlyAsLineTerminator() throws URISyntaxException {
@@ -56,7 +67,6 @@ public class RF2FileStructureTesterTest {
 		assertNotNull(res);
 		final File f = new File(res.toURI());
 		final ResourceProvider resourceManager = new TestFileResourceProvider(f);
-		testReport = new StreamTestReport(new CsvMetadataResultFormatter(), new TestWriterDelegate(new StringWriter()), false);
 		RF2FileStructureTester rf2FileStructureTester = new RF2FileStructureTester(new TestValidationLogImpl(RF2FileStructureTester.class), resourceManager, testReport);
 		rf2FileStructureTester.runTests();
 	}
