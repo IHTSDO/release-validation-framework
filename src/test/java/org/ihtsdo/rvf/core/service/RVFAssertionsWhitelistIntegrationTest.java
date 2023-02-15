@@ -1,10 +1,9 @@
-package org.ihtsdo.rvf.core.service.harness;
+package org.ihtsdo.rvf.core.service;
 
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.TestRunItem;
-import org.ihtsdo.rvf.core.service.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.util.ZipFileUtils;
 import org.ihtsdo.rvf.core.service.whitelist.WhitelistItem;
@@ -30,7 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = TestConfig.class)
-public class RVFAssertionsWhitelistRegressionHarnessForTest {
+public class RVFAssertionsWhitelistIntegrationTest {
     private static final String COMPONENT_CENTRIC_VALIDATION = "component-centric-validation";
     private static final String PROSPECTIVE_RELEASE = "rvf_regression_test_prospective";
     private static final String PREVIOUS_RELEASE = "rvf_regression_test_previous";
@@ -72,14 +71,14 @@ public class RVFAssertionsWhitelistRegressionHarnessForTest {
         config.setProspectiveVersion(PROSPECTIVE_RELEASE);
         config.setFailureExportMax(10);
         if (!releaseDataManager.isKnownRelease(PREVIOUS_RELEASE)) {
-            URL previousReleaseUrl = RVFAssertionsWhitelistRegressionHarnessForTest.class.getResource("/SnomedCT_RegressionTest_20130131");
+            URL previousReleaseUrl = RVFAssertionsWhitelistIntegrationTest.class.getResource("/SnomedCT_RegressionTest_20130131");
             assertNotNull(previousReleaseUrl, "Must not be null");
             File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
             ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
             releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
         }
         if (!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
-            final URL prospectiveReleaseUrl = RVFAssertionsWhitelistRegressionHarnessForTest.class.getResource("/SnomedCT_RegressionTest_20130731");
+            final URL prospectiveReleaseUrl = RVFAssertionsWhitelistIntegrationTest.class.getResource("/SnomedCT_RegressionTest_20130731");
             assertNotNull(prospectiveReleaseUrl, "Must not be null");
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
             ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());

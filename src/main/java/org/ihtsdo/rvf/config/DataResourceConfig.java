@@ -1,20 +1,15 @@
-package org.ihtsdo.rvf.core.service.config;
+package org.ihtsdo.rvf.config;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.rvf.core.service.config.AssertionsResourceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@EntityScan("org.ihtsdo.rvf.core.data.model")
-@EnableJpaRepositories("org.ihtsdo.rvf.core.data.repository")
-@EnableTransactionManagement
-public class DatabaseServiceConfig {
+public abstract class DataResourceConfig {
 
     @Value("${rvf.jdbc.driverClassName}")
     private String driverClassName;

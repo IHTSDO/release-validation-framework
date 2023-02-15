@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.core.service.harness;
+package org.ihtsdo.rvf.core.service;
 
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
@@ -24,7 +24,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = {TestConfig.class})
-public class ValidationVersionLoaderIntegrationHarnessForTest {
+public class ValidationVersionLoaderIntegrationTest {
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 	
@@ -77,7 +77,7 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 		assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	public void testProspectiveVersionWithExtension() throws Exception {
 		prospectiveVersion = validationConfig.getRunId().toString();
 		validationConfig.addDependencyRelease("int_20160131");
@@ -100,7 +100,7 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 		
 	}
 	
-	@org.junit.jupiter.api.Test
+	@Test
 	public void testLoadPreviousIntDerivativeVersion() throws Exception {
 		
 		validationConfig.setExtensionDependency("int_20160131");
@@ -126,7 +126,7 @@ public class ValidationVersionLoaderIntegrationHarnessForTest {
 		validationConfig = null;
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	public void testCopyFile() throws IOException {
 		File prospectiveFile = File.createTempFile(validationConfig.getRunId() + "_" + validationConfig.getTestFileName(), ".zip");
 		try (FileOutputStream out = new FileOutputStream(prospectiveFile); InputStream input = new FileInputStream(ClassLoader.getSystemResource("Daily_Export_Delta.zip").getFile())) {

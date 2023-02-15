@@ -10,7 +10,7 @@ public class ValidationRunConfig {
 	private String testFileName;
 	private Long runId;
 	private transient MultipartFile file;
-	private boolean writeSucceses;
+	private boolean writeSuccess;
 	private transient MultipartFile manifestFile;
 	private List<String> groupsList;
 	private String previousRelease;
@@ -52,11 +52,11 @@ public class ValidationRunConfig {
 		this.file = file;
 		return this;
 	}
-	public boolean isWriteSucceses() {
-		return writeSucceses;
+	public boolean isWriteSuccess() {
+		return writeSuccess;
 	}
 	public ValidationRunConfig addWriteSucceses(final boolean writeSucceses) {
-		this.writeSucceses = writeSucceses;
+		this.writeSuccess = writeSucceses;
 		return this;
 	}
 	public MultipartFile getManifestFile() {
@@ -124,8 +124,8 @@ public class ValidationRunConfig {
 		this.runId = runId;
 	}
 
-	public void setWriteSucceses(boolean writeSucceses) {
-		this.writeSucceses = writeSucceses;
+	public void setWriteSuccess(boolean writeSuccess) {
+		this.writeSuccess = writeSuccess;
 	}
 
 	public void setGroupsList(List<String> groupsList) {

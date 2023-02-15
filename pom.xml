@@ -13,13 +13,12 @@
     <artifactId>release-validation-framework</artifactId>
     <version>3.14.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>release-validation-framework</name>
     <description>SNOMED Release Validation Framework</description>
 
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <packageName>rvf-${project.artifactId}</packageName>
+        <packageName>rvf-api</packageName>
         <execFinalName>validation-${project.build.finalName}.jar</execFinalName>
         <skip.integration.tests>true</skip.integration.tests>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -52,7 +51,7 @@
         <snomed-drools.version>3.3.0</snomed-drools.version>
         <snomed-drools.version>3.3.0</snomed-drools.version>
         <snomed.utilities.version>1.4.1</snomed.utilities.version>
-        <spring-cloud-version>1.2.2.RELEASE</spring-cloud-version>
+        <spring-cloud-version>2.2.6.RELEASE</spring-cloud-version>
         <springfox-swagger.version>2.7.0</springfox-swagger.version>
         <swagger-springmvc.version>1.0.2</swagger-springmvc.version>
     </properties>
@@ -456,6 +455,10 @@
                     <groupId>org.junit.vintage</groupId>
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.vaadin.external.google</groupId>
+                    <artifactId>android-json</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
@@ -494,9 +497,7 @@
                 <configuration>
                     <includes>
                         <include>**/*IT.java</include>
-                        <exclude>**/*HarnessForTest.java</exclude>
                         <include>**/*IntegrationTest.java</include>
-                        <include>**/*IntegrationSpec.java</include>
                     </includes>
                     <skipTests>${skip.integration.tests}</skipTests>
                 </configuration>
@@ -542,34 +543,12 @@
                             <signPackage>false</signPackage>
                             <dataSet>
                                 <data>
-                                    <src>${project.build.directory}/${project.artifactId}.${project.packaging}</src>
-                                    <dst>app.jar</dst>
+                                    <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                                    <dst>${packageName}.jar</dst>
                                     <type>file</type>
                                     <mapper>
                                         <type>perm</type>
-                                        <prefix>/opt/${packageName}/lib/</prefix>
-                                    </mapper>
-                                </data>
-                                <data>
-                                    <src>${basedir}/src/deb/supervisor.conf</src>
-                                    <dst>/etc/supervisor/conf.d/${packageName}.conf</dst>
-                                    <type>file</type>
-                                </data>
-                                <data>
-                                    <type>template</type>
-                                    <paths>
-                                        <path>/etc/opt/${packageName}</path>
-                                        <path>/opt/${packageName}</path>
-                                    </paths>
-                                </data>
-                                <data>
-                                    <type>template</type>
-                                    <paths>
-                                        <path>/var/opt/${packageName}</path>
-                                        <path>/var/opt/${packageName}/run</path>
-                                    </paths>
-                                    <mapper>
-                                        <type>perm</type>
+                                        <prefix>/opt/${packageName}/</prefix>
                                         <user>${packageName}</user>
                                         <group>${packageName}</group>
                                         <dirmode>0750</dirmode>
