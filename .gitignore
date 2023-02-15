@@ -25,3 +25,4 @@ activemq-data/
 # Whitelist some files
 !.gitattributes
 store
+application-*.properties

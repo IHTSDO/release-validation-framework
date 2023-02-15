@@ -10,10 +10,13 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("application-test.properties")
 @TestConfiguration
 @SpringBootApplication(
-        exclude = {ContextCredentialsAutoConfiguration.class,
+        exclude = {
+                ContextCredentialsAutoConfiguration.class,
                 ContextInstanceDataAutoConfiguration.class,
                 ContextRegionProviderAutoConfiguration.class,
                 ContextResourceLoaderAutoConfiguration.class,
-                ContextStackAutoConfiguration.class})
+                ContextStackAutoConfiguration.class
+        }
+)
 public class TestConfig extends Config {
 }

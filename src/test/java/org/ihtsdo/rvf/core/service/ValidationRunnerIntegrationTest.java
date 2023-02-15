@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.core.service.harness;
+package org.ihtsdo.rvf.core.service;
 
 import org.ihtsdo.rvf.TestConfig;
 import org.ihtsdo.rvf.core.service.ValidationRunner;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public class ValidationRunnerHarnessForTest {
+public class ValidationRunnerIntegrationTest {
 	@Autowired
 	ValidationRunner runner;
 	

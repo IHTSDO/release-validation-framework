@@ -1,8 +1,8 @@
 package org.ihtsdo.rvf.core.service.structure.validation;
 
-import org.ihtsdo.rvf.core.service.structure.pojo.FileElement;
-import org.ihtsdo.rvf.core.service.structure.pojo.Folder;
-import org.ihtsdo.rvf.core.service.structure.pojo.ManifestFile;
+import org.ihtsdo.rvf.core.service.structure.listing.FileElement;
+import org.ihtsdo.rvf.core.service.structure.listing.Folder;
+import org.ihtsdo.rvf.core.service.structure.listing.ManifestFile;
 
 import java.util.ArrayList;
 import java.util.Arrays;

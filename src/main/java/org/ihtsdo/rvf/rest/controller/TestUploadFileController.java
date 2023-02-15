@@ -11,7 +11,7 @@ import org.ihtsdo.rvf.core.service.ValidationRunner;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.core.service.structure.validation.StructuralTestRunner;
 import org.ihtsdo.rvf.core.service.structure.validation.TestReportable;
-import org.ihtsdo.rvf.core.service.structure.pojo.ManifestFile;
+import org.ihtsdo.rvf.core.service.structure.listing.ManifestFile;
 import org.ihtsdo.rvf.core.service.structure.resource.ResourceProvider;
 import org.ihtsdo.rvf.core.service.structure.resource.TextFileResourceProvider;
 import org.ihtsdo.rvf.core.service.structure.resource.ZipFileResourceProvider;

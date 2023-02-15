@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.core.service.structure.pojo;
+package org.ihtsdo.rvf.core.service.structure.listing;
 
 public class FileElement {
 

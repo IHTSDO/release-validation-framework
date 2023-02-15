@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.core.service.harness;
+package org.ihtsdo.rvf.core.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -8,7 +8,6 @@ import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.FailureDetail;
 import org.ihtsdo.rvf.core.data.model.TestRunItem;
-import org.ihtsdo.rvf.core.service.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.util.ZipFileUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -33,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 
 @ContextConfiguration(classes = TestConfig.class)
-public class RVFAssertionsRegressionHarnessForTest {
+public class RVFAssertionsRegressIntegrationTest {
 
     public static final String DIFF = "*** Difference explained: ";
 
@@ -82,7 +81,7 @@ public class RVFAssertionsRegressionHarnessForTest {
             boolean testMysqlBinaryArchive = false;
 
             if (!testMysqlBinaryArchive || !releaseDataManager.restoreReleaseFromBinaryArchive(PREVIOUS_RELEASE + ".zip")) {
-                URL previousReleaseUrl = RVFAssertionsRegressionHarnessForTest.class.getResource("/SnomedCT_RegressionTest_20130131");
+                URL previousReleaseUrl = RVFAssertionsRegressIntegrationTest.class.getResource("/SnomedCT_RegressionTest_20130131");
                 assertNotNull(previousReleaseUrl, "Must not be null");
                 File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
                 ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
@@ -94,7 +93,7 @@ public class RVFAssertionsRegressionHarnessForTest {
             }
         }
         if (reloadTestData || !releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
-            final URL prospectiveReleaseUrl = RVFAssertionsRegressionHarnessForTest.class.getResource("/SnomedCT_RegressionTest_20130731");
+            final URL prospectiveReleaseUrl = RVFAssertionsRegressIntegrationTest.class.getResource("/SnomedCT_RegressionTest_20130731");
             assertNotNull(prospectiveReleaseUrl, "Must not be null");
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
             ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
@@ -105,11 +104,11 @@ public class RVFAssertionsRegressionHarnessForTest {
             assertFalse(assertions.isEmpty());
             assertionExecutionService.executeAssertions(assertions, config);
         }
-        releaseTypeExpectedResults = RVFAssertionsRegressionHarnessForTest.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
+        releaseTypeExpectedResults = RVFAssertionsRegressIntegrationTest.class.getResource("/regressionTestResults/releaseTypeRegressionExpected.json");
         assertNotNull(releaseTypeExpectedResults, "Must not be null");
-        componentCentrilExpected = RVFAssertionsRegressionHarnessForTest.class.getResource("/regressionTestResults/componentCentricRegressionExpected.json");
+        componentCentrilExpected = RVFAssertionsRegressIntegrationTest.class.getResource("/regressionTestResults/componentCentricRegressionExpected.json");
         assertNotNull(componentCentrilExpected, "Must not be null");
-        fileCentricExpected = RVFAssertionsRegressionHarnessForTest.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
+        fileCentricExpected = RVFAssertionsRegressIntegrationTest.class.getResource("/regressionTestResults/fileCentricRegressionExpected.json");
         assertNotNull(fileCentricExpected, "Must not be null");
         isRunFirstTime = false;
     }

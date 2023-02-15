@@ -5,7 +5,7 @@ import org.ihtsdo.rvf.core.data.model.FailureDetail;
 import org.ihtsdo.rvf.core.data.model.TestRunItem;
 import org.ihtsdo.rvf.core.data.model.TestType;
 import org.ihtsdo.rvf.core.data.model.ValidationReport;
-import org.ihtsdo.rvf.core.service.structure.pojo.ManifestFile;
+import org.ihtsdo.rvf.core.service.structure.listing.ManifestFile;
 import org.ihtsdo.rvf.core.service.structure.resource.ResourceProvider;
 import org.ihtsdo.rvf.core.service.structure.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;

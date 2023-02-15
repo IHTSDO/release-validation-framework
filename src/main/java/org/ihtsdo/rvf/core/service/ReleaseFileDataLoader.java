@@ -41,22 +41,6 @@ public class ReleaseFileDataLoader {
 		dataTypeConverter = typeConverter;
 	}
 
-
-	/**TODO
-	 * @param rf2FileName
-	 * @return
-	 * @throws SQLException
-	 * @throws FileRecognitionException
-	 */
-	public String createTableSQL(final String rf2FileName) throws SQLException, FileRecognitionException {
-		final SchemaFactory schemaFactory = new SchemaFactory();
-		final TableSchema tableSchema = schemaFactory.createSchemaBean(rf2FileName);
-		//TODO need to have logic in place so that table name can be constructed following current convention if
-		//not found for a new file
-		return createTable(tableSchema);
-	}
-
-	
 	/**
 	 * @param rf2TextFileRootPath
 	 * @param rf2Files

@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.core.validation;
 
-import org.ihtsdo.rvf.core.service.structure.pojo.Listing;
-import org.ihtsdo.rvf.core.service.structure.pojo.ManifestFile;
+import org.ihtsdo.rvf.core.service.structure.listing.Listing;
+import org.ihtsdo.rvf.core.service.structure.listing.ManifestFile;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

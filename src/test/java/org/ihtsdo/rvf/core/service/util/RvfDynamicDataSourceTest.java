@@ -21,7 +21,6 @@ public class RvfDynamicDataSourceTest {
 	private RvfDynamicDataSource rvfDynamicDataSource;
 
 	@Test
-	@Disabled
 	public void testGettingLargeNumberOfConnections() throws Exception {
 		assertNotNull(rvfDynamicDataSource);
 		// try and 10 connections

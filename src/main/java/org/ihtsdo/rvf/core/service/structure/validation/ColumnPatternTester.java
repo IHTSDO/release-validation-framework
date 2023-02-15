@@ -1,6 +1,6 @@
 package org.ihtsdo.rvf.core.service.structure.validation;
 
-import org.ihtsdo.rvf.core.service.structure.pojo.ColumnType;
+import org.ihtsdo.rvf.core.service.structure.listing.ColumnType;
 import org.ihtsdo.rvf.core.service.structure.resource.ResourceProvider;
 import org.ihtsdo.snomed.util.rf2.schema.*;
 import org.slf4j.Logger;

@@ -16,7 +16,6 @@ import org.ihtsdo.rvf.core.service.structure.validation.StructuralTestRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import javax.jms.JMSException;
@@ -31,7 +30,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Service
-@Scope("prototype")
 public class ValidationRunner {
 
 	public static final List<String> EMPTY_TEST_ASSERTION_GROUPS = Collections.singletonList("empty-test");
@@ -215,7 +213,7 @@ public class ValidationRunner {
 																		validationConfig.getLocalProspectiveFile(),
 																		validationConfig.getRunId(),
 																		validationConfig.getLocalManifestFile(),
-																		validationConfig.isWriteSucceses(),
+																		validationConfig.isWriteSuccess(),
 																		validationConfig.getUrl(),
 																		validationConfig.getStorageLocation(),
 																		validationConfig.getFailureExportMax());

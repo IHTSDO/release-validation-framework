@@ -8,7 +8,6 @@ import org.ihtsdo.rvf.core.data.model.Test;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
 public interface AssertionService {
 	//Assertion
 	Assertion create(Assertion assertion);

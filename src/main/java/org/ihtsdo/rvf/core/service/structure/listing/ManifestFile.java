@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.core.service.structure.pojo;
+package org.ihtsdo.rvf.core.service.structure.listing;
 
 import org.apache.commons.digester3.Digester;
 import org.apache.commons.digester3.binder.DigesterLoader;
