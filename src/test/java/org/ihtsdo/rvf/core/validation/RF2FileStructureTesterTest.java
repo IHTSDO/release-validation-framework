@@ -26,11 +26,6 @@ public class RF2FileStructureTesterTest {
 		testReport = new StreamTestReport(new CsvMetadataResultFormatter(), new TestWriterDelegate(new StringWriter()), false);
 	}
 
-	@BeforeEach
-	void tearDown() {
-		testReport = null;
-	}
-
 	@Test
 	public void testFileWithLFOnlyAsLineTerminator() throws URISyntaxException {
 		executeRun("/structure/rel2_sRefset_SimpleMapDelta_WithUnixLineEnding.txt");
@@ -49,9 +44,9 @@ public class RF2FileStructureTesterTest {
 
 	@Test
 	public void testFileWithoutLineTerminatorForLastLine() throws Exception {
-		executeRun("/structure/der2_Refset_SimpleDelta_LastLineWithoutTerminator.txt");
+		executeRun("/structure/rel2_Refset_SimpleDelta_LastLineWithoutTerminator.txt");
 		System.out.println(testReport.getResult());
-		assertEquals(1, testReport.getNumErrors(), "Total errors not matching");
+		assertEquals(2, testReport.getNumErrors(), "Total errors not matching");
 	}
 	
 	@Test
