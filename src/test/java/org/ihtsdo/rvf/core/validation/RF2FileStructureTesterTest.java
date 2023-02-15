@@ -22,7 +22,7 @@ public class RF2FileStructureTesterTest {
 
 	@Test
 	public void testFileWithLFOnlyAsLineTerminator() throws URISyntaxException {
-		executeRun("/rel2_sRefset_SimpleMapDelta_WithUnixLineEnding.txt");
+		executeRun("/structure/rel2_sRefset_SimpleMapDelta_WithUnixLineEnding.txt");
 		System.out.println(testReport.getResult());
 		assertEquals(2, testReport.getNumErrors(), "Total errors not matching");
 
@@ -38,14 +38,14 @@ public class RF2FileStructureTesterTest {
 
 	@Test
 	public void testFileWithoutLineTerminatorForLastLine() throws Exception {
-		executeRun("/der2_Refset_SimpleDelta_LastLineWithoutTerminator.txt");
+		executeRun("/structure/der2_Refset_SimpleDelta_LastLineWithoutTerminator.txt");
 		System.out.println(testReport.getResult());
 		assertEquals(1, testReport.getNumErrors(), "Total errors not matching");
 	}
 	
 	@Test
 	public void testEmptyFIle() throws Exception {
-		executeRun("/rel2_Refset_SimpleDelta_INT_20140131_Empty.txt");
+		executeRun("/structure/rel2_Refset_SimpleDelta_INT_20140131_Empty.txt");
 		System.out.println(testReport.getResult());
 		assertEquals(1, testReport.getNumErrors(), "Total errors not matching");
 	}
