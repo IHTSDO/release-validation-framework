@@ -266,6 +266,20 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- consul and vault -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-consul-config</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-vault-config</artifactId>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

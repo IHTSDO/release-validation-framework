@@ -11,16 +11,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public abstract class DataResourceConfig {
 
-    @Value("${rvf.jdbc.driverClassName}")
+    @Value("${spring.datasource.driver-class-name}")
     private String driverClassName;
 
-    @Value("${rvf.jdbc.url}")
+    @Value("${spring.datasource.url}")
     private String url;
 
-    @Value("${rvf.jdbc.username}")
+    @Value("${spring.datasource.username}")
     private String username;
 
-    @Value("${rvf.jdbc.password}")
+    @Value("${spring.datasource.password}")
     private String password;
 
     @Value("${rvf.master.schema.name}")
@@ -28,7 +28,6 @@ public abstract class DataResourceConfig {
 
     @Autowired
     private AssertionsResourceConfig assertionsResourceConfig;
-
     @Bean(name = "dataSource")
     public BasicDataSource getDataSource() {
         BasicDataSource basicDataSource = new BasicDataSource();
