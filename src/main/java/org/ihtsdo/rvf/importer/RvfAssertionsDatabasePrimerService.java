@@ -2,15 +2,14 @@ package org.ihtsdo.rvf.importer;
 
 
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
-import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
+import org.ihtsdo.rvf.core.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -22,7 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@ConditionalOnProperty(name = "import.assertions", havingValue = "true")
+@ConditionalOnProperty(name = "rvf.import.assertions.on-startup", havingValue = "true")
 public class RvfAssertionsDatabasePrimerService {
 	@Autowired
 	private AssertionsDatabaseImporter dbImporter;
