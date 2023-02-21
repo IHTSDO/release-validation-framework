@@ -6,12 +6,10 @@ import org.ihtsdo.rvf.rest.helper.BuildVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/version")
-@Api(tags = "RVF api version")
+@Api(tags = "Version")
 public class VersionController {
 	@Autowired(required = false)
 	private BuildProperties buildProperties;
