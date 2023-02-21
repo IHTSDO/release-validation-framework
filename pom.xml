@@ -52,7 +52,7 @@
         <snomed-drools.version>3.3.0</snomed-drools.version>
         <snomed.utilities.version>1.4.1</snomed.utilities.version>
         <spring-cloud-auto-config-version>2.2.6.RELEASE</spring-cloud-auto-config-version>
-        <spring-cloud.version>2020.0.5</spring-cloud.version>
+        <spring-consul.version>3.1.1</spring-consul.version>
         <springfox-swagger.version>2.7.0</springfox-swagger.version>
         <swagger-springmvc.version>1.0.2</swagger-springmvc.version>
     </properties>
@@ -267,26 +267,20 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
-            <!-- consul and vault -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+                <version>${spring-consul.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-consul-config</artifactId>
+                <version>${spring-consul.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-vault-config</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <version>${spring-consul.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -438,6 +432,10 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-activemq</artifactId>
         </dependency>
         <dependency>
@@ -482,6 +480,20 @@
                     <artifactId>android-json</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- consul and vault -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-vault-config</artifactId>
         </dependency>
     </dependencies>
 
