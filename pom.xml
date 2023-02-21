@@ -51,7 +51,8 @@
         <snomed-drools.version>3.3.0</snomed-drools.version>
         <snomed-drools.version>3.3.0</snomed-drools.version>
         <snomed.utilities.version>1.4.1</snomed.utilities.version>
-        <spring-cloud-version>2.2.6.RELEASE</spring-cloud-version>
+        <spring-cloud-auto-config-version>2.2.6.RELEASE</spring-cloud-auto-config-version>
+        <spring-cloud.version>2020.0.5</spring-cloud.version>
         <springfox-swagger.version>2.7.0</springfox-swagger.version>
         <swagger-springmvc.version>1.0.2</swagger-springmvc.version>
     </properties>
@@ -162,7 +163,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-aws-autoconfigure</artifactId>
-                <version>${spring-cloud-version}</version>
+                <version>${spring-cloud-auto-config-version}</version>
             </dependency>
 
             <dependency>
@@ -279,6 +280,13 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-vault-config</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
