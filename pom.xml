@@ -555,6 +555,13 @@
                 <configuration>
                     <mainClass>org.ihtsdo.rvf.App</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
