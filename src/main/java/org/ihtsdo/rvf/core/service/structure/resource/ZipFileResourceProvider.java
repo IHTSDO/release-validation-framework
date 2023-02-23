@@ -11,9 +11,9 @@ import java.util.zip.ZipFile;
 
 public class ZipFileResourceProvider implements ResourceProvider {
 
-	private ZipFile zipFile;
-	private String filePath;
-	private Map<String, ZipEntry> filenames = new LinkedHashMap<>();
+	private final ZipFile zipFile;
+	private final String filePath;
+	private final Map<String, ZipEntry> filenames = new LinkedHashMap<>();
 
 	public ZipFileResourceProvider(File file) throws IOException {
 		this.zipFile = new ZipFile(file);

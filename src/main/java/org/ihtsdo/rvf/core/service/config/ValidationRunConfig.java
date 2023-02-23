@@ -191,7 +191,7 @@ public class ValidationRunConfig {
 	}
 
 	public boolean isFirstTimeRelease() {
-		return previousRelease == null ? true : false;
+		return previousRelease == null;
 	}
 
 	public ValidationRunConfig addProspectiveFileFullPath(String s3File) {

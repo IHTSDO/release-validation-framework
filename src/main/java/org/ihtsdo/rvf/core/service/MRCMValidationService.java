@@ -263,7 +263,7 @@ public class MRCMValidationService {
 		} else if (LateralizableRefsetValidationService.ASSERTION_ID_CONCEPTS_NEED_TO_BE_ADDED_TO_LATERALIZABLE_REFSET.equals(mrcmAssertion.getUuid().toString())) {
 			for (int i = 0; i < firstNCount; i++) {
 				Long conceptId = mrcmAssertion.getCurrentViolatedConceptIds().get(i);
-				failedDetails.add(new FailureDetail(conceptId.toString(), String.format(mrcmAssertion.getDetails(), conceptId.toString()), null));
+				failedDetails.add(new FailureDetail(conceptId.toString(), String.format(mrcmAssertion.getDetails(), conceptId), null));
 			}
 		} else {
 			for (int i = 0; i < firstNCount; i++) {

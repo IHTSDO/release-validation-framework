@@ -28,7 +28,7 @@ public class ValidationMessageListener implements Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidationMessageListener.class);
 	
-	private static AtomicBoolean isRunning = new AtomicBoolean(false);
+	private static final AtomicBoolean isRunning = new AtomicBoolean(false);
 
 	private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 	

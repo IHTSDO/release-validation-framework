@@ -38,7 +38,7 @@ public class AutomatedTestService {
 
     private final LinkedBlockingQueue<ValidationComparisonReport> buildComparisonBlockingQueue = new LinkedBlockingQueue<>();
 
-    private ExecutorService comparisonExecutorService = Executors.newFixedThreadPool(5);
+    private final ExecutorService comparisonExecutorService = Executors.newFixedThreadPool(5);
 
     public String compareReportGivenUrls(String previousReportUrl, String prospectiveReportUrl) {
         String compareId = UUID.randomUUID().toString();

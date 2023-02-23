@@ -224,11 +224,8 @@ public class TestRunItem implements Comparable<TestRunItem>{
 		} else if (!testCategory.equals(other.testCategory))
 			return false;
 		if (testType == null) {
-			if (other.testType != null)
-				return false;
-		} else if (!testType.equals(other.testType))
-			return false;
-		return true;
+			return other.testType == null;
+		} else return testType.equals(other.testType);
 	}
 
 	@Override

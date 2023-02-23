@@ -38,6 +38,6 @@ public class RvfReleaseDbSchemaNameGenerator {
 				builder.append(part);
 			}
 		}
-		return "rvf_" + builder.toString();
+		return "rvf_" + builder;
 	}
 }

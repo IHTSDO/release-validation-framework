@@ -6,7 +6,7 @@ public class MysqlExecutionConfig {
 
 	private String prospectiveVersion;
 	private String previousVersion;
-	private Long executionId;
+	private final Long executionId;
 	private List<String> groupNames;
 	private int failureExportMax = 10;
 	private boolean firstTimeRelease;

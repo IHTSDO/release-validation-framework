@@ -25,9 +25,9 @@ import java.util.List;
 public class AcceptanceGatewayClient {
     private static final Logger logger = LoggerFactory.getLogger(AcceptanceGatewayClient.class);
 
-    private String acceptanceGatewayServiceUrl;
-    private RestTemplate restTemplate;
-    private HttpHeaders headers;
+    private final String acceptanceGatewayServiceUrl;
+    private final RestTemplate restTemplate;
+    private final HttpHeaders headers;
     private static final ParameterizedTypeReference<List<WhitelistItem>> WHITELIST_ITEM_LIST_TYPE_REFERENCE = new ParameterizedTypeReference<List<WhitelistItem>>() {};
 
     public AcceptanceGatewayClient(String acceptanceGatewayServiceUrl, String authToken) throws URISyntaxException, IOException {

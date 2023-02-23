@@ -107,11 +107,11 @@ public class ValidationReportService {
 	 
 	 public String recoverProgress(String storageLocation) {
 		 String filePath = storageLocation + progressFilePath;
-		 String progressMsg = new String("Failed to read from " + filePath);
+		 String progressMsg = "Failed to read from " + filePath;
 		 try {
 			 try ( InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath)) {
 				if (is != null) {
-					 progressMsg = IOUtils.toString(is, UTF_8);
+					 progressMsg = IOUtils.toString(is, StandardCharsets.UTF_8);
 				 } else {
 					logger.warn("Failed to find progress file {}, via resource config {}", filePath, jobResourceConfig);
 				 } 
@@ -134,7 +134,7 @@ public class ValidationReportService {
 					jsonResults  = mapper.readValue(inputStreamReader, Map.class);
 				}
 				if (jsonResults == null) {
-					jsonResults = new String("Failed to recover results in " + filePath);
+					jsonResults = "Failed to recover results in " + filePath;
 				}
 				responseMap.put("rvfValidationResult", jsonResults);
 			}
@@ -149,7 +149,7 @@ public class ValidationReportService {
 				 if (is == null) {
 					 logger.warn("Failed to find state file {}, via resource config {}", filePath, jobResourceConfig);
 				 }
-				 String stateStr = IOUtils.toString(is, UTF_8);
+				 String stateStr = IOUtils.toString(is, StandardCharsets.UTF_8);
 				 currentState = State.valueOf(stateStr);
 			 }
 			 

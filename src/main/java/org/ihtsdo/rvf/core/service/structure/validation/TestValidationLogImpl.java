@@ -10,8 +10,8 @@ import java.util.Set;
 public class TestValidationLogImpl implements ValidationLog {
 
 	private final Logger logger;
-	private Map<String, Object[]> errors;
-	private Class subject;
+	private final Map<String, Object[]> errors;
+	private final Class subject;
 
 	public TestValidationLogImpl(Class subject) {
 		this.subject = subject;

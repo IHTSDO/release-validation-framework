@@ -399,7 +399,7 @@ public class ReleaseDataManager {
 			sql = sql + " and table_name like ?";
 		}
 		try (Connection connection = rvfDynamicDataSource.getConnection(schemaName);
-			PreparedStatement statement = connection.prepareStatement(sql);) {
+			PreparedStatement statement = connection.prepareStatement(sql)) {
 			statement.setString(1, schemaName);
 			if (tableNamePattern != null) {
 				statement.setString(2, tableNamePattern);
@@ -420,7 +420,7 @@ public class ReleaseDataManager {
 	public void copyTableData(String sourceVersion, String destinationVersion, 
 			String tableNamePattern, List<String> excludeTableNames) throws BusinessServiceException {
 		final long startTime = System.currentTimeMillis();
-		StringBuilder errorMsg = new StringBuilder();;
+		StringBuilder errorMsg = new StringBuilder();
 		if (!isKnownRelease(sourceVersion)) {
 			errorMsg.append(VERSION_NOT_FOUND + sourceVersion); 
 		}

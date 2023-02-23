@@ -38,7 +38,7 @@ public class ColumnPatternTester {
 	private final TestReportable testReport;
 	private Map<ColumnType, PatternTest> columnTests;
 	
-	private Logger logger = LoggerFactory.getLogger(ColumnPatternTester.class.getName());
+	private final Logger logger = LoggerFactory.getLogger(ColumnPatternTester.class.getName());
 
 	public ColumnPatternTester(final ValidationLog validationLog, final ResourceProvider resourceManager, final TestReportable testReport) {
 		this.validationLog = validationLog;
@@ -245,7 +245,7 @@ public class ColumnPatternTester {
 			column.setName(value);
 		} else if (!expectedColumnName.equalsIgnoreCase(value)) {
 			validationLog.assertionError("Column name does not match expected value: expected '{}', actual '{}'", expectedColumnName, value);
-			testReport.addError("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "", value, expectedColumnName,1l);
+			testReport.addError("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "", value, expectedColumnName, 1L);
 		} else {
 			testReport.addSuccess("1-" + colIndex, startTime, fileName, resourceManager.getFilePath(), expectedColumnName, COLUMN_HEADING_TEST, "");
 		}

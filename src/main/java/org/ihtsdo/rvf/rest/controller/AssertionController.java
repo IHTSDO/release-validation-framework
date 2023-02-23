@@ -227,7 +227,7 @@ public class AssertionController {
 
 		// Creating a list of 1 here so we can use the same code and receive the
 		// same json as response
-		final Collection<Assertion> assertions = new ArrayList<Assertion>(Arrays.asList(assertion));
+		final Collection<Assertion> assertions = new ArrayList<Assertion>(List.of(assertion));
 
 		final MysqlExecutionConfig config = new MysqlExecutionConfig(runId);
 		Map<String, Object> failures = new HashMap<String, Object>();

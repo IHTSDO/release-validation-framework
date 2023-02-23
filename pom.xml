@@ -514,7 +514,6 @@
                 </configuration>
             </plugin>
 
-            <!-- To run integration tests use: mvn clean install -Dskip.integration.tests=false -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>

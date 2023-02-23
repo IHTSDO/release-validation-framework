@@ -14,10 +14,10 @@ public class ValidationReport {
 	private int totalWarnings;
 	private int totalFailures;
 	private int totalTestsIncomplete;
-	private List<TestRunItem> assertionsFailed;
-	private List<TestRunItem> assertionsWarning;
-	private List<TestRunItem> assertionsSkipped;
-	private List<TestRunItem> assertionsPassed;
+	private final List<TestRunItem> assertionsFailed;
+	private final List<TestRunItem> assertionsWarning;
+	private final List<TestRunItem> assertionsSkipped;
+	private final List<TestRunItem> assertionsPassed;
 
 	public ValidationReport() {
 		assertionsFailed = new ArrayList<>();

@@ -48,7 +48,7 @@ public class RF2FilesReleaseTypeTester {
                     String expected = "All files under folder " + releaseType + " should be " + releaseType + " files";
                     report.addError("", startDate, "manifest.xml", "",""
                             , FILES_ORG_TEST, "*" + releaseType + "*",
-                            invalidFileNames.toString() + " under " + releaseType + " folder", expected, 0L);
+                            invalidFileNames + " under " + releaseType + " folder", expected, 0L);
                 }
             }
         } catch (Exception e) {
