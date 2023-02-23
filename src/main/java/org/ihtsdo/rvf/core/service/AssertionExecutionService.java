@@ -31,11 +31,11 @@ public class AssertionExecutionService {
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	@Value("${rvf.qa.result.table.name}")
 	private String qaResulTableName;
-	private String deltaTableSuffix = "d";
-	private String snapshotTableSuffix = "s";
-	private String fullTableSuffix = "f";
+	private final String deltaTableSuffix = "d";
+	private final String snapshotTableSuffix = "s";
+	private final String fullTableSuffix = "f";
 
-	private ExecutorService executorService = Executors.newCachedThreadPool();
+	private final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	private final Logger logger = LoggerFactory.getLogger(AssertionExecutionService.class);
 
@@ -147,7 +147,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				runItem.setRunTime((timeEnd - timeStart));
 			} catch (final Exception e) {
 				e.printStackTrace();
-				logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command.toString());
+				logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command);
 				runItem.setFailureMessage("Error executing SQL command object Nested exception : " + e.fillInStackTrace());
 				return runItem;
 			}

@@ -14,12 +14,12 @@ public enum TestType {
 	DROOL_RULES("droolsRules"),
 	UNKNOWN("unknown");
 
-	private String name;
+	private final String name;
 	TestType(String name) {
 		this.name = name;
 	}
 	public boolean equalsName(String otherName) {
-		return otherName != null && name.equals(otherName);
+		return name.equals(otherName);
 	}
 
 	@Override

@@ -12,11 +12,11 @@ public class StreamTestReport implements TestReportable {
 
 	private final PrintWriter writer;
 	private ResultFormatter formatter;
-	private AtomicInteger numFailures = new AtomicInteger(0);
-	private AtomicInteger numTestRuns = new AtomicInteger(0);
+	private final AtomicInteger numFailures = new AtomicInteger(0);
+	private final AtomicInteger numTestRuns = new AtomicInteger(0);
 	private boolean writeSuccesses;
-	private ConcurrentHashMap<String, TestRunItemCount> errorMap = new ConcurrentHashMap<>();
-	private List<StructuralTestRunItem> failedItems = Collections.synchronizedList(new ArrayList<StructuralTestRunItem>());
+	private final ConcurrentHashMap<String, TestRunItemCount> errorMap = new ConcurrentHashMap<>();
+	private final List<StructuralTestRunItem> failedItems = Collections.synchronizedList(new ArrayList<StructuralTestRunItem>());
 
 	public StreamTestReport(ResultFormatter formatter, OutputStream outputStream, boolean writeSuccesses) {
 		this.formatter = formatter;

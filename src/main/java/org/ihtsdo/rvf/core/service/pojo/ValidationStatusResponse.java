@@ -7,10 +7,10 @@ import org.springframework.util.StringUtils;
 import java.util.StringJoiner;
 
 public class ValidationStatusResponse {
-	private Long runId;
-	private String state;
-	private String username;
-	private String authenticationToken;
+	private final Long runId;
+	private final String state;
+	private final String username;
+	private final String authenticationToken;
 
 	public ValidationStatusResponse(ValidationRunConfig config, ValidationReportService.State state) {
 		this.runId = config.getRunId();

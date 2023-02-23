@@ -7,8 +7,8 @@ import java.util.List;
 
 public class TextFileResourceProvider implements ResourceProvider {
 
-	private File file;
-	private List<String> fileNames;
+	private final File file;
+	private final List<String> fileNames;
 
 	public TextFileResourceProvider(File file, String fileName) {
 		this.file = file;

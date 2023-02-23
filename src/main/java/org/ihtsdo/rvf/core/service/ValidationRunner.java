@@ -69,7 +69,7 @@ public class ValidationRunner {
 		} catch (final Exception t) {
 			StringWriter errors = new StringWriter();
 			t.printStackTrace(new PrintWriter(errors));
-			String failureMsg = "System Failure: " + t.getMessage() + " : " + errors.toString();
+			String failureMsg = "System Failure: " + t.getMessage() + " : " + errors;
 			ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 			statusReport.addFailureMessage(failureMsg);
 			logger.error("Exception thrown, writing as result",t);

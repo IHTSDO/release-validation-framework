@@ -24,7 +24,7 @@ public class ReleaseFileDataLoader {
 
 	private static final int MAX_THREAD_POOL_SIZE = 100;
 	public static final String TERM = "term";
-	private MySqlDataTypeConverter dataTypeConverter;
+	private final MySqlDataTypeConverter dataTypeConverter;
 	private Connection connection;
 	private final Logger LOGGER = LoggerFactory.getLogger(ReleaseFileDataLoader.class);
 	private RvfDynamicDataSource dataSource;
@@ -126,7 +126,7 @@ public class ReleaseFileDataLoader {
 				.append(")");
 			}
 		}
-		builder.append(indexBuilder.toString())
+		builder.append(indexBuilder)
 				.append("\n")
 				.append(")");
 		builder.append(" engine=myisam default charset=utf8;");
@@ -135,9 +135,7 @@ public class ReleaseFileDataLoader {
 
 	private boolean isFieldRequiredIndexing(final TableSchema tableSchema, final Field field) {
 		if (ComponentType.TEXT_DEFINITION == tableSchema.getComponentType()) {
-			if (TERM.equals(field.getName())) {
-				return false;
-			}
+			return !TERM.equals(field.getName());
 		}
 		return true;
 	}

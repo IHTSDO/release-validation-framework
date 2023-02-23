@@ -5,14 +5,14 @@ public enum SeverityLevel {
 	INFOR("INFOR"),
 	ERROR("ERROR");
 
-	private String severity;
+	private final String severity;
 
 	SeverityLevel(String severity) {
 		this.severity = severity;
 	}
 
 	public boolean equalsName(String otherName) {
-		return otherName != null && severity.equals(otherName);
+		return severity.equals(otherName);
 	}
 
 	@Override

@@ -74,16 +74,13 @@ public class FailureDetail implements Comparable<FailureDetail>{
 		} else if (!conceptId.equals(other.conceptId))
 			return false;
 		if (detail == null) {
-			if (other.detail != null)
-				return false;
-		} else if (!detail.equals(other.detail))
-			return false;
-		return true;
-	}
+            return other.detail == null;
+		} else return detail.equals(other.detail);
+    }
 
 	@Override
 	public int compareTo(FailureDetail other) {
-		return ((Integer)hashCode()).compareTo((Integer)other.hashCode());
+		return ((Integer)hashCode()).compareTo(other.hashCode());
 	}
 
 	public String getConceptFsn() {

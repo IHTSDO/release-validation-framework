@@ -219,7 +219,7 @@ public class RVFAssertionsRegressIntegrationTest {
             results.add(result);
 
             if (result.getTotalFailed() < 0) {
-                throw new RuntimeException("Assertion didn't complete sucessfully - " + item.toString());
+                throw new RuntimeException("Assertion didn't complete sucessfully - " + item);
             }
 
             if (result.getTotalFailed() > 0) {

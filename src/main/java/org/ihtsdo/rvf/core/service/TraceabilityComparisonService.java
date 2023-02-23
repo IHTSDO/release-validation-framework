@@ -78,7 +78,7 @@ public class TraceabilityComparisonService {
 	@Autowired
 	private TraceabilityServiceClientFactory traceabilityServiceClientFactory;
 
-	private String traceabilityServiceUrl;
+	private final String traceabilityServiceUrl;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 

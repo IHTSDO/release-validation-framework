@@ -22,9 +22,9 @@ import java.net.URISyntaxException;
 public class TraceabilityServiceClient {
     private static final Logger logger = LoggerFactory.getLogger(TraceabilityServiceClient.class);
 
-    private String traceabilityServiceUrl;
-    private RestTemplate restTemplate;
-    private HttpHeaders headers;
+    private final String traceabilityServiceUrl;
+    private final RestTemplate restTemplate;
+    private final HttpHeaders headers;
 
     private static final ParameterizedTypeReference<ChangeSummaryReport> CHANGE_SUMMARY_REPORT_TYPE_REFERENCE = new ParameterizedTypeReference<>() {};
 

@@ -48,16 +48,13 @@ import java.util.*;
 		private ResourceManager assertionResourceManager;
 
 		protected ObjectMapper objectMapper = new ObjectMapper();
-		private Map<String, String> lookupMap = new HashMap<>();
+		private final Map<String, String> lookupMap = new HashMap<>();
 		@Autowired
 		AssertionService assertionService;
 
 		public boolean isAssertionImportRequired() {
 			List<Assertion> assertions = assertionService.findAll();
-			if (assertions == null || assertions.isEmpty() || assertionImportRequired) {
-				return true;
-			}
-			return false;
+			return assertions == null || assertions.isEmpty() || assertionImportRequired;
 		}
 
 		public List<Assertion> getAssertionsFromFile(final InputStream manifestInputStream) {
@@ -239,7 +236,7 @@ import java.util.*;
 			}
 			if (storedProcedureFound && storedProcedureSql.length() > 0) {
 				statements.add(storedProcedureSql.toString());
-				logger.debug("Stored proecure found:" + storedProcedureSql.toString());
+				logger.debug("Stored proecure found:" + storedProcedureSql);
 			}
 
 			uploadTest(assertion, sql, statements);
@@ -281,7 +278,7 @@ import java.util.*;
 		protected static String readStream(final InputStream is) throws Exception {
 			final InputStreamReader reader = new InputStreamReader(is);
 			final StringBuilder builder = new StringBuilder();
-			final char buffer[] = new char[1024];
+			final char[] buffer = new char[1024];
 			// Wait for at least 1 byte (e.g. stdin)
 			int n = reader.read(buffer);
 			builder.append(buffer, 0, n);

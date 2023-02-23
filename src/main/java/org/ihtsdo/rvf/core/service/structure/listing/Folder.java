@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.core.service.structure.listing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Folder {
 
@@ -86,10 +87,10 @@ public class Folder {
 
 		Folder folder = (Folder) o;
 
-		if (files != null ? !files.equals(folder.files) : folder.files != null) return false;
+		if (!Objects.equals(files, folder.files)) return false;
 		if (!folderName.equals(folder.folderName)) return false;
-		if (folders != null ? !folders.equals(folder.folders) : folder.folders != null) return false;
-		return parent != null ? parent.equals(folder.parent) : folder.parent == null;
+		if (!Objects.equals(folders, folder.folders)) return false;
+		return Objects.equals(parent, folder.parent);
 	}
 
 	@Override

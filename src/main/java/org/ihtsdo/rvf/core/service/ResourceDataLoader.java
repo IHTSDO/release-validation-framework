@@ -58,7 +58,7 @@ public class ResourceDataLoader {
 			ResourceManager resourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
 			File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
 			try (InputStream input = resourceManager.readResourceStreamOrNullIfNotExists(US_TO_GB_TERMS_MAP_FILENAME);
-					OutputStream out = new FileOutputStream(localMapFile);) {
+					OutputStream out = new FileOutputStream(localMapFile)) {
 				if (input != null) {
 					IOUtils.copy(input, out);
 				}

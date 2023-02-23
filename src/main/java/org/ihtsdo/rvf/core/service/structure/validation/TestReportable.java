@@ -26,7 +26,7 @@ public interface TestReportable {
 	List<StructuralTestRunItem> getFailedItems();
 
 	class TestRunItemCount {
-		private StructuralTestRunItem item;
+		private final StructuralTestRunItem item;
 		private Integer count = 0;
 
 		public TestRunItemCount(StructuralTestRunItem item) {

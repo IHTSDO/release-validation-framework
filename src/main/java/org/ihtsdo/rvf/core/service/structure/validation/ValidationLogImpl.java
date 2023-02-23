@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 public class ValidationLogImpl implements ValidationLog {
 
 	private final Logger logger;
-	private Class subject;
+	private final Class subject;
 
 	public ValidationLogImpl(Class subject) {
 		this.subject = subject;

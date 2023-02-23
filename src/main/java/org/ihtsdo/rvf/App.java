@@ -19,7 +19,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @EnableJms
 @EnableSwagger2
 public class App extends Config {
-	private static Logger logger = LoggerFactory.getLogger(App.class);
+	private static final Logger logger = LoggerFactory.getLogger(App.class);
 	@Bean
 	// The default queue prefetch size is 1,000. That prevents autoscaling rvf
 	public ActiveMQConnectionFactoryPrefetchCustomizer queuePrefetchCustomizer(@Value("${spring.activemq.queuePrefetch:1}") int queuePrefetch) {

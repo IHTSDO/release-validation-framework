@@ -69,8 +69,8 @@ public class AssertionGroupImporter {
 		DERIVATIVE_EDITION("DERIVATIVE","DerivativeEdition");
 
 
-		private String name;
-		private String releaseCenter;
+		private final String name;
+		private final String releaseCenter;
 		AssertionGroupName(String releaseCenter, String name) {
 			this.releaseCenter = releaseCenter;
 			this.name = name;
@@ -116,8 +116,8 @@ public class AssertionGroupImporter {
 			TM("TM", "895344001"),
 			SV("SNOVET", "332351000009108");
 
-			private String name;
-			private String moduleId;
+			private final String name;
+			private final String moduleId;
 			ProductName(String name, String moduleId) {
 					this.name = name;
 					this.moduleId = moduleId;
@@ -344,11 +344,7 @@ public class AssertionGroupImporter {
 
 	public boolean isImportRequired() {
 		List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
-		if (allGroups == null || allGroups.isEmpty()) {
-			return true;
-		} else {
-			return false;
-		}
+		return allGroups == null || allGroups.isEmpty();
 	}
 
 	/*
