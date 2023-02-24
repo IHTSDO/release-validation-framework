@@ -21,6 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-resources/**",
                         "/v2/api-docs",
                         "/v2/**",
+                        "/version",
                         "/webjars/springfox-swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
                 .and().httpBasic();
