@@ -200,7 +200,6 @@ public class ValidationVersionLoader {
 		}
 
 		List<String> includedModules = new ArrayList<>();
-		includedModules.add("900000000000207008"); // Core Module
 		if (validationConfig.getIncludedModules() != null) {
 			includedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).collect(Collectors.toList()));
 		}
