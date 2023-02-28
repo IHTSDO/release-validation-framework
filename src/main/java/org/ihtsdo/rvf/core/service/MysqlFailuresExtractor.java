@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.core.service;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.rvf.core.data.model.Assertion;
+import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.FailureDetail;
 import org.ihtsdo.rvf.core.data.model.TestRunItem;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -20,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +41,9 @@ public class MysqlFailuresExtractor {
 
     @Autowired
     private WhitelistService whitelistService;
+
+    @Autowired
+    private AssertionService assertionService;
 
     public void extractTestResults(final List<TestRunItem> items, final MysqlExecutionConfig config, List<Assertion> assertions) throws SQLException, RestClientException {
         Map<UUID, Long> uuidToAssertionIdMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, assertion -> assertion.getAssertionId()));
@@ -70,48 +76,61 @@ public class MysqlFailuresExtractor {
     }
 
     private void validateFailuresAndExtractTestResults(Connection connection, List<TestRunItem> items, MysqlExecutionConfig config, Map<UUID, Long> uuidToAssertionIdMap, Map<String, Integer> assertionIdToTotalFailureMap) throws SQLException, RestClientException {
+        List<Assertion> assertions = getAssertionsAndJoinGroups();
+        Map<UUID, Assertion> uuidAssertionMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, Function.identity()));
+
         for (TestRunItem item : items) {
-            String key = String.valueOf(uuidToAssertionIdMap.get(item.getAssertionUuid()));
-            if (!StringUtils.isEmpty(item.getFailureMessage())) {
+            UUID assertionUuid = item.getAssertionUuid();
+            String key = String.valueOf(uuidToAssertionIdMap.get(assertionUuid));
+            if (StringUtils.hasLength(item.getFailureMessage())) {
                 item.setFailureCount(-1L);
                 item.setFirstNInstances(null);
             } else if (assertionIdToTotalFailureMap.containsKey(key)) {
                 int batch_counter = 0;
-                int total_failures_extracted = 0;
-                int total_whitelistedItem_extracted = 0;
-                int total_failures = assertionIdToTotalFailureMap.get(key);
+                int totalValidFailures = 0;
+                int totalFailures = assertionIdToTotalFailureMap.get(key);
+                boolean belongToCommonAuthoringOrCommonEditionGroup = uuidAssertionMap.containsKey(assertionUuid) && uuidAssertionMap.get(assertionUuid).getGroups() != null
+                                                                    && (uuidAssertionMap.get(assertionUuid).getGroups().contains("common-edition") || uuidAssertionMap.get(assertionUuid).getGroups().contains("common-authoring"));
                 List<FailureDetail> firstNInstances = new ArrayList<>();
-                while(batch_counter * whitelistBatchSize < total_failures && total_failures_extracted < whitelistBatchSize) {
+                while(batch_counter * whitelistBatchSize < totalFailures) {
                     int offset = batch_counter * whitelistBatchSize;
                     List<FailureDetail> failureDetails = fetchFailureDetails(connection, config.getExecutionId(), uuidToAssertionIdMap.get(item.getAssertionUuid()), -1, offset, whitelistBatchSize);
                     failureDetails.stream().forEach(failureDetail -> {
-                        failureDetail.setFullComponent(getAdditionalFields(connection,failureDetail));
+                        setModuleAndFullFields(connection,failureDetail);
                     });
+
+                    // filter by the extension modules only
+                    if (belongToCommonAuthoringOrCommonEditionGroup && config.isExtensionValidation() && !CollectionUtils.isEmpty(config.getIncludedModules())) {
+                        failureDetails = failureDetails.stream().filter(f -> config.getIncludedModules().contains(f.getModuleId())).collect(Collectors.toList());
+                    }
+
+                    if (failureDetails.size() == 0) {
+                        continue;
+                    }
 
                     // Convert to WhitelistItem
                     List<WhitelistItem> whitelistItems = failureDetails.stream()
-                            .map(failureDetail -> new WhitelistItem(item.getAssertionUuid().toString(), StringUtils.isEmpty(failureDetail.getComponentId())? "" : failureDetail.getComponentId(), failureDetail.getConceptId(), failureDetail.getFullComponent()))
+                            .map(failureDetail -> new WhitelistItem(item.getAssertionUuid().toString(), StringUtils.hasLength(failureDetail.getComponentId())? failureDetail.getComponentId() : "", failureDetail.getConceptId(), failureDetail.getFullComponent()))
                             .collect(Collectors.toList());
 
                     // Send to Authoring acceptance gateway
                     List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
 
                     // Find the failures which are not in the whitelisted item
-                    List<FailureDetail> noneWhitelistedFailures = failureDetails.stream().filter(failureDetail ->
+                    List<FailureDetail> validFailures = failureDetails.stream().filter(failureDetail ->
                         whitelistedItems.stream().noneMatch(whitelistedItem -> failureDetail.getComponentId().equals(whitelistedItem.getComponentId()))
                     ).collect(Collectors.toList());
 
-                    total_whitelistedItem_extracted += whitelistedItems.size();
-                    total_failures_extracted += noneWhitelistedFailures.size();
-                    firstNInstances.addAll(noneWhitelistedFailures);
+                    totalValidFailures += validFailures.size();
+                    firstNInstances.addAll(validFailures);
                     batch_counter++;
                 }
 
-                if (total_failures_extracted == 0) {
+                if (totalValidFailures == 0) {
                     item.setFailureCount(0L);
                     item.setFirstNInstances(null);
                 } else {
-                    item.setFailureCount(Long.valueOf(total_failures - total_whitelistedItem_extracted));
+                    item.setFailureCount(Long.valueOf(totalValidFailures));
                     item.setFirstNInstances(firstNInstances.size() > config.getFailureExportMax() ? firstNInstances.subList(0, config.getFailureExportMax()) : firstNInstances);
                 }
             } else {
@@ -121,9 +140,9 @@ public class MysqlFailuresExtractor {
         }
     }
 
-    private String getAdditionalFields(Connection connection, FailureDetail failureDetail)  {
-        if (StringUtils.isEmpty(failureDetail.getComponentId())) {
-            return "";
+    private void setModuleAndFullFields(Connection connection, FailureDetail failureDetail)  {
+        if (!StringUtils.hasLength(failureDetail.getComponentId())) {
+            return;
         }
         String sql = "select * from " + failureDetail.getTableName()+ " where id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -137,19 +156,21 @@ public class MysqlFailuresExtractor {
                         if (i == 1 || i == 2) {
                             continue;
                         }
+                        // Column moduleId
+                        if (i == 4) {
+                            failureDetail.setModuleId(resultSet.getString(i));
+                        }
                         if(additionalFields.length() > 0) {
                             additionalFields.append(",");
                         }
                         additionalFields.append(resultSet.getString(i));
                     }
-                    return additionalFields.toString();
+                    failureDetail.setFullComponent(additionalFields.toString());
                 }
             }
         } catch (SQLException exception) {
             logger.error("Error retrieving additional fields for component id {} against table {}", failureDetail.getComponentId(), failureDetail.getTableName());
         }
-
-        return "";
     }
 
     private Map<String, Integer> getAssertionIdToTotalFailureMap(Connection connection, MysqlExecutionConfig config) throws SQLException {
@@ -197,6 +218,21 @@ public class MysqlFailuresExtractor {
             }
         }
         return firstNInstances;
+    }
+
+    private List<Assertion> getAssertionsAndJoinGroups() {
+        List<Assertion> assertions = assertionService.findAll();
+        List<AssertionGroup> assertionGroups = assertionService.getAllAssertionGroups();
+        assertionGroups.stream().forEach(assertionGroup -> {
+            assertionGroup.getAssertions().stream().forEach(a -> {
+                assertions.stream().forEach(b -> {
+                    if (a.getUuid().toString().equals(b.getUuid().toString())) {
+                        b.addGroup(assertionGroup.getName());
+                    }
+                });
+            });
+        });
+        return assertions;
     }
 
 }

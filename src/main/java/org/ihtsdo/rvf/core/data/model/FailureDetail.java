@@ -9,6 +9,7 @@ public class FailureDetail implements Comparable<FailureDetail>{
 	private String conceptFsn;
 	private String detail;
 	private String componentId;
+	private String moduleId;
 	private String fullComponent;
 
 	private transient String tableName;
@@ -117,5 +118,14 @@ public class FailureDetail implements Comparable<FailureDetail>{
 
 	public String getFullComponent() {
 		return fullComponent;
+	}
+
+	public FailureDetail setModuleId(String moduleId) {
+		this.moduleId = moduleId;
+		return this;
+	}
+
+	public String getModuleId() {
+		return moduleId;
 	}
 }

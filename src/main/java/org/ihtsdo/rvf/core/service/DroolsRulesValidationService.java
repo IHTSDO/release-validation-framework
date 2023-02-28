@@ -31,6 +31,7 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -177,19 +178,13 @@ public class DroolsRulesValidationService {
 
 				// Load the dependency package from S3 to snapshot files list before validating if the package is an MS extension and not an edition release
 				// If the package is an MS edition, it is not necessary to load the dependency
-				Set<String> modulesSet = null;
+
 				if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
 					if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
 						throw new RVFExecutionException("Drools validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 					}
 					InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyReleaseFile());
 					snapshotsInputStream.add(dependencyStream);
-
-					//Will filter the results based on component's module IDs if the package is an extension only
-					String moduleIds = validationConfig.getIncludedModules();
-					if(StringUtils.isNotBlank(moduleIds)) {
-						modulesSet = Sets.newHashSet(moduleIds.split(","));
-					}
 				}
 
 				DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, testResourceManager);
@@ -209,7 +204,18 @@ public class DroolsRulesValidationService {
 				}
 
 				//Run validation
-				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, CollectionUtils.isEmpty(previousReleaseDirectories) ? null : previousReleaseDirectories, droolsRulesSets, effectiveDate, modulesSet, true);
+				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, CollectionUtils.isEmpty(previousReleaseDirectories) ? null : previousReleaseDirectories, droolsRulesSets, effectiveDate, null, true);
+
+				// Filter the results based on component's module IDs if the package is an extension
+				String moduleIdStr = validationConfig.getIncludedModules();
+				if(StringUtils.isNotBlank(moduleIdStr)) {
+					Set<String> modules = Sets.newHashSet(moduleIdStr.split(","));
+					if (!modules.isEmpty()) {
+						Map<UUID, Assertion> uuidAssertionMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, Function.identity()));
+						invalidContents = invalidContents.stream().filter(item -> !uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring")
+																				|| (uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring") && modules.contains(item.getComponent().getModuleId()))).collect(Collectors.toList());
+					}
+				}
 
 				if (invalidContents.size() != 0 && !whitelistService.isWhitelistDisabled()) {
 					List<InvalidContent> newInvalidContents = new ArrayList<>();
