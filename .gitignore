@@ -13,6 +13,8 @@ release.properties
 # Ubuntu/OSX hidden files
 .*
 
+# Bound Job Dir
+jobs/
 
 api-demo/report.csv
 api-demo/tmp
