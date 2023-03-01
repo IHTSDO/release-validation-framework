@@ -2,8 +2,6 @@ package org.ihtsdo.rvf.importer;
 
 
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
-import org.ihtsdo.rvf.core.data.model.Assertion;
-import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +13,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @ConditionalOnProperty(name = "rvf.import.assertions.on-startup", havingValue = "true")
@@ -42,40 +36,14 @@ public class RvfAssertionsDatabasePrimerService {
 	public void importAssertionsAndGroups() throws IOException {
 		InputStream manifestInputStream = assertionResourceManager.readResourceStream("manifest.xml");
 		if (dbImporter.isAssertionImportRequired()) {
-			LOGGER.info("No assertons exist and start importing...");
-
+			LOGGER.info("No assertions exist and start importing...");
 			// import content
 			dbImporter.importAssertionsFromFile(manifestInputStream, scriptsDir);
-
 			LOGGER.info("Assertions imported");
+			// Create assertion group
+			assertionGroupImporter.importAssertionGroups();
 		} else {
-			// detect assertions to insert/update/delete
-
-			List<Assertion> dbAssertions = assertionService.findAll();
-			Set<UUID> dbAssertionUUIDs = dbAssertions.stream(). map(Assertion::getUuid).collect(Collectors.toSet());
-
-			List<Assertion> fileAssertions = dbImporter.getAssertionsFromFile(manifestInputStream);
-			Set<UUID> fileAssertionUUIDs = fileAssertions.stream(). map(Assertion::getUuid).collect(Collectors.toSet());
-
-			// remove assertions
-			List<UUID> toDeleteAssertions = dbAssertionUUIDs.stream().filter(uuid -> !fileAssertionUUIDs.contains(uuid)).collect(Collectors.toList());
-			for (UUID uuid : toDeleteAssertions) {
-				final Assertion assertion = assertionService.findAssertionByUUID(uuid);
-				if (assertion != null) {
-					List<AssertionGroup> groups = assertionService.getGroupsForAssertion(assertion);
-					// remove assertion from group
-					for (AssertionGroup group : groups) {
-						assertionService.removeAssertionFromGroup(assertion, group);
-					}
-					assertionService.delete(assertion);
-				}
-			}
-
-			// import content to insert/update assertions
-			dbImporter.importAssertionsFromFile(manifestInputStream, scriptsDir);
-			LOGGER.info("Assertions updated");
+			LOGGER.info("Assertions and assertion groups exist already.");
 		}
-		//create assertion group
-		assertionGroupImporter.importAssertionGroups();
 	}
 }
