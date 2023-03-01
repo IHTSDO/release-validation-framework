@@ -86,44 +86,40 @@ public class MysqlFailuresExtractor {
                 item.setFailureCount(-1L);
                 item.setFirstNInstances(null);
             } else if (assertionIdToTotalFailureMap.containsKey(key)) {
-                int batch_counter = 0;
+                int batchCounter = 0;
                 int totalValidFailures = 0;
                 int totalFailures = assertionIdToTotalFailureMap.get(key);
                 boolean belongToCommonAuthoringOrCommonEditionGroup = uuidAssertionMap.containsKey(assertionUuid) && uuidAssertionMap.get(assertionUuid).getGroups() != null
                                                                     && (uuidAssertionMap.get(assertionUuid).getGroups().contains("common-edition") || uuidAssertionMap.get(assertionUuid).getGroups().contains("common-authoring"));
                 List<FailureDetail> firstNInstances = new ArrayList<>();
-                while(batch_counter * whitelistBatchSize < totalFailures) {
-                    int offset = batch_counter * whitelistBatchSize;
+                while(batchCounter * whitelistBatchSize < totalFailures) {
+                    int offset = batchCounter * whitelistBatchSize;
                     List<FailureDetail> failureDetails = fetchFailureDetails(connection, config.getExecutionId(), uuidToAssertionIdMap.get(item.getAssertionUuid()), -1, offset, whitelistBatchSize);
-                    failureDetails.stream().forEach(failureDetail -> {
-                        setModuleAndFullFields(connection,failureDetail);
-                    });
+                    failureDetails.forEach(failure -> setModuleAndFullFields(connection, failure));
 
                     // filter by the extension modules only
                     if (belongToCommonAuthoringOrCommonEditionGroup && config.isExtensionValidation() && !CollectionUtils.isEmpty(config.getIncludedModules())) {
-                        failureDetails = failureDetails.stream().filter(f -> config.getIncludedModules().contains(f.getModuleId())).collect(Collectors.toList());
+                        failureDetails = failureDetails.stream().filter(failure -> config.getIncludedModules().contains(failure.getModuleId())).collect(Collectors.toList());
                     }
 
-                    if (failureDetails.size() == 0) {
-                        continue;
+                    if (failureDetails.size() != 0) {
+                        // Convert to WhitelistItem
+                        List<WhitelistItem> whitelistItems = failureDetails.stream()
+                                .map(failureDetail -> new WhitelistItem(item.getAssertionUuid().toString(), StringUtils.hasLength(failureDetail.getComponentId())? failureDetail.getComponentId() : "", failureDetail.getConceptId(), failureDetail.getFullComponent()))
+                                .collect(Collectors.toList());
+
+                        // Send to Authoring acceptance gateway
+                        List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
+
+                        // Find the failures which are not in the whitelisted item
+                        List<FailureDetail> validFailures = failureDetails.stream().filter(failure ->
+                                whitelistedItems.stream().noneMatch(whitelistedItem -> failure.getComponentId().equals(whitelistedItem.getComponentId()))
+                        ).collect(Collectors.toList());
+
+                        totalValidFailures += validFailures.size();
+                        firstNInstances.addAll(validFailures);
                     }
-
-                    // Convert to WhitelistItem
-                    List<WhitelistItem> whitelistItems = failureDetails.stream()
-                            .map(failureDetail -> new WhitelistItem(item.getAssertionUuid().toString(), StringUtils.hasLength(failureDetail.getComponentId())? failureDetail.getComponentId() : "", failureDetail.getConceptId(), failureDetail.getFullComponent()))
-                            .collect(Collectors.toList());
-
-                    // Send to Authoring acceptance gateway
-                    List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
-
-                    // Find the failures which are not in the whitelisted item
-                    List<FailureDetail> validFailures = failureDetails.stream().filter(failureDetail ->
-                        whitelistedItems.stream().noneMatch(whitelistedItem -> failureDetail.getComponentId().equals(whitelistedItem.getComponentId()))
-                    ).collect(Collectors.toList());
-
-                    totalValidFailures += validFailures.size();
-                    firstNInstances.addAll(validFailures);
-                    batch_counter++;
+                    batchCounter++;
                 }
 
                 if (totalValidFailures == 0) {
@@ -140,7 +136,7 @@ public class MysqlFailuresExtractor {
         }
     }
 
-    private void setModuleAndFullFields(Connection connection, FailureDetail failureDetail)  {
+    private void setModuleAndFullFields(Connection connection, final FailureDetail failureDetail)  {
         if (!StringUtils.hasLength(failureDetail.getComponentId())) {
             return;
         }

@@ -48,8 +48,17 @@ public class FailureDetail implements Comparable<FailureDetail>{
 
 	@Override
 	public String toString() {
-		return "FailureDetail [conceptId=" + conceptId + ", detail=" + detail + ", componentId=" + componentId + ", tableName=" + tableName + "]";
+		return "FailureDetail{" +
+				"conceptId='" + conceptId + '\'' +
+				", conceptFsn='" + conceptFsn + '\'' +
+				", detail='" + detail + '\'' +
+				", componentId='" + componentId + '\'' +
+				", moduleId='" + moduleId + '\'' +
+				", fullComponent='" + fullComponent + '\'' +
+				", tableName='" + tableName + '\'' +
+				'}';
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
