@@ -1,7 +1,24 @@
-Importing Assertions
-====================
+# Importing SNOMED Release Validation Assertions
 
-_more documentation is needed and will be added here_
+RVF assertions are in github [snomed-release-validation-assertions](https://github.com/IHTSDO/snomed-release-validation-assertions)
 
+## Clone snomed-release-validation-assertions in the parent folder of release-validation-framework
 
-Assertions are imported automatically during RVF application startup. The list of assertions is documented in the manifest.xml file under importer/src/main/resources/xml/lists/ folder. Actual assertion SQL files can be found in the importer/src/main/resources/scripts folder.
+```bash
+git clone https://github.com/IHTSDO/snomed-release-validation-assertions.git
+```
+## Import assertions on startup by default
+
+RVF imports assertions on startup from following location:
+```properties
+rvf.assertion.resource.local.path=../snomed-release-validation-assertions/
+```
+
+## Reload the latest assertions
+
+RVF skips importing assertions if they exist already. To reload the latest assertions, the easiest way is to log onto mysql and recreate rvf_master db.
+
+```sql
+drop database rvf_master;
+create database rvf_master;
+```

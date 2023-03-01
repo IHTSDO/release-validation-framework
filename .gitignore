@@ -26,3 +26,4 @@ activemq-data/
 !.gitattributes
 store
 application-*.properties
+snomed-release-validation-assertions

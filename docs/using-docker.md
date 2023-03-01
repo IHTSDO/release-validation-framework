@@ -28,7 +28,7 @@ docker-compose up -d
 
 Go to <http://localhost:8081/api/swagger-ui.html> and you should see the Swagger API documentation page.
 
-For more information on what to do next, go to the [getting started page](getting-started.md).
+For more information on what to do next, go to the [getting started page](using-the-api.md).
 
 You can use the same to restart the application by using `docker-compose up -d` as specific docker volumes are used in to ensure that the data survives across docker image changes. 
 

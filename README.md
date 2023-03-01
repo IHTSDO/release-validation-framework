@@ -8,9 +8,9 @@ Documentation
 
 Documentation is sparse for now, but will be improved as the project moves out of a proof of concept phase.
 
-- [Docker Quickstart (quickest way to get going!)](docs/docker.md)
-- [Manual Installation](docs/manual-installation.md)
-- [Getting started with the RVF](docs/getting-started.md)
+- [Docker Quickstart (the quickest way to get going!)](docs/using-docker.md)
+- [Manual Installation](docs/getting-started.md)
+- [Getting started with the RVF](docs/using-the-api.md)
 - [Importing Assertions](docs/importing-assertions.md)
 
 Questions
