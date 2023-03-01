@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class AcceptanceGatewayClientFactory {
 
-    @Value("${acceptance.gateway.url}")
+    @Value("${aag.url}")
     private String acceptanceGatewayServiceUrl;
 
     @Value("${ims.url}")
