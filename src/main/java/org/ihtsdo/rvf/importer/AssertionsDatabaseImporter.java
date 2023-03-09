@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,9 +39,6 @@ import java.util.*;
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 		private static final String RESOURCE_PATH_SEPARATOR = "/";
 
-		@Value("${rvf.assertion.import.required:false}")
-		private boolean assertionImportRequired;
-
 		@Autowired
 		@Qualifier("assertionResourceManager")
 		private ResourceManager assertionResourceManager;
@@ -54,7 +50,7 @@ import java.util.*;
 
 		public boolean isAssertionImportRequired() {
 			List<Assertion> assertions = assertionService.findAll();
-			return assertions == null || assertions.isEmpty() || assertionImportRequired;
+			return assertions == null || assertions.isEmpty();
 		}
 
 		public List<Assertion> getAssertionsFromFile(final InputStream manifestInputStream) {
