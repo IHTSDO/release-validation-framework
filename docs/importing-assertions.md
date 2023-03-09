@@ -14,11 +14,3 @@ RVF imports assertions on startup from following location:
 rvf.assertion.resource.local.path=../snomed-release-validation-assertions/
 ```
 
-## Reload the latest assertions
-
-RVF skips importing assertions if they exist already. To reload the latest assertions, the easiest way is to log onto mysql and recreate rvf_master db.
-
-```sql
-drop database rvf_master;
-create database rvf_master;
-```
