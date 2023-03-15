@@ -557,7 +557,7 @@ public class AssertionGroupImporter {
 		if (INT_AUTHORING.equals(groupName)) {
             allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())).collect(Collectors.toList()));
 		} else {
-			if (!US_AUTHORING.equals(groupName)) {
+			if (!US_AUTHORING.equals(groupName) && !NL_AUTHORING.equals(groupName)) {
 				allAssertions.addAll(assertionService.getAssertionsByKeyWords(",EXTENSION", false));
 			}
 			allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())).collect(Collectors.toList()));
