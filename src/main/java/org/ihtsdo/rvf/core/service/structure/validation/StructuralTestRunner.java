@@ -164,6 +164,7 @@ public class StructuralTestRunner {
 				failDetailList = new ArrayList<>();
 			}
 			String failMsg = "Structural test " + structuralTestRunItem.getTestType() +
+					" for file " + structuralTestRunItem.getFileName() +
 					" failed at row-column " + structuralTestRunItem.getExecutionId() +
 					" with error: " + structuralTestRunItem.getActualExpectedValue();
 			FailureDetail testFailItem  = new FailureDetail("",failMsg);
@@ -180,6 +181,7 @@ public class StructuralTestRunner {
 				TestRunItem item = new TestRunItem();
 				item.setTestCategory(key);
 				item.setTestType(TestType.ARCHIVE_STRUCTURAL);
+				item.setAssertionText("RF2 Structural test failed");
 				item.setFirstNInstances(failItems.stream().limit(firstNInstance).collect(Collectors.toList()));
 				item.setFailureCount((long) failItems.size());
 				testRunFailItems.add(item);
