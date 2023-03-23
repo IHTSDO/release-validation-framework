@@ -87,12 +87,12 @@ public class MysqlFailuresExtractor {
                 item.setFirstNInstances(null);
             } else if (assertionIdToTotalFailureMap.containsKey(key)) {
                 int batchCounter = 0;
-                int totalValidFailures = 0;
+                int totalWhitelistedFailures = 0;
                 int totalFailures = assertionIdToTotalFailureMap.get(key);
                 boolean belongToCommonAuthoringOrCommonEditionGroup = uuidAssertionMap.containsKey(assertionUuid) && uuidAssertionMap.get(assertionUuid).getGroups() != null
                                                                     && (uuidAssertionMap.get(assertionUuid).getGroups().contains("common-edition") || uuidAssertionMap.get(assertionUuid).getGroups().contains("common-authoring"));
                 List<FailureDetail> firstNInstances = new ArrayList<>();
-                while(batchCounter * whitelistBatchSize < totalFailures) {
+                while(batchCounter * whitelistBatchSize < totalFailures && firstNInstances.size() < config.getFailureExportMax()) {
                     int offset = batchCounter * whitelistBatchSize;
                     List<FailureDetail> failureDetails = fetchFailureDetails(connection, config.getExecutionId(), uuidToAssertionIdMap.get(item.getAssertionUuid()), -1, offset, whitelistBatchSize);
                     failureDetails.forEach(failure -> setModuleAndFullFields(connection, failure));
@@ -116,17 +116,17 @@ public class MysqlFailuresExtractor {
                                 whitelistedItems.stream().noneMatch(whitelistedItem -> failure.getComponentId().equals(whitelistedItem.getComponentId()))
                         ).collect(Collectors.toList());
 
-                        totalValidFailures += validFailures.size();
+                        totalWhitelistedFailures += whitelistedItems.size();
                         firstNInstances.addAll(validFailures);
                     }
                     batchCounter++;
                 }
 
-                if (totalValidFailures == 0) {
+                if (firstNInstances.size() == 0) {
                     item.setFailureCount(0L);
                     item.setFirstNInstances(null);
                 } else {
-                    item.setFailureCount(Long.valueOf(totalValidFailures));
+                    item.setFailureCount(Long.valueOf(totalFailures - totalWhitelistedFailures));
                     item.setFirstNInstances(firstNInstances.size() > config.getFailureExportMax() ? firstNInstances.subList(0, config.getFailureExportMax()) : firstNInstances);
                 }
             } else {
