@@ -598,7 +598,7 @@ public class AssertionGroupImporter {
 		String keywords;
 		for (Assertion assertion : allAssertions) {
 			 keywords = assertion.getKeywords();
-			if (keywords.contains(MDRS) || FILE_CENTRIC_VALIDATION.getName().equals(keywords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keywords)
+			if (FILE_CENTRIC_VALIDATION.getName().equals(keywords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keywords)
 					|| RELEASE_TYPE_VALIDATION.getName().equals(keywords)) {
 				result.add(assertion);
 			}
