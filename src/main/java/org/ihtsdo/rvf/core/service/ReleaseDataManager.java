@@ -677,7 +677,7 @@ public class ReleaseDataManager {
 		try (Connection connection = rvfDynamicDataSource.getConnection(schemaName)) {
 			DatabaseMetaData md = connection.getMetaData();
 			ResultSet rs = md.getTables(null, null, "%", null);
-			List<String> snapShotTables = new ArrayList<>();
+			Set<String> snapShotTables = new HashSet<>();
 			while (rs.next()) {
 				if (rs.getString(3).endsWith("_s")) {
 					snapShotTables.add(rs.getString(3));
