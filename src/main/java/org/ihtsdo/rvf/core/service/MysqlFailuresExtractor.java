@@ -88,6 +88,7 @@ public class MysqlFailuresExtractor {
             } else if (assertionIdToTotalFailureMap.containsKey(key)) {
                 int batchCounter = 0;
                 int totalWhitelistedFailures = 0;
+                int totalFilteredOutFailures = 0;
                 int totalFailures = assertionIdToTotalFailureMap.get(key);
                 boolean belongToCommonAuthoringOrCommonEditionGroup = uuidAssertionMap.containsKey(assertionUuid) && uuidAssertionMap.get(assertionUuid).getGroups() != null
                                                                     && (uuidAssertionMap.get(assertionUuid).getGroups().contains("common-edition") || uuidAssertionMap.get(assertionUuid).getGroups().contains("common-authoring"));
@@ -99,7 +100,9 @@ public class MysqlFailuresExtractor {
 
                     // filter by the extension modules only
                     if (belongToCommonAuthoringOrCommonEditionGroup && config.isExtensionValidation() && !CollectionUtils.isEmpty(config.getIncludedModules())) {
+                        int totalBatchFailures = failureDetails.size();
                         failureDetails = failureDetails.stream().filter(failure -> config.getIncludedModules().contains(failure.getModuleId())).collect(Collectors.toList());
+                        totalFilteredOutFailures += (totalBatchFailures - failureDetails.size());
                     }
 
                     if (failureDetails.size() != 0) {
@@ -126,7 +129,7 @@ public class MysqlFailuresExtractor {
                     item.setFailureCount(0L);
                     item.setFirstNInstances(null);
                 } else {
-                    item.setFailureCount(Long.valueOf(totalFailures - totalWhitelistedFailures));
+                    item.setFailureCount(Long.valueOf(totalFailures - totalWhitelistedFailures - totalFilteredOutFailures));
                     item.setFirstNInstances(firstNInstances.size() > config.getFailureExportMax() ? firstNInstances.subList(0, config.getFailureExportMax()) : firstNInstances);
                 }
             } else {
