@@ -65,4 +65,4 @@ USER rvf
 
 RUN echo 'alias ll="ls -la $@"' >> ~/.bashrc
 
-ENTRYPOINT ["java","-Dspring-boot.run.jvmArguments=\\\"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9000\\\" -Djava.security.egd=file:/dev/urandom -DrvfConfigLocation=config","-jar","api.jar"]
+ENTRYPOINT ["java"," -Djava.security.egd=file:/dev/urandom -DrvfConfigLocation=config","-jar","api.jar"]
