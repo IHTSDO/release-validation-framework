@@ -1,0 +1,269 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_017_Australian Schedule 8 controlled medications(1050951000168102) content validation" verbose="2">
+
+    <test name="01 Australian Schedule 8 controlled trade medications(1050951000168102) is populated">
+        <parameter name="query" value="SELECT count(*) FROM &lt;PROSPECTIVE&gt;.simplerefset_active WHERE refsetId = 1050951000168102;"/>
+        <parameter name="expectedValue" value="0"/>
+		<parameter name="qualifier" value=">"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+    <test name="02 RefsetId(1050951000168102) is an active concept">
+        <parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.concept_active where id = 1050951000168102;"/>
+        <parameter name="resultCount" value="1"/>
+        <parameter name="skip" value="true"/> <!--Refactor this test-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+    
+    <test name="03 All active references are from module 900062011000036108|AMT module|">
+        <parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.simplerefset_active WHERE refsetId = 1050951000168102 AND moduleId != 900062011000036108;"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="04 FSN is 'Australian Schedule 8 controlled medications reference set (foundation metadata concept)'">
+        <parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.description_active WHERE conceptId = 1050951000168102
+										AND typeId = 900000000000003001
+										AND term = 'Australian Schedule 8 controlled medications reference set (foundation metadata concept)'
+										AND id != 2162761000168119;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="05 PT (in ADRS) is 'Schedule 8 medications reference set'">
+        <parameter name="query" value="SELECT get_cr_ADRS_PT(1050951000168102) = 'Schedule 8 medications reference set';"/>
+		<parameter name="description" value="query returns 1 if the string matches, otherwise 0"></parameter>
+        <parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="06 All active members are MPUU,MPP, TPUU or CTPP concepts">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="Select id,get_cr_FSN(id) from &lt;PROSPECTIVE&gt;.concept_active
+										Where isActiveMemberOf_cr_refset(id, 1050951000168102)
+										and NOT (isActiveMemberOf_cr_refset(id, 929360071000036103) 
+													OR isActiveMemberOf_cr_refset(id, 929360081000036101)
+													OR isActiveMemberOf_cr_refset(id, 929360031000036100)													
+													OR isActiveMemberOf_cr_refset(id, 929360051000036108)													
+													);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+
+	<test name="07 IS A child of 32570701000036108 | Reference sets for Medications">
+        <parameter name="query" value="select isChildOf_cr(1050951000168102, 32570701000036108);"/>
+		<parameter name="description" value="query returns 1 if true, otherwise 0"></parameter>
+        <parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="08 IS A child of 446609009 | Simple type reference set">
+        <parameter name="query" value="select isChildOf_cr(1050951000168102, 446609009);"/>
+		<parameter name="description" value="query returns 1 if true, otherwise 0"></parameter>
+        <parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="09 Only has parents 32570701000036108 | Reference sets for Medications AND 446609009 | Simple type reference set">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where sourceId = 1050951000168102
+                                        and typeId = 116680003
+										and destinationId not in (32570701000036108,446609009);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="10 No duplicate active references (referencedComponentId is unique within reference set)">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="SELECT referencedComponentId, count(*) FROM &lt;PROSPECTIVE&gt;.simplerefset_active
+										WHERE refsetId = 1050951000168102
+										GROUP BY referencedComponentId
+										HAVING count(*) > 1;"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="11 All CTPP Members are S8 - (or at least not some other schedule) (4 exceptions)">
+        <parameter name="description" value="Checks members are S8. Some members won't be due to TGA cancellation (absent) or having both a N and S8 code.."></parameter>
+		<parameter name="query" value="select referencedComponentId,get_cr_FSN(referencedComponentId),value1 from rf2_cr_irefset_active
+                                        where refsetId = 11000168105
+													 and isActiveMemberOf_cr_refset(referencedComponentId, 1050951000168102)
+
+                                        and value1 in (select distinct TGA.ARTGID from TGA_Data.tga_feed AS TGA
+                                                                                where TGA.PoisonSchedule NOT RLIKE '(S8|Not scheduled. Not considered by committee)'
+                                                                                );"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="12 All S8 products are Members">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select * from rf2_cr_irefset_active
+                                        where value1 in (select distinct TGA.ARTGID from TGA_Data.tga_feed AS TGA where PoisonSchedule RLIKE 'S8')
+                                        and not isActiveMemberOf_cr_refset(referencedComponentId, 1050951000168102);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="13 All TPPus of member CTPPs are also member">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where typeId = 30409011000036107
+                                        and isActiveMemberOf_cr_refset(sourceId, 1050951000168102)
+                                        and NOT isActiveMemberOf_cr_refset(destinationId, 1050951000168102);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="14 All CTPPs that have TPUUs that are members are also members">
+        <parameter name="description" value="sourceId is a CTPP but not a member"></parameter>
+		<parameter name="query" value="select distinct sourceId, get_cr_FSN(sourceId) from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where typeId = 30409011000036107
+                                        and NOT isActiveMemberOf_cr_refset(sourceId, 1050951000168102)
+                                        and isActiveMemberOf_cr_refset(sourceId, 929360051000036108)
+                                        and isActiveMemberOf_cr_refset(destinationId, 1050951000168102);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+
+	<test name="15 S8 Products not in AMT">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select * from TGA_Data.tga_feed AS TGA
+                                        where TGA.PoisonSchedule RLIKE 'S8'
+                                        and TGA.ARTGID not in (select value1 from rf2_cr_irefset_active AS ARTGID 
+                                                                   where ARTGID.refsetid = 11000168105);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="16 All single ingredient codeine TPUUs are S8">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select sourceId, get_cr_FSN(sourceId) from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where sourceId in (
+                                                                select sourceId from &lt;PROSPECTIVE&gt;.relationship_active
+                                                                where typeId = 700000081000036101 and destinationId = 1978011000036103
+                                                                and isKindOf_cr(sourceId, 30425011000036101)
+                                                                )
+                                        and typeId = 700000081000036101
+                                        and NOT isActiveMemberOf_cr_refset(sourceId, 1050951000168102)
+                                        group by sourceId
+                                        having count(1) = 1;"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="17 All CTPPs with ALWAYS S8 ingredients are in S8 Refset">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select referencedComponentId,get_cr_FSN(referencedComponentId) from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 929360051000036108
+                                        and get_cr_FSN(referencedComponentId) RLIKE '( |\\(|^)(ACETYLDIHYDROCODEINE|ACETYLMETHADOL|ACETYLMORPHINES|ALFENTANIL|ALPHACETYLMETHADOL|ALPHAPRODINE|ALPRAZOLAM|AMFETAMINE|ANILERIDINE|BENZYLMORPHINE|BEZITRAMIDE|BUPRENORPHINE|BUTOBARBITAL|BUTORPHANOL|CARFENTANYL|COCAINE|CODEINE-N-OXIDE|CYCLOBARBITAL|DEXAMFETAMINE|DEXTROMORAMIDE|DIHYDROMORPHINE|DIPIPANONE|DRONABINOL|DROTEBANOL|ETHYLAMFETAMINE|FENTANYL|FLUNITRAZEPAM|HYDROCODONE|HYDROMORPHINOL|HYDROMORPHONE|KETAMINE|LEVAMFETAMINE|LEVOMETHAMFETAMINE|LEVOMORAMIDE|LEVORPHANOL|LISDEXAMFETAMINE|METHADONE|METAMFETAMINE|METHYLDIHYDROMORPHINE|METHYLPHENIDATE|MORPHINE|NABILONE|NORCODEINE|NORMETHADONE|OPIUM|OXYCODONE|OXYMORPHONE|PENTAZOCINE|PETHIDINE|PHENDIMETRAZINE|PHENMETRAZINE|PHENOPERIDINE|PIRITRAMIDE|PROPIRAM|RACEMORAMIDE|REMIFENTANIL|SECBUTOBARBITAL|SECOBARBITAL|OXYBATE|SUFENTANIL|TAPENTADOL|THEBACON|THEBAINE|TILIDINE|nabiximol|.*TETRAHYDROCANN|NABILONE).*'
+                                        and referencedComponentId not IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1050951000168102)
+                                        and referencedComponentId not IN (1634371000168108,1635881000168100,1635851000168107,1636781000168100,1634891000168103);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="18 All TPUUs with ALWAYS S8 ingredients are in S8 Refset">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select referencedComponentId,get_cr_FSN(referencedComponentId) from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 929360031000036100
+                                        and get_cr_FSN(referencedComponentId) RLIKE '( |\\(|^)(ACETYLDIHYDROCODEINE|ACETYLMETHADOL|ACETYLMORPHINES|ALFENTANIL|ALPHACETYLMETHADOL|ALPHAPRODINE|ALPRAZOLAM|AMFETAMINE|ANILERIDINE|BENZYLMORPHINE|BEZITRAMIDE|BUPRENORPHINE|BUTOBARBITAL|BUTORPHANOL|CARFENTANYL|COCAINE|CODEINE-N-OXIDE|CYCLOBARBITAL|DEXAMFETAMINE|DEXTROMORAMIDE|DIHYDROMORPHINE|DIPIPANONE|DRONABINOL|DROTEBANOL|ETHYLAMFETAMINE|FENTANYL|FLUNITRAZEPAM|HYDROCODONE|HYDROMORPHINOL|HYDROMORPHONE|KETAMINE|LEVAMFETAMINE|LEVOMETHAMFETAMINE|LEVOMORAMIDE|LEVORPHANOL|LISDEXAMFETAMINE|METHADONE|METAMFETAMINE|METHYLDIHYDROMORPHINE|METHYLPHENIDATE|MORPHINE|NABILONE|NORCODEINE|NORMETHADONE|OPIUM|OXYCODONE|OXYMORPHONE|PENTAZOCINE|PETHIDINE|PHENDIMETRAZINE|PHENMETRAZINE|PHENOPERIDINE|PIRITRAMIDE|PROPIRAM|RACEMORAMIDE|REMIFENTANIL|SECBUTOBARBITAL|SECOBARBITAL|OXYBATE|SUFENTANIL|TAPENTADOL|THEBACON|THEBAINE|TILIDINE|NABIXIMOL|.*TETRAHYDROCANN|NABILONE).*'
+                                        and referencedComponentId not in (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1050951000168102)
+                                        and referencedComponentId not IN (1634341000168101,1636751000168107,1635821000168104,1634861000168105);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+    <test name="19 All imediate MPUU parents of TPUU members are included in S8 refset">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select distinct destinationId,get_cr_FSN(destinationId) from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where typeId = 116680003
+                                        and isActiveMemberOf_cr_refset(sourceId, 929360031000036100)
+                                        and isActiveMemberOf_cr_refset(sourceId, 1050951000168102)                                        
+                                        and isActiveMemberOf_cr_refset(destinationId, 929360071000036103)
+                                        and NOT isActiveMemberOf_cr_refset(destinationId, 1050951000168102);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="20 All MPPs that have MPUUs that are S8 members are also members">
+        <parameter name="description" value="The MPPs of all S8 MPUUs are also in the refset"></parameter>
+		<parameter name="query" value="select distinct sourceId, get_cr_FSN(sourceId) from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where typeId = 30348011000036104
+                                        and NOT isActiveMemberOf_cr_refset(sourceId, 1050951000168102)
+                                        and isActiveMemberOf_cr_refset(sourceId, 929360081000036101)
+                                        and isActiveMemberOf_cr_refset(destinationId, 1050951000168102);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="20 All MPPs members are ancestors of S8 CTPPs">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select CTPP_TPP.sourceid, Get_cr_fsn(CTPP_TPP.sourceid), TPP_MPP.destinationid, Get_cr_fsn(TPP_MPP.destinationid) 
+                                        from &lt;PROSPECTIVE&gt;.relationship_active CTPP_TPP
+                                        join &lt;PROSPECTIVE&gt;.relationship_active TPP_MPP
+                                        on CTPP_TPP.destinationid = TPP_MPP.sourceid
+                                        where CTPP_TPP.sourceid in (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetid = 929360051000036108)
+                                        and TPP_MPP.destinationid in (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetid = 929360081000036101)
+                                        and TPP_MPP.destinationid in (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetid = 1050951000168102)
+                                        and CTPP_TPP.sourceid NOT in (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetid = 1050951000168102);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+</suite>
+

@@ -1,0 +1,114 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_006_Full AMT Identifier" verbose="2">
+
+    <!-- RVF DOES NOT CURRENTLY TEST THE IDENTIFIERS FILE -->
+
+    <test name="01 rf2_cr_identifiers_full IS empty">
+        <parameter name="query" value="CALL TableIsPopulated('rf2_cr_identifiers_full');"/>
+        <parameter name="description" value=""></parameter>
+		<!--<parameter name="qualifier" value=">"></parameter> -->
+		<parameter name="expectedValue" value="0"/>
+        <parameter name="skip" value="true"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+
+    <test name="02 identifierSchemeId a descendant of 900000000000453004|Identifier scheme| within the metadata hierarchy">
+        <parameter name="query" value="SELECT * FROM rf2_cr_identifiers_full WHERE NOT isDescendentOf_cr(identifierSchemeId, 900000000000453004);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="03 alternateIdentifier is a string of some sort">
+        <parameter name="query" value="SELECT * FROM rf2_cr_identifiers_full WHERE CHAR_LENGTH(alternateidentifier) = 0;"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+
+    <test name="04 effectiveTime is valid Timeformat">
+        <parameter name="query" value="SELECT * FROM rf2_cr_identifiers_full WHERE NOT isValidTimeFormat(effectiveTime);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="05 active is boolean value">
+        <parameter name="query" value="SELECT * FROM rf2_cr_identifiers_full WHERE active != 1 AND active != 0;"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="06 moduleId is a descendant of 900000000000443000|Module| within the metadata hierarchy">
+        <parameter name="query" value="SELECT * FROM rf2_cr_identifiers_full WHERE NOT isValidModuleId(moduleId);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="07 referencedComponentId references an valid componentId">
+        <parameter name="query" value="select * from rf2_cr_identifiers_full AS Identifiers
+										where NOT EXISTS (select 1 from &lt;PROSPECTIVE&gt;.concept_&lt;FULL&gt; AS T where T.id = referencedComponentId)
+										 AND  NOT EXISTS (select 1 from &lt;PROSPECTIVE&gt;.descriptions_&lt;FULL&gt; AS T where T.id = referencedComponentId)
+										 AND  NOT EXISTS (select 1 from &lt;PROSPECTIVE&gt;.relationship_&lt;FULL&gt; AS T where T.id = referencedComponentId);"/>
+        <parameter name="description" value="Validates refernceComponentId is a Concept,Description or relationship ID. Member Ids not checked, as regarded unlikely. But could easily be added"></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="08 identifierSchemeId is a ConceptId (referential integrity)">
+        <parameter name="query" value="SELECT * FROM rf2_cr_identifiers_full AS concepts WHERE identifierSchemeId NOT IN (SELECT id FROM &lt;PROSPECTIVE&gt;.concept_&lt;FULL&gt;);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="09 moduleId is a ConceptId (referential integrity)">
+        <parameter name="query" value="SELECT * FROM rf2_cr_identifiers_full AS concepts WHERE moduleId NOT IN (SELECT id FROM &lt;PROSPECTIVE&gt;.concept_&lt;FULL&gt;);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="09 All entries in the Identifiers file are on the AMT module(900062011000036108)">
+        <parameter name="query" value="SELECT * FROM rf2_cr_identifiers_full WHERE moduleId != 900062011000036108;"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+</suite>

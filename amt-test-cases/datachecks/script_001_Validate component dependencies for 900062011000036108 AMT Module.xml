@@ -1,0 +1,248 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_001_Validate component dependencies for 900062011000036108 |AMT Module|" verbose="2">
+
+
+
+
+
+
+
+
+
+
+    <test name="05 OWL Axioms for concepts on AMT Module must be on modules that are dependent AMT Module">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.owlexpressionrefset_&lt;SNAPSHOT&gt;
+										where referencedComponentId in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+										and moduleId not in (select referencedComponentId from rf2_cr_ssrefset_snapshot where active and moduleId =  900062011000036108 UNION select  900062011000036108);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="06 OWL Axioms on AMT Module must be for concepts on modules AMT Module dependens on">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.owlexpressionrefset_&lt;SNAPSHOT&gt;
+                                        where moduleId = 900062011000036108
+										and referencedComponentId not in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt;
+                                                                        where moduleId in (select referencedComponentId from rf2_cr_ssrefset_snapshot 
+                                                                                           where active and moduleId =  900062011000036108 UNION select  900062011000036108
+                                                                                           )
+                                                                        );"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="07 Inferred relationships sourceId from AMT Module only depends on concepts from modules AMT Module depends on">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_&lt;SNAPSHOT&gt;
+										where sourceId in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+										and destinationId not in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt;
+																  where moduleId in (select referencedComponentId from rf2_cr_ssrefset_snapshot where active and moduleId =  900062011000036108 UNION select  900062011000036108));"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="08 Inferred Relationships for concepts on AMT Module must be on modules that are dependent AMT Module">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_&lt;SNAPSHOT&gt;
+										where sourceId in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+										and moduleId not in (select referencedComponentId from rf2_cr_ssrefset_snapshot where active and moduleId =  900062011000036108 UNION select  900062011000036108);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="09 Inferred Relationships on AMT Module must be for sourceIds from modules AMT Module dependens on">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_&lt;SNAPSHOT&gt;
+										where moduleId = 900062011000036108
+                                        and sourceId not in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt;
+                                                                        where moduleId in (select referencedComponentId from rf2_cr_ssrefset_snapshot 
+                                                                                           where active and moduleId =  900062011000036108 UNION select  900062011000036108
+                                                                                           )
+                                                                        );"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="10 Inferred Relationships on AMT Module must be for destinationIds from modules AMT Module dependens on">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_&lt;SNAPSHOT&gt;
+										where moduleId = 900062011000036108
+                                        and destinationId not in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt;
+                                                                        where moduleId in (select referencedComponentId from rf2_cr_ssrefset_snapshot 
+                                                                                           where active and moduleId =  900062011000036108 UNION select  900062011000036108
+                                                                                           )
+                                                                        );"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+    <test name="11  Descriptions for concepts on AMT Module must be on modules that are dependent AMT Module, excluding concepts previously on dependent modules.">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.descriptions_&lt;SNAPSHOT&gt;
+										where conceptId in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+										and moduleId not in (select moduleId from rf2_cr_ssrefset_snapshot where active and referencedComponentId =  900062011000036108 UNION select  900062011000036108)
+                                        and conceptId not in (select distinct id from &lt;PROSPECTIVE&gt;.concept_&lt;FULL&gt;
+                                                            where id in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+                                                            and moduleId != 900062011000036108
+                                                            and moduleId in (select referencedComponentId from rf2_cr_ssrefset_snapshot where active and moduleId = 900062011000036108));"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="12  Descriptions on AMT Module must be for concepts that AMT Module depends on">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.descriptions_&lt;SNAPSHOT&gt;
+										where moduleId = 900062011000036108
+										and conceptId not in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt;
+                                                                                where moduleId in (select referencedComponentId from rf2_cr_ssrefset_snapshot 
+                                                                                                        where active and moduleId = 900062011000036108 
+																																		  UNION select 900062011000036108));"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="13 ADRS Language preferences for descriptions on AMT Module must be on modules that are dependent AMT Module">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.langrefset_&lt;SNAPSHOT&gt;
+										where refsetId =  900000000000506000
+										and referencedComponentId in (select id from &lt;PROSPECTIVE&gt;.descriptions_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+										and moduleId not in (select moduleId from rf2_cr_ssrefset_snapshot where active and referencedComponentId =  900062011000036108 UNION select  900062011000036108);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="14 ADRS Language preferences on AMT Module must be for descriptions on modules AMT Module dependens on">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.langrefset_&lt;SNAPSHOT&gt;
+                                        where moduleId = 900062011000036108
+                                        and refsetId =  900000000000506000
+                                        and referencedComponentId not in (select id from &lt;PROSPECTIVE&gt;.descriptions_&lt;SNAPSHOT&gt;
+                                                                                where moduleId in (select moduleId from rf2_cr_ssrefset_snapshot 
+                                                                                                        where active and referencedComponentId = 900062011000036108 UNION select 900062011000036108));"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="15 Simple Type Refset memberships for concepts on AMT Module must be on modules that are dependent AMT Module">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.simplerefset_&lt;SNAPSHOT&gt;
+										where referencedComponentId in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+										and moduleId not in (select moduleId from rf2_cr_ssrefset_snapshot where active and referencedComponentId =  900062011000036108 UNION select  900062011000036108);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="16 Simple Type Refset memberships on AMT Module must be for concepts on modules AMT Module dependens on">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.simplerefset_&lt;SNAPSHOT&gt;
+                                        where moduleId = 900062011000036108
+                                        and referencedComponentId not in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt;
+                                                                                where moduleId in (select moduleId from rf2_cr_ssrefset_snapshot 
+                                                                                                        where active and referencedComponentId = 900062011000036108 UNION select 900062011000036108));"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+   <test name="17 cRefset memberships for concepts on AMT Module must be on modules that are dependent AMT Module">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.langrefset_&lt;SNAPSHOT&gt;
+                                        where referencedComponentId in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt; where moduleId = 900062011000036108)
+                                        and moduleId not in (select moduleId from rf2_cr_ssrefset_snapshot where active and referencedComponentId = 900062011000036108 UNION select 900062011000036108)
+                                        and referencedComponentId not in (select distinct id from &lt;PROSPECTIVE&gt;.concept_&lt;FULL&gt;
+                                                            where id in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+                                                            and moduleId != 900062011000036108
+                                                            and moduleId in (select referencedComponentId from rf2_cr_ssrefset_snapshot where active and moduleId = 900062011000036108));"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+       <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="18 cRefset memberships on AMT Module must be for concepts on modules AMT Module dependens on">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.langrefset_&lt;SNAPSHOT&gt;
+                                        where moduleId = 900062011000036108
+                                        and referencedComponentId in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt;)
+                                        and referencedComponentId not in (	select id from &lt;PROSPECTIVE&gt;.concept_&lt;SNAPSHOT&gt;
+																									where moduleId in (select moduleId from rf2_cr_ssrefset_snapshot 
+																															where active and referencedComponentId = 900062011000036108 UNION select 900062011000036108));"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="19 cRefset memberships for descriptions on AMT Module must be on modules that are dependent AMT Module">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.langrefset_&lt;SNAPSHOT&gt;
+										where referencedComponentId in (select id from &lt;PROSPECTIVE&gt;.descriptions_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+										and moduleId not in (select moduleId from rf2_cr_ssrefset_snapshot where active and referencedComponentId =  900062011000036108 UNION select  900062011000036108)
+                                        and referencedComponentId not in (select distinct id from &lt;PROSPECTIVE&gt;.descriptions_&lt;FULL&gt;
+                                                            where id in (select id from &lt;PROSPECTIVE&gt;.descriptions_&lt;SNAPSHOT&gt; where moduleId =  900062011000036108)
+                                                            and moduleId != 900062011000036108
+                                                            and moduleId in (select referencedComponentId from rf2_cr_ssrefset_snapshot where active and moduleId = 900062011000036108));"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+   
+    <test name="20 cRefset memberships on AMT Module must be for descriptions on modules AMT Module depends on">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.langrefset_&lt;SNAPSHOT&gt;
+                                        where moduleId = 900062011000036108
+                                        and referencedComponentId in (select id from &lt;PROSPECTIVE&gt;.descriptions_&lt;SNAPSHOT&gt;)
+                                        and referencedComponentId not in (	select id from &lt;PROSPECTIVE&gt;.descriptions_&lt;SNAPSHOT&gt;
+																									where moduleId in (select referencedComponentId from rf2_cr_ssrefset_snapshot 
+																															where active and moduleId = 900062011000036108 UNION select 900062011000036108));"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>   
+
+</suite>
+

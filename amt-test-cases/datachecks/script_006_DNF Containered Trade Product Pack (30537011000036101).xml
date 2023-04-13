@@ -1,0 +1,365 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_006_DNF Containered Trade Product Pack (30537011000036101)" verbose="2">
+
+    <test name="01 Some Containered Trade Product Pack exist">
+        <parameter name="query" value="select count(*) from &lt;PROSPECTIVE&gt;.concept_active where id in (select sourceid from rf2_cr_transitiveclosuretable where destinationId = 30537011000036101);"/>
+		<parameter name="qualifier" value=">"></parameter>
+		<parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+<!-- Basic Content validation !-->
+<!-- Voltaren tube exceptions in #2 http://jira.cti/browse/AMT-28544 -->
+	 <test name="02 Containered Trade Product Pack and all of its descendants are 900000000000073002|Defined">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.concept_active
+										WHERE isKindOf_cr(id, 30537011000036101)
+										AND definitionstatusid != 900000000000073002
+                                        and id not in (1093401000168106,1093381000168106,1165781000168101,43828011000036102,1406701000168104,1406641000168107,1443351000168100,1443381000168107,1445571000168104,1445601000168105,1445641000168107,1445671000168100,1462191000168109,1462221000168103,1492621000168104,1492651000168107);"/>
+        <parameter name="resultCount" value="0"/>
+         <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="03 All concepts with semantic tag (containered trade product pack) are descendants of 30537011000036101|Containered Trade Product Pack (or itself)">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.description_active
+										where isActiveConcept_cr(conceptId)
+										and typeId = 900000000000003001
+										AND term REGEXP BINARY ' \\(containered trade product pack\\)$'
+										and NOT isKindOf_cr(conceptId,30537011000036101);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="04 Containered Trade Product Pack and all of its children have FSNs with a semantic tag (containered trade product pack)">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE  isKindOf_cr(conceptid, 30537011000036101)
+										AND typeid = 900000000000003001
+										AND term NOT REGEXP BINARY ' \\(containered trade product pack\\)$';"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="05 Concept 30537011000036101|CTPP has FSN = 'containered trade product pack (containered trade product pack)'">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE     typeId = 900000000000003001
+										AND conceptId = 30537011000036101
+										AND term = BINARY 'containered trade product pack (containered trade product pack)'
+										and id != 344628011000036117;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="06a Concept 30537011000036101|CTPP has SYN = 'containered trade product pack' or 'CTPP - containered trade product pack'">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE     typeId = 900000000000013009
+										AND conceptId = 30537011000036101
+										AND term != BINARY 'containered trade product pack'
+										AND term != BINARY 'CTPP - containered trade product pack';"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="06b Concept 30537011000036101|CTPP has SYN = 'containered trade product pack' or 'CTPP - containered trade product pack'">
+        <parameter name="query" value="select get_cr_ADRS_PT(30537011000036101) = BINARY 'containered trade product pack';"/>
+		<parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+	
+	<test name="07 Containered Trade Product Pack is a child of 30404011000036106|trade product pack">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE     sourceid = 30537011000036101
+										AND typeid = 116680003
+										AND destinationid = 30404011000036106
+										AND id != 2914021000168127;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="09 Containered Trade Product Pack is only a child of 30404011000036106|trade product pack OR 30506011000036107|Australian product">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE sourceid = 30537011000036101
+										AND typeid = 116680003
+										AND NOT destinationid in (30404011000036106,30506011000036107);"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+       </classes>
+    </test>
+
+<!-- Defining/Source properties !-->
+<!-- has container type !-->
+	
+	<test name="10 [30465011000036106|has container type] relationships only have sourceIds that are types of 30537011000036101|containered trade product pack (or itself)">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where typeId = 30465011000036106
+										and NOT isKindOf_cr(sourceId,30537011000036101);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="11 [30465011000036106|has container type] relationships only have destinationIds that are descendents of 30446011000036105|container type (or itself)">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE typeId = 30465011000036106
+										AND NOT isKindOf_cr(destinationid, 30446011000036105);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="12a All children of Containered Trade Product Pack no more than one [30465011000036106|has container type] relationship">
+        <parameter name="query" value="SELECT sourceid, count(*)
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE typeId = 30465011000036106
+										AND isChildOf_cr(sourceId, 30537011000036101)
+										GROUP BY sourceid
+										HAVING count(*) != 1;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="12b All children of Containered Trade Product Pack at least one [30465011000036106|has container type] relationship">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.concept_active
+										where isKindOf_cr(id, 30537011000036101)
+										and id not in (SELECT distinct sourceid FROM &lt;PROSPECTIVE&gt;.relationship_active
+														WHERE typeId = 30465011000036106);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+<!-- 30454011000036104 has subpack !-->
+
+	<test name="13 All destinationids of [30454011000036104|has subpack] relationships of CTPP concepts are types of the destinationids for the related MPP has subpack relationship">
+        <parameter name="query" value="SELECT r1.*
+										FROM &lt;PROSPECTIVE&gt;.relationship_active r1
+										JOIN &lt;PROSPECTIVE&gt;.relationship_active r2
+										JOIN &lt;PROSPECTIVE&gt;.relationship_active r3
+										JOIN &lt;PROSPECTIVE&gt;.relationship_active r4
+										ON     r1.sourceid = r2.sourceid
+										AND r2.destinationid = r3.sourceid
+										AND r3.destinationid = r4.sourceid
+										AND r1.typeid = 30454011000036104
+										AND r2.typeid = 116680003
+										AND r3.typeid = 116680003
+										AND r4.typeid = 30454011000036104
+										WHERE isKindOf_cr(r1.sourceid, 30537011000036101)
+										AND (isChildOf_cr(r3.destinationid, 30513011000036104)
+										OR r3.destinationid = 30513011000036104)
+										AND NOT isKindOf_cr(r1.destinationid, r4.destinationid);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>  
+
+	<test name="14 [30454011000036104|has subpack] relationships of Containered Trade Product Pack concepts only have destinationIds that are types of 30537011000036101|containered trade product pack">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where isKindOf_cr(sourceId, 30537011000036101)
+										AND typeId = 30454011000036104
+										and NOT isKindOf_cr(destinationId,30537011000036101);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="15 [30454011000036104|has subpack] relationships with destination CTPP concepts only have sourceIDs that are 30537011000036101|CTPPs">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where isKindOf_cr(destinationId, 30537011000036101)
+										AND typeId = 30454011000036104
+										and NOT isKindOf_cr(sourceId,30537011000036101);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="17 Maximum of 1 has subpack (30454011000036104) for all kinds of 30537011000036101|CTPP">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE typeId = 30454011000036104
+										AND isKindOf_cr(sourceid, 30537011000036101)
+										GROUP BY sourceId
+										HAVING count(*) != 1;"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test> 
+
+<!-- 700000061000036106 has component pack 
+This query is horrible. make sure you have a coffee when trying to decipher.
+Was originally the same as Subtest(13) above, however, because component packs have 0..*, rather than 0..1 - the other components cause fails. So need to test the set of destinationIds also.
+!-->
+
+	<test name="18 All destinationids of [700000061000036106|has component pack] relationships of CTPP concepts are types of the destinationids for the related MPP has component pack relationship">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active AS MPPs
+										join &lt;PROSPECTIVE&gt;.relationship_active AS CTPPs on MPPs.active = CTPPs.active
+										where IsKindOf_cr(MPPs.sourceId,30513011000036104)
+										and MPPs.typeId = 700000061000036106
+										and CTPPs.typeId = 700000061000036106
+										and isAncestorOf_cr(MPPs.sourceId,CTPPs.sourceId)
+										and NOT isAncestorOf_cr(MPPs.destinationId,CTPPs.destinationId)
+
+										and MPPs.destinationId not in (select destinationId from &lt;PROSPECTIVE&gt;.relationship_active As nested_MPP
+																		where nested_MPP.sourceId = MPPs.sourceId
+																		and nested_MPP.typeId = 700000061000036106
+																		);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>  
+
+	<test name="19 [700000061000036106|has component pack] relationships of Containered Trade Product Pack concepts only have destinationIds that are kinds of 30537011000036101|containered trade product pack">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where isKindOf_cr(sourceId, 30537011000036101)
+										AND typeId = 700000061000036106
+										and NOT isKindOf_cr(destinationId,30537011000036101);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+<!-- Note this next test is void for DNF !-->
+	<test name="21 If destinationId is kind of 30537011000036101|CTPP, all has component pack (700000061000036106) sourceId are also kinds of 30537011000036101|CTPP">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where typeId = 700000061000036106
+										and isKindOf_cr(destinationId,30537011000036101)
+										and NOT isKindOf_cr(sourceId,30537011000036101);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	
+<!-- general relationship constraints !-->
+
+	<test name="22 All Containered Trade Product Pack only have [116680003|Is a] OR [700000061000036106|has component pack] OR [30454011000036104|has subpack] OR [30465011000036106|has container type] 700000101000036108 [has TP] OR 30348011000036104 [has MPUU] OR 30409011000036107 [has TPUU] relationships">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE    isKindOf_cr(sourceId, 30537011000036101)
+										AND typeId NOT IN (116680003, 700000061000036106, 30454011000036104, 30465011000036106,30348011000036104,700000101000036108,30409011000036107);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="23 Containered Trade Product Pack concepts only have [116680003|Is a] relationships to 30404011000036106|trade product pack concepts or 30537011000036101|CTPP">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE isDescendentOf_cr(sourceId, 30537011000036101)
+										AND typeId = 116680003
+										AND destinationID not in (										
+																select id from &lt;PROSPECTIVE&gt;.concept_active
+																where isKindOf_cr(id, 30404011000036106)
+																and NOT isDescendentOf_cr(id, 30537011000036101)
+																);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="24 All Containered Trade Product Pack relationships except HasTP, IS A, hasComponentPack, ContainerType are grouped">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE isKindOf_cr(sourceid, 30537011000036101)
+										and typeId not in (116680003,30465011000036106,700000061000036106,700000101000036108)
+										AND relationshipgroup = 0;"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="24 Containered Trade Product Pack relationships - HasTP, IS A, hasComponentPack, ContainerType are never grouped">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE isKindOf_cr(sourceid, 30537011000036101)
+										and typeId in (116680003,30465011000036106,700000061000036106,700000101000036108)
+										AND relationshipgroup != 0;"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="25 DNF All CTPPs are disjoint (CTPPs aren't subtypes of other CTPPs)">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where typeId = 116680003
+										AND isDescendentof_cr(sourceId,30537011000036101)
+										AND isDescendentof_cr(destinationId,30537011000036101);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test> 
+
+	<test name="26 DNF 30537011000036101|CTPPs with 700000061000036106|hasComponentPack relationships, have at least 2">(
+        <parameter name="query" value="select sourceId,count(id) from &lt;PROSPECTIVE&gt;.relationship_active
+										where typeId = 700000061000036106
+										and isDescendentOf_cr(sourceId,30537011000036101)
+										group by sourceId
+										having count(id) &lt; 2;"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+</suite>

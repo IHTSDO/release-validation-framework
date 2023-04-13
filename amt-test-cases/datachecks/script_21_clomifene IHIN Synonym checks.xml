@@ -1,0 +1,57 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_21_clomifene IHIN Synonym checks" verbose="2">
+
+  <test name="01 All AMT concepts with clomifene FSN, have more than one synonym">
+    <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.description_active
+										where typeId = 900000000000013009
+										and conceptId in (
+																select conceptId from &lt;PROSPECTIVE&gt;.description_active
+																where Binary term RLIKE Binary '[[:&lt;:]]clomifene[[:&gt;:]]' and typeId = 900000000000003001
+																and conceptId in (select id from &lt;PROSPECTIVE&gt;.concept_active)
+																and moduleId = 900062011000036108
+																)
+										group by conceptId
+										having count(*) = 1;"/>
+    <parameter name="description" value=""></parameter>
+    <parameter name="resultCount" value="null"/>
+    <classes>
+      <class name="au.gov.nehta.test.ResultCountTest"/>
+    </classes>
+  </test>
+
+  <test name="02 No AMT Preferred terms contain the clomiphene (Excluding TPs)">
+    <parameter name="query" value="select conceptId from &lt;PROSPECTIVE&gt;.description_active
+										where Binary term RLIKE Binary '[[:&lt;:]]clomifene[[:&gt;:]]' and typeId = 900000000000003001
+										and conceptId in (select id from &lt;PROSPECTIVE&gt;.concept_active)
+										and moduleId = 900062011000036108
+										and BINARY get_cr_ADRS_PT(conceptId) RLIKE '[[:&lt;:]]clomiphene[[:&gt;:]]';
+										"/>
+    <parameter name="description" value=""></parameter>
+    <parameter name="resultCount" value="null"/>
+    <classes>
+      <class name="au.gov.nehta.test.ResultCountTest"/>
+    </classes>
+  </test>
+
+  <test name="03 No AMT non-PT synonym contains the clomifene (Excluding TPs)">
+    <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.description_active
+										where typeId = 900000000000013009
+										and conceptId in (select id from &lt;PROSPECTIVE&gt;.concept_active)
+										and conceptId in (
+																select conceptId from &lt;PROSPECTIVE&gt;.description_active
+																where Binary term RLIKE Binary '[[:&lt;:]]clomifene[[:&gt;:]]' and typeId = 900000000000003001
+																and conceptId in (select id from &lt;PROSPECTIVE&gt;.concept_active)
+																and moduleId = 900062011000036108
+																)
+										and id not in (select referencedComponentId from &lt;PROSPECTIVE&gt;.langrefset_active where refsetId = 32570271000036106 and value1 = 900000000000548007)
+										and BINARY term RLIKE '[[:&lt;:]]clomifene[[:&gt;:]]';
+										"/>
+    <parameter name="description" value=""></parameter>
+    <parameter name="resultCount" value="null"/>
+    <classes>
+      <class name="au.gov.nehta.test.ResultCountTest"/>
+    </classes>
+  </test>
+
+</suite>

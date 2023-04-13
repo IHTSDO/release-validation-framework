@@ -15,6 +15,7 @@ import javax.naming.ConfigurationException;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.entity.*;
 import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
+import org.ihtsdo.rvf.execution.service.util.MySqlQueryTransformer;
 import org.ihtsdo.rvf.importer.AssertionGroupImporter.ProductName;
 import org.ihtsdo.rvf.service.AssertionService;
 import org.slf4j.Logger;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class AssertionExecutionService {
 
-	private static final String FAILED_TO_FIND_RVF_DB_SCHEMA = "Failed to find rvf db schema for ";
 	@Autowired
 	private AssertionService assertionService;
 	@Resource(name = "dataSource")
@@ -35,9 +35,7 @@ public class AssertionExecutionService {
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	@Value("${rvf.qa.result.table.name}")
 	private String qaResulTableName;
-	private String deltaTableSuffix = "d";
-	private String snapshotTableSuffix = "s";
-	private String fullTableSuffix = "f";
+
 
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -226,52 +224,12 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 
 	private List<String> transformSql(String[] parts, Assertion assertion, MysqlExecutionConfig config) throws ConfigurationException {
 		List<String> result = new ArrayList<>();
+		MySqlQueryTransformer queryTransformer = new MySqlQueryTransformer();
+		queryTransformer.transformSql(parts, config);
 		String defaultCatalog = dataSource.getDefaultCatalog();
-		String prospectiveSchema = config.getProspectiveVersion();
-		final String[] nameParts = config.getProspectiveVersion().split("_");
-		String moduleId = (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
-		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
-
-		String previousReleaseSchema = config.getPreviousVersion();
-		String dependencyReleaseSchema = config.getExtensionDependencyVersion();
-
-		//We need both these schemas to exist
-		if (prospectiveSchema == null) {
-			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + prospectiveSchema);
-		}
-
-		if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
-			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + previousReleaseSchema);
-		}
 		for( String part : parts) {
-			if ((part.contains("<PREVIOUS>") && previousReleaseSchema == null)
-				|| (part.contains("<DEPENDENCY>") && dependencyReleaseSchema == null)) {
-				continue;
-			}
-
-			logger.debug("Original sql statement: {}", part);
-			// remove all SQL comments - //TODO might throw errors for -- style comments
-			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
-			part = commentPattern.matcher(part).replaceAll("");
-			// replace all substitutions for exec
-			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
-			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
-			part = part.replaceAll("<MODULEID>", moduleId);
-			part = part.replaceAll("<VERSION>", version);
-			// watch out for any 's that users might have introduced
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
-			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
-			part = part.replaceAll("<TEMP>", prospectiveSchema);
-			if (previousReleaseSchema != null) {
-				part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
-			}
-			if (dependencyReleaseSchema != null) {
-				part = part.replaceAll("<DEPENDENCY>", dependencyReleaseSchema);
-			}
-			part = part.replaceAll("<DELTA>", deltaTableSuffix);
-			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
-			part = part.replaceAll("<FULL>", fullTableSuffix);
-			part.trim();
+			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
 			logger.debug("Transformed sql statement: {}", part);
 			result.add(part);
 		}

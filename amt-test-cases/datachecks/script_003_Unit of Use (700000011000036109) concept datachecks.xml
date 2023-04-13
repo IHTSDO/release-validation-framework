@@ -1,0 +1,108 @@
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_003_Unit of Use (700000011000036109) concept datachecks" verbose="2">
+
+
+
+	<test name="01a DNF Some Unit of Use concepts actually exist">
+        <parameter name="query" value="select count(*) from &lt;PROSPECTIVE&gt;.concept_active where id in (select sourceid from rf2_cr_transitiveclosuretable where destinationId = 700000011000036109 or sourceid = 700000011000036109);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="qualifier" value=">"></parameter>
+		<parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+	
+<!-- Basic Content validation !-->
+    <test name="02 All types of Unit of Use are 900000000000074008|primitive">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.concept_active
+										where definitionStatusId != 900000000000074008
+										and isKindOf_cr(id,700000011000036109);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="04 All concepts that are types of 700000011000036109|Unit of Use have semantic tag (AU qualifier)">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.description_active
+										where isActiveConcept_cr(conceptId) AND isKindOf_cr(conceptId,700000011000036109)
+										and typeId = 900000000000003001
+										and SUBSTRING(term,-14,14) != '(AU qualifier)';"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+
+		<test name="05b DNF Unit of Use(700000011000036109) is a child of 30515011000036103|Australian qualifier">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_&lt;SNAPSHOT&gt;
+										where sourceId = 700000011000036109 and typeId = 116680003 and destinationId = 30515011000036103
+										and id != 4569361000168121;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+
+
+	<test name="06b DNF Unit of Use(700000011000036109) is only a child of 30515011000036103|Australian qualifier">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_&lt;SNAPSHOT&gt;
+										where sourceId = 700000011000036109 and typeId = 116680003 and destinationId != 30515011000036103;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+<!-- Defining/Source properties !-->
+
+	
+	<test name="08b DNF Unit of Use concepts only have 116680003|Is a relationships">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where isKindOf_cr(sourceId,700000011000036109)
+										and typeId  != 116680003;"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+
+
+	<test name="07b DNF Unit of Use subtypes only have destinationId that are types of 700000011000036109|Unit of Use">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where isDescendentOf_cr(sourceId,700000011000036109)
+										and NOT isKindOf_cr(destinationId,700000011000036109);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+
+	
+	<test name="10b DNF All Unit of Use concept relationships are ungrouped (group = 0)">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where isKindOf_cr(sourceId,700000011000036109)
+										and relationshipgroup != 0;"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+</suite>

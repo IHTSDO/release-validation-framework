@@ -1,0 +1,114 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_002_DNF Unit of use size reference set (700000141000036106)" verbose="2">
+
+	<test name="01 Some 700000141000036106 [Unit of use size reference set] entries exist">
+        <parameter name="query" value="select count(*) from rf2_cr_ccsrefset_active where refsetId = 700000141000036106;"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="qualifier" value=">"></parameter>
+		<parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="02 700000141000036106 [Unit of use size reference set] is a child of 700001351000036100|Measurement type float (foundation metadata concept)">
+        <parameter name="query" value="select isChildOf_cr(700000141000036106,700001351000036100);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="03 All active referencedComponents are active 30548011000036101 [has unit of use]">
+        <parameter name="query" value="select * from rf2_cr_ccsrefset_active 
+										where refsetId = 700000141000036106
+										and referencedComponentId not in (select id from &lt;PROSPECTIVE&gt;.relationship_active
+																		  where typeId = 30548011000036101);"/>
+        <parameter name="description" value=""></parameter>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="03b All active 30548011000036101 [has unit of use] relationships are actively referenced (except where sourceId IS MPUU or TPUU)">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active where typeId = 30548011000036101
+										and id not in (select referencedComponentId from rf2_cr_ccsrefset_active where refsetId = 700000141000036106)
+										and sourceId not in (30450011000036109,30425011000036101);"/>
+        <parameter name="description" value=""></parameter>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="04 All UnitIds are Kinds of 30428011000036107 [unit of measure]">
+        <parameter name="query" value="select * from rf2_cr_ccsrefset_active 
+										where refsetId = 700000141000036106
+										and NOT isKindOf_cr(value1, 30428011000036107);"/>
+        <parameter name="description" value=""></parameter>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="05 All OperatorIds are Kinds of 700001311000036104 [Operator id value]">
+        <parameter name="query" value="select * from rf2_cr_ccsrefset_active 
+										where refsetId = 700000141000036106
+										and NOT isKindOf_cr(value2, 700001311000036104);"/>
+        <parameter name="description" value=""></parameter>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+<!-- The following test is valid until we start having greater than or less than values, probably some time away. Once present, remove test -->
+	<test name="06 All OperatorIds are 700000051000036108 [Equal to]">
+        <parameter name="query" value="select * from rf2_cr_ccsrefset_active 
+										where refsetId = 700000141000036106
+										and value2 != 700000051000036108;"/>
+        <parameter name="description" value=""></parameter>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="07 All values are numerics">
+        <parameter name="query" value="select * from rf2_cr_ccsrefset_active
+										where refsetId = 700000141000036106
+										and NOT value3 REGEXP '[0-9]+(\\.[0-9])?[0-9]*';"/>
+        <parameter name="description" value=""></parameter>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+<!-- The following test is valid until we start having greater than or less than values, probably some time away. Once present, remove test -->
+	<test name="08 All UoU.Size values are greater than zero">
+        <parameter name="query" value="select * from rf2_cr_ccsrefset_active
+										where refsetId = 700000141000036106
+										and (value3 &lt; 0 or value3 = 0);"/>
+        <parameter name="description" value=""></parameter>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+</suite>

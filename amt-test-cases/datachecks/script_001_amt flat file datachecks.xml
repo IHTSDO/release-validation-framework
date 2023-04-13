@@ -1,0 +1,25 @@
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_001_amt flat file datachecks" verbose="2">
+
+    <test name="01 check that the datachecks SQL version of the AMT flat file contains no rows that aren't present in the Java code version">
+        <parameter name="query" value="select a.* from datachecks_amt_flat_file a left join generated_amt_flat_file b on a.CTPP_ID = b.CTPP_ID and a.CTPP_PT = b.CTPP_PT  and a.ARTG_ID = b.ARTG_ID and a.TPP_ID = b.TPP_ID and a.TPP_PT = b.TPP_PT and a.TPUU_ID = b.TPUU_ID and a.TPUU_PT = b.TPUU_PT and a.TPP_TP_ID = b.TPP_TP_ID and a.TPP_TP_PT = b.TPP_TP_PT and a.TPUU_TP_ID = b.TPUU_TP_ID and a.TPUU_TP_PT = b.TPUU_TP_PT and a.MPP_ID = b.MPP_ID and a.MPP_PT = b.MPP_PT and a.MPUU_ID = b.MPUU_ID and a.MPUU_PT = b.MPUU_PT and a.MP_ID = b.MP_ID and a.MP_PT = b.MP_PT where b.CTPP_ID is null;"/>
+        <parameter name="description" value=""></parameter>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+    <test name="02 check that the Java code version of the flat file contains no rows that aren't present in the datachecks SQL version">
+        <parameter name="query" value="select b.* from generated_amt_flat_file b left join datachecks_amt_flat_file a on a.CTPP_ID = b.CTPP_ID and a.CTPP_PT = b.CTPP_PT and a.ARTG_ID = b.ARTG_ID and a.TPP_ID = b.TPP_ID and a.TPP_PT = b.TPP_PT and a.TPUU_ID = b.TPUU_ID and a.TPUU_PT = b.TPUU_PT and a.TPP_TP_ID = b.TPP_TP_ID and a.TPP_TP_PT = b.TPP_TP_PT and a.TPUU_TP_ID = b.TPUU_TP_ID and a.TPUU_TP_PT = b.TPUU_TP_PT and a.MPP_ID = b.MPP_ID and a.MPP_PT = b.MPP_PT and a.MPUU_ID = b.MPUU_ID and a.MPUU_PT = b.MPUU_PT and a.MP_ID = b.MP_ID and a.MP_PT = b.MP_PT where a.CTPP_ID is null;"/>
+        <parameter name="description" value=""></parameter>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+</suite>

@@ -1,0 +1,701 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="script_001_MP Description Validation" verbose="2">
+
+	<test name="7a Concept 21351011000036101 has FSN:mesalazine (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21351011000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="mesalazine (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="7b Concept 21351011000036101 has PT:mesalazine">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21351011000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="mesalazine"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="13a Concept 21451011000036105 has FSN:carboplatin (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21451011000036105
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="carboplatin (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="13b Concept 21451011000036105 has PT:carboplatin">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21451011000036105
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="carboplatin"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="19a Concept 21669011000036102 has FSN:nystatin (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21669011000036102
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="nystatin (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="19b Concept 21669011000036102 has PT:nystatin">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21669011000036102
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="nystatin"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="25a Concept 21415011000036100 has FSN:amoxycillin (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21415011000036100
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="amoxycillin (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="25b Concept 21415011000036100 has PT:amoxycillin">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21415011000036100
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="amoxycillin"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="31a Concept 21288011000036105 has FSN:diclofenac (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21288011000036105
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="diclofenac (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="31b Concept 21288011000036105 has PT:diclofenac">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21288011000036105
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="diclofenac"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="37a Concept 21904011000036103 has FSN:lamivudine + zidovudine (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21904011000036103
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="lamivudine + zidovudine (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="37b Concept 21904011000036103 has PT:lamivudine + zidovudine">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21904011000036103
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="lamivudine + zidovudine"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="43a Concept 21286011000036106 has FSN:codeine + paracetamol (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21286011000036106
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="codeine + paracetamol (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="43b Concept 21286011000036106 has PT:paracetamol + codeine">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21286011000036106
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="paracetamol + codeine"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="49a Concept 21428011000036100 has FSN:ethinyloestradiol + levonorgestrel (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21428011000036100
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="ethinyloestradiol + levonorgestrel (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="49b Concept 21428011000036100 has PT:ethinyloestradiol + levonorgestrel">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21428011000036100
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="ethinyloestradiol + levonorgestrel"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="50a Concept 21220011000036103 has FSN:inert substance (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21220011000036103
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="inert substance (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="50b Concept 21220011000036103 has PT:inert substance">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21220011000036103
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="inert substance"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="64a Concept 21311011000036109 has FSN:calcium carbonate (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21311011000036109
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="calcium carbonate (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="64b Concept 21311011000036109 has PT:calcium carbonate">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21311011000036109
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="calcium carbonate"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="65a Concept 21656011000036103 has FSN:etidronate disodium (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21656011000036103
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="etidronate disodium (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="65b Concept 21656011000036103 has PT:etidronate disodium">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21656011000036103
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="etidronate disodium"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="77a Concept 21703011000036107 has FSN:epoprostenol (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21703011000036107
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="epoprostenol (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="77b Concept 21703011000036107 has PT:epoprostenol">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21703011000036107
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="epoprostenol"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="78a Concept 21220011000036103 has FSN:inert substance (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21220011000036103
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="inert substance (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="78b Concept 21220011000036103 has PT:inert substance">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21220011000036103
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="inert substance"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="90a Concept 21871011000036100 has FSN:calcium + chloride + polygeline + potassium + sodium (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21871011000036100
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="calcium + chloride + polygeline + potassium + sodium (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="90b Concept 21871011000036100 has PT:calcium + chloride + polygeline + potassium + sodium">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21871011000036100
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="calcium + chloride + polygeline + potassium + sodium"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="96a Concept 21697011000036107 has FSN:esomeprazole (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21697011000036107
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="esomeprazole (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="96b Concept 21697011000036107 has PT:esomeprazole">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21697011000036107
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="esomeprazole"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="97a Concept 21836011000036107 has FSN:clarithromycin (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21836011000036107
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="clarithromycin (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="97b Concept 21836011000036107 has PT:clarithromycin">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21836011000036107
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="clarithromycin"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="98a Concept 21415011000036100 has FSN:amoxycillin (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21415011000036100
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="amoxycillin (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="98b Concept 21415011000036100 has PT:amoxycillin">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21415011000036100
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="amoxycillin"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="117a Concept 21642011000036104 has FSN:minoxidil (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21642011000036104
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="minoxidil (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="117b Concept 21642011000036104 has PT:minoxidil">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21642011000036104
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="minoxidil"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="123a Concept 21642011000036104 has FSN:minoxidil (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21642011000036104
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="minoxidil (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="123b Concept 21642011000036104 has PT:minoxidil">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21642011000036104
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="minoxidil"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="129a Concept 21432011000036100 has FSN:nicotine (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21432011000036100
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="nicotine (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="129b Concept 21432011000036100 has PT:nicotine">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21432011000036100
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="nicotine"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="135a Concept 33639011000036103 has FSN:insulin isophane human + insulin neutral human (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 33639011000036103
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="insulin isophane human + insulin neutral human (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="135b Concept 33639011000036103 has PT:insulin isophane human + insulin neutral human">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 33639011000036103
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="insulin isophane human + insulin neutral human"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="141a Concept 21233011000036108 has FSN:fluticasone + salmeterol (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21233011000036108
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="fluticasone + salmeterol (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="141b Concept 21233011000036108 has PT:fluticasone + salmeterol">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21233011000036108
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="fluticasone + salmeterol"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="147a Concept 61731011000036105 has FSN:atropine sulfate monohydrate + hyoscine hydrobromide trihydrate + hyoscyamine + kaolin + pectin (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 61731011000036105
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="atropine sulfate monohydrate + hyoscine hydrobromide trihydrate + hyoscyamine + kaolin + pectin (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="147b Concept 61731011000036105 has PT:atropine sulfate monohydrate + hyoscine hydrobromide trihydrate + hyoscyamine + kaolin + pectin">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 61731011000036105
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="atropine sulfate monohydrate + hyoscine hydrobromide trihydrate + hyoscyamine + kaolin + pectin"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="153a Concept 50750011000036107 has FSN:glucose indicator blood (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 50750011000036107
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="glucose indicator blood (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="153b Concept 50750011000036107 has PT:glucose indicator blood">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 50750011000036107
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="glucose indicator blood"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="159a Concept 50710011000036101 has FSN:dressing activated charcoal malodorous wound (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 50710011000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="dressing activated charcoal malodorous wound (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="159b Concept 50710011000036101 has PT:dressing activated charcoal malodorous wound">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 50710011000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="dressing activated charcoal malodorous wound"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="165a Concept 927711011000036107 has FSN:citrulline with carbohydrate (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 927711011000036107
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="citrulline with carbohydrate (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="165b Concept 927711011000036107 has PT:citrulline with carbohydrate">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 927711011000036107
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="citrulline with carbohydrate"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="171a Concept 97351000036100 has FSN:A/California/7/2009 (H1N1) - like strain (A/California/7/2009 (NYMC X-181))  + A/Victoria/361/2009 (H3N2) - like strain (A/Victoria/361/2011 (IVR-165)) + B/Wisconsin/1/2010 - like strain (B/Hubei-Wujiagang/158/2009 (NYMC BX-39)) (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 97351000036100
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="A/California/7/2009 (H1N1) - like strain (A/California/7/2009 (NYMC X-181))  + A/Victoria/361/2009 (H3N2) - like strain (A/Victoria/361/2011 (IVR-165)) + B/Wisconsin/1/2010 - like strain (B/Hubei-Wujiagang/158/2009 (NYMC BX-39)) (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="171b Concept 97351000036100 has PT:influenza virus vaccine 2013">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 97351000036100
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="influenza virus vaccine 2013"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="177a Concept 21614011000036102 has FSN:metformin (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21614011000036102
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="metformin (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="177b Concept 21614011000036102 has PT:metformin">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 21614011000036102
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="metformin"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="183a Concept 35685011000036104 has FSN:carbomer-980 (medicinal product)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 35685011000036104
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="carbomer-980 (medicinal product)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="183b Concept 35685011000036104 has PT:carbomer-980">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 35685011000036104
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="carbomer-980"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+</suite>

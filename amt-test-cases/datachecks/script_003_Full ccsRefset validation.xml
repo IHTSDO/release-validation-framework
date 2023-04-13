@@ -1,0 +1,161 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_003_Full ccsRefset validation" verbose="2">
+
+    <test name="01 rf2_cr_ccsRefset_full has been populated">
+        <parameter name="query" value="call TableIsPopulated('rf2_cr_ccsRefset_full');"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="qualifier" value=">"></parameter>
+		<parameter name="expectedValue" value="0"/>
+        <parameter name="skip" value="true"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+	
+	<test name="02 id field is a valid 128 bit unsigned integer/UUID">
+        <parameter name="query" value="select distinct id from rf2_cr_ccsRefset_full where not isValidUUID(id);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="03 effectiveTime is valid Timeformat">
+        <parameter name="query" value="select distinct effectiveTime from rf2_cr_ccsRefset_full where NOT isValidTimeFormat(effectiveTime);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="04 active is boolean value">
+        <parameter name="query" value="select id, active from rf2_cr_ccsRefset_full where active != 1 AND active != 0;"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="05 moduleId is a descendant of 900000000000443000|Module| within the metadata hierarchy">
+        <parameter name="query" value="SELECT distinct moduleId FROM rf2_cr_ccsRefset_full WHERE NOT isValidModuleId(moduleId);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="06 refsetId is a descendant of  900000000000455006 | Reference set | within the metadata hierarchy">
+        <parameter name="query" value="SELECT distinct refsetId FROM rf2_cr_ccsRefset_full WHERE NOT isValidRefsetId_cr(refsetId);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="07 referencedComponentId is a valid ComponentId">
+        <parameter name="query" value="SELECT distinct id, refsetId, referencedComponentId FROM rf2_cr_ccsRefset_full WHERE NOT isValidComponentId_cr(referencedComponentId);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="08 Only one reference set member record with the same id field will be current at any point in time">
+        <parameter name="query" value="select id,effectiveTime,count(*) from rf2_cr_ccsRefset_full group by id, effectiveTime having count(*) > 1;"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="09 refSetId and referencedComponentId fields will not change between two rows with the same id, in other words they are immutable">
+        <parameter name="query" value="SELECT id,refSetId,referencedComponentId FROM rf2_cr_ccsRefset_full 
+										GROUP BY id HAVING COUNT(distinct refSetId,referencedComponentId) > 1;"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="10 moduleId is a ConceptId (referential integrity)">
+        <parameter name="query" value="select id, effectiveTime,moduleId from rf2_cr_ccsRefset_full as refset where moduleId not in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;FULL&gt;);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="11 refsetId is a ConceptId (referential integrity)">
+        <parameter name="query" value="select id, effectiveTime,refsetId from rf2_cr_ccsRefset_full as refset where refsetId not in (select id from &lt;PROSPECTIVE&gt;.concept_&lt;FULL&gt;);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="12 value1 is a valid ComponentId">
+        <parameter name="query" value="select distinct value1 from rf2_cr_ccsRefset_full where NOT isValidComponentId_cr(value1);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+	</test>
+
+	<test name="12 value2 is a valid ComponentId">
+        <parameter name="query" value="select distinct value2 from rf2_cr_ccsRefset_full where NOT isValidComponentId_cr(value2);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+	</test>
+
+	<test name="13 value3 is not null and contains at least 1 character">
+        <parameter name="query" value="select distinct value3 from rf2_cr_ccsRefset_full where value3 is null or CHAR_LENGTH(value3) &lt; 1;"/>
+        <parameter name="description" value="32bit unsigned integer check"></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+	</test>
+
+	<test name="12 All currently active references are unique within rf2_cr_ccsrefset_active">
+        <parameter name="query" value="select * from rf2_cr_ccsrefset_active
+										group by refsetId,referencedComponentId,value1,value2,value3
+										having count(1) &gt; 1;"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+
+</suite>

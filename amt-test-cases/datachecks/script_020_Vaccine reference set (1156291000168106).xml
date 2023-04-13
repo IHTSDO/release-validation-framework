@@ -1,0 +1,228 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_020_Vaccine reference set (1156291000168106) content validation" verbose="2">
+
+    <test name="01 Vaccine reference set(1156291000168106) is populated">
+        <parameter name="query" value="SELECT count(*) FROM &lt;PROSPECTIVE&gt;.simplerefset_active WHERE refsetId = 1156291000168106;"/>
+        <parameter name="qualifier" value=">"/>
+		<parameter name="expectedValue" value="0"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+    <test name="02 RefsetId(1156291000168106) is an active concept">
+        <parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.concept_active where id = 1156291000168106;"/>
+        <parameter name="resultCount" value="1"/>
+        <parameter name="skip" value="true"/> <!--Refactor this test-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+    
+    <test name="03 All active references are from module 900062011000036108|AMT Module|">
+        <parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.simplerefset_&lt;SNAPSHOT&gt; WHERE refsetId = 1156291000168106 AND moduleId != 900062011000036108;"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="04 FSN is 'Australian vaccine reference set (foundation metadata concept)'">
+        <parameter name="query" value="SELECT get_cr_FSN(1156291000168106) = 'Australian vaccine reference set (foundation metadata concept)';"/>
+        <parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+    <test name="05 PT (in ADRS) is 'Vaccine reference set'">
+        <parameter name="query" value="SELECT get_cr_ADRS_PT(1156291000168106) = 'Vaccine reference set';"/>
+		<parameter name="description" value="query returns 1 if the string matches, otherwise 0"></parameter>
+        <parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+    <test name="06 All members are types of 30506011000036107|Australian Product">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.simplerefset_active WHERE refsetId = 1156291000168106
+                                        and not isDescendentOf_cr(referencedComponentId, 30506011000036107);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+
+	<test name="07 IS A child of 446609009 | Simple type reference set">
+        <parameter name="query" value="select isChildOf_cr(1156291000168106, 446609009);"/>
+		<parameter name="description" value="query returns 1 if true, otherwise 0"></parameter>
+        <parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="08 No duplicate active references (referencedComponentId is unique within reference set)">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="SELECT referencedComponentId, count(*) FROM &lt;PROSPECTIVE&gt;.simplerefset_active
+										WHERE refsetId = 1156291000168106
+										GROUP BY referencedComponentId
+										HAVING count(*) > 1;"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="09 Only 2 descriptions exist for the reference set">
+        <parameter name="query" value="SELECT count(*) FROM &lt;PROSPECTIVE&gt;.description_active WHERE conceptId = 1156291000168106;"/>
+        <parameter name="expectedValue" value="2"/>	
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+	
+	<test name="10 Reference set debut date is 20180630">
+        <parameter name="query" value="select DATE_FORMAT(min(effectiveTime),'%Y%m%d') from &lt;PROSPECTIVE&gt;.simplerefset_&lt;FULL&gt;
+										where refsetId = 1156291000168106 limit 1;"/>
+        <parameter name="expectedValue" value="20180630"/>	
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="11 All debut members are active">
+        <parameter name="query" value="select count(1) from &lt;PROSPECTIVE&gt;.simplerefset_&lt;FULL&gt;
+										where refsetId = 1156291000168106
+										and active = 0
+										and effectiveTime = 20180630;"/>
+        <parameter name="expectedValue" value="0"/>	
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="12 All Australian products with containing ‘antigen’, ‘toxoid’, ‘virus’ 'vaccine', 'like strain' or 'serogroup' in a term are included (excluding 'skin'(tests) and 'diluent')">
+        <parameter name="query" value="select conceptId,term, get_cr_FSN(conceptId) from &lt;PROSPECTIVE&gt;.description_active
+                                        where isKindOf_cr(conceptId, 30506011000036107)
+                                        and term RLIKE '(antigen|toxoid|virus|vaccine|serogroup|like strain)'
+                                        and term not RLIKE 'skin|diluent'
+                                        and conceptId not in (1599991000168105, 1600021000168106, 1600041000168100, 1600051000168103, 1600071000168107, 1600081000168105)
+                                        and conceptId not in (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    	<test name="13 All MPPs and subtypes containing ‘antigen’, ‘toxoid’, ‘virus’ 'vaccine', 'like strain', 'serogroup' or 'tozinameran' in a term are included (excluding 'skin'(tests); 'diulent' allowed)">
+        <parameter name="query" value="select conceptId,term, get_cr_FSN(conceptId) from &lt;PROSPECTIVE&gt;.description_active
+                                        where isKindOf_cr(conceptId, 30513011000036104)
+                                        and term RLIKE '(antigen|toxoid|virus|vaccine|serogroup|like strain|tozinameran)'
+                                        and term not RLIKE 'skin'
+                                        and conceptId not in (1600041000168100, 1600051000168103, 1600071000168107, 1600081000168105)
+                                        and conceptId not in (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106);"/>
+        <parameter name="resultCount" value="null"/>
+            <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="14 Every member contains at least ‘antigen’, ‘toxoid’, ‘virus’ 'vaccine', 'like strain', 'serogroup' or 'tozinameran' in a term">
+        <parameter name="query" value="select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106
+                                        and referencedComponentId not in (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 929360021000036102)
+                                        and referencedComponentId not in (select distinct conceptId from &lt;PROSPECTIVE&gt;.description_active where term RLIKE '(antigen|toxoid|virus|vaccine|serogroup|like strain|tozinameran)');"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+    <test name="15 All descendents of MP members, are also members of Vaccine refset">
+        <parameter name="query" value="select distinct sourceId,get_cr_FSN(sourceId) from rf2_cr_transitiveclosuretable 
+                                        where destinationId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 929360061000036106)
+                                        and destinationId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106)
+                                        and sourceId NOT IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="16 All descendents of MPP members, are also members of Vaccine refset">
+        <parameter name="query" value="select distinct sourceId,get_cr_FSN(sourceId) from rf2_cr_transitiveclosuretable 
+                                        where destinationId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 929360081000036101)
+                                        and destinationId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106)
+                                        and sourceId NOT IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="17 All ancestors of TPUU members, are also members of Vaccine refset">
+        <parameter name="query" value="select distinct destinationId,get_cr_FSN(destinationId) from rf2_cr_transitiveclosuretable 
+                                        where sourceId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 929360031000036100)
+                                        and sourceId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106)
+                                        and destinationId NOT IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106)
+                                        and destinationId NOT IN (30506011000036107,30561011000036101,30425011000036101,30560011000036108,30450011000036109,30497011000036103);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="18 All ancestors of CTPP members, are also members of Vaccine refset">
+        <parameter name="query" value="select distinct destinationId,get_cr_FSN(destinationId) from rf2_cr_transitiveclosuretable 
+                                        where sourceId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 929360051000036108)
+                                        and sourceId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106)
+                                        and destinationId NOT IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106)
+                                        and destinationId NOT IN (30537011000036101,30404011000036106,30506011000036107,30513011000036104,30561011000036101);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="19 All TPs of members, are also members of Vaccine refset">
+        <parameter name="query" value="select distinct destinationId,get_cr_FSN(destinationId) from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where destinationId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 929360021000036102)
+                                        and sourceId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106)
+                                        and destinationId NOT IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="20 All products whose TP is a member, are also members of Vaccine refset (excluding inert diluents)">
+        <parameter name="query" value="select distinct sourceId,get_cr_FSN(sourceId) from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where destinationId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 929360021000036102)
+                                        and destinationId IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106)
+                                        and sourceId NOT IN (select referencedComponentId from &lt;PROSPECTIVE&gt;.simplerefset_active where refsetId = 1156291000168106)
+                                        and sourceID not in (select sourceId from &lt;PROSPECTIVE&gt;.relationship_active where typeId = 700000081000036101 and destinationId = 920012011000036105);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+</suite>
+

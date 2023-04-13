@@ -1,0 +1,773 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="script_004_TPUU Description Validation" verbose="2">
+
+	<test name="4a Concept 6121011000036107 has FSN:Loceryl Nail Lacquer 5% (amorolfine (as hydrochloride) 50 mg / 1 mL) application (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6121011000036107
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Loceryl Nail Lacquer 5% (amorolfine (as hydrochloride) 50 mg / 1 mL) application (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="4b Concept 6121011000036107 has PT:Loceryl Nail Lacquer 5% application">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6121011000036107
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Loceryl Nail Lacquer 5% application"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="10a Concept 70321000036101 has FSN:Salofalk (mesalazine 500 mg) granules, 500 mg sachet (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 70321000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Salofalk (mesalazine 500 mg) granules, 500 mg sachet (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="10b Concept 70321000036101 has PT:Salofalk 500 mg granules, sachet">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 70321000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Salofalk 500 mg granules, sachet"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="16a Concept 5031011000036102 has FSN:Carboplatin (Ebewe) (carboplatin 150 mg / 15 mL) injection, 15 mL vial (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5031011000036102
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Carboplatin (Ebewe) (carboplatin 150 mg / 15 mL) injection, 15 mL vial (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="16b Concept 5031011000036102 has PT:Carboplatin (Ebewe) 150 mg/15 mL injection, vial">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5031011000036102
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Carboplatin (Ebewe) 150 mg/15 mL injection, vial"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="22a Concept 5387011000036104 has FSN:Nilstat Cream Pessaries (nystatin 100000 international units) pessary: shell (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5387011000036104
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Nilstat Cream Pessaries (nystatin 100000 international units) pessary: shell (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="22b Concept 5387011000036104 has PT:Nilstat Cream Pessaries 100 000 units pessary: shell">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5387011000036104
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Nilstat Cream Pessaries 100 000 units pessary: shell"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="28a Concept 6140011000036103 has FSN:Amoxil (amoxycillin (as trihydrate) 500 mg) capsule: hard (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6140011000036103
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Amoxil (amoxycillin (as trihydrate) 500 mg) capsule: hard (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="28b Concept 6140011000036103 has PT:Amoxil 500 mg capsule: hard">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6140011000036103
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Amoxil 500 mg capsule: hard"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="34a Concept 5542011000036109 has FSN:Voltaren 50 (diclofenac sodium 50 mg) tablet: enteric (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5542011000036109
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Voltaren 50 (diclofenac sodium 50 mg) tablet: enteric (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="34b Concept 5542011000036109 has PT:Voltaren 50 mg tablet: enteric">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5542011000036109
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Voltaren 50 mg tablet: enteric"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="40a Concept 6270011000036101 has FSN:Combivir (lamivudine 150 mg + zidovudine 300 mg) tablet: film-coated (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6270011000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Combivir (lamivudine 150 mg + zidovudine 300 mg) tablet: film-coated (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="40b Concept 6270011000036101 has PT:Combivir tablet: film-coated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6270011000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Combivir tablet: film-coated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="46a Concept 6647011000036101 has FSN:Panadeine Forte (codeine phosphate 30 mg + paracetamol 500 mg) tablet: uncoated (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6647011000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Panadeine Forte (codeine phosphate 30 mg + paracetamol 500 mg) tablet: uncoated (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="46b Concept 6647011000036101 has PT:Panadeine Forte tablet: uncoated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6647011000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Panadeine Forte tablet: uncoated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="57a Concept 5079011000036101 has FSN:Triphasil (ethinyloestradiol 30 microgram + levonorgestrel 50 microgram) tablet: sugar-coated (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5079011000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Triphasil (ethinyloestradiol 30 microgram + levonorgestrel 50 microgram) tablet: sugar-coated (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="57b Concept 5079011000036101 has PT:Triphasil (ethinyloestradiol 30 microgram + levonorgestrel 50 microgram) tablet: sugar-coated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5079011000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Triphasil (ethinyloestradiol 30 microgram + levonorgestrel 50 microgram) tablet: sugar-coated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="58a Concept 5101011000036104 has FSN:Triphasil (ethinyloestradiol 40 microgram + levonorgestrel 75 microgram) tablet: sugar-coated (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5101011000036104
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Triphasil (ethinyloestradiol 40 microgram + levonorgestrel 75 microgram) tablet: sugar-coated (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="58b Concept 5101011000036104 has PT:Triphasil (ethinyloestradiol 40 microgram + levonorgestrel 75 microgram) tablet: sugar-coated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5101011000036104
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Triphasil (ethinyloestradiol 40 microgram + levonorgestrel 75 microgram) tablet: sugar-coated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="59a Concept 4527011000036104 has FSN:Triphasil (ethinyloestradiol 30 microgram + levonorgestrel 125 microgram) tablet: sugar-coated (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 4527011000036104
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Triphasil (ethinyloestradiol 30 microgram + levonorgestrel 125 microgram) tablet: sugar-coated (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="59b Concept 4527011000036104 has PT:Triphasil (ethinyloestradiol 30 microgram + levonorgestrel 125 microgram) tablet: sugar-coated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 4527011000036104
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Triphasil (ethinyloestradiol 30 microgram + levonorgestrel 125 microgram) tablet: sugar-coated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="60a Concept 5104011000036101 has FSN:Triphasil (inert substance) tablet: sugar-coated (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5104011000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Triphasil (inert substance) tablet: sugar-coated (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="60b Concept 5104011000036101 has PT:Triphasil (inert substance) tablet: sugar-coated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5104011000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Triphasil (inert substance) tablet: sugar-coated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="71a Concept 5083011000036109 has FSN:Didronel (etidronate disodium 200 mg) tablet: uncoated (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5083011000036109
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Didronel (etidronate disodium 200 mg) tablet: uncoated (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="71b Concept 5083011000036109 has PT:Didronel 200mg tablet: uncoated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5083011000036109
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Didronel 200mg tablet: uncoated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="72a Concept 5739011000036101 has FSN:Calcium Carbonate (Sanofi-Aventis) (calcium (as carbonate) 500 mg) tablet: film-coated (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5739011000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Calcium Carbonate (Sanofi-Aventis) (calcium (as carbonate) 500 mg) tablet: film-coated (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="72b Concept 5739011000036101 has PT:Calcium Carbonate (Sanofi-Aventis) (calcium (as carbonate) 500 mg) tablet: film-coated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5739011000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Calcium Carbonate (Sanofi-Aventis) (calcium (as carbonate) 500 mg) tablet: film-coated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="84a Concept 7054011000036104 has FSN:Flolan (epoprostenol (as sodium) 500 microgram) injection: powder for, vial (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 7054011000036104
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Flolan (epoprostenol (as sodium) 500 microgram) injection: powder for, vial (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="84b Concept 7054011000036104 has PT:Flolan 500 microgram injection: powder for, vial">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 7054011000036104
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Flolan 500 microgram injection: powder for, vial"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="85a Concept 7056011000036107 has FSN:Flolan (inert substance) diluent, vial (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 7056011000036107
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Flolan (inert substance) diluent, vial (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="85b Concept 7056011000036107 has PT:Flolan diluent, vial">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 7056011000036107
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Flolan diluent, vial"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="93a Concept 5188011000036109 has FSN:Haemaccel (calcium (as salt unspecified) 125 mg / 500 mL + chloride (as base unspecified) 2.574 g / 500 mL + polygeline 17.5 g / 500 mL + potassium (as salt unspecified) 99.71 mg / 500 mL + sodium (as salt unspecified) 1.67 g / 500 mL) injection: solution, 500 mL bottle (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5188011000036109
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Haemaccel (calcium (as salt unspecified) 125 mg / 500 mL + chloride (as base unspecified) 2.574 g / 500 mL + polygeline 17.5 g / 500 mL + potassium (as salt unspecified) 99.71 mg / 500 mL + sodium (as salt unspecified) 1.67 g / 500 mL) injection: solution, 500 mL bottle (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="93b Concept 5188011000036109 has PT:Haemaccel injection: solution, bottle">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5188011000036109
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Haemaccel injection: solution, bottle"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="106a Concept 7488011000036109 has FSN:Nexium (esomeprazole (as magnesium trihydrate) 20 mg) tablet: enteric (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 7488011000036109
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Nexium (esomeprazole (as magnesium trihydrate) 20 mg) tablet: enteric (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="106b Concept 7488011000036109 has PT:Amoxil 500 mg capsule: hard">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 7488011000036109
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Amoxil 500 mg capsule: hard"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="107a Concept 7489011000036101 has FSN:Klacid (clarithromycin 500 mg) tablet: film-coated (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 7489011000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Klacid (clarithromycin 500 mg) tablet: film-coated (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="107b Concept 7489011000036101 has PT:Klacid 500 mg tablet: film-coated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 7489011000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Klacid 500 mg tablet: film-coated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="108a Concept 6140011000036103 has FSN:Amoxil (amoxycillin (as trihydrate) 500 mg) capsule: hard (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6140011000036103
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Amoxil (amoxycillin (as trihydrate) 500 mg) capsule: hard (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="108b Concept 6140011000036103 has PT:Nexium 20 mg tablet: enteric">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6140011000036103
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Nexium 20 mg tablet: enteric"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="120a Concept 54166011000036105 has FSN:Regaine 2% (minoxidil 20 mg / 1 g) gel (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 54166011000036105
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Regaine 2% (minoxidil 20 mg / 1 g) gel (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="120b Concept 54166011000036105 has PT:Regaine 2% gel">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 54166011000036105
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Regaine 2% gel"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="126a Concept 54166011000036105 has FSN:Regaine 2% (minoxidil 20 mg / 1 g) gel (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 54166011000036105
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Regaine 2% (minoxidil 20 mg / 1 g) gel (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="126b Concept 54166011000036105 has PT:Regaine 2% gel">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 54166011000036105
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Regaine 2% gel"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="132a Concept 5199011000036102 has FSN:Nicorette (nicotine 15 mg / 16 hours) patch (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5199011000036102
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Nicorette (nicotine 15 mg / 16 hours) patch (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="132b Concept 5199011000036102 has PT:Nicorette 15 mg/16 hours patch">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5199011000036102
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Nicorette 15 mg/16 hours patch"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="138a Concept 6764011000036109 has FSN:Mixtard 30/70 Innolet (insulin isophane human 70 international units / 1 mL + insulin neutral human 30 international units / 1 mL) injection: suspension, cartridge (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6764011000036109
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Mixtard 30/70 Innolet (insulin isophane human 70 international units / 1 mL + insulin neutral human 30 international units / 1 mL) injection: suspension, cartridge (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="138b Concept 6764011000036109 has PT:Mixtard 30/70 Innolet (insulin isophane human 70 international units/mL + insulin neutral human 30 international units/mL) injection: suspension, cartridge">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 6764011000036109
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Mixtard 30/70 Innolet (insulin isophane human 70 international units/mL + insulin neutral human 30 international units/mL) injection: suspension, cartridge"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="144a Concept 5512011000036102 has FSN:Seretide MDI 125/25 (fluticasone propionate 125 microgram / 1 actuation + salmeterol (as xinafoate) 25 microgram / 1 actuation) inhalation: pressurised (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5512011000036102
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Seretide MDI 125/25 (fluticasone propionate 125 microgram / 1 actuation + salmeterol (as xinafoate) 25 microgram / 1 actuation) inhalation: pressurised (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="144b Concept 5512011000036102 has PT:Seretide MDI 125/25 (fluticasone propionate 125 microgram/actuation + salmeterol (as xinafoate) 25 microgram/actuation) inhalation: pressurised">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 5512011000036102
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Seretide MDI 125/25 (fluticasone propionate 125 microgram/actuation + salmeterol (as xinafoate) 25 microgram/actuation) inhalation: pressurised"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="150a Concept 53857011000036107 has FSN:Donnagel (atropine sulfate monohydrate 19.4 microgram / 30 mL + hyoscine hydrobromide trihydrate 6.5 microgram / 30 mL + hyoscyamine sulfate dihydrate 103.7 microgram / 30 mL + kaolin 6 g / 30 mL + pectin 142.8 mg / 30 mL) oral liquid: suspension, 30 mL measure (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 53857011000036107
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Donnagel (atropine sulfate monohydrate 19.4 microgram / 30 mL + hyoscine hydrobromide trihydrate 6.5 microgram / 30 mL + hyoscyamine sulfate dihydrate 103.7 microgram / 30 mL + kaolin 6 g / 30 mL + pectin 142.8 mg / 30 mL) oral liquid: suspension, 30 mL measure (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="150b Concept 53857011000036107 has PT:Donnagel oral liquid: suspension">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 53857011000036107
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Donnagel oral liquid: suspension"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="156a Concept 48840011000036101 has FSN:Accu-Chek Active (glucose indicator blood) strip: diagnostic, 1 diagnostic strip (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 48840011000036101
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Accu-Chek Active (glucose indicator blood) strip: diagnostic, 1 diagnostic strip (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="156b Concept 48840011000036101 has PT:Accu-Chek Active (glucose indicator blood) strip: diagnostic">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 48840011000036101
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Accu-Chek Active (glucose indicator blood) strip: diagnostic"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="162a Concept 122221000036100 has FSN:Actisorb Plus (MAP105) (dressing activated charcoal malodorous wound 10.5 cm x 10.5 cm) dressing (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 122221000036100
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Actisorb Plus (MAP105) (dressing activated charcoal malodorous wound 10.5 cm x 10.5 cm) dressing (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="162b Concept 122221000036100 has PT:Actisorb Plus (MAP105) 10.5 cm x 10.5 cm dressing">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 122221000036100
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Actisorb Plus (MAP105) 10.5 cm x 10.5 cm dressing"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="168a Concept 107401000036103 has FSN:Citrulline1000 (citrulline with carbohydrate containing 1 g citrulline) oral liquid: powder for, sachet (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 107401000036103
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Citrulline1000 (citrulline with carbohydrate containing 1 g citrulline) oral liquid: powder for, sachet (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="168b Concept 107401000036103 has PT:Citrulline1000 (citrulline with carbohydrate containing 1 g citrulline) oral liquid: powder for, sachet">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 107401000036103
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Citrulline1000 (citrulline with carbohydrate containing 1 g citrulline) oral liquid: powder for, sachet"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="174a Concept 96451000036106 has FSN:Fluvax 2013 (A/California/7/2009 (H1N1) - like strain (A/California/7/2009 (NYMC X-181)) 15 microgram + A/Victoria/361/2009 (H3N2) - like strain (A/Victoria/361/2011 (IVR-165)) 15 microgram + B/Wisconsin/1/2010 - like strain (B/Hubei-Wujiagang/158/2009 (NYMC BX-39)) 15 microgram) injection: suspension, 0.5 mL syringe (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 96451000036106
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Fluvax 2013 (A/California/7/2009 (H1N1) - like strain (A/California/7/2009 (NYMC X-181)) 15 microgram + A/Victoria/361/2009 (H3N2) - like strain (A/Victoria/361/2011 (IVR-165)) 15 microgram + B/Wisconsin/1/2010 - like strain (B/Hubei-Wujiagang/158/2009 (NYMC BX-39)) 15 microgram) injection: suspension, 0.5 mL syringe (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="174b Concept 96451000036106 has PT:Fluvax 2013 injection: suspension, 0.5 mL syringe">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 96451000036106
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Fluvax 2013 injection: suspension, 0.5 mL syringe"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="180a Concept 925684011000036100 has FSN:Metformin Hydrochloride 1000 (APO) (metformin hydrochloride 1 g) tablet: film-coated, 1 tablet (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 925684011000036100
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Metformin Hydrochloride 1000 (APO) (metformin hydrochloride 1 g) tablet: film-coated, 1 tablet (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="180b Concept 925684011000036100 has PT:Metformin Hydrochloride 1000 (APO) 1 g tablet: film-coated">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 925684011000036100
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Metformin Hydrochloride 1000 (APO) 1 g tablet: film-coated"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="186a Concept 92671000036103 has FSN:Viscotears Gel PF 0.2% (carbomer-980 1.2 mg / 600 mg) eye drops: solution, 600 mg unit dose (trade product unit of use)">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 92671000036103
+										AND typeId = 900000000000003001;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Viscotears Gel PF 0.2% (carbomer-980 1.2 mg / 600 mg) eye drops: solution, 600 mg unit dose (trade product unit of use)"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+	<test name="186b Concept 92671000036103 has PT:Viscotears Gel PF 0.2% eye drops: solution, unit dose">
+		<parameter name="query" value="SELECT term FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE conceptid = 92671000036103
+										AND typeId = 900000000000013009;"/>
+		<parameter name="description" value=""></parameter>
+		<parameter name="expectedValue" value="Viscotears Gel PF 0.2% eye drops: solution, unit dose"/>
+		<parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+		</classes>
+	</test>
+
+</suite>

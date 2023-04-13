@@ -1,0 +1,113 @@
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_007_DNF Trade Product (30560011000036108)" verbose="2">
+
+	<test name="01 Some Trade Products exist">
+        <parameter name="query" value="select count(*) from &lt;PROSPECTIVE&gt;.concept_active where id in (select sourceid from rf2_cr_transitiveclosuretable where destinationId = 30560011000036108);"/>
+        <parameter name="description" value=""></parameter>
+		<parameter name="qualifier" value=">"></parameter>
+		<parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+<!-- Basic Content/Descriptions validation !-->
+    <test name="02 All Trade Products are 900000000000074008|Primitive">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.concept_active
+										where isKindOf_cr(id,30560011000036108)
+										and not isKindOf_cr(id,30425011000036101)
+										and definitionStatusId != 900000000000074008;"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="03 Trade Product is 900000000000074008|Primitive">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.concept_active
+										where id = 30560011000036108
+										and definitionStatusId != 900000000000074008;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="04 All concepts with semantic tag (trade product) on AMT module are kinds of 30560011000036108|Trade Product (or itself)">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.description_active
+                                        where isActiveConcept_cr(conceptId)
+                                        and typeId = 900000000000003001
+                                        and SUBSTRING(term,-15) = '(trade product)'
+                                        and NOT isKindOf_cr(conceptId,30560011000036108);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="05 All concepts that are kinds of 30560011000036108|Trade Product (and not kinds 30425011000036101|TPUU) have semantic tag (trade product)">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.description_active
+                                        where isKindOf_cr(conceptId,30560011000036108)
+                                        and NOT isKindOf_cr(conceptId,    30425011000036101)
+                                        and typeId = 900000000000003001
+                                        and BINARY SUBSTRING(term,-16) != ' (trade product)';"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="06 Concept 30560011000036108|Trade Product has FSN = 'trade product (trade product)'">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.description_active
+										where typeId = 900000000000003001
+										and conceptId = 30560011000036108
+										and term != BINARY 'trade product (trade product)';"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="07 Concept 30560011000036108|Trade Product has SYN = 'trade product' or 'MP - trade product'">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.description_active
+										where typeId = 900000000000013009
+										and conceptId = 30560011000036108	
+										and term != BINARY 'trade product'
+                                        and term != BINARY 'TP - trade product';"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="08 Concept 30560011000036108|Trade Product has SYN = 'trade product' or 'TP - trade product'">
+        <parameter name="query" value="select get_cr_ADRS_PT(30560011000036108) = BINARY 'trade product';"/>
+		<parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+
+    <test name="09 TPs only have a relationship that is 'IS A 30560011000036108|TP|'">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where isDescendentOf_cr(sourceId,30560011000036108)
+                                        and NOT isKindOf_cr(sourceId,    30425011000036101)
+                                        and (typeId != 116680003 OR destinationId != 30560011000036108);"/>
+		<parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	
+</suite>

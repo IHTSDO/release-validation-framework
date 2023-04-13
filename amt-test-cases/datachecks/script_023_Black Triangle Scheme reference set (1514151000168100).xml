@@ -1,0 +1,189 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_023_Black Triangle Scheme reference set (1514151000168100) content validation" verbose="2">
+
+    <test name="01 Australian Schedule 8 controlled trade medications(1514151000168100) is populated">
+        <parameter name="query" value="SELECT count(*) FROM &lt;PROSPECTIVE&gt;.simplerefset_active WHERE refsetId = 1514151000168100;"/>
+        <parameter name="expectedValue" value="0"/>
+		<parameter name="qualifier" value=">"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+    <test name="02 RefsetId(1514151000168100) is an active concept">
+        <parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.concept_active where id = 1514151000168100;"/>
+        <parameter name="resultCount" value="1"/>
+        <parameter name="skip" value="true"/> <!--Refactor this test-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+    
+    <test name="03 All active references are on module 	900062011000036108 |AMT module|">
+        <parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.simplerefset_active WHERE refsetId = 1514151000168100 AND moduleId != 	900062011000036108;"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="04 FSN is 'Australian Black Triangle Scheme reference set (foundation metadata concept)'">
+        <parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.description_active WHERE conceptId = 1514151000168100
+										AND typeId = 900000000000003001
+										AND term = 'Australian Black Triangle Scheme reference set (foundation metadata concept)'
+										and id != 4501271000168110;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="05 PT (in ADRS) is 'Black Triangle Scheme reference set'">
+        <parameter name="query" value="SELECT get_cr_ADRS_PT(1514151000168100) = 'Black Triangle Scheme reference set';"/>
+		<parameter name="description" value="query returns 1 if the string matches, otherwise 0"></parameter>
+        <parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="06 All active members are TPUU or CTPP concepts">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="Select id,get_cr_FSN(id) from &lt;PROSPECTIVE&gt;.concept_active
+										Where isActiveMemberOf_cr_refset(id, 1514151000168100)
+										and NOT (isActiveMemberOf_cr_refset(id, 929360031000036100)													
+												 OR isActiveMemberOf_cr_refset(id, 929360051000036108)													
+													);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+
+	<test name="07 IS A child of 32570701000036108 | Reference sets for Medications">
+        <parameter name="query" value="select isChildOf_cr(1514151000168100, 32570701000036108);"/>
+		<parameter name="description" value="query returns 1 if true, otherwise 0"></parameter>
+        <parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="08 IS A child of 446609009 | Simple type reference set">
+        <parameter name="query" value="select isChildOf_cr(1514151000168100, 446609009);"/>
+		<parameter name="description" value="query returns 1 if true, otherwise 0"></parameter>
+        <parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+	<test name="09 Only has parents 32570701000036108 | Reference sets for Medications AND 446609009 | Simple type reference set">
+        <parameter name="query" value="select * from &lt;PROSPECTIVE&gt;.relationship_active
+										where sourceId = 1514151000168100
+                                        and typeId = 116680003
+										and destinationId not in (32570701000036108,446609009);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="10 No duplicate active references (referencedComponentId is unique within reference set)">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="SELECT referencedComponentId, count(*) FROM &lt;PROSPECTIVE&gt;.simplerefset_active
+										WHERE refsetId = 1514151000168100
+										GROUP BY referencedComponentId
+										HAVING count(*) > 1;"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+    <test name="11 All CTPP Members are BTS products">
+        <parameter name="description" value="Checks members are listed as BTS."></parameter>
+		<parameter name="query" value="select referencedComponentId,get_cr_FSN(referencedComponentId),value1 from rf2_cr_irefset_active
+                                        where refsetId = 11000168105
+										and isActiveMemberOf_cr_refset(referencedComponentId, 1514151000168100)
+                                        and value1 in (select distinct TGA.ARTGID 
+                                                       from TGA_Data.tga_feed AS TGA
+                                                       where TGA.BlackTriangle != 'Y');"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="12 All BTS products are Members">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select distinct referencedComponentId,get_cr_FSN(referencedComponentId),value1 from rf2_cr_irefset_active
+                                        where value1 in (select distinct TGA.ARTGID from TGA_Data.tga_feed AS TGA where BlackTriangle = 'Y')
+                                        and not isActiveMemberOf_cr_refset(referencedComponentId, 1514151000168100);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="13 All TPPus of member CTPPs are also member">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select destinationId,get_cr_FSN(destinationId) from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where typeId = 30409011000036107 and isActiveMemberOf_cr_refset(sourceId, 1514151000168100) 
+                                        and NOT isActiveMemberOf_cr_refset(destinationId, 1514151000168100);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="14 All CTPPs that have TPUUs that are members are also members">
+        <parameter name="description" value="sourceId is a CTPP but not a member"></parameter>
+		<parameter name="query" value="select distinct sourceId, get_cr_FSN(sourceId) from &lt;PROSPECTIVE&gt;.relationship_active
+                                        where typeId = 30409011000036107
+                                        and NOT isActiveMemberOf_cr_refset(sourceId, 1514151000168100)
+                                        and isActiveMemberOf_cr_refset(sourceId, 929360051000036108)
+                                        and isActiveMemberOf_cr_refset(destinationId, 1514151000168100);"/>
+        <parameter name="resultCount" value="null"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+
+	<test name="15 BTS Products not in AMT">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select distinct ARTGID from TGA_Data.tga_feed AS TGA where TGA.BlackTriangle = 'Y' 
+                                        and TGA.ARTGID not in (select value1 from rf2_cr_irefset_active where refsetId = 11000168105)
+                                        and TGA.ARTGID not in (325682,287446);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="15x ARTGID 287446 - exception monitoring See AA-58336">
+        <parameter name="description" value=""></parameter>
+		<parameter name="query" value="select conceptId, get_cr_FSN(conceptId) from &lt;PROSPECTIVE&gt;.description_active
+                                        where (term RLIKE 'fluorouracil' AND term RLIKE 'salicyl') OR term RLIKE 'ACTIKERALL'
+                                        UNION
+                                        select referencedComponentId, get_cr_FSN(referencedComponentId) from rf2_cr_irefset_active where refsetId = 11000168105 AND value1 in (325682,287446);"/>
+        <parameter name="resultCount" value="null"/>
+        <parameter name="skip" value="true"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+    
+</suite>
+

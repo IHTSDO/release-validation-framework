@@ -2,13 +2,13 @@ package org.ihtsdo.rvf.execution.service;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.attribute.GroupPrincipal;
@@ -32,7 +32,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.naming.ConfigurationException;
 
+import com.amazonaws.util.StringInputStream;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -44,13 +47,16 @@ import org.ihtsdo.rvf.execution.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationMysqlBinaryStorageConfig;
 import org.ihtsdo.rvf.execution.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.execution.service.util.MySqlDataTypeConverter;
+import org.ihtsdo.rvf.execution.service.util.MySqlQueryTransformer;
 import org.ihtsdo.rvf.execution.service.util.RF2FileTableMapper;
 import org.ihtsdo.rvf.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -739,6 +745,39 @@ public class ReleaseDataManager {
 					ps.execute();
 				}
 			}
+		}
+	}
+
+	public void runPreRequisiteSql(MysqlExecutionConfig executionConfig, String schemaName, File preRequisiteSql)
+			throws BusinessServiceException {
+		try (Connection connection = rvfDynamicDataSource.getConnection(schemaName)) {
+			String sqlContent = new MySqlQueryTransformer()
+					.transformSql(new String[]{FileUtils.readFileToString(preRequisiteSql, StandardCharsets.UTF_8)},
+							executionConfig).iterator().next();
+			ResourceDatabasePopulator dbPop;
+			String delimiter = ";";
+			String[] sqlChunks = sqlContent.trim().split("^[ ]*(delimiter|DELIMITER)", Pattern.MULTILINE);
+			for (int i = 0; i < sqlChunks.length; i++) {
+				String sqlChunk = sqlChunks[i].trim();
+				if (!sqlChunk.isEmpty()) {
+					if (i > 0) {
+						delimiter = sqlChunk.trim().replaceAll("(?s)^([^ \r\n]+).*$", "$1");
+						sqlChunk = sqlChunk.trim().replaceAll("(?s)^[^ \r\n]+(.*)$", "$1").trim();
+					}
+					if (!sqlChunk.isEmpty()) {
+						logger.info("Executing pre-requisite SQL: " + sqlChunk);
+						dbPop = new ResourceDatabasePopulator(
+								false,
+								false,
+								null,
+								new InputStreamResource(new StringInputStream(sqlChunk)));
+						dbPop.setSeparator(delimiter);
+						dbPop.populate(connection);
+					}
+				}
+			}
+		} catch (SQLException | IOException | ConfigurationException e) {
+			throw new BusinessServiceException("Could not run pre-requisite SQL", e);
 		}
 	}
 }

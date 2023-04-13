@@ -6,7 +6,9 @@ WORKDIR $HOME
 ADD . $HOME
 WORKDIR /usr/src/app
 ENV DOCKER_BUILDKIT=1
-RUN --mount=type=cache,target=/root/.m2 mvn -f $HOME/pom.xml clean install -DskipTests=true
+#RUN --mount=type=cache,target=/root/.m2 mvn -f $HOME/pom.xml clean install -DskipTests=true
+#RUN mvn -f $HOME/pom.xml clean install -DskipTests=true
+
 
 FROM openjdk:11-jdk
 LABEL maintainer="SNOMED International <tooling@snomed.org>"
@@ -23,6 +25,7 @@ RUN apt-get -y install vim
 # Create a working directory
 RUN mkdir /app
 WORKDIR /app
+ADD api/target/api.jar api.jar
 
 # Add in the necessary config files to be able to run the rvf
 RUN mkdir /config
@@ -62,4 +65,4 @@ USER rvf
 
 RUN echo 'alias ll="ls -la $@"' >> ~/.bashrc
 
-ENTRYPOINT ["java"," -Djava.security.egd=file:/dev/urandom -DrvfConfigLocation=config","-jar","api.jar"]
+ENTRYPOINT ["java","-Dspring-boot.run.jvmArguments=\\\"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9000\\\" -Djava.security.egd=file:/dev/urandom -DrvfConfigLocation=config","-jar","api.jar"]

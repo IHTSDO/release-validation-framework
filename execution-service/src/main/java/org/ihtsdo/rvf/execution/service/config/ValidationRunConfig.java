@@ -13,6 +13,7 @@ public class ValidationRunConfig {
 	private transient MultipartFile file;
 	private boolean writeSucceses;
 	private transient MultipartFile manifestFile;
+	private transient MultipartFile preRequisiteSql;
 	private List<String> groupsList;
 	private String previousRelease;
 	private String dependencyRelease;
@@ -27,6 +28,8 @@ public class ValidationRunConfig {
 	private transient File localManifestFile;
 	private transient File localDependencyReleaseFile;
 	private transient File localPreviousReleaseFile;
+	private transient File localPreRequisiteSqlFile;
+
 	private boolean isRf2DeltaOnly;
 	private boolean enableDrools;
 	private String effectiveTime;
@@ -45,6 +48,8 @@ public class ValidationRunConfig {
 	private Long contentBaseTimestamp;
 	private String username;
 	private String authenticationToken;
+	private boolean preRequisiteSqlFileInS3;
+	private String preRequisiteSqlFileFullPath;
 
 	public MultipartFile getFile() {
 		return file;
@@ -468,5 +473,40 @@ public class ValidationRunConfig {
 		}
 		maskedToken[maskedToken.length - 1] = token.charAt(token.length() - 1);
 		return new String(maskedToken);
+	}
+
+	public ValidationRunConfig addPreRequisiteSql(MultipartFile preRequisiteSql) {
+		this.preRequisiteSql = preRequisiteSql;
+		return this;
+	}
+
+	public MultipartFile getPreRequisiteSql() {
+		return preRequisiteSql;
+	}
+
+	public String getPreRequisiteSqlFileFullPath() {
+		return this.preRequisiteSqlFileFullPath;
+	}
+
+	public boolean isPreRequisiteSqlFileInS3() {
+		return preRequisiteSqlFileInS3;
+	}
+
+	public void setLocalPreRequisiteSqlFile(File localPreRequisiteSqlFile) {
+		this.localPreRequisiteSqlFile = localPreRequisiteSqlFile;
+	}
+
+	public ValidationRunConfig setPreRequisiteSqlFileInS3(boolean preRequisiteSqlFileInS3) {
+		this.preRequisiteSqlFileInS3 = preRequisiteSqlFileInS3;
+		return this;
+	}
+
+	public ValidationRunConfig setPreRequisiteSqlFileFullPath(String preRequisiteSqlFileFullPath) {
+		this.preRequisiteSqlFileFullPath = preRequisiteSqlFileFullPath;
+		return this;
+	}
+
+	public File getLocalPreRequisiteSqlFile() {
+		return localPreRequisiteSqlFile;
 	}
 }

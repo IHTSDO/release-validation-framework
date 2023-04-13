@@ -1,0 +1,171 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="script_007_Container Type (30446011000036105) concept datachecks" verbose="2">
+
+
+
+    <test name="01b DNF Some Container Types exist">
+        <parameter name="query" value="select count(*) from &lt;PROSPECTIVE&gt;.concept_active where id in (select sourceid from rf2_cr_transitiveclosuretable where destinationId = 30446011000036105 or sourceid = 30446011000036105);"/>
+		<parameter name="qualifier" value=">"></parameter>
+		<parameter name="expectedValue" value="1"/>
+        <parameter name="skip" value="true"/>
+        <parameter name="skip" value="true"/> <!--Will come back to expected value tests-->
+        <classes>
+            <class name="au.gov.nehta.test.ExpectedValueTest"/>
+        </classes>
+    </test>
+
+<!-- Basic Content validation !-->
+	 <test name="02 All Container Types are 900000000000074008|primitive">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.concept_active
+										WHERE     isKindOf_cr(id, 30446011000036105)
+										AND definitionstatusid != 900000000000074008;"/>
+        <parameter name="resultCount" value="0"/>
+         <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="03 All Container Type FSNs have a semantic tag (AU qualifier)">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE isActiveConcept_cr(conceptId) AND isKindOf_cr(conceptid, 30446011000036105)
+										AND typeid = 900000000000003001
+										AND term NOT REGEXP BINARY ' \\(AU qualifier\\)$';"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+	
+	<test name="04 Concept 30446011000036105|container type has FSN = 'container type (AU qualifier)'">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE     typeId = 900000000000003001
+										AND conceptId = 30446011000036105
+										AND term != BINARY 'container type (AU qualifier)';"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+	<test name="05 Concept 30446011000036105|container type has SYN = 'container type'">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.description_active
+										WHERE     typeId = 900000000000013009
+										AND conceptId = 30446011000036105
+										AND term != BINARY 'container type';"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+
+	 <test name="06b DNF All descendents of Container Types only have destinationIds that are types of 30446011000036105|container type">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE isDescendentOf_cr(sourceid, 30446011000036105)
+										AND NOT isKindOf_cr(destinationid, 30446011000036105);"/>
+        <parameter name="resultCount" value="0"/>
+         <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+	
+	<test name="07b DNF container type(30446011000036105) is a child of 30515011000036103|Australian qualifier">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE sourceId = 30446011000036105
+										AND typeId = 116680003
+										AND destinationId = 30515011000036103
+										AND id != 5087551000168126;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+
+	<test name="08b DNF container type(30446011000036105) is only a child of 30515011000036103|Australian qualifier">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE sourceId = 30446011000036105
+										AND typeId = 116680003
+										AND destinationId != 30515011000036103;"/>
+        <parameter name="resultCount" value="0"/>
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+<!-- Defining/Source properties !-->
+
+
+	<test name="09b DNF Container Type concepts only have 116680003|Is a relationships">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE isKindOf_cr(sourceid, 30446011000036105)
+										AND typeid != 116680003;"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+
+	 <test name="10b DNF Container Type descendents only have destinationIds that are types of 30446011000036105|container type">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE isDescendentOf_cr(sourceid, 30446011000036105)
+										AND NOT isKindOf_cr(destinationid, 30446011000036105);"/>
+        <parameter name="resultCount" value="0"/>
+         <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+
+	<test name="11b DNF All Container Type relationships are ungrouped (group = 0)">
+        <parameter name="query" value="SELECT *
+										FROM &lt;PROSPECTIVE&gt;.relationship_active
+										WHERE isKindOf_cr(sourceid, 30446011000036105)
+										AND relationshipgroup != 0;"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test>
+
+
+<!-- Destination properties !-->
+	
+
+
+	<test name="12b DNF All children of Container Type are the destination of at least one [30465011000036106|has container type] relationship">
+        <parameter name="query" value="SELECT * FROM &lt;PROSPECTIVE&gt;.concept_active
+										WHERE isKindOf_cr(Id, 30446011000036105) 
+										AND id NOT IN (SELECT destinationid FROM &lt;PROSPECTIVE&gt;.relationship_active WHERE typeId = 30465011000036106)
+										and id NOT IN (SELECT destinationid FROM &lt;PROSPECTIVE&gt;.relationship_active WHERE typeId = 116680003);"/>
+        <parameter name="resultCount" value="0"/>
+        <parameter name="skip" value="true"/> <!--Uses a function or proc that needs refactoring-->
+        <classes>
+            <class name="au.gov.nehta.test.ResultCountTest"/>
+        </classes>
+    </test> 
+
+</suite>
