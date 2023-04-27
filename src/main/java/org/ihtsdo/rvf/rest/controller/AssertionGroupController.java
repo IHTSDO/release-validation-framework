@@ -55,7 +55,7 @@ public class AssertionGroupController {
 	@ApiOperation(value = "Get all assertions for a given assertion group", notes = "Retrieves all assertions for a given assertion group identified by the group id.")
 	public List<Assertion> getAssertionsForGroup(@ApiParam(value = "Assertion group id") @PathVariable final Long id) {
 
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).get();
 		return new ArrayList<>(group.getAssertions());
 	}
 
@@ -66,7 +66,7 @@ public class AssertionGroupController {
 			@RequestBody(required = false) final List<String> assertionsList,
 			final HttpServletResponse response) {
 
-		final AssertionGroup group = assertionGroupRepository.getOne(id);
+		final AssertionGroup group = assertionGroupRepository.findById(id).get();
 		// Do we have anything to add?
 		if (assertionsList == null || assertionsList.size() == 0) {
 			response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -88,7 +88,7 @@ public class AssertionGroupController {
 			+ " This api may only be used when user desires to add all assertion found in the system to an assertion group"
 			+ " otherwise use {id}/assertions api as post call.")
 	public AssertionGroup addAllAssertions(@PathVariable final Long id) {
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).get();
 		List<Assertion> assertionList = assertionService.findAll();
 		group.setAssertions(new HashSet<>(assertionList));
 		return assertionGroupRepository.save(group);
@@ -101,7 +101,7 @@ public class AssertionGroupController {
 	public AssertionGroup removeAssertionsFromGroup(
 			@PathVariable final Long id,
 			@ApiParam(value = "Only assertion id is required") @RequestBody final List<Assertion> assertions) {
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).get();
 		for (final Assertion assertion : group.getAssertions()) {
 			group = assertionService.removeAssertionFromGroup(assertion, group);
 		}
@@ -115,7 +115,7 @@ public class AssertionGroupController {
 	public AssertionGroup setAsAssertionsInGroup(@PathVariable final Long id,
 			@RequestBody(required = false) final Set<Assertion> assertions) {
 
-		final AssertionGroup group = assertionGroupRepository.getOne(id);
+		final AssertionGroup group = assertionGroupRepository.findById(id).get();
 		// replace all existing assertions with current list
 		group.setAssertions(assertions);
 		return assertionGroupRepository.save(group);
@@ -129,7 +129,7 @@ public class AssertionGroupController {
 		if (!assertionGroupRepository.existsById(id)) {
 			throw new EntityNotFoundException(id);
 		}
-		return assertionGroupRepository.getOne(id);
+		return assertionGroupRepository.findById(id).get();
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
@@ -137,7 +137,7 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Delete an assertion group", notes = "Deletes an assertion group from the system")
 	public AssertionGroup deleteAssertionGroup(@ApiParam(value="Assertion group id") @PathVariable final Long id) {
-		final AssertionGroup group = assertionGroupRepository.getOne(id);
+		final AssertionGroup group = assertionGroupRepository.findById(id).get();
 		group.removeAllAssertionsFromGroup();
 		assertionGroupRepository.delete(group);
 		return group;
@@ -159,7 +159,7 @@ public class AssertionGroupController {
 	@ApiOperation(value = "Update an assertion group", notes = "Updates the group name for the assertion group identified by the group id.")
 	public AssertionGroup updateAssertionGroup(@PathVariable final Long id,
 			@ApiParam(value = "Assertion group name") @RequestParam final String name) {
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).get();
 		group.setName(name);
 		return assertionGroupRepository.save(group);
 	}
@@ -173,7 +173,7 @@ public class AssertionGroupController {
 			@ApiParam(value="Prospective version") @RequestParam final String prospectiveReleaseVersion,
 			@ApiParam(value="Previous release version", required = false) @RequestParam final String previousReleaseVersion) {
 
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).get();
 		MysqlExecutionConfig config = new MysqlExecutionConfig(runId);
 		config.setPreviousVersion(previousReleaseVersion);
 		config.setProspectiveVersion(prospectiveReleaseVersion);
