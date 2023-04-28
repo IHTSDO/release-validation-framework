@@ -28,7 +28,7 @@ services:
     container_name: rvf
     depends_on:
       - db
-    entrypoint: java -Xms512m -Xmx4g -DrvfConfigLocation=/app/config -jar api.jar --server.port=8081 --server.servlet.context-path=/api
+    entrypoint: java -Xms512m -Xmx4g -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:9000 -DrvfConfigLocation=/app/config -jar api.jar --server.port=8081 --server.servlet.context-path=/api
     ports:
       - 8081:8081
     networks:

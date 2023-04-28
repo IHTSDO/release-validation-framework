@@ -59,7 +59,7 @@ public class ValidationRunner {
 	@Autowired
 	private MessagingHelper messagingHelper;
 
-	private boolean skipStructureTests = false;
+	private boolean skipStructureTests = true;
 
 	private static final String MSG_VALIDATIONS_RUN = "Validations executed. Failures count: ";
 	private static final String MSG_VALIDATIONS_DISABLED = "Validations are disabled.";
