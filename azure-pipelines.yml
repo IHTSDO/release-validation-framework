@@ -31,7 +31,7 @@ stages:
               artifactsFeeds: 'mavenbuild'
           - task: Docker@2
             inputs:
-              containerRegistry: 'ontoserver-cr'
+              containerRegistry: $(acr_registry)
               command: 'login'
           - task: Maven@3
             displayName: Build and verify
