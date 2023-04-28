@@ -1,9 +1,9 @@
-name: rvf-k8s-job-helm-$(Date:yyyyMMdd)$(Rev:.r)
+name: release-validation-framework-$(Date:yyyyMMdd)$(Rev:.r)
 
 trigger:
   branches:
     include:
-      - '*'
+      - 'groups-api-fix'
 pool:
   vmImage: 'ubuntu-latest'
 
