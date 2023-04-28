@@ -4,4 +4,4 @@
 
 set -e
 
-docker-compose -f docker-compose.yml -f docker-compose.m1.yml down -v
+docker-compose -f docker-compose.yml -f docker-compose.m1.yml down

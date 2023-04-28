@@ -30,7 +30,6 @@ import java.util.Map;
 @Service
 public class ValidationQueueManager {
 
-	private static final String PRE_REQ_FILES = "pre_requisites";
 	private static final String FILES_TO_VALIDATE = "files_to_validate";
 	private static final String FAILURE_MESSAGE = "failureMessage";
 
@@ -115,7 +114,7 @@ public class ValidationQueueManager {
 	private boolean saveUploadedFiles(final ValidationRunConfig config,
 			final Map<String, String> responseMap) throws IOException, NoSuchAlgorithmException, DecoderException {
 		
-		if (!jobResourceConfig.isUseCloud() && (config.isProspectiveFileInS3() || config.isPreRequisiteSqlFileInS3())) {
+		if (!jobResourceConfig.isUseCloud() && config.isProspectiveFileInS3()) {
 			responseMap.put(FAILURE_MESSAGE, "Can't process files from S3 as validation resource config is configured to use local files "
 					+ jobResourceConfig.toString());
 			reportService.writeState(State.FAILED, config.getStorageLocation());
@@ -133,24 +132,11 @@ public class ValidationQueueManager {
 				validationJobResourceManager.writeResource(manifestS3Path, config.getManifestFile().getInputStream());
 				config.setManifestFileFullPath(manifestS3Path);
 			}
-			if (config.getPreRequisiteSql() != null) {
-				String preReqS3Path = jobStoragePath + config.getPreRequisiteSql().getOriginalFilename();
-				validationJobResourceManager.writeResource(preReqS3Path, config.getPreRequisiteSql().getInputStream());
-				config.setPreRequisiteSqlFileFullPath(preReqS3Path);
-			}
 			config.setProspectiveFilesInS3(jobResourceConfig.isUseCloud());
 			if (jobResourceConfig.isUseCloud()) {
 				config.setBucketName(jobResourceConfig.getCloud().getBucketName());
 			}
-		}
-		if (!config.isPreRequisiteSqlFileInS3() && config.getPreRequisiteSql() != null) {
-			String filename = config.getPreRequisiteSql().getOriginalFilename();
-			String jobStoragePath = config.getStorageLocation() + File.separator + PRE_REQ_FILES + File.separator;
-			String preReqS3Path = jobStoragePath + config.getPreRequisiteSql().getOriginalFilename();
-			validationJobResourceManager.writeResource(preReqS3Path, config.getPreRequisiteSql().getInputStream());
-			config.setPreRequisiteSqlFileFullPath(preReqS3Path);
-			config.setPreRequisiteSqlFileInS3(jobResourceConfig.isUseCloud());
-		}
+		} 
 		return true;
 	}
 }

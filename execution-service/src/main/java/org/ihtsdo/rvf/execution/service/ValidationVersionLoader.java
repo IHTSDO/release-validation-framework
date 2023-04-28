@@ -45,7 +45,6 @@ public class ValidationVersionLoader {
 	private static final String SNAPSHOT_TABLE = "%_s";
 
 	private static final String ZIP_FILE_EXTENSION = ".zip";
-	private static final String SQL_FILE_EXTENSION = ".sql";
 
 	private static final String UTF_8 = "UTF-8";
 	private static final String DELTA_TABLE = "%_d";
@@ -119,8 +118,8 @@ public class ValidationVersionLoader {
 			uploadReleaseFileIntoDB(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		}
 
-		final String schemaName = prospectiveVersion.startsWith(RVF_DB_PREFIX) ? prospectiveVersion : RVF_DB_PREFIX + prospectiveVersion;
 		if (!validationConfig.isRf2DeltaOnly() && !checkDeltaFilesExist(validationConfig.getLocalProspectiveFile())) {
+			final String schemaName = prospectiveVersion.startsWith(RVF_DB_PREFIX) ? prospectiveVersion : RVF_DB_PREFIX + prospectiveVersion;
 			releaseDataManager.insertIntoProspectiveDeltaTables(schemaName, executionConfig);
 		}
 
@@ -130,13 +129,6 @@ public class ValidationVersionLoader {
 		reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveVersion, reportStorage);
 		resourceLoader.loadResourceData(prospectiveVersion);
 		logger.info("completed loading resource data for schema:" + prospectiveVersion);
-
-		if (validationConfig.getLocalPreRequisiteSqlFile() != null) {
-			logger.info("Running the pre-requisite SQL file:" + validationConfig.getLocalPreRequisiteSqlFile().getName());
-			// run pre-requisite sql
-			releaseDataManager.runPreRequisiteSql(executionConfig, schemaName, validationConfig.getLocalPreRequisiteSqlFile());
-			logger.info("Completed execution of the pre-requisite SQL file:" + validationConfig.getLocalPreRequisiteSqlFile().getName());
-		}
 	}
 
 	private boolean checkDeltaFilesExist(File localProspectiveFile) throws FileNotFoundException, ReleaseImportException {
@@ -313,41 +305,6 @@ public class ValidationVersionLoader {
 					validationConfig.setLocalPreviousReleaseFile(previousFile);
 				}
 			}
-		}
-	}
-
-	public void downloadPreRequisiteSqlFile(ValidationRunConfig validationConfig) throws Exception {
-		File preReqFile = File.createTempFile(validationConfig.getRunId() + "_PRE_REQUISITE_SQL", SQL_FILE_EXTENSION);
-		ResourceManager jobResource = new ResourceManager(jobResourceConfig, cloudResourceLoader);
-		InputStream preReqInput = null;
-		//streaming file from S3 to local
-		String preReqFileFullPath = validationConfig.getPreRequisiteSqlFileFullPath();
-		if (jobResourceConfig.isUseCloud() && validationConfig.isPreRequisiteSqlFileInS3()) {
-			if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
-				ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
-						new Cloud(validationConfig.getBucketName(), ""));
-				ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
-				if (preReqFileFullPath != null) {
-					preReqInput = manualResource.readResourceStreamOrNullIfNotExists(preReqFileFullPath);
-				}
-			} else {
-				//update s3 path if required when full path containing job resource path already
-				if (preReqFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
-					preReqFileFullPath = preReqFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
-				}
-			}
-		}
-		if (preReqInput == null) {
-			preReqInput = jobResource.readResourceStreamOrNullIfNotExists(preReqFileFullPath);
-		}
-
-		if (preReqInput != null) {
-			OutputStream out = new FileOutputStream(preReqFile);
-			IOUtils.copy(preReqInput, out);
-			IOUtils.closeQuietly(preReqInput);
-			IOUtils.closeQuietly(out);
-			logger.debug("local pre-requisite SQL file" + preReqFile.getAbsolutePath());
-			validationConfig.setLocalPreRequisiteSqlFile(preReqFile);
 		}
 	}
 	

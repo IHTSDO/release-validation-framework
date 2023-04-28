@@ -74,8 +74,6 @@ public class TestUploadFileController {
 
 	private static final String MANIFEST = "manifest";
 
-	private static final String PRE_REQUISITE_SQL = "preRequisiteSql";
-
 	private static final String WRITE_SUCCESSES = "writeSuccesses";
 
 	private static final String RF2_DELTA_ONLY = "rf2DeltaOnly";
@@ -182,7 +180,6 @@ public class TestUploadFileController {
 			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = RF2_DELTA_ONLY, required = false, defaultValue = "false") final boolean isRf2DeltaOnly,
 			@ApiParam(value = "Default to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false, defaultValue = "false") final boolean writeSucceses,
 			@ApiParam(value = "manifest.xml file(optional)") @RequestParam(value = MANIFEST, required = false) final MultipartFile manifestFile,
-			@ApiParam(value = "Pre-requisite SQL file, for custom SQL to be executed after importing the RF2 content, but before the tests execute (optional)") @RequestParam(value = PRE_REQUISITE_SQL, required = false) final MultipartFile preRequisiteSql,
 			@ApiParam(value = "Assertion group names separated by a comma.") @RequestParam(value = GROUPS) final List<String> groupsList,
 			@ApiParam(value = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
@@ -214,7 +211,6 @@ public class TestUploadFileController {
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFile(manifestFile)
-				.addPreRequisiteSql(preRequisiteSql)
 				.addPreviousRelease(previousRelease)
 				.addDependencyRelease(extensionDependency)
 				.addPreviousDependencyEffectiveTime(previousDependencyEffectiveTime)
@@ -262,7 +258,6 @@ public class TestUploadFileController {
 			@ApiParam(value = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = RF2_DELTA_ONLY, required = false, defaultValue = "false") final boolean isRf2DeltaOnly,
 			@ApiParam(value = "Defaults to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false) final boolean writeSucceses,
 			@ApiParam(value = "manifest.xml file path in AWS S3") @RequestParam(value = "manifestFileS3Path", required = false) final String manifestFileS3Path,
-			@ApiParam(value = "Pre-requisite SQL file, for custom SQL to be executed after importing the RF2 content, but before the tests execute (optional)") @RequestParam(value = PRE_REQUISITE_SQL, required = false) final MultipartFile preRequisiteSql,
 			@ApiParam(value = "Assertion group names") @RequestParam(value = GROUPS) final List<String> groupsList,
 			@ApiParam(value = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@ApiParam(value = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
@@ -298,7 +293,6 @@ public class TestUploadFileController {
 				.addGroupsList(groupsList)
 				.addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFileFullPath(manifestFileS3Path)
-				.addPreRequisiteSql(preRequisiteSql)
 				.addPreviousRelease(previousRelease)
 				.addDependencyRelease(extensionDependency)
 				.addPreviousDependencyEffectiveTime(previousDependencyEffectiveTime)

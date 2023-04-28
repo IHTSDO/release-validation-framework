@@ -14,7 +14,6 @@ import org.ihtsdo.rvf.validation.StructuralTestRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -59,8 +58,6 @@ public class ValidationRunner {
 	@Autowired
 	private MessagingHelper messagingHelper;
 
-	private boolean skipStructureTests = true;
-
 	private static final String MSG_VALIDATIONS_RUN = "Validations executed. Failures count: ";
 	private static final String MSG_VALIDATIONS_DISABLED = "Validations are disabled.";
 
@@ -91,7 +88,6 @@ public class ValidationRunner {
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		releaseVersionLoader.downloadProspectiveFiles(validationConfig);
 		releaseVersionLoader.downloadPreviousReleaseAndDependencyFiles(validationConfig);
-		releaseVersionLoader.downloadPreRequisiteSqlFile(validationConfig);
 		if (validationConfig.getLocalProspectiveFile() == null) {
 			reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
 			String errorMsg = "Prospective file can't be null " + validationConfig.getLocalProspectiveFile();
@@ -128,11 +124,8 @@ public class ValidationRunner {
 	}
 
 	private void doRunValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws Exception {
-		if (!skipStructureTests) {
-			runRF2StructureTests(validationConfig, statusReport);
-		} else {
-			logger.warn("Skipping execution of the RF2 file structure tests");
-		}
+		runRF2StructureTests(validationConfig, statusReport);
+
 		Map<String, Future<ValidationStatusReport>> taskMap = new HashMap<>();
 		ExecutorService executorService = Executors.newFixedThreadPool(5);
 		StringBuilder statusMessages = new StringBuilder();
