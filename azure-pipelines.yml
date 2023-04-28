@@ -40,4 +40,4 @@ stages:
               jdkArchitectureOption: 'x64'
               publishJUnitResults: true
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'clean install dockerfile:build -DalsoPush -Drepository=ontoserver.azurecr.io/rvf'
+              goals: 'clean install dockerfile:build -DalsoPush -Drepository=$(acr_repo)'
