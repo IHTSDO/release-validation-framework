@@ -8,14 +8,9 @@ services:
   db:
     platform: linux/amd64
     image: mariadb:latest
-    ports:
-      - "3336:3306"
   rvf:
     platform: linux/amd64
     image: rvf-m1:latest
     volumes:
       - rvf-store:/app/store
       - rvf-assertions:/app/store/assertions
-      - type: bind
-        source: ./jobs
-        target: /app/store/jobs
