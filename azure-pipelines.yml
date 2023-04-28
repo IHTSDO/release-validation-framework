@@ -1,4 +1,4 @@
-name: release-validation-framework-$(Date:yyyyMMdd)$(Rev:.r)
+name: rvf-$(Date:yyyyMMdd)$(Rev:.r)
 
 trigger:
   branches:
