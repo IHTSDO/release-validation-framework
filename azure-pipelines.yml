@@ -29,6 +29,10 @@ stages:
           - task: MavenAuthenticate@0
             inputs:
               artifactsFeeds: 'mavenbuild'
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'ontoserver-cr'
+              command: 'login'
           - task: Maven@3
             displayName: Build and verify
             inputs:
