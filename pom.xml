@@ -49,7 +49,7 @@
         <snomed-boot.version>4.0.1</snomed-boot.version>
         <snomed-drools.version>3.3.0</snomed-drools.version>
         <snomed-drools.version>3.3.0</snomed-drools.version>
-        <snomed.utilities.version>1.4.2-SNAPSHOT</snomed.utilities.version>
+        <snomed.utilities.version>1.5.0</snomed.utilities.version>
         <spring-cloud-auto-config-version>2.2.6.RELEASE</spring-cloud-auto-config-version>
         <spring-consul.version>3.1.1</spring-consul.version>
         <springfox-swagger.version>2.7.0</springfox-swagger.version>
