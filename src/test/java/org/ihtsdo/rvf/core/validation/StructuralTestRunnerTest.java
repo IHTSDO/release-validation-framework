@@ -66,7 +66,7 @@ public class StructuralTestRunnerTest {
 		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), false);
 		assertNotNull(response.getResult());
 		assertEquals(3444, response.getNumTestRuns(), "There should be 3444 tests in total");
-		assertEquals(7, response.getNumErrors(), "There should be 3 file names that are not valid plus 4 other errors");
+		assertEquals(22, response.getNumErrors(), "There should be 6 file names that are not valid plus 16 other errors");
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class StructuralTestRunnerTest {
 
 		assertNotNull(response.getResult());
 		System.out.println(response.getResult());
-		assertEquals(7, response.getNumErrors(), "There are 3 file names that are not valid plus 4 other errors");
+		assertEquals(22, response.getNumErrors(), "There are 6 file names that are not valid plus 16 other errors");
 	}
 
 	@Test

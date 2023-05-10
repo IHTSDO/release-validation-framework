@@ -11,7 +11,7 @@
 
     <groupId>org.ihtsdo.snomed.rvf</groupId>
     <artifactId>release-validation-framework</artifactId>
-    <version>4.0.5</version>
+    <version>4.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>SNOMED Release Validation Framework</description>
 
@@ -39,7 +39,7 @@
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxen.version>1.1.6</jaxen.version>
         <jdom.version>2.0.2</jdom.version>
-        <mrcm-validator.version>1.11.0</mrcm-validator.version>
+        <mrcm-validator.version>1.11.1</mrcm-validator.version>
         <mybatis.version>3.5.6</mybatis.version>
         <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
         <mysql.version>5.1.46</mysql.version>
@@ -49,7 +49,7 @@
         <snomed-boot.version>4.0.1</snomed-boot.version>
         <snomed-drools.version>3.3.0</snomed-drools.version>
         <snomed-drools.version>3.3.0</snomed-drools.version>
-        <snomed.utilities.version>1.4.1</snomed.utilities.version>
+        <snomed.utilities.version>1.5.0</snomed.utilities.version>
         <spring-cloud-auto-config-version>2.2.6.RELEASE</spring-cloud-auto-config-version>
         <spring-consul.version>3.1.1</spring-consul.version>
         <springfox-swagger.version>2.7.0</springfox-swagger.version>
