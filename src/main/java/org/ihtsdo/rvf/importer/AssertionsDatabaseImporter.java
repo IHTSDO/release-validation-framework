@@ -38,6 +38,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 	public class AssertionsDatabaseImporter {
 
 		private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
+	    private static final String CREATE_FUNCTION = "CREATE FUNCTION";
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 		private static final String RESOURCE_PATH_SEPARATOR = "/";
 
@@ -153,7 +154,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			for (final StatementSplitter.Statement statement : splitter.getCompleteStatements()) {
 				String cleanedSql = statement.statement();
 				logger.debug("sql to be cleaned:" + cleanedSql);
-				if ( cleanedSql.startsWith(CREATE_PROCEDURE) || cleanedSql.startsWith(CREATE_PROCEDURE.toLowerCase())) {
+				if( cleanedSql.toUpperCase().startsWith(CREATE_PROCEDURE) || cleanedSql.toUpperCase().startsWith(CREATE_FUNCTION)) {
 					storedProcedureFound = true;
 				}
 				// Process SQL statement
