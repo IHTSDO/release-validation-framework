@@ -35,6 +35,7 @@ import java.util.*;
 	public class AssertionsDatabaseImporter {
 
 		private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
+		private static final String CREATE_FUNCTION = "CREATE FUNCTION";
 		private static final String JSON_EXTENSION = ".json";
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 		private static final String RESOURCE_PATH_SEPARATOR = "/";
@@ -192,7 +193,7 @@ import java.util.*;
 			{
 				String cleanedSql = statement.statement();
 				logger.debug("sql to be cleaned:" + cleanedSql);
-				if ( cleanedSql.startsWith(CREATE_PROCEDURE) || cleanedSql.startsWith(CREATE_PROCEDURE.toLowerCase())) {
+				if( cleanedSql.toUpperCase().startsWith(CREATE_PROCEDURE) || cleanedSql.toUpperCase().startsWith(CREATE_FUNCTION)) {
 					storedProcedureFound = true;
 				}
 				// tokenise and process statement
