@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.AssertionService;
+import org.ihtsdo.rvf.core.service.util.MySqlQueryTransformer;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -25,7 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
-	/**
+/**
 	 * An implementation of a {@link org.ihtsdo.rvf.importer.AssertionsDatabaseImporter} that imports older
 	 * Release Assertion Toolkit content via XML and SQL files. The XML file defines the assertions and the SQL files are
 	 * used to populate the corresponding tests.
@@ -112,7 +113,11 @@ import java.util.*;
 								if (sqlInputStream != null) {
 									final String sqlString = readStream(sqlInputStream);
 									// add test to assertion
-									addSqlTestToAssertion(assertion, sqlString);
+									if(isPreRequisitesSql(sqlFileName)){ //handle pre-requisites.sql
+										addPreRequisiteSqlToAssertion(assertion, sqlString);
+									} else{
+										addSqlTestToAssertion(assertion, sqlString);
+									}
 								} else {
 									String msg = "Failed to find sql file name from source:" + sqlResourceFileName + " for assertion uuid:" + assertion.getUuid();
 									logger.error(msg);
@@ -140,6 +145,15 @@ import java.util.*;
 			else{
 				logger.warn("Error generating document from xml file passed : " + manifestInputStream);
 			}
+		}
+
+	/**
+	 * 
+	 * @param sqlFileName
+	 * @return
+	 */
+		private boolean isPreRequisitesSql(String sqlFileName){
+			return sqlFileName.equalsIgnoreCase("pre-requisites.sql");
 		}
 
 		protected Assertion createAssertionFromElement(final Element element){
@@ -236,6 +250,14 @@ import java.util.*;
 			}
 
 			uploadTest(assertion, sql, statements);
+		}
+
+
+		protected void addPreRequisiteSqlToAssertion(final Assertion assertion, String preRequisiteSql)
+				throws RuntimeException {
+			MySqlQueryTransformer mySqlQueryTransformer = new MySqlQueryTransformer();
+			final List<String> sqlStatements = mySqlQueryTransformer.transformToStatements(preRequisiteSql);
+			uploadTest(assertion, preRequisiteSql, sqlStatements);
 		}
 
 		private void uploadTest (Assertion assertion, String orignalSql, List<String> sqlStatements) {
