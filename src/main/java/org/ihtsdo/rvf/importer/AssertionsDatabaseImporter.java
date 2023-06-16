@@ -8,6 +8,7 @@ import org.ihtsdo.rvf.core.data.model.ExecutionCommand;
 import org.ihtsdo.rvf.core.data.model.Test;
 import org.ihtsdo.rvf.core.data.model.TestType;
 import org.ihtsdo.rvf.core.service.AssertionService;
+import org.ihtsdo.rvf.core.service.util.MySqlQueryTransformer;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -28,6 +29,7 @@ import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
 /**
 	 * An implementation of a {@link org.ihtsdo.rvf.importer.AssertionsDatabaseImporter} that imports older
 	 * Release Assertion Toolkit content via XML and SQL files. The XML file defines assertions and SQL files are
@@ -54,82 +56,180 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			return assertions == null || assertions.isEmpty();
 		}
 
-		/**
-		 * Imports assertions from the given manifest file input stream. The manifest file should be an XML file
-		 * containing a list of assertions to import. Each assertion should contain a list of SQL scripts to execute
-		 * to populate the assertion tests.
-		 * @param manifestInputStream the manifest file input stream
-		 * @param sqlFileDir the directory containing the SQL files
-		 * @throws IOException if there is an error reading the manifest file
-		 */
-		public void importAssertionsFromManifest(final InputStream manifestInputStream, final String sqlFileDir) throws IOException {
-			final List<Element> scriptElements = getScriptElements(manifestInputStream);
-			if (scriptElements.isEmpty()) {
-				logger.warn("There are no script elements to import in the XML file provided. Please note that the " +
-						"XML file should contain element named script");
-			} else {
-				// Create Assertions and tests from script elements
-				for (final Element element : scriptElements) {
-					createAssertionAndTest(element, sqlFileDir);
+		public List<Assertion> getAssertionsFromFile(final InputStream manifestInputStream) {
+			final Document xmlDocument = getJDomDocumentFromFile(manifestInputStream);
+			List<Assertion> assertions = new ArrayList<>();
+			if(xmlDocument != null)
+			{
+				final XPathFactory factory = XPathFactory.instance();
+				final XPathExpression expression = factory.compile("//script");
+				final List<Element> scriptElements = expression.evaluate(xmlDocument);
+				if(scriptElements.size() > 0) {
+					// get various values from script element
+					for (final Element element : scriptElements) {
+						assertions.add(createAssertionFromElement(element));
+
+					}
 				}
 			}
+			return assertions;
 		}
 
-		 List<Element> getScriptElements(InputStream manifestInputStream) throws IOException {
-			// Get JDOM document from given manifest file input stream
-			final Document xmlDocument;
-			try {
-				final SAXBuilder sax = new SAXBuilder();
-				xmlDocument = sax.build(manifestInputStream);
-			} catch (JDOMException e) {
-				throw new IOException("Failed to parse manifest file.", e);
+		public void importAssertionsFromFile(final InputStream manifestInputStream, final String sqlResourcesFolderLocation){
+			// get JDOM document from given manifest file
+			final Document xmlDocument = getJDomDocumentFromFile(manifestInputStream);
+			if(xmlDocument != null)
+			{
+				final XPathFactory factory = XPathFactory.instance();
+				final XPathExpression expression = factory.compile("//script");
+				final List<Element> scriptElements = expression.evaluate(xmlDocument);
+				if(scriptElements.size() > 0)
+				{
+					// get various values from script element
+					for(final Element element : scriptElements)
+					{
+						final Assertion assertion = createAssertionFromElement(element);
+						if(assertion != null){
+							try
+							{
+								logger.info("Created assertion id : " + assertion.getAssertionId());
+								assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
+								// get Sql file name from element and use it to add SQL test
+								final String sqlFileName = element.getAttributeValue("sqlFile");
+								logger.info("sqlFileName = " + sqlFileName);
+								String category = element.getAttributeValue("category");
+								/*
+									We know category is written as file-centric-validation, component-centric-validation, etc
+									We use this to generate the corresponding using folder name = category - validation
+								  */
+								final int index = category.indexOf("validation");
+								if(index > -1)
+								{
+									category = category.substring(0, index-1);
+								}
+								logger.info("category = " + category);
+
+								String sqlResourceFileName = sqlResourcesFolderLocation + RESOURCE_PATH_SEPARATOR + category + RESOURCE_PATH_SEPARATOR + sqlFileName;
+								InputStream sqlInputStream = null;
+								sqlInputStream = assertionResourceManager.readResourceStream(sqlResourceFileName);
+								if (sqlInputStream != null) {
+									final String sqlString = readStream(sqlInputStream);
+									// add test to assertion
+									if(isPreRequisitesSql(sqlFileName)){ //handle pre-requisites.sql
+										addPreRequisiteSqlToAssertion(assertion, sqlString);
+									} else{
+										addSqlTestToAssertion(assertion, sqlString);
+									}
+								} else {
+									String msg = "Failed to find sql file name from source:" + sqlResourceFileName + " for assertion uuid:" + assertion.getUuid();
+									logger.error(msg);
+									throw new IllegalStateException(msg);
+								}
+							}
+							catch (final Exception e) {
+								logger.warn("Error reading sql from input stream. Nested exception is : " + e.getMessage());
+								throw new IllegalStateException("Failed to add sql script test to assertion with uuid:" + assertion.getUuid(), e);
+							}
+						}
+						else{
+							throw new IllegalStateException("Error creating assertion");
+						}
+					}
+
+					// finally print all lookup map contents for debugging - //todo save somewhere?
+				logger.debug("lookupMap = " + lookupMap);
+				}
+				else{
+					logger.error("There are no script elements to import in the XML file provided. Please note that the " +
+							"XML file should contain element named script");
+				}
 			}
-			final XPathFactory factory = XPathFactory.instance();
-			final XPathExpression<Element> expression = factory.compile("//script", new ElementFilter("script"));
-			return expression.evaluate(xmlDocument);
+			else{
+				logger.warn("Error generating document from xml file passed : " + manifestInputStream);
+			}
 		}
 
-
-		private void createAssertionAndTest(Element element, String sqlFileDir) {
-			Assertion assertion = createAssertionFromElement(element);
-			// Persist assertion
-			assertionService.create(assertion);
-			// Add SQL tests to assertion
-			try {
-				addSqlTestsToAssertion(assertion, element, sqlFileDir);
-			} catch (Exception e) {
-				String errorMsg = "Failed to add sql script test to assertion with uuid:" + assertion.getUuid();
-				logger.error(errorMsg, e);
-				throw new IllegalStateException(errorMsg, e);
+	/**
+	 * Imports assertions from the given manifest file input stream. The manifest file should be an XML file
+	 * containing a list of assertions to import. Each assertion should contain a list of SQL scripts to execute
+	 * to populate the assertion tests.
+	 * @param manifestInputStream the manifest file input stream
+	 * @param sqlFileDir the directory containing the SQL files
+	 * @throws IOException if there is an error reading the manifest file
+	 */
+	public void importAssertionsFromManifest(final InputStream manifestInputStream, final String sqlFileDir) throws IOException {
+		final List<Element> scriptElements = getScriptElements(manifestInputStream);
+		if (scriptElements.isEmpty()) {
+			logger.warn("There are no script elements to import in the XML file provided. Please note that the " +
+					"XML file should contain element named script");
+		} else {
+			// Create Assertions and tests from script elements
+			for (final Element element : scriptElements) {
+				createAssertionAndTest(element, sqlFileDir);
 			}
 		}
+	}
 
-		private void addSqlTestsToAssertion(Assertion assertion, Element element, String sqlFileDir) throws IOException {
-			assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
-			// get Sql file name from element and use it to add SQL test
-			final String sqlFileName = element.getAttributeValue("sqlFile");
-			logger.debug("sqlFileName = " + sqlFileName);
-			String category = element.getAttributeValue("category");
-			// Category is written as file-centric-validation, component-centric-validation, etc.
-			// Use this to generate the corresponding using folder name = category - validation
-			final int index = category.indexOf("validation");
-			if (index > -1) {
-				category = category.substring(0, index-1);
-			}
-			logger.debug("category = {} ", category);
-			String sqlFullFilename = sqlFileDir + RESOURCE_PATH_SEPARATOR + category + RESOURCE_PATH_SEPARATOR + sqlFileName;
-			InputStream sqlInputStream = assertionResourceManager.readResourceStream(sqlFullFilename);
-			if (sqlInputStream == null) {
-				String msg = "Failed to find sql file name from source:" + sqlFullFilename + " for assertion uuid:" + assertion.getUuid();
-				logger.error(msg);
-				throw new IllegalStateException(msg);
-			}
-			final String sqlString = IOUtils.toString(sqlInputStream, UTF_8);
-			// add test to assertion
-			addSqlTestToAssertion(assertion, sqlString);
+	List<Element> getScriptElements(InputStream manifestInputStream) throws IOException {
+		// Get JDOM document from given manifest file input stream
+		final Document xmlDocument;
+		try {
+			final SAXBuilder sax = new SAXBuilder();
+			xmlDocument = sax.build(manifestInputStream);
+		} catch (JDOMException e) {
+			throw new IOException("Failed to parse manifest file.", e);
 		}
+		final XPathFactory factory = XPathFactory.instance();
+		final XPathExpression<Element> expression = factory.compile("//script", new ElementFilter("script"));
+		return expression.evaluate(xmlDocument);
+	}
 
-		private Assertion createAssertionFromElement(final Element element){
+
+	private void createAssertionAndTest(Element element, String sqlFileDir) {
+		Assertion assertion = createAssertionFromElement(element);
+		// Persist assertion
+		assertionService.create(assertion);
+		// Add SQL tests to assertion
+		try {
+			addSqlTestsToAssertion(assertion, element, sqlFileDir);
+		} catch (Exception e) {
+			String errorMsg = "Failed to add sql script test to assertion with uuid:" + assertion.getUuid();
+			logger.error(errorMsg, e);
+			throw new IllegalStateException(errorMsg, e);
+		}
+	}
+
+	private void addSqlTestsToAssertion(Assertion assertion, Element element, String sqlFileDir) throws IOException {
+		assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
+		// get Sql file name from element and use it to add SQL test
+		final String sqlFileName = element.getAttributeValue("sqlFile");
+		logger.debug("sqlFileName = " + sqlFileName);
+		String category = element.getAttributeValue("category");
+		// Category is written as file-centric-validation, component-centric-validation, etc.
+		// Use this to generate the corresponding using folder name = category - validation
+		final int index = category.indexOf("validation");
+		if (index > -1) {
+			category = category.substring(0, index-1);
+		}
+		logger.debug("category = {} ", category);
+		String sqlFullFilename = sqlFileDir + RESOURCE_PATH_SEPARATOR + category + RESOURCE_PATH_SEPARATOR + sqlFileName;
+		InputStream sqlInputStream = assertionResourceManager.readResourceStream(sqlFullFilename);
+		if (sqlInputStream == null) {
+			String msg = "Failed to find sql file name from source:" + sqlFullFilename + " for assertion uuid:" + assertion.getUuid();
+			logger.error(msg);
+			throw new IllegalStateException(msg);
+		}
+		final String sqlString = IOUtils.toString(sqlInputStream, UTF_8);
+		// add test to assertion
+		addSqlTestToAssertion(assertion, sqlString);
+	}
+
+	private boolean isPreRequisitesSql(String sqlFileName){
+		return sqlFileName.equalsIgnoreCase("pre-requisites.sql");
+	}
+
+	private Assertion createAssertionFromElement(final Element element){
+
 			final String category = element.getAttributeValue("category");
 			final String uuid = element.getAttributeValue("uuid");
 			final String text = element.getAttributeValue("text");
@@ -209,6 +309,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			tests.add(test);
 			logger.debug("Adding tests for assertion id {}", assertion.getAssertionId());
 			assertionService.addTests(assertion, tests);
+		}
+
+		protected void addPreRequisiteSqlToAssertion(final Assertion assertion, String preRequisiteSql)
+				throws RuntimeException {
+			MySqlQueryTransformer mySqlQueryTransformer = new MySqlQueryTransformer();
+			final List<String> sqlStatements = mySqlQueryTransformer.transformToStatements(preRequisiteSql);
+			uploadTest(assertion, preRequisiteSql, sqlStatements);
 		}
 
 		private Map<String, String> getRvfSchemaMapping(String ratSchema){
