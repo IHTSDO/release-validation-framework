@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.core.service.util;
 
 import com.facebook.presto.sql.parser.StatementSplitter;
 import com.google.common.collect.ImmutableSet;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.importer.AssertionGroupImporter;
 import org.slf4j.Logger;
@@ -28,6 +29,9 @@ public class MySqlQueryTransformer {
     public List<String> transformSql(String[] parts, MysqlExecutionConfig config, final Map<String, String> configMap) throws ConfigurationException {
         List<String> result = new ArrayList<>();
         String prospectiveSchema = config.getProspectiveVersion();
+        if (prospectiveSchema == null) {
+            throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + prospectiveSchema);
+        }
         final String[] nameParts = config.getProspectiveVersion().split("_");
         String moduleId = (nameParts.length >= 2 ? AssertionGroupImporter.ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
         String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
@@ -36,10 +40,6 @@ public class MySqlQueryTransformer {
         String dependencyReleaseSchema = config.getExtensionDependencyVersion();
 
         //We need both these schemas to exist
-        if (prospectiveSchema == null) {
-            throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + prospectiveSchema);
-        }
-
         if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
             throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + previousReleaseSchema);
         }
@@ -83,7 +83,7 @@ public class MySqlQueryTransformer {
      * @param sqlFileContent
      * @return
      */
-    public List<String> transformToStatements(String sqlFileContent){
+    public List<String> transformToStatements(String sqlFileContent) throws BusinessServiceException {
         String delimiter = DEFAULT_DELIMITER;
         List<String> result = new ArrayList<>();
         String[] sqlChunks = sqlFileContent.trim().split(DELIMITER_REGEX_PATTERN, Pattern.MULTILINE);
@@ -98,7 +98,9 @@ public class MySqlQueryTransformer {
                     logger.debug("Executing pre-requisite SQL: " + sqlChunk);
                     final StatementSplitter splitter = new StatementSplitter(sqlChunk, ImmutableSet.of(delimiter));
                     if (splitter.getCompleteStatements() == null || splitter.getCompleteStatements().isEmpty()) {
-                        logger.warn(String.format("SQL statements not ending with %s %s",delimiter, sqlChunk) );
+                        String errorMsg = String.format("SQL statements not ending with %s %s",delimiter, sqlChunk);
+                        logger.error( errorMsg);
+                        throw new BusinessServiceException(errorMsg);
                     }
                     result= splitter.getCompleteStatements().stream().map(s -> s.statement()).collect(Collectors.toList());
 

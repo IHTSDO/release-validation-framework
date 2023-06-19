@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.importer;
 import com.facebook.presto.sql.parser.StatementSplitter;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.ExecutionCommand;
 import org.ihtsdo.rvf.core.data.model.Test;
@@ -296,7 +297,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			uploadTest(assertion, sql, statements);
 		}
 
-		private void uploadTest (Assertion assertion, String originalSql, List<String> sqlStatements) {
+	protected void addPreRequisiteSqlToAssertion(final Assertion assertion, String preRequisiteSql)
+			throws RuntimeException {
+		MySqlQueryTransformer mySqlQueryTransformer = new MySqlQueryTransformer();
+		final List<String> sqlStatements = mySqlQueryTransformer.transformToStatements(preRequisiteSql);
+		uploadTest(assertion, preRequisiteSql, sqlStatements);
+	}
+
+	private void uploadTest (Assertion assertion, String originalSql, List<String> sqlStatements) {
 			final ExecutionCommand command = new ExecutionCommand();
 			command.setTemplate(originalSql);
 			command.setStatements(sqlStatements);
@@ -309,13 +317,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			tests.add(test);
 			logger.debug("Adding tests for assertion id {}", assertion.getAssertionId());
 			assertionService.addTests(assertion, tests);
-		}
-
-		protected void addPreRequisiteSqlToAssertion(final Assertion assertion, String preRequisiteSql)
-				throws RuntimeException {
-			MySqlQueryTransformer mySqlQueryTransformer = new MySqlQueryTransformer();
-			final List<String> sqlStatements = mySqlQueryTransformer.transformToStatements(preRequisiteSql);
-			uploadTest(assertion, preRequisiteSql, sqlStatements);
 		}
 
 		private Map<String, String> getRvfSchemaMapping(String ratSchema){
