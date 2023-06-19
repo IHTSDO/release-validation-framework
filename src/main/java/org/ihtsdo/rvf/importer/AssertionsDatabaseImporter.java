@@ -4,6 +4,7 @@ import com.facebook.presto.sql.parser.StatementSplitter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.service.util.MySqlQueryTransformer;
@@ -253,8 +254,7 @@ import java.util.*;
 		}
 
 
-		protected void addPreRequisiteSqlToAssertion(final Assertion assertion, String preRequisiteSql)
-				throws RuntimeException {
+		protected void addPreRequisiteSqlToAssertion(final Assertion assertion, String preRequisiteSql) throws BusinessServiceException {
 			MySqlQueryTransformer mySqlQueryTransformer = new MySqlQueryTransformer();
 			final List<String> sqlStatements = mySqlQueryTransformer.transformToStatements(preRequisiteSql);
 			uploadTest(assertion, preRequisiteSql, sqlStatements);
