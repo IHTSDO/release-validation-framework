@@ -4,6 +4,7 @@ trigger:
   branches:
     include:
       - 'groups-api-fix'
+      - 'support-stored-proc-file'
 pool:
   vmImage: 'ubuntu-latest'
 
