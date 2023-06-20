@@ -132,7 +132,7 @@ public class MySqlQueryTransformerTest {
                 "\tunion\n" +
                 "        select referencedcomponentid, <ASSERTIONUUID> from <PROSPECTIVE>.simplerefset_<DELTA>\n" +
                 "\tunion\n" +
-                "        select referencedcomponentid from <PROSPECTIVE>.simplemaprefset_<DELTA>\n" +
+                "        select referencedcomponentid from <PROSPECTIVE>.simplemaprefset_<DELTA> and RLIKE Binary '[[:<:]]hexachlorophene[[:>:]]'\n" +
                 "    )";
         String[] sqlParts = {sql};
         String testAssertionId = "xyz";
@@ -143,11 +143,13 @@ public class MySqlQueryTransformerTest {
                 "<ASSERTIONUUID>", String.valueOf(testAssertionId));
         List<String> result = queryTransformer.transformSql(sqlParts,config, configMap);
         assertEquals(1,result.size());
-        assertFalse(result.get(0).contains("<PROSPECTIVE>"));
-        assertFalse(result.get(0).contains("<ASSERTIONUUID>"));
+        assertTrue(!result.get(0).contains("<PROSPECTIVE>"));
+        assertTrue(!result.get(0).contains("<ASSERTIONUUID>"));
         assertTrue(result.get(0).contains("rvf_au_20221231_230619110027.description_d"));
+        assertTrue(result.get(0).contains("'\\bhexachlorophene\\b'"));
         assertTrue(result.get(0).contains(testAssertionId));
     }
+
 
     @Test
     public void transformSqlMissingConfig() {
