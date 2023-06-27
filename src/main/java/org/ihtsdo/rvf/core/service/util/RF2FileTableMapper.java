@@ -11,6 +11,7 @@ public class RF2FileTableMapper {
 	private static final String STATED_RELATIONSHIP_FILE_HEADER = "sct2_StatedRelationship_";
 	private static final String SIMPLE_FILE_HEADER = "der2_Refset_.*Simple";
 	private static final String SIMPLE_MAP_FILE_HEADER = "der2_sRefset_.*SimpleMap";
+	private static final String INTEGER_SIMPLE_MAP_FILE_HEADER = "der2_iRefset_.*SimpleMap";
 	private static final String RELATIONSHIP_FILE_HEADER = "sct2_Relationship_";
 	private static final String RELATIONSHIP_CONCRETE_VALUES_FILE_HEADER = "sct2_RelationshipConcreteValues";
 	private static final String LANGUAGE_FILE_HEADER = "der2_cRefset_.*Language";
@@ -67,6 +68,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(ATTRIBUTE_VALUE_MAP_FILE_HEADER + DELTA, "attributevaluemap_d");
 		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + DELTA, "extendedassociation_d");
 		tableNameMap.put(IDENTIFIER_FILE_HEADER + DELTA, "identifier_d");
+		tableNameMap.put(INTEGER_SIMPLE_MAP_FILE_HEADER + DELTA, "isimplemaprefset_d");
 
 		//Full
 		tableNameMap.put(CONCEPT_FILE_HEADER + FULL, "concept_f");
@@ -95,6 +97,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(ATTRIBUTE_VALUE_MAP_FILE_HEADER + FULL, "attributevaluemap_f");
 		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + FULL, "extendedassociation_f");
 		tableNameMap.put(IDENTIFIER_FILE_HEADER + FULL, "identifier_f");
+		tableNameMap.put(INTEGER_SIMPLE_MAP_FILE_HEADER + FULL, "isimplemaprefset_f");
 		
 		//Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
@@ -123,6 +126,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(ATTRIBUTE_VALUE_MAP_FILE_HEADER + SNAPSHOT, "attributevaluemap_s");
 		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + SNAPSHOT, "extendedassociation_s");
 		tableNameMap.put(IDENTIFIER_FILE_HEADER + SNAPSHOT, "identifier_s");
+		tableNameMap.put(INTEGER_SIMPLE_MAP_FILE_HEADER + SNAPSHOT, "isimplemaprefset_s");
 	}
 	
 	public static String getLegacyTableName(final String filename) {
