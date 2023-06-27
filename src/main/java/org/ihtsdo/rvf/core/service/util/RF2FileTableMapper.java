@@ -34,6 +34,8 @@ public class RF2FileTableMapper {
 	private static final String ATTRIBUTE_VALUE_MAP_FILE_HEADER = "der2_csRefset_.*AttributeValueMap";
 	private static final String EXTENDED_ASSOCIATION_FILE_HEADER = "der2_ccRefset_.*ExtendedAssociation";
 	private static final String IDENTIFIER_FILE_HEADER = "sct2_Identifier_";
+	private static final String CCS_REFSET_FILE_HEADER = "der2_ccsRefset_";
+	private static final String CCI_REFSET_FILE_HEADER = "der2_cciRefset_";
 
 	private static final Map<String,String> tableNameMap = new HashMap<>();
 	private static final String DELTA = ".*Delta.*_*_\\d{8}.txt";
@@ -69,6 +71,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + DELTA, "extendedassociation_d");
 		tableNameMap.put(IDENTIFIER_FILE_HEADER + DELTA, "identifier_d");
 		tableNameMap.put(INTEGER_SIMPLE_MAP_FILE_HEADER + DELTA, "isimplemaprefset_d");
+		tableNameMap.put(CCS_REFSET_FILE_HEADER + DELTA, "ccsrefset_d");
+		tableNameMap.put(CCI_REFSET_FILE_HEADER + DELTA, "ccirefset_d");
 
 		//Full
 		tableNameMap.put(CONCEPT_FILE_HEADER + FULL, "concept_f");
@@ -98,6 +102,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + FULL, "extendedassociation_f");
 		tableNameMap.put(IDENTIFIER_FILE_HEADER + FULL, "identifier_f");
 		tableNameMap.put(INTEGER_SIMPLE_MAP_FILE_HEADER + FULL, "isimplemaprefset_f");
+		tableNameMap.put(CCS_REFSET_FILE_HEADER + FULL, "ccsrefset_f");
+		tableNameMap.put(CCI_REFSET_FILE_HEADER + FULL, "ccirefset_f");
 		
 		//Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
@@ -127,6 +133,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + SNAPSHOT, "extendedassociation_s");
 		tableNameMap.put(IDENTIFIER_FILE_HEADER + SNAPSHOT, "identifier_s");
 		tableNameMap.put(INTEGER_SIMPLE_MAP_FILE_HEADER + SNAPSHOT, "isimplemaprefset_s");
+		tableNameMap.put(CCS_REFSET_FILE_HEADER + SNAPSHOT, "ccsrefset_s");
+		tableNameMap.put(CCI_REFSET_FILE_HEADER + SNAPSHOT, "ccirefset_s");
 	}
 	
 	public static String getLegacyTableName(final String filename) {
