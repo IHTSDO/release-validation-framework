@@ -30,6 +30,10 @@ public class RF2FileTableMapper {
 	private static final String MRCM_ATRRIBUTE_RANGE_FILE_HEADER = "der2_ssccRefset_.*MRCMAttributeRange";
 	private static final String MRCM_DOMAIN_FILE_HEADER = "der2_sssssssRefset_.*MRCMDomain";
 	private static final String DESCRIPTION_TYPE_FILE_HEADER = "der2_ciRefset_.*DescriptionType";
+	private static final String ATTRIBUTE_VALUE_MAP_FILE_HEADER = "der2_csRefset_.*AttributeValueMap";
+	private static final String EXTENDED_ASSOCIATION_FILE_HEADER = "der2_ccRefset_.*ExtendedAssociation";
+	private static final String IDENTIFIER_FILE_HEADER = "sct2_Identifier_";
+
 	private static final Map<String,String> tableNameMap = new HashMap<>();
 	private static final String DELTA = ".*Delta.*_*_\\d{8}.txt";
 	private static final String SNAPSHOT = ".*Snapshot.*_*_\\d{8}.txt";
@@ -60,7 +64,10 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + DELTA, "mrcmattributerangerefset_d");
 		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + DELTA, "mrcmdomainrefset_d");
 		tableNameMap.put(DESCRIPTION_TYPE_FILE_HEADER + DELTA, "descriptiontyperefset_d");
-		
+		tableNameMap.put(ATTRIBUTE_VALUE_MAP_FILE_HEADER + DELTA, "attributevaluemap_d");
+		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + DELTA, "extendedassociation_d");
+		tableNameMap.put(IDENTIFIER_FILE_HEADER + DELTA, "identifier_d");
+
 		//Full
 		tableNameMap.put(CONCEPT_FILE_HEADER + FULL, "concept_f");
 		tableNameMap.put(DESCRIPTION_FILE_HEADER + FULL, "description_f");
@@ -85,6 +92,9 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + FULL, "mrcmattributerangerefset_f");
 		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + FULL, "mrcmdomainrefset_f");
 		tableNameMap.put(DESCRIPTION_TYPE_FILE_HEADER + FULL, "descriptiontyperefset_f");
+		tableNameMap.put(ATTRIBUTE_VALUE_MAP_FILE_HEADER + FULL, "attributevaluemap_f");
+		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + FULL, "extendedassociation_f");
+		tableNameMap.put(IDENTIFIER_FILE_HEADER + FULL, "identifier_f");
 		
 		//Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
@@ -110,6 +120,9 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_ATRRIBUTE_RANGE_FILE_HEADER + SNAPSHOT, "mrcmattributerangerefset_s");
 		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + SNAPSHOT, "mrcmdomainrefset_s");
 		tableNameMap.put(DESCRIPTION_TYPE_FILE_HEADER + SNAPSHOT, "descriptiontyperefset_s");
+		tableNameMap.put(ATTRIBUTE_VALUE_MAP_FILE_HEADER + SNAPSHOT, "attributevaluemap_s");
+		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + SNAPSHOT, "extendedassociation_s");
+		tableNameMap.put(IDENTIFIER_FILE_HEADER + SNAPSHOT, "identifier_s");
 	}
 	
 	public static String getLegacyTableName(final String filename) {
