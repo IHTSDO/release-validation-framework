@@ -526,6 +526,23 @@ create table ccirefset_f(
     key idx_value(value)
 ) engine=myisam default charset=utf8;
 
+drop table if exists crefset_f;
+create table crefset_f(
+                          id varchar(36) not null,
+                          effectivetime char(8) not null,
+                          active char(1) not null,
+                          moduleid bigint(20) not null,
+                          refsetid bigint(20) not null,
+                          referencedcomponentid bigint(20) not null,
+                          componentid bigint(20) not null,
+                          key idx_id(id),
+                          key idx_effectivetime(effectivetime),
+                          key idx_active(active),
+                          key idx_moduleid(moduleid),
+                          key idx_refsetid(refsetid),
+                          key idx_referencedcomponentid(referencedcomponentid),
+                          key idx_componentid(componentid)
+) engine=myisam default charset=utf8;
 
 /* create the Snapshot S-CT data tables */
 
@@ -1052,6 +1069,24 @@ create table ccirefset_s(
                             key idx_componentid1(componentid1),
                             key idx_componentid2(componentid2),
                             key idx_value(value)
+) engine=myisam default charset=utf8;
+
+drop table if exists crefset_s;
+create table crefset_s(
+                          id varchar(36) not null,
+                          effectivetime char(8) not null,
+                          active char(1) not null,
+                          moduleid bigint(20) not null,
+                          refsetid bigint(20) not null,
+                          referencedcomponentid bigint(20) not null,
+                          componentid bigint(20) not null,
+                          key idx_id(id),
+                          key idx_effectivetime(effectivetime),
+                          key idx_active(active),
+                          key idx_moduleid(moduleid),
+                          key idx_refsetid(refsetid),
+                          key idx_referencedcomponentid(referencedcomponentid),
+                          key idx_componentid(componentid)
 ) engine=myisam default charset=utf8;
 
 /* create the Delta S-CT data tables */
@@ -1789,4 +1824,22 @@ create table ccirefset_d(
                             key idx_componentid1(componentid1),
                             key idx_componentid2(componentid2),
                             key idx_value(value)
+) engine=myisam default charset=utf8;
+
+drop table if exists crefset_d;
+create table crefset_d(
+                            id varchar(36) not null,
+                            effectivetime char(8) not null,
+                            active char(1) not null,
+                            moduleid bigint(20) not null,
+                            refsetid bigint(20) not null,
+                            referencedcomponentid bigint(20) not null,
+                            componentid bigint(20) not null,
+                            key idx_id(id),
+                            key idx_effectivetime(effectivetime),
+                            key idx_active(active),
+                            key idx_moduleid(moduleid),
+                            key idx_refsetid(refsetid),
+                            key idx_referencedcomponentid(referencedcomponentid),
+                            key idx_componentid(componentid)
 ) engine=myisam default charset=utf8;

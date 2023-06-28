@@ -36,6 +36,7 @@ public class RF2FileTableMapper {
 	private static final String IDENTIFIER_FILE_HEADER = "sct2_Identifier_";
 	private static final String CCS_REFSET_FILE_HEADER = "der2_ccsRefset_";
 	private static final String CCI_REFSET_FILE_HEADER = "der2_cciRefset_";
+	private static final String C_REFSET_FILE_HEADER = "der2_cRefset_";
 
 	private static final Map<String,String> tableNameMap = new HashMap<>();
 	private static final String DELTA = ".*Delta.*_*_\\d{8}.txt";
@@ -73,6 +74,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(INTEGER_SIMPLE_MAP_FILE_HEADER + DELTA, "isimplemaprefset_d");
 		tableNameMap.put(CCS_REFSET_FILE_HEADER + DELTA, "ccsrefset_d");
 		tableNameMap.put(CCI_REFSET_FILE_HEADER + DELTA, "ccirefset_d");
+		tableNameMap.put(C_REFSET_FILE_HEADER + DELTA, "crefset_d");
 
 		//Full
 		tableNameMap.put(CONCEPT_FILE_HEADER + FULL, "concept_f");
@@ -104,7 +106,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(INTEGER_SIMPLE_MAP_FILE_HEADER + FULL, "isimplemaprefset_f");
 		tableNameMap.put(CCS_REFSET_FILE_HEADER + FULL, "ccsrefset_f");
 		tableNameMap.put(CCI_REFSET_FILE_HEADER + FULL, "ccirefset_f");
-		
+		tableNameMap.put(C_REFSET_FILE_HEADER + FULL, "crefset_f");
+
 		//Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
 		tableNameMap.put(DESCRIPTION_FILE_HEADER + SNAPSHOT, "description_s");
@@ -135,6 +138,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(INTEGER_SIMPLE_MAP_FILE_HEADER + SNAPSHOT, "isimplemaprefset_s");
 		tableNameMap.put(CCS_REFSET_FILE_HEADER + SNAPSHOT, "ccsrefset_s");
 		tableNameMap.put(CCI_REFSET_FILE_HEADER + SNAPSHOT, "ccirefset_s");
+		tableNameMap.put(C_REFSET_FILE_HEADER + SNAPSHOT, "crefset_s");
 	}
 	
 	public static String getLegacyTableName(final String filename) {
