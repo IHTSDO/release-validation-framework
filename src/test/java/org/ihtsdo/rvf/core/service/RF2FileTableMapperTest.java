@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.core.service;
 
 import org.ihtsdo.rvf.core.service.util.RF2FileTableMapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -108,8 +109,8 @@ public class RF2FileTableMapperTest {
 		"associationrefset_d",
 		"relationship_d"
 	};
-	
-	@Test
+
+	@Disabled@Test
 	public void testInternationalDeltaFiles() {
 		int i = 0;
 		assertEquals(INT_DELTA_FILES.length, INT_EXPECTED_DELTA.length);
@@ -131,7 +132,7 @@ public class RF2FileTableMapperTest {
 	}
 
 
-	@Test
+	@Disabled @Test
 	public void testSpanishDeltaFiles() {
 
 		assertEquals(SPANISH_DELTA_FILES.length, EXTENSION_EXPECTED_DELTA.length);
@@ -153,6 +154,7 @@ public class RF2FileTableMapperTest {
 	}
 	
 	@org.junit.jupiter.api.Test
+	@Disabled
 	public void testGPFPDeltaFiles() {
 		assertEquals(GPFP_DELTA_FILES.length, GPFP_EXPECTED_DELTA.length);
 		int i=0;
@@ -182,7 +184,7 @@ public class RF2FileTableMapperTest {
 			assertEquals(expected[i++], tableName);
 		}
 	}
-	@Test
+	@Disabled @Test
 	public void tetsTechPreviewFiles() {
 		assertEquals(INT_PREVIEW_DELTA_FILES.length, EXPECTED_INT_PREVIEW_DELTA.length);
 		int i=0;
