@@ -220,7 +220,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			else {
 				if (sqlStatement.startsWith("create table")){
 					// only add engine if we do not create using a like statement
-					if (!(sqlStatement.contains("like") || sqlStatement.contains("as"))) {
+					if (!sqlStatement.toUpperCase().contains(" ENGINE") && !(sqlStatement.contains("like") || sqlStatement.contains("as"))) {
 						sqlStatement = sqlStatement + " ENGINE = MyISAM";
 					}
 				}
