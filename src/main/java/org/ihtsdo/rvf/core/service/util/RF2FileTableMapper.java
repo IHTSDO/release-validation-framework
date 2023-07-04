@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.core.service.util;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -38,7 +38,7 @@ public class RF2FileTableMapper {
 	private static final String CCI_REFSET_FILE_HEADER = "der2_cciRefset_";
 	private static final String C_REFSET_FILE_HEADER = "der2_cRefset_";
 
-	private static final Map<String,String> tableNameMap = new HashMap<>();
+	private static final Map<String,String> tableNameMap = new LinkedHashMap<>();
 	private static final String DELTA = ".*Delta.*_*_\\d{8}.txt";
 	private static final String SNAPSHOT = ".*Snapshot.*_*_\\d{8}.txt";
 	private static final String FULL = ".*Full.*_*_\\d{8}.txt";
