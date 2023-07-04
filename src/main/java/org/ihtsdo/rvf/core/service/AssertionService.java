@@ -52,6 +52,7 @@ public interface AssertionService {
 	AssertionGroup getAssertionGroupByName(String groupName);
 
 	List<AssertionGroup> getAssertionGroupsByNames(List<String> groupNames);
+
 	List<AssertionGroup> getAllAssertionGroups();
 
 	Assertion getAssertionByUuid(UUID assertionUUID);
