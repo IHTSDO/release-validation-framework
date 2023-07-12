@@ -43,7 +43,7 @@
         <mybatis.version>3.5.6</mybatis.version>
         <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
         <mysql.version>5.1.46</mysql.version>
-        <otf.common.version>5.8.0</otf.common.version>
+        <otf.common.version>5.13.0-SNAPSHOT</otf.common.version>
         <presto-parser.version>0.83</presto-parser.version>
         <slf4j.version>1.7.30</slf4j.version>
         <snomed-boot.version>4.0.4</snomed-boot.version>
