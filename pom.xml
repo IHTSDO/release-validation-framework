@@ -47,8 +47,7 @@
         <presto-parser.version>0.83</presto-parser.version>
         <slf4j.version>1.7.30</slf4j.version>
         <snomed-boot.version>4.0.4</snomed-boot.version>
-        <snomed-drools.version>3.3.0</snomed-drools.version>
-        <snomed-drools.version>3.3.0</snomed-drools.version>
+        <snomed-drools.version>3.4.0-SNAPSHOT</snomed-drools.version>
         <snomed.utilities.version>1.5.0</snomed.utilities.version>
         <spring-cloud-auto-config-version>2.2.6.RELEASE</spring-cloud-auto-config-version>
         <spring-consul.version>3.1.1</spring-consul.version>
