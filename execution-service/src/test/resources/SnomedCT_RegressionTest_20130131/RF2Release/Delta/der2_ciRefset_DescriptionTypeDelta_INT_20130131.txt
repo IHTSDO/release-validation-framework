@@ -1,2 +1,0 @@
-id	effectiveTime	active	moduleId	refsetId	referencedComponentId	descriptionFormat	descriptionLength
-807f775b-1d66-5069-b58e-a37ace985dcf	20140131	1	900000000000207008	900000000000538005	900000000000550004	900000000000540000	4096

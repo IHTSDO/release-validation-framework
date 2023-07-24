@@ -1,9 +1,9 @@
-FROM maven:3.3-jdk-8 AS builder
+FROM maven:3.6.3-openjdk-11 AS builder
 COPY . /usr/src/app
 WORKDIR /usr/src/app
-RUN mvn clean install -DskipTests=true 
+RUN mvn clean install -DskipTests=true
 
-FROM openjdk:8-jdk-alpine
+FROM adoptopenjdk/openjdk11:alpine
 LABEL maintainer="SNOMED International <tooling@snomed.org>"
 
 ARG SUID=1042
@@ -11,31 +11,24 @@ ARG SGID=1042
 
 VOLUME /tmp
 
-RUN apk update 
+RUN apk update
 RUN apk add git
 
 # Create a working directory
 RUN mkdir /app
 WORKDIR /app
 
-# Add in the necessary config files to be able to run the rvf
-RUN mkdir /config
-WORKDIR /app/config
-ADD config/data-service.properties data-service.properties 
-
-WORKDIR /app/config
-ADD config/execution-service.properties execution-service.properties
-
-WORKDIR /app
-
 # Clone in the drools rules needed
 RUN git clone https://github.com/IHTSDO/snomed-drools-rules.git
+
+# Clone validation assertions
+RUN git clone https://github.com/IHTSDO/snomed-release-validation-assertions.git
 
 RUN mkdir /app/store
 RUN mkdir /app/store/releases
 
 # Copy necessary files
-COPY --from=builder /usr/src/app/api/target/api*.jar api.jar
+COPY --from=builder /usr/src/app/target/release-validation-framework*.jar rvf-api.jar
 
 # Create the rvf user
 RUN addgroup -g $SGID rvf && \
@@ -47,4 +40,4 @@ RUN chown -R rvf:rvf /app
 # Run as the rvf user.
 USER rvf
 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","api.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","rvf-api.jar"]
