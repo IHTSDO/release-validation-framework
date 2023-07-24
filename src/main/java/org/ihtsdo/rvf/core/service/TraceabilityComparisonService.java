@@ -335,6 +335,11 @@ public class TraceabilityComparisonService {
 					}
 					memberIdToRefsetIdMap.put(id, refsetId);
 				}
+
+				@Override
+				public void newIdentifierState(String alternateIdentifier, String effectiveTime, String active, String moduleId, String identifierSchemeId, String referencedComponentId) {
+
+				}
 			};
 
 			if (rf2DeltaOnly) {
