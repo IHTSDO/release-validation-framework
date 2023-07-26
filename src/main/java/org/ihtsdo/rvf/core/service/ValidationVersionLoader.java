@@ -199,6 +199,7 @@ public class ValidationVersionLoader {
 			executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
 		}
 
+		executionConfig.setDefaultModuleId(validationConfig.getDefaultModuleId());
 		List<String> includedModules = new ArrayList<>();
 		if (validationConfig.getIncludedModules() != null) {
 			includedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).collect(Collectors.toList()));

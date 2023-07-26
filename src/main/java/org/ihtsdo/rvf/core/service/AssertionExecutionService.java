@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -232,7 +233,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String defaultCatalog = dataSource.getDefaultCatalog();
 		String prospectiveSchema = config.getProspectiveVersion();
 		final String[] nameParts = config.getProspectiveVersion().split("_");
-		String moduleId = (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
+		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
 		String includedModules = config.getIncludedModules().stream().collect(Collectors.joining(","));
 		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
 
@@ -260,7 +261,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			// replace all substitutions for exec
 			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
 			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
-			part = part.replaceAll("<MODULEID>", moduleId);
+			part = part.replaceAll("<MODULEID>", defaultModuleId);
 			part = part.replaceAll("<MODULEIDS>", includedModules);
 			part = part.replaceAll("<VERSION>", version);
 			// watch out for any 's that users might have introduced

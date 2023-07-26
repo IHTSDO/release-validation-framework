@@ -44,6 +44,8 @@ public class TestUploadFileController {
 	private static final String ENABLE_TRACEABILITY_VALIDATION = "enableTraceabilityValidation";
 	private static final String ENABLE_CHANGE_NOT_AT_TASK_LEVEL_VALIDATION = "enableChangeNotAtTaskLevelValidation";
 
+	private static final String DEFAULT_MODULE_ID = "defaultModuleId";
+
 	private static final String INCLUDED_MODULES = "includedModules";
 
 	private static final String RELEASE_AS_AN_EDITION = "releaseAsAnEdition";
@@ -191,8 +193,8 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
 			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
 			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
-			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
-			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			@ApiParam(value = "Default module ID of components in the MS extension") @RequestParam(value = DEFAULT_MODULE_ID, required = false) final String defaultModuleId,
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
 			@ApiParam(value = "Enable change not at task level validation. This parameter needs to be combined together with enableTraceabilityValidation.", defaultValue = "false") @RequestParam(value = ENABLE_CHANGE_NOT_AT_TASK_LEVEL_VALIDATION, required = false) final boolean enableChangeNotAtTaskLevelValidation,
@@ -220,6 +222,7 @@ public class TestUploadFileController {
 				.setEnableDrools(enableDrools)
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
+				.setDefaultModuleId(defaultModuleId)
 				.setIncludedModules(includedModules)
 				.addUrl(urlPrefix)
 				.setEnableMRCMValidation(enableMrcmValidation)
@@ -267,14 +270,12 @@ public class TestUploadFileController {
 			@ApiParam(value = "Defaults to 10 when not set", defaultValue = "10") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
 			@ApiParam(value = "The sub folder for validation reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
 			@ApiParam(value = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
-			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") 
-			@RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
+			@ApiParam(value = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
 			@ApiParam(value = "Base timestamp of content branch, used for traceability rebase changes summary report.") @RequestParam(required = false) final Long contentBaseTimestamp,
 			@ApiParam(value = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
-			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") 
-			@RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
-			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") 
-			@RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
+			@ApiParam(value = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
+			@ApiParam(value = "Default module ID of components in the MS extension") @RequestParam(value = DEFAULT_MODULE_ID, required = false) final String defaultModuleId,
+			@ApiParam(value = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@ApiParam(value = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
 			@ApiParam(value = "Enable traceability validation.", defaultValue = "false") @RequestParam(value = ENABLE_TRACEABILITY_VALIDATION, required = false) final boolean enableTraceabilityValidation,
 			@ApiParam(value = "Enable change not at task level validation. This parameter needs to be combined together with enableTraceabilityValidation.", defaultValue = "false") @RequestParam(value = ENABLE_CHANGE_NOT_AT_TASK_LEVEL_VALIDATION, required = false) final boolean enableChangeNotAtTaskLevelValidation,
@@ -304,6 +305,7 @@ public class TestUploadFileController {
 				.setEnableDrools(enableDrools)
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
+				.setDefaultModuleId(defaultModuleId)
 				.setIncludedModules(includedModules)
 				.setEnableMRCMValidation(enableMrcmValidation)
 				.setEnableTraceabilityValidation(enableTraceabilityValidation)
