@@ -153,7 +153,7 @@ public class TestUploadFileController {
 					tempManifestFile = File.createTempFile(originalFilename, ".xml");
 					manifestFile.transferTo(tempManifestFile);
 					final ManifestFile mf = new ManifestFile(tempManifestFile);
-					report = structureTestRunner.execute(resourceManager, writer, writeSucceses, mf);
+					report = structureTestRunner.execute(resourceManager, null, writer, writeSucceses, mf);
 				}
 				// store the report to disk for now with a timestamp
 				if (report.getNumErrors() > 0) {
@@ -388,7 +388,7 @@ public class TestUploadFileController {
 				file.transferTo(tempFile);
 				final ResourceProvider resourceManager = new TextFileResourceProvider(
 						tempFile, filename);
-				final TestReportable report = structureTestRunner.execute(resourceManager, writer, writeSucceses, null);
+				final TestReportable report = structureTestRunner.execute(resourceManager, null, writer, writeSucceses, null);
 				// store the report to disk for now with a timestamp
 				if (report.getNumErrors() > 0) {
 					LOGGER.error("No Errors expected but got " + report.getNumErrors() + " errors");

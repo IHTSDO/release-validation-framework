@@ -92,7 +92,7 @@ public class StructuralTestRunnerTest {
 		ZipFileResourceProvider provider = new ZipFileResourceProvider(getFile(fileName));
 		ManifestFile manifestFile = new ManifestFile(getFile("/manifest_20250731.xml"));
 
-		TestReportable response = validationRunner.execute(provider, new TestWriterDelegate(new StringWriter()), true, manifestFile);
+		TestReportable response = validationRunner.execute(provider, null, new TestWriterDelegate(new StringWriter()), true, manifestFile);
 
 		assertNotNull(response.getResult());
 		assertEquals(54, response.getNumErrors(), "Should only be manifest errors in this");

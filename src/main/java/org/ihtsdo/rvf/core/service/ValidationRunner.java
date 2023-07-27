@@ -211,7 +211,9 @@ public class ValidationRunner {
 
 		boolean isFailed = structuralTestRunner.verifyZipFileStructure(statusReport.getResultReport(), 
 																		validationConfig.getLocalProspectiveFile(),
+																		validationConfig.getLocalPreviousReleaseFile(),
 																		validationConfig.getRunId(),
+																		validationConfig.isRf2DeltaOnly(),
 																		validationConfig.getLocalManifestFile(),
 																		validationConfig.isWriteSuccess(),
 																		validationConfig.getUrl(),

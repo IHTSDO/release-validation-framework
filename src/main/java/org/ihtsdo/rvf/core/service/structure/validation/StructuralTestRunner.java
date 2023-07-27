@@ -1,6 +1,8 @@
 package org.ihtsdo.rvf.core.service.structure.validation;
 
 import org.apache.commons.io.FileUtils;
+import org.ihtsdo.otf.snomedboot.ReleaseImportException;
+import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.rvf.core.data.model.FailureDetail;
 import org.ihtsdo.rvf.core.data.model.TestRunItem;
 import org.ihtsdo.rvf.core.data.model.TestType;
@@ -15,19 +17,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class StructuralTestRunner {
 	
 	private final Logger logger = LoggerFactory.getLogger(StructuralTestRunner.class);
+
+	private static final String FILE_SIZE_TEST_TYPE = "FileSizeTest";
 	
 	protected String reportFolderLocation;
 	
@@ -43,7 +42,7 @@ public class StructuralTestRunner {
 	private ValidationLogFactory validationLogFactory;
 	
 
-	public TestReportable execute(final ResourceProvider resourceManager, final PrintWriter writer, final boolean writeSuccesses,
+	public TestReportable execute(final ResourceProvider prospectiveFileResourceProvider, final ResourceProvider previousFileResourceProvider, final PrintWriter writer, final boolean writeSuccesses,
 								  final ManifestFile manifest) {
 		// the information for the manifest testing
 		long start = System.currentTimeMillis();
@@ -51,12 +50,12 @@ public class StructuralTestRunner {
 		final ValidationLog validationLog = validationLogFactory.getValidationLog(ColumnPatternTester.class);
 		// run manifest tests
 		if ( manifest != null) {
-			runManifestTests(resourceManager, testReport, manifest, validationLogFactory.getValidationLog(ManifestPatternTester.class));
+			runManifestTests(prospectiveFileResourceProvider, testReport, manifest, validationLogFactory.getValidationLog(ManifestPatternTester.class));
 			testReport.addNewLine();
 		}
-		runColumnTests(resourceManager, testReport, validationLog);
-		runLineFeedTests(resourceManager, testReport);
-
+		runColumnTests(prospectiveFileResourceProvider, testReport, validationLog);
+		runLineFeedTests(prospectiveFileResourceProvider, testReport);
+		runFileSizeTest(prospectiveFileResourceProvider, previousFileResourceProvider, testReport);
 		if ( manifest != null) {
 			runRF2FileReleaseTypeTester(testReport, manifest);
 		}
@@ -68,6 +67,51 @@ public class StructuralTestRunner {
 		return testReport;
 	}
 
+	private void runFileSizeTest(ResourceProvider prospectiveFileResourceProvider, ResourceProvider previousFileResourceProvider, StreamTestReport testReport) {
+		if (prospectiveFileResourceProvider != null && previousFileResourceProvider != null) {
+			try {
+				File prospectiveSnapshotDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(prospectiveFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.SNAPSHOT);
+				File prospectiveFullDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(prospectiveFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.FULL);
+				File previousSnapshotDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(previousFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.SNAPSHOT);
+				File previousFullDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(previousFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.FULL);
+				for (File prospectiveFile : prospectiveSnapshotDirectory.listFiles()) {
+					for (File previousFile : previousSnapshotDirectory.listFiles()) {
+						String prospectiveFilename = prospectiveFile.getName();
+						String previousFilename = previousFile.getName();
+
+						if (prospectiveFilename.endsWith(".txt") && previousFilename.endsWith(".txt")
+							&& prospectiveFilename.substring(0, prospectiveFilename.lastIndexOf("_")).equals(previousFilename.substring(0, previousFilename.lastIndexOf("_")))) {
+							if (prospectiveFile.length() < previousFile.length()) {
+								testReport.addError("0-0", new Date(), prospectiveFilename, prospectiveSnapshotDirectory.getPath(), "File Size", FILE_SIZE_TEST_TYPE, "Snapshot files must be equal to or greater in size than previous release", prospectiveFilename + " file size:" + prospectiveFile.length(),
+										previousFilename + " file size:" + previousFile.length(),null);
+							}
+							break;
+						}
+					}
+				}
+				for (File prospectiveFile : prospectiveFullDirectory.listFiles()) {
+					for (File previousFile : previousFullDirectory.listFiles()) {
+						String prospectiveFilename = prospectiveFile.getName();
+						String previousFilename = previousFile.getName();
+
+						if (prospectiveFilename.endsWith(".txt") && previousFilename.endsWith(".txt")
+							&& prospectiveFilename.substring(0, prospectiveFilename.lastIndexOf("_")).equals(previousFilename.substring(0, previousFilename.lastIndexOf("_")))) {
+							if (prospectiveFile.length() < previousFile.length()) {
+								testReport.addError("0-0", new Date(), prospectiveFilename, prospectiveFullDirectory.getPath(), "File Size", FILE_SIZE_TEST_TYPE, "Full files must be equal to or greater in size than previous release", prospectiveFilename + " file size:" + prospectiveFile.length(),
+										previousFilename + " file size:" + previousFile.length(),null);
+							}
+							break;
+						}
+					}
+				}
+			} catch (FileNotFoundException e) {
+				logger.error("File not found", e);
+			}  catch (ReleaseImportException e) {
+				logger.error("Failed to unzip the release files", e);
+			}
+		}
+	}
+
 	private void runLineFeedTests(ResourceProvider resourceManager, StreamTestReport testReport) {
 		
 		final RF2FileStructureTester lineFeedPatternTest = new RF2FileStructureTester(validationLogFactory.getValidationLog(RF2FileStructureTester.class), 
@@ -77,7 +121,7 @@ public class StructuralTestRunner {
 	}
 
 	public TestReportable execute(final ResourceProvider resourceManager, final PrintWriter writer, final boolean writeSuccesses) {
-		return execute(resourceManager, writer, writeSuccesses, null);
+		return execute(resourceManager, null, writer, writeSuccesses, null);
 	}
 
 	private void runManifestTests(final ResourceProvider resourceManager, final TestReportable report,
@@ -98,33 +142,22 @@ public class StructuralTestRunner {
 		columnPatternTest.runTests();
 	}
 	
-	public boolean verifyZipFileStructure(final ValidationReport validationReport, final File tempFile, final Long runId, final File manifestFile,
+	public boolean verifyZipFileStructure(final ValidationReport validationReport, final File prospectiveFile, final File previousReleaseFile, final Long runId, final boolean isRf2DeltaOnly, final File manifestFile,
 										  final boolean writeSucceses, final String urlPrefix, String storageLocation, Integer maxFailuresExport ) throws IOException {
 		boolean isFailed = false;
 		final long timeStart = System.currentTimeMillis();
-		if (tempFile != null) {
-			logger.debug("Start verifying zip file structure of {} against manifest", tempFile.getAbsolutePath());
+		if (prospectiveFile != null) {
+			logger.debug("Start verifying zip file structure of {} against manifest", prospectiveFile.getAbsolutePath());
 		}
 		// convert groups which is passed as string to assertion groups
 		// set up the response in order to stream directly to the response
 		final File structureTestReport = new File(getReportDataFolder(), "structure_validation_"+ runId+".txt");
 		structureTestReportPath = structureTestReport.getAbsolutePath();
 		try (PrintWriter writer = new PrintWriter(structureTestReport)) {
-			final ResourceProvider resourceManager = new ZipFileResourceProvider(tempFile);
+			final ResourceProvider prospectiveFileResourceProvider = new ZipFileResourceProvider(prospectiveFile);
+			final ResourceProvider previousFileResourceProvider = previousReleaseFile != null && !isRf2DeltaOnly ? new ZipFileResourceProvider(previousReleaseFile) : null;
 
-			TestReportable report;
-
-			if (manifestFile == null) {
-				report = execute(resourceManager, writer, writeSucceses,null);
-			} else {
-				File tempManifestFile  = null;
-				try {
-					final ManifestFile mf = new ManifestFile(manifestFile);
-					report = execute(resourceManager, writer, writeSucceses, mf);
-				} finally {
-					FileUtils.deleteQuietly(tempManifestFile);
-				}
-			}
+			TestReportable report = execute(prospectiveFileResourceProvider, previousFileResourceProvider, writer, writeSucceses, manifestFile == null ? null : new ManifestFile(manifestFile));
 			report.getResult();
 			logger.info(report.writeSummary());
 			// verify if manifest is valid
@@ -149,7 +182,7 @@ public class StructuralTestRunner {
 		}
 		final long timeEnd = System.currentTimeMillis();
 		validationReport.addTimeTaken((timeEnd-timeStart)/1000);
-		logger.debug("Finished verifying zip file structure of {} against manifest", tempFile.getName());
+		logger.debug("Finished verifying zip file structure of {} against manifest", prospectiveFile.getName());
 		return isFailed;
 	}
 
