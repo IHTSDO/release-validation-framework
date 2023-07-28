@@ -82,8 +82,9 @@ public class StructuralTestRunner {
 						if (prospectiveFilename.endsWith(".txt") && previousFilename.endsWith(".txt")
 							&& prospectiveFilename.substring(0, prospectiveFilename.lastIndexOf("_")).equals(previousFilename.substring(0, previousFilename.lastIndexOf("_")))) {
 							if (prospectiveFile.length() < previousFile.length()) {
-								testReport.addError("0-0", new Date(), prospectiveFilename, prospectiveSnapshotDirectory.getPath(), "File Size", FILE_SIZE_TEST_TYPE, "Snapshot files must be equal to or greater in size than previous release", prospectiveFilename + " file size:" + prospectiveFile.length(),
-										previousFilename + " file size:" + previousFile.length(),null);
+								testReport.addError("0-0", new Date(), prospectiveFilename, prospectiveSnapshotDirectory.getPath(), "File Size", FILE_SIZE_TEST_TYPE, "Snapshot files must be equal to or greater in size than previous release",
+										"The file " + prospectiveFilename + " (" + (prospectiveFile.length() / 1024) + " KB) is less than previous release file " + previousFilename + " (" + (previousFile.length() / 1024) + " KB)",
+									"The file " + prospectiveFilename + " must be equal to or greater in size than previous release file " + previousFilename,null);
 							}
 							break;
 						}
@@ -97,8 +98,9 @@ public class StructuralTestRunner {
 						if (prospectiveFilename.endsWith(".txt") && previousFilename.endsWith(".txt")
 							&& prospectiveFilename.substring(0, prospectiveFilename.lastIndexOf("_")).equals(previousFilename.substring(0, previousFilename.lastIndexOf("_")))) {
 							if (prospectiveFile.length() < previousFile.length()) {
-								testReport.addError("0-0", new Date(), prospectiveFilename, prospectiveFullDirectory.getPath(), "File Size", FILE_SIZE_TEST_TYPE, "Full files must be equal to or greater in size than previous release", prospectiveFilename + " file size:" + prospectiveFile.length(),
-										previousFilename + " file size:" + previousFile.length(),null);
+								testReport.addError("0-0", new Date(), prospectiveFilename, prospectiveFullDirectory.getPath(), "File Size", FILE_SIZE_TEST_TYPE, "Full files must be equal to or greater in size than previous release",
+											"The file " + prospectiveFilename + " (" + (prospectiveFile.length() / 1024) + " KB) is less than previous release file " + previousFilename + " (" + (previousFile.length() / 1024) + " KB)",
+										"The file " + prospectiveFilename + " must be equal to or greater in size than previous release file " + previousFilename,null);
 							}
 							break;
 						}
