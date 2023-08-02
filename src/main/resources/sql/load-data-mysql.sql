@@ -18,7 +18,7 @@ load data local
 	lines terminated by '\r\n' 
 	ignore 1 lines
     (id, effectivetime, active, moduleid, conceptid, languagecode, typeid, @term, casesignificanceid)
-    set term = if (length(@term <= 333), @term, if (typeid = '900000000000003001', md5(@term) + ' ' + REGEXP_REPLACE(@term, '^.*(\\([^)]+\\))$', '\1'), md5(@term)));
+    set term = if (length(@term) <= 333, @term, if (typeid = '900000000000003001', md5(@term) + ' ' + REGEXP_REPLACE(@term, '^.*(\\([^)]+\\))$', '\\1'), md5(@term)));
 
 load data local 
 	infile '<data_location>/sct2_TextDefinition_Full-en_INT_<release_version>.txt' 
@@ -133,7 +133,7 @@ load data local
 	lines terminated by '\r\n' 
 	ignore 1 lines
     (id, effectivetime, active, moduleid, conceptid, languagecode, typeid, @term, casesignificanceid)
-    set term = if (length(@term <= 333), @term, if (typeid = '900000000000003001', md5(@term) + ' ' + REGEXP_REPLACE(@term, '^.*(\\([^)]+\\))$', '\1'), md5(@term)));
+    set term = if (length(@term) <= 333, @term, if (typeid = '900000000000003001', md5(@term) + ' ' + REGEXP_REPLACE(@term, '^.*(\\([^)]+\\))$', '\\1'), md5(@term)));
 
 load data local 
 	infile '<data_location>/sct2_TextDefinition_Snapshot-en_INT_<release_version>.txt' 
@@ -248,7 +248,7 @@ load data local
 	lines terminated by '\r\n' 
 	ignore 1 lines
     (id, effectivetime, active, moduleid, conceptid, languagecode, typeid, @term, casesignificanceid)
-    set term = if (length(@term <= 333), @term, if (typeid = '900000000000003001', md5(@term) + ' ' + REGEXP_REPLACE(@term, '^.*(\\([^)]+\\))$', '\1'), md5(@term)));
+    set term = if (length(@term) <= 333, @term, if (typeid = '900000000000003001', md5(@term) + ' ' + REGEXP_REPLACE(@term, '^.*(\\([^)]+\\))$', '\\1'), md5(@term)));
 
 load data local 
 	infile '<data_location>/sct2_TextDefinition_Delta-en_INT_<release_version>.txt' 
