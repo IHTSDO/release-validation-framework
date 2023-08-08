@@ -70,20 +70,4 @@ public class ReleaseControllerIntegrationTest {
 		mockMvc.perform(get("/releases/{version}", "19000131").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
-
-//	@Test
-//	public void testUploadRelease() throws Exception {
-//
-//		mockMvc.perform(
-//				fileUpload("/releases/{version}", "20140131")
-//						.file(new MockMultipartFile("file", "SnomedCT_Release_INT_20140131.zip", "application/zip",
-//								getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip")))
-//				.param("overWriteExisting", "false")
-//				.param("purgeExistingDatabase", "false")
-//				)
-//				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
-//				.andExpect(status().isOk())
-//				.andExpect(content().string(containsString("true")))
-//				.andDo(print());
-//	}
 }

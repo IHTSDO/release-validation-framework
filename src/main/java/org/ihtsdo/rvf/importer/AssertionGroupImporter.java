@@ -394,71 +394,26 @@ public class AssertionGroupImporter {
 
 	private void addAssertionsToAssertionGroup(AssertionGroup assertionGroup, List<Assertion> allAssertions) {
 		AssertionGroupName groupName = AssertionGroupName.fromName(assertionGroup.getName());
-		switch (groupName) {
-			case FILE_CENTRIC_VALIDATION :
-			case RELEASE_TYPE_VALIDATION :
-			case COMPONENT_CENTRIC_VALIDATION :
-				addAssertionsByKeyWord(allAssertions, assertionGroup);
-				break;
-			case MDRS_VALIDATION :
-				addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
-				break;
-			case LOINC_EDITION :
-			case SPANISH_EDITION :
-			case DANISH_EDITION	:
-			case SWEDISH_EDITION :
-			case INTERNATIONAL_EDITION :
-			case US_EDITION :
-			case BE_EDITION :
-			case COMMON_EDITION :
-			case NO_EDITION :
-			case CH_EDITION :
-			case IE_EDITION :
-			case GMDN :
-			case EE_EDITION :
-			case AT_EDITION :
-			case AU_EDITION :
-			case GPFP_ICPC2 :
-			case DERIVATIVE_EDITION :
-				addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
-				break;
-			case COMMON_AUTHORING :
-				addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
-				break;
-			case COMMON_AUTHORING_WITHOUT_LANG_REFSETS :
-				addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions, assertionGroup);
-				break;
-			case INT_AUTHORING :
-			case AT_AUTHORING :
-			case AU_AUTHORING :
-			case DK_AUTHORING :
-			case SE_AUTHORING :
-			case US_AUTHORING :
-			case BE_AUTHORING :
-			case NO_AUTHORING :
-			case CH_AUTHORING :
-			case IE_AUTHORING :
-			case NZ_AUTHORING :
-			case ZH_AUTHORING :
-			case EE_AUTHORING :
-            case KR_AUTHORING :
-			case NL_AUTHORING :
-				addAssertionToSnapshotAssertionGroup(assertionGroup);
-				break;
-			case FIRST_TIME_LOINC_VALIDATION :
-			case FIRST_TIME_COMMON_EDITION_VALIDATION :
-				addAssertionsToFirstTimeReleaseGroup(allAssertions, assertionGroup);
-				break;
-			case STATED_RELATIONSHIPS_VALIDATION:
-				addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, false);
-				break;
-			case STATED_RELATIONSHIPS_RELEASE_VALIDATION:
-				addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, true);
-				break;
-			default :
-					 LOGGER.warn("unrecognized group: " + assertionGroup.getName());
-			  break;
-		}
+        switch (groupName) {
+            case FILE_CENTRIC_VALIDATION, RELEASE_TYPE_VALIDATION, COMPONENT_CENTRIC_VALIDATION ->
+                    addAssertionsByKeyWord(allAssertions, assertionGroup);
+            case MDRS_VALIDATION ->
+                    addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
+            case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
+                    addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
+            case COMMON_AUTHORING -> addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
+            case COMMON_AUTHORING_WITHOUT_LANG_REFSETS ->
+                    addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions, assertionGroup);
+            case INT_AUTHORING, AT_AUTHORING, AU_AUTHORING, DK_AUTHORING, SE_AUTHORING, US_AUTHORING, BE_AUTHORING, NO_AUTHORING, CH_AUTHORING, IE_AUTHORING, NZ_AUTHORING, ZH_AUTHORING, EE_AUTHORING, KR_AUTHORING, NL_AUTHORING ->
+                    addAssertionToSnapshotAssertionGroup(assertionGroup);
+            case FIRST_TIME_LOINC_VALIDATION, FIRST_TIME_COMMON_EDITION_VALIDATION ->
+                    addAssertionsToFirstTimeReleaseGroup(allAssertions, assertionGroup);
+            case STATED_RELATIONSHIPS_VALIDATION ->
+                    addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, false);
+            case STATED_RELATIONSHIPS_RELEASE_VALIDATION ->
+                    addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, true);
+            default -> LOGGER.warn("unrecognized group: " + assertionGroup.getName());
+        }
 
 	}
 
@@ -470,7 +425,7 @@ public class AssertionGroupImporter {
 			if (Arrays.asList(COMMON_AUTHORING_ONLY_LIST).contains(assertion.getUuid().toString()) || Arrays.asList(FIRST_TIME_COMMON_ADDITIONAL_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
-			keyWords=assertion.getKeywords();
+			keyWords = assertion.getKeywords();
 			//exclude SNOMED RT assertions
 			if ( Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;

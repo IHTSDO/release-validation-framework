@@ -117,7 +117,7 @@ public class ValidationReportService {
 				 } 
 			 }
 		 } catch (IOException e) {
-			 logger.error("Failed to read data from progress file {}, via resource config {", filePath, jobResourceConfig);
+			 logger.error("Failed to read data from progress file {}, via resource config {}", filePath, jobResourceConfig);
 		 }
 		 return progressMsg;
 	 }

@@ -34,7 +34,7 @@ public class ReleaseController {
 	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiOperation(value = "Upload a published release version", notes = "Uploads a published release for a given product.")
-	public ResponseEntity uploadRelease(
+	public ResponseEntity<?> uploadRelease(
 			@ApiParam(value = "The published RF2 zip package") @RequestParam(value = "file") final MultipartFile file,
 			@ApiParam(value = "The short product name e.g int for international RF2 release") @PathVariable final String product,
 			@ApiParam(value = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
@@ -53,7 +53,7 @@ public class ReleaseController {
 	@RequestMapping(value = "{version}", method = RequestMethod.GET)
 	@ResponseBody
 	@ApiOperation(value = "Check a given release is loaded already", notes = "Checks whether a version is loaded or not. The version format is rvf_{product}_{releaseDate} e.g rvf_int_20170131")
-	public ResponseEntity getRelease(
+	public ResponseEntity<?> getRelease(
 			@ApiParam(value = "The version name e.g rvf_int_20170131") @PathVariable final String version) {
 		if (releaseDataManager.isKnownRelease(version)) {
 			return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);

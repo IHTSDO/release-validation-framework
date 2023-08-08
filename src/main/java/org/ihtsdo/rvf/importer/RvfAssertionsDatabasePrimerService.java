@@ -38,7 +38,7 @@ public class RvfAssertionsDatabasePrimerService {
 		if (dbImporter.isAssertionImportRequired()) {
 			LOGGER.info("No assertions exist and start importing...");
 			// import content
-			dbImporter.importAssertionsFromFile(manifestInputStream, scriptsDir);
+			dbImporter.importAssertionsFromManifest(manifestInputStream, scriptsDir);
 			LOGGER.info("Assertions imported");
 			// Create assertion group
 			assertionGroupImporter.importAssertionGroups();

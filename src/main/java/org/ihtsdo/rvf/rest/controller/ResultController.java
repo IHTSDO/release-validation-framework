@@ -41,20 +41,15 @@ public class ResultController {
 			responseMap.put(MESSAGE, "No validation state found at " + storageLocation);
 		} else {
 			responseMap.put("status", state.toString());
-			switch (state) {
-				case READY:
-				case QUEUED:
-					responseMap.put(MESSAGE, "Validation hasn't started running yet!");
-					break;
-				case RUNNING:
-					String progress = reportService.recoverProgress(storageLocation);
-					responseMap.put(MESSAGE, "Validation is still running.");
-					responseMap.put("Progress", progress);
-					break;
-				default:
-					reportService.recoverResult(responseMap, runId, storageLocation);
-					break;
-			}
+            switch (state) {
+                case READY, QUEUED -> responseMap.put(MESSAGE, "Validation hasn't started running yet!");
+                case RUNNING -> {
+                    String progress = reportService.recoverProgress(storageLocation);
+                    responseMap.put(MESSAGE, "Validation is still running.");
+                    responseMap.put("Progress", progress);
+                }
+                default -> reportService.recoverResult(responseMap, runId, storageLocation);
+            }
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);
 	}

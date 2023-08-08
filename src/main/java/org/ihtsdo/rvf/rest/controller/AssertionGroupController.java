@@ -1,16 +1,17 @@
 package org.ihtsdo.rvf.rest.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.ihtsdo.rvf.rest.helper.AssertionHelper;
-import org.ihtsdo.rvf.rest.helper.EntityNotFoundException;
-import org.ihtsdo.rvf.core.data.repository.AssertionGroupRepository;
-import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
+import org.ihtsdo.rvf.core.data.repository.AssertionGroupRepository;
+import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
+import org.ihtsdo.rvf.rest.helper.AssertionHelper;
+import org.ihtsdo.rvf.rest.helper.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -54,8 +54,7 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Get all assertions for a given assertion group", notes = "Retrieves all assertions for a given assertion group identified by the group id.")
 	public List<Assertion> getAssertionsForGroup(@ApiParam(value = "Assertion group id") @PathVariable final Long id) {
-
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		return new ArrayList<>(group.getAssertions());
 	}
 
@@ -63,12 +62,11 @@ public class AssertionGroupController {
 	@ResponseBody
 	@ApiOperation(value = "Add assertions to a group", notes = "Adds assertions to the assertion group identified by the group id.")
 	public AssertionGroup addAssertionsToGroup(@PathVariable final Long id,
-			@RequestBody(required = false) final List<String> assertionsList,
-			final HttpServletResponse response) {
+			@RequestBody(required = false) final List<String> assertionsList, final HttpServletResponse response) throws JsonProcessingException {
 
-		final AssertionGroup group = assertionGroupRepository.getOne(id);
+		final AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		// Do we have anything to add?
-		if (assertionsList == null || assertionsList.size() == 0) {
+		if (assertionsList == null || assertionsList.isEmpty()) {
 			response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 		} else {
 			final List<Assertion> assertions = getAssertions(assertionsList);
@@ -77,7 +75,6 @@ public class AssertionGroupController {
 			}
 			response.setStatus(HttpServletResponse.SC_OK);
 		}
-
 		return group;
 	}
 
@@ -88,7 +85,7 @@ public class AssertionGroupController {
 			+ " This api may only be used when user desires to add all assertion found in the system to an assertion group"
 			+ " otherwise use {id}/assertions api as post call.")
 	public AssertionGroup addAllAssertions(@PathVariable final Long id) {
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		List<Assertion> assertionList = assertionService.findAll();
 		group.setAssertions(new HashSet<>(assertionList));
 		return assertionGroupRepository.save(group);
@@ -101,7 +98,7 @@ public class AssertionGroupController {
 	public AssertionGroup removeAssertionsFromGroup(
 			@PathVariable final Long id,
 			@ApiParam(value = "Only assertion id is required") @RequestBody final List<Assertion> assertions) {
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		for (final Assertion assertion : group.getAssertions()) {
 			group = assertionService.removeAssertionFromGroup(assertion, group);
 		}
@@ -115,7 +112,7 @@ public class AssertionGroupController {
 	public AssertionGroup setAsAssertionsInGroup(@PathVariable final Long id,
 			@RequestBody(required = false) final Set<Assertion> assertions) {
 
-		final AssertionGroup group = assertionGroupRepository.getOne(id);
+		final AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		// replace all existing assertions with current list
 		group.setAssertions(assertions);
 		return assertionGroupRepository.save(group);
@@ -126,10 +123,7 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Get an assertion group", notes = "Retrieves an assertion group for a given id")
 	public AssertionGroup getAssertionGroup(@PathVariable final Long id) {
-		if (!assertionGroupRepository.existsById(id)) {
-			throw new EntityNotFoundException(id);
-		}
-		return assertionGroupRepository.getOne(id);
+		return assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
@@ -137,7 +131,7 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@ApiOperation(value = "Delete an assertion group", notes = "Deletes an assertion group from the system")
 	public AssertionGroup deleteAssertionGroup(@ApiParam(value="Assertion group id") @PathVariable final Long id) {
-		final AssertionGroup group = assertionGroupRepository.getOne(id);
+		final AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		group.removeAllAssertionsFromGroup();
 		assertionGroupRepository.delete(group);
 		return group;
@@ -159,7 +153,7 @@ public class AssertionGroupController {
 	@ApiOperation(value = "Update an assertion group", notes = "Updates the group name for the assertion group identified by the group id.")
 	public AssertionGroup updateAssertionGroup(@PathVariable final Long id,
 			@ApiParam(value = "Assertion group name") @RequestParam final String name) {
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		group.setName(name);
 		return assertionGroupRepository.save(group);
 	}
@@ -173,7 +167,7 @@ public class AssertionGroupController {
 			@ApiParam(value="Prospective version") @RequestParam final String prospectiveReleaseVersion,
 			@ApiParam(value="Previous release version", required = false) @RequestParam final String previousReleaseVersion) {
 
-		AssertionGroup group = assertionGroupRepository.getOne(id);
+		AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		MysqlExecutionConfig config = new MysqlExecutionConfig(runId);
 		config.setPreviousVersion(previousReleaseVersion);
 		config.setProspectiveVersion(prospectiveReleaseVersion);
@@ -181,22 +175,17 @@ public class AssertionGroupController {
 		return assertionHelper.assertAssertions(group.getAssertions(), config);
 	}
 
-	private List<Assertion> getAssertions(final List<String> items) {
+	private List<Assertion> getAssertions(final List<String> items) throws JsonProcessingException {
 		final List<Assertion> assertions = new ArrayList<>();
 		for (final String item : items) {
-			try {
-				if (item.matches("\\d+")) {
-					// treat as assertion id and retrieve associated assertion
-					final Assertion assertion = assertionService.find(Long.valueOf(item));
-					if (assertion != null) {
-						assertions.add(assertion);
-					}
-				} else {
-					assertions.add(objectMapper.readValue(item, Assertion.class));
+			if (item.matches("\\d+")) {
+				// treat as assertion id and retrieve associated assertion
+				final Assertion assertion = assertionService.find(Long.valueOf(item));
+				if (assertion != null) {
+					assertions.add(assertion);
 				}
-			} catch (final IOException e) {
-				e.printStackTrace();
-				logger.error("Failed to add assertion " + item);
+			} else {
+				assertions.add(objectMapper.readValue(item, Assertion.class));
 			}
 		}
 		return assertions;

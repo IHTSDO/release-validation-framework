@@ -16,7 +16,7 @@ public class StreamTestReport implements TestReportable {
 	private final AtomicInteger numTestRuns = new AtomicInteger(0);
 	private boolean writeSuccesses;
 	private final ConcurrentHashMap<String, TestRunItemCount> errorMap = new ConcurrentHashMap<>();
-	private final List<StructuralTestRunItem> failedItems = Collections.synchronizedList(new ArrayList<StructuralTestRunItem>());
+	private final List<StructuralTestRunItem> failedItems = Collections.synchronizedList(new ArrayList<>());
 
 	public StreamTestReport(ResultFormatter formatter, OutputStream outputStream, boolean writeSuccesses) {
 		this.formatter = formatter;

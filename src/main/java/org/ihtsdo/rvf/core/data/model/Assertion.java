@@ -138,10 +138,8 @@ public class Assertion {
 
 	@Override
 	public String toString() {
-		return "Assertion{" +
-				"id=" + assertionId +
-				", name='" + assertionText + '\'' +
-				'}';
+		return "Assertion [assertionId=" + assertionId + ", assertionText=" + assertionText + ", keywords=" + keywords
+				+ ", uuid=" + uuid +"]";
 	}
 
 	@Override

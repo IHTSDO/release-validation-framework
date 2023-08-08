@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class AutomatedTestService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutomatedTestService.class);
 
-    private final int pollPeriod = 60 * 1000; // 1 minute
+    private final int pollPeriod = 60*1000; // 1 minute
 
     @Value("${rvf.report.max.poll.period:3600000}")
     private int maxPollPeriod; // default 1 hour
@@ -152,8 +152,8 @@ public class AutomatedTestService {
                 .collect(Collectors.toMap(i -> i.getAssertionUuid().toString(), Function.identity()));
 
         Collection removedIDs = CollectionUtils.subtract(leftTestRunItemToUUIDMap.keySet(), rightTestRunItemToUUIDMap.keySet());
-        Collection addedIDs = CollectionUtils.subtract(rightTestRunItemToUUIDMap.keySet(), leftTestRunItemToUUIDMap.keySet());
-        Collection unChangedIDs = CollectionUtils.intersection(rightTestRunItemToUUIDMap.keySet(), leftTestRunItemToUUIDMap.keySet());
+        Collection<String> addedIDs = CollectionUtils.subtract(rightTestRunItemToUUIDMap.keySet(), leftTestRunItemToUUIDMap.keySet());
+        Collection<String> unChangedIDs = CollectionUtils.intersection(rightTestRunItemToUUIDMap.keySet(), leftTestRunItemToUUIDMap.keySet());
         removedIDs.forEach(id -> {
             report.addRemovedAssertion(leftTestRunItemToUUIDMap.get(id));
             if (!ValidationComparisonReport.Status.FAILED.equals(report.getStatus())) {
@@ -220,7 +220,6 @@ public class AutomatedTestService {
         while (true) {
             Thread.sleep(pollPeriod);
             count += pollPeriod;
-
             String validationReportString = rvfRestTemplate.getForObject(url, String.class);
             if (!StringUtils.isEmpty(validationReportString)) {
                 final HighLevelValidationReport highLevelValidationReport = objectMapper.readValue(validationReportString, HighLevelValidationReport.class);
@@ -228,7 +227,6 @@ public class AutomatedTestService {
                     return highLevelValidationReport.getRvfValidationResult();
                 }
             }
-
             if (count > maxPollPeriod) {
                 throw new BusinessServiceException(String.format("RVF report %s did not complete within the allotted time (%s minutes).", url, maxPollPeriod / (60 * 1000)));
             }

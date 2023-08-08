@@ -96,7 +96,7 @@ public class AssertionController {
 			@RequestParam List<Long> testIds) {
 		final Assertion assertion = find(id);
 		Collection<Test> tests = assertionService.getTests(assertion);
-		List<Test> toDelete = new ArrayList<Test>();
+		List<Test> toDelete = new ArrayList<>();
 
 		for (Long testId : testIds) {
 			for (Test test : tests) {
@@ -123,12 +123,12 @@ public class AssertionController {
 		try {
 			assertion = find(id);
 		} catch (IllegalArgumentException e) {
-			return new ResponseEntity<Assertion>((Assertion) null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>((Assertion) null, HttpStatus.BAD_REQUEST);
 		}
 		if (assertion == null) {
-			return new ResponseEntity<Assertion>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<Assertion>(assertion, HttpStatus.OK);
+		return new ResponseEntity<>(assertion, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
@@ -141,11 +141,11 @@ public class AssertionController {
 		}
 		List<AssertionGroup> groups = assertionService.getGroupsForAssertion(assertion);
 		if ((groups != null) && !groups.isEmpty()) {
-			return new ResponseEntity<Assertion>(assertion, HttpStatus.CONFLICT);
+			return new ResponseEntity<>(assertion, HttpStatus.CONFLICT);
 		}
 		assertionService.delete(assertion);
 
-		return new ResponseEntity<Assertion>(assertion, HttpStatus.OK);
+		return new ResponseEntity<>(assertion, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
@@ -158,22 +158,22 @@ public class AssertionController {
 		// Firstly, the assertion must have a UUID (otherwise malformed request)
 		try {
 			if (assertion.getUuid() == null) {
-				return new ResponseEntity<Assertion>((Assertion) null, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>((Assertion) null, HttpStatus.BAD_REQUEST);
 			}
 		} catch (IllegalArgumentException e) {
-			return new ResponseEntity<Assertion>((Assertion) null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>((Assertion) null, HttpStatus.BAD_REQUEST);
 		}
 
 		// Now make sure we don't already have one of those (otherwise conflict)
 		Assertion existingAssertion = assertionService.findAssertionByUUID(assertion.getUuid());
 
 		if (existingAssertion != null) {
-			return new ResponseEntity<Assertion>((Assertion) null, HttpStatus.CONFLICT);
+			return new ResponseEntity<>((Assertion) null, HttpStatus.CONFLICT);
 		}
 
 		Assertion newAssertion = assertionService.create(assertion);
 
-		return new ResponseEntity<Assertion>(newAssertion, HttpStatus.CREATED);
+		return new ResponseEntity<>(newAssertion, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
@@ -222,20 +222,20 @@ public class AssertionController {
 			@ApiParam("The previous release version. Not required when there is no previous release.") @RequestParam(required = false) final String previousReleaseVersion) {
 		final Assertion assertion = find(id);
 		if (assertion == null) {
-			return new ResponseEntity<Map<String, Object>>((Map<String, Object>) null, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>((Map<String, Object>) null, HttpStatus.NOT_FOUND);
 		}
 
 		// Creating a list of 1 here so we can use the same code and receive the
 		// same json as response
-		final Collection<Assertion> assertions = new ArrayList<Assertion>(List.of(assertion));
+		final Collection<Assertion> assertions = new ArrayList<>(List.of(assertion));
 
 		final MysqlExecutionConfig config = new MysqlExecutionConfig(runId);
-		Map<String, Object> failures = new HashMap<String, Object>();
+		Map<String, Object> failures = new HashMap<>();
 
 		if (prospectiveReleaseVersion != null && !releaseDataManager.isKnownRelease(prospectiveReleaseVersion)) {
 			failures.put("failureMessage", "Release version not found:" + prospectiveReleaseVersion);
 
-			return new ResponseEntity<Map<String, Object>>(failures, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(failures, HttpStatus.NOT_FOUND);
 		}
 
 		config.setProspectiveVersion(prospectiveReleaseVersion);
@@ -244,14 +244,14 @@ public class AssertionController {
 		if (previousReleaseVersion != null && !releaseDataManager.isKnownRelease(previousReleaseVersion)) {
 			failures.put("failureMessage", "Release version not found:" + previousReleaseVersion);
 
-			return new ResponseEntity<Map<String, Object>>(failures, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(failures, HttpStatus.NOT_FOUND);
 		}
 
 		if (previousReleaseVersion == null) {
 			config.setFirstTimeRelease(true);
 		}
 
-		return new ResponseEntity<Map<String, Object>>(assertionHelper.assertAssertions(assertions, config), HttpStatus.OK);
+		return new ResponseEntity<>(assertionHelper.assertAssertions(assertions, config), HttpStatus.OK);
 	}
 
 	/**
@@ -284,15 +284,11 @@ public class AssertionController {
 	private List<Assertion> getAssertionsAndJoinGroups() {
 		List<Assertion> assertions = assertionService.findAll();
 		List<AssertionGroup> assertionGroups = assertionService.getAllAssertionGroups();
-		assertionGroups.stream().forEach(assertionGroup -> {
-			assertionGroup.getAssertions().stream().forEach(a -> {
-				assertions.stream().forEach(b -> {
-					if (a.getUuid().toString().equals(b.getUuid().toString())) {
-						b.addGroup(assertionGroup.getName());
-					}
-				});
-			});
-		});
+		assertionGroups.forEach(assertionGroup -> assertionGroup.getAssertions().forEach(a -> assertions.forEach(b -> {
+			if (a.getUuid().toString().equals(b.getUuid().toString())) {
+				b.addGroup(assertionGroup.getName());
+			}
+		})));
 		return assertions;
 	}
 }

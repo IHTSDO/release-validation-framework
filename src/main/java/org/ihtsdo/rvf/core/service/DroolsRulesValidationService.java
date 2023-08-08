@@ -230,7 +230,7 @@ public class DroolsRulesValidationService {
 						// Convert to WhitelistItem
 						List<WhitelistItem> whitelistItems = batch.stream()
 								.filter(invalidContent -> !ERROR_COMPONENT_RULE_ID.equals(invalidContent.getRuleId()) && !WARNING_COMPONENT_RULE_ID.equals(invalidContent.getRuleId()))
-								.map(invalidContent -> new WhitelistItem(invalidContent.getRuleId(), org.springframework.util.StringUtils.isEmpty(invalidContent.getComponentId())? "" : invalidContent.getComponentId(), invalidContent.getConceptId(), getAdditionalFields(invalidContent.getComponent())))
+								.map(invalidContent -> new WhitelistItem(invalidContent.getRuleId(), StringUtils.isEmpty(invalidContent.getComponentId())? "" : invalidContent.getComponentId(), invalidContent.getConceptId(), getAdditionalFields(invalidContent.getComponent())))
 								.collect(Collectors.toList());
 
 						// Send to Authoring acceptance gateway
@@ -240,7 +240,7 @@ public class DroolsRulesValidationService {
 						// Find the failures which are not in the whitelisted item
 						newInvalidContents.addAll(batch.stream().filter(invalidContent ->
 								whitelistedItems.stream().noneMatch(whitelistedItem -> invalidContent.getRuleId().equals(whitelistedItem.getValidationRuleId()) && invalidContent.getComponentId().equals(whitelistedItem.getComponentId()))
-						).collect(Collectors.toList())) ;
+						).toList());
 					}
 					invalidContents = newInvalidContents;
 				}
@@ -327,11 +327,9 @@ public class DroolsRulesValidationService {
 		String additionalFields = (component.isActive() ? "1" : "0") + COMMA + component.getModuleId();
 		if (component instanceof Concept) {
 			return additionalFields + COMMA + ((Concept) component).getDefinitionStatusId();
-		} else if (component instanceof Description) {
-			Description description = (Description) component;
+		} else if (component instanceof Description description) {
 			return additionalFields + COMMA + description.getConceptId() + COMMA + description.getLanguageCode() + COMMA + description.getTypeId() + COMMA + description.getTerm() + COMMA + description.getCaseSignificanceId();
-		} else if (component instanceof Relationship) {
-			Relationship relationship = (Relationship) component;
+		} else if (component instanceof Relationship relationship) {
 			return additionalFields + COMMA + relationship.getSourceId() + COMMA + relationship.getDestinationId() + COMMA + relationship.getRelationshipGroup() + COMMA + relationship.getTypeId() + COMMA + relationship.getCharacteristicTypeId();
 		} else if (component instanceof OntologyAxiom) {
 			return additionalFields + COMMA + ((OntologyAxiom) component).getReferencedComponentId() + COMMA + ((OntologyAxiom) component).getOwlExpression();

@@ -60,12 +60,7 @@ public class ColumnPatternTester {
 		ExecutorService executor = Executors.newCachedThreadPool();
 		List<Future<Long>> tasks = new ArrayList<>();
 		for (final String fileName : fileNames) {
-			Future<Long> task = executor.submit(new Callable<Long>() {
-				@Override
-				public Long call() throws Exception {
-					return runTestForFile(fileName, schemaFactory);
-				}
-			});
+			Future<Long> task = executor.submit(() -> runTestForFile(fileName, schemaFactory));
 			tasks.add(task);
 		}
 		
@@ -219,24 +214,16 @@ public class ColumnPatternTester {
 	}
 
 	private ColumnType getColumnType(final Field field) {
-		switch (field.getType()) {
-			case SCTID:
-				return ColumnType.SCTID;
-			case SCTID_OR_UUID:
-				return ColumnType.REL_SCTID;
-			case UUID:
-				return field.isMandatory() ? ColumnType.UUID : ColumnType.REL_UUID;
-			case TIME:
-				return field.isMandatory() ? ColumnType.TIME : ColumnType.REL_TIME;
-			case BOOLEAN:
-				return ColumnType.BOOLEAN;
-			case INTEGER:
-				return ColumnType.INTEGER;
-			case STRING:
-				return ColumnType.STRING;
-		}
-		return null;
-	}
+        return switch (field.getType()) {
+            case SCTID -> ColumnType.SCTID;
+            case SCTID_OR_UUID -> ColumnType.REL_SCTID;
+            case UUID -> field.isMandatory() ? ColumnType.UUID : ColumnType.REL_UUID;
+            case TIME -> field.isMandatory() ? ColumnType.TIME : ColumnType.REL_TIME;
+            case BOOLEAN -> ColumnType.BOOLEAN;
+            case INTEGER -> ColumnType.INTEGER;
+            case STRING -> ColumnType.STRING;
+        };
+    }
 
 	private void testHeaderValue(final String value, final Field column, final Date startTime, final String fileName, final int colIndex) {
 		final String expectedColumnName = column.getName();
