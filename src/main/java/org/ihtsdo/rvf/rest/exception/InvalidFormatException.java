@@ -1,4 +1,4 @@
-package org.ihtsdo.rvf.rest.controller;
+package org.ihtsdo.rvf.rest.exception;
 
 import java.io.Serial;
 

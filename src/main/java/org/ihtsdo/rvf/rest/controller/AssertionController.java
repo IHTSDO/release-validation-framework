@@ -1,6 +1,11 @@
 package org.ihtsdo.rvf.rest.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.ihtsdo.rvf.rest.exception.InvalidFormatException;
 import org.ihtsdo.rvf.rest.helper.AssertionHelper;
 import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.data.model.Assertion;
@@ -21,7 +26,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/assertions")
-@Api(tags = "Assertions")
+@Tag(name = "Assertions")
 public class AssertionController {
 	@Autowired
 	private AssertionService assertionService;
@@ -39,7 +44,7 @@ public class AssertionController {
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Get all assertions", notes = "Retrieves all assertions available in the system.")
+	@Operation(summary = "Get all assertions", description = "Retrieves all assertions available in the system.")
 	public List<Assertion> getAssertions(@RequestParam(required = false) final boolean includeDroolsRules,
 										 @RequestParam(required = false) final boolean includeTraceabilityAssertions,
 										 @RequestParam(required = false) final boolean ignoreResourceType) {
@@ -61,9 +66,9 @@ public class AssertionController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@ApiResponses(value = {
-			@ApiResponse(code = 400, message = "Invalid ID supplied."),
-			@ApiResponse(code = 404, message = "Assertion tests not found.") })
-	@ApiOperation(value = "Retrieves all tests for an assertion", notes = "Retrieves all tests which belong to a given assertion id.")
+			@ApiResponse(responseCode = "400", description = "Invalid ID supplied."),
+			@ApiResponse(responseCode = "404", description = "Assertion tests not found.") })
+	@Operation(summary = "Retrieves all tests for an assertion", description = "Retrieves all tests which belong to a given assertion id.")
 	public List<Test> getTestsForAssertion(@PathVariable final String id) {
 		final Assertion assertion = find(id);
 
@@ -73,7 +78,7 @@ public class AssertionController {
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Add tests to an assertion", notes = "Add one or more tests to an assertion identified by the id which can be the assertion id or uuid.")
+	@Operation(summary = "Add tests to an assertion", description = "Add one or more tests to an assertion identified by the id which can be the assertion id or uuid.")
 	public Assertion addTestsForAssertion(@PathVariable final String id,
 			@RequestBody(required = false) final List<Test> tests) {
 		final Assertion assertion = find(id);
@@ -90,9 +95,9 @@ public class AssertionController {
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.DELETE)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Delete tests from an assertion", notes = "Delete tests for a given assertion. Note: This doesn't delete the assertion.")
+	@Operation(summary = "Delete tests from an assertion", description = "Delete tests for a given assertion. Note: This doesn't delete the assertion.")
 	public Assertion deleteTestsForAssertion(
-			@ApiParam(value = "Assertion id or uuid") @PathVariable final String id,
+			@Parameter(name = "Assertion id or uuid") @PathVariable final String id,
 			@RequestParam List<Long> testIds) {
 		final Assertion assertion = find(id);
 		Collection<Test> tests = assertionService.getTests(assertion);
@@ -114,11 +119,11 @@ public class AssertionController {
 
 	@RequestMapping(value = "{id}", method = RequestMethod.GET)
 	@ApiResponses(value = {
-			@ApiResponse(code = 400, message = "Invalid ID supplied"),
-			@ApiResponse(code = 404, message = "Assertion not found") })
-	@ApiOperation(value = "Get an assertion", notes = "Retrieves an assertion identified by the id.")
+			@ApiResponse(responseCode = "400", description = "Invalid ID supplied"),
+			@ApiResponse(responseCode = "404", description = "Assertion not found") })
+	@Operation(summary = "Get an assertion", description = "Retrieves an assertion identified by the id.")
 	public ResponseEntity<Assertion> getAssertion(
-			@ApiParam(value = "Assertion id or uuid", required = true) @PathVariable final String id) {
+			@Parameter(name = "Assertion id or uuid", required = true) @PathVariable final String id) {
 		Assertion assertion = null;
 		try {
 			assertion = find(id);
@@ -133,8 +138,8 @@ public class AssertionController {
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Delete an assertion", notes = "Delete an assertion identified by the id.")
-	public ResponseEntity<Assertion> deleteAssertion(@ApiParam(value = "Assertion id or uuid") @PathVariable final String id) {
+	@Operation(summary = "Delete an assertion", description = "Delete an assertion identified by the id.")
+	public ResponseEntity<Assertion> deleteAssertion(@Parameter(name = "Assertion id or uuid") @PathVariable final String id) {
 		final Assertion assertion = find(id);
 		if (assertion == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -151,7 +156,7 @@ public class AssertionController {
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CREATED)
-	@ApiOperation(value = "Create an assertion", notes = "Create an assertion with values provided. The assertion id is not required as it will be auto generated. "
+	@Operation(summary = "Create an assertion", description = "Create an assertion with values provided. The assertion id is not required as it will be auto generated. "
 			+ "The uuid field is optional as a random uuid will be assigned when this is not set.")
 	public ResponseEntity<Assertion> createAssertion(
 			@RequestBody final Assertion assertion) {
@@ -179,9 +184,9 @@ public class AssertionController {
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Update an assertion", notes = "Updates the assertion text,keywords and uuid property for the existing assertion identified by the assertion id or uuid.")
+	@Operation(summary = "Update an assertion", description = "Updates the assertion text,keywords and uuid property for the existing assertion identified by the assertion id or uuid.")
 	public Assertion updateAssertion(
-			@ApiParam(value = "Assertion id or uuid") @PathVariable final String id,
+			@Parameter(name = "Assertion id or uuid") @PathVariable final String id,
 			@RequestBody(required = true) final Assertion assertion) {
 		final Assertion existing = find(id);
 
@@ -198,10 +203,10 @@ public class AssertionController {
 	@RequestMapping(value = "{id}/tests", method = RequestMethod.PUT)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Update a specific test for a given assertion", notes = "Updates a specific test for a given assertion.")
+	@Operation(summary = "Update a specific test for a given assertion", description = "Updates a specific test for a given assertion.")
 	public Assertion updateTest(
-			@ApiParam(value = "Assertion id or uuid") @PathVariable String id,
-			@ApiParam(value="Test to be updated") @RequestBody(required = true) Test test) {
+			@Parameter(name = "Assertion id or uuid") @PathVariable String id,
+			@Parameter(name = "Test to be updated") @RequestBody(required = true) Test test) {
 		final Assertion existing = find(id);
 
 		if (existing == null) {
@@ -214,12 +219,12 @@ public class AssertionController {
 	@RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Execute tests of an assertion", notes = "Executes tests for the assertion specified by the id (assertion id or uuid).")
+	@Operation(summary = "Execute tests of an assertion", description = "Executes tests for the assertion specified by the id (assertion id or uuid).")
 	public ResponseEntity<Map<String, Object>> executeTest(
-			@ApiParam("Assertion id or uuid") @PathVariable final String id,
-			@ApiParam("Unique number")@RequestParam final Long runId,
-			@ApiParam("The prospective version to be validated.") @RequestParam final String prospectiveReleaseVersion,
-			@ApiParam("The previous release version. Not required when there is no previous release.") @RequestParam(required = false) final String previousReleaseVersion) {
+			@Parameter(name = "Assertion id or uuid") @PathVariable final String id,
+			@Parameter(name = "Unique number") @RequestParam final Long runId,
+			@Parameter(name = "The prospective version to be validated.") @RequestParam final String prospectiveReleaseVersion,
+			@Parameter(name = "The previous release version. Not required when there is no previous release.") @RequestParam(required = false) final String previousReleaseVersion) {
 		final Assertion assertion = find(id);
 		if (assertion == null) {
 			return new ResponseEntity<>((Map<String, Object>) null, HttpStatus.NOT_FOUND);

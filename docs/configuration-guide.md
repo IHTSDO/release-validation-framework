@@ -1,6 +1,6 @@
 # Configuration Guide
 ## Overview
-RVF uses Spring Boot and you can follow [Spring Boot configuration guide](https://docs.spring.io/spring-boot/docs/2.7.8.RELEASE/reference/htmlsingle/#boot-features-external-config)
+RVF uses Spring Boot and you can follow [Spring Boot configuration guide](https://docs.spring.io/spring-boot/docs/2.7.14/reference/htmlsingle/#features.external-config)
 
 ## Default Configurations
 

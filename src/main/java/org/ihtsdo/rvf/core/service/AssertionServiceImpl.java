@@ -7,7 +7,7 @@ import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.AssertionTest;
 import org.ihtsdo.rvf.core.data.model.Test;
-import org.ihtsdo.rvf.rest.helper.EntityNotFoundException;
+import org.ihtsdo.rvf.rest.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
