@@ -3,17 +3,18 @@ set -e
 
 #example useage ./start-api-local.sh -d -p 8081
 apiPort=8081
+buildApp=true
+debugFlags=""
 
 while getopts ":dsp:" opt
 do
 	case $opt in
 		d) 
-			debugMode=true
+			debugFlags="-Xdebug -Xnoagent  -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8001  -Djava.compiler=NONE"
 			echo "Option set to start API in debug mode."
-			debugFlags="-Xdebug -Xnoagent  -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8001  -Djava.compiler=NONE" 
 		;;
 		s) 
-			skipMode=true
+			buildApp=false
 			echo "Option set to skip build."
 		;;
 		p)
@@ -30,8 +31,7 @@ do
 	esac
 done
 
-if [ -z "${skipMode}" ]
-then
+if $buildApp; then
 	echo 'Building RVF API webapp..'
 	sleep 1
 	mvn clean install -Dapple.awt.UIElement='true' -DrvfConfigLocation=/tmp
@@ -41,5 +41,4 @@ fi
 configLocation="$(pwd)/config"
 echo "Starting RVF API webapp on port ${apiPort} with config directory ${configLocation}"
 echo
-java -Xmx4g ${debugFlags} -DENV_NAME=$(whoami)  -DrvfConfigLocation=${configLocation} -jar api/target/dependency/webapp-runner.jar api/target/api.war --path /api --port ${apiPort}
-
+java -Xmx4g ${debugFlags} -DENV_NAME=$(whoami) -DrvfConfigLocation=${configLocation} -jar api/target/dependency/webapp-runner.jar api/target/api.war --path /api --port ${apiPort}

@@ -4,7 +4,7 @@ RVF uses Spring Boot and you can follow [Spring Boot configuration guide](https:
 
 ## Default Configurations
 
-You can find a list of default configurations in [src/main/resources/**application.properties**](/src/main/resources/application.properties).
+You can find a list of default configurations in **[/src/main/resources/application.properties](../src/main/resources/application.properties)**.
 
 ## MySQL database and user
 RVF expects rvf_master database is available during startup.
@@ -16,7 +16,7 @@ create database rvf_master;
 ### Create a rvf_user if you don't want to use 'root'
 ```sql
 create user 'rvf_user'@'localhost';
-// Alternatively give a password: create user 'rvf_user'@'localhost' IDENTIFIED BY 'password_here';
+-- Alternatively give a password: create user 'rvf_user'@'localhost' IDENTIFIED BY 'password_here';
 grant all privileges on *.* to 'rvf_user'@'localhost';
 ```
 

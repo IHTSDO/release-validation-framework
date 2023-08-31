@@ -12,6 +12,7 @@ Documentation is sparse for now, but will be improved as the project moves out o
 - [Manual Installation](docs/getting-started.md)
 - [Getting started with the RVF](docs/using-the-api.md)
 - [Importing Assertions](docs/importing-assertions.md)
+- [Configuration guide](docs/configuration-guide.md)
 
 Questions
 ---------
@@ -32,4 +33,4 @@ License
 
 Apache 2.0
 
-See the [LICENSE file](LICENSE) for details.
+See the [LICENSE file](LICENSE.md) for details.
