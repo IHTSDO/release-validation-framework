@@ -197,10 +197,21 @@ public class AssertionGroupImporter {
             "e6082dc4-c6f4-48c6-afa3-233182336a5c",
             "eff30fb0-7856-11e1-b0c4-0800200c9a66",
             "fbfc4fd1-f10d-4fc2-889f-df0e089df4b7",
-            "202ef495-5f18-4e3e-8129-63759f2bbbd6"
+            "202ef495-5f18-4e3e-8129-63759f2bbbd6",
+			"d182e8d4-c8e1-4e5f-ae17-b2f786f55727",
+			"23a71f2e-5c90-4090-af07-bcb3fa3d5673",
+			"89ceaf00-79b9-11e1-b0c4-0800200c9a66",
+			"88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
+			"32b07ff2-9a9a-497f-ae26-92b68ebed20e",
+			"80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
+			"0cc708af-6816-4370-91be-dba8da99d227",
+			"cab60a2f-4239-4933-91d6-dc910a8ac08b"
+
+
     };
 
-	private static final String[] MS_AUTHORING_INCLUDE_LIST = {"35680574-3ac6-4b68-9efe-de88b677eb35",
+	private static final String[] MS_AUTHORING_INCLUDE_LIST = {
+			"35680574-3ac6-4b68-9efe-de88b677eb35",
 			"11735994-4b7f-4e61-9bde-059b7e085031",
 			"4478a896-2724-4417-8bce-8986ecc53c4e",
 			"372e59d5-d6f3-4708-93d0-6cb92da69006",
@@ -223,7 +234,10 @@ public class AssertionGroupImporter {
 			"4deb9274-d923-4f84-b0dc-c4dab0c2fc4c",
 			"560e6d0c-64e8-4726-9516-ae7a7606b0b3",
 			"910844a8-97e5-4096-add2-e1734b941e10",
-			"26c25479-c3ba-47f2-9851-bb05ae42ad48"
+			"26c25479-c3ba-47f2-9851-bb05ae42ad48",
+			"a98e02f7-e810-449b-89ff-0a9037cea32d",
+			"32b07ff2-9a9a-497f-ae26-92b68ebed20e",
+			"80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
 	};
 
 	private static final String[] INT_EDITION_EXCLUDE_LIST = {"2e2542f9-64a4-43d0-bf4e-9029af8b7cf0"};
