@@ -53,7 +53,7 @@ public class AssertionGroupController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Get all assertions for a given assertion group", description = "Retrieves all assertions for a given assertion group identified by the group id.")
-	public List<Assertion> getAssertionsForGroup(@Parameter(name = "Assertion group id") @PathVariable final Long id) {
+	public List<Assertion> getAssertionsForGroup(@Parameter(description = "Assertion group id") @PathVariable final Long id) {
 		AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		return new ArrayList<>(group.getAssertions());
 	}
@@ -97,7 +97,7 @@ public class AssertionGroupController {
 	@Operation(summary = "Delete assertions from a group", description = "Removes supplied assertions from a given assertion group")
 	public AssertionGroup removeAssertionsFromGroup(
 			@PathVariable final Long id,
-			@Parameter(name = "Only assertion id is required") @RequestBody final List<Assertion> assertions) {
+			@Parameter(description = "Only assertion id is required") @RequestBody final List<Assertion> assertions) {
 		AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		for (final Assertion assertion : group.getAssertions()) {
 			group = assertionService.removeAssertionFromGroup(assertion, group);
@@ -130,7 +130,7 @@ public class AssertionGroupController {
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Delete an assertion group", description = "Deletes an assertion group from the system")
-	public AssertionGroup deleteAssertionGroup(@Parameter(name = "Assertion group id") @PathVariable final Long id) {
+	public AssertionGroup deleteAssertionGroup(@Parameter(description = "Assertion group id") @PathVariable final Long id) {
 		final AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		group.removeAllAssertionsFromGroup();
 		assertionGroupRepository.delete(group);
@@ -152,7 +152,7 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Update an assertion group", description = "Updates the group name for the assertion group identified by the group id.")
 	public AssertionGroup updateAssertionGroup(@PathVariable final Long id,
-			@Parameter(name = "Assertion group name") @RequestParam final String name) {
+			@Parameter(description = "Assertion group name") @RequestParam final String name) {
 		AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		group.setName(name);
 		return assertionGroupRepository.save(group);
@@ -163,10 +163,10 @@ public class AssertionGroupController {
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Execute all tests for a given assertion group", description = "Executes all tests for the assertion group identified by the group id.")
 	public Map<String, Object> executeAssertions(
-			@Parameter(name = "Assertion group id") @PathVariable final Long id,
-			@Parameter(name = "Unique number") @RequestParam final Long runId,
-			@Parameter(name = "Prospective version") @RequestParam final String prospectiveReleaseVersion,
-			@Parameter(name = "Previous release version", required = false) @RequestParam final String previousReleaseVersion) {
+			@Parameter(description = "Assertion group id") @PathVariable final Long id,
+			@Parameter(description = "Unique number") @RequestParam final Long runId,
+			@Parameter(description = "Prospective version") @RequestParam final String prospectiveReleaseVersion,
+			@Parameter(description = "Previous release version", required = false) @RequestParam final String previousReleaseVersion) {
 
 		AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		MysqlExecutionConfig config = new MysqlExecutionConfig(runId);

@@ -30,13 +30,13 @@ public class ReleaseController {
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 	
-	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
+	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST, consumes = "multipart/form-data")
 	@ResponseBody
 	@Operation(summary = "Upload a published release version", description = "Uploads a published release for a given product.")
 	public ResponseEntity<?> uploadRelease(
-			@Parameter(name = "The published RF2 zip package") @RequestParam(value = "file") final MultipartFile file,
-			@Parameter(name = "The short product name e.g int for international RF2 release") @PathVariable final String product,
-			@Parameter(name = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
+			@Parameter(description = "The published RF2 zip package") @RequestParam(value = "file") final MultipartFile file,
+			@Parameter(description = "The short product name e.g int for international RF2 release") @PathVariable final String product,
+			@Parameter(description = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
 		try {
 			final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), product, version);
 			return new ResponseEntity<>(result, HttpStatus.OK);
@@ -53,7 +53,7 @@ public class ReleaseController {
 	@ResponseBody
 	@Operation(summary = "Check a given release is loaded already", description = "Checks whether a version is loaded or not. The version format is rvf_{product}_{releaseDate} e.g rvf_int_20170131")
 	public ResponseEntity<?> getRelease(
-			@Parameter(name = "The version name e.g rvf_int_20170131") @PathVariable final String version) {
+			@Parameter(description = "The version name e.g rvf_int_20170131") @PathVariable final String version) {
 		if (releaseDataManager.isKnownRelease(version)) {
 			return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
 		} else {

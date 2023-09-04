@@ -97,7 +97,7 @@ public class AssertionController {
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Delete tests from an assertion", description = "Delete tests for a given assertion. Note: This doesn't delete the assertion.")
 	public Assertion deleteTestsForAssertion(
-			@Parameter(name = "Assertion id or uuid") @PathVariable final String id,
+			@Parameter(description = "Assertion id or uuid") @PathVariable final String id,
 			@RequestParam List<Long> testIds) {
 		final Assertion assertion = find(id);
 		Collection<Test> tests = assertionService.getTests(assertion);
@@ -123,7 +123,7 @@ public class AssertionController {
 			@ApiResponse(responseCode = "404", description = "Assertion not found") })
 	@Operation(summary = "Get an assertion", description = "Retrieves an assertion identified by the id.")
 	public ResponseEntity<Assertion> getAssertion(
-			@Parameter(name = "Assertion id or uuid", required = true) @PathVariable final String id) {
+			@Parameter(description = "Assertion id or uuid", required = true) @PathVariable final String id) {
 		Assertion assertion = null;
 		try {
 			assertion = find(id);
@@ -139,7 +139,7 @@ public class AssertionController {
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Delete an assertion", description = "Delete an assertion identified by the id.")
-	public ResponseEntity<Assertion> deleteAssertion(@Parameter(name = "Assertion id or uuid") @PathVariable final String id) {
+	public ResponseEntity<Assertion> deleteAssertion(@Parameter(description = "Assertion id or uuid") @PathVariable final String id) {
 		final Assertion assertion = find(id);
 		if (assertion == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -186,7 +186,7 @@ public class AssertionController {
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Update an assertion", description = "Updates the assertion text,keywords and uuid property for the existing assertion identified by the assertion id or uuid.")
 	public Assertion updateAssertion(
-			@Parameter(name = "Assertion id or uuid") @PathVariable final String id,
+			@Parameter(description = "Assertion id or uuid") @PathVariable final String id,
 			@RequestBody(required = true) final Assertion assertion) {
 		final Assertion existing = find(id);
 
@@ -205,8 +205,8 @@ public class AssertionController {
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Update a specific test for a given assertion", description = "Updates a specific test for a given assertion.")
 	public Assertion updateTest(
-			@Parameter(name = "Assertion id or uuid") @PathVariable String id,
-			@Parameter(name = "Test to be updated") @RequestBody(required = true) Test test) {
+			@Parameter(description = "Assertion id or uuid") @PathVariable String id,
+			@Parameter(description = "Test to be updated") @RequestBody(required = true) Test test) {
 		final Assertion existing = find(id);
 
 		if (existing == null) {
@@ -221,10 +221,10 @@ public class AssertionController {
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Execute tests of an assertion", description = "Executes tests for the assertion specified by the id (assertion id or uuid).")
 	public ResponseEntity<Map<String, Object>> executeTest(
-			@Parameter(name = "Assertion id or uuid") @PathVariable final String id,
-			@Parameter(name = "Unique number") @RequestParam final Long runId,
-			@Parameter(name = "The prospective version to be validated.") @RequestParam final String prospectiveReleaseVersion,
-			@Parameter(name = "The previous release version. Not required when there is no previous release.") @RequestParam(required = false) final String previousReleaseVersion) {
+			@Parameter(description = "Assertion id or uuid") @PathVariable final String id,
+			@Parameter(description = "Unique number") @RequestParam final Long runId,
+			@Parameter(description = "The prospective version to be validated.") @RequestParam final String prospectiveReleaseVersion,
+			@Parameter(description = "The previous release version. Not required when there is no previous release.") @RequestParam(required = false) final String previousReleaseVersion) {
 		final Assertion assertion = find(id);
 		if (assertion == null) {
 			return new ResponseEntity<>((Map<String, Object>) null, HttpStatus.NOT_FOUND);

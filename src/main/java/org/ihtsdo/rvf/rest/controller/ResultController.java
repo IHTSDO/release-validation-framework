@@ -28,7 +28,7 @@ public class ResultController {
 	@RequestMapping(value = "{runId}", method = RequestMethod.GET)
 	@Operation(summary = "Retrieve the validation report for a given run id and storage location.", description = "Retrieves the validation report specified by the runId and storageLocation.")
 	public ResponseEntity<Map<String, Object>> getResult(
-			@Parameter(name = "Unique number") @PathVariable final Long runId,
+			@Parameter(description = "Unique number") @PathVariable final Long runId,
 			@RequestParam(value = "storageLocation") final String storageLocation)
 			throws IOException {
 		// Can we find an rvf status file at that location? Return 404 if not.
