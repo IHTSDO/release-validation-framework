@@ -184,6 +184,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 				   statements.add(cleanedSql);
 				} else {
 					storedProcedureSql.append(cleanedSql);
+					storedProcedureSql.append(";");
 					storedProcedureSql.append("\n");
 				}
 			}
