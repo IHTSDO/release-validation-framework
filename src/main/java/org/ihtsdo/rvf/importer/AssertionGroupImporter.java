@@ -203,7 +203,6 @@ public class AssertionGroupImporter {
 			"89ceaf00-79b9-11e1-b0c4-0800200c9a66",
 			"88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
 			"32b07ff2-9a9a-497f-ae26-92b68ebed20e",
-			"80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
 			"0cc708af-6816-4370-91be-dba8da99d227",
 			"cab60a2f-4239-4933-91d6-dc910a8ac08b"
 
@@ -236,8 +235,7 @@ public class AssertionGroupImporter {
 			"910844a8-97e5-4096-add2-e1734b941e10",
 			"26c25479-c3ba-47f2-9851-bb05ae42ad48",
 			"a98e02f7-e810-449b-89ff-0a9037cea32d",
-			"32b07ff2-9a9a-497f-ae26-92b68ebed20e",
-			"80463c76-d84e-4a1a-8abb-c5b4d12b5da4",
+			"32b07ff2-9a9a-497f-ae26-92b68ebed20e"
 	};
 
 	private static final String[] INT_EDITION_EXCLUDE_LIST = {"2e2542f9-64a4-43d0-bf4e-9029af8b7cf0"};
