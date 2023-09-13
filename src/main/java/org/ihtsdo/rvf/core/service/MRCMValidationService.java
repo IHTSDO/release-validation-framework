@@ -41,8 +41,6 @@ public class MRCMValidationService {
 
 	private static final String EXT_ZIP = ".zip";
 
-	public enum CharacteristicType {inferred, stated}
-
 	@Autowired
 	private WhitelistService whitelistService;
 
@@ -77,7 +75,7 @@ public class MRCMValidationService {
 				snapshotsInputStream.add(testedReleaseFileStream);
 			}
 
-			//Load the dependency package from S3 to snapshot files list before validating if the package is a MS extension and not an edition release
+			//Load the dependency package from S3 to snapshot files list before validating if the package is an MS extension and not an edition release
 			//If the package is an MS edition, it is not necessary to load the dependency
 			Set<String> moduleIds = null;
 			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
@@ -124,8 +122,8 @@ public class MRCMValidationService {
 			executorService.invokeAll(callables);
 
 			if (!whitelistService.isWhitelistDisabled()) {
-				checkWhitelistItems(validationRunnerInferredForm, maxFailureExports);
-				checkWhitelistItems(validationRunnerInStatedForm, maxFailureExports);
+				checkWhitelistItems(validationRunnerInferredForm);
+				checkWhitelistItems(validationRunnerInStatedForm);
 			}
 
 			extractTestResults(maxFailureExports, report, validationRunnerInferredForm, ContentType.INFERRED);
@@ -145,36 +143,35 @@ public class MRCMValidationService {
 		return statusReport;
 	}
 
-	private void checkWhitelistItems(ValidationRun report, int maxFailureExports) throws RestClientException {
+	private void checkWhitelistItems(ValidationRun report) throws RestClientException {
 		for (final Assertion assertion : report.getAssertionsWithWarning()) {
-			checkWhitelistItemAgainstEachAssertion(assertion, maxFailureExports);
+			checkWhitelistItemAgainstEachAssertion(assertion);
 		}
 		for (final Assertion assertion : report.getFailedAssertions()) {
-			checkWhitelistItemAgainstEachAssertion(assertion, maxFailureExports);
+			checkWhitelistItemAgainstEachAssertion(assertion);
 		}
 	}
 
-	private void checkWhitelistItemAgainstEachAssertion(Assertion assertion, int maxFailureExports) throws RestClientException {
+	private void checkWhitelistItemAgainstEachAssertion(Assertion assertion) throws RestClientException {
 		// checking whitelist
-		if (assertion.getCurrentViolatedConceptIds().size() != 0) {
+		if (!assertion.getCurrentViolatedConceptIds().isEmpty()) {
 			List<Long> newViolatedConceptIds = new ArrayList<>();
-			List<ConceptResult> newViolatedConcepts = new ArrayList<>();
-			for (List<Long> batch : Iterables.partition(assertion.getCurrentViolatedConceptIds(), whitelistBatchSize)) {
+            for (List<Long> batch : Iterables.partition(assertion.getCurrentViolatedConceptIds(), whitelistBatchSize)) {
 				// Convert to WhitelistItem
 				List<WhitelistItem> whitelistItems = batch.stream()
 						.map(conceptId -> new WhitelistItem(assertion.getUuid().toString(), "", String.valueOf(conceptId), ""))
 						.collect(Collectors.toList());
 
 				// Send to Authoring acceptance gateway
-				LOGGER.info("Checking %s whitelist items in batch", whitelistItems.size());
+				LOGGER.info("Checking {} whitelist items in batch", whitelistItems.size());
 				List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
 
 				// Find the failures which are not in the whitelisted item
 				newViolatedConceptIds.addAll(batch.stream().filter(conceptId ->
 						whitelistedItems.stream().noneMatch(whitelistedItem -> String.valueOf(conceptId).equals(whitelistedItem.getConceptId()))
-				).collect(Collectors.toList()));
+				).toList());
 			}
-			newViolatedConcepts.addAll(assertion.getCurrentViolatedConcepts().stream().filter(concept -> newViolatedConceptIds.contains(Long.valueOf(concept.getId()))).collect(Collectors.toList()));
+            List<ConceptResult> newViolatedConcepts = new ArrayList<>(assertion.getCurrentViolatedConcepts().stream().filter(concept -> newViolatedConceptIds.contains(Long.valueOf(concept.getId()))).toList());
 			assertion.setCurrentViolatedConceptIds(newViolatedConceptIds);
 			assertion.setCurrentViolatedConcepts(newViolatedConcepts);
 		}
@@ -254,7 +251,7 @@ public class MRCMValidationService {
 
 		TestRunItem testRunItem = createTestRunItem(mrcmAssertion, contentType);
 		testRunItem.setFailureCount((long) failureCount);
-		List<FailureDetail> failedDetails = new ArrayList(firstNCount);
+		List<FailureDetail> failedDetails = new ArrayList<>(firstNCount);
 		if (LateralizableRefsetValidationService.ASSERTION_ID_MEMBERS_NEED_TO_BE_REMOVED_FROM_LATERALIZABLE_REFSET.equals(mrcmAssertion.getUuid().toString())) {
 			for (int i = 0; i < firstNCount; i++) {
 				String refsetMemberId = mrcmAssertion.getCurrentViolatedReferenceSetMembers().get(i);

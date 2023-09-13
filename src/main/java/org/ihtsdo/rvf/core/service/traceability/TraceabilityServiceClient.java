@@ -6,10 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
@@ -39,12 +39,9 @@ public class TraceabilityServiceClient {
                 .errorHandler(new ExpressiveErrorHandler())
                 .build();
 
-        restTemplate.getInterceptors().add(new ClientHttpRequestInterceptor(){
-            @Override
-            public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-                request.getHeaders().addAll(headers);
-                return execution.execute(request, body);
-            }
+        restTemplate.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().addAll(headers);
+            return execution.execute(request, body);
         });
     }
 

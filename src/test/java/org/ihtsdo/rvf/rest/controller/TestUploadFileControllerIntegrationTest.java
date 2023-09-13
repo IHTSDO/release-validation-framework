@@ -131,8 +131,7 @@ public class TestUploadFileControllerIntegrationTest {
 		final Long assertionId = assertion2.getAssertionId();
 
 		// set configuration
-		final String template = "" +
-				"select  " +
+		final String template = "select  " +
 				"concat('CONCEPT: id=',a.id, ':Concept has only one defining relationship but is not primitive.')  " +
 				"from <PROSPECTIVE>.concept_<SNAPSHOT> a  " +
 				"inner join <PROSPECTIVE>.stated_relationship_<SNAPSHOT> b on a.id = b.id " +

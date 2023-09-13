@@ -1,16 +1,5 @@
 package org.ihtsdo.rvf.core.service;
 
-import java.sql.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-import javax.naming.ConfigurationException;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
@@ -20,10 +9,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
+import javax.naming.ConfigurationException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -89,18 +85,13 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		List<Assertion> batch = null;
 		for (final Assertion assertion: assertions) {
 			if (batch == null) {
-				batch = new ArrayList<Assertion>();
+				batch = new ArrayList<>();
 			}
 			batch.add(assertion);
 			if (counter % 10 == 0 || counter == assertions.size()) {
 				final List<Assertion> work = batch;
 				logger.info(String.format("Started executing assertion [%1s] of [%2s]", counter, assertions.size()));
-				final Future<Collection<TestRunItem>> future = executorService.submit(new Callable<Collection<TestRunItem>>() {
-					@Override
-					public Collection<TestRunItem> call() throws Exception {
-						return executeAssertions(work, executionConfig);
-					}
-				});
+				final Future<Collection<TestRunItem>> future = executorService.submit(() -> executeAssertions(work, executionConfig));
 				logger.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
 				//reporting every 10 assertions
 				concurrentTasks.add(future);
@@ -153,8 +144,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				long timeEnd = System.currentTimeMillis();
 				runItem.setRunTime((timeEnd - timeStart));
 			} catch (final Exception e) {
-				e.printStackTrace();
-				logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command);
+				logger.warn("Failed to execute command {},Nested exception is {}", command, e.getMessage(), e);
 				runItem.setFailureMessage("Error executing SQL command object Nested exception : " + e.fillInStackTrace());
 				return runItem;
 			}
@@ -232,7 +222,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String defaultCatalog = dataSource.getDefaultCatalog();
 		String prospectiveSchema = config.getProspectiveVersion();
 		final String[] nameParts = config.getProspectiveVersion().split("_");
-		String moduleId = (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
+		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
 		String includedModules = config.getIncludedModules().stream().collect(Collectors.joining(","));
 		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
 
@@ -260,7 +250,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			// replace all substitutions for exec
 			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
 			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
-			part = part.replaceAll("<MODULEID>", moduleId);
+			part = part.replaceAll("<MODULEID>", defaultModuleId);
 			part = part.replaceAll("<MODULEIDS>", includedModules);
 			part = part.replaceAll("<VERSION>", version);
 			// watch out for any 's that users might have introduced

@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 5.0.0
+
+### Breaking
+- Update libraries to use BOMs and remove explicit version numbers from dependencies.
+- Update to Java 17.
+
 ## 3.14.0
 
 ### Breaking

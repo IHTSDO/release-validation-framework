@@ -77,7 +77,7 @@ public class SimpleAssertion {
 	}
 	
 	public List<String> getTestsAsList() {
-		ArrayList<String> sqls = new ArrayList<String>();
+		ArrayList<String> sqls = new ArrayList<>();
 		for (String[] sqlLines : tests) {
 			sqls.add(StringUtils.join(sqlLines, "\n"));
 		}

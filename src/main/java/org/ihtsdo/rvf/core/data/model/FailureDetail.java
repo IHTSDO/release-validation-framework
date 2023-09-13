@@ -90,7 +90,7 @@ public class FailureDetail implements Comparable<FailureDetail>{
 
 	@Override
 	public int compareTo(FailureDetail other) {
-		return ((Integer)hashCode()).compareTo(other.hashCode());
+		return Integer.compare(hashCode(), other.hashCode());
 	}
 
 	public String getConceptFsn() {

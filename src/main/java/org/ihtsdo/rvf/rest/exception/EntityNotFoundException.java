@@ -1,12 +1,14 @@
-package org.ihtsdo.rvf.rest.helper;
+package org.ihtsdo.rvf.rest.exception;
 
+import java.io.Serial;
 import java.util.UUID;
 
 /**
  * A custom Exception for reporting missing entities.
  *
 */
-public class EntityNotFoundException extends RuntimeException{
+public class EntityNotFoundException extends RuntimeException {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	public EntityNotFoundException(final Long id) {

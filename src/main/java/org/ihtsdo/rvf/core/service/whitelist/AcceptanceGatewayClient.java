@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
@@ -28,7 +28,7 @@ public class AcceptanceGatewayClient {
     private final String acceptanceGatewayServiceUrl;
     private final RestTemplate restTemplate;
     private final HttpHeaders headers;
-    private static final ParameterizedTypeReference<List<WhitelistItem>> WHITELIST_ITEM_LIST_TYPE_REFERENCE = new ParameterizedTypeReference<List<WhitelistItem>>() {};
+    private static final ParameterizedTypeReference<List<WhitelistItem>> WHITELIST_ITEM_LIST_TYPE_REFERENCE = new ParameterizedTypeReference<>() {};
 
     public AcceptanceGatewayClient(String acceptanceGatewayServiceUrl, String authToken) throws URISyntaxException, IOException {
         this.acceptanceGatewayServiceUrl = acceptanceGatewayServiceUrl;
@@ -42,12 +42,9 @@ public class AcceptanceGatewayClient {
                 .build();
 
         //Add a ClientHttpRequestInterceptor to the RestTemplate to add cookies as required
-        restTemplate.getInterceptors().add(new ClientHttpRequestInterceptor(){
-            @Override
-            public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-                request.getHeaders().addAll(headers);
-                return execution.execute(request, body);
-            }
+        restTemplate.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().addAll(headers);
+            return execution.execute(request, body);
         });
     }
 
