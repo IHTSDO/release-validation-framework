@@ -7,6 +7,7 @@ import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.importer.AssertionGroupImporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ public class MySqlQueryTransformer {
         }
         final String[] nameParts = config.getProspectiveVersion().split("_");
         String moduleId = (nameParts.length >= 2 ? AssertionGroupImporter.ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
-        String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
 
         String previousReleaseSchema = config.getPreviousVersion();
         String dependencyReleaseSchema = config.getExtensionDependencyVersion();
@@ -43,6 +43,11 @@ public class MySqlQueryTransformer {
         if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
             throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + previousReleaseSchema);
         }
+
+        final String[] nameParts = config.getProspectiveVersion().split("_");
+        String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
+        String includedModules = config.getIncludedModules().stream().collect(Collectors.joining(","));
+        String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : (nameParts.length >= 2 ? AssertionGroupImporter.ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
         for( String part : parts) {
             if ((part.contains("<PREVIOUS>") && previousReleaseSchema == null)
                     || (part.contains("<DEPENDENCY>") && dependencyReleaseSchema == null)) {
