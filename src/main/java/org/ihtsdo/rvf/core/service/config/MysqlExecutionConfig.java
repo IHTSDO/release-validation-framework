@@ -9,6 +9,7 @@ public class MysqlExecutionConfig {
 	private String previousVersion;
 	private final Long executionId;
 	private List<String> groupNames;
+	private String defaultModuleId;
 	private List<String> includedModules;
 	private int failureExportMax = 10;
 	private boolean firstTimeRelease;
@@ -48,6 +49,14 @@ public class MysqlExecutionConfig {
 
 	public List<String> getIncludedModules() {
 		return includedModules;
+	}
+
+	public void setDefaultModuleId(String defaultModuleId) {
+		this.defaultModuleId = defaultModuleId;
+	}
+
+	public String getDefaultModuleId() {
+		return defaultModuleId;
 	}
 
 	public void setIncludedModules(List<String> includedModules) {

@@ -48,7 +48,7 @@ public class ValidationMessageListener implements Closeable {
 	
 	private void runValidation(final TextMessage incomingMessage) {
 		Gson gson = new Gson();
-		ValidationRunConfig config = null;
+		ValidationRunConfig config;
 		try {
 			config = gson.fromJson(incomingMessage.getText(), ValidationRunConfig.class);
 			LOGGER.info("validation config:" + config);

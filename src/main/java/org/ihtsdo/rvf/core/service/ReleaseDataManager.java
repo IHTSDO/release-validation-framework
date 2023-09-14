@@ -160,8 +160,8 @@ public class ReleaseDataManager {
 			return false;
 			
 		} finally {
-			IOUtils.closeQuietly(inputStream);
-			IOUtils.closeQuietly(out);
+			IOUtils.closeQuietly(inputStream, null);
+			IOUtils.closeQuietly(out, null);
 		}
 		String rvfVersion = getRVFVersion(product, version);
 		logger.info("RVF release version:" + rvfVersion);
@@ -190,8 +190,8 @@ public class ReleaseDataManager {
 			return false;
 			
 		} finally {
-			IOUtils.closeQuietly(inputStream);
-			IOUtils.closeQuietly(out);
+			IOUtils.closeQuietly(inputStream, null);
+			IOUtils.closeQuietly(out, null);
 		}
 		
 		if (schemaNames.contains(schemaName)) {
@@ -234,7 +234,7 @@ public class ReleaseDataManager {
 			createSchema(createdSchemaName);
 			loadReleaseFilesToDB(outputFolder, rvfDynamicDataSource, rf2FilesLoaded, createdSchemaName);
 		} catch (final RVFExecutionException | IOException e) {
-			List<String> fileNames = Arrays.asList(zipDataFile).stream().map(file -> file.getName()).collect(Collectors.toList());
+			List<String> fileNames = Arrays.asList(zipDataFile).stream().map(File::getName).collect(Collectors.toList());
 			final String errorMsg = String.format("Error while loading file %s into version %s", Arrays.toString(fileNames.toArray()), versionName);
 			logger.error(errorMsg,e);
 			throw new BusinessServiceException(errorMsg, e);
@@ -248,13 +248,7 @@ public class ReleaseDataManager {
 
 	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final RvfDynamicDataSource dataSource, List<String> rf2FilesLoaded, String schemaName) throws RVFExecutionException {
 		if (rf2TextFilesDir != null) {
-			final String[] rf2Files = rf2TextFilesDir.list( new FilenameFilter() {
-				
-				@Override
-				public boolean accept(final File dir, final String name) {
-					return name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2"));
-				}
-			});
+			final String[] rf2Files = rf2TextFilesDir.list((dir, name) -> name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2")));
 			final ReleaseFileDataLoader dataLoader = new ReleaseFileDataLoader(dataSource, schemaName, new MySqlDataTypeConverter());
 			dataLoader.loadFilesIntoDB(rf2TextFilesDir.getAbsolutePath(), rf2Files, rf2FilesLoaded);
 		}
@@ -454,7 +448,7 @@ public class ReleaseDataManager {
 				statement.execute(deleteSql);
 				statement.execute(insertSql);
 			} catch (final SQLException e) {
-				logger.error("Failed to update table {} with data from {}  due to {} ", snapshotTbl, deltaTbl, e.fillInStackTrace());
+				logger.error("Failed to update table {} with data from {}  due to {} ", snapshotTbl, deltaTbl, e.getMessage(), e);
 			}
 		}
 		
@@ -523,7 +517,7 @@ public class ReleaseDataManager {
 				Statement statement = connection.createStatement() ) {
 			statement.execute(deleteQaResultSQL);
 		} catch (final SQLException e) {
-			logger.error("Failed to delete data from qa_result table for runId {}  due to {} ", runId, e.fillInStackTrace());
+			logger.error("Failed to delete data from qa_result table for runId {} due to {} ", runId, e.getMessage(), e);
 		}
 	}
 	
@@ -620,8 +614,8 @@ public class ReleaseDataManager {
 			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
 			return null;
 		} finally {
-			IOUtils.closeQuietly(input);
-			IOUtils.closeQuietly(out);
+			IOUtils.closeQuietly(input, null);
+			IOUtils.closeQuietly(out, null);
 		}
 	}
 
@@ -630,8 +624,8 @@ public class ReleaseDataManager {
 		String snomedFile = "";
 		List<String> zipFileList = getFileList(zipDataFile);
 		Optional<String> sctOrDerFile = zipFileList.stream()
-							.filter(file -> ( file.indexOf("sct2_") != -1
-										|| file.indexOf("der2_") != -1)
+							.filter(file -> (file.contains("sct2_")
+										|| file.contains("der2_"))
 										&& file.endsWith(".txt"))
 							.findFirst();
 		if (!sctOrDerFile.isPresent()) {
@@ -688,7 +682,7 @@ public class ReleaseDataManager {
 				String previousDependencyEffectiveTime = executionConfig.getPreviousDependencyEffectiveTime().replaceAll("-", "");
 				for (String snapshotTable : snapShotTables) {
 					insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
-							+ " SELECT * FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f")
+							+ " SELECT * FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable
 							+ " WHERE cast(effectivetime as datetime) > cast('" + previousDependencyEffectiveTime + "' as datetime)";
 					PreparedStatement ps = connection.prepareStatement(insertSQL);
 					logger.info(insertSQL);

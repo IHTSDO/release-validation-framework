@@ -233,7 +233,7 @@ public class MysqlValidationService {
 			for (final TestRunItem item : items) {
 				item.setTestType(TestType.SQL);
 				if (item.getFailureCount() != 0) {
-					if (item.getFailureCount().longValue() == -1L) {
+					if (item.getFailureCount() == -1L) {
 						incompleteItems.add(item);
 					}
 					if (SeverityLevel.WARN.toString().equalsIgnoreCase(item.getSeverity())) {

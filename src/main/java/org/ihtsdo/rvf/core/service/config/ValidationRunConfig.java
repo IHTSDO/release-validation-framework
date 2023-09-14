@@ -30,6 +30,7 @@ public class ValidationRunConfig {
 	private boolean enableDrools;
 	private String effectiveTime;
 	private boolean releaseAsAnEdition;
+	private String defaultModuleId;
 	private String includedModules;
 	private List<String> droolsRulesGroupList;
 	private String bucketName;
@@ -167,6 +168,7 @@ public class ValidationRunConfig {
 				.add("enableDrools=" + enableDrools)
 				.add("effectiveTime='" + effectiveTime + "'")
 				.add("releaseAsAnEdition=" + releaseAsAnEdition)
+				.add("defaultModuleId='" + defaultModuleId + "'")
 				.add("includedModules='" + includedModules + "'")
 				.add("droolsRulesGroupList=" + droolsRulesGroupList)
 				.add("bucketName='" + bucketName + "'")
@@ -276,6 +278,15 @@ public class ValidationRunConfig {
 
 	public ValidationRunConfig setReleaseAsAnEdition(boolean releaseAsAnEdition) {
 		this.releaseAsAnEdition = releaseAsAnEdition;
+		return this;
+	}
+
+	public String getDefaultModuleId() {
+		return defaultModuleId;
+	}
+
+	public ValidationRunConfig setDefaultModuleId(String defaultModuleId) {
+		this.defaultModuleId = defaultModuleId;
 		return this;
 	}
 

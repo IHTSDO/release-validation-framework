@@ -49,13 +49,7 @@ public class RF2FileStructureTester {
 			if (!fileName.endsWith(".txt")) {
 				continue;
 			}
-			Future<Boolean> task = executorService.submit(new Callable<Boolean>() {
-
-				@Override
-				public Boolean call() throws Exception {
-					return runTestForFile(fileName);
-				}
-			});
+			Future<Boolean> task = executorService.submit(() -> runTestForFile(fileName));
 			futures.add(task);
 		}
 		for (Future<Boolean> task : futures) {
@@ -105,7 +99,7 @@ public class RF2FileStructureTester {
 							builder.append(charRead);
 						}
 					}
-					if (!RF2_LINE_SEPARATOR.equals(builder.toString())) {
+					if (!RF2_LINE_SEPARATOR.contentEquals(builder)) {
 						StringBuilder actualResult = new StringBuilder();
 						String actualLineSeparator = builder.toString().replace("\n", "LF").replace("\r", "CR");
 						actualResult.append("the last line is terminated with[");

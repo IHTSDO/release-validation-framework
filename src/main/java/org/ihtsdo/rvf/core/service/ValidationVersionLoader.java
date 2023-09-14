@@ -199,6 +199,7 @@ public class ValidationVersionLoader {
 			executionConfig.setFailureExportMax(validationConfig.getFailureExportMax());
 		}
 
+		executionConfig.setDefaultModuleId(validationConfig.getDefaultModuleId());
 		List<String> includedModules = new ArrayList<>();
 		if (validationConfig.getIncludedModules() != null) {
 			includedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).collect(Collectors.toList()));
@@ -268,19 +269,22 @@ public class ValidationVersionLoader {
 			manifestInput = jobResource.readResourceStreamOrNullIfNotExists(manifestFileFullPath);
 		}
 
-		if (prospectiveInput != null && prospectiveFile != null) {
-			OutputStream out = new FileOutputStream(prospectiveFile);
-			IOUtils.copy(prospectiveInput, out);
-			IOUtils.closeQuietly(prospectiveInput);
-			IOUtils.closeQuietly(out);
+		if (prospectiveInput != null) {
+			try (OutputStream out = new FileOutputStream(prospectiveFile)) {
+				IOUtils.copy(prospectiveInput, out);
+			} finally {
+				IOUtils.closeQuietly(prospectiveInput, null);
+			}
 			logger.debug("local prospective file" + prospectiveFile.getAbsolutePath());
 			validationConfig.setLocalProspectiveFile(prospectiveFile);
 		}
 		if (manifestInput != null) {
-			Writer output = new FileWriter(manifestFile);
-			IOUtils.copy(manifestInput, output, UTF_8);
-			IOUtils.closeQuietly(manifestInput);
-			IOUtils.closeQuietly(output);
+			// Copy manifest input stream to local file
+			try (Writer out = new FileWriter(manifestFile)) {
+				IOUtils.copy(manifestInput, out, UTF_8);
+			} finally {
+				IOUtils.closeQuietly(manifestInput, null);
+			}
 			validationConfig.setLocalManifestFile(manifestFile);
 		}
 		logger.info("Time taken {} seconds to download files {} from s3", (System.currentTimeMillis()-s3StreamingStart)/1000 ,
@@ -288,31 +292,29 @@ public class ValidationVersionLoader {
 	}
 
 	public void downloadPreviousReleaseAndDependencyFiles(ValidationRunConfig validationConfig) throws Exception {
-		if (!StringUtils.isEmpty(validationConfig.getExtensionDependency())) {
+		if (StringUtils.hasLength(validationConfig.getExtensionDependency())) {
 			InputStream dependencyStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getExtensionDependency());
 			if (dependencyStream != null) {
 				File dependencyFile = File.createTempFile(validationConfig.getRunId() + "_DEPENDENCY_RF2", ZIP_FILE_EXTENSION);
-				if (dependencyFile != null) {
-					OutputStream out = new FileOutputStream(dependencyFile);
+				try (OutputStream out = new FileOutputStream(dependencyFile)) {
 					IOUtils.copy(dependencyStream, out);
-					IOUtils.closeQuietly(dependencyStream);
-					IOUtils.closeQuietly(out);
-					validationConfig.setLocalDependencyReleaseFile(dependencyFile);
+				} finally {
+					IOUtils.closeQuietly(dependencyStream, null);
 				}
+				validationConfig.setLocalDependencyReleaseFile(dependencyFile);
 			}
 		}
 
-		if (!StringUtils.isEmpty(validationConfig.getPreviousRelease())) {
+		if (StringUtils.hasLength(validationConfig.getPreviousRelease())) {
 			InputStream previousStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getPreviousRelease());
 			if (previousStream != null) {
 				File previousFile = File.createTempFile(validationConfig.getRunId() + "_PREVIOUS_RF2", ZIP_FILE_EXTENSION);
-				if (previousStream != null) {
-					OutputStream out = new FileOutputStream(previousFile);
+				try (OutputStream out = new FileOutputStream(previousFile)) {
 					IOUtils.copy(previousStream, out);
-					IOUtils.closeQuietly(previousStream);
-					IOUtils.closeQuietly(out);
-					validationConfig.setLocalPreviousReleaseFile(previousFile);
+				} finally {
+					IOUtils.closeQuietly(previousStream, null);
 				}
+				validationConfig.setLocalPreviousReleaseFile(previousFile);
 			}
 		}
 	}

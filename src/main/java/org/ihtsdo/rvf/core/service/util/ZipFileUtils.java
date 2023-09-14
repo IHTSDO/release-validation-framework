@@ -33,7 +33,7 @@ public class ZipFileUtils {
 	 */
 	public static void extractFilesFromZipToOneFolder(final File file, final String outputDir) throws IOException {
 		//debug for investigating encoding issue
-		LOGGER.debug("deafult file.encoding:" + System.getProperty("file.encoding"));
+		LOGGER.debug("default file.encoding:" + System.getProperty("file.encoding"));
 		LOGGER.debug("default charset:" + Charset.defaultCharset());
 		try (ZipFile zipFile = new ZipFile(file)){
 			final Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -52,8 +52,8 @@ public class ZipFileUtils {
 							out = new FileOutputStream(entryDestination);
 							IOUtils.copy(in, out);
 						} finally {
-							IOUtils.closeQuietly(in);
-							IOUtils.closeQuietly(out);
+							IOUtils.close(in);
+							IOUtils.close(out);
 						}
 				}
 			}
@@ -90,8 +90,8 @@ public class ZipFileUtils {
 						out = new FileOutputStream(entryDestination);
 						IOUtils.copy(in, out);
 						} finally {
-							IOUtils.closeQuietly(in);
-							IOUtils.closeQuietly(out);
+							IOUtils.close(in);
+							IOUtils.close(out);
 						}
 				}
 			}
@@ -201,7 +201,7 @@ public class ZipFileUtils {
 		List<String> fileList = 
 			zipFileToOpen.stream()
 				.filter(file -> !file.isDirectory())
-				.map(entry -> entry.getName())
+				.map(ZipEntry::getName)
 				.collect(Collectors.toList());
 		zipFileToOpen.close();
 		return fileList;

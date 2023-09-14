@@ -2,7 +2,7 @@ package org.ihtsdo.rvf.core.service.pojo;
 
 import org.ihtsdo.rvf.core.service.ValidationReportService;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.StringJoiner;
 

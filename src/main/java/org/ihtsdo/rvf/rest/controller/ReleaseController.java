@@ -1,8 +1,8 @@
 package org.ihtsdo.rvf.rest.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.core.service.ReleaseDataManager;
 import org.slf4j.Logger;
@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-
 /**
  * A controller that handles API calls for uploading and checking status of
  * previously published releases. Note: The GET methods in this controller do
@@ -24,20 +23,20 @@ import java.io.IOException;
  */
 @RestController
 @RequestMapping("/releases")
-@Api(tags = "Published releases")
+@Tag(name = "Published Releases")
 public class ReleaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseController.class);
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
 	
-	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST)
+	@RequestMapping(value = "{product}/{version}", method = RequestMethod.POST, consumes = "multipart/form-data")
 	@ResponseBody
-	@ApiOperation(value = "Upload a published release version", notes = "Uploads a published release for a given product.")
-	public ResponseEntity uploadRelease(
-			@ApiParam(value = "The published RF2 zip package") @RequestParam(value = "file") final MultipartFile file,
-			@ApiParam(value = "The short product name e.g int for international RF2 release") @PathVariable final String product,
-			@ApiParam(value = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
+	@Operation(summary = "Upload a published release version", description = "Uploads a published release for a given product.")
+	public ResponseEntity<?> uploadRelease(
+			@Parameter(description = "The published RF2 zip package") @RequestParam(value = "file") final MultipartFile file,
+			@Parameter(description = "The short product name e.g int for international RF2 release") @PathVariable final String product,
+			@Parameter(description = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
 		try {
 			final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), product, version);
 			return new ResponseEntity<>(result, HttpStatus.OK);
@@ -52,9 +51,9 @@ public class ReleaseController {
 
 	@RequestMapping(value = "{version}", method = RequestMethod.GET)
 	@ResponseBody
-	@ApiOperation(value = "Check a given release is loaded already", notes = "Checks whether a version is loaded or not. The version format is rvf_{product}_{releaseDate} e.g rvf_int_20170131")
-	public ResponseEntity getRelease(
-			@ApiParam(value = "The version name e.g rvf_int_20170131") @PathVariable final String version) {
+	@Operation(summary = "Check a given release is loaded already", description = "Checks whether a version is loaded or not. The version format is rvf_{product}_{releaseDate} e.g rvf_int_20170131")
+	public ResponseEntity<?> getRelease(
+			@Parameter(description = "The version name e.g rvf_int_20170131") @PathVariable final String version) {
 		if (releaseDataManager.isKnownRelease(version)) {
 			return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
 		} else {
@@ -65,8 +64,8 @@ public class ReleaseController {
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
-	@ApiOperation(value = "Get all versions that are loaded in the RVF database", 
-	notes = "Gets all versions that are loaded in the RVF database. Published versions are loaded in the format of rvf_{product}_{releaseDate} e.g rvf_int_20170131.")
+	@Operation(summary = "Get all versions that are loaded in the RVF database",
+	description = "Gets all versions that are loaded in the RVF database. Published versions are loaded in the format of rvf_{product}_{releaseDate} e.g rvf_int_20170131.")
 	public java.util.Set<String> getAllKnownReleases() {
 		return releaseDataManager.getAllKnownReleases();
 	}

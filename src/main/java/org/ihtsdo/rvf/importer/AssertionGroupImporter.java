@@ -197,10 +197,20 @@ public class AssertionGroupImporter {
             "e6082dc4-c6f4-48c6-afa3-233182336a5c",
             "eff30fb0-7856-11e1-b0c4-0800200c9a66",
             "fbfc4fd1-f10d-4fc2-889f-df0e089df4b7",
-            "202ef495-5f18-4e3e-8129-63759f2bbbd6"
+            "202ef495-5f18-4e3e-8129-63759f2bbbd6",
+			"d182e8d4-c8e1-4e5f-ae17-b2f786f55727",
+			"23a71f2e-5c90-4090-af07-bcb3fa3d5673",
+			"89ceaf00-79b9-11e1-b0c4-0800200c9a66",
+			"88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
+			"32b07ff2-9a9a-497f-ae26-92b68ebed20e",
+			"0cc708af-6816-4370-91be-dba8da99d227",
+			"cab60a2f-4239-4933-91d6-dc910a8ac08b"
+
+
     };
 
-	private static final String[] MS_AUTHORING_INCLUDE_LIST = {"35680574-3ac6-4b68-9efe-de88b677eb35",
+	private static final String[] MS_AUTHORING_INCLUDE_LIST = {
+			"35680574-3ac6-4b68-9efe-de88b677eb35",
 			"11735994-4b7f-4e61-9bde-059b7e085031",
 			"4478a896-2724-4417-8bce-8986ecc53c4e",
 			"372e59d5-d6f3-4708-93d0-6cb92da69006",
@@ -223,7 +233,9 @@ public class AssertionGroupImporter {
 			"4deb9274-d923-4f84-b0dc-c4dab0c2fc4c",
 			"560e6d0c-64e8-4726-9516-ae7a7606b0b3",
 			"910844a8-97e5-4096-add2-e1734b941e10",
-			"26c25479-c3ba-47f2-9851-bb05ae42ad48"
+			"26c25479-c3ba-47f2-9851-bb05ae42ad48",
+			"a98e02f7-e810-449b-89ff-0a9037cea32d",
+			"32b07ff2-9a9a-497f-ae26-92b68ebed20e"
 	};
 
 	private static final String[] INT_EDITION_EXCLUDE_LIST = {"2e2542f9-64a4-43d0-bf4e-9029af8b7cf0"};
@@ -394,71 +406,26 @@ public class AssertionGroupImporter {
 
 	private void addAssertionsToAssertionGroup(AssertionGroup assertionGroup, List<Assertion> allAssertions) {
 		AssertionGroupName groupName = AssertionGroupName.fromName(assertionGroup.getName());
-		switch (groupName) {
-			case FILE_CENTRIC_VALIDATION :
-			case RELEASE_TYPE_VALIDATION :
-			case COMPONENT_CENTRIC_VALIDATION :
-				addAssertionsByKeyWord(allAssertions, assertionGroup);
-				break;
-			case MDRS_VALIDATION :
-				addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
-				break;
-			case LOINC_EDITION :
-			case SPANISH_EDITION :
-			case DANISH_EDITION	:
-			case SWEDISH_EDITION :
-			case INTERNATIONAL_EDITION :
-			case US_EDITION :
-			case BE_EDITION :
-			case COMMON_EDITION :
-			case NO_EDITION :
-			case CH_EDITION :
-			case IE_EDITION :
-			case GMDN :
-			case EE_EDITION :
-			case AT_EDITION :
-			case AU_EDITION :
-			case GPFP_ICPC2 :
-			case DERIVATIVE_EDITION :
-				addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
-				break;
-			case COMMON_AUTHORING :
-				addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
-				break;
-			case COMMON_AUTHORING_WITHOUT_LANG_REFSETS :
-				addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions, assertionGroup);
-				break;
-			case INT_AUTHORING :
-			case AT_AUTHORING :
-			case AU_AUTHORING :
-			case DK_AUTHORING :
-			case SE_AUTHORING :
-			case US_AUTHORING :
-			case BE_AUTHORING :
-			case NO_AUTHORING :
-			case CH_AUTHORING :
-			case IE_AUTHORING :
-			case NZ_AUTHORING :
-			case ZH_AUTHORING :
-			case EE_AUTHORING :
-            case KR_AUTHORING :
-			case NL_AUTHORING :
-				addAssertionToSnapshotAssertionGroup(assertionGroup);
-				break;
-			case FIRST_TIME_LOINC_VALIDATION :
-			case FIRST_TIME_COMMON_EDITION_VALIDATION :
-				addAssertionsToFirstTimeReleaseGroup(allAssertions, assertionGroup);
-				break;
-			case STATED_RELATIONSHIPS_VALIDATION:
-				addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, false);
-				break;
-			case STATED_RELATIONSHIPS_RELEASE_VALIDATION:
-				addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, true);
-				break;
-			default :
-					 LOGGER.warn("unrecognized group: " + assertionGroup.getName());
-			  break;
-		}
+        switch (groupName) {
+            case FILE_CENTRIC_VALIDATION, RELEASE_TYPE_VALIDATION, COMPONENT_CENTRIC_VALIDATION ->
+                    addAssertionsByKeyWord(allAssertions, assertionGroup);
+            case MDRS_VALIDATION ->
+                    addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
+            case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
+                    addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
+            case COMMON_AUTHORING -> addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
+            case COMMON_AUTHORING_WITHOUT_LANG_REFSETS ->
+                    addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions, assertionGroup);
+            case INT_AUTHORING, AT_AUTHORING, AU_AUTHORING, DK_AUTHORING, SE_AUTHORING, US_AUTHORING, BE_AUTHORING, NO_AUTHORING, CH_AUTHORING, IE_AUTHORING, NZ_AUTHORING, ZH_AUTHORING, EE_AUTHORING, KR_AUTHORING, NL_AUTHORING ->
+                    addAssertionToSnapshotAssertionGroup(assertionGroup);
+            case FIRST_TIME_LOINC_VALIDATION, FIRST_TIME_COMMON_EDITION_VALIDATION ->
+                    addAssertionsToFirstTimeReleaseGroup(allAssertions, assertionGroup);
+            case STATED_RELATIONSHIPS_VALIDATION ->
+                    addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, false);
+            case STATED_RELATIONSHIPS_RELEASE_VALIDATION ->
+                    addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, true);
+            default -> LOGGER.warn("unrecognized group: " + assertionGroup.getName());
+        }
 
 	}
 
@@ -470,7 +437,7 @@ public class AssertionGroupImporter {
 			if (Arrays.asList(COMMON_AUTHORING_ONLY_LIST).contains(assertion.getUuid().toString()) || Arrays.asList(FIRST_TIME_COMMON_ADDITIONAL_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
-			keyWords=assertion.getKeywords();
+			keyWords = assertion.getKeywords();
 			//exclude SNOMED RT assertions
 			if ( Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())) {
 				continue;

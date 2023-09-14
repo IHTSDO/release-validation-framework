@@ -1,9 +1,9 @@
 package org.ihtsdo.rvf.rest.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.io.IOException;
 public class RootController {
 
 	@RequestMapping(path = "/", method = RequestMethod.GET)
-	@ApiIgnore
+	@Hidden
 	public void getRoot(HttpServletResponse response) throws IOException {
 		response.sendRedirect("swagger-ui.html");
 	}

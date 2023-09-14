@@ -46,7 +46,7 @@ public class MysqlFailuresExtractor {
     private AssertionService assertionService;
 
     public void extractTestResults(final List<TestRunItem> items, final MysqlExecutionConfig config, List<Assertion> assertions) throws SQLException, RestClientException {
-        Map<UUID, Long> uuidToAssertionIdMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, assertion -> assertion.getAssertionId()));
+        Map<UUID, Long> uuidToAssertionIdMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, Assertion::getAssertionId));
         try (Connection connection = dataSource.getConnection()) {
             Map<String, Integer> assertionIdToTotalFailureMap = getAssertionIdToTotalFailureMap(connection, config);
             if (whitelistService.isWhitelistDisabled()) {
@@ -64,7 +64,7 @@ public class MysqlFailuresExtractor {
                 item.setFailureCount(Long.valueOf(assertionIdToTotalFailureMap.get(key)));
                 item.setFirstNInstances(fetchFailureDetails(connection, config.getExecutionId(), uuidToAssertionIdMap.get(item.getAssertionUuid()), config.getFailureExportMax(), null, null));
             } else {
-                if (StringUtils.isEmpty(item.getFailureMessage())) {
+                if (!StringUtils.hasLength(item.getFailureMessage())) {
                     item.setFailureCount(0L);
                     item.setFirstNInstances(null);
                 } else {
@@ -105,7 +105,7 @@ public class MysqlFailuresExtractor {
                         totalFilteredOutFailures += (totalBatchFailures - failureDetails.size());
                     }
 
-                    if (failureDetails.size() != 0) {
+                    if (!failureDetails.isEmpty()) {
                         // Convert to WhitelistItem
                         List<WhitelistItem> whitelistItems = failureDetails.stream()
                                 .map(failureDetail -> new WhitelistItem(item.getAssertionUuid().toString(), StringUtils.hasLength(failureDetail.getComponentId())? failureDetail.getComponentId() : "", failureDetail.getConceptId(), failureDetail.getFullComponent()))
@@ -117,7 +117,7 @@ public class MysqlFailuresExtractor {
                         // Find the failures which are not in the whitelisted item
                         List<FailureDetail> validFailures = failureDetails.stream().filter(failure ->
                                 whitelistedItems.stream().noneMatch(whitelistedItem -> failure.getComponentId().equals(whitelistedItem.getComponentId()))
-                        ).collect(Collectors.toList());
+                        ).toList();
 
                         totalWhitelistedFailures += whitelistedItems.size();
                         firstNInstances.addAll(validFailures);
@@ -125,11 +125,11 @@ public class MysqlFailuresExtractor {
                     batchCounter++;
                 }
 
-                if (firstNInstances.size() == 0) {
+                if (firstNInstances.isEmpty()) {
                     item.setFailureCount(0L);
                     item.setFirstNInstances(null);
                 } else {
-                    item.setFailureCount(Long.valueOf(totalFailures - totalWhitelistedFailures - totalFilteredOutFailures));
+                    item.setFailureCount((long) (totalFailures - totalWhitelistedFailures - totalFilteredOutFailures));
                     item.setFirstNInstances(firstNInstances.size() > config.getFailureExportMax() ? firstNInstances.subList(0, config.getFailureExportMax()) : firstNInstances);
                 }
             } else {
@@ -159,7 +159,7 @@ public class MysqlFailuresExtractor {
                         if (i == 4) {
                             failureDetail.setModuleId(resultSet.getString(i));
                         }
-                        if(additionalFields.length() > 0) {
+                        if (!additionalFields.isEmpty()) {
                             additionalFields.append(",");
                         }
                         additionalFields.append(resultSet.getString(i));
@@ -179,7 +179,7 @@ public class MysqlFailuresExtractor {
             preparedStatement.setLong(1, config.getExecutionId());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    assertionIdToTotalFailureMap.put(resultSet.getString(1), Integer.valueOf(resultSet.getInt(2)));
+                    assertionIdToTotalFailureMap.put(resultSet.getString(1), resultSet.getInt(2));
                 }
             }
         }
@@ -195,7 +195,7 @@ public class MysqlFailuresExtractor {
         else if (failureExportMax > 0) {
             resultSQL += " limit ?";
         }
-        List<FailureDetail> firstNInstances = new ArrayList();
+        List<FailureDetail> firstNInstances = new ArrayList<>();
         long counter = 0;
         try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
             // select results that match execution
@@ -222,15 +222,11 @@ public class MysqlFailuresExtractor {
     private List<Assertion> getAssertionsAndJoinGroups() {
         List<Assertion> assertions = assertionService.findAll();
         List<AssertionGroup> assertionGroups = assertionService.getAllAssertionGroups();
-        assertionGroups.stream().forEach(assertionGroup -> {
-            assertionGroup.getAssertions().stream().forEach(a -> {
-                assertions.stream().forEach(b -> {
-                    if (a.getUuid().toString().equals(b.getUuid().toString())) {
-                        b.addGroup(assertionGroup.getName());
-                    }
-                });
-            });
-        });
+        assertionGroups.forEach(assertionGroup -> assertionGroup.getAssertions().forEach(a -> assertions.forEach(b -> {
+            if (a.getUuid().toString().equals(b.getUuid().toString())) {
+                b.addGroup(assertionGroup.getName());
+            }
+        })));
         return assertions;
     }
 

@@ -10,9 +10,10 @@ import org.ihtsdo.rvf.core.service.whitelist.WhitelistItem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -29,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ContextConfiguration(classes = TestConfig.class)
+@ExtendWith(MockitoExtension.class)
 public class RVFAssertionsWhitelistIntegrationTest {
     private static final String COMPONENT_CENTRIC_VALIDATION = "component-centric-validation";
     private static final String PROSPECTIVE_RELEASE = "rvf_regression_test_prospective";
@@ -59,8 +61,6 @@ public class RVFAssertionsWhitelistIntegrationTest {
 
     @BeforeEach
     public void setUp() throws IOException, BusinessServiceException {
-        MockitoAnnotations.initMocks(this);
-
         if (!isRunFirstTime) {
             return;
         }

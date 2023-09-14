@@ -66,8 +66,7 @@ public class AssertionExecutionServiceIntegrationTest {
 		assert assertionExecutionService != null;
 		assert dataSource != null;
 		// set configuration
-		final String template = "" +
-				"select  " +
+		final String template = "select  " +
 				"concat('CONCEPT: id=',a.id, ':Concept has only one defining relationship but is not primitive.')  " +
 				"from <PROSPECTIVE>.concept_<SNAPSHOT> a  " +
 				"inner join <PROSPECTIVE>.stated_relationship_<SNAPSHOT> b on a.id = b.id " +
@@ -95,8 +94,7 @@ public class AssertionExecutionServiceIntegrationTest {
 		assert assertionExecutionService != null;
 		assert dataSource != null;
 		// set configuration
-		final String template = "" +
-				"create or replace view v_act_langrs as " +
+		final String template = "create or replace view v_act_langrs as " +
 				"select referencedcomponentid " +
 				"from <PROSPECTIVE>.langrefset_<SNAPSHOT> " +
 				"where active = '1';" +

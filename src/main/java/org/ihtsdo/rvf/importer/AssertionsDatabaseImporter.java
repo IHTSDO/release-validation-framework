@@ -1,16 +1,19 @@
 package org.ihtsdo.rvf.importer;
 
 import com.facebook.presto.sql.parser.StatementSplitter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
-import org.ihtsdo.rvf.core.data.model.*;
+import org.ihtsdo.rvf.core.data.model.Assertion;
+import org.ihtsdo.rvf.core.data.model.ExecutionCommand;
+import org.ihtsdo.rvf.core.data.model.Test;
+import org.ihtsdo.rvf.core.data.model.TestType;
 import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.service.util.MySqlQueryTransformer;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.filter.ElementFilter;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
@@ -21,15 +24,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
 	 * An implementation of a {@link org.ihtsdo.rvf.importer.AssertionsDatabaseImporter} that imports older
-	 * Release Assertion Toolkit content via XML and SQL files. The XML file defines the assertions and the SQL files are
+	 * Release Assertion Toolkit content via XML and SQL files. The XML file defines assertions and SQL files are
 	 * used to populate the corresponding tests.
 	 */
 	@Service
@@ -38,7 +41,6 @@ import java.util.*;
 
 		private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
 		private static final String CREATE_FUNCTION = "CREATE FUNCTION";
-		private static final String JSON_EXTENSION = ".json";
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 		private static final String RESOURCE_PATH_SEPARATOR = "/";
 
@@ -46,154 +48,115 @@ import java.util.*;
 		@Qualifier("assertionResourceManager")
 		private ResourceManager assertionResourceManager;
 
-		protected ObjectMapper objectMapper = new ObjectMapper();
-		private final Map<String, String> lookupMap = new HashMap<>();
 		@Autowired
-		AssertionService assertionService;
+		private AssertionService assertionService;
 
 		public boolean isAssertionImportRequired() {
 			List<Assertion> assertions = assertionService.findAll();
 			return assertions == null || assertions.isEmpty();
 		}
 
-		public List<Assertion> getAssertionsFromFile(final InputStream manifestInputStream) {
-			final Document xmlDocument = getJDomDocumentFromFile(manifestInputStream);
-			List<Assertion> assertions = new ArrayList<>();
-			if(xmlDocument != null)
-			{
-				final XPathFactory factory = XPathFactory.instance();
-				final XPathExpression expression = factory.compile("//script");
-				final List<Element> scriptElements = expression.evaluate(xmlDocument);
-				if(scriptElements.size() > 0) {
-					// get various values from script element
-					for (final Element element : scriptElements) {
-						assertions.add(createAssertionFromElement(element));
-
-					}
+		/**
+		 * Imports assertions from the given manifest file input stream. The manifest file should be an XML file
+		 * containing a list of assertions to import. Each assertion should contain a list of SQL scripts to execute
+		 * to populate the assertion tests.
+		 * @param manifestInputStream the manifest file input stream
+		 * @param sqlFileDir the directory containing the SQL files
+		 * @throws IOException if there is an error reading the manifest file
+		 */
+		public void importAssertionsFromManifest(final InputStream manifestInputStream, final String sqlFileDir) throws IOException {
+			final List<Element> scriptElements = getScriptElements(manifestInputStream);
+			if (scriptElements.isEmpty()) {
+				logger.warn("There are no script elements to import in the XML file provided. Please note that the " +
+						"XML file should contain element named script");
+			} else {
+				// Create Assertions and tests from script elements
+				for (final Element element : scriptElements) {
+					createAssertionAndTest(element, sqlFileDir);
 				}
-			}
-			return assertions;
-		}
-
-		public void importAssertionsFromFile(final InputStream manifestInputStream, final String sqlResourcesFolderLocation){
-			// get JDOM document from given manifest file
-			final Document xmlDocument = getJDomDocumentFromFile(manifestInputStream);
-			if(xmlDocument != null)
-			{
-				final XPathFactory factory = XPathFactory.instance();
-				final XPathExpression expression = factory.compile("//script");
-				final List<Element> scriptElements = expression.evaluate(xmlDocument);
-				if(scriptElements.size() > 0)
-				{
-					// get various values from script element
-					for(final Element element : scriptElements)
-					{
-						final Assertion assertion = createAssertionFromElement(element);
-						if(assertion != null){
-							try
-							{
-								logger.info("Created assertion id : " + assertion.getAssertionId());
-								assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
-								// get Sql file name from element and use it to add SQL test
-								final String sqlFileName = element.getAttributeValue("sqlFile");
-								logger.info("sqlFileName = " + sqlFileName);
-								String category = element.getAttributeValue("category");
-								/*
-									We know category is written as file-centric-validation, component-centric-validation, etc
-									We use this to generate the corresponding using folder name = category - validation
-								  */
-								final int index = category.indexOf("validation");
-								if(index > -1)
-								{
-									category = category.substring(0, index-1);
-								}
-								logger.info("category = " + category);
-
-								String sqlResourceFileName = sqlResourcesFolderLocation + RESOURCE_PATH_SEPARATOR + category + RESOURCE_PATH_SEPARATOR + sqlFileName;
-								InputStream sqlInputStream = null;
-								sqlInputStream = assertionResourceManager.readResourceStream(sqlResourceFileName);
-								if (sqlInputStream != null) {
-									final String sqlString = readStream(sqlInputStream);
-									// add test to assertion
-									if(isPreRequisitesSql(sqlFileName)){ //handle pre-requisites.sql
-										addPreRequisiteSqlToAssertion(assertion, sqlString);
-									} else{
-										addSqlTestToAssertion(assertion, sqlString);
-									}
-								} else {
-									String msg = "Failed to find sql file name from source:" + sqlResourceFileName + " for assertion uuid:" + assertion.getUuid();
-									logger.error(msg);
-									throw new IllegalStateException(msg);
-								}
-							}
-							catch (final Exception e) {
-								logger.warn("Error reading sql from input stream. Nested exception is : " + e.getMessage());
-								throw new IllegalStateException("Failed to add sql script test to assertion with uuid:" + assertion.getUuid(), e);
-							}
-						}
-						else{
-							throw new IllegalStateException("Error creating assertion");
-						}
-					}
-
-					// finally print all lookup map contents for debugging - //todo save somewhere?
-				logger.debug("lookupMap = " + lookupMap);
-				}
-				else{
-					logger.error("There are no script elements to import in the XML file provided. Please note that the " +
-							"XML file should contain element named script");
-				}
-			}
-			else{
-				logger.warn("Error generating document from xml file passed : " + manifestInputStream);
 			}
 		}
 
-	/**
-	 * 
-	 * @param sqlFileName
-	 * @return
-	 */
+		 List<Element> getScriptElements(InputStream manifestInputStream) throws IOException {
+			// Get JDOM document from given manifest file input stream
+			final Document xmlDocument;
+			try {
+				final SAXBuilder sax = new SAXBuilder();
+				xmlDocument = sax.build(manifestInputStream);
+			} catch (JDOMException e) {
+				throw new IOException("Failed to parse manifest file.", e);
+			}
+			final XPathFactory factory = XPathFactory.instance();
+			final XPathExpression<Element> expression = factory.compile("//script", new ElementFilter("script"));
+			return expression.evaluate(xmlDocument);
+		}
+
+
+		private void createAssertionAndTest(Element element, String sqlFileDir) {
+			Assertion assertion = createAssertionFromElement(element);
+			// Persist assertion
+			assertionService.create(assertion);
+			// Add SQL tests to assertion
+			try {
+				addSqlTestsToAssertion(assertion, element, sqlFileDir);
+			} catch (Exception e) {
+				String errorMsg = "Failed to add sql script test to assertion with uuid:" + assertion.getUuid();
+				logger.error(errorMsg, e);
+				throw new IllegalStateException(errorMsg, e);
+			}
+		}
+
+		private void addSqlTestsToAssertion(Assertion assertion, Element element, String sqlFileDir) throws IOException {
+			assert UUID.fromString(element.getAttributeValue("uuid")).equals(assertion.getUuid());
+			// get Sql file name from element and use it to add SQL test
+			final String sqlFileName = element.getAttributeValue("sqlFile");
+			logger.debug("sqlFileName = " + sqlFileName);
+			String category = element.getAttributeValue("category");
+			// Category is written as file-centric-validation, component-centric-validation, etc.
+			// Use this to generate the corresponding using folder name = category - validation
+			final int index = category.indexOf("validation");
+			if (index > -1) {
+				category = category.substring(0, index-1);
+			}
+			logger.debug("category = {} ", category);
+			String sqlFullFilename = sqlFileDir + RESOURCE_PATH_SEPARATOR + category + RESOURCE_PATH_SEPARATOR + sqlFileName;
+			InputStream sqlInputStream = assertionResourceManager.readResourceStream(sqlFullFilename);
+			if (sqlInputStream == null) {
+				String msg = "Failed to find sql file name from source:" + sqlFullFilename + " for assertion uuid:" + assertion.getUuid();
+				logger.error(msg);
+				throw new IllegalStateException(msg);
+			}
+			final String sqlString = IOUtils.toString(sqlInputStream, UTF_8);
+			// add test to assertion
+			if(isPreRequisitesSql(sqlFileName)){ //handle pre-requisites.sql
+				try {
+					addPreRequisiteSqlToAssertion(assertion, sqlString);
+				} catch (Exception e) {
+					String errorMsg = "Failed to add pre-requisite sql script test to assertion with uuid:" + assertion.getUuid();
+					logger.error(errorMsg, e);
+					throw new IllegalStateException(errorMsg, e);
+				}
+			} else{
+				addSqlTestToAssertion(assertion, sqlString);
+			}
+		}
+
 		private boolean isPreRequisitesSql(String sqlFileName){
 			return sqlFileName.equalsIgnoreCase("pre-requisites.sql");
 		}
 
-		protected Assertion createAssertionFromElement(final Element element){
-
+		private Assertion createAssertionFromElement(final Element element){
 			final String category = element.getAttributeValue("category");
-			logger.info("category = " + category);
 			final String uuid = element.getAttributeValue("uuid");
-			logger.info("uuid = " + uuid);
 			final String text = element.getAttributeValue("text");
-			logger.info("text = " + text);
-			final String sqlFileName = element.getAttributeValue("sqlFile");
-			logger.info("sqlFileName = " + sqlFileName);
 			final String severity = element.getAttributeValue("severity");
-			logger.info("severity = " + severity);
-
-			// add entities using rest client
-			final UUID key = UUID.fromString(uuid);
-			final Assertion assertionFromDb = assertionService.findAssertionByUUID(key);
-			final Assertion assertion;
-			if (assertionFromDb != null) {
-			    assertion = assertionFromDb;
-			} else {
-			    assertion = new Assertion();
-			    assertion.setUuid(key);
-			}
+			final Assertion assertion = new Assertion();
+			assertion.setUuid(UUID.fromString(uuid));
 			assertion.setAssertionText(text);
 			assertion.setKeywords(category);
 			assertion.setSeverity(severity);
-			if (assertionFromDb == null) {
-			    return assertionService.create(assertion);
-			} else {
-
-			    assertionService.deleteTests(assertionFromDb, assertionService.getTests(assertionFromDb));
-			    return assertionService.save(assertion);
-			}
+			return assertion;
 		}
-
-
 
 		public void addSqlTestToAssertion(final Assertion assertion, final String sql){
 
@@ -204,35 +167,29 @@ import java.util.*;
 			}
 			final StringBuilder storedProcedureSql = new StringBuilder();
 			boolean storedProcedureFound = false;
-			for(final StatementSplitter.Statement statement : splitter.getCompleteStatements())
-			{
+			for (final StatementSplitter.Statement statement : splitter.getCompleteStatements()) {
 				String cleanedSql = statement.statement();
 				logger.debug("sql to be cleaned:" + cleanedSql);
 				if( cleanedSql.toUpperCase().startsWith(CREATE_PROCEDURE) || cleanedSql.toUpperCase().startsWith(CREATE_FUNCTION)) {
 					storedProcedureFound = true;
 				}
-				// tokenise and process statement
+				// Process SQL statement
 				final StringTokenizer tokenizer = new StringTokenizer(cleanedSql);
-				while(tokenizer.hasMoreTokens())
-				{
+				while(tokenizer.hasMoreTokens()) {
 					String token = tokenizer.nextToken();
-					// we know sometimes tokenizer messed up and leaves a trailing ), so we clean this up
-					if(token.endsWith(")")){
+					// sometimes tokenizer messed up and leaves a trailing ')', so we clean this up
+					if (token.endsWith(")")){
 						token = token.substring(0, token.length() - 1);
 					}
-					if(token.length() > 2 && token.startsWith("'") && token.endsWith("'")){
+					if (token.length() > 2 && token.startsWith("'") && token.endsWith("'")){
 						token = token.substring(1, token.length() - 1);
 					}
 					final Map<String, String> schemaMapping = getRvfSchemaMapping(token);
-					if(schemaMapping.keySet().size() > 0){
-
-						lookupMap.put(token, schemaMapping.get(token));
+					if (!schemaMapping.keySet().isEmpty()) {
 						// now replace all instances with rvf mapping
-						if (schemaMapping.get(token) != null)
-						{
+						if (schemaMapping.get(token) != null) {
 							cleanedSql = cleanedSql.replaceAll(token, schemaMapping.get(token));
 						}
-
 					}
 				}
 				cleanedSql = cleanedSql.replaceAll("runid", "run_id");
@@ -243,17 +200,17 @@ import java.util.*;
 				if (!storedProcedureFound) {
 				   statements.add(cleanedSql);
 				} else {
-					storedProcedureSql.append(cleanedSql + ";\n");
+					storedProcedureSql.append(cleanedSql);
+					storedProcedureSql.append(";");
+					storedProcedureSql.append("\n");
 				}
 			}
-			if (storedProcedureFound && storedProcedureSql.length() > 0) {
+			if (storedProcedureFound && !storedProcedureSql.isEmpty()) {
 				statements.add(storedProcedureSql.toString());
-				logger.debug("Stored proecure found:" + storedProcedureSql);
+				logger.debug("Stored procedure found {}", storedProcedureSql);
 			}
-
 			uploadTest(assertion, sql, statements);
 		}
-
 
 		protected void addPreRequisiteSqlToAssertion(final Assertion assertion, String preRequisiteSql) throws BusinessServiceException {
 			MySqlQueryTransformer mySqlQueryTransformer = new MySqlQueryTransformer();
@@ -261,9 +218,9 @@ import java.util.*;
 			uploadTest(assertion, preRequisiteSql, sqlStatements);
 		}
 
-		private void uploadTest (Assertion assertion, String orignalSql, List<String> sqlStatements) {
+		private void uploadTest (Assertion assertion, String originalSql, List<String> sqlStatements) {
 			final ExecutionCommand command = new ExecutionCommand();
-			command.setTemplate(orignalSql);
+			command.setTemplate(originalSql);
 			command.setStatements(sqlStatements);
 			final Test test = new Test();
 			test.setType(TestType.SQL);
@@ -272,146 +229,57 @@ import java.util.*;
 			// we have to add as a list of tests, since api spec expects list of tests
 			final List<Test> tests = new ArrayList<>();
 			tests.add(test);
-
-			//import via assertion service
-//			if( assertionService.findAssertionByUUID(assertion.getUuid()) == null ) {
-//				assertion = assertionService.create(assertion);
-//			}
-			logger.debug("Adding tests for assertion id" + assertion.getAssertionId());
+			logger.debug("Adding tests for assertion id {}", assertion.getAssertionId());
 			assertionService.addTests(assertion, tests);
-
 		}
 
-		protected static Document getJDomDocumentFromFile(final InputStream manifestInputStream){
-
-			try {
-				final SAXBuilder sax = new SAXBuilder();
-				return sax.build(manifestInputStream);
-			}
-			catch (JDOMException | IOException e) {
-				logger.warn("Nested exception is : " + e.fillInStackTrace());
-				return null;
-			}
-		}
-
-		protected static String readStream(final InputStream is) throws Exception {
-			final InputStreamReader reader = new InputStreamReader(is);
-			final StringBuilder builder = new StringBuilder();
-			final char[] buffer = new char[1024];
-			// Wait for at least 1 byte (e.g. stdin)
-			int n = reader.read(buffer);
-			builder.append(buffer, 0, n);
-			while(reader.ready()) {
-				n = reader.read(buffer);
-				builder.append(buffer, 0, n);
-			}
-			return builder.toString();
-		}
-
-		protected Map<String, String> getRvfSchemaMapping(String ratSchema){
+		private Map<String, String> getRvfSchemaMapping(String ratSchema){
 			String rvfSchema = "";
 			ratSchema = ratSchema.trim();
 			final String originalRatSchema = ratSchema;
 			boolean currOrPrevFound = false;
-			if(ratSchema.startsWith("curr_")){
+			if (ratSchema.startsWith("curr_")){
 				rvfSchema = "<PROSPECTIVE>";
 				// we strip the prefix - note we don't include _ in length since strings are 0 indexed
 				ratSchema = ratSchema.substring("curr_".length());
 				currOrPrevFound = true;
-			}
-			else if(ratSchema.startsWith("prev_")){
+			} else if (ratSchema.startsWith("prev_")){
 				rvfSchema = "<PREVIOUS>";
 				// we strip the prefix - note we don't include _ in length since strings are 0 indexed
 				ratSchema = ratSchema.substring("prev_".length());
 				currOrPrevFound = true;
-			}
-			else if(ratSchema.startsWith("dependency_")){
+			} else if (ratSchema.startsWith("dependency_")){
 				rvfSchema = "<DEPENDENCY>";
 				ratSchema = ratSchema.substring("dependency_".length());
-			}
-			else if(ratSchema.startsWith("v_")){
+			} else if (ratSchema.startsWith("v_")){
 				// finally process token that represents temp tables - starts with v_
 				ratSchema = ratSchema.substring("v_".length());
 				rvfSchema = "<TEMP>" + "." + ratSchema;
 			}
-
-			// hack to clean up conditions where tokenisation produces schema mappings with ) at the end
-			if(currOrPrevFound && ratSchema.endsWith(")")){
+			// clean up conditions where tokenization produces schema mappings with ')' at the end
+			if (currOrPrevFound && ratSchema.endsWith(")")){
 				ratSchema = ratSchema.substring(0, ratSchema.lastIndexOf(")"));
 			}
-
 			// now process for release type suffix
-			if(ratSchema.endsWith("_s")){
-				// we strip the suffix
-				ratSchema = ratSchema.substring(0, ratSchema.length() - 2);
-				rvfSchema = rvfSchema + "." + ratSchema + "_<SNAPSHOT>";
+			if (ratSchema.endsWith("_s")){
+				rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<SNAPSHOT>";
+			} else if (ratSchema.endsWith("_d")){
+				rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<DELTA>";
+			} else if (ratSchema.endsWith("_f")){
+				rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<FULL>";
 			}
-			else if(ratSchema.endsWith("_d")){
-				// we strip the suffix
-				ratSchema = ratSchema.substring(0, ratSchema.length() - 2);
-				rvfSchema = rvfSchema + "." + ratSchema + "_<DELTA>";
-			}
-			else if(ratSchema.endsWith("_f")){
-				// we strip the suffix
-				ratSchema = ratSchema.substring(0, ratSchema.length() - 2);
-				rvfSchema = rvfSchema + "." + ratSchema + "_<FULL>";
-			}
-
-			if (rvfSchema.length() > 0) {
+			if (!rvfSchema.isEmpty()) {
 				final Map<String, String> map = new HashMap<>();
 				map.put(originalRatSchema, rvfSchema);
-
 				return map;
+			} else {
+				return Collections.emptyMap();
 			}
-			else{
-				return Collections.EMPTY_MAP;
-			}
-
 		}
 
-
-		/**
-		 * Attempts to import any .json file in taretDir and child directories
-		 * @param targetDir
-		 * @param keywords
-		 * @throws JsonProcessingException
-		 */
-		public void importAssertionsFromDirectory(File targetDir, String keywords) throws JsonProcessingException {
-			logger.info("Loading json files from {}", targetDir);
-			ObjectMapper mapper = new ObjectMapper();
-			SimpleAssertion assertion = null;
-			for (File file : targetDir.listFiles()) {
-				if (file.isDirectory()) {
-					importAssertionsFromDirectory(file, keywords + "," + file.getName());
-				} else {
-					if (file.getName().endsWith(JSON_EXTENSION)) {
-						try {
-							assertion = mapper.readValue(file, SimpleAssertion.class);
-							//If keywords are not specified in the file, take them from the directory name
-							if (assertion.getKeywords() == null || assertion.getKeywords().isEmpty()) {
-								assertion.setKeywords(keywords);
-							}
-						} catch (Exception e) {
-							logger.error("Failed to parse {} ", file.getName(), e);
-						}
-						createOrUpdateAssertion(assertion);
-					} else {
-						logger.info ("Skipping non-json file {}", file.getAbsolutePath());
-					}
-				}
-			}
-
+		private static String scripSuffix(String ratSchema) {
+			return ratSchema.substring(0, ratSchema.length() - 2);
 		}
 
-		private void createOrUpdateAssertion(SimpleAssertion simpleAssertion) {
-			Assertion assertion = simpleAssertion.toAssertion();
-			//Do we need to create that assertion or does it already exist?
-			if ( assertionService.find(assertion.getAssertionId()) != null) {
-				assertionService.delete(assertion);
-			}
-			assertion = assertionService.create(assertion);
-			List<String> tests = simpleAssertion.getTestsAsList();
-			uploadTest(assertion, null, tests);
-		}
 	}
 

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.naming.ConfigurationException;
+import javax.naming.ConfigurationException;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
@@ -22,10 +23,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
+import javax.naming.ConfigurationException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -91,18 +99,13 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		List<Assertion> batch = null;
 		for (final Assertion assertion: assertions) {
 			if (batch == null) {
-				batch = new ArrayList<Assertion>();
+				batch = new ArrayList<>();
 			}
 			batch.add(assertion);
 			if (counter % 10 == 0 || counter == assertions.size()) {
 				final List<Assertion> work = batch;
 				logger.info(String.format("Started executing assertion [%1s] of [%2s]", counter, assertions.size()));
-				final Future<Collection<TestRunItem>> future = executorService.submit(new Callable<Collection<TestRunItem>>() {
-					@Override
-					public Collection<TestRunItem> call() throws Exception {
-						return executeAssertions(work, executionConfig);
-					}
-				});
+				final Future<Collection<TestRunItem>> future = executorService.submit(() -> executeAssertions(work, executionConfig));
 				logger.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
 				//reporting every 10 assertions
 				concurrentTasks.add(future);
@@ -155,8 +158,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				long timeEnd = System.currentTimeMillis();
 				runItem.setRunTime((timeEnd - timeStart));
 			} catch (final Exception e) {
-				e.printStackTrace();
-				logger.warn("Failed to excute command {},Nested exception is : " + e.fillInStackTrace(), command);
+				logger.warn("Failed to execute command {},Nested exception is {}", command, e.getMessage(), e);
 				runItem.setFailureMessage("Error executing SQL command object Nested exception : " + e.fillInStackTrace());
 				return runItem;
 			}
@@ -230,9 +232,10 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 	}
 
 	private List<String> transformSql(String[] parts, Assertion assertion, MysqlExecutionConfig config) throws ConfigurationException {
+		String defaultCatalog = dataSource.getDefaultCatalog();
 		String qaResult = dataSource.getDefaultCatalog()+ "." + qaResulTableName;
 		MySqlQueryTransformer queryTransformer = new MySqlQueryTransformer();
-		Map configMap = Map.of("qa_result",qaResult, "<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
+		Map configMap = Map.of("default_catalog", defaultCatalog, "qa_result",qaResult, "<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
 		return queryTransformer.transformSql(parts, config, configMap);
 	}
 

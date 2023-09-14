@@ -99,7 +99,7 @@ public class ResourceDataLoader {
 				final File temp = File.createTempFile("load-resource-data.txt", null);
 				try {
 					try (final InputStream input = getClass().getResourceAsStream("/sql/load-resource-data.sql")) {
-						for (String line : IOUtils.readLines(input)) {
+						for (String line : IOUtils.readLines(input, UTF_8)) {
 							// process line and add to output file
 							line = line.replaceAll("<data_location>", localResourceDir.getPath());
 							FileUtils.writeStringToFile(temp, line + "\n",UTF_8, true);
