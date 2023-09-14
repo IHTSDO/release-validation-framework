@@ -74,6 +74,8 @@ public class MySqlQueryTransformer {
             part = part.replaceAll("<DELTA>", deltaTableSuffix);
             part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
             part = part.replaceAll("<FULL>", fullTableSuffix);
+            part = part.replaceAll(Pattern.quote("[[:<:]]"),"\\\\b" );
+            part = part.replaceAll(Pattern.quote("[[:>:]]"),"\\\\b" );
             for(Map.Entry<String, String> configMapEntry: configMap.entrySet()){
                 part = part.replaceAll(configMapEntry.getKey(), configMapEntry.getValue());
             }
