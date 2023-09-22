@@ -31,6 +31,9 @@ public class MySqlQueryTransformer {
 
     public List<String> transformSql(String[] parts, MysqlExecutionConfig config, final Map<String, String> configMap)
             throws ConfigurationException {
+
+        logger.info("Config Map contains " + configMap.entrySet().stream().map(e -> e.getKey() + " : " + e.getValue()).collect(Collectors.joining(",")));
+
         List<String> result = new ArrayList<>();
         String prospectiveSchema = config.getProspectiveVersion();
         String previousReleaseSchema = config.getPreviousVersion();
