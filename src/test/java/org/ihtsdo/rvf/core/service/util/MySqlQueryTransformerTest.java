@@ -139,9 +139,7 @@ public class MySqlQueryTransformerTest {
         String testQaResult = "abc";
         when(config.getProspectiveVersion()).thenReturn("rvf_au_20221231_230619110027");
         when(config.getPreviousVersion()).thenReturn(String.valueOf(10));
-        Map configMap = Map.of(
-                "default_catalog", "rvf_au_20221231_230619110027",
-                "qa_result", testQaResult,
+        Map configMap = Map.of("qa_result",testQaResult,
                 "<ASSERTIONUUID>", String.valueOf(testAssertionId));
         List<String> result = queryTransformer.transformSql(sqlParts,config, configMap);
         assertEquals(1,result.size());

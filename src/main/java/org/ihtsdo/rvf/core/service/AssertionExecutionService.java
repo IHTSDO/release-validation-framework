@@ -232,10 +232,9 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 	}
 
 	private List<String> transformSql(String[] parts, Assertion assertion, MysqlExecutionConfig config) throws ConfigurationException {
-		String defaultCatalog = dataSource.getDefaultCatalog();
 		String qaResult = dataSource.getDefaultCatalog()+ "." + qaResulTableName;
 		MySqlQueryTransformer queryTransformer = new MySqlQueryTransformer();
-		Map configMap = Map.of("default_catalog", defaultCatalog, "qa_result",qaResult, "<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
+		Map configMap = Map.of("qa_result", qaResult, "<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
 		return queryTransformer.transformSql(parts, config, configMap);
 	}
 

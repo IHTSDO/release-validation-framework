@@ -69,10 +69,7 @@ public class MySqlQueryTransformer {
             part = part.replaceAll("<MODULEIDS>", includedModules);
             part = part.replaceAll("<VERSION>", version);
             // watch out for any 's that users might have introduced
-            part = part.replaceAll("qa_result",
-                configMap.get("qa_result").startsWith(configMap.get("default_catalog"))
-                    ? configMap.get("default_catalog") + "." + configMap.get("qa_result")
-                        : configMap.get("qa_result"));
+            part = part.replaceAll("qa_result", configMap.get("qa_result"));
             part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
             part = part.replaceAll("<TEMP>", prospectiveSchema);
             if (previousReleaseSchema != null) {
@@ -87,7 +84,7 @@ public class MySqlQueryTransformer {
             part = part.replaceAll(Pattern.quote("[[:<:]]"),"\\\\b" );
             part = part.replaceAll(Pattern.quote("[[:>:]]"),"\\\\b" );
             for(Map.Entry<String, String> configMapEntry: configMap.entrySet()){
-                if (!configMapEntry.getKey().equals("qa_result")) {
+                if (configMapEntry.getKey().matches("^<[^>]+>$")) {
                     part = part.replaceAll(configMapEntry.getKey(), configMapEntry.getValue());
                 }
             }
