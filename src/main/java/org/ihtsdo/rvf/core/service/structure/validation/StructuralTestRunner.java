@@ -215,7 +215,7 @@ public class StructuralTestRunner {
 				
 				TestRunItem item = new TestRunItem();
 				item.setTestCategory(key);
-				item.setAssertionUuid(UUID.randomUUID());
+				item.setAssertionUuid(UUID.nameUUIDFromBytes(key.getBytes()));
 				item.setTestType(TestType.ARCHIVE_STRUCTURAL);
 				item.setAssertionText("RF2 Archive Structural test failed for file " + key);
 				item.setFirstNInstances(failItems.stream().limit(firstNInstance).collect(Collectors.toList()));
