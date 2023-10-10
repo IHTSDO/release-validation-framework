@@ -10,7 +10,7 @@ public class DroolsRulesValidationRequest {
 	
 	private String includedModules;
 	
-	private List<String> droolsRulesGroupList;
+	private List<String> droolsRulesGroups;
 
 	public String getEffectiveTime() {
 		return effectiveTime;
@@ -36,12 +36,12 @@ public class DroolsRulesValidationRequest {
 		this.includedModules = includedModules;
 	}
 
-	public List<String> getDroolsRulesGroupList() {
-		return droolsRulesGroupList;
+	public List<String> getDroolsRulesGroups() {
+		return droolsRulesGroups;
 	}
 
-	public void setDroolsRulesGroupList(List<String> droolsRulesGroupList) {
-		this.droolsRulesGroupList = droolsRulesGroupList;
+	public void setDroolsRulesGroups(List<String> droolsRulesGroups) {
+		this.droolsRulesGroups = droolsRulesGroups;
 	}
 	
 }
