@@ -153,12 +153,12 @@ public class DroolsRulesValidationService {
 			long timeStart = new Date().getTime();
 			String effectiveDate = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replaceAll("-","") : "";
 			//Filter only Drools rules set from all the assertion groups
-			Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroups()));
+			Set<String> droolsRulesSets = getDroolsRulesSetFromAssertionGroups(Sets.newHashSet(validationConfig.getDroolsRulesGroupList()));
 			ValidationReport validationReport = statusReport.getResultReport();
 			//Skip running Drools rules set altogether if there is no Drools rules set in the assertion groups
 			if (droolsRulesSets.isEmpty()) {
-				LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroups());
-				statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),"No drools rules found for assertion group " + validationConfig.getDroolsRulesGroups());
+				LOGGER.info("No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
+				statusReport.getReportSummary().put(TestType.DROOL_RULES.name(),"No drools rules found for assertion group " + validationConfig.getDroolsRulesGroupList());
 				return statusReport;
 			}
 			List<InvalidContent> invalidContents;

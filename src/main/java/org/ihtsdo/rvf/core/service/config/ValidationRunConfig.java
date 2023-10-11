@@ -32,7 +32,7 @@ public class ValidationRunConfig {
 	private boolean releaseAsAnEdition;
 	private String defaultModuleId;
 	private String includedModules;
-	private List<String> droolsRulesGroups;
+	private List<String> droolsRulesGroupList;
 	private String bucketName;
 	private boolean enableMRCMValidation;
 	private boolean enableTraceabilityValidation;
@@ -74,8 +74,8 @@ public class ValidationRunConfig {
 		this.groupsList = groupsList;
 		return this;
 	}
-	public ValidationRunConfig addDroolsRulesGroups(final List<String> droolsRulesGroups) {
-		this.droolsRulesGroups = droolsRulesGroups;
+	public ValidationRunConfig addDroolsRulesGroupList(final List<String> droolsRulesGroupList) {
+		this.droolsRulesGroupList = droolsRulesGroupList;
 		return this;
 	}
 
@@ -170,7 +170,7 @@ public class ValidationRunConfig {
 				.add("releaseAsAnEdition=" + releaseAsAnEdition)
 				.add("defaultModuleId='" + defaultModuleId + "'")
 				.add("includedModules='" + includedModules + "'")
-				.add("droolsRulesGroups=" + droolsRulesGroups)
+				.add("droolsRulesGroupList=" + droolsRulesGroupList)
 				.add("bucketName='" + bucketName + "'")
 				.add("enableMRCMValidation=" + enableMRCMValidation)
 				.add("enableTraceabilityValidation=" + enableTraceabilityValidation)
@@ -299,12 +299,12 @@ public class ValidationRunConfig {
 		return this;
 	}
 
-	public List<String> getDroolsRulesGroups() {
-		return droolsRulesGroups;
+	public List<String> getDroolsRulesGroupList() {
+		return droolsRulesGroupList;
 	}
 
-	public void setDroolsRulesGroups(List<String> droolsRulesGroups) {
-		this.droolsRulesGroups = droolsRulesGroups;
+	public void setDroolsRulesGroupList(List<String> droolsRulesGroupList) {
+		this.droolsRulesGroupList = droolsRulesGroupList;
 	}
 
 	public ValidationRunConfig addPreviousRelease(String previousRelease) {

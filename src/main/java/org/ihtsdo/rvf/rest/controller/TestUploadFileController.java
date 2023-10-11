@@ -183,7 +183,7 @@ public class TestUploadFileController {
 			@Parameter(description = "Default to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false, defaultValue = "false") final boolean writeSucceses,
 			@Parameter(description = "manifest.xml file(optional)") @RequestParam(value = MANIFEST, required = false) final MultipartFile manifestFile,
 			@Parameter(description = "Assertion group names separated by a comma.") @RequestParam(value = GROUPS) final List<String> groupsList,
-			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroups,
+			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@Parameter(description = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
 			@Parameter(description = "Required for extension release testing") @RequestParam(value = PREVIOUS_DEPENDENCY_EFFECTIVE_TIME, required = false) final String previousDependencyEffectiveTime,
@@ -211,7 +211,7 @@ public class TestUploadFileController {
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
 		String urlPrefix = URI.create(uriComponentsBuilder.toUriString()).toURL().toString();
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
-				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroups(droolsRulesGroups)
+				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFile(manifestFile)
 				.addPreviousRelease(previousRelease)
 				.addDependencyRelease(extensionDependency)
@@ -262,7 +262,7 @@ public class TestUploadFileController {
 			@Parameter(description = "Defaults to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false) final boolean writeSucceses,
 			@Parameter(description = "manifest.xml file path in AWS S3") @RequestParam(name =  "manifestFileS3Path", required = false) final String manifestFileS3Path,
 			@Parameter(description = "Assertion group names") @RequestParam(value = GROUPS) final List<String> groupsList,
-			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroups,
+			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@Parameter(description = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
 			@Parameter(description = "Required for extension release testing") @RequestParam(value = PREVIOUS_DEPENDENCY_EFFECTIVE_TIME, required = false) final String previousDependencyEffectiveTime,
@@ -292,7 +292,7 @@ public class TestUploadFileController {
 				.addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses)
 				.addGroupsList(groupsList)
-				.addDroolsRulesGroups(droolsRulesGroups)
+				.addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFileFullPath(manifestFileS3Path)
 				.addPreviousRelease(previousRelease)
 				.addDependencyRelease(extensionDependency)

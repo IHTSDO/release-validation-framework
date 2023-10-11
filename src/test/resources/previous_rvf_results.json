@@ -18,7 +18,7 @@
       "effectiveTime" : "2021-12-07",
       "releaseAsAnEdition" : false,
       "includedModules" : "2011000195101",
-      "droolsRulesGroups" : [ "common-authoring", "ch-authoring" ],
+      "droolsRulesGroupList" : [ "common-authoring", "ch-authoring" ],
       "bucketName" : "snomed-releases",
       "enableMRCMValidation" : true,
       "enableTraceabilityValidation" : false,
