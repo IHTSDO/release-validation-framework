@@ -1,6 +1,6 @@
 package org.ihtsdo.rvf.core.data.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 

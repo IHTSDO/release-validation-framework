@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
-	@ExceptionHandler(value = { javax.persistence.EntityNotFoundException.class, EntityNotFoundException.class })
+	@ExceptionHandler(value = { jakarta.persistence.EntityNotFoundException.class, EntityNotFoundException.class })
 	protected ResponseEntity<Object> handleEntityNotFoundException( final RuntimeException exception, final WebRequest request) {
 		final String bodyOfResponse = exception.getMessage();
 		final HttpHeaders headers = new HttpHeaders();

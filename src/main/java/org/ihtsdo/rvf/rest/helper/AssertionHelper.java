@@ -7,7 +7,7 @@ import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Component
