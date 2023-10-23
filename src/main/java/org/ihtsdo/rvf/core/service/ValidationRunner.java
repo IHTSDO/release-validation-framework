@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.core.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.jms.JMSException;
 import org.apache.commons.codec.DecoderException;
 import org.ihtsdo.otf.jms.MessagingHelper;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.jms.JMSException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;

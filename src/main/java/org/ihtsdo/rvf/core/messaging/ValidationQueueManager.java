@@ -19,8 +19,8 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.jms.JMSException;
+import jakarta.annotation.PostConstruct;
+import jakarta.jms.JMSException;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;

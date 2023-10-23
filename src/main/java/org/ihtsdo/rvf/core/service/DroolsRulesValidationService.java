@@ -1,9 +1,5 @@
 package org.ihtsdo.rvf.core.service;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.AnonymousAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
@@ -27,7 +23,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.services.s3.S3Client;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
@@ -73,11 +72,8 @@ public class DroolsRulesValidationService {
 
 	@PostConstruct
 	public void init() {
-		AmazonS3 anonymousClient = AmazonS3ClientBuilder.standard()
-				.withRegion(awsRegion)
-				.withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
-				.build();
-		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
+		S3Client s3Client = S3Client.builder().credentialsProvider(ProfileCredentialsProvider.create()).build();
+		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(s3Client));
 
 		File droolsRuleDir = new File(droolsRuleDirectoryPath);
 		if (droolsRuleDir.isDirectory()) {
