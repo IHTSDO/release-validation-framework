@@ -1,9 +1,5 @@
 package org.ihtsdo.rvf.core.service;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.AnonymousAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -16,6 +12,8 @@ import org.snomed.otf.script.dao.SimpleStorageResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -33,9 +31,6 @@ public class ResourceDataLoader {
 	@Autowired
 	private ValidationResourceConfig testResourceConfig;
 	
-	@Value("${cloud.aws.region.static}")
-	private String region;
-	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResourceDataLoader.class);
 	private File localResourceDir;
 
@@ -51,11 +46,8 @@ public class ResourceDataLoader {
 			throw new BusinessServiceException(errorMsg, e);
 		}
 		try {
-			AmazonS3 anonymousClient = AmazonS3ClientBuilder.standard()
-					.withCredentials(new AWSStaticCredentialsProvider(new AnonymousAWSCredentials()))
-					.withRegion(region)
-					.build();
-			ResourceManager resourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(anonymousClient));
+			S3Client s3Client = S3Client.builder().credentialsProvider(ProfileCredentialsProvider.create()).build();
+			ResourceManager resourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(s3Client));
 			File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
 			try (InputStream input = resourceManager.readResourceStreamOrNullIfNotExists(US_TO_GB_TERMS_MAP_FILENAME);
 					OutputStream out = new FileOutputStream(localMapFile)) {

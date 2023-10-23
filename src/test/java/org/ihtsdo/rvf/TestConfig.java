@@ -3,20 +3,11 @@ package org.ihtsdo.rvf;
 import org.ihtsdo.rvf.config.Config;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.*;
 import org.springframework.context.annotation.PropertySource;
 
-@PropertySource("application.properties")
-@PropertySource("application-test.properties")
+@PropertySource(value = "classpath:application.properties", encoding = "UTF-8")
+@PropertySource(value = "classpath:application-test.properties", encoding = "UTF-8")
 @TestConfiguration
-@SpringBootApplication(
-        exclude = {
-                ContextCredentialsAutoConfiguration.class,
-                ContextInstanceDataAutoConfiguration.class,
-                ContextRegionProviderAutoConfiguration.class,
-                ContextResourceLoaderAutoConfiguration.class,
-                ContextStackAutoConfiguration.class
-        }
-)
+@SpringBootApplication
 public class TestConfig extends Config {
 }
