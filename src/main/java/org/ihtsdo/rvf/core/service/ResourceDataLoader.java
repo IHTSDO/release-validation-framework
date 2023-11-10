@@ -10,9 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snomed.otf.script.dao.SimpleStorageResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.*;
@@ -46,7 +45,7 @@ public class ResourceDataLoader {
 			throw new BusinessServiceException(errorMsg, e);
 		}
 		try {
-			S3Client s3Client = S3Client.builder().credentialsProvider(ProfileCredentialsProvider.create()).build();
+			S3Client s3Client = S3Client.builder().region(DefaultAwsRegionProviderChain.builder().build().getRegion()).build();
 			ResourceManager resourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(s3Client));
 			File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);
 			try (InputStream input = resourceManager.readResourceStreamOrNullIfNotExists(US_TO_GB_TERMS_MAP_FILENAME);
