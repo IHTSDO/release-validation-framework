@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -22,17 +21,14 @@ public class SecurityConfig {
 		http.httpBasic(withDefaults());
 		http.csrf(AbstractHttpConfigurer::disable);
 		http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-		http.addFilterBefore(new RequestHeaderAuthenticationDecorator(), FilterSecurityInterceptor.class);
+		http.addFilterBefore(new RequestHeaderAuthenticationDecorator(), AuthorizationFilter.class);
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/swagger-ui.html",
-                        "/swagger-resources/**",
-                        "/v2/api-docs",
-                        "/v2/**",
-                        "/version",
-                        "/webjars/springfox-swagger-ui/**")
+						"/version",
+						"/swagger-ui/**",
+						"/v3/api-docs/**")
                 .permitAll()
                 .anyRequest().authenticated()
         );
-
 		return http.build();
 	}
 }
