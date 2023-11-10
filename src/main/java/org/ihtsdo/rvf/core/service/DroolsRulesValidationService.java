@@ -50,9 +50,6 @@ public class DroolsRulesValidationService {
 	@Value("${rvf.drools.rule.repository.url}")
 	private String droolsRuleRepositoryUrl;
 
-	@Value("${cloud.aws.region.static}")
-	private String awsRegion;
-
 	@Value("${rvf.assertion.whitelist.batchsize:1000}")
 	private int whitelistBatchSize;
 
