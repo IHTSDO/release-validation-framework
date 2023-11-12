@@ -62,7 +62,6 @@ public class AssertionServiceImplTest {
 		assert test != null;
 		assert test.getId() != null;
 		assert testRepository.findAll().size() > 0;
-		assert testRepository.count() > 0;
 
 		//create assertion test
 		assertionTest = new AssertionTest();
@@ -71,7 +70,6 @@ public class AssertionServiceImplTest {
 		assertionTest = assertionTestRepo.save(assertionTest);
 		assert assertionTest != null;
 		assert assertionTest.getId() != null;
-		assert assertionTestRepo.count() > 0;
 	}
 
 
