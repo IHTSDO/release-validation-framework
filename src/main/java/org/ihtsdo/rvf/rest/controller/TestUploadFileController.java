@@ -19,8 +19,10 @@ import org.ihtsdo.rvf.core.service.structure.resource.ZipFileResourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -96,6 +98,9 @@ public class TestUploadFileController {
 	private AssertionService assertionService;
 	@Autowired
 	private ValidationQueueManager queueManager;
+
+	@Value("${rvf.empty-release-file}")
+	private String emptyRf2File;
 
 	@RequestMapping(value = "/test-file", method = RequestMethod.POST, consumes = "multipart/form-data")
 	@ResponseBody
@@ -213,7 +218,7 @@ public class TestUploadFileController {
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFile(manifestFile)
-				.addPreviousRelease(previousRelease)
+				.addPreviousRelease(StringUtils.hasLength(previousRelease) ? previousRelease : emptyRf2File)
 				.addDependencyRelease(extensionDependency)
 				.addPreviousDependencyEffectiveTime(previousDependencyEffectiveTime)
 				.addRunId(runId).addStorageLocation(storageLocation)
@@ -294,7 +299,7 @@ public class TestUploadFileController {
 				.addGroupsList(groupsList)
 				.addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFileFullPath(manifestFileS3Path)
-				.addPreviousRelease(previousRelease)
+				.addPreviousRelease(StringUtils.hasLength(previousRelease) ? previousRelease : emptyRf2File)
 				.addDependencyRelease(extensionDependency)
 				.addPreviousDependencyEffectiveTime(previousDependencyEffectiveTime)
 				.addRunId(runId)
