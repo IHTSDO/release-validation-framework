@@ -1,8 +1,22 @@
 package org.ihtsdo.rvf.core.service;
 
+import java.sql.*;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+import javax.naming.ConfigurationException;
+import javax.naming.ConfigurationException;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
+import org.ihtsdo.rvf.core.service.util.MySqlQueryTransformer;
 import org.ihtsdo.rvf.importer.AssertionGroupImporter.ProductName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -208,7 +222,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			else {
 				if (sqlStatement.startsWith("create table")){
 					// only add engine if we do not create using a like statement
-					if (!(sqlStatement.contains("like") || sqlStatement.contains("as"))) {
+					if (!sqlStatement.toUpperCase().contains(" ENGINE") && !(sqlStatement.contains("like") || sqlStatement.contains("as"))) {
 						sqlStatement = sqlStatement + " ENGINE = MyISAM";
 					}
 				}
@@ -218,59 +232,10 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 	}
 
 	private List<String> transformSql(String[] parts, Assertion assertion, MysqlExecutionConfig config) throws ConfigurationException {
-		List<String> result = new ArrayList<>();
-		String defaultCatalog = dataSource.getDefaultCatalog();
-		String prospectiveSchema = config.getProspectiveVersion();
-		final String[] nameParts = config.getProspectiveVersion().split("_");
-		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
-		String includedModules = config.getIncludedModules().stream().collect(Collectors.joining(","));
-		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
-
-		String previousReleaseSchema = config.getPreviousVersion();
-		String dependencyReleaseSchema = config.getExtensionDependencyVersion();
-
-		//We need both these schemas to exist
-		if (prospectiveSchema == null) {
-			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + prospectiveSchema);
-		}
-
-		if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
-			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + previousReleaseSchema);
-		}
-		for( String part : parts) {
-			if ((part.contains("<PREVIOUS>") && previousReleaseSchema == null)
-				|| (part.contains("<DEPENDENCY>") && dependencyReleaseSchema == null)) {
-				continue;
-			}
-
-			logger.debug("Original sql statement: {}", part);
-			// remove all SQL comments - //TODO might throw errors for -- style comments
-			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
-			part = commentPattern.matcher(part).replaceAll("");
-			// replace all substitutions for exec
-			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
-			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
-			part = part.replaceAll("<MODULEID>", defaultModuleId);
-			part = part.replaceAll("<MODULEIDS>", includedModules);
-			part = part.replaceAll("<VERSION>", version);
-			// watch out for any 's that users might have introduced
-			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
-			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
-			part = part.replaceAll("<TEMP>", prospectiveSchema);
-			if (previousReleaseSchema != null) {
-				part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
-			}
-			if (dependencyReleaseSchema != null) {
-				part = part.replaceAll("<DEPENDENCY>", dependencyReleaseSchema);
-			}
-			part = part.replaceAll("<DELTA>", deltaTableSuffix);
-			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
-			part = part.replaceAll("<FULL>", fullTableSuffix);
-			part.trim();
-			logger.debug("Transformed sql statement: {}", part);
-			result.add(part);
-		}
-		return result;
+		String qaResult = dataSource.getDefaultCatalog()+ "." + qaResulTableName;
+		MySqlQueryTransformer queryTransformer = new MySqlQueryTransformer();
+		Map configMap = Map.of("qa_result", qaResult, "<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
+		return queryTransformer.transformSql(parts, config, configMap);
 	}
 
 

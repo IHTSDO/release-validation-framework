@@ -3,7 +3,7 @@ COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN mvn clean install -DskipTests=true
 
-FROM adoptopenjdk/openjdk11:alpine
+FROM aehrc/jre:openjdk-17
 LABEL maintainer="SNOMED International <tooling@snomed.org>"
 
 ARG SUID=1042

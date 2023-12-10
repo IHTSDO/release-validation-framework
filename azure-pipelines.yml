@@ -1,0 +1,48 @@
+name: rvf-$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+      - 'groups-api-fix'
+      - 'support-stored-proc-file'
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  mavenCache: $(Pipeline.Workspace)/.m2/repository
+  mavenOptions: '-Dmaven.repo.local=$(mavenCache)'
+
+stages:
+  - stage: build
+    displayName: Build
+    jobs:
+      - job: build
+        displayName: Build
+        steps:
+          - task: Cache@2
+            displayName: Cache Maven local repo
+            inputs:
+              key: 'maven | "$(Agent.OS)" | **/pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+                maven
+              path: $(mavenCache)
+          - task: MavenAuthenticate@0
+            inputs:
+              artifactsFeeds: 'mavenbuild'
+          - task: Docker@2
+            inputs:
+              containerRegistry: $(acr_registry)
+              command: 'login'
+          - task: Maven@3
+            displayName: Build and verify
+            inputs:
+              mavenPomFile: 'pom.xml'
+              options: '-Ddocker.image.prefix=$(acr_repo)'
+              mavenOptions: '$(mavenOptions)'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              goals: 'clean install dockerfile:build dockerfile:push'

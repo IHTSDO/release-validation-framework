@@ -3,11 +3,13 @@ package org.ihtsdo.rvf.importer;
 import com.facebook.presto.sql.parser.StatementSplitter;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.ExecutionCommand;
 import org.ihtsdo.rvf.core.data.model.Test;
 import org.ihtsdo.rvf.core.data.model.TestType;
 import org.ihtsdo.rvf.core.service.AssertionService;
+import org.ihtsdo.rvf.core.service.util.MySqlQueryTransformer;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -38,6 +40,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 	public class AssertionsDatabaseImporter {
 
 		private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";
+		private static final String CREATE_FUNCTION = "CREATE FUNCTION";
 		private static final Logger logger = LoggerFactory.getLogger(AssertionsDatabaseImporter.class);
 		private static final String RESOURCE_PATH_SEPARATOR = "/";
 
@@ -125,7 +128,21 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			}
 			final String sqlString = IOUtils.toString(sqlInputStream, UTF_8);
 			// add test to assertion
-			addSqlTestToAssertion(assertion, sqlString);
+			if(isPreRequisitesSql(sqlFileName)){ //handle pre-requisites.sql
+				try {
+					addPreRequisiteSqlToAssertion(assertion, sqlString);
+				} catch (Exception e) {
+					String errorMsg = "Failed to add pre-requisite sql script test to assertion with uuid:" + assertion.getUuid();
+					logger.error(errorMsg, e);
+					throw new IllegalStateException(errorMsg, e);
+				}
+			} else{
+				addSqlTestToAssertion(assertion, sqlString);
+			}
+		}
+
+		private boolean isPreRequisitesSql(String sqlFileName){
+			return sqlFileName.equalsIgnoreCase("pre-requisites.sql");
 		}
 
 		private Assertion createAssertionFromElement(final Element element){
@@ -153,7 +170,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			for (final StatementSplitter.Statement statement : splitter.getCompleteStatements()) {
 				String cleanedSql = statement.statement();
 				logger.debug("sql to be cleaned:" + cleanedSql);
-				if ( cleanedSql.startsWith(CREATE_PROCEDURE) || cleanedSql.startsWith(CREATE_PROCEDURE.toLowerCase())) {
+				if( cleanedSql.toUpperCase().startsWith(CREATE_PROCEDURE) || cleanedSql.toUpperCase().startsWith(CREATE_FUNCTION)) {
 					storedProcedureFound = true;
 				}
 				// Process SQL statement
@@ -193,6 +210,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 				logger.debug("Stored procedure found {}", storedProcedureSql);
 			}
 			uploadTest(assertion, sql, statements);
+		}
+
+		protected void addPreRequisiteSqlToAssertion(final Assertion assertion, String preRequisiteSql) throws BusinessServiceException {
+			MySqlQueryTransformer mySqlQueryTransformer = new MySqlQueryTransformer();
+			final List<String> sqlStatements = mySqlQueryTransformer.transformToStatements(preRequisiteSql);
+			uploadTest(assertion, preRequisiteSql, sqlStatements);
 		}
 
 		private void uploadTest (Assertion assertion, String originalSql, List<String> sqlStatements) {
