@@ -43,6 +43,7 @@ public class AssertionGroupImporter {
 		BE_AUTHORING("BE", "be-authoring"),
 		NO_AUTHORING("NO", "no-authoring"),
 		CH_AUTHORING("CH", "ch-authoring"),
+		FR_AUTHORING("FR", "fr-authoring"),
 		IE_AUTHORING("IE", "ie-authoring"),
 		EE_AUTHORING("EE", "ee-authoring"),
 		NZ_AUTHORING("NZ", "nz-authoring"),
@@ -59,6 +60,7 @@ public class AssertionGroupImporter {
 		BE_EDITION("BE", "BelgianEdition"),
 		NO_EDITION("NO", "NorwegianEdition"),
 		CH_EDITION("CH", "SwissEdition"),
+		FR_EDITION("FR", "FrenchEdition"),
 		IE_EDITION("IE", "IrishEdition"),
 		EE_EDITION("EE", "EstonianEdition"),
 		AT_EDITION("AT", "AustrianEdition"),
@@ -411,12 +413,12 @@ public class AssertionGroupImporter {
                     addAssertionsByKeyWord(allAssertions, assertionGroup);
             case MDRS_VALIDATION ->
                     addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
-            case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
+            case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, FR_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
                     addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
             case COMMON_AUTHORING -> addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
             case COMMON_AUTHORING_WITHOUT_LANG_REFSETS ->
                     addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions, assertionGroup);
-            case INT_AUTHORING, AT_AUTHORING, AU_AUTHORING, DK_AUTHORING, SE_AUTHORING, US_AUTHORING, BE_AUTHORING, NO_AUTHORING, CH_AUTHORING, IE_AUTHORING, NZ_AUTHORING, ZH_AUTHORING, EE_AUTHORING, KR_AUTHORING, NL_AUTHORING ->
+            case INT_AUTHORING, AT_AUTHORING, AU_AUTHORING, DK_AUTHORING, SE_AUTHORING, US_AUTHORING, BE_AUTHORING, NO_AUTHORING, CH_AUTHORING, FR_AUTHORING, IE_AUTHORING, NZ_AUTHORING, ZH_AUTHORING, EE_AUTHORING, KR_AUTHORING, NL_AUTHORING ->
                     addAssertionToSnapshotAssertionGroup(assertionGroup);
             case FIRST_TIME_LOINC_VALIDATION, FIRST_TIME_COMMON_EDITION_VALIDATION ->
                     addAssertionsToFirstTimeReleaseGroup(allAssertions, assertionGroup);
