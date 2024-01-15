@@ -33,6 +33,7 @@ public class ValidationRunConfig {
 	private String defaultModuleId;
 	private String includedModules;
 	private List<String> droolsRulesGroupList;
+	private List<String> assertionExclusionList;
 	private String bucketName;
 	private boolean enableMRCMValidation;
 	private boolean enableTraceabilityValidation;
@@ -70,8 +71,18 @@ public class ValidationRunConfig {
 	public List<String> getGroupsList() {
 		return groupsList;
 	}
+
+	public List<String> getAssertionExclusionList() {
+		return assertionExclusionList;
+	}
+
 	public ValidationRunConfig addGroupsList(final List<String> groupsList) {
 		this.groupsList = groupsList;
+		return this;
+	}
+
+	public ValidationRunConfig addAssertionExclusionList(final List<String> assertionExclusionList) {
+		this.assertionExclusionList = assertionExclusionList;
 		return this;
 	}
 	public ValidationRunConfig addDroolsRulesGroupList(final List<String> droolsRulesGroupList) {
@@ -171,6 +182,7 @@ public class ValidationRunConfig {
 				.add("defaultModuleId='" + defaultModuleId + "'")
 				.add("includedModules='" + includedModules + "'")
 				.add("droolsRulesGroupList=" + droolsRulesGroupList)
+				.add("assertionExclusionList=" + assertionExclusionList)
 				.add("bucketName='" + bucketName + "'")
 				.add("enableMRCMValidation=" + enableMRCMValidation)
 				.add("enableTraceabilityValidation=" + enableTraceabilityValidation)

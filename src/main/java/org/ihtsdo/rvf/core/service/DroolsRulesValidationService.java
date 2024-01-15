@@ -200,8 +200,13 @@ public class DroolsRulesValidationService {
 					previousReleaseDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
 				}
 
+				Set<String> assertionExclusionList = null;
+				if (validationConfig.getAssertionExclusionList() != null) {
+					assertionExclusionList = new HashSet<>(validationConfig.getAssertionExclusionList());
+				}
+
 				//Run validation
-				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, CollectionUtils.isEmpty(previousReleaseDirectories) ? null : previousReleaseDirectories, droolsRulesSets, effectiveDate, null, true);
+				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, CollectionUtils.isEmpty(previousReleaseDirectories) ? null : previousReleaseDirectories, droolsRulesSets, assertionExclusionList, effectiveDate, null, true);
 
 				// Filter the results based on component's module IDs if the package is an extension
 				String moduleIdStr = validationConfig.getIncludedModules();
