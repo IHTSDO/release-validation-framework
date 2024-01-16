@@ -183,6 +183,7 @@ public class ValidationVersionLoader {
 		executionConfig.setProspectiveVersion(RVF_DB_PREFIX + getProspectiveVersionFromFileNames(validationConfig) 
 							+ "_" + executionConfig.getExecutionId().toString());
 		executionConfig.setGroupNames(validationConfig.getGroupsList());
+		executionConfig.setAssertionExclusionList(validationConfig.getAssertionExclusionList());
 		executionConfig.setExtensionValidation(isExtension(validationConfig));
 		executionConfig.setFirstTimeRelease(validationConfig.isFirstTimeRelease());
 		executionConfig.setEffectiveTime(validationConfig.getEffectiveTime());

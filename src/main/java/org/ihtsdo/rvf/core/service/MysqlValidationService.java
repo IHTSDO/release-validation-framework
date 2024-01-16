@@ -177,6 +177,10 @@ public class MysqlValidationService {
 		int counter = 1;
 		List<Assertion> batch = null;
 		for (final Assertion assertion: assertions) {
+			UUID assertionUUID = assertion.getUuid();
+			if (executionConfig.getAssertionExclusionList() != null && executionConfig.getAssertionExclusionList().contains(assertionUUID.toString())) {
+				continue;
+			}
 			if (batch == null) {
 				batch = new ArrayList<>();
 			}
@@ -207,6 +211,10 @@ public class MysqlValidationService {
 		int counter = 1;
 		for (Assertion assertion: assertions) {
 			UUID assertionUUID = assertion.getUuid();
+			if (executionConfig.getAssertionExclusionList() != null && executionConfig.getAssertionExclusionList().contains(assertionUUID.toString())) {
+				continue;
+			}
+
 			LOGGER.info("Started executing assertion {} of {} with uuid : {}", counter, assertions.size(), assertionUUID);
 			results.addAll(assertionExecutionService.executeAssertion(assertion, executionConfig));
 			LOGGER.info("Finished executing assertion {} of {} with uuid : {}", counter, assertions.size(), assertion.getUuid());

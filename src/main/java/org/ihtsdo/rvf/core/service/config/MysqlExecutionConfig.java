@@ -9,6 +9,7 @@ public class MysqlExecutionConfig {
 	private String previousVersion;
 	private final Long executionId;
 	private List<String> groupNames;
+	private List<String> assertionExclusionList;
 	private String defaultModuleId;
 	private List<String> includedModules;
 	private int failureExportMax = 10;
@@ -45,6 +46,14 @@ public class MysqlExecutionConfig {
 
 	public List<String> getGroupNames() {
 		return groupNames;
+	}
+
+	public void setAssertionExclusionList(List<String> assertionExclusionList) {
+		this.assertionExclusionList = assertionExclusionList;
+	}
+
+	public List<String> getAssertionExclusionList() {
+		return assertionExclusionList;
 	}
 
 	public List<String> getIncludedModules() {
