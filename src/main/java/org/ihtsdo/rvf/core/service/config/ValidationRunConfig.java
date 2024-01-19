@@ -31,6 +31,7 @@ public class ValidationRunConfig {
 	private boolean enableDrools;
 	private String effectiveTime;
 	private boolean releaseAsAnEdition;
+	private boolean standAloneProduct;
 	private String defaultModuleId;
 	private String includedModules;
 	private List<String> droolsRulesGroupList;
@@ -296,6 +297,15 @@ public class ValidationRunConfig {
 
 	public ValidationRunConfig setReleaseAsAnEdition(boolean releaseAsAnEdition) {
 		this.releaseAsAnEdition = releaseAsAnEdition;
+		return this;
+	}
+
+	public boolean isStandAloneProduct() {
+		return standAloneProduct;
+	}
+
+	public ValidationRunConfig setStandAloneProduct(boolean standAloneProduct) {
+		this.standAloneProduct = standAloneProduct;
 		return this;
 	}
 

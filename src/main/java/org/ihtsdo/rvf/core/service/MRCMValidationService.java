@@ -78,7 +78,7 @@ public class MRCMValidationService {
 			//Load the dependency package from S3 to snapshot files list before validating if the package is an MS extension and not an edition release
 			//If the package is an MS edition, it is not necessary to load the dependency
 			Set<String> moduleIds = null;
-			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
+			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition() && !validationConfig.isStandAloneProduct()) {
 				if (StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
 					throw new RVFExecutionException("MRCM validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 				}

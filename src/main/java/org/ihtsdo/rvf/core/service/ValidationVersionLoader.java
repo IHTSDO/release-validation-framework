@@ -206,7 +206,7 @@ public class ValidationVersionLoader {
 			includedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).collect(Collectors.toList()));
 		}
 		executionConfig.setIncludedModules(includedModules);
-
+		executionConfig.setStandAloneProduct(validationConfig.isStandAloneProduct());
 		executionConfig.setReleaseValidation(!validationConfig.isRf2DeltaOnly());
 		return executionConfig;
 	}

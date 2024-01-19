@@ -14,6 +14,7 @@ public class MysqlExecutionConfig {
 	private List<String> includedModules;
 	private int failureExportMax = 10;
 	private boolean firstTimeRelease;
+	private boolean standAloneProduct;
 	private boolean extensionValidation;
 	private boolean isReleaseValidation;
 	private String extensionDependencyVersion;
@@ -29,6 +30,14 @@ public class MysqlExecutionConfig {
 	public MysqlExecutionConfig(Long runId, boolean firstTimeRelease) {
 		this.executionId = runId;
 		this.firstTimeRelease = firstTimeRelease;
+	}
+
+	public void setStandAloneProduct(boolean standAloneProduct) {
+		this.standAloneProduct = standAloneProduct;
+	}
+
+	public boolean isStandAloneProduct() {
+		return standAloneProduct;
 	}
 
 	public void setProspectiveVersion(final String prospectiveVersion) {

@@ -84,6 +84,8 @@ public class TestUploadFileController {
 
 	private static final String RF2_DELTA_ONLY = "rf2DeltaOnly";
 
+	private static final String STANDALONE_PRODUCT = "standAloneProduct";
+
 	private static final String RESPONSE_QUEUE = "responseQueue";
 
 	private static final String USER_NAME = "username";
@@ -201,6 +203,7 @@ public class TestUploadFileController {
 			@Parameter(description = "Defaults to false") @RequestParam(value = ENABLE_DROOLS, required = false) final boolean enableDrools,
 			@Parameter(description = "Effective time, optionally used in Drools validation, required if Jira creation flag is true") @RequestParam(value = EFFECTIVE_TIME, required = false) final String effectiveTime,
 			@Parameter(description = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
+			@Parameter(description = "If release package file is a standalone product, should set to true. Defaults to false") @RequestParam(value = STANDALONE_PRODUCT, required = false, defaultValue = "false") final boolean standAloneProduct,
 			@Parameter(description = "Default module ID of components in the MS extension") @RequestParam(value = DEFAULT_MODULE_ID, required = false) final String defaultModuleId,
 			@Parameter(description = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@Parameter(description = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
@@ -232,6 +235,7 @@ public class TestUploadFileController {
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setFirstTimeRelease(!StringUtils.hasLength(previousRelease))
+				.setStandAloneProduct(standAloneProduct)
 				.setDefaultModuleId(defaultModuleId)
 				.setIncludedModules(includedModules)
 				.addUrl(urlPrefix)
@@ -285,6 +289,7 @@ public class TestUploadFileController {
 			@Parameter(description = "Base timestamp of content branch, used for traceability rebase changes summary report.") @RequestParam(required = false) final Long contentBaseTimestamp,
 			@Parameter(description = "Head timestamp of content branch, used for stale state detection.") @RequestParam(required = false) final Long contentHeadTimestamp,
 			@Parameter(description = "If release package file is an MS edition, should set to true. Defaults to false") @RequestParam(value = RELEASE_AS_AN_EDITION, required = false) final boolean releaseAsAnEdition,
+			@Parameter(description = "If release package file is a standalone product, should set to true. Defaults to false") @RequestParam(value = STANDALONE_PRODUCT, required = false, defaultValue = "false") final boolean standAloneProduct,
 			@Parameter(description = "Default module ID of components in the MS extension") @RequestParam(value = DEFAULT_MODULE_ID, required = false) final String defaultModuleId,
 			@Parameter(description = "Module IDs of components in the MS extension. Used for filtering results in Drools validation. Values are separated by comma") @RequestParam(value = INCLUDED_MODULES, required = false) final String includedModules,
 			@Parameter(description = "Defaults to false.") @RequestParam(value = ENABLE_MRCM_VALIDATION, required = false) final boolean enableMrcmValidation,
@@ -318,6 +323,7 @@ public class TestUploadFileController {
 				.setEffectiveTime(effectiveTime)
 				.setReleaseAsAnEdition(releaseAsAnEdition)
 				.setFirstTimeRelease(!StringUtils.hasLength(previousRelease))
+				.setStandAloneProduct(standAloneProduct)
 				.setDefaultModuleId(defaultModuleId)
 				.setIncludedModules(includedModules)
 				.setEnableMRCMValidation(enableMrcmValidation)

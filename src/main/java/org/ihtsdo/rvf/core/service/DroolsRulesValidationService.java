@@ -176,7 +176,7 @@ public class DroolsRulesValidationService {
 				// Load the dependency package from S3 to snapshot files list before validating if the package is an MS extension and not an edition release
 				// If the package is an MS edition, it is not necessary to load the dependency
 
-				if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition()) {
+				if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition() && !validationConfig.isStandAloneProduct()) {
 					if(StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
 						throw new RVFExecutionException("Drools validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 					}
