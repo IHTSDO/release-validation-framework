@@ -34,6 +34,8 @@ public class AssertionExecutionService {
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	@Value("${rvf.qa.result.table.name}")
 	private String qaResulTableName;
+	@Value("${rvf.validation.international.modules}")
+	private String internationalModules;
 	private final String deltaTableSuffix = "d";
 	private final String snapshotTableSuffix = "s";
 	private final String fullTableSuffix = "f";
@@ -257,6 +259,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
 			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
 			part = part.replaceAll("<TEMP>", prospectiveSchema);
+			part = part.replaceAll("<INTERNATIONAL_MODULES>", internationalModules);
 			if (previousReleaseSchema != null) {
 				part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
 			}
