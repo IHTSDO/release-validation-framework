@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -153,6 +154,7 @@ public class AutomatedTestController {
                 .setEnableDrools(enableDrools)
                 .setEffectiveTime(effectiveTime)
                 .setReleaseAsAnEdition(releaseAsAnEdition)
+                .setFirstTimeRelease(!StringUtils.hasLength(previousRelease))
                 .setIncludedModules(includedModules)
                 .addUrl(urlPrefix)
                 .setEnableMRCMValidation(enableMrcmValidation)
@@ -217,6 +219,7 @@ public class AutomatedTestController {
                 .addFailureExportMax(exportMax)
                 .addUrl(urlPrefix)
                 .addProspectiveFilesInS3(true)
+                .setFirstTimeRelease(!StringUtils.hasLength(previousRelease))
                 .setEnableDrools(enableDrools)
                 .setEffectiveTime(effectiveTime)
                 .setReleaseAsAnEdition(releaseAsAnEdition)

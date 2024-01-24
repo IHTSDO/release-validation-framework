@@ -27,6 +27,7 @@ public class ValidationRunConfig {
 	private transient File localDependencyReleaseFile;
 	private transient File localPreviousReleaseFile;
 	private boolean isRf2DeltaOnly;
+	private boolean firstTimeRelease;
 	private boolean enableDrools;
 	private String effectiveTime;
 	private boolean releaseAsAnEdition;
@@ -205,7 +206,12 @@ public class ValidationRunConfig {
 	}
 
 	public boolean isFirstTimeRelease() {
-		return previousRelease == null;
+		return firstTimeRelease;
+	}
+
+	public ValidationRunConfig setFirstTimeRelease(boolean firstTimeRelease) {
+		this.firstTimeRelease = firstTimeRelease;
+		return this;
 	}
 
 	public ValidationRunConfig addProspectiveFileFullPath(String s3File) {

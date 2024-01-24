@@ -71,9 +71,7 @@ public class StructuralTestRunner {
 		if (prospectiveFileResourceProvider != null && previousFileResourceProvider != null) {
 			try {
 				File prospectiveSnapshotDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(prospectiveFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.SNAPSHOT);
-				File prospectiveFullDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(prospectiveFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.FULL);
 				File previousSnapshotDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(previousFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.SNAPSHOT);
-				File previousFullDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(previousFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.FULL);
 				for (File prospectiveFile : prospectiveSnapshotDirectory.listFiles()) {
 					for (File previousFile : previousSnapshotDirectory.listFiles()) {
 						String prospectiveFilename = prospectiveFile.getName();
@@ -90,19 +88,36 @@ public class StructuralTestRunner {
 						}
 					}
 				}
-				for (File prospectiveFile : prospectiveFullDirectory.listFiles()) {
-					for (File previousFile : previousFullDirectory.listFiles()) {
-						String prospectiveFilename = prospectiveFile.getName();
-						String previousFilename = previousFile.getName();
 
-						if (prospectiveFilename.endsWith(".txt") && previousFilename.endsWith(".txt")
-							&& prospectiveFilename.substring(0, prospectiveFilename.lastIndexOf("_")).equals(previousFilename.substring(0, previousFilename.lastIndexOf("_")))) {
-							if (prospectiveFile.length() < previousFile.length()) {
-								testReport.addError("0-0", new Date(), prospectiveFilename, prospectiveFullDirectory.getPath(), "File Size", FILE_SIZE_TEST_TYPE, "Full files must be equal to or greater in size than previous release",
+				File prospectiveFullDirectory = null;
+				File previousFullDirectory = null;
+
+				try {
+					prospectiveFullDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(prospectiveFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.FULL);
+				} catch (IllegalStateException e) {
+					logger.warn("No Full files found in prospective version");
+				}
+				try {
+					previousFullDirectory = new ReleaseImporter().unzipRelease(new FileInputStream(previousFileResourceProvider.getFilePath()), ReleaseImporter.ImportType.FULL);
+				} catch (IllegalStateException e) {
+					logger.warn("No Full files found in previous version");
+				}
+
+				if (prospectiveFullDirectory != null && previousFullDirectory != null) {
+					for (File prospectiveFile : prospectiveFullDirectory.listFiles()) {
+						for (File previousFile : previousFullDirectory.listFiles()) {
+							String prospectiveFilename = prospectiveFile.getName();
+							String previousFilename = previousFile.getName();
+
+							if (prospectiveFilename.endsWith(".txt") && previousFilename.endsWith(".txt")
+									&& prospectiveFilename.substring(0, prospectiveFilename.lastIndexOf("_")).equals(previousFilename.substring(0, previousFilename.lastIndexOf("_")))) {
+								if (prospectiveFile.length() < previousFile.length()) {
+									testReport.addError("0-0", new Date(), prospectiveFilename, prospectiveFullDirectory.getPath(), "File Size", FILE_SIZE_TEST_TYPE, "Full files must be equal to or greater in size than previous release",
 											"The file " + prospectiveFilename + " (" + (prospectiveFile.length() / 1024) + " KB) is less than previous release file " + previousFilename + " (" + (previousFile.length() / 1024) + " KB)",
-										"The file " + prospectiveFilename + " must be equal to or greater in size than previous release file " + previousFilename,null);
+											"The file " + prospectiveFilename + " must be equal to or greater in size than previous release file " + previousFilename, null);
+								}
+								break;
 							}
-							break;
 						}
 					}
 				}

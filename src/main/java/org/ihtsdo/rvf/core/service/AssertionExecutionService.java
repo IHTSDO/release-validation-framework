@@ -226,7 +226,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String includedModules = config.getIncludedModules().stream().collect(Collectors.joining(","));
 		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
 
-		String previousReleaseSchema = config.getPreviousVersion();
+		String previousReleaseSchema = config.isFirstTimeRelease() ? null : config.getPreviousVersion();
 		String dependencyReleaseSchema = config.getExtensionDependencyVersion();
 
 		//We need both these schemas to exist
