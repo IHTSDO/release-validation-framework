@@ -50,6 +50,7 @@ public class AssertionGroupImporter {
 		ZH_AUTHORING("ZH", "zh-authoring"),
         KR_AUTHORING("KR", "kr-authoring"),
 		NL_AUTHORING("NL", "nl-authoring"),
+		STANDALONE_RELEASE("STANDALONE_RELEASE", "standalone-release"),
 		LOINC_AUTHORING("LOINC", "loinc-authoring"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC", "first-time-loinc-validation"),
 		FIRST_TIME_COMMON_EDITION_VALIDATION ("COMMON", "first-time-common-edition"),
@@ -411,7 +412,7 @@ public class AssertionGroupImporter {
         switch (groupName) {
             case FILE_CENTRIC_VALIDATION, RELEASE_TYPE_VALIDATION, COMPONENT_CENTRIC_VALIDATION ->
                     addAssertionsByKeyWord(allAssertions, assertionGroup);
-            case MDRS_VALIDATION ->
+            case MDRS_VALIDATION, STANDALONE_RELEASE ->
                     addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
             case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, FR_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
                     addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
