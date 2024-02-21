@@ -107,14 +107,16 @@ public class MysqlValidationService {
 		LOGGER.debug("Running release-type validations {}", releaseTypeAssertions.size());
 		String reportStorage = validationConfig.getStorageLocation();
 		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage,false);
-		//loading international snapshot
-		try {
-			releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig, validationConfig);
-		} catch (BusinessServiceException e) {
-			String msg = String.format("Failed to prepare data for extension testing due to error %s", ExceptionUtils.getRootCauseMessage(e));
-			statusReport.addFailureMessage(msg);
-			LOGGER.error(msg, e);
-			statusReport.getReportSummary().put(TestType.SQL.name(), msg);
+		if (!executionConfig.isStandAloneProduct()) {
+			//loading international snapshot
+			try {
+				releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig, validationConfig);
+			} catch (BusinessServiceException e) {
+				String msg = String.format("Failed to prepare data for extension testing due to error %s", ExceptionUtils.getRootCauseMessage(e));
+				statusReport.addFailureMessage(msg);
+				LOGGER.error(msg, e);
+				statusReport.getReportSummary().put(TestType.SQL.name(), msg);
+			}
 		}
 		testItems.addAll(runAssertionTests(executionConfig, noneReleaseTypeAssertions, reportStorage, true));
 		constructTestReport(statusReport, executionConfig, timeStart, testItems, assertions);
