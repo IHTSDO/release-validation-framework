@@ -26,9 +26,8 @@ public class QAResult implements Serializable {
 	
 	@Column(name = "concept_id")
 	private Long conceptId;
-	
-	@Lob
-	@Column(name ="details")
+
+	@Column(name ="details", columnDefinition = "TEXT")
 	private String details;
 
 	@Column(name = "component_id")
