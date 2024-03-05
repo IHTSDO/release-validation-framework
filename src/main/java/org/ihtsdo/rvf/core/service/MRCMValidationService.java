@@ -219,8 +219,17 @@ public class MRCMValidationService {
 			}
 		}
 
+		final List<TestRunItem> incompleteAssertions = new ArrayList<>();
+		for (Assertion assertion : validationRun.getIncompleteAssertions()) {
+			testRunItem = createTestRunItem(assertion, contentType);
+			testRunItem.setFailureCount(-1L);
+			testRunItem.setFailureMessage(assertion.getFailureMessage());
+			incompleteAssertions.add(testRunItem);
+		}
+
 		report.addFailedAssertions(failedAssertions);
 		report.addWarningAssertions(warnedAssertions);
+		report.addIncompleteAssesrtions(incompleteAssertions);
 		report.addSkippedAssertions(skippedAssertions);
 		report.addPassedAssertions(passedAssertions);
 	}
