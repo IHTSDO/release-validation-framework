@@ -682,8 +682,9 @@ public class ReleaseDataManager {
 				String previousDependencyEffectiveTime = executionConfig.getPreviousDependencyEffectiveTime().replaceAll("-", "");
 				for (String snapshotTable : snapShotTables) {
 					insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
-							+ " SELECT * FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable
-							+ " WHERE cast(effectivetime as datetime) > cast('" + previousDependencyEffectiveTime + "' as datetime)";
+							+ " SELECT * FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable + " a"
+							+ " WHERE cast(a.effectivetime as datetime) > cast('" + previousDependencyEffectiveTime + "' as datetime)"
+							+ " AND EXISTS (SELECT id FROM " + snapshotTable + " WHERE a.id = id AND a.moduleid = moduleid)";
 					PreparedStatement ps = connection.prepareStatement(insertSQL);
 					logger.info(insertSQL);
 					ps.execute();
