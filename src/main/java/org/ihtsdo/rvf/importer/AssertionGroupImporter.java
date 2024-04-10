@@ -66,6 +66,7 @@ public class AssertionGroupImporter {
 		EE_EDITION("EE", "EstonianEdition"),
 		AT_EDITION("AT", "AustrianEdition"),
 		AU_EDITION("AU", "AustralianEdition"),
+		NL_EDITION("NL", "DutchEdition"),
 		GPFP_ICPC2("GPFP-ICPC2","GPFP-ICPC2"),
 		GMDN("GMDN","GMDN"),
 		STATED_RELATIONSHIPS_VALIDATION("STATED_RELATIONSHIPS","stated-relationships-validation"), //Assertions group that contains only stated relationship for file centric and component centric assertions
@@ -218,7 +219,7 @@ public class AssertionGroupImporter {
 			"4478a896-2724-4417-8bce-8986ecc53c4e",
 			"372e59d5-d6f3-4708-93d0-6cb92da69006",
 			"0cc708af-6816-4370-91be-dba8da99d227",
-			"44916964-5b78-4842-81d8-e8293ee93bea",
+			"7b86a5c9-f764-41b1-b42d-feb4a61de911",
 			"fbfc4fd1-f10d-4fc2-889f-df0e089df4b7",
 			"a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5",
 			"9912342f-5010-40fd-9bea-301b737973a1",
@@ -414,7 +415,7 @@ public class AssertionGroupImporter {
                     addAssertionsByKeyWord(allAssertions, assertionGroup);
             case MDRS_VALIDATION, STANDALONE_RELEASE ->
                     addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
-            case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, FR_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
+			case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, FR_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, NL_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
                     addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
             case COMMON_AUTHORING -> addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
             case COMMON_AUTHORING_WITHOUT_LANG_REFSETS ->
@@ -595,7 +596,9 @@ public class AssertionGroupImporter {
 		AssertionGroupName groupName = AssertionGroupName.fromName(assertionGroup.getName());
 		List<Assertion> assertionsToBeAdded = getCommonReleaseAssertions(allAssertions);
 		assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()));
-		if (!AssertionGroupName.COMMON_EDITION.equals(groupName) && !AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && !AssertionGroupName.US_EDITION.equals(groupName)) {
+		boolean isEdition = AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) || AssertionGroupName.US_EDITION.equals(groupName)
+							|| AssertionGroupName.AU_EDITION.equals(groupName) || AssertionGroupName.NL_EDITION.equals(groupName);
+		if (!AssertionGroupName.COMMON_EDITION.equals(groupName) && !isEdition) {
 			assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, "EXTENSION"));
 		}
 		for (Assertion assertion : assertionsToBeAdded) {
