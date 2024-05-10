@@ -17,6 +17,7 @@ import org.ihtsdo.rvf.core.service.whitelist.WhitelistItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snomed.quality.validator.mrcm.*;
+import org.snomed.quality.validator.mrcm.model.ReferenceSetMember;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -263,8 +264,8 @@ public class MRCMValidationService {
 		List<FailureDetail> failedDetails = new ArrayList<>(firstNCount);
 		if (LateralizableRefsetValidationService.ASSERTION_ID_MEMBERS_NEED_TO_BE_REMOVED_FROM_LATERALIZABLE_REFSET.equals(mrcmAssertion.getUuid().toString())) {
 			for (int i = 0; i < firstNCount; i++) {
-				String refsetMemberId = mrcmAssertion.getCurrentViolatedReferenceSetMembers().get(i);
-				failedDetails.add(new FailureDetail(null, String.format(mrcmAssertion.getDetails(), refsetMemberId), null));
+				ReferenceSetMember referenceSetMember = mrcmAssertion.getCurrentViolatedReferenceSetMembers().get(i);
+				failedDetails.add(new FailureDetail(referenceSetMember.referencedComponentId(), String.format(mrcmAssertion.getDetails(), referenceSetMember.memberId()), null));
 			}
 		} else if (LateralizableRefsetValidationService.ASSERTION_ID_CONCEPTS_NEED_TO_BE_ADDED_TO_LATERALIZABLE_REFSET.equals(mrcmAssertion.getUuid().toString())) {
 			for (int i = 0; i < firstNCount; i++) {
