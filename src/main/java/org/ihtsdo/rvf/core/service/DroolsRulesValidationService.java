@@ -264,7 +264,7 @@ public class DroolsRulesValidationService {
 			List<TestRunItem> failedAssertions = new ArrayList<>();
 			List<TestRunItem> warningAssertions = new ArrayList<>();
 			int failureExportMax = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
-			Map<String, List<InvalidContent>> groupRules = new HashMap<>();
+			Map<UUID, Assertion> uuidToAssertionMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, Function.identity()));
 
 			//Convert the Drools validation report into RVF report format
 			for (String ruleId : invalidContentMap.keySet()) {
@@ -273,8 +273,11 @@ public class DroolsRulesValidationService {
 				validationRule.setTestType(TestType.DROOL_RULES);
 				validationRule.setTestCategory("");
 				List<InvalidContent> invalidContentList = invalidContentMap.get(ruleId);
-				validationRule.setAssertionText(invalidContentList.get(0).getMessage().replaceAll("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}","<UUID>").replaceAll("\\d{6,20}","<SCTID>"));
-
+				if (uuidToAssertionMap.containsKey(parseUUID(ruleId))) {
+					validationRule.setAssertionText(uuidToAssertionMap.get(parseUUID(ruleId)).getAssertionText());
+				} else {
+					validationRule.setAssertionText(invalidContentList.get(0).getMessage().replaceAll("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}","<UUID>").replaceAll("\\d{6,20}","<SCTID>"));
+				}
 				validationRule.setFailureCount((long) invalidContentList.size());
 				if (!whitelistService.isWhitelistDisabled()) {
 					validationRule.setFirstNInstances(invalidContentList.stream().limit(failureExportMax)
