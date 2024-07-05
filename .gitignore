@@ -27,3 +27,5 @@ activemq-data/
 store
 application-*.properties
 snomed-release-validation-assertions
+snomed-drools-rules
+/local*
