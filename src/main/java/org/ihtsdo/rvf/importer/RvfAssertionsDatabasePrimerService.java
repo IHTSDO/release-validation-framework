@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -34,16 +36,20 @@ public class RvfAssertionsDatabasePrimerService {
 
 	@PostConstruct
 	public void importAssertionsAndGroups() throws IOException {
-		InputStream manifestInputStream = assertionResourceManager.readResourceStream("manifest.xml");
-		if (dbImporter.isAssertionImportRequired()) {
-			LOGGER.info("No assertions exist and start importing...");
-			// import content
-			dbImporter.importAssertionsFromManifest(manifestInputStream, scriptsDir);
-			LOGGER.info("Assertions imported");
-			// Create assertion group
-			assertionGroupImporter.importAssertionGroups();
-		} else {
-			LOGGER.info("Assertions and assertion groups exist already.");
+		try (InputStream manifestInputStream = assertionResourceManager.readResourceStream("manifest.xml")) {
+			if (dbImporter.isAssertionImportRequired()) {
+				LOGGER.info("No assertions exist and start importing...");
+				// import content
+				dbImporter.importAssertionsFromManifest(manifestInputStream, scriptsDir);
+				LOGGER.info("Assertions imported");
+				// Create assertion group
+				assertionGroupImporter.importAssertionGroups();
+			} else {
+				LOGGER.info("Assertions and assertion groups exist already.");
+			}
+		} catch (FileNotFoundException e) {
+			LOGGER.error("Failed to import assertions and assertion groups due to no manifest.xml found", e);
+			throw e;
 		}
 	}
 }
