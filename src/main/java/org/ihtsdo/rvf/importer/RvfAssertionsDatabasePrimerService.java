@@ -49,7 +49,8 @@ public class RvfAssertionsDatabasePrimerService {
 			}
 		} catch (FileNotFoundException e) {
 			LOGGER.error("Failed to import assertions and assertion groups due to no manifest.xml found", e);
-			throw e;
+			throw new IOException("No manifest.xml file found in the assertions directory.", e);
 		}
+
 	}
 }
