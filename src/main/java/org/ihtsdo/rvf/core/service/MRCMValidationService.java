@@ -17,7 +17,6 @@ import org.ihtsdo.rvf.core.service.whitelist.WhitelistItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snomed.quality.validator.mrcm.*;
-import org.snomed.quality.validator.mrcm.model.ReferenceSetMember;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,6 +40,8 @@ public class MRCMValidationService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MRCMValidationService.class);
 
 	private static final String EXT_ZIP = ".zip";
+
+	private static final String COMMA = ",";
 
 	@Autowired
 	private WhitelistService whitelistService;
@@ -264,13 +265,15 @@ public class MRCMValidationService {
 		List<FailureDetail> failedDetails = new ArrayList<>(firstNCount);
 		if (LateralizableRefsetValidationService.ASSERTION_ID_MEMBERS_NEED_TO_BE_REMOVED_FROM_LATERALIZABLE_REFSET.equals(mrcmAssertion.getUuid().toString())) {
 			for (int i = 0; i < firstNCount; i++) {
-				ReferenceSetMember referenceSetMember = mrcmAssertion.getCurrentViolatedReferenceSetMembers().get(i);
-				failedDetails.add(new FailureDetail(referenceSetMember.referencedComponentId(), String.format(mrcmAssertion.getDetails(), referenceSetMember.memberId()), null));
+				ConceptResult conceptResult = mrcmAssertion.getCurrentViolatedConcepts().get(i);
+				String conceptId = conceptResult.getId();
+				failedDetails.add(new FailureDetail(conceptId, String.format(mrcmAssertion.getDetails(), conceptId, "removed from"), conceptResult.getFsn()).setFullComponent(getAdditionalFields(conceptResult)).setComponentId(conceptId));
 			}
 		} else if (LateralizableRefsetValidationService.ASSERTION_ID_CONCEPTS_NEED_TO_BE_ADDED_TO_LATERALIZABLE_REFSET.equals(mrcmAssertion.getUuid().toString())) {
 			for (int i = 0; i < firstNCount; i++) {
-				Long conceptId = mrcmAssertion.getCurrentViolatedConceptIds().get(i);
-				failedDetails.add(new FailureDetail(conceptId.toString(), String.format(mrcmAssertion.getDetails(), conceptId), null));
+				ConceptResult conceptResult = mrcmAssertion.getCurrentViolatedConcepts().get(i);
+				String conceptId = conceptResult.getId();
+				failedDetails.add(new FailureDetail(conceptId, String.format(mrcmAssertion.getDetails(), conceptId, "added to"), conceptResult.getFsn()).setFullComponent(getAdditionalFields(conceptResult)).setComponentId(conceptId));
 			}
 		} else {
 			for (int i = 0; i < firstNCount; i++) {
@@ -281,5 +284,9 @@ public class MRCMValidationService {
 
 		testRunItem.setFirstNInstances(failedDetails);
 		return testRunItem;
+	}
+
+	private String getAdditionalFields(ConceptResult conceptResult) {
+		return (conceptResult.isActive() ? "1" : "0") + COMMA + conceptResult.getModuleId() + COMMA + conceptResult.getDefinitionStatusId();
 	}
 }
