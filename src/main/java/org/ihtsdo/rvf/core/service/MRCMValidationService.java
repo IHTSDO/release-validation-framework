@@ -25,14 +25,10 @@ import org.springframework.util.CollectionUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 @Service
 public class MRCMValidationService {
@@ -156,24 +152,21 @@ public class MRCMValidationService {
 
 	private void checkWhitelistItemAgainstEachAssertion(Assertion assertion) throws RestClientException {
 		// checking whitelist
+		List<ConceptResult> currentViolatedConcepts = assertion.getCurrentViolatedConcepts();
 		if (!assertion.getCurrentViolatedConceptIds().isEmpty()) {
 			List<Long> newViolatedConceptIds = new ArrayList<>();
-            for (List<Long> batch : Iterables.partition(assertion.getCurrentViolatedConceptIds(), whitelistBatchSize)) {
+			for (List<ConceptResult> batch : Iterables.partition(currentViolatedConcepts, whitelistBatchSize)) {
 				// Convert to WhitelistItem
-				List<WhitelistItem> whitelistItems = batch.stream()
-						.map(conceptId -> new WhitelistItem(assertion.getUuid().toString(), "", String.valueOf(conceptId), ""))
-						.collect(Collectors.toList());
+				List<WhitelistItem> whitelistItems = batch.stream().map(conceptResult -> new WhitelistItem(assertion.getUuid().toString(), conceptResult.getId(), conceptResult.getId(), getAdditionalFields(conceptResult))).toList();
 
 				// Send to Authoring acceptance gateway
 				LOGGER.info("Checking {} whitelist items in batch", whitelistItems.size());
 				List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
 
 				// Find the failures which are not in the whitelisted item
-				newViolatedConceptIds.addAll(batch.stream().filter(conceptId ->
-						whitelistedItems.stream().noneMatch(whitelistedItem -> String.valueOf(conceptId).equals(whitelistedItem.getConceptId()))
-				).toList());
+				newViolatedConceptIds.addAll(batch.stream().filter(conceptResult -> whitelistedItems.stream().noneMatch(whitelistedItem -> String.valueOf(conceptResult.getId()).equals(whitelistedItem.getConceptId()))).map(conceptResult -> Long.parseLong(conceptResult.getId())).toList());
 			}
-            List<ConceptResult> newViolatedConcepts = new ArrayList<>(assertion.getCurrentViolatedConcepts().stream().filter(concept -> newViolatedConceptIds.contains(Long.valueOf(concept.getId()))).toList());
+			List<ConceptResult> newViolatedConcepts = new ArrayList<>(currentViolatedConcepts.stream().filter(concept -> newViolatedConceptIds.contains(Long.valueOf(concept.getId()))).toList());
 			assertion.setCurrentViolatedConceptIds(newViolatedConceptIds);
 			assertion.setCurrentViolatedConcepts(newViolatedConcepts);
 		}
@@ -278,7 +271,8 @@ public class MRCMValidationService {
 		} else {
 			for (int i = 0; i < firstNCount; i++) {
 				ConceptResult concept = mrcmAssertion.getCurrentViolatedConcepts().get(i);
-				failedDetails.add(new FailureDetail(concept.getId(), mrcmAssertion.getDetails(), concept.getFsn()));
+				String conceptId = concept.getId();
+				failedDetails.add(new FailureDetail(conceptId, mrcmAssertion.getDetails(), concept.getFsn()).setFullComponent(getAdditionalFields(concept)).setComponentId(conceptId));
 			}
 		}
 
