@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import jakarta.annotation.PostConstruct;
+import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import software.amazon.awssdk.services.s3.S3Client;
 
@@ -69,8 +70,9 @@ public class DroolsRulesValidationService {
 
 	@PostConstruct
 	public void init() {
-		S3Client s3Client = S3Client.builder().region(DefaultAwsRegionProviderChain.builder().build().getRegion()).build();
-		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(s3Client));
+		S3Client s3Client = S3Client.builder().region(DefaultAwsRegionProviderChain.builder().build().getRegion())
+				.credentialsProvider(AnonymousCredentialsProvider.create()).build();
+		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(s3Client), s3Client);
 
 		File droolsRuleDir = new File(droolsRuleDirectoryPath);
 		if (droolsRuleDir.isDirectory()) {
