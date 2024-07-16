@@ -29,9 +29,9 @@ services:
       - db
     entrypoint: java -Xms512m -Xmx4g -Daws.region=us-east-1 -cp @/app/jib-classpath-file org.ihtsdo.rvf.App --server.port=8081 --server.servlet.context-path=/api
     ports:
-      - 8081:8081
+      - "8081:8081"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/?useSSL=false
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/?useSSL=false&allowLoadLocalInfile=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=snomed
       - rvf.assertion.resource.local.path=snomed-release-validation-assertions
