@@ -6,31 +6,9 @@ The RVF API is documented using Swagger and is found here - http://localhost:808
 
 The steps to validate an extension or edition are as follows:
 
-1. [Uploading Published Releases](#uploading-published-releases)
+1. [Download Published Releases](download-published-releases.md)
 2. [Understanding Validation Assertions](#understanding-validation-assertions)
 3. [Validate Your Content](#validate-your-content)
-
-Uploading Published Releases
---------------------------
-
-The RVF needs at least one published release loaded, and at least the release that your own extension/content depends upon. Generally this will be the relevant version of the SNOMED International Edition as the starting point.
-
-The release endpoint of the REST API can be used to list releases and to upload a published release.
-
-Go to the endpoint at **<http://localhost:8081/api/releases>** where you can provide the filename, a string name for the release (e.g. `"int"`), and a release date which should be in the yyyymmdd format (e.g. `"20200731"`). An example using curl is (_noting the release name and release date at the end of the url_):
-
-```bash
-curl -X POST -F 'file=@SnomedCT_RF2Release_INT_20200731.zip' http://localhost:8081/api/releases/int/20200731
-```
-
-Once the upload has completed, go and check at http://localhost:8081/api/releases and you should see the recently uploaded release listed.
-
-If you want to validate a new release against a previous release, you should also replicate the step above for the previous version of the extension you want to validate.
-
-As an example, if you would like to check your local Sept 2020 version against the March 2020 version and your new version will be dependent on the July 2020 International Edition, you would load the following releases following the instructions above (the order makes no difference):
-
-- International Edition 20200731 (**dependent edition - int_20200731**)
-- Local Extension 20200301 (**previous release - local_20200301**)
 
 Understanding Validation Assertions
 -----------------------------------
