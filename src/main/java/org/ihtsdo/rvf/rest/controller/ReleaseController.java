@@ -57,7 +57,7 @@ public class ReleaseController {
 		if (releaseDataManager.isKnownRelease(version)) {
 			return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<>(Boolean.TRUE, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(Boolean.FALSE, HttpStatus.NOT_FOUND);
 		}
 	}
 
