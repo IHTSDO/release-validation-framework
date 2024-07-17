@@ -26,7 +26,7 @@ grant all privileges on *.* to 'rvf_user'@'localhost';
 ```properties
 spring.datasource.username=root
 spring.datasource.password=
-spring.datasource.url=jdbc:mysql://localhost:3306/?useSSL=false
+spring.datasource.url=jdbc:mysql://localhost:3306/?useSSL=false&allowLoadLocalInfile=true&sessionVariables=sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'
 ```
 ### Use a properties file to override default values
 Create a properties file named **application-local.properties** with content:

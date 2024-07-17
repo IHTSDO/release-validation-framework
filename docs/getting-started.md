@@ -26,5 +26,5 @@ mvn clean install
 ### Start RVF application
 
 ```bash
-java -Xms512m -Xmx4g -jar target/release-validation-framework*.jar --server.port=8081 --server.servlet.context-path=/api
+java -Xms1024m -Xmx8g -Daws.region=us-east-1 -jar target/release-validation-framework*.jar --server.port=8081 --server.servlet.context-path=/api
 ```
