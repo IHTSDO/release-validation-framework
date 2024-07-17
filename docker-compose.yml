@@ -1,4 +1,4 @@
-version: '2.1'
+version: '2.28.1'
 volumes:
   mysql:
     driver: local
@@ -42,6 +42,9 @@ services:
       - rvf_net
     volumes:
       - rvf-store:/app/store
+      - type: bind
+        source: ./store/releases
+        target: /app/store/releases
     restart: always
 
 networks:
