@@ -105,10 +105,10 @@ public class DroolsRulesValidationService {
 	private void convertDroolsRuleToAssertion(File droolsRulesSubfile) throws IOException {
 		try (final BufferedReader reader = Files.newBufferedReader(droolsRulesSubfile.toPath())) {
 			String line;
+			UUID uuid;
 			Assertion assertion = null;
 			boolean severityWarning = false;
 			boolean severityError = false;
-			UUID uuid = null;
 			String group = getAssertionGroup(droolsRulesSubfile.getAbsolutePath());
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("rule") && !line.contains("Always passes")) {
@@ -125,20 +125,16 @@ public class DroolsRulesValidationService {
 						assertions.add(assertion);
 					}
 				}
-				if (line.contains("new InvalidContent")) {
+				if (assertion != null && line.contains("new InvalidContent")) {
 					uuid = extractUuid(line);
+					assertion.setUuid(uuid);
 				}
 				// check for severity
-				if (line.contains("Severity.WARNING")) {
-					severityWarning = true;
+				severityWarning = severityWarning || detectSeverity(line, "Severity.WARNING");
+				severityError = severityError || detectSeverity(line, "Severity.ERROR");
+				if (assertion != null && "end".equals(line.trim())) {
+					assertion.setSeverity(buildSeverity(severityWarning, severityError));
 				}
-				if (line.contains("Severity.ERROR")) {
-					severityError = true;
-				}
-			}
-			if (assertion != null) {
-				assertion.setUuid(uuid);
-				assertion.setSeverity(buildSeverity(severityWarning, severityError));
 			}
 		}
 	}
@@ -149,6 +145,10 @@ public class DroolsRulesValidationService {
 			return UUID.fromString(matcher.group(1));
 		}
 		return null;
+	}
+
+	private static boolean detectSeverity(String line, String type) {
+		return line.contains(type);
 	}
 
 	@NotNull
