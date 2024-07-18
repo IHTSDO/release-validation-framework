@@ -59,7 +59,7 @@ public class MysqlValidationService {
 			// load dependency release
 			if (executionConfig.isExtensionValidation() && !executionConfig.isStandAloneProduct()) {
 				releaseVersionLoader.loadDependencyVersion(executionConfig);
-				if (!releaseVersionLoader.isKnownVersion(executionConfig.getExtensionDependencyVersion())) {
+				if (releaseVersionLoader.isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {
 					statusReport.addFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
 				}
 			}

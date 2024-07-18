@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -92,9 +91,9 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			batch.add(assertion);
 			if (counter % 10 == 0 || counter == assertions.size()) {
 				final List<Assertion> work = batch;
-				logger.info(String.format("Started executing assertion [%1s] of [%2s]", counter, assertions.size()));
+				logger.info("Started executing assertion [{}] of [{}]", counter, assertions.size());
 				final Future<Collection<TestRunItem>> future = executorService.submit(() -> executeAssertions(work, executionConfig));
-				logger.info(String.format("Finished executing assertion [%1s] of [%2s]", counter, assertions.size()));
+				logger.info("Finished executing assertion [{}] of [{}]", counter, assertions.size());
 				//reporting every 10 assertions
 				concurrentTasks.add(future);
 				batch = null;
@@ -113,7 +112,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		return results;
 	}
 	/** Executes an update using statement sql and logs the time taken **/
-	private int executeUpdateStatement (final Connection connection, final String sql) throws SQLException{
+	private void executeUpdateStatement (final Connection connection, final String sql) throws SQLException{
 		final long startTime = System.currentTimeMillis();
 		logger.info("Executing {} statement:", sql.replaceAll("\n", " " ).replaceAll("\t", ""));
 		try (Statement statement = connection.createStatement()) {
@@ -121,14 +120,13 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			final int result = statement.executeUpdate(sql);
 			final long timeTaken = System.currentTimeMillis() - startTime;
 			logger.info("Completed in {}ms, result = {}", timeTaken, result);
-			return result;
 		}
 	}
 
 	public TestRunItem executeTest(final Assertion assertion, final Test test, final MysqlExecutionConfig config) {
 
 		long timeStart = System.currentTimeMillis();
-		logger.debug("Start executing assertion:" + assertion.getUuid());
+		logger.debug("Start executing assertion: {}", assertion.getUuid());
 		final TestRunItem runItem = new TestRunItem();
 		runItem.setTestCategory(assertion.getKeywords());
 		runItem.setAssertionText(assertion.getAssertionText());
@@ -161,16 +159,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 	private void executeCommand(final Assertion assertion, final MysqlExecutionConfig config,
 			final ExecutionCommand command, final Connection connection)
 			throws SQLException, ConfigurationException {
-		String[] parts = {""};
-		if (command.getStatements().size() == 0)
-		{
-			final String sql = command.getTemplate();
-			if (sql != null) {
-				parts = sql.split(";");
-			}
-		}else {
-			parts = command.getStatements().toArray(new String[command.getStatements().size()]);
-		}
+		String[] parts = splitCommand(command);
 		// parse sql to get select statement
 		final List<String> sqlStatements = transformSql(parts, assertion, config);
 		for (String sqlStatement: sqlStatements)
@@ -185,38 +174,50 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				logger.info("End of calling stored proecure {}", sqlStatement);
 			} else if (sqlStatement.toLowerCase().startsWith("select")){
 				//TODO need to verify this is required.
-				logger.info("Select query found:" + sqlStatement);
-				final Long executionId = config.getExecutionId();
+				logger.info("Select query found: {}", sqlStatement);
 				try (PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement)) {
 					try (ResultSet execResult = preparedStatement.executeQuery()) {
-						final String insertSQL = "insert into " + qaResulTableName + " (run_id, assertion_id, details) values (?, ?, ?)";
-						try (Connection qaDbConnecion = dataSource.getConnection()) {
-							try (PreparedStatement insertStatement = qaDbConnecion.prepareStatement(insertSQL)) {
-								while(execResult.next())
-								{
-									insertStatement.setLong(1, executionId);
-									insertStatement.setLong(2, assertion.getAssertionId());
-									insertStatement.setString(3, execResult.getString(3));
+						try (Connection qaDbConnection = dataSource.getConnection()) {
+							final String insertSQL = "insert into ? (run_id, assertion_id, details) values (?, ?, ?)";
+							try(PreparedStatement insertStatement = qaDbConnection.prepareStatement(insertSQL)) {
+								while (execResult.next()) {
+									insertStatement.setString(1, qaResulTableName);
+									insertStatement.setLong(2, config.getExecutionId());
+									insertStatement.setLong(3, assertion.getAssertionId());
+									insertStatement.setString(4, execResult.getString(3));
 									insertStatement.addBatch();
 								}
 								// execute insert statement
 								insertStatement.executeBatch();
-								logger.debug("batch insert completed for assertion:" + assertion.getAssertionText());
+								logger.debug("batch insert completed for assertion: {}", assertion.getAssertionText());
 							}
 						}
 					}
 				}
 			}
 			else {
-				if (sqlStatement.startsWith("create table")){
+				if (sqlStatement.startsWith("create table")
 					// only add engine if we do not create using a like statement
-					if (!(sqlStatement.contains("like") || sqlStatement.contains("as"))) {
-						sqlStatement = sqlStatement + " ENGINE = MyISAM";
-					}
+					&& (!(sqlStatement.contains("like") || sqlStatement.contains("as")))){
+					sqlStatement = sqlStatement + " ENGINE = MyISAM";
 				}
 				executeUpdateStatement(connection, sqlStatement);
 			}
 		}
+	}
+
+	private String[] splitCommand(ExecutionCommand command) {
+		String[] parts = {""};
+		if (command.getStatements().isEmpty())
+		{
+			final String sql = command.getTemplate();
+			if (sql != null) {
+				parts = sql.split(";");
+			}
+		} else {
+			parts = command.getStatements().toArray(new String[0]);
+		}
+		return parts;
 	}
 
 	private List<String> transformSql(String[] parts, Assertion assertion, MysqlExecutionConfig config) throws ConfigurationException {
@@ -225,20 +226,13 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String prospectiveSchema = config.getProspectiveVersion();
 		final String[] nameParts = config.getProspectiveVersion().split("_");
 		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
-		String includedModules = config.getIncludedModules().stream().collect(Collectors.joining(","));
+		String includedModules = String.join(",", config.getIncludedModules());
 		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
 
 		String previousReleaseSchema = config.isFirstTimeRelease() ? null : config.getPreviousVersion();
 		String dependencyReleaseSchema = config.getExtensionDependencyVersion();
+		validateSchemas(config, prospectiveSchema, previousReleaseSchema);
 
-		//We need both these schemas to exist
-		if (prospectiveSchema == null) {
-			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + prospectiveSchema);
-		}
-
-		if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
-			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + previousReleaseSchema);
-		}
 		for( String part : parts) {
 			if ((part.contains("<PREVIOUS>") && previousReleaseSchema == null)
 				|| (part.contains("<DEPENDENCY>") && dependencyReleaseSchema == null)) {
@@ -246,7 +240,6 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			}
 
 			logger.debug("Original sql statement: {}", part);
-			// remove all SQL comments - //TODO might throw errors for -- style comments
 			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
 			part = commentPattern.matcher(part).replaceAll("");
 			// replace all substitutions for exec
@@ -269,15 +262,21 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = part.replaceAll("<DELTA>", deltaTableSuffix);
 			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
 			part = part.replaceAll("<FULL>", fullTableSuffix);
-			part.trim();
+			part = part.trim();
 			logger.debug("Transformed sql statement: {}", part);
 			result.add(part);
 		}
 		return result;
 	}
 
+	private static void validateSchemas(MysqlExecutionConfig config, String prospectiveSchema, String previousReleaseSchema) throws ConfigurationException {
+		//We need both these schemas to exist
+		if (prospectiveSchema == null) {
+			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + "prospective release");
+		}
 
-	public void setQaResulTableName(final String qaResulTableName) {
-		this.qaResulTableName = qaResulTableName;
+		if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
+			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + "previous release");
+		}
 	}
 }

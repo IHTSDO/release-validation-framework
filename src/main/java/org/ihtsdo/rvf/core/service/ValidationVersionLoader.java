@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.core.service;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
@@ -22,20 +24,15 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import javax.naming.ConfigurationException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.ihtsdo.rvf.core.service.ReleaseDataManager.RVF_DB_PREFIX;
@@ -44,11 +41,8 @@ import static org.ihtsdo.rvf.core.service.ReleaseDataManager.RVF_DB_PREFIX;
 public class ValidationVersionLoader {
 
 	private static final String COMBINED = "_combined";
-	private static final String SNAPSHOT_TABLE = "%_s";
-
 	private static final String ZIP_FILE_EXTENSION = ".zip";
-
-	private static final String UTF_8 = "UTF-8";
+	private static final String SNAPSHOT_TABLE = "%_s";
 	private static final String DELTA_TABLE = "%_d";
 	private static final String FULL_TABLE = "%_f";
 	
@@ -85,7 +79,7 @@ public class ValidationVersionLoader {
 		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
 	}
 	
-	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws Exception {
+	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws BusinessServiceException, IOException {
 		String schemaName = constructRVFSchema(executionConfig.getPreviousVersion());
 		releaseDataManager.dropDatabaseIfExist(schemaName);
 		if (executionConfig.getPreviousVersion().endsWith(ZIP_FILE_EXTENSION)) {
@@ -109,7 +103,7 @@ public class ValidationVersionLoader {
 		}
 	}
 	
-	public void loadProspectiveVersion(ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws Exception {
+	public void loadProspectiveVersion(ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws BusinessServiceException, ReleaseImportException, SQLException, ConfigurationException {
 		String prospectiveVersion = executionConfig.getProspectiveVersion();
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		String reportStorage = validationConfig.getStorageLocation();
@@ -130,16 +124,17 @@ public class ValidationVersionLoader {
 		statusReport.setRF2Files(rf2FilesLoaded);
 		reportService.writeProgress("Loading resource data for prospective schema:" + prospectiveVersion, reportStorage);
 		resourceLoader.loadResourceData(prospectiveVersion);
-		logger.info("completed loading resource data for schema:" + prospectiveVersion);
+		logger.info("completed loading resource data for schema: {}", prospectiveVersion);
 	}
 
-	private boolean checkDeltaFilesExist(File localProspectiveFile) throws FileNotFoundException, ReleaseImportException {
+	private boolean checkDeltaFilesExist(File localProspectiveFile) throws ReleaseImportException {
 		try {
 			String deltaDirectoryPath = new ReleaseImporter().unzipRelease(new FileInputStream(localProspectiveFile), ReleaseImporter.ImportType.DELTA).getAbsolutePath();
-			final Stream<Path> pathStream = Files.find(new File(deltaDirectoryPath).toPath(), 50,
-					(path, basicFileAttributes) -> path.toFile().getName().matches("x?(sct|rel)2_Concept_[^_]*Delta_.*.txt"));
-			if (pathStream.findFirst().isPresent()) {
-				return true;
+			try(Stream<Path> pathStream = Files.find(new File(deltaDirectoryPath).toPath(), 50,
+					(path, basicFileAttributes) -> path.toFile().getName().matches("x?(sct|rel)2_Concept_[^_]*Delta_.*.txt"))) {
+				if (pathStream.findFirst().isPresent()) {
+					return true;
+				}
 			}
 		} catch (IOException | IllegalStateException e) {
 			if (e.getMessage().contains("No Delta files found")) {
@@ -156,22 +151,22 @@ public class ValidationVersionLoader {
 				return RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
 			}
 			return releaseVersion.startsWith(RVF_DB_PREFIX) ? releaseVersion : RVF_DB_PREFIX + releaseVersion;
+		} else {
+			return null;
 		}
-		return releaseVersion;
 	}
 	
 	private String loadRelease(String releaseVersion) throws IOException, BusinessServiceException {
 		if (releaseVersion != null && releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
 			String schemaName = RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
-			if (!releaseDataManager.isKnownRelease(schemaName)) {
-				if (!releaseDataManager.restoreReleaseFromBinaryArchive(schemaName + ZIP_FILE_EXTENSION)) {
+			if (!releaseDataManager.isKnownRelease(schemaName) && (!releaseDataManager.restoreReleaseFromBinaryArchive(schemaName + ZIP_FILE_EXTENSION))) {
 					logger.info("No existing mysql binary release available.");
 					releaseDataManager.uploadPublishedReleaseFromStore(releaseVersion, schemaName);
 					if (generateBinaryArchive) {
 						String archiveFilename = releaseDataManager.generateBinaryArchive(schemaName);
-						logger.info("Release mysql binary archive is generated:" + archiveFilename);
+						logger.info("Release mysql binary archive is generated: {}", archiveFilename);
 					}
-				} 
+
 			} 
 			return schemaName;	
 		}
@@ -203,7 +198,7 @@ public class ValidationVersionLoader {
 		executionConfig.setDefaultModuleId(validationConfig.getDefaultModuleId());
 		List<String> includedModules = new ArrayList<>();
 		if (validationConfig.getIncludedModules() != null) {
-			includedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).collect(Collectors.toList()));
+			includedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).toList());
 		}
 		executionConfig.setIncludedModules(includedModules);
 		executionConfig.setStandAloneProduct(validationConfig.isStandAloneProduct());
@@ -234,65 +229,87 @@ public class ValidationVersionLoader {
 	}
 	
 
-	public void downloadProspectiveFiles(ValidationRunConfig validationConfig) throws Exception {
+	public void downloadProspectiveFiles(ValidationRunConfig validationConfig) throws IOException {
 		File prospectiveFile = File.createTempFile(validationConfig.getRunId() + "_RF2", ZIP_FILE_EXTENSION);
 		File manifestFile = File.createTempFile("manifest_" + validationConfig.getRunId(), ".xml");
 		ResourceManager jobResource = new ResourceManager(jobResourceConfig, cloudResourceLoader);
-		InputStream prospectiveInput = null;
-		InputStream manifestInput = null;
+
 		//streaming file from S3 to local
 		long s3StreamingStart = System.currentTimeMillis();
-		String prospectiveFileFullPath = validationConfig.getProspectiveFileFullPath();
-		String manifestFileFullPath = validationConfig.getManifestFileFullPath();
-		if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
-			if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
-				ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
-						new Cloud(validationConfig.getBucketName(), ""));
-				ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
-				prospectiveInput = manualResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
-				if (manifestFileFullPath != null) {
-					manifestInput = manualResource.readResourceStreamOrNullIfNotExists(manifestFileFullPath);
-				}
-			} else {
-				//update s3 path if required when full path containing job resource path already
-				if (prospectiveFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
-					prospectiveFileFullPath = prospectiveFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
-				}
-				if (manifestFileFullPath != null && manifestFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
-					manifestFileFullPath = manifestFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
-				}
-			}
-		}
-		if (prospectiveInput == null) {
-			prospectiveInput = jobResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
-		}
-		if (manifestInput == null && manifestFileFullPath != null) {
-			manifestInput = jobResource.readResourceStreamOrNullIfNotExists(manifestFileFullPath);
-		}
-
+		InputStream prospectiveInput = downloadProspectiveReleaseFile(validationConfig, jobResource);
+		InputStream manifestInput = downloadProspectiveManifestFile(validationConfig, jobResource);
 		if (prospectiveInput != null) {
 			try (OutputStream out = new FileOutputStream(prospectiveFile)) {
 				IOUtils.copy(prospectiveInput, out);
 			} finally {
 				IOUtils.closeQuietly(prospectiveInput, null);
 			}
-			logger.debug("local prospective file" + prospectiveFile.getAbsolutePath());
+			logger.debug("local prospective file {}", prospectiveFile.getAbsolutePath());
 			validationConfig.setLocalProspectiveFile(prospectiveFile);
 		}
 		if (manifestInput != null) {
 			// Copy manifest input stream to local file
 			try (Writer out = new FileWriter(manifestFile)) {
-				IOUtils.copy(manifestInput, out, UTF_8);
+				IOUtils.copy(manifestInput, out, StandardCharsets.UTF_8);
 			} finally {
 				IOUtils.closeQuietly(manifestInput, null);
 			}
 			validationConfig.setLocalManifestFile(manifestFile);
 		}
 		logger.info("Time taken {} seconds to download files {} from s3", (System.currentTimeMillis()-s3StreamingStart)/1000 ,
-				prospectiveFileFullPath);
+				validationConfig.getProspectiveFileFullPath());
 	}
 
-	public void downloadPreviousReleaseAndDependencyFiles(ValidationRunConfig validationConfig) throws Exception {
+	private InputStream downloadProspectiveReleaseFile(ValidationRunConfig validationConfig, ResourceManager jobResource) throws IOException {
+		InputStream prospectiveInput = null;
+		//streaming file from S3 to local
+		String prospectiveFileFullPath = validationConfig.getProspectiveFileFullPath();
+		if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
+			if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
+				ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
+						new Cloud(validationConfig.getBucketName(), ""));
+				ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
+				prospectiveInput = manualResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
+			} else {
+				//update s3 path if required when full path containing job resource path already
+				if (prospectiveFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
+					prospectiveFileFullPath = prospectiveFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
+				}
+			}
+		}
+		if (prospectiveInput == null) {
+			prospectiveInput = jobResource.readResourceStreamOrNullIfNotExists(prospectiveFileFullPath);
+		}
+		return prospectiveInput;
+	}
+
+	private InputStream downloadProspectiveManifestFile(ValidationRunConfig validationConfig, ResourceManager jobResource) throws IOException {
+		InputStream manifestInput = null;
+		//streaming file from S3 to local
+		String manifestFileFullPath = validationConfig.getManifestFileFullPath();
+		if (jobResourceConfig.isUseCloud() && validationConfig.isProspectiveFileInS3()) {
+			if (!jobResourceConfig.getCloud().getBucketName().equals(validationConfig.getBucketName())) {
+				ManualResourceConfiguration manualConfig = new ManualResourceConfiguration(true, true, null,
+						new Cloud(validationConfig.getBucketName(), ""));
+				ResourceManager manualResource = new ResourceManager(manualConfig, cloudResourceLoader);
+				if (manifestFileFullPath != null) {
+					manifestInput = manualResource.readResourceStreamOrNullIfNotExists(manifestFileFullPath);
+				}
+			} else {
+				//update s3 path if required when full path containing job resource path already
+				if (manifestFileFullPath != null && manifestFileFullPath.startsWith(jobResourceConfig.getCloud().getPath())) {
+					manifestFileFullPath = manifestFileFullPath.replace(jobResourceConfig.getCloud().getPath(), "");
+				}
+			}
+		}
+		if (manifestInput == null && manifestFileFullPath != null) {
+			manifestInput = jobResource.readResourceStreamOrNullIfNotExists(manifestFileFullPath);
+		}
+
+		return manifestInput;
+	}
+
+	public void downloadPreviousReleaseAndDependencyFiles(ValidationRunConfig validationConfig) throws IOException {
 		if (StringUtils.hasLength(validationConfig.getExtensionDependency())) {
 			InputStream dependencyStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getExtensionDependency());
 			if (dependencyStream != null) {
@@ -325,8 +342,8 @@ public class ValidationVersionLoader {
 				&& !runConfig.getExtensionDependency().trim().isEmpty());
 	}
 
-	public boolean isKnownVersion( String vertionToCheck) {
-		return releaseDataManager.isKnownRelease(vertionToCheck);
+	public boolean isUnknownVersion( String versionToCheck) {
+		return !releaseDataManager.isKnownRelease(versionToCheck);
 	}
 	
 	private String extractEffectiveTimeFromVersion(String dependencyVersion) {
@@ -356,7 +373,7 @@ public class ValidationVersionLoader {
 										 final List<String> rf2FilesLoaded) throws ConfigurationException, BusinessServiceException {
 
 		if (knownVersion != null && !knownVersion.trim().isEmpty()) {
-			logger.info(String.format("Baseline version: [%1s] will be combined with prospective release file: [%2s]", knownVersion, tempFile.getName()));
+			logger.info("Baseline version: {} will be combined with prospective release file: {}", knownVersion, tempFile.getName());
 			//load them together here as opposed to clone the existing DB so that to make sure it is clean.
 			String versionDate = knownVersion;
 			if (knownVersion.length() > 8) {
@@ -366,9 +383,9 @@ public class ValidationVersionLoader {
 			if (filesFound != null && !filesFound.isEmpty()) {
 				File preLoadedZipFile = filesFound.get(0);
 				if (filesFound.size() > 1) {
-					logger.info("Found more than release files with date:" + versionDate);
+					logger.info("Found more than release files with date: {}", versionDate);
 					String[] splits = knownVersion.split("_");
-					logger.info("Release center short name:" + splits[0]);
+					logger.info("Release center short name: {}", splits[0]);
 					for (File zipFile : filesFound ) {
 						if (zipFile.getName().contains(splits[0].toUpperCase())) {
 							preLoadedZipFile = zipFile;
@@ -403,9 +420,9 @@ public class ValidationVersionLoader {
 		String extensionVersion = executionConfig.getProspectiveVersion();
 		String combinedVersion = executionConfig.getProspectiveVersion() + COMBINED;
 		executionConfig.setProspectiveVersion(combinedVersion);
-		logger.debug("Combined version:" + combinedVersion);
+		logger.debug("Combined version: {}", combinedVersion);
 		String combinedSchema = releaseDataManager.createSchema(combinedVersion);
-		if (!isKnownVersion(executionConfig.getExtensionDependencyVersion())) {
+		if (isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {
 			throw new BusinessServiceException("Extension dependency version is not found in DB:" + executionConfig.getExtensionDependencyVersion());
 		}
 		if (isExtension(validationConfig)) {

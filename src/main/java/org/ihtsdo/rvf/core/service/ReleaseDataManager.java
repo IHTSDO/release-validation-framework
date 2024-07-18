@@ -33,7 +33,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 public class ReleaseDataManager {
@@ -43,6 +42,12 @@ public class ReleaseDataManager {
 	private static final String ZIP_FILE_EXTENSION = ".zip";
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManager.class);
 	private static final Map<String, String> FILENAME_PATTERN_TO_EDITION_MAP = new HashMap<>();
+	public static final String RECEIVING_RELEASE_DATA_INFO_MSG = "Receiving release data - {}";
+	public static final String RELEASE_FILE_COPIED_TO_INFO_MSG = "Release file copied to : {}";
+	public static final String COPY_RELEASE_FILE_WARNING_MSG = "Error copying release file to %s. Nested exception is : \n";
+	public static final String SQL_SELECT = " SELECT * FROM ";
+	public static final String SQL_ALTER_TABLE = "ALTER TABLE ";
+
 	static  {
 		FILENAME_PATTERN_TO_EDITION_MAP.put("SpanishExtension.*_INT", "ES");
 		FILENAME_PATTERN_TO_EDITION_MAP.put("_NL_[0-9]+\\.txt", "NL");
@@ -94,17 +99,17 @@ public class ReleaseDataManager {
 	
 	@PostConstruct
 	public void init() throws Exception {
-		logger.info("Sct Data Location passed = " + sctDataLocation);
+		logger.info("Sct Data Location passed = {}", sctDataLocation);
 		if (sctDataLocation == null || sctDataLocation.isEmpty()) {
 			sctDataLocation = FileUtils.getTempDirectoryPath() + System.getProperty("file.separator") + "rvf-sct-data";
 		}
 		sctDataFolder = new File(sctDataLocation);
 		if (!sctDataFolder.exists()) {
 			if (sctDataFolder.mkdirs()) {
-				logger.info("Created data folder at : " + sctDataLocation);
+				logger.info("Created data folder at : {}", sctDataLocation);
 			} 
 		}
-		logger.info("Using data location as :" + sctDataFolder.getAbsolutePath());
+		logger.info("Using data location as : {}", sctDataFolder.getAbsolutePath());
 		fetchRvfSchemasFromDb();
 	}
 
@@ -120,15 +125,15 @@ public class ReleaseDataManager {
 				}
 			}
 		} catch (final SQLException e) {
-			logger.error("Error getting list of existing schemas. Nested exception is : \n" + e.fillInStackTrace());
+			logger.error("Error getting list of existing schemas. Nested exception is : \n", e.fillInStackTrace());
 		}
 	}
 
 	public void dropDatabaseIfExist(String schemaName) throws BusinessServiceException{
 		logger.info("Dropping schema: {}", schemaName);
 		//clean database
-		String dropStr = "drop database if exists " + schemaName + ";";
 		try (Statement statement = dataSource.getConnection().createStatement()) {
+			String dropStr = "drop database if exists " + schemaName + ";";
 			statement.execute(dropStr);
 			schemaNames.remove(schemaName);
 		} catch (SQLException e) {
@@ -148,15 +153,15 @@ public class ReleaseDataManager {
 	 */
 	public boolean uploadPublishedReleaseData(final InputStream inputStream, final String fileName, final String product, final String version) throws BusinessServiceException {
 		// copy release pack zip to data location
-		logger.info("Receiving release data - " + fileName);
+		logger.info(RECEIVING_RELEASE_DATA_INFO_MSG, fileName);
 		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
 		OutputStream out = null;
 		try {
 			out = new FileOutputStream(fileDestination);
 			IOUtils.copy(inputStream, out);
-			logger.info("Release file copied to : " + fileDestination.getAbsolutePath());
+			logger.info(RELEASE_FILE_COPIED_TO_INFO_MSG, fileDestination.getAbsolutePath());
 		} catch (final IOException e) {
-			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
+			logger.warn(String.format(COPY_RELEASE_FILE_WARNING_MSG, sctDataFolder), e.fillInStackTrace());
 			return false;
 			
 		} finally {
@@ -164,13 +169,13 @@ public class ReleaseDataManager {
 			IOUtils.closeQuietly(out, null);
 		}
 		String rvfVersion = getRVFVersion(product, version);
-		logger.info("RVF release version:" + rvfVersion);
+		logger.info("RVF release version: {}", rvfVersion);
 		if (schemaNames.contains(rvfVersion) ) {
-			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: " + rvfVersion);
+			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: {}", rvfVersion);
 		}
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		String schemaName = loadSnomedData(rvfVersion, rf2FilesLoaded, fileDestination);
-		logger.info("schemaName = " + schemaName);
+		logger.info("schemaName = {}", schemaName);
 		schemaNames.add(schemaName);
 		return true;
 	}
@@ -178,15 +183,15 @@ public class ReleaseDataManager {
 	
 	public boolean uploadReleaseDataIntoDB(final InputStream inputStream, String fileName, String schemaName) throws BusinessServiceException {
 		// copy release pack zip to data location
-		logger.info("Receiving release data - " + fileName);
+		logger.info(RECEIVING_RELEASE_DATA_INFO_MSG, fileName);
 		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
 		OutputStream out = null;
 		try {
 			out = new FileOutputStream(fileDestination);
 			IOUtils.copy(inputStream, out);
-			logger.info("Release file copied to : " + fileDestination.getAbsolutePath());
+			logger.info(RELEASE_FILE_COPIED_TO_INFO_MSG, fileDestination.getAbsolutePath());
 		} catch (final IOException e) {
-			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
+			logger.warn(String.format(COPY_RELEASE_FILE_WARNING_MSG, sctDataFolder), e.fillInStackTrace());
 			return false;
 			
 		} finally {
@@ -195,12 +200,12 @@ public class ReleaseDataManager {
 		}
 		
 		if (schemaNames.contains(schemaName)) {
-			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: " + schemaName);
+			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: {}", schemaName);
 		}
-		logger.info("Loading data into schema " + schemaName);
+		logger.info("Loading data into schema {}", schemaName);
 		List<String> rf2FilesLoaded = new ArrayList<>();
 		loadSnomedData(schemaName, rf2FilesLoaded, fileDestination);
-		logger.info("schemaName = " + schemaName);
+		logger.info("schemaName = {}", schemaName);
 		return true;
 	}
 
@@ -220,7 +225,7 @@ public class ReleaseDataManager {
 		final long startTime = Calendar.getInstance().getTimeInMillis();
 		try {
 			outputFolder = new File(FileUtils.getTempDirectoryPath(), createdSchemaName);
-			logger.info("Setting output folder location = " + outputFolder.getAbsolutePath());
+			logger.info("Setting output folder location = {}", outputFolder.getAbsolutePath());
 			if (outputFolder.exists()) {
 				logger.info("Output folder already exists and will be deleted before recreating.");
 				outputFolder.delete();
@@ -234,7 +239,7 @@ public class ReleaseDataManager {
 			createSchema(createdSchemaName);
 			loadReleaseFilesToDB(outputFolder, rvfDynamicDataSource, rf2FilesLoaded, createdSchemaName);
 		} catch (final RVFExecutionException | IOException e) {
-			List<String> fileNames = Arrays.asList(zipDataFile).stream().map(File::getName).collect(Collectors.toList());
+			List<String> fileNames = Arrays.asList(zipDataFile).stream().map(File::getName).toList();
 			final String errorMsg = String.format("Error while loading file %s into version %s", Arrays.toString(fileNames.toArray()), versionName);
 			logger.error(errorMsg,e);
 			throw new BusinessServiceException(errorMsg, e);
@@ -242,7 +247,7 @@ public class ReleaseDataManager {
 			// remove output directory so it does not occupy space
 			FileUtils.deleteQuietly(outputFolder);
 		}
-		logger.info("Finished loading of data in : " + ((Calendar.getInstance().getTimeInMillis() - startTime) / 1000) + " seconds.");
+		logger.info("Finished loading of data in : {} seconds.", ((Calendar.getInstance().getTimeInMillis() - startTime) / 1000));
 		return createdSchemaName;
 	}
 
@@ -277,7 +282,7 @@ public class ReleaseDataManager {
 		List<File> filesFound = new ArrayList<>();
 		if (knownVersion != null ) {
 			final File [] zipFiles = sctDataFolder.listFiles( new FilenameFilter() {
-				
+
 				public boolean accept(final File dir, final String name) {
 					final String[] tokens = name.split("_");
 					final String lastToken = tokens[tokens.length -1];
@@ -301,13 +306,13 @@ public class ReleaseDataManager {
 			createSchema(schemaName);
 		} catch (Exception e) {
 			isFailed = true;
-			logger.error("Failed to create db schema and tables for version:" + combinedVersionName +" due to " + e.fillInStackTrace());
+			logger.error(String.format("Failed to create db schema and tables for version: %s due to ", combinedVersionName), e.fillInStackTrace());
 		}
 		//select data from known version schema and insert into the new schema
 		for (String knownSchema : knownVersions) {
 			if (isKnownRelease(knownSchema)) {
 				isFailed = true;
-				logger.error("Known schema doesn't exist for:" + knownSchema);
+				logger.error("Known schema doesn't exist for: {}", knownSchema);
 				break;
 			}
 			logger.info("Adding known version {} to schema {}", knownSchema, combinedVersionName);
@@ -321,7 +326,7 @@ public class ReleaseDataManager {
 			}
 		}
 		final long endTime = System.currentTimeMillis();
-		logger.info("Time taken to combine both known versions into one schema in seconds: " + (endTime-startTime)/1000);
+		logger.info("Time taken to combine both known versions into one schema in seconds: {}", ((endTime-startTime)/1000));
 		return !isFailed;
 	}
 	
@@ -334,8 +339,8 @@ public class ReleaseDataManager {
 	 * @throws BusinessServiceException
 	 */
 	private void copyData(String tableName, String sourceSchemaA, String sourceSchemaB, String targetSchema) throws BusinessServiceException {
-		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
-		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
+		final String disableIndex = SQL_ALTER_TABLE + tableName + " DISABLE KEYS";
+		final String enableIndex = SQL_ALTER_TABLE + tableName + " ENABLE KEYS";
 		String selectDataFromASql = "select a.* from " + sourceSchemaA + "." + tableName + " a where not exists ( select c.id from " + sourceSchemaB + "." 
 				+ tableName + " c where a.id=c.id)";
 		String latestDataFromASelectSql = "select a.* from " + sourceSchemaA + "." + tableName + " a where exists ( select b.id from " + sourceSchemaB + "." + tableName 
@@ -362,14 +367,11 @@ public class ReleaseDataManager {
 			throw new BusinessServiceException(msg, e);
 		}
 	}
-	
-	
-	
-	
+
 	private void copyData(String tableName, String sourceSchema, String targetSchema) throws BusinessServiceException {
-		final String disableIndex = "ALTER TABLE " + tableName + " DISABLE KEYS";
-		final String enableIndex = "ALTER TABLE " + tableName + " ENABLE KEYS";
-		final String sql = "insert into " + targetSchema + "." + tableName  + " select * from " + sourceSchema + "." + tableName;
+		final String disableIndex = SQL_ALTER_TABLE + tableName + " DISABLE KEYS";
+		final String enableIndex = SQL_ALTER_TABLE + tableName + " ENABLE KEYS";
+		final String sql = "insert into " + targetSchema + "." + tableName  + SQL_SELECT + sourceSchema + "." + tableName;
 		logger.debug("Copying table {} with sql {} ", tableName, sql);
 		try (Connection connection = rvfDynamicDataSource.getConnection(targetSchema);
 			Statement statement = connection.createStatement() ) {
@@ -382,9 +384,7 @@ public class ReleaseDataManager {
 			throw new BusinessServiceException(msg, e);
 		}		
 	}
-	
-	
-	
+
 	private List<String> getValidTableNamesFromSchema(String schemaName, String tableNamePattern) {
 		List<String> result = new ArrayList<>();
 		Collection<String> mappedTables = RF2FileTableMapper.getAllTableNames();
@@ -406,7 +406,7 @@ public class ReleaseDataManager {
 				}
 			}
 		} catch (SQLException e) {
-			logger.error("Failed to select table name from db schema: " + schemaName +" due to " + e.fillInStackTrace());
+			logger.error(String.format("Failed to select table name from db schema: %s due to ",schemaName), e.fillInStackTrace());
 		}
 		return result;
 	}
@@ -416,12 +416,12 @@ public class ReleaseDataManager {
 		final long startTime = System.currentTimeMillis();
 		StringBuilder errorMsg = new StringBuilder();
 		if (!isKnownRelease(sourceVersion)) {
-			errorMsg.append(VERSION_NOT_FOUND + sourceVersion); 
+			errorMsg.append(VERSION_NOT_FOUND).append(sourceVersion);
 		}
 		if (!isKnownRelease(destinationVersion)) {
-			errorMsg.append(VERSION_NOT_FOUND + destinationVersion); 
+			errorMsg.append(VERSION_NOT_FOUND).append(destinationVersion);
 		}
-		if (errorMsg.length() > 0) {
+		if (!errorMsg.isEmpty()) {
 			throw new BusinessServiceException(errorMsg.toString());
 		}
 		for (final String tableName : getValidTableNamesFromSchema(sourceVersion, tableNamePattern)) {
@@ -439,12 +439,12 @@ public class ReleaseDataManager {
 		List<String> deltaTableNames = getValidTableNamesFromSchema(schema, "%_d");
 		for (String deltaTbl : deltaTableNames) {
 			String snapshotTbl = deltaTbl.replace("_d", "_s");
-			final String deleteSql = "delete a.* from " + schema + "." + snapshotTbl + " a where exists ( select b.id from " + schema + "." + deltaTbl + " b where a.id=b.id)";
-			logger.debug("Delete data from snapshot table sql:" + deleteSql);
-			final String insertSql = "insert into " + schema + "." + snapshotTbl  + " select * from " + schema + "." + deltaTbl;
-			logger.debug("Insert delta into snapshot table sql:" + insertSql);
 			try (Connection connection = rvfDynamicDataSource.getConnection(schema);
 					Statement statement = connection.createStatement() ) {
+				final String deleteSql = "delete a.* from " + schema + "." + snapshotTbl + " a where exists ( select b.id from " + schema + "." + deltaTbl + " b where a.id=b.id)";
+				logger.debug("Delete data from snapshot table sql: {}", deleteSql);
+				final String insertSql = "insert into " + schema + "." + snapshotTbl  + SQL_SELECT + schema + "." + deltaTbl;
+				logger.debug("Insert delta into snapshot table sql: {}", insertSql);
 				statement.execute(deleteSql);
 				statement.execute(insertSql);
 			} catch (final SQLException e) {
@@ -459,15 +459,15 @@ public class ReleaseDataManager {
 		final long startTime = System.currentTimeMillis();
 		StringBuilder errorMsg = new StringBuilder();
 		if (!isKnownRelease(sourceSchemaA)) {
-			errorMsg.append(VERSION_NOT_FOUND + sourceSchemaA); 
+			errorMsg.append(VERSION_NOT_FOUND).append(sourceSchemaA);
 		}
 		if (!isKnownRelease(sourceSchemaB)) {
-			errorMsg.append(VERSION_NOT_FOUND + sourceSchemaB); 
+			errorMsg.append(VERSION_NOT_FOUND).append(sourceSchemaB);
 		}
 		if (!isKnownRelease(destinationSchema)) {
-			errorMsg.append(VERSION_NOT_FOUND + destinationSchema); 
+			errorMsg.append(VERSION_NOT_FOUND).append(destinationSchema);
 		}
-		if (errorMsg.length() > 0) {
+		if (!errorMsg.isEmpty()) {
 			throw new BusinessServiceException(errorMsg.toString());
 		}
 		for (String tableName : getValidTableNamesFromSchema(sourceSchemaA, tableNamePattern)) {
@@ -483,11 +483,11 @@ public class ReleaseDataManager {
 
 	public String createSchema(String version) throws BusinessServiceException {
 		String schemaName = version.startsWith(RVF_DB_PREFIX) ? version : RVF_DB_PREFIX + version;
-		logger.info("Creating db schema " + schemaName);
+		logger.info("Creating db schema {}", schemaName);
 		//clean and create database
-		String dropStr = "drop database if exists " + schemaName + ";";
-		String createDbStr = "create database if not exists "+ schemaName + ";";
 		try (Statement statement = dataSource.getConnection().createStatement()) {
+			String dropStr = "drop database if exists " + schemaName + ";";
+			String createDbStr = "create database if not exists "+ schemaName + ";";
 			statement.execute(dropStr);
 			statement.execute(createDbStr);
 		} catch (SQLException e) {
@@ -507,7 +507,7 @@ public class ReleaseDataManager {
 			throw new BusinessServiceException("Failed to create tables for schema " + schemaName, e);
 		}
 		schemaNames.add(schemaName);
-		logger.info(schemaName + " is created successfully.");
+		logger.info("{} is created successfully.", schemaName);
 		return schemaName;
 	}
 
@@ -528,12 +528,12 @@ public class ReleaseDataManager {
 		File dataDir = new File(mysqlDataDir);
 		File binaryFile = new File(mysqlDataDir, schemaName);
 		if (!dataDir.canRead()) {
-			logger.error("Can't access directory " + dataDir.getPath());
+			logger.error("Can't access directory {}", dataDir.getPath());
 			try {
 				GroupPrincipal group = Files.readAttributes(dataDir.toPath(), PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS).group();
 				UserPrincipal owner = Files.readAttributes(dataDir.toPath(), PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS).owner();
-				logger.info("user group:" + group.toString());
-				logger.info("owner :" + owner.toString());
+				logger.info("user group: {}", group);
+				logger.info("owner : {}", owner);
 				Files.setOwner(binaryFile.toPath(), owner);
 				Files.getFileAttributeView(binaryFile.toPath(), PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS).setGroup(group);
 				Files.getFileAttributeView(binaryFile.toPath(), PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS).setOwner(owner);
@@ -548,10 +548,10 @@ public class ReleaseDataManager {
 		File archiveFile = new File(FileUtils.getTempDirectoryPath(), schemaName + ZIP_FILE_EXTENSION);
 		try {
 			ZipFileUtils.zip(binaryFile.getAbsolutePath(), archiveFile.getAbsolutePath());
-			logger.info("Mysql binary archive file is created " + archiveFile.getPath());
+			logger.info("Mysql binary archive file is created {}", archiveFile.getPath());
 			ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
 			resourceManager.writeResource(archiveFile.getName(), new FileInputStream(archiveFile));
-			logger.info("Mysql binary archive file " + archiveFile.getName() + " is loaded to " + mysqlBinaryStorageConfig.toString());
+			logger.info("Mysql binary archive file {} is loaded to {}", archiveFile.getName(), mysqlBinaryStorageConfig);
 		} catch (IOException e) {
 			throw new BusinessServiceException("Failed to zip binary file " + binaryFile.getAbsolutePath(), e);
 		}
@@ -562,12 +562,12 @@ public class ReleaseDataManager {
 		ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
 		InputStream inputStream = resourceManager.readResourceStreamOrNullIfNotExists(archiveFileName);
 		if (inputStream == null) {
-			logger.info("No resource available for " + archiveFileName + " via " + mysqlBinaryStorageConfig.toString());
+			logger.info("No resource available for {} via {}", archiveFileName, mysqlBinaryStorageConfig);
 			return false;
 		}
 		File outputFile = downloadFile(inputStream, archiveFileName);
 		if (outputFile == null) {
-			logger.error("Failed to download " + archiveFileName + " via " + mysqlBinaryStorageConfig.toString());
+			logger.error("Failed to download {} via {}", archiveFileName, mysqlBinaryStorageConfig);
 			return false;
 		}
 		File outputDir = new File(mysqlDataDir, archiveFileName.replace(".zip", ""));
@@ -576,7 +576,7 @@ public class ReleaseDataManager {
 		}
 		outputDir.mkdir();
 		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
-		logger.info("Mysql binary files are restored successfully in " +  outputDir.getPath());
+		logger.info("Mysql binary files are restored successfully in {}",  outputDir.getPath());
 		fetchRvfSchemasFromDb();
 		return true;
 	}
@@ -595,7 +595,7 @@ public class ReleaseDataManager {
 			ResourceManager resourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
 			inputStream = resourceManager.readResourceStream(releaseFilename);
 		} catch (IOException e) {
-			logger.error("Error while reading release package " + releaseFilename + " due to " + e.fillInStackTrace());
+			logger.error(String.format("Error while reading release package %s due to ", releaseFilename), e.fillInStackTrace());
 			throw new BusinessServiceException("Failed to read file " + releaseFilename + " via " + releaseStorageConfig.toString(), e);
 		}
 		uploadReleaseDataIntoDB(inputStream, releaseFilename, schemaName);
@@ -608,10 +608,10 @@ public class ReleaseDataManager {
 		try {
 			out = new FileOutputStream(fileDestination);
 			IOUtils.copy(input, out);
-			logger.info("Release file copied to : " + fileDestination.getAbsolutePath());
+			logger.info(RELEASE_FILE_COPIED_TO_INFO_MSG, fileDestination.getAbsolutePath());
 			return fileDestination;
 		} catch (final IOException e) {
-			logger.warn("Error copying release file to " + sctDataFolder + ". Nested exception is : \n" + e.fillInStackTrace());
+			logger.warn(String.format(COPY_RELEASE_FILE_WARNING_MSG, sctDataFolder), e.fillInStackTrace());
 			return null;
 		} finally {
 			IOUtils.closeQuietly(input, null);
@@ -628,7 +628,7 @@ public class ReleaseDataManager {
 										|| file.contains("der2_"))
 										&& file.endsWith(".txt"))
 							.findFirst();
-		if (!sctOrDerFile.isPresent()) {
+		if (sctOrDerFile.isEmpty()) {
 			throw new BusinessServiceException("There are no RF2 files in data file: " + zipDataFile);
 		}
 		snomedFile = sctOrDerFile.get();
@@ -642,7 +642,7 @@ public class ReleaseDataManager {
 				"Could not find RF2 file with standard name in data zip file " 
 				+ zipDataFile.getName());
 		}
-		logger.info ("Identified edition and version " + editionAndVersion + " from zip file " + zipDataFile.getName());
+		logger.info ("Identified edition and version {} from zip file {}", editionAndVersion, zipDataFile.getName());
 		return editionAndVersion;
 	}
 
@@ -660,8 +660,7 @@ public class ReleaseDataManager {
 
 	private List<String> getFileList(final File dataFile) throws BusinessServiceException {
 		try {
-			List<String> fileList = ZipFileUtils.listFiles(dataFile);
-			return fileList;
+			return ZipFileUtils.listFiles(dataFile);
 		} catch (IOException e) {
 			throw new BusinessServiceException("Could not get file list from " + dataFile, e);
 		}
@@ -677,45 +676,58 @@ public class ReleaseDataManager {
 					snapShotTables.add(rs.getString(3));
 				}
 			}
-			String insertSQL;
 			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
-				String previousDependencyEffectiveTime = executionConfig.getPreviousDependencyEffectiveTime().replaceAll("-", "");
-				for (String snapshotTable : snapShotTables) {
-					insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
-							+ " SELECT * FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable + " a"
-							+ " WHERE cast(a.effectivetime as datetime) > cast('" + previousDependencyEffectiveTime + "' as datetime)"
-							+ " AND EXISTS (SELECT id FROM " + snapshotTable + " WHERE a.id = id AND a.moduleid = moduleid)";
-					PreparedStatement ps = connection.prepareStatement(insertSQL);
-					logger.info(insertSQL);
-					ps.execute();
-				}
+				insertIntoProspectiveDeltaTablesFromDependency(executionConfig, snapShotTables, connection);
 			}
 			if (executionConfig.isFirstTimeRelease()) {
-				String effectiveTime = StringUtils.isNotBlank(executionConfig.getEffectiveTime()) ? executionConfig.getEffectiveTime().replaceAll("-","") : "";
-				for (String snapshotTable: snapShotTables) {
-					insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
-							+ " SELECT * FROM " + snapshotTable
-							+ " WHERE (effectivetime IS NULL OR effectivetime='" + effectiveTime + "')";
-					if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
-						insertSQL += " AND moduleid NOT IN (SELECT DISTINCT(referencedcomponentid) FROM " + executionConfig.getExtensionDependencyVersion() + ".moduledependencyrefset_s WHERE active = '1')";
-					}
-					PreparedStatement ps = connection.prepareStatement(insertSQL);
-					logger.info(insertSQL);
-					ps.execute();
-				}
+				insertIntoProspectiveDeltaTablesForFirstTimeRelease(executionConfig, snapShotTables, connection);
 			} else {
-				for (String snapshotTable: snapShotTables) {
-					insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
-							+ " SELECT * FROM " + snapshotTable
-							+ " WHERE (effectivetime IS NULL OR cast(effectivetime as datetime) > cast('" + executionConfig.getPreviousEffectiveTime() + "' as datetime))";
-					if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
-						insertSQL += " AND moduleid NOT IN (SELECT DISTINCT(referencedcomponentid) FROM " + executionConfig.getExtensionDependencyVersion() + ".moduledependencyrefset_s WHERE active = '1')";
-					}
-					PreparedStatement ps = connection.prepareStatement(insertSQL);
-					logger.info(insertSQL);
-					ps.execute();
-				}
+				insertIntoProspectiveDeltaTablesForNoneFirstTimeRelease(executionConfig, snapShotTables, connection);
 			}
+		}
+	}
+
+	private static void insertIntoProspectiveDeltaTablesForNoneFirstTimeRelease(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
+		String insertSQL;
+		for (String snapshotTable: snapShotTables) {
+			insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
+					+ SQL_SELECT + snapshotTable.replaceAll("_s$", "_f") + " a"
+					+ " WHERE (a.effectivetime IS NULL OR cast(a.effectivetime as datetime) > cast('" + executionConfig.getPreviousEffectiveTime() + "' as datetime))";
+			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
+				insertSQL += " AND NOT EXISTS (SELECT id FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " WHERE a.id = id AND a.moduleid = moduleid AND a.effectivetime = effectivetime)";
+			}
+			PreparedStatement ps = connection.prepareStatement(insertSQL);
+			logger.info(insertSQL);
+			ps.execute();
+		}
+	}
+
+	private void insertIntoProspectiveDeltaTablesForFirstTimeRelease(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
+		String insertSQL;
+		String effectiveTime = StringUtils.isNotBlank(executionConfig.getEffectiveTime()) ? executionConfig.getEffectiveTime().replaceAll("-","") : "";
+		for (String snapshotTable: snapShotTables) {
+			insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
+					+ SQL_SELECT + snapshotTable + " a"
+					+ " WHERE (a.effectivetime IS NULL OR a.effectivetime='" + effectiveTime + "')";
+			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
+				insertSQL += " AND NOT EXISTS (SELECT id FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " WHERE a.id = id AND a.moduleid = moduleid AND a.effectivetime = effectivetime)";
+			}
+			PreparedStatement ps = connection.prepareStatement(insertSQL);
+			logger.info(insertSQL);
+			ps.execute();
+		}
+	}
+
+	private void insertIntoProspectiveDeltaTablesFromDependency(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
+		String insertSQL;
+		String previousDependencyEffectiveTime = executionConfig.getPreviousDependencyEffectiveTime().replaceAll("-", "");
+		for (String snapshotTable : snapShotTables) {
+			insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
+					+ SQL_SELECT + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " a"
+					+ " WHERE cast(a.effectivetime as datetime) > cast('" + previousDependencyEffectiveTime + "' as datetime)";
+			PreparedStatement ps = connection.prepareStatement(insertSQL);
+			logger.info(insertSQL);
+			ps.execute();
 		}
 	}
 }

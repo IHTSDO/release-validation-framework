@@ -145,9 +145,7 @@ public class AssertionGroupImporter {
 	}
 
 	private static final String SIMPLE_MAP = "simple map";
-	private static final String RESOURCE = "resource";
-	private static final String LOINC = "LOINC";
-	private static final String ICD_9_COMPLEX_MAP ="ICD-9-CM";
+
 	@Autowired
 	private AssertionService assertionService;
 
@@ -159,8 +157,6 @@ public class AssertionGroupImporter {
 		"2e4fd620-7d08-11e1-b0c4-0800200c9a66",
 		"6dbaed71-f031-4290-b74f-f35561c2e283",
 		"c2975dd5-3869-4bf7-ac75-53fd53b90144"};
-
-	private static final String[] COMMON_AUTHORING_ONLY_LIST = {"a49fabee-0d72-41b0-957d-32983c79f26c"};
 
 	//SNOMED RT Identifier is deprecated from the international 20170731 release onwards.
 	private static final String[] SNOMED_RT_IDENTIFIER_ASSERTIONS = {"730720b0-7f25-11e1-b0c4-0800200c9a66","83638340-7f25-11e1-b0c4-0800200c9a66",
@@ -219,7 +215,7 @@ public class AssertionGroupImporter {
 			"4478a896-2724-4417-8bce-8986ecc53c4e",
 			"372e59d5-d6f3-4708-93d0-6cb92da69006",
 			"0cc708af-6816-4370-91be-dba8da99d227",
-			"7b86a5c9-f764-41b1-b42d-feb4a61de911",
+			"44916964-5b78-4842-81d8-e8293ee93bea",
 			"fbfc4fd1-f10d-4fc2-889f-df0e089df4b7",
 			"a0a0b444-b1c7-4d31-ac45-c44f2e35c5a5",
 			"9912342f-5010-40fd-9bea-301b737973a1",
@@ -228,8 +224,8 @@ public class AssertionGroupImporter {
 			"5f1a51a3-6200-4463-8799-d75998165278",
 			"2b193a88-8dab-4d19-b995-b556ed59398d",
 			"e6082dc4-c6f4-48c6-afa3-233182336a5c",
-			"84cd7605-bf3c-4332-a87d-c9b612c6c819",
-			"3953475e-0eff-4aba-a849-ed8cacd4c71f",
+			"b88b9f46-4c33-4d8e-b9ab-ddb87aef3068",
+			"2aa0bea1-b1fa-4543-b277-b4392a6f864d",
 			"88315a11-4e71-49d2-977f-a5d5ac2a4dc4",
 			"9190473a-29f7-40fc-b879-9ae0d038b681",
 			"eff30fb0-7856-11e1-b0c4-0800200c9a66",
@@ -238,7 +234,7 @@ public class AssertionGroupImporter {
 			"560e6d0c-64e8-4726-9516-ae7a7606b0b3",
 			"910844a8-97e5-4096-add2-e1734b941e10",
 			"26c25479-c3ba-47f2-9851-bb05ae42ad48",
-			"a98e02f7-e810-449b-89ff-0a9037cea32d",
+			"5c6b6bc0-79b9-11e1-b0c4-0800200c9a66",
 			"32b07ff2-9a9a-497f-ae26-92b68ebed20e"
 	};
 
@@ -381,7 +377,7 @@ public class AssertionGroupImporter {
 		// remove all assertions from existing group
 		if (allGroups != null) {
 			for (AssertionGroup group : allGroups) {
-				LOGGER.info("Validation group is already created:" + group.getName());
+				LOGGER.info("Validation group is already created: {}", group.getName());
 
 				group.removeAllAssertionsFromGroup();
 				existingGroups.add(group.getName());
@@ -393,7 +389,7 @@ public class AssertionGroupImporter {
 		for (AssertionGroupName groupName : AssertionGroupName.values()) {
 			allGroupNames.add(groupName.getName());
 			if (!existingGroups.contains(groupName.getName())) {
-				LOGGER.info("creating assertion group:" + groupName.getName());
+				LOGGER.info("creating assertion group: {}", groupName.getName());
 				AssertionGroup group = new AssertionGroup();
 				group.setName(groupName.getName());
 				allGroups.add(assertionService.createAssertionGroup(group));
@@ -410,27 +406,28 @@ public class AssertionGroupImporter {
 
 	private void addAssertionsToAssertionGroup(AssertionGroup assertionGroup, List<Assertion> allAssertions) {
 		AssertionGroupName groupName = AssertionGroupName.fromName(assertionGroup.getName());
-        switch (groupName) {
-            case FILE_CENTRIC_VALIDATION, RELEASE_TYPE_VALIDATION, COMPONENT_CENTRIC_VALIDATION ->
-                    addAssertionsByKeyWord(allAssertions, assertionGroup);
-            case MDRS_VALIDATION, STANDALONE_RELEASE ->
-                    addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
-			case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, FR_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, NL_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
-                    addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
-            case COMMON_AUTHORING -> addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
-            case COMMON_AUTHORING_WITHOUT_LANG_REFSETS ->
-                    addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions, assertionGroup);
-            case INT_AUTHORING, AT_AUTHORING, AU_AUTHORING, DK_AUTHORING, SE_AUTHORING, US_AUTHORING, BE_AUTHORING, NO_AUTHORING, CH_AUTHORING, FR_AUTHORING, IE_AUTHORING, NZ_AUTHORING, ZH_AUTHORING, EE_AUTHORING, KR_AUTHORING, NL_AUTHORING ->
-                    addAssertionToSnapshotAssertionGroup(assertionGroup);
-            case FIRST_TIME_LOINC_VALIDATION, FIRST_TIME_COMMON_EDITION_VALIDATION ->
-                    addAssertionsToFirstTimeReleaseGroup(allAssertions, assertionGroup);
-            case STATED_RELATIONSHIPS_VALIDATION ->
-                    addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, false);
-            case STATED_RELATIONSHIPS_RELEASE_VALIDATION ->
-                    addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, true);
-            default -> LOGGER.warn("unrecognized group: " + assertionGroup.getName());
-        }
-
+		if (groupName != null) {
+			switch (groupName) {
+				case FILE_CENTRIC_VALIDATION, RELEASE_TYPE_VALIDATION, COMPONENT_CENTRIC_VALIDATION ->
+						addAssertionsByKeyWord(allAssertions, assertionGroup);
+				case MDRS_VALIDATION, STANDALONE_RELEASE ->
+						addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
+				case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, FR_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, NL_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
+						addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
+				case COMMON_AUTHORING -> addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
+				case COMMON_AUTHORING_WITHOUT_LANG_REFSETS ->
+						addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions, assertionGroup);
+				case INT_AUTHORING, AT_AUTHORING, AU_AUTHORING, DK_AUTHORING, SE_AUTHORING, US_AUTHORING, BE_AUTHORING, NO_AUTHORING, CH_AUTHORING, FR_AUTHORING, IE_AUTHORING, NZ_AUTHORING, ZH_AUTHORING, EE_AUTHORING, KR_AUTHORING, NL_AUTHORING ->
+						addAssertionToSnapshotAssertionGroup(assertionGroup);
+				case FIRST_TIME_LOINC_VALIDATION, FIRST_TIME_COMMON_EDITION_VALIDATION ->
+						addAssertionsToFirstTimeReleaseGroup(allAssertions, assertionGroup);
+				case STATED_RELATIONSHIPS_VALIDATION ->
+						addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, false);
+				case STATED_RELATIONSHIPS_RELEASE_VALIDATION ->
+						addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, true);
+				default -> LOGGER.warn("unrecognized group: {}", assertionGroup.getName());
+			}
+		}
 	}
 
 	private void addAssertionsToFirstTimeReleaseGroup(List<Assertion> allAssertions, AssertionGroup group) {
@@ -438,7 +435,7 @@ public class AssertionGroupImporter {
 		int counter = 0;
 		String keyWords;
 		for (Assertion assertion : allAssertions) {
-			if (Arrays.asList(COMMON_AUTHORING_ONLY_LIST).contains(assertion.getUuid().toString()) || Arrays.asList(FIRST_TIME_COMMON_ADDITIONAL_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
+			if (Arrays.asList(FIRST_TIME_COMMON_ADDITIONAL_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
 				continue;
 			}
 			keyWords = assertion.getKeywords();
@@ -499,19 +496,11 @@ public class AssertionGroupImporter {
 			}
 			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)) {
 				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
-				if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
-					continue;
-				}
-				//exclude simple map file checking as term server extracts don't contain these
-				if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
-					continue;
-				}
-				// Exclude stated relationship assertions
-				if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
-					continue;
-				}
-
-				if (Arrays.asList(COMMON_LANGUAGE_REFSETS_ASSERTIONS).contains(assertion.getUuid().toString())) {
+				if ((Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString()))
+					|| (assertion.getAssertionText().contains(SIMPLE_MAP))
+					|| (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString()))
+					|| (Arrays.asList(COMMON_LANGUAGE_REFSETS_ASSERTIONS).contains(assertion.getUuid().toString()))
+				) {
 					continue;
 				}
 				assertionService.addAssertionToGroup(assertion, group);
@@ -535,33 +524,24 @@ public class AssertionGroupImporter {
 			allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())).collect(Collectors.toList()));
         }
 		for (Assertion assertion : allAssertions) {
-			if (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
-																					|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())))) {
-				continue;
-			}
-			//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
-			if (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
-																								|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())))) {
-				continue;
-			}
-			// Exclude stated relationship assertions
-			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString()) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())) {
-				continue;
-			}
-			//exclude simple map file checking as term server extracts don't contain these
-			if (assertion.getAssertionText().contains(SIMPLE_MAP) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
-																	|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())))) {
-				continue;
-			}
-			if (AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
-				continue;
-			}
-			if (AssertionGroupName.INT_AUTHORING.equals(groupName) && Arrays.asList(INT_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
-				continue;
-			}
+			if (isExcludeAssertionFromSnapshotAssertionGroup(assertion, groupName)) continue;
 			assertionService.addAssertionToGroup(assertion, group);
 		}
 		LOGGER.info("Total assertions added {} for assertion group {}", allAssertions.size(), group.getName() );
+	}
+
+	private boolean isExcludeAssertionFromSnapshotAssertionGroup(Assertion assertion, AssertionGroupName groupName) {
+		boolean isUSAuthoringExcludedAssertion = (AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString()));
+		boolean isINTAuthoringExcludedAssertion = (AssertionGroupName.INT_AUTHORING.equals(groupName) && Arrays.asList(INT_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString()));
+		boolean isSnapshotExcludedAssertion = (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
+				|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))));
+		boolean isSimpleMapExcludedAssertion = (assertion.getAssertionText().contains(SIMPLE_MAP) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
+				|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))));
+		boolean isStatedRelationshipExcludedAssertion = (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString()) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()));
+		boolean isReleaseTypeExcludedAssertion = (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
+				|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))));
+
+		return isReleaseTypeExcludedAssertion || isStatedRelationshipExcludedAssertion || isSimpleMapExcludedAssertion || isUSAuthoringExcludedAssertion || isINTAuthoringExcludedAssertion || isSnapshotExcludedAssertion;
 	}
 
 
@@ -575,7 +555,7 @@ public class AssertionGroupImporter {
 				result.add(assertion);
 			}
 		}
-		LOGGER.info("Total common release assertions:" + result.size());
+		LOGGER.info("Total common release assertions: {}", result.size());
 		return result;
 	}
 
@@ -602,30 +582,17 @@ public class AssertionGroupImporter {
 			assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, "EXTENSION"));
 		}
 		for (Assertion assertion : assertionsToBeAdded) {
-			if (Arrays.asList(COMMON_AUTHORING_ONLY_LIST).contains(assertion.getUuid().toString())) {
-				continue;
-			}
-			if ( AssertionGroupName.SPANISH_EDITION.equals(groupName) && Arrays.asList(SPANISH_EXTENSION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
-				continue;
-			}
-			// Exclude stated relationship assertions
-			if (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString())) {
-				continue;
-			}
-			//exclude SNOMED RT assertions
-			if ( AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && (Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())
-																				|| Arrays.asList(INT_EDITION_EXCLUDE_LIST).contains(assertion.getUuid().toString()))) {
-				continue;
-			}
-			if ( AssertionGroupName.US_EDITION.equals(groupName) && Arrays.asList(US_EDITION_EXCLUDE_LIST).contains(assertion.getUuid().toString())) {
-				continue;
-			}
-			if ( AssertionGroupName.DERIVATIVE_EDITION.equals(groupName) && Arrays.asList(MRCM_REFSETS_ASSERTIONS).contains(assertion.getUuid().toString())) {
+			if ((AssertionGroupName.SPANISH_EDITION.equals(groupName) && Arrays.asList(SPANISH_EXTENSION_EXCLUDE_LIST).contains(assertion.getUuid().toString()))
+				|| (Arrays.asList(STATED_RELATIONSHIP_ASSERTIONS).contains(assertion.getUuid().toString()))
+				|| (AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && (Arrays.asList(SNOMED_RT_IDENTIFIER_ASSERTIONS).contains(assertion.getUuid().toString())
+					|| Arrays.asList(INT_EDITION_EXCLUDE_LIST).contains(assertion.getUuid().toString())))
+				|| (AssertionGroupName.US_EDITION.equals(groupName) && Arrays.asList(US_EDITION_EXCLUDE_LIST).contains(assertion.getUuid().toString()))
+				|| (AssertionGroupName.DERIVATIVE_EDITION.equals(groupName) && Arrays.asList(MRCM_REFSETS_ASSERTIONS).contains(assertion.getUuid().toString()))) {
 				continue;
 			}
 			assertionService.addAssertionToGroup(assertion, assertionGroup);
 		}
-		LOGGER.info("Total assertions added {} for assertion group {}", assertionsToBeAdded.size(), groupName.getName() );
+		LOGGER.info("Total assertions added {} for assertion group {}", assertionsToBeAdded.size(), groupName.getName());
 	}
 
 	private void addAssertionsByKeyWord(List<Assertion> allAssertions, AssertionGroup group) {
@@ -658,7 +625,6 @@ public class AssertionGroupImporter {
 				if(count == statedRelationshipAssertionCount) break;
 			}
 		}
-
 	}
 
 }
