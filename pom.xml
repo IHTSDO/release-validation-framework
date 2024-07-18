@@ -318,7 +318,7 @@
                             <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
                             <jvmFlag>--add-opens=java.base/java.lang=ALL-UNNAMED</jvmFlag>
                             <jvmFlag>-Xms512m</jvmFlag>
-                            <jvmFlag>-Xmx4g</jvmFlag>
+                            <jvmFlag>-Xmx8g</jvmFlag>
                         </jvmFlags>
                         <ports>
                             <port>8080</port>
