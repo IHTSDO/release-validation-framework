@@ -27,7 +27,7 @@ services:
     container_name: rvf
     depends_on:
       - db
-    entrypoint: java -Xms512m -Xmx4g -Daws.region=us-east-1 -cp @/app/jib-classpath-file org.ihtsdo.rvf.App --server.port=8081 --server.servlet.context-path=/api
+    entrypoint: java -Xms512m -Xmx8g -Daws.region=us-east-1 --add-opens=java.base/java.lang=ALL-UNNAMED -cp @/app/jib-classpath-file org.ihtsdo.rvf.App --server.port=8081 --server.servlet.context-path=/api
     ports:
       - "8081:8081"
     environment:
