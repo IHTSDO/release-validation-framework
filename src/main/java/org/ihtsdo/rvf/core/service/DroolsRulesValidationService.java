@@ -327,6 +327,9 @@ public class DroolsRulesValidationService {
 					throw new RVFExecutionException("Drools validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
 				}
 				extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(testedReleaseFileStream, ReleaseImporter.ImportType.DELTA).getAbsolutePath());
+				try (InputStream previousReleaseStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile())) {
+					extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
+				}
 			} else {
 				// If the validation is Snapshot validation, current file must be loaded to snapshot files list
 				extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(testedReleaseFileStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
