@@ -282,7 +282,7 @@ public class DroolsRulesValidationService {
 							|| WARNING_COMPONENT_RULE_ID.equals(item.getRuleId())
 							|| !uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring")
 							|| (uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring")
-							&& modules.contains(item.getComponent().getModuleId()))).toList();
+							&& modules.contains(item.getComponent().getModuleId()))).collect(Collectors.toList());
 				}
 			}
 
