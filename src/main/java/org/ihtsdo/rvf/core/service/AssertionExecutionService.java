@@ -229,7 +229,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String includedModules = String.join(",", config.getIncludedModules());
 		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
 
-		String previousReleaseSchema = config.isFirstTimeRelease() ? null : config.getPreviousVersion();
+		String previousReleaseSchema = config.getPreviousVersion();
 		String dependencyReleaseSchema = config.getExtensionDependencyVersion();
 		validateSchemas(config, prospectiveSchema, previousReleaseSchema);
 

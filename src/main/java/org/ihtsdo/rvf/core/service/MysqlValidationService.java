@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -53,7 +54,7 @@ public class MysqlValidationService {
 		String reportStorage = validationConfig.getStorageLocation();
 		try {
 			// prepare release data for testing
-			if (!executionConfig.isFirstTimeRelease()) {
+			if (StringUtils.hasLength(executionConfig.getPreviousVersion())) {
 				releaseVersionLoader.loadPreviousVersion(executionConfig);
 			}
 			// load dependency release
@@ -106,7 +107,7 @@ public class MysqlValidationService {
 		}
 		LOGGER.debug("Running release-type validations {}", releaseTypeAssertions.size());
 		String reportStorage = validationConfig.getStorageLocation();
-		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage,false);
+		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage,true);
 		if (!executionConfig.isStandAloneProduct()) {
 			//loading international snapshot
 			try {
