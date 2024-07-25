@@ -6,8 +6,7 @@ volumes:
 
 services:
   db:
-    image: mysql:5.7
-    platform: linux/amd64
+    image: mysql:8.0
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=snomed
@@ -21,7 +20,7 @@ services:
     volumes:
       - mysql:/var/lib/mysql
     command:
-      mysqld --sql_mode="NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES" --lower_case_table_names=1 --local_infile=1
+     mysqld --sql_mode="NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES" --lower_case_table_names=1 --local_infile=1 --innodb_redo_log_capacity=4G
   rvf:
     image: snomedinternational/release-validation-framework:latest
     container_name: rvf
@@ -42,6 +41,7 @@ services:
       - rvf_net
     volumes:
       - rvf-store:/app/store
+      - mysql:/var/lib/mysql
       - type: bind
         source: ./store/releases
         target: /app/store/releases
