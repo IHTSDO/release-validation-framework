@@ -159,7 +159,7 @@ public class ValidationVersionLoader {
 	private String loadRelease(String releaseVersion) throws IOException, BusinessServiceException {
 		if (releaseVersion != null && releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
 			String schemaName = RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
-			if (!releaseDataManager.isKnownRelease(schemaName) && (!releaseDataManager.restoreReleaseFromBinaryArchive(schemaName + ZIP_FILE_EXTENSION))) {
+			if (!releaseDataManager.isKnownRelease(schemaName) && (!releaseDataManager.restoreReleaseFromBinaryArchive(schemaName))) {
 					logger.info("No existing mysql binary release available.");
 					releaseDataManager.uploadPublishedReleaseFromStore(releaseVersion, schemaName);
 					if (generateBinaryArchive) {
