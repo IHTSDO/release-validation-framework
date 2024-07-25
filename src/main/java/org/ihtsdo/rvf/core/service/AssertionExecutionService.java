@@ -15,6 +15,7 @@ import jakarta.annotation.Resource;
 import javax.naming.ConfigurationException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
@@ -116,7 +117,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		final long startTime = System.currentTimeMillis();
 		logger.info("Executing {} statement:", sql.replaceAll("\n", " " ).replaceAll("\t", ""));
 		try (Statement statement = connection.createStatement()) {
-			//try block will close statement in all circumstances
+			// try block will close statement in all circumstances
 			final int result = statement.executeUpdate(sql);
 			final long timeTaken = System.currentTimeMillis() - startTime;
 			logger.info("Completed in {}ms, result = {}", timeTaken, result);
@@ -161,17 +162,16 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			throws SQLException, ConfigurationException {
 		String[] parts = splitCommand(command);
 		// parse sql to get select statement
-		final List<String> sqlStatements = transformSql(parts, assertion, config);
-		for (String sqlStatement: sqlStatements)
-		{
+		final List<String> sqlStatements = transformSql(Arrays.asList(parts), assertion, config);
+		for (String sqlStatement: sqlStatements) {
 			// remove any leading and train white space
 			sqlStatement = sqlStatement.trim();
 			if (sqlStatement.startsWith("call")) {
-				logger.info("Start calling stored proecure {}", sqlStatement);
+				logger.info("Start calling stored procedure {}", sqlStatement);
 				try ( CallableStatement cs = connection.prepareCall(sqlStatement)) {
 					cs.execute();
 				}
-				logger.info("End of calling stored proecure {}", sqlStatement);
+				logger.info("End of calling stored procedure {}", sqlStatement);
 			} else if (sqlStatement.toLowerCase().startsWith("select")){
 				//TODO need to verify this is required.
 				logger.info("Select query found: {}", sqlStatement);
@@ -206,10 +206,10 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		}
 	}
 
+
 	private String[] splitCommand(ExecutionCommand command) {
 		String[] parts = {""};
-		if (command.getStatements().isEmpty())
-		{
+		if (command.getStatements().isEmpty()) {
 			final String sql = command.getTemplate();
 			if (sql != null) {
 				parts = sql.split(";");
@@ -220,7 +220,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		return parts;
 	}
 
-	private List<String> transformSql(String[] parts, Assertion assertion, MysqlExecutionConfig config) throws ConfigurationException {
+	private List<String> transformSql(List<String> parts, Assertion assertion, MysqlExecutionConfig config) throws ConfigurationException {
 		List<String> result = new ArrayList<>();
 		String defaultCatalog = dataSource.getDefaultCatalog();
 		String prospectiveSchema = config.getProspectiveVersion();
@@ -233,7 +233,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String dependencyReleaseSchema = config.getExtensionDependencyVersion();
 		validateSchemas(config, prospectiveSchema, previousReleaseSchema);
 
-		for( String part : parts) {
+		for ( String part : parts) {
 			if ((part.contains("<PREVIOUS>") && previousReleaseSchema == null)
 				|| (part.contains("<DEPENDENCY>") && dependencyReleaseSchema == null)) {
 				continue;
