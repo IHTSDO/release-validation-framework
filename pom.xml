@@ -5,7 +5,7 @@
 
     <groupId>org.ihtsdo.snomed.rvf</groupId>
     <artifactId>release-validation-framework</artifactId>
-    <version>6.4.2</version>
+    <version>6.5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>SNOMED Release Validation Framework</description>
 
