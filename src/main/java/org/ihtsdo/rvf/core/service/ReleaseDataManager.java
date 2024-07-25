@@ -558,8 +558,9 @@ public class ReleaseDataManager {
 		return archiveFile.getName();
 	}
 
-	public boolean restoreReleaseFromBinaryArchive(String archiveFileName) throws IOException {
+	public boolean restoreReleaseFromBinaryArchive(String schemaName) throws IOException, BusinessServiceException {
 		ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
+		String archiveFileName = schemaName + ZIP_FILE_EXTENSION;
 		InputStream inputStream = resourceManager.readResourceStreamOrNullIfNotExists(archiveFileName);
 		if (inputStream == null) {
 			logger.info("No resource available for {} via {}", archiveFileName, mysqlBinaryStorageConfig);
@@ -570,6 +571,10 @@ public class ReleaseDataManager {
 			logger.error("Failed to download {} via {}", archiveFileName, mysqlBinaryStorageConfig);
 			return false;
 		}
+		// Create database schema and tables
+		createSchema(schemaName);
+
+		// Restore data from binary archive
 		File outputDir = new File(mysqlDataDir, archiveFileName.replace(".zip", ""));
 		if (outputDir.exists()) {
 			outputDir.delete();
@@ -577,6 +582,7 @@ public class ReleaseDataManager {
 		outputDir.mkdir();
 		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
 		logger.info("Mysql binary files are restored successfully in {}",  outputDir.getPath());
+
 		fetchRvfSchemasFromDb();
 		return true;
 	}
