@@ -146,19 +146,21 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			final List<String> statements = new ArrayList<>();
 			final StatementSplitter splitter = new StatementSplitter(sql);
 			if (splitter.getCompleteStatements() == null || splitter.getCompleteStatements().isEmpty()) {
-				logger.warn("SQL statements not ending with ;" + sql );
+				logger.warn("SQL statements not ending with ; {}", sql);
 			}
 			final StringBuilder storedProcedureSql = new StringBuilder();
 			boolean storedProcedureFound = false;
 			for (final StatementSplitter.Statement statement : splitter.getCompleteStatements()) {
 				String cleanedSql = statement.statement();
-				logger.debug("sql to be cleaned:" + cleanedSql);
+				logger.debug("cleaning sql for assertion uuid {}", assertion.getUuid());
+				logger.debug("sql to be cleaned:");
+				logger.debug(cleanedSql);
 				if ( cleanedSql.startsWith(CREATE_PROCEDURE) || cleanedSql.startsWith(CREATE_PROCEDURE.toLowerCase())) {
 					storedProcedureFound = true;
 				}
 				// Process SQL statement
 				final StringTokenizer tokenizer = new StringTokenizer(cleanedSql);
-				while(tokenizer.hasMoreTokens()) {
+				while (tokenizer.hasMoreTokens()) {
 					String token = tokenizer.nextToken();
 					// sometimes tokenizer messed up and leaves a trailing ')', so we clean this up
 					if (token.endsWith(")")){
@@ -179,7 +181,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 				cleanedSql = cleanedSql.replaceAll("assertionuuid", "assertion_id");
 				cleanedSql = cleanedSql.replaceAll("assertiontext,", "");
 				cleanedSql = cleanedSql.replaceAll("'<ASSERTIONTEXT>',", "");
-				logger.debug("cleaned sql:" + cleanedSql);
+				logger.debug("cleaned sql:");
+				logger.debug(cleanedSql);
 				if (!storedProcedureFound) {
 				   statements.add(cleanedSql);
 				} else {
