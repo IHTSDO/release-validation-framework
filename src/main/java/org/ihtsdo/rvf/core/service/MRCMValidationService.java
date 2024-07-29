@@ -281,6 +281,16 @@ public class MRCMValidationService {
 	}
 
 	private String getAdditionalFields(ConceptResult conceptResult) {
-		return (conceptResult.isActive() ? "1" : "0") + COMMA + conceptResult.getModuleId() + COMMA + conceptResult.getDefinitionStatusId();
+		if (conceptResult == null) {
+			return null;
+		}
+
+		String moduleId = conceptResult.getModuleId();
+		String definitionStatusId = conceptResult.getDefinitionStatusId();
+		if (moduleId == null || definitionStatusId == null) {
+			return null;
+		}
+
+		return (conceptResult.isActive() ? "1" : "0") + COMMA + moduleId + COMMA + definitionStatusId;
 	}
 }
