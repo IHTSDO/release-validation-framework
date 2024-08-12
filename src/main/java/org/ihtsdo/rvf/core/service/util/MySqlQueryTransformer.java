@@ -48,7 +48,6 @@ public class MySqlQueryTransformer {
             throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + previousReleaseSchema);
         }
 
-        final String[] nameParts = config.getProspectiveVersion().split("_");
         String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
         String includedModules = config.getIncludedModules().stream().collect(Collectors.joining(","));
         String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : (nameParts.length >= 2 ? AssertionGroupImporter.ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
