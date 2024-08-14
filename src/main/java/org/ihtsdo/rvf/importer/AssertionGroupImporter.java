@@ -52,6 +52,7 @@ public class AssertionGroupImporter {
 		NL_AUTHORING("NL", "nl-authoring"),
 		STANDALONE_RELEASE("STANDALONE_RELEASE", "standalone-release"),
 		LOINC_AUTHORING("LOINC", "loinc-authoring"),
+		SIMPLEX_AUTHORING("SIMPLEX", "simplex-authoring"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC", "first-time-loinc-validation"),
 		FIRST_TIME_COMMON_EDITION_VALIDATION ("COMMON", "first-time-common-edition"),
 		LOINC_EDITION ("LOINC", "LoincEdition"),
@@ -412,7 +413,7 @@ public class AssertionGroupImporter {
 						addAssertionsByKeyWord(allAssertions, assertionGroup);
 				case MDRS_VALIDATION, STANDALONE_RELEASE ->
 						addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
-				case LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, FR_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, NL_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
+				case SIMPLEX_AUTHORING, LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, FR_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, NL_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
 						addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
 				case COMMON_AUTHORING -> addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
 				case COMMON_AUTHORING_WITHOUT_LANG_REFSETS ->
