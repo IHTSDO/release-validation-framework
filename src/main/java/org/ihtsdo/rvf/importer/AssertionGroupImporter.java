@@ -165,6 +165,8 @@ public class AssertionGroupImporter {
 
 	private static final String[] US_AUTHORING_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b","6bed3e87-6d20-4b05-81ce-43d359a6f684"};
 
+	private static final String[] AU_AUTHORING_EXCLUDE_LIST = {"35ec824d-b53d-4567-833e-8ce79774acae"};
+
 	private static final String[] US_EDITION_EXCLUDE_LIST = {"31f5e2c8-b0b9-42ee-a9bf-87d95edad83b","2e2542f9-64a4-43d0-bf4e-9029af8b7cf0"};
 
 	private static final String[] INT_AUTHORING_EXCLUDE_LIST = {"6bed3e87-6d20-4b05-81ce-43d359a6f684"};
@@ -519,7 +521,7 @@ public class AssertionGroupImporter {
 		if (INT_AUTHORING.equals(groupName)) {
             allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())).collect(Collectors.toList()));
 		} else {
-			if (!US_AUTHORING.equals(groupName) && !NL_AUTHORING.equals(groupName)) {
+			if (!US_AUTHORING.equals(groupName) && !NL_AUTHORING.equals(groupName) && !AU_AUTHORING.equals(groupName)) {
 				allAssertions.addAll(assertionService.getAssertionsByKeyWords(",EXTENSION", false));
 			}
 			allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString())).collect(Collectors.toList()));
@@ -533,6 +535,7 @@ public class AssertionGroupImporter {
 
 	private boolean isExcludeAssertionFromSnapshotAssertionGroup(Assertion assertion, AssertionGroupName groupName) {
 		boolean isUSAuthoringExcludedAssertion = (AssertionGroupName.US_AUTHORING.equals(groupName) && Arrays.asList(US_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString()));
+		boolean isAuAuthoringExcludedAssertion = (AssertionGroupName.AU_AUTHORING.equals(groupName) && Arrays.asList(AU_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString()));
 		boolean isINTAuthoringExcludedAssertion = (AssertionGroupName.INT_AUTHORING.equals(groupName) && Arrays.asList(INT_AUTHORING_EXCLUDE_LIST).contains(assertion.getUuid().toString()));
 		boolean isSnapshotExcludedAssertion = (Arrays.asList(SNAPSHOT_EXCLUDE_LIST).contains(assertion.getUuid().toString()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
 				|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))));
@@ -542,7 +545,7 @@ public class AssertionGroupImporter {
 		boolean isReleaseTypeExcludedAssertion = (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(MS_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))
 				|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !Arrays.asList(INT_AUTHORING_INCLUDE_LIST).contains(assertion.getUuid().toString()))));
 
-		return isReleaseTypeExcludedAssertion || isStatedRelationshipExcludedAssertion || isSimpleMapExcludedAssertion || isUSAuthoringExcludedAssertion || isINTAuthoringExcludedAssertion || isSnapshotExcludedAssertion;
+		return isReleaseTypeExcludedAssertion || isAuAuthoringExcludedAssertion || isStatedRelationshipExcludedAssertion || isSimpleMapExcludedAssertion || isUSAuthoringExcludedAssertion || isINTAuthoringExcludedAssertion || isSnapshotExcludedAssertion;
 	}
 
 
