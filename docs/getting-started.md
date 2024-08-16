@@ -4,12 +4,12 @@
 - Maven 3
 
 ## Setup
-### Install Mysql 5.7
+### Install Mysql 8.0
 RVF requires a local MySQL database to be available. 
-#### Download and install [MySQL 5.7](https://dev.mysql.com/doc/refman/5.7/en/installing.html)
+#### Download and install [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/installing.html)
 #### Or use brew on macOS
 ```bash
-brew install mysql@5.7
+brew install mysql@8.0
 ```
 
 Following [this](configuration-guide.md) to set up the database and user.
