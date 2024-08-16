@@ -36,9 +36,9 @@ public class AssertionExecutionService {
 	private String qaResulTableName;
 	@Value("${rvf.validation.international.modules}")
 	private String internationalModules;
-	private final String deltaTableSuffix = "d";
-	private final String snapshotTableSuffix = "s";
-	private final String fullTableSuffix = "f";
+	private static final String DELTA_TABLE_SUFFIX = "d";
+	private static final String SNAPSHOT_TABLE_SUFFIX = "s";
+	private static final String FULL_TABLE_SUFFIX = "f";
 
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -108,6 +108,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				results.addAll(concurrentTask.get());
 			} catch (ExecutionException | InterruptedException e) {
 				logger.error("Thread interrupted while waiting for future result.", e);
+				Thread.currentThread().interrupt();
 			}
 		}
 		return results;
@@ -115,7 +116,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 	/** Executes an update using statement sql and logs the time taken **/
 	private void executeUpdateStatement (final Connection connection, final String sql) throws SQLException{
 		final long startTime = System.currentTimeMillis();
-		logger.info("Executing {} statement:", sql.replaceAll("\n", " " ).replaceAll("\t", ""));
+		logger.info("Executing statement: {}", sql.replaceAll("\n", " " ).replaceAll("\t", ""));
 		try (Statement statement = connection.createStatement()) {
 			// try block will close statement in all circumstances
 			final int result = statement.executeUpdate(sql);
@@ -153,7 +154,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			runItem.setFailureMessage("Test does not have any associated execution command:" + test);
 			return runItem;
 		}
-		logger.info(runItem.toString());
+		logger.info("Executed {}", runItem);
 		return runItem;
 	}
 
@@ -173,7 +174,6 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				}
 				logger.info("End of calling stored procedure {}", sqlStatement);
 			} else if (sqlStatement.toLowerCase().startsWith("select")){
-				//TODO need to verify this is required.
 				logger.info("Select query found: {}", sqlStatement);
 				try (PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement)) {
 					try (ResultSet execResult = preparedStatement.executeQuery()) {
@@ -225,7 +225,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String defaultCatalog = dataSource.getDefaultCatalog();
 		String prospectiveSchema = config.getProspectiveVersion();
 		final String[] nameParts = config.getProspectiveVersion().split("_");
-		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : (nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED");
+		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : getModuleId(nameParts);
 		String includedModules = String.join(",", config.getIncludedModules());
 		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
 
@@ -243,30 +243,34 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
 			part = commentPattern.matcher(part).replaceAll("");
 			// replace all substitutions for exec
-			part = part.replaceAll("<RUNID>", String.valueOf(config.getExecutionId()));
-			part = part.replaceAll("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
-			part = part.replaceAll("<MODULEID>", defaultModuleId);
-			part = part.replaceAll("<MODULEIDS>", includedModules);
-			part = part.replaceAll("<VERSION>", version);
+			part = part.replace("<RUNID>", String.valueOf(config.getExecutionId()));
+			part = part.replace("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
+			part = part.replace("<MODULEID>", defaultModuleId);
+			part = part.replace("<MODULEIDS>", includedModules);
+			part = part.replace("<VERSION>", version);
 			// watch out for any 's that users might have introduced
-			part = part.replaceAll("qa_result", defaultCatalog+ "." + qaResulTableName);
-			part = part.replaceAll("<PROSPECTIVE>", prospectiveSchema);
-			part = part.replaceAll("<TEMP>", prospectiveSchema);
-			part = part.replaceAll("<INTERNATIONAL_MODULES>", internationalModules);
+			part = part.replace("qa_result", defaultCatalog+ "." + qaResulTableName);
+			part = part.replace("<PROSPECTIVE>", prospectiveSchema);
+			part = part.replace("<TEMP>", prospectiveSchema);
+			part = part.replace("<INTERNATIONAL_MODULES>", internationalModules);
 			if (previousReleaseSchema != null) {
-				part = part.replaceAll("<PREVIOUS>", previousReleaseSchema);
+				part = part.replace("<PREVIOUS>", previousReleaseSchema);
 			}
 			if (dependencyReleaseSchema != null) {
-				part = part.replaceAll("<DEPENDENCY>", dependencyReleaseSchema);
+				part = part.replace("<DEPENDENCY>", dependencyReleaseSchema);
 			}
-			part = part.replaceAll("<DELTA>", deltaTableSuffix);
-			part = part.replaceAll("<SNAPSHOT>", snapshotTableSuffix);
-			part = part.replaceAll("<FULL>", fullTableSuffix);
+			part = part.replace("<DELTA>", DELTA_TABLE_SUFFIX);
+			part = part.replace("<SNAPSHOT>", SNAPSHOT_TABLE_SUFFIX);
+			part = part.replace("<FULL>", FULL_TABLE_SUFFIX);
 			part = part.trim();
 			logger.debug("Transformed sql statement: {}", part);
 			result.add(part);
 		}
 		return result;
+	}
+
+	private static String getModuleId(String[] nameParts) {
+		return nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED";
 	}
 
 	private static void validateSchemas(MysqlExecutionConfig config, String prospectiveSchema, String previousReleaseSchema) throws ConfigurationException {

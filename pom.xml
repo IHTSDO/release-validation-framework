@@ -252,6 +252,9 @@
                         <exclude>**/*IntegrationTest.java</exclude>
                         <exclude>**/*IntegrationSpec.java</exclude>
                     </excludes>
+                    <systemPropertyVariables>
+                        <aws.region>us-east-1</aws.region>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 
