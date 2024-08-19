@@ -101,7 +101,7 @@ public class MysqlFailuresExtractor {
                     // filter by the extension modules only
                     if (belongToCommonAuthoringOrCommonEditionGroup && config.isExtensionValidation() && !CollectionUtils.isEmpty(config.getIncludedModules())) {
                         int totalBatchFailures = failureDetails.size();
-                        failureDetails = failureDetails.stream().filter(failure -> config.getIncludedModules().contains(failure.getModuleId())).collect(Collectors.toList());
+                        failureDetails = failureDetails.stream().filter(failure -> config.getIncludedModules().contains(failure.getModuleId())).toList();
                         totalFilteredOutFailures += (totalBatchFailures - failureDetails.size());
                     }
 
@@ -109,7 +109,7 @@ public class MysqlFailuresExtractor {
                         // Convert to WhitelistItem
                         List<WhitelistItem> whitelistItems = failureDetails.stream()
                                 .map(failureDetail -> new WhitelistItem(item.getAssertionUuid().toString(), StringUtils.hasLength(failureDetail.getComponentId())? failureDetail.getComponentId() : "", failureDetail.getConceptId(), failureDetail.getFullComponent()))
-                                .collect(Collectors.toList());
+                                .toList();
 
                         // Send to Authoring acceptance gateway
                         List<WhitelistItem> whitelistedItems = whitelistService.checkComponentFailuresAgainstWhitelist(whitelistItems);
@@ -174,9 +174,10 @@ public class MysqlFailuresExtractor {
 
     private Map<String, Integer> getAssertionIdToTotalFailureMap(Connection connection, MysqlExecutionConfig config) throws SQLException {
         Map<String, Integer> assertionIdToTotalFailureMap = new HashMap<>();
-        String totalSQL = "select assertion_id, count(*) total from " + dataSource.getDefaultCatalog() + "." + qaResultTableName + " where run_id = ? group by assertion_id";
+        String totalSQL = "select assertion_id, count(*) total from ? where run_id = ? group by assertion_id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(totalSQL)) {
-            preparedStatement.setLong(1, config.getExecutionId());
+            preparedStatement.setString(1, dataSource.getDefaultCatalog() + "." + qaResultTableName);
+            preparedStatement.setLong(2, config.getExecutionId());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     assertionIdToTotalFailureMap.put(resultSet.getString(1), resultSet.getInt(2));
@@ -188,7 +189,7 @@ public class MysqlFailuresExtractor {
 
     private List<FailureDetail> fetchFailureDetails(Connection connection, Long executionId, Long assertionId, int failureExportMax, Integer offset, Integer rowCount)
             throws SQLException {
-        String resultSQL = "select concept_id, details, component_id, table_name from " + dataSource.getDefaultCatalog() + "." + qaResultTableName + " where assertion_id = ? and run_id = ?";
+        String resultSQL = "select concept_id, details, component_id, table_name from ? where assertion_id = ? and run_id = ?";
         if (offset != null && rowCount != null) {
             resultSQL += " limit " + offset + "," + rowCount;
         }
@@ -199,10 +200,11 @@ public class MysqlFailuresExtractor {
         long counter = 0;
         try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
             // select results that match execution
-            preparedStatement.setLong(1, assertionId);
-            preparedStatement.setLong(2, executionId);
+            preparedStatement.setString(1, dataSource.getDefaultCatalog() + "." + qaResultTableName);
+            preparedStatement.setLong(2, assertionId);
+            preparedStatement.setLong(3, executionId);
             if (failureExportMax > 0) {
-                preparedStatement.setLong(3, failureExportMax);
+                preparedStatement.setLong(4, failureExportMax);
             }
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

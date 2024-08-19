@@ -116,8 +116,14 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 	/** Executes an update using statement sql and logs the time taken **/
 	private void executeUpdateStatement (final Connection connection, final String sql) throws SQLException{
 		final long startTime = System.currentTimeMillis();
-		logger.info("Executing statement: {}", sql.replaceAll("\n", " " ).replaceAll("\t", ""));
+		if (sql == null) {
+			logger.warn("SQL statement is null, skipping execution");
+			return;
+		}
 		try (Statement statement = connection.createStatement()) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Executing statement: {}", sql.replace("\n", " ").replace("\t", ""));
+			}
 			// try block will close statement in all circumstances
 			final int result = statement.executeUpdate(sql);
 			final long timeTaken = System.currentTimeMillis() - startTime;
