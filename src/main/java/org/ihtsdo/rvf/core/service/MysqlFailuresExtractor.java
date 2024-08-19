@@ -143,9 +143,10 @@ public class MysqlFailuresExtractor {
         if (!StringUtils.hasLength(failureDetail.getComponentId())) {
             return;
         }
-        String sql = "select * from " + failureDetail.getTableName()+ " where id = ?";
+        String sql = "select * from ? where id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, failureDetail.getComponentId());
+            preparedStatement.setString(1, failureDetail.getTableName());
+            preparedStatement.setString(2, failureDetail.getComponentId());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     int columnCount = resultSet.getMetaData().getColumnCount();
