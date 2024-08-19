@@ -192,9 +192,8 @@ public class MysqlFailuresExtractor {
             throws SQLException {
         String resultSQL = "select concept_id, details, component_id, table_name from ? where assertion_id = ? and run_id = ?";
         if (offset != null && rowCount != null) {
-            resultSQL += " limit " + offset + "," + rowCount;
-        }
-        else if (failureExportMax > 0) {
+            resultSQL += " limit ?,?";
+        } else if (failureExportMax > 0) {
             resultSQL += " limit ?";
         }
         List<FailureDetail> firstNInstances = new ArrayList<>();
@@ -204,7 +203,10 @@ public class MysqlFailuresExtractor {
             preparedStatement.setString(1, dataSource.getDefaultCatalog() + "." + qaResultTableName);
             preparedStatement.setLong(2, assertionId);
             preparedStatement.setLong(3, executionId);
-            if (failureExportMax > 0) {
+            if (offset != null && rowCount != null) {
+                preparedStatement.setInt(4, offset);
+                preparedStatement.setInt(5, rowCount);
+            } else if (failureExportMax > 0) {
                 preparedStatement.setLong(4, failureExportMax);
             }
 
