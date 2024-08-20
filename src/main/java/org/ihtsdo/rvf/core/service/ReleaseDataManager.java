@@ -623,8 +623,8 @@ public class ReleaseDataManager {
 			throw new BusinessServiceException("There are no RF2 files in data file: " + zipDataFile);
 		}
 		snomedFile = sctOrDerFile.get();
-		Matcher matcher = Pattern.compile(".*_([0-9]+)\\.txt").matcher(snomedFile);
-		if (matcher.find()) {
+		Matcher matcher = Pattern.compile(".*_(\\d+)\\.txt").matcher(snomedFile);
+		if (matcher.matches()) {
 			editionAndVersion = 
 				mapFilenameToEdition(snomedFile).toLowerCase() + "_"
 				+ matcher.group(1);
@@ -639,11 +639,9 @@ public class ReleaseDataManager {
 
 	private String mapFilenameToEdition(String name) {
 		String edition = "INT";
-		for (String pattern : FILENAME_PATTERN_TO_EDITION_MAP.keySet()) {
-			Matcher editionMatcher = Pattern.compile(pattern).matcher(name);
-			if (editionMatcher.find()) {
-				edition = FILENAME_PATTERN_TO_EDITION_MAP.get(pattern);
-				break;
+		for (Map.Entry<String, String> entry : FILENAME_PATTERN_TO_EDITION_MAP.entrySet()) {
+			if (Pattern.compile(entry.getKey()).matcher(name).find()) {
+				return entry.getValue();
 			}
 		}
 		return edition;
@@ -679,9 +677,8 @@ public class ReleaseDataManager {
 	}
 
 	private static void insertIntoProspectiveDeltaTablesForNoneFirstTimeRelease(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
-		String insertSQL;
 		for (String snapshotTable: snapShotTables) {
-			insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
+			String insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
 					+ SQL_SELECT + snapshotTable.replaceAll("_s$", "_f") + " a"
 					+ " WHERE (a.effectivetime IS NULL OR cast(a.effectivetime as datetime) > cast('" + executionConfig.getPreviousEffectiveTime() + "' as datetime))";
 			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
@@ -695,10 +692,9 @@ public class ReleaseDataManager {
 	}
 
 	private void insertIntoProspectiveDeltaTablesForFirstTimeRelease(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
-		String insertSQL;
-		String effectiveTime = StringUtils.isNotBlank(executionConfig.getEffectiveTime()) ? executionConfig.getEffectiveTime().replaceAll("-", "") : "";
+		String effectiveTime = StringUtils.isNotBlank(executionConfig.getEffectiveTime()) ? executionConfig.getEffectiveTime().replace("-", "") : "";
 		for (String snapshotTable : snapShotTables) {
-			insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
+			String insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
 					+ SQL_SELECT + snapshotTable + " a"
 					+ " WHERE (a.effectivetime IS NULL OR a.effectivetime=?)";
 			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
@@ -714,7 +710,7 @@ public class ReleaseDataManager {
 
 	private void insertIntoProspectiveDeltaTablesFromDependency(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
 		String insertSQL;
-		String previousDependencyEffectiveTime = executionConfig.getPreviousDependencyEffectiveTime().replaceAll("-", "");
+		String previousDependencyEffectiveTime = executionConfig.getPreviousDependencyEffectiveTime().replace("-", "");
 		for (String snapshotTable : snapShotTables) {
 			insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
 					+ SQL_SELECT + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " a"
