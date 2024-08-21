@@ -562,18 +562,27 @@ public class ReleaseDataManager {
 			logger.error("Failed to download {} via {}", archiveFileName, mysqlBinaryStorageConfig);
 			return false;
 		}
-		// Create database schema and tables
+		// Create database schema and tables for mysql 8 workaround
 		createSchema(schemaName);
 
 		// Restore data from binary archive
 		File outputDir = new File(mysqlDataDir, archiveFileName.replace(".zip", ""));
 		if (outputDir.exists()) {
-			outputDir.delete();
+			logger.info("Output directory {} already exists and will be deleted before recreating.", outputDir.getPath());
+			if (outputDir.delete()) {
+				logger.info("Deleted directory {}", outputDir.getPath());
+				if (outputDir.mkdir()) {
+					logger.info("Created directory {}", outputDir.getPath());
+				} else {
+					logger.error("Failed to create directory {}", outputDir.getPath());
+				}
+			} else {
+				logger.error("Failed to delete directory {}", outputDir.getPath());
+			}
 		}
-		outputDir.mkdir();
+		logger.info("Extracting mysql binary files from {} to {}", outputFile.getPath(), outputDir.getPath());
 		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
 		logger.info("Mysql binary files are restored successfully in {}",  outputDir.getPath());
-
 		fetchRvfSchemasFromDb();
 		return true;
 	}
