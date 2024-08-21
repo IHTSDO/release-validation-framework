@@ -47,6 +47,7 @@ public class ReleaseDataManager {
 	public static final String COPY_RELEASE_FILE_WARNING_MSG = "Error copying release file to %s. Nested exception is : \n";
 	public static final String SQL_SELECT = " SELECT * FROM ";
 	public static final String SQL_ALTER_TABLE = "ALTER TABLE ";
+	public static final String INSERT_INTO = "INSERT INTO ";
 
 	static  {
 		FILENAME_PATTERN_TO_EDITION_MAP.put("SpanishExtension.*_INT", "ES");
@@ -333,17 +334,18 @@ public class ReleaseDataManager {
 	private void copyData(String tableName, String sourceSchemaA, String sourceSchemaB, String targetSchema) throws BusinessServiceException {
 		final String disableIndex = SQL_ALTER_TABLE + tableName + " DISABLE KEYS";
 		final String enableIndex = SQL_ALTER_TABLE + tableName + " ENABLE KEYS";
-		String selectDataFromASql = "select a.* from " + sourceSchemaA + "." + tableName + " a where not exists ( select c.id from " + sourceSchemaB + "." 
+		String selectAFrom = "select a.* from ";
+		String selectDataFromASql = selectAFrom + sourceSchemaA + "." + tableName + " a where not exists ( select c.id from " + sourceSchemaB + "."
 				+ tableName + " c where a.id=c.id)";
-		String latestDataFromASelectSql = "select a.* from " + sourceSchemaA + "." + tableName + " a where exists ( select b.id from " + sourceSchemaB + "." + tableName 
+		String latestDataFromASelectSql = selectAFrom + sourceSchemaA + "." + tableName + " a where exists ( select b.id from " + sourceSchemaB + "." + tableName
 					+ " b where a.id=b.id and cast(a.effectivetime as datetime) >= cast(b.effectivetime as datetime))";
 		
-		String selectDataFromBSql = "select a.* from " + sourceSchemaB + "." + tableName + " a where not exists ( select c.id from " + sourceSchemaA + "." 
+		String selectDataFromBSql = selectAFrom + sourceSchemaB + "." + tableName + " a where not exists ( select c.id from " + sourceSchemaA + "."
 				+ tableName + " c where a.id=c.id)";
-		String latestDataFromBSelectSql = "select a.* from " + sourceSchemaB + "." + tableName + " a where exists ( select b.id from " + sourceSchemaA + "." + tableName 
+		String latestDataFromBSelectSql = selectAFrom + sourceSchemaB + "." + tableName + " a where exists ( select b.id from " + sourceSchemaA + "." + tableName
 					+ " b where a.id=b.id and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime))";
 		
-		final String insertSql = "insert into " + targetSchema + "." + tableName  + " ";
+		final String insertSql = INSERT_INTO + targetSchema + "." + tableName  + " ";
 		logger.debug("Copying table {}", tableName);
 		try (Connection connection = rvfDynamicDataSource.getConnection(targetSchema);
 			Statement statement = connection.createStatement() ) {
@@ -678,7 +680,7 @@ public class ReleaseDataManager {
 
 	private static void insertIntoProspectiveDeltaTablesForNoneFirstTimeRelease(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
 		for (String snapshotTable: snapShotTables) {
-			String insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$","_d")
+			String insertSQL = INSERT_INTO + snapshotTable.replaceAll("_s$","_d")
 					+ SQL_SELECT + snapshotTable.replaceAll("_s$", "_f") + " a"
 					+ " WHERE (a.effectivetime IS NULL OR cast(a.effectivetime as datetime) > cast('" + executionConfig.getPreviousEffectiveTime() + "' as datetime))";
 			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
@@ -694,7 +696,7 @@ public class ReleaseDataManager {
 	private void insertIntoProspectiveDeltaTablesForFirstTimeRelease(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
 		String effectiveTime = StringUtils.isNotBlank(executionConfig.getEffectiveTime()) ? executionConfig.getEffectiveTime().replace("-", "") : "";
 		for (String snapshotTable : snapShotTables) {
-			String insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
+			String insertSQL = INSERT_INTO + snapshotTable.replaceAll("_s$", "_d")
 					+ SQL_SELECT + snapshotTable + " a"
 					+ " WHERE (a.effectivetime IS NULL OR a.effectivetime=?)";
 			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
@@ -712,7 +714,7 @@ public class ReleaseDataManager {
 		String insertSQL;
 		String previousDependencyEffectiveTime = executionConfig.getPreviousDependencyEffectiveTime().replace("-", "");
 		for (String snapshotTable : snapShotTables) {
-			insertSQL = "INSERT INTO " + snapshotTable.replaceAll("_s$", "_d")
+			insertSQL = INSERT_INTO + snapshotTable.replaceAll("_s$", "_d")
 					+ SQL_SELECT + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " a"
 					+ " WHERE cast(a.effectivetime as datetime) > cast('" + previousDependencyEffectiveTime + "' as datetime)";
 			try (PreparedStatement ps = connection.prepareStatement(insertSQL)) {
