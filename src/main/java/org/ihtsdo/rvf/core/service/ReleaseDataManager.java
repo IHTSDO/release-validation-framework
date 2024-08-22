@@ -219,13 +219,15 @@ public class ReleaseDataManager {
 		try {
 			outputFolder = new File(FileUtils.getTempDirectoryPath(), createdSchemaName);
 			logger.info("Setting output folder location = {}", outputFolder.getAbsolutePath());
-			if (outputFolder.exists()) {
+			if (Files.deleteIfExists(outputFolder.toPath())) {
 				logger.info("Output folder already exists and will be deleted before recreating.");
-				outputFolder.delete();
-			} 
-			outputFolder.mkdir();
+			}
+			if (outputFolder.mkdir()) {
+				logger.info("Output folder created successfully.");
+			} else {
+				logger.error("Failed to create output folder.");
+			}
 			// extract SNOMED CT content from zip file
-			
 			for (final File zipFile : zipDataFile) {
 				ZipFileUtils.extractFilesFromZipToOneFolder(zipFile, outputFolder.getAbsolutePath());
 			}
@@ -562,24 +564,10 @@ public class ReleaseDataManager {
 			logger.error("Failed to download {} via {}", archiveFileName, mysqlBinaryStorageConfig);
 			return false;
 		}
-		// Create database schema and tables for mysql 8 workaround
+		// In mysql 8 you must create database schema and tables as restoring binary files alone doesn't create schema and tables
 		createSchema(schemaName);
-
 		// Restore data from binary archive
-		File outputDir = new File(mysqlDataDir, archiveFileName.replace(".zip", ""));
-		if (outputDir.exists()) {
-			logger.info("Output directory {} already exists and will be deleted before recreating.", outputDir.getPath());
-			if (outputDir.delete()) {
-				logger.info("Deleted directory {}", outputDir.getPath());
-				if (outputDir.mkdir()) {
-					logger.info("Created directory {}", outputDir.getPath());
-				} else {
-					logger.error("Failed to create directory {}", outputDir.getPath());
-				}
-			} else {
-				logger.error("Failed to delete directory {}", outputDir.getPath());
-			}
-		}
+		File outputDir = new File(mysqlDataDir, schemaName);
 		logger.info("Extracting mysql binary files from {} to {}", outputFile.getPath(), outputDir.getPath());
 		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
 		logger.info("Mysql binary files are restored successfully in {}",  outputDir.getPath());
@@ -596,7 +584,7 @@ public class ReleaseDataManager {
 				return true;
 			}
 		}
-		InputStream inputStream = null;
+		InputStream inputStream;
 		try {
 			ResourceManager resourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
 			inputStream = resourceManager.readResourceStream(releaseFilename);
