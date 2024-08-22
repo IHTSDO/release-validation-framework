@@ -143,10 +143,9 @@ public class MysqlFailuresExtractor {
         if (!StringUtils.hasLength(failureDetail.getComponentId())) {
             return;
         }
-        String sql = "select * from ? where id = ?";
+        String sql = "select * from " + failureDetail.getTableName() + " where id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, failureDetail.getTableName());
-            preparedStatement.setString(2, failureDetail.getComponentId());
+            preparedStatement.setString(1, failureDetail.getComponentId());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     int columnCount = resultSet.getMetaData().getColumnCount();
@@ -175,10 +174,10 @@ public class MysqlFailuresExtractor {
 
     private Map<String, Integer> getAssertionIdToTotalFailureMap(Connection connection, MysqlExecutionConfig config) throws SQLException {
         Map<String, Integer> assertionIdToTotalFailureMap = new HashMap<>();
-        String totalSQL = "select assertion_id, count(*) total from ? where run_id = ? group by assertion_id";
+        String totalSQL = "select assertion_id, count(*) total from " + dataSource.getDefaultCatalog() + "." + qaResultTableName +
+                " where run_id = ? group by assertion_id";
         try (PreparedStatement preparedStatement = connection.prepareStatement(totalSQL)) {
-            preparedStatement.setString(1, dataSource.getDefaultCatalog() + "." + qaResultTableName);
-            preparedStatement.setLong(2, config.getExecutionId());
+            preparedStatement.setLong(1, config.getExecutionId());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     assertionIdToTotalFailureMap.put(resultSet.getString(1), resultSet.getInt(2));
@@ -190,7 +189,8 @@ public class MysqlFailuresExtractor {
 
     private List<FailureDetail> fetchFailureDetails(Connection connection, Long executionId, Long assertionId, int failureExportMax, Integer offset, Integer rowCount)
             throws SQLException {
-        String resultSQL = "select concept_id, details, component_id, table_name from ? where assertion_id = ? and run_id = ?";
+        String resultSQL = "select concept_id, details, component_id, table_name from " + dataSource.getDefaultCatalog() + "." + qaResultTableName +
+                " where assertion_id = ? and run_id = ?";
         if (offset != null && rowCount != null) {
             resultSQL += " limit ?,?";
         } else if (failureExportMax > 0) {
@@ -200,16 +200,14 @@ public class MysqlFailuresExtractor {
         long counter = 0;
         try (PreparedStatement preparedStatement = connection.prepareStatement(resultSQL)) {
             // select results that match execution
-            preparedStatement.setString(1, dataSource.getDefaultCatalog() + "." + qaResultTableName);
-            preparedStatement.setLong(2, assertionId);
-            preparedStatement.setLong(3, executionId);
+            preparedStatement.setLong(1, assertionId);
+            preparedStatement.setLong(2, executionId);
             if (offset != null && rowCount != null) {
-                preparedStatement.setInt(4, offset);
-                preparedStatement.setInt(5, rowCount);
+                preparedStatement.setInt(3, offset);
+                preparedStatement.setInt(4, rowCount);
             } else if (failureExportMax > 0) {
-                preparedStatement.setLong(4, failureExportMax);
+                preparedStatement.setLong(3, failureExportMax);
             }
-
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     // only get first N failed results
