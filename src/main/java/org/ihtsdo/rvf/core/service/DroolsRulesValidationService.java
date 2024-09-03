@@ -132,9 +132,7 @@ public class DroolsRulesValidationService {
 				// check for severity
 				severityWarning = severityWarning || detectSeverity(line, "Severity.WARNING");
 				severityError = severityError || detectSeverity(line, "Severity.ERROR");
-				if (assertion != null && "end".equals(line.trim())) {
-					assertion.setSeverity(buildSeverity(severityWarning, severityError));
-				}
+				setSeverityIfNeeded(assertion, line, severityWarning, severityError);
 			}
 		}
 	}
@@ -145,6 +143,12 @@ public class DroolsRulesValidationService {
 			return UUID.fromString(matcher.group(1));
 		}
 		return null;
+	}
+
+	private void setSeverityIfNeeded(Assertion assertion, String line, boolean severityWarning, boolean severityError) {
+		if (assertion != null && "end".equals(line.trim()) && (severityWarning || severityError)) {
+			assertion.setSeverity(buildSeverity(severityWarning, severityError));
+		}
 	}
 
 	private static boolean detectSeverity(String line, String type) {
@@ -217,6 +221,7 @@ public class DroolsRulesValidationService {
 		List<TestRunItem> warningAssertions = new ArrayList<>();
 		int failureExportMax = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 10;
 		Map<UUID, Assertion> uuidToAssertionMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, Function.identity()));
+		Set<UUID> failedAssertionUUIDs = new HashSet<>();
 
 		// Convert the Drools validation report into RVF report format
 		invalidContentMap.keySet().forEach(ruleId -> {
@@ -247,10 +252,24 @@ public class DroolsRulesValidationService {
 			} else {
 				failedAssertions.add(validationRule);
 			}
+			failedAssertionUUIDs.add(validationRule.getAssertionUuid());
 		});
 		ValidationReport validationReport = new ValidationReport();
 		validationReport.addFailedAssertions(failedAssertions);
 		validationReport.addWarningAssertions(warningAssertions);
+
+		Set<Assertion> passedAssertions = assertions.stream().filter(item -> validationConfig.getDroolsRulesGroupList().stream().anyMatch(item.getGroups()::contains) && !failedAssertionUUIDs.contains(item.getUuid())).collect(Collectors.toSet());
+		validationReport.addPassedAssertions(passedAssertions.stream().map(item -> {
+			TestRunItem testRunItem =	new TestRunItem();
+			testRunItem.setFailureCount(0L);
+			testRunItem.setTestCategory("");
+			testRunItem.setTestType(TestType.DROOL_RULES);
+			testRunItem.setSeverity(item.getSeverity());
+			testRunItem.setAssertionUuid(item.getUuid());
+			testRunItem.setAssertionText(item.getAssertionText());
+			return testRunItem;
+		}).toList());
+
 		return validationReport;
 	}
 
