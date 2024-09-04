@@ -7,12 +7,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.otf.utils.ZipFileUtils;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationMysqlBinaryStorageConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.core.service.util.MySqlDataTypeConverter;
 import org.ihtsdo.rvf.core.service.util.RF2FileTableMapper;
-import org.ihtsdo.rvf.core.service.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -247,7 +247,9 @@ public class ReleaseDataManager {
 
 	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final RvfDynamicDataSource dataSource, List<String> rf2FilesLoaded, String schemaName) throws RVFExecutionException {
 		if (rf2TextFilesDir != null) {
-			final String[] rf2Files = rf2TextFilesDir.list((dir, name) -> name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2")));
+			final String[] rf2Files = rf2TextFilesDir.list((dir, name) ->
+					name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2") || name.startsWith("xder2") || name.startsWith("xsct2"))
+			);
 			if (rf2Files != null && rf2Files.length > 0) {
 				final ReleaseFileDataLoader dataLoader = new ReleaseFileDataLoader(dataSource, schemaName, new MySqlDataTypeConverter());
 				dataLoader.loadFilesIntoDB(rf2TextFilesDir.getAbsolutePath(), rf2Files, rf2FilesLoaded);
