@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.core.util;
 
 import org.apache.commons.io.FileUtils;
-import org.ihtsdo.rvf.core.service.util.ZipFileUtils;
+import org.ihtsdo.otf.utils.ZipFileUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -26,7 +26,7 @@ public class ZipFileUtilsTest {
 			ZipFileUtils.extractFilesFromZipToOneFolder(zipFile, unzippedFolder.getAbsolutePath());
 			final File[] filesUnzipped = unzippedFolder.listFiles();
 			assertNotNull(filesUnzipped);
-			assertEquals(filesUnzipped.length, 3);
+			assertEquals(3, filesUnzipped.length);
 			for( final File file : filesUnzipped) {
 				assertTrue(file.isFile());
 			}
