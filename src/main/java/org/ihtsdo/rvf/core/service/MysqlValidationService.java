@@ -64,9 +64,11 @@ public class MysqlValidationService {
 		String reportStorage = validationConfig.getStorageLocation();
 		try {
 			// prepare release data for testing
-			if (StringUtils.hasLength(executionConfig.getPreviousVersion())) {
-				releaseVersionLoader.loadPreviousVersion(executionConfig);
+			releaseVersionLoader.loadPreviousVersion(executionConfig);
+			if (releaseVersionLoader.isUnknownVersion(executionConfig.getPreviousVersion())) {
+				statusReport.addFailureMessage("Failed to load previous release " + executionConfig.getPreviousVersion());
 			}
+
 			// load dependency release
 			releaseVersionLoader.loadDependencyVersion(executionConfig);
 			if (releaseVersionLoader.isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {

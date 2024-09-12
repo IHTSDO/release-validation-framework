@@ -128,8 +128,8 @@ public class ReleaseDataManager {
 		}
 	}
 
-	public void dropDatabaseIfExist(String schemaName) throws BusinessServiceException{
-		logger.info("Dropping schema: {}", schemaName);
+	public void dropSchema(String schemaName) throws BusinessServiceException{
+		logger.info("Dropping schema {}", schemaName);
 		//clean database
 		try (Statement statement = dataSource.getConnection().createStatement()) {
 			String dropStr = "drop database if exists " + schemaName + ";";
@@ -720,6 +720,27 @@ public class ReleaseDataManager {
 				logger.info(insertSQL);
 				ps.execute();
 			}
+		}
+	}
+
+	public long getPublishedReleaseLastModifiedDate(String publishedRelease) {
+		ResourceManager resourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
+        try {
+            return resourceManager.getResourceLastModifiedDate(publishedRelease);
+        } catch (Exception e) {
+            logger.warn("Failed to find the last modified for resource {}", publishedRelease, e);
+			return 0L;
+        }
+    }
+
+	public long getBinaryArchiveSchemaLastModifiedDate(String schemaName) {
+		ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
+		String archiveFileName = schemaName + ZIP_FILE_EXTENSION;
+		try {
+			return resourceManager.getResourceLastModifiedDate(archiveFileName);
+		} catch (Exception e) {
+			logger.warn("Failed to find the last modified for resource {}", schemaName, e);
+			return 0L;
 		}
 	}
 }

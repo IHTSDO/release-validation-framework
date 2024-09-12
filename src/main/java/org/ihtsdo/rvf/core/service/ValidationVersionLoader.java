@@ -80,8 +80,6 @@ public class ValidationVersionLoader {
 	}
 	
 	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws BusinessServiceException, IOException {
-		String schemaName = constructRVFSchema(executionConfig.getPreviousVersion());
-		releaseDataManager.dropDatabaseIfExist(schemaName);
 		if (executionConfig.getPreviousVersion().endsWith(ZIP_FILE_EXTENSION)) {
 			String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion());
 			executionConfig.setPreviousVersion(rvfDbSchema);
@@ -92,8 +90,6 @@ public class ValidationVersionLoader {
 	}
 		
 	public void loadDependencyVersion(MysqlExecutionConfig executionConfig) throws IOException, BusinessServiceException {
-		String schemaName = constructRVFSchema(executionConfig.getExtensionDependencyVersion());
-		releaseDataManager.dropDatabaseIfExist(schemaName);
 		if (executionConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
 			String dependencyVersion = loadRelease(executionConfig.getExtensionDependencyVersion());
 			executionConfig.setExtensionDependencyVersion(dependencyVersion);
@@ -145,32 +141,39 @@ public class ValidationVersionLoader {
 		return false;
 	}
 
-	private String constructRVFSchema(String releaseVersion) {
-		if (releaseVersion != null) {
-			if (releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
-				return RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
-			}
-			return releaseVersion.startsWith(RVF_DB_PREFIX) ? releaseVersion : RVF_DB_PREFIX + releaseVersion;
-		} else {
-			return null;
-		}
-	}
-	
 	private String loadRelease(String releaseVersion) throws IOException, BusinessServiceException {
 		if (releaseVersion != null && releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
 			String schemaName = RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
-			if (!releaseDataManager.isKnownRelease(schemaName) && (!releaseDataManager.restoreReleaseFromBinaryArchive(schemaName))) {
-					logger.info("No existing mysql binary release available.");
-					releaseDataManager.uploadPublishedReleaseFromStore(releaseVersion, schemaName);
-					if (generateBinaryArchive) {
-						String archiveFilename = releaseDataManager.generateBinaryArchive(schemaName);
-						logger.info("Release mysql binary archive is generated: {}", archiveFilename);
-					}
+			long publishedReleaseLastModifiedDate = releaseDataManager.getPublishedReleaseLastModifiedDate(releaseVersion);
+			long binaryArchiveSchemaLastModifiedDate = releaseDataManager.getBinaryArchiveSchemaLastModifiedDate(schemaName);
 
-			} 
-			return schemaName;	
+			// If the binary archive has been deleted (- or it has not been generated yet), OR the release file has been changed,
+			// then the schema and the binary archive schema need to be re-generated
+			if (binaryArchiveSchemaLastModifiedDate == 0 || publishedReleaseLastModifiedDate > binaryArchiveSchemaLastModifiedDate) {
+				logger.info("The Binary Archive file was deleted (- or it has not been generated yet), OR a new version of published release has been detected.");
+				if (releaseDataManager.isKnownRelease(schemaName)) {
+					releaseDataManager.dropSchema(schemaName);
+				}
+				uploadPublishedReleaseThenGenerateBinaryArchive(releaseVersion, schemaName);
+			} else {
+				// Restore schema from binary archive file
+				if (!releaseDataManager.isKnownRelease(schemaName) && !releaseDataManager.restoreReleaseFromBinaryArchive(schemaName)) {
+					logger.info("No existing mysql binary release available.");
+					uploadPublishedReleaseThenGenerateBinaryArchive(releaseVersion, schemaName);
+				}
+			}
+
+			return schemaName;
 		}
 		return releaseVersion;
+	}
+
+	private void uploadPublishedReleaseThenGenerateBinaryArchive(String releaseVersion, String schemaName) throws BusinessServiceException {
+		releaseDataManager.uploadPublishedReleaseFromStore(releaseVersion, schemaName);
+		if (generateBinaryArchive) {
+			String archiveFilename = releaseDataManager.generateBinaryArchive(schemaName);
+			logger.info("Release mysql binary archive is generated: {}", archiveFilename);
+		}
 	}
 
 	public MysqlExecutionConfig createExecutionConfig(ValidationRunConfig validationConfig) throws BusinessServiceException {
