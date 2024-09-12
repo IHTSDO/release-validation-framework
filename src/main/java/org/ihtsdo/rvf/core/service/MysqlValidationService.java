@@ -33,6 +33,9 @@ public class MysqlValidationService {
 	
 	@Value("${rvf.assertion.execution.BatchSize}")
 	private int batchSize;
+
+	@Value("${rvf.empty-release-file}")
+	private String emptyRf2File;
 	
 	@Autowired
 	private ValidationReportService reportService;
@@ -51,6 +54,13 @@ public class MysqlValidationService {
 
 	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
+		if (!StringUtils.hasLength(validationConfig.getPreviousRelease())) {
+			executionConfig.setPreviousVersion(emptyRf2File);
+		}
+		if (!StringUtils.hasLength(validationConfig.getExtensionDependency()) || executionConfig.isStandAloneProduct()) {
+			executionConfig.setExtensionDependencyVersion(emptyRf2File);
+		}
+
 		String reportStorage = validationConfig.getStorageLocation();
 		try {
 			// prepare release data for testing
@@ -58,11 +68,9 @@ public class MysqlValidationService {
 				releaseVersionLoader.loadPreviousVersion(executionConfig);
 			}
 			// load dependency release
-			if (executionConfig.isExtensionValidation() && !executionConfig.isStandAloneProduct()) {
-				releaseVersionLoader.loadDependencyVersion(executionConfig);
-				if (releaseVersionLoader.isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {
-					statusReport.addFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
-				}
+			releaseVersionLoader.loadDependencyVersion(executionConfig);
+			if (releaseVersionLoader.isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {
+				statusReport.addFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
 			}
 			// load prospective version
 			releaseVersionLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
