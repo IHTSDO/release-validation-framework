@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.core.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.jms.JMSException;
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.io.FileUtils;
 import org.ihtsdo.otf.jms.MessagingHelper;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.core.data.model.TestRunItem;
@@ -83,44 +84,60 @@ public class ValidationRunner {
 	}
 	
 	private void runValidations(ValidationRunConfig validationConfig) throws Exception {
-		// Prepare to run validations
-		Calendar startTime = Calendar.getInstance();
-		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
-		releaseVersionLoader.downloadProspectiveFiles(validationConfig);
-		releaseVersionLoader.downloadPreviousReleaseAndDependencyFiles(validationConfig);
-		if (validationConfig.getLocalProspectiveFile() == null) {
-			reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
-			String errorMsg = "Prospective file can't be null " + validationConfig.getLocalProspectiveFile();
-			reportService.writeProgress(errorMsg, validationConfig.getStorageLocation());
-			logger.error(errorMsg);
+		try {
+			// Prepare to run validations
+			Calendar startTime = Calendar.getInstance();
+			MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
+			releaseVersionLoader.downloadProspectiveFiles(validationConfig);
+			releaseVersionLoader.downloadPreviousReleaseAndDependencyFiles(validationConfig);
+			if (validationConfig.getLocalProspectiveFile() == null) {
+				reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
+				String errorMsg = "Prospective file can't be null " + validationConfig.getLocalProspectiveFile();
+				reportService.writeProgress(errorMsg, validationConfig.getStorageLocation());
+				logger.error(errorMsg);
+			}
+			ValidationReport report = new ValidationReport();
+			report.setExecutionId(executionConfig.getExecutionId());
+			report.setReportUrl(validationConfig.getUrl());
+			ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
+			statusReport.setResultReport(report);
+
+			if (!EMPTY_TEST_ASSERTION_GROUPS.equals(validationConfig.getGroupsList())) {
+				// Actually run validations
+				doRunValidations(validationConfig, statusReport);
+			}
+
+			// Update reports and status after validations run
+			report.sortAssertionLists();
+			final Calendar endTime = Calendar.getInstance();
+			final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
+			logger.info("Finished execution with runId : {} in {} minutes ", validationConfig.getRunId(), timeTaken);
+			statusReport.setStartTime(startTime.getTime());
+			statusReport.setEndTime(endTime.getTime());
+			report.setTimeTakenInSeconds(timeTaken*60);
+			State state = statusReport.getFailureMessages().isEmpty() ? State.COMPLETE : State.FAILED;
+			updateRvfState(validationConfig, state);
+			updateExecutionSummary(statusReport, validationConfig);
+
+			// Ignore token and user name to be persisted to S3
+			statusReport.getValidationConfig().setAuthenticationToken(null);
+			statusReport.getValidationConfig().setUsername(null);
+			reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
+		} finally {
+			// Clean up release package file
+			if (validationConfig.getLocalProspectiveFile() != null) {
+				FileUtils.deleteQuietly(validationConfig.getLocalProspectiveFile());
+			}
+			if (validationConfig.getLocalDependencyReleaseFile() != null) {
+				FileUtils.deleteQuietly(validationConfig.getLocalDependencyReleaseFile());
+			}
+			if (validationConfig.getLocalPreviousReleaseFile() != null) {
+				FileUtils.deleteQuietly(validationConfig.getLocalPreviousReleaseFile());
+			}
+			if (validationConfig.getLocalManifestFile() != null) {
+				FileUtils.deleteQuietly(validationConfig.getLocalManifestFile());
+			}
 		}
-		ValidationReport report = new ValidationReport();
-		report.setExecutionId(executionConfig.getExecutionId());
-		report.setReportUrl(validationConfig.getUrl());
-		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
-		statusReport.setResultReport(report);
-
-		if (!EMPTY_TEST_ASSERTION_GROUPS.equals(validationConfig.getGroupsList())) {
-			// Actually run validations
-			doRunValidations(validationConfig, statusReport);
-		}
-
-		// Update reports and status after validations run
-		report.sortAssertionLists();
-		final Calendar endTime = Calendar.getInstance();
-		final long timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 60000;
-		logger.info("Finished execution with runId : {} in {} minutes ", validationConfig.getRunId(), timeTaken);
-		statusReport.setStartTime(startTime.getTime());
-		statusReport.setEndTime(endTime.getTime());
-		report.setTimeTakenInSeconds(timeTaken*60);
-		State state = statusReport.getFailureMessages().isEmpty() ? State.COMPLETE : State.FAILED;
-		updateRvfState(validationConfig, state);
-		updateExecutionSummary(statusReport, validationConfig);
-
-		// Ignore token and user name to be persisted to S3
-		statusReport.getValidationConfig().setAuthenticationToken(null);
-		statusReport.getValidationConfig().setUsername(null);
-		reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
 	}
 
 	private void doRunValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws Exception {

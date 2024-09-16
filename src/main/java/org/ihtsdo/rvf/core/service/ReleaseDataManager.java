@@ -145,7 +145,7 @@ public class ReleaseDataManager {
 	}
 
 	/**
-	 * Method that uses a {@link java.io.InputStream}  to copy a known/published release pack into the data folder.
+	 * Method that uses a {@link InputStream}  to copy a known/published release pack into the data folder.
 	 * This method is not intended to be used
 	 * for uploading prospective releases since they do not need to be stored for later use.
 	 *
@@ -554,27 +554,34 @@ public class ReleaseDataManager {
 	}
 
 	public boolean restoreReleaseFromBinaryArchive(String schemaName) throws IOException, BusinessServiceException {
-		ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
-		String archiveFileName = schemaName + ZIP_FILE_EXTENSION;
-		InputStream inputStream = resourceManager.readResourceStreamOrNullIfNotExists(archiveFileName);
-		if (inputStream == null) {
-			logger.info("No resource available for {} via {}", archiveFileName, mysqlBinaryStorageConfig);
-			return false;
+		File outputFile = null;
+		try {
+			ResourceManager resourceManager = new ResourceManager(mysqlBinaryStorageConfig, cloudResourceLoader);
+			String archiveFileName = schemaName + ZIP_FILE_EXTENSION;
+			InputStream inputStream = resourceManager.readResourceStreamOrNullIfNotExists(archiveFileName);
+			if (inputStream == null) {
+				logger.info("No resource available for {} via {}", archiveFileName, mysqlBinaryStorageConfig);
+				return false;
+			}
+			outputFile = downloadFile(inputStream, archiveFileName);
+			if (outputFile == null) {
+				logger.error("Failed to download {} via {}", archiveFileName, mysqlBinaryStorageConfig);
+				return false;
+			}
+			// In mysql 8 you must create database schema and tables as restoring binary files alone doesn't create schema and tables
+			createSchema(schemaName);
+			// Restore data from binary archive
+			File outputDir = new File(mysqlDataDir, schemaName);
+			logger.info("Extracting mysql binary files from {} to {}", outputFile.getPath(), outputDir.getPath());
+			ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
+			logger.info("Mysql binary files are restored successfully in {}",  outputDir.getPath());
+			fetchRvfSchemasFromDb();
+			return true;
+		} finally {
+			if (outputFile != null) {
+				FileUtils.deleteQuietly(outputFile);
+			}
 		}
-		File outputFile = downloadFile(inputStream, archiveFileName);
-		if (outputFile == null) {
-			logger.error("Failed to download {} via {}", archiveFileName, mysqlBinaryStorageConfig);
-			return false;
-		}
-		// In mysql 8 you must create database schema and tables as restoring binary files alone doesn't create schema and tables
-		createSchema(schemaName);
-		// Restore data from binary archive
-		File outputDir = new File(mysqlDataDir, schemaName);
-		logger.info("Extracting mysql binary files from {} to {}", outputFile.getPath(), outputDir.getPath());
-		org.ihtsdo.otf.utils.ZipFileUtils.extractFilesFromZipToOneFolder(outputFile, outputDir.getAbsolutePath());
-		logger.info("Mysql binary files are restored successfully in {}",  outputDir.getPath());
-		fetchRvfSchemasFromDb();
-		return true;
 	}
 
 	public boolean uploadPublishedReleaseFromStore(String releaseFilename, String schemaName) throws BusinessServiceException {

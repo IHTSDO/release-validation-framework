@@ -46,14 +46,27 @@ public class MysqlValidationService {
 	@Autowired
 	private ValidationVersionLoader releaseVersionLoader;
 
+	@Autowired
+	private ReleaseDataManager releaseDataManager;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(MysqlValidationService.class);
 	
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
+
+	private final Set<String> legacyProspectiveVersions = new HashSet<>();
 	
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
+		// Clean up the prospective databases if any
+		for (String legacyProspectiveVersion : this.legacyProspectiveVersions) {
+			releaseDataManager.dropSchema(legacyProspectiveVersion);
+		}
+		this.legacyProspectiveVersions.clear();
+
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
+		this.legacyProspectiveVersions.add(executionConfig.getProspectiveVersion());
+
 		if (!StringUtils.hasLength(validationConfig.getPreviousRelease())) {
 			executionConfig.setPreviousVersion(emptyRf2File);
 		}
@@ -122,6 +135,7 @@ public class MysqlValidationService {
 			//loading international snapshot
 			try {
 				releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig, validationConfig);
+				this.legacyProspectiveVersions.add(executionConfig.getProspectiveVersion());
 			} catch (BusinessServiceException e) {
 				String msg = String.format("Failed to prepare data for extension testing due to error %s", ExceptionUtils.getRootCauseMessage(e));
 				statusReport.addFailureMessage(msg);
