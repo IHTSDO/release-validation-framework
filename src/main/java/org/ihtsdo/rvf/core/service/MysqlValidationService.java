@@ -60,9 +60,10 @@ public class MysqlValidationService {
 	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
 		// Clean up the prospective databases if any
 		for (String legacyProspectiveVersion : this.legacyProspectiveVersions) {
-			releaseDataManager.dropSchema(legacyProspectiveVersion);
+			this.releaseDataManager.dropSchema(legacyProspectiveVersion);
 		}
 		this.legacyProspectiveVersions.clear();
+		this.releaseDataManager.truncateQAResult();
 
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		this.legacyProspectiveVersions.add(executionConfig.getProspectiveVersion());

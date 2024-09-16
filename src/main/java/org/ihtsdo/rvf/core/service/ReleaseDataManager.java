@@ -515,6 +515,16 @@ public class ReleaseDataManager {
 			logger.error("Failed to delete data from qa_result table for runId {} due to {} ", runId, e.getMessage(), e);
 		}
 	}
+
+	public void truncateQAResult() {
+		String truncateQaResultSQL = " truncate table rvf_master.qa_result";
+		try (Connection connection = dataSource.getConnection();
+			 Statement statement = connection.createStatement() ) {
+			statement.execute(truncateQaResultSQL);
+		} catch (final SQLException e) {
+			logger.error("Failed to truncate qa_result table due to {} ", e.getMessage(), e);
+		}
+	}
 	
 	public String generateBinaryArchive(String schemaName) throws BusinessServiceException {
 		if (schemaName == null || !isKnownRelease(schemaName)) {
