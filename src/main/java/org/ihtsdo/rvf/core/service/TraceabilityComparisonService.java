@@ -281,6 +281,11 @@ public class TraceabilityComparisonService {
 
 			final ComponentFactory componentFactory = new ComponentFactory() {
 				@Override
+				public LoadingProfile getLoadingProfile() {
+					return null;
+				}
+
+				@Override
 				public void preprocessingContent() {
 					// Not needed
 				}
