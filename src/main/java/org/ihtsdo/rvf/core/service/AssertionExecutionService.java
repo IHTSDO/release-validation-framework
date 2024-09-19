@@ -9,15 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import jakarta.annotation.Resource;
 import javax.naming.ConfigurationException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
@@ -26,6 +24,8 @@ import java.util.regex.Pattern;
 public class AssertionExecutionService {
 
 	private static final String FAILED_TO_FIND_RVF_DB_SCHEMA = "Failed to find rvf db schema for ";
+	private static final String NOT_SUPPLIED = "NOT_SUPPLIED";
+
 	@Autowired
 	private AssertionService assertionService;
 	@Resource(name = "dataSource")
@@ -232,19 +232,14 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String prospectiveSchema = config.getProspectiveVersion();
 		final String[] nameParts = config.getProspectiveVersion().split("_");
 		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : getModuleId(nameParts);
-		String includedModules = String.join(",", config.getIncludedModules());
-		String version = (nameParts.length >= 3 ? nameParts[2] : "NOT_SUPPLIED");
+		String includedModules = CollectionUtils.isEmpty(config.getIncludedModules()) ? "NULL" : String.join(",", config.getIncludedModules());
+		String version = (nameParts.length >= 3 ? nameParts[2] : NOT_SUPPLIED);
 
 		String previousReleaseSchema = config.getPreviousVersion();
 		String dependencyReleaseSchema = config.getExtensionDependencyVersion();
 		validateSchemas(config, prospectiveSchema, previousReleaseSchema);
 
 		for ( String part : parts) {
-			if ((part.contains("<PREVIOUS>") && previousReleaseSchema == null)
-				|| (part.contains("<DEPENDENCY>") && dependencyReleaseSchema == null)) {
-				continue;
-			}
-
 			logger.debug("Original sql statement: {}", part);
 			final Pattern commentPattern = Pattern.compile("/\\*.*?\\*/", Pattern.DOTALL);
 			part = commentPattern.matcher(part).replaceAll("");
@@ -252,19 +247,15 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = part.replace("<RUNID>", String.valueOf(config.getExecutionId()));
 			part = part.replace("<ASSERTIONUUID>", String.valueOf(assertion.getAssertionId()));
 			part = part.replace("<MODULEID>", defaultModuleId);
-			part = part.replace("<MODULEIDS>", includedModules);
+			part = part.replace("<INCLUDED_MODULES>", includedModules);
 			part = part.replace("<VERSION>", version);
 			// watch out for any 's that users might have introduced
 			part = part.replace("qa_result", defaultCatalog+ "." + qaResulTableName);
 			part = part.replace("<PROSPECTIVE>", prospectiveSchema);
 			part = part.replace("<TEMP>", prospectiveSchema);
 			part = part.replace("<INTERNATIONAL_MODULES>", internationalModules);
-			if (previousReleaseSchema != null) {
-				part = part.replace("<PREVIOUS>", previousReleaseSchema);
-			}
-			if (dependencyReleaseSchema != null) {
-				part = part.replace("<DEPENDENCY>", dependencyReleaseSchema);
-			}
+			part = part.replace("<PREVIOUS>", previousReleaseSchema);
+			part = part.replace("<DEPENDENCY>", dependencyReleaseSchema);
 			part = part.replace("<DELTA>", DELTA_TABLE_SUFFIX);
 			part = part.replace("<SNAPSHOT>", SNAPSHOT_TABLE_SUFFIX);
 			part = part.replace("<FULL>", FULL_TABLE_SUFFIX);
@@ -276,7 +267,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 	}
 
 	private static String getModuleId(String[] nameParts) {
-		return nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : "NOT_SUPPLIED";
+		return nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : NOT_SUPPLIED;
 	}
 
 	private static void validateSchemas(MysqlExecutionConfig config, String prospectiveSchema, String previousReleaseSchema) throws ConfigurationException {
