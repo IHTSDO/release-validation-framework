@@ -299,8 +299,11 @@ public class DroolsRulesValidationService {
 					Map<UUID, Assertion> uuidAssertionMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, Function.identity()));
 					invalidContents = invalidContents.stream().filter(item -> ERROR_COMPONENT_RULE_ID.equals(item.getRuleId())
 							|| WARNING_COMPONENT_RULE_ID.equals(item.getRuleId())
-							|| !uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring")
-							|| (uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring")
+							|| parseUUID(item.getRuleId()) == null
+							|| (!uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring") &&
+								!uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("int-authoring"))
+							|| ((uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring") ||
+								uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("int-authoring"))
 							&& modules.contains(item.getComponent().getModuleId()))).collect(Collectors.toList());
 				}
 			}
