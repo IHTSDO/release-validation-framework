@@ -1,6 +1,6 @@
 # Configuration Guide
 
-This document will detail how to set up the application locally.
+This document will detail how to configure a MySQL database.
 
 ### Create a new database using Docker
 ```bash
@@ -31,6 +31,9 @@ sleep 30
 docker exec -i mysql-rvf mysql -u root -p$MYSQL_ROOT_PASSWORD -e "GRANT ALL PRIVILEGES ON *.* TO '$MYSQL_USER'@'%' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 
 ```
+
+### Create a new database using source
+Alternatively, follow the steps described on [this page](https://dev.mysql.com/doc/refman/8.0/en/installing.html) to install and configure MySQL 8.
 
 If the MySQL database has been set up outside of Docker, the command to update the user's privileges will still need
 run:
