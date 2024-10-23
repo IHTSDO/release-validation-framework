@@ -1,3 +1,7 @@
+# Importing Assertions
+
+This document will detail how to install & configure assertions.
+
 # Importing SNOMED Release Validation Assertions
 
 RVF assertions are in github [snomed-release-validation-assertions](https://github.com/IHTSDO/snomed-release-validation-assertions)
