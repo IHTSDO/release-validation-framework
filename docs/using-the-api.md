@@ -9,6 +9,7 @@ The steps to validate an extension or edition are as follows:
 1. [Download Published Releases](download-published-releases.md)
 2. [Understanding Validation Assertions](#understanding-validation-assertions)
 3. [Validate Your Content](#validate-your-content)
+4. [Examples](#examples)
 
 Understanding Validation Assertions
 -----------------------------------
@@ -52,3 +53,34 @@ Once those have been entered, then submit the post and wait. The validation is l
 e.g `:"location": "http://localhost:8081/api/result/201905010901?storageLocation=int/20190131/test"`
 
 When complete,the results report is returned, formated in JSON at the same URL.
+
+Examples
+--------
+1. Validating an International Edition release package
+```curl
+curl -X 'POST' \
+  'http://localhost:8081/api/run-post?rf2DeltaOnly=false&writeSuccesses=false&groups=InternationalEdition&droolsRulesGroups=common-authoring%2Cint-authoring&runId=1727827200&failureExportMax=10&storageLocation=int%2F1727827200&enableDrools=false&effectiveTime=2024-10-01&releaseAsAnEdition=false&standAloneProduct=false&enableMRCMValidation=false&enableTraceabilityValidation=false&enableChangeNotAtTaskLevelValidation=false' \
+  -H 'accept: */*' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@SnomedCT_InternationalRF2_PRODUCTION_20241001T120000Z.zip;type=application/zip' \
+  -F 'manifest='
+  ```
+
+2. Validating a National Extension release package (e.g. Austrian Extension)
+```
+curl -X 'POST' \
+  'http://localhost:8081/api/run-post?rf2DeltaOnly=false&writeSuccesses=false&groups=common-edition&groups=at-authoring&droolsRulesGroups=common-authoring&droolsRulesGroups=at-authoring&previousRelease=SnomedCT_ManagedServiceAT_PRODUCTION_AT1000234_20240215T120000Z.zip&dependencyRelease=SnomedCT_InternationalRF2_PRODUCTION_20240701T120000Z.zip&runId=1723766400&failureExportMax=10&storageLocation=at%2F1723766400&enableDrools=true&effectiveTime=2024-08-15&releaseAsAnEdition=false&standAloneProduct=false&defaultModuleId=11000234105&includedModules=11000234105&enableMRCMValidation=true&enableTraceabilityValidation=false&enableChangeNotAtTaskLevelValidation=false' \
+  -H 'accept: */*' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@SnomedCT_ManagedServiceAT_PRODUCTION_AT1000234_20240815T120000Z.zip;type=application/zip' \
+  -F 'manifest='
+```
+
+3. Validating a National Edition release package (e.g. Netherlands Edition)
+```
+curl -X 'POST' \
+  'http://localhost:8081/api/run-post?rf2DeltaOnly=false&writeSuccesses=false&groups=common-edition&groups=nl-authoring&droolsRulesGroups=common-authoring&droolsRulesGroups=nl-authoring&previousRelease=SnomedCT_ManagedServiceNL_PRODUCTION_NL1000146_20240831T120000Z.zip&dependencyRelease=SnomedCT_InternationalRF2_PRODUCTION_20240901T120000Z.zip&previousDependencyEffectiveTime=2024-08-01&runId=1727740800&failureExportMax=10&storageLocation=nl%2F1727740800&enableDrools=true&effectiveTime=2024-09-30&releaseAsAnEdition=false&standAloneProduct=false&defaultModuleId=11000146104&includedModules=11000146104&enableMRCMValidation=true&enableTraceabilityValidation=false&enableChangeNotAtTaskLevelValidation=false' \
+  -H 'accept: */*' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@SnomedCT_ManagedServiceNL_PRODUCTION_NL1000146_20240930T120000Z.zip;type=application/zip' \
+  -F 'manifest='
