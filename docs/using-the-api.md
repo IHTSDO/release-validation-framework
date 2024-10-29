@@ -45,6 +45,8 @@ The following parameters should be used:
 | runId | `<numeric identifier>` | Enter either the timestamp for point that this validation is being run or any numeric identifier to be used to identify the job (e.g. `2020090101`). |
 | storageLocation | `<sub_foldername>` | The folder where validation reports will be saved to. This needs to have a value and the rvf application must have permissions to write to this location. eg. `int/20190131/test` or `/tmp` |
 
+Please ensure that the releases specified in the parameters (e.g. _previousRelease_, _dependencyRelease_, and _previousDependencyEffectiveTime_) are made available to RVF [as described here](download-published-releases.md).
+
 Once those have been entered, then submit the post and wait. The validation is likely to take some time but the job status can be found via the results URL. The URL of these RVF validation results can be found in the response location header parameter:
 
 e.g `:"location": "http://localhost:8081/api/result/201905010901?storageLocation=int/20190131/test"`
