@@ -57,14 +57,14 @@ When complete,the results report is returned, formated in JSON at the same URL.
 Examples
 --------
 1. Validating an International Edition release package
-```curl
+```
 curl -X 'POST' \
   'http://localhost:8081/api/run-post?rf2DeltaOnly=false&writeSuccesses=false&groups=InternationalEdition&droolsRulesGroups=common-authoring%2Cint-authoring&runId=1727827200&failureExportMax=10&storageLocation=int%2F1727827200&enableDrools=false&effectiveTime=2024-10-01&releaseAsAnEdition=false&standAloneProduct=false&enableMRCMValidation=false&enableTraceabilityValidation=false&enableChangeNotAtTaskLevelValidation=false' \
   -H 'accept: */*' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@SnomedCT_InternationalRF2_PRODUCTION_20241001T120000Z.zip;type=application/zip' \
   -F 'manifest='
-  ```
+```
 
 2. Validating a National Extension release package (e.g. Austrian Extension)
 ```
@@ -84,3 +84,4 @@ curl -X 'POST' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@SnomedCT_ManagedServiceNL_PRODUCTION_NL1000146_20240930T120000Z.zip;type=application/zip' \
   -F 'manifest='
+```
