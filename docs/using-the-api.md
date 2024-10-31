@@ -89,10 +89,10 @@ curl -X 'POST' \
   -F 'manifest='
 ```
 
-4. Validating a National Edition release package (e.g. Netherlands Edition). Note that _previousDependencyEffectiveTime_ is required for Edition release packages.
+4. Validating a National Edition release package (e.g. Netherlands Edition). Note that _previousDependencyEffectiveTime_ is required and _releaseAsAnEdition_ should be set to `true` for Edition release packages.
 ```
 curl -X 'POST' \
-  'http://localhost:8081/api/run-post?rf2DeltaOnly=false&writeSuccesses=false&groups=common-edition&groups=nl-authoring&droolsRulesGroups=common-authoring&droolsRulesGroups=nl-authoring&previousRelease=SnomedCT_ManagedServiceNL_PRODUCTION_NL1000146_20240831T120000Z.zip&dependencyRelease=SnomedCT_InternationalRF2_PRODUCTION_20240901T120000Z.zip&previousDependencyEffectiveTime=2024-08-01&runId=1727740800&failureExportMax=10&storageLocation=nl%2F1727740800&enableDrools=true&effectiveTime=2024-09-30&releaseAsAnEdition=false&standAloneProduct=false&defaultModuleId=11000146104&includedModules=11000146104&enableMRCMValidation=true&enableTraceabilityValidation=false&enableChangeNotAtTaskLevelValidation=false' \
+  'http://localhost:8081/api/run-post?rf2DeltaOnly=false&writeSuccesses=false&groups=common-edition&groups=nl-authoring&droolsRulesGroups=common-authoring&droolsRulesGroups=nl-authoring&previousRelease=SnomedCT_ManagedServiceNL_PRODUCTION_NL1000146_20240831T120000Z.zip&dependencyRelease=SnomedCT_InternationalRF2_PRODUCTION_20240901T120000Z.zip&previousDependencyEffectiveTime=2024-08-01&runId=1727740800&failureExportMax=10&storageLocation=nl%2F1727740800&enableDrools=true&effectiveTime=2024-09-30&releaseAsAnEdition=true&standAloneProduct=false&defaultModuleId=11000146104&includedModules=11000146104&enableMRCMValidation=true&enableTraceabilityValidation=false&enableChangeNotAtTaskLevelValidation=false' \
   -H 'accept: */*' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@SnomedCT_ManagedServiceNL_PRODUCTION_NL1000146_20240930T120000Z.zip;type=application/zip' \
