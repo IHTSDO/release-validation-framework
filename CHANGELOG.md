@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 6.5.0 / 7.0.0
+
+### Breaking
+- Upgrade to MySQL 8.
+
 ## 5.0.0
 
 ### Breaking
