@@ -29,7 +29,9 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
+import static org.snomed.quality.validator.mrcm.SEPRefsetValidationService.SEPAssertionType;
 @Service
 public class MRCMValidationService {
 
@@ -267,6 +269,12 @@ public class MRCMValidationService {
 				ConceptResult conceptResult = mrcmAssertion.getCurrentViolatedConcepts().get(i);
 				String conceptId = conceptResult.getId();
 				failedDetails.add(new FailureDetail(conceptId, String.format(mrcmAssertion.getDetails(), conceptId, "added to"), conceptResult.getFsn()).setFullComponent(getAdditionalFields(conceptResult)).setComponentId(conceptId));
+			}
+		} else if (Arrays.stream(SEPAssertionType.values()).map(SEPAssertionType::getUuid).collect(Collectors.toSet()).contains(mrcmAssertion.getUuid().toString())) {
+			for (int i = 0; i < firstNCount; i++) {
+				ConceptResult conceptResult = mrcmAssertion.getCurrentViolatedConcepts().get(i);
+				String conceptId = conceptResult.getId();
+				failedDetails.add(new FailureDetail(conceptId, String.format(mrcmAssertion.getDetails(), conceptId), conceptResult.getFsn()).setFullComponent(getAdditionalFields(conceptResult)).setComponentId(conceptId));
 			}
 		} else {
 			for (int i = 0; i < firstNCount; i++) {
