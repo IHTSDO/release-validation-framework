@@ -108,8 +108,8 @@ public class RF2FileTableMapperTest {
 		"associationrefset_d",
 		"relationship_d"
 	};
-	
-	@Test
+
+    @Test
 	public void testInternationalDeltaFiles() {
 		int i = 0;
 		assertEquals(INT_DELTA_FILES.length, INT_EXPECTED_DELTA.length);
