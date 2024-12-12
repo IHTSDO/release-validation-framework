@@ -1,8 +1,9 @@
 package org.ihtsdo.rvf.core.service;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.otf.utils.ExceptionUtils;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
@@ -76,8 +77,10 @@ public class MysqlValidationService {
 		}
 
 		String reportStorage = validationConfig.getStorageLocation();
+		String lastItemLoadAttempted = "Item Unknown";
 		try {
 			// prepare release data for testing
+			lastItemLoadAttempted = "Previous Release - " + executionConfig.getPreviousVersion();
 			releaseVersionLoader.loadPreviousVersion(executionConfig);
 			if (releaseVersionLoader.isUnknownVersion(executionConfig.getPreviousVersion())) {
 				statusReport.addFailureMessage("Failed to load previous release " + executionConfig.getPreviousVersion());
@@ -85,16 +88,19 @@ public class MysqlValidationService {
 
 			// load dependency release
 			releaseVersionLoader.loadDependencyVersion(executionConfig);
+			lastItemLoadAttempted = "Dependency Release - " + executionConfig.getExtensionDependencyVersion();
 			if (releaseVersionLoader.isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {
 				statusReport.addFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
 			}
 			// load prospective version
+			lastItemLoadAttempted = "Prospective Release - " + executionConfig.getProspectiveVersion();
 			releaseVersionLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
 		} catch (Exception e) {
-			String errorMsg = String.format("Failed to load data into MySql due to %s", ExceptionUtils.getRootCauseMessage(e));
-			LOGGER.error(errorMsg, e);
-			statusReport.addFailureMessage(errorMsg);
-			statusReport.getReportSummary().put(TestType.SQL.name(), errorMsg);
+			String errorMsg = String.format("Failed to load data (%s) into MySql", lastItemLoadAttempted);
+			String errorMsgWithCause = ExceptionUtils.getExceptionCause(errorMsg, e);
+			LOGGER.error(errorMsgWithCause, e);
+			statusReport.addFailureMessage(errorMsgWithCause);
+			statusReport.getReportSummary().put(TestType.SQL.name(), errorMsgWithCause);
 			return statusReport;
 		}
 		if (executionConfig.isExtensionValidation()) {
@@ -138,10 +144,10 @@ public class MysqlValidationService {
 				releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig, validationConfig);
 				this.legacyProspectiveVersions.add(executionConfig.getProspectiveVersion());
 			} catch (BusinessServiceException e) {
-				String msg = String.format("Failed to prepare data for extension testing due to error %s", ExceptionUtils.getRootCauseMessage(e));
-				statusReport.addFailureMessage(msg);
-				LOGGER.error(msg, e);
-				statusReport.getReportSummary().put(TestType.SQL.name(), msg);
+				String errMsg = ExceptionUtils.getExceptionCause("Failed to prepare data for extension testing", e);
+				statusReport.addFailureMessage(errMsg);
+				LOGGER.error(errMsg, e);
+				statusReport.getReportSummary().put(TestType.SQL.name(), errMsg);
 			}
 		}
 		testItems.addAll(runAssertionTests(executionConfig, noneReleaseTypeAssertions, reportStorage, true));
@@ -289,7 +295,7 @@ public class MysqlValidationService {
 			report.addFailedAssertions(Collections.emptyList());
 			report.addWarningAssertions(Collections.emptyList());
 			report.addPassedAssertions(Collections.emptyList());
-			statusReport.addFailureMessage(String.format("Failed to extract test results caused by %s", ExceptionUtils.getRootCauseMessage(exception)));
+			statusReport.addFailureMessage(ExceptionUtils.getExceptionCause("Failed to extract test results",exception));
 		}
 
 		final long timeEnd = System.currentTimeMillis();

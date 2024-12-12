@@ -84,7 +84,7 @@ public class ValidationVersionLoader {
 			String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion());
 			executionConfig.setPreviousVersion(rvfDbSchema);
 		} else {
-			throw new BusinessServiceException("Previous release specified is not found "
+			throw new BusinessServiceException("Previous release specified is not found: "
 					+ executionConfig.getPreviousVersion());
 		}
 	}
