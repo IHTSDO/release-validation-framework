@@ -342,6 +342,7 @@ public class DroolsRulesValidationService {
 	}
 
 	private void extractFiles(ValidationRunConfig validationConfig, Set<String> extractedRF2FilesDirectories, Set<String> previousReleaseDirectories) throws RVFExecutionException, ReleaseImportException, IOException {
+		verifyLocalFile("extracting prospective file", validationConfig.getLocalProspectiveFile());
 		try (InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
 			// If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 			if (validationConfig.isRf2DeltaOnly()) {
@@ -364,15 +365,23 @@ public class DroolsRulesValidationService {
 			if (StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
 				throw new RVFExecutionException("Drools validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 			}
+			verifyLocalFile("extracting dependency file", validationConfig.getLocalDependencyReleaseFile());
 			try (InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyReleaseFile())) {
 				extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(dependencyStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
 			}
 		}
 
 		if (StringUtils.isNotBlank(validationConfig.getPreviousRelease()) && validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
+			verifyLocalFile("extracting previous release file", validationConfig.getLocalPreviousReleaseFile());
 			try (InputStream previousReleaseStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile())) {
 				previousReleaseDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
 			}
+		}
+	}
+
+	private void verifyLocalFile(String step, File file) throws RVFExecutionException {
+		if (file == null || !file.exists() || !file.canRead()) {
+			throw new RVFExecutionException("Drools validation failure while " + step + " as it is null, not found, or cannot be read.  File name: '" + file + "'");
 		}
 	}
 
