@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,15 +147,17 @@ public class ValidationRunner {
 		Map<String, Future<ValidationStatusReport>> taskMap = new HashMap<>();
 		ExecutorService executorService = Executors.newFixedThreadPool(5);
 		StringBuilder statusMessages = new StringBuilder();
-		statusMessages.append("RVF assertions validation started");
-		reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 
-		ValidationStatusReport mysqlValidationStatusReport = new ValidationStatusReport(validationConfig);
-		mysqlValidationStatusReport.setResultReport(new ValidationReport());
-		taskMap.put("SQL Assertions", executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
+		if (!CollectionUtils.isEmpty(validationConfig.getGroupsList())) {
+			statusMessages.append("RVF assertions validation started");
+			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
+			ValidationStatusReport mysqlValidationStatusReport = new ValidationStatusReport(validationConfig);
+			mysqlValidationStatusReport.setResultReport(new ValidationReport());
+			taskMap.put("SQL Assertions", executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
+		}
 
 		if (validationConfig.isEnableDrools()) {
-			statusMessages.append("\nDrools rules validation started");
+			statusMessages.append(statusMessages.isEmpty() ? "" : "\n").append("Drools rules validation started");
 			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 			ValidationStatusReport droolsValidationStatusReport = new ValidationStatusReport(validationConfig);
 			droolsValidationStatusReport.setResultReport(new ValidationReport());
@@ -162,7 +165,7 @@ public class ValidationRunner {
 		}
 
 		if (validationConfig.isEnableMRCMValidation()) {
-			statusMessages.append("\nMRCM validation started");
+			statusMessages.append(statusMessages.isEmpty() ? "" : "\n").append("MRCM validation started");
 			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 			ValidationStatusReport mrcmValidationStatusReport = new ValidationStatusReport(validationConfig);
 			mrcmValidationStatusReport.setResultReport(new ValidationReport());
@@ -170,7 +173,7 @@ public class ValidationRunner {
 		}
 
 		if (validationConfig.isEnableTraceabilityValidation()) {
-			statusMessages.append("\nTraceability comparison validation started");
+			statusMessages.append(statusMessages.isEmpty() ? "" : "\n").append("Traceability comparison validation started");
 			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
 			ValidationStatusReport traceabilityComparisonReport = new ValidationStatusReport(validationConfig);
 			traceabilityComparisonReport.setResultReport(new ValidationReport());
@@ -247,7 +250,7 @@ public class ValidationRunner {
 		List<TestRunItem> failures = statusReport.getResultReport().getAssertionsFailed();
 		Map<TestType, Integer> testTypeFailuresCount = new EnumMap<>(TestType.class);
 		testTypeFailuresCount.put(TestType.ARCHIVE_STRUCTURAL, 0);
-		testTypeFailuresCount.put(TestType.SQL, 0);
+		testTypeFailuresCount.put(TestType.SQL, !CollectionUtils.isEmpty(validationRunConfig.getGroupsList()) ? 0 : -1);
 		testTypeFailuresCount.put(TestType.DROOL_RULES, validationRunConfig.isEnableDrools() ? 0 : -1);
 		testTypeFailuresCount.put(TestType.MRCM, validationRunConfig.isEnableMRCMValidation() ? 0 : -1);
 		testTypeFailuresCount.put(TestType.TRACEABILITY, validationRunConfig.isEnableTraceabilityValidation() ? 0 : -1);

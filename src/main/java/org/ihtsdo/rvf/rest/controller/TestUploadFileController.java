@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -191,7 +192,7 @@ public class TestUploadFileController {
 			@Parameter(description = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = RF2_DELTA_ONLY, required = false, defaultValue = "false") final boolean isRf2DeltaOnly,
 			@Parameter(description = "Default to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false, defaultValue = "false") final boolean writeSucceses,
 			@Parameter(description = "manifest.xml file(optional)") @RequestParam(value = MANIFEST, required = false) final MultipartFile manifestFile,
-			@Parameter(description = "Assertion group names separated by a comma.") @RequestParam(value = GROUPS) final List<String> groupsList,
+			@Parameter(description = "Assertion group names separated by a comma.") @RequestParam(value = GROUPS, required = false) final List<String> groupsList,
 			@Parameter(description = "Assertion exclusion list separated by a comma.") @RequestParam(value = ASSERTION_EXCLUSION_LIST, required = false) final List<String> assertionExclusionList,
 			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
@@ -274,7 +275,7 @@ public class TestUploadFileController {
 			@Parameter(description = "True if the test file contains RF2 delta files only. Defaults to false.") @RequestParam(value = RF2_DELTA_ONLY, required = false, defaultValue = "false") final boolean isRf2DeltaOnly,
 			@Parameter(description = "Defaults to false to reduce the size of report file") @RequestParam(value = WRITE_SUCCESSES, required = false, defaultValue = "false") final boolean writeSucceses,
 			@Parameter(description = "manifest.xml file path in AWS S3") @RequestParam(name =  "manifestFileS3Path", required = false) final String manifestFileS3Path,
-			@Parameter(description = "Assertion group names") @RequestParam(value = GROUPS) final List<String> groupsList,
+			@Parameter(description = "Assertion group names") @RequestParam(value = GROUPS, required = false) final List<String> groupsList,
 			@Parameter(description = "Assertion exclusion list separated by a comma.") @RequestParam(value = ASSERTION_EXCLUSION_LIST, required = false) final List<String> assertionExclusionList,
 			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
@@ -357,7 +358,7 @@ public class TestUploadFileController {
 			Map<String, String> responseMap) {
 		// check assertion groups
 
-		if (ValidationRunner.EMPTY_TEST_ASSERTION_GROUPS.equals(validationGroups)) {
+		if (CollectionUtils.isEmpty(validationGroups) || ValidationRunner.EMPTY_TEST_ASSERTION_GROUPS.equals(validationGroups)) {
 			return true;
 		}
 
