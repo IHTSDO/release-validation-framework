@@ -183,6 +183,8 @@ public class MRCMValidationService {
 		validationRun.setUngroupedAttributes(validationRunner.getUngroupedAttributes());
 		validationRun.setConceptsUsedInMRCMTemplates(validationRunner.getConceptsUsedInMRCMTemplates());
 		validationRun.setLateralizableRefsetMembers(validationRunner.getLateralizableRefsetMembers());
+		validationRun.setAnatomyStructureAndEntireRefsets(validationRunner.getAnatomyStructureAndEntireRefsets());
+		validationRun.setAnatomyStructureAndPartRefsets(validationRunner.getAnatomyStructureAndPartRefsets());
 		return validationRun;
 	}
 
