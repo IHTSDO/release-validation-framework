@@ -26,9 +26,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static org.snomed.quality.validator.mrcm.SEPRefsetValidationService.SEPAssertionType;
@@ -109,17 +109,19 @@ public class MRCMValidationService {
 			ValidationRun validationRunnerInferredForm = getValidationRunGivenForm(effectiveDate, validationRunner, fullSnapshotRelease, moduleIds, ContentType.INFERRED);
 			ValidationRun validationRunnerInStatedForm = getValidationRunGivenForm(effectiveDate, validationRunner, fullSnapshotRelease, moduleIds, ContentType.STATED);
 
-			Set<Callable<Void>> callables = new HashSet<>();
-			callables.add(() -> {
+			ExecutorService executorService = Executors.newCachedThreadPool();
+			List<Future<Void>> tasks = new ArrayList<>();
+			tasks.add(executorService.submit (() -> {
 				validationService.validateRelease(extractedRF2FilesDirectory, validationRunnerInferredForm);
 				return null;
-			});
-			callables.add(() -> {
+			}));
+			tasks.add(executorService.submit (() -> {
 				validationService.validateRelease(extractedRF2FilesDirectory, validationRunnerInStatedForm);
 				return null;
-			});
-			ExecutorService executorService = Executors.newCachedThreadPool();
-			executorService.invokeAll(callables);
+			}));
+			for (Future<Void> task : tasks) {
+				task.get(); // Use Future.get to receive any exceptions throwing from Thread
+			}
 
 			if (!whitelistService.isWhitelistDisabled()) {
 				checkWhitelistItems(validationRunnerInferredForm);
