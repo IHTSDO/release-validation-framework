@@ -139,7 +139,7 @@ public class AutomatedTestService {
         leftAllTestRunItems.addAll(leftResultReport.getAssertionsSkipped());
         leftAllTestRunItems.addAll(leftResultReport.getAssertionsWarning());
         Map<String, TestRunItem> leftTestRunItemToUUIDMap = leftAllTestRunItems.stream()
-                .filter(i -> !TestType.MRCM.equals(i.getTestType()))
+                .filter(i -> !TestType.MRCM.equals(i.getTestType()) && !"resource".equals(i.getTestCategory()))
                 .collect(Collectors.toMap(i -> i.getAssertionUuid().toString(), Function.identity()));
 
         List<TestRunItem> rightAllTestRunItems = new ArrayList <>();
@@ -148,7 +148,7 @@ public class AutomatedTestService {
         rightAllTestRunItems.addAll(rightResultReport.getAssertionsSkipped());
         rightAllTestRunItems.addAll(rightResultReport.getAssertionsWarning());
         Map<String, TestRunItem> rightTestRunItemToUUIDMap = rightAllTestRunItems.stream()
-                .filter(i -> !TestType.MRCM.equals(i.getTestType()))
+                .filter(i -> !TestType.MRCM.equals(i.getTestType()) && !"resource".equals(i.getTestCategory()))
                 .collect(Collectors.toMap(i -> i.getAssertionUuid().toString(), Function.identity()));
 
         Collection removedIDs = CollectionUtils.subtract(leftTestRunItemToUUIDMap.keySet(), rightTestRunItemToUUIDMap.keySet());
