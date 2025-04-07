@@ -77,19 +77,19 @@ public class MRCMValidationService {
 
 			//Load the dependency package from S3 to snapshot files list before validating if the package is an MS extension and not an edition release
 			//If the package is an MS edition, it is not necessary to load the dependency
-			Set<String> moduleIds = null;
 			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition() && !validationConfig.isStandAloneProduct()) {
 				if (StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
 					throw new RVFExecutionException("MRCM validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
 				}
 				InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyReleaseFile());
 				snapshotsInputStream.add(dependencyStream);
+			}
 
-				//Will filter the results based on component's module IDs if the package is an extension only
-				String moduleIdStr = validationConfig.getIncludedModules();
-				if (StringUtils.isNotBlank(moduleIdStr)) {
-					moduleIds = Sets.newHashSet(moduleIdStr.split(","));
-				}
+			//Will filter the results based on component's module IDs if the package is an extension only
+			Set<String> moduleIds = null;
+			String moduleIdStr = validationConfig.getIncludedModules();
+			if (StringUtils.isNotBlank(moduleIdStr)) {
+				moduleIds = Sets.newHashSet(moduleIdStr.split(","));
 			}
 
 			//Unzip the release files
