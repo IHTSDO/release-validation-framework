@@ -760,4 +760,29 @@ public class ReleaseDataManager {
 			return 0L;
 		}
 	}
+
+	public void insertIntoProspectiveFullTables(String schemaName) throws SQLException {
+		try (Connection connection = rvfDynamicDataSource.getConnection(schemaName)) {
+			DatabaseMetaData md = connection.getMetaData();
+			ResultSet rs = md.getTables(null, null, "%", null);
+			Set<String> snapShotTables = new HashSet<>();
+			while (rs.next()) {
+				if (rs.getString(3).endsWith("_s")) {
+					snapShotTables.add(rs.getString(3));
+				}
+			}
+			insertIntoProspectiveFullTables(snapShotTables, connection);
+		}
+	}
+
+	private void insertIntoProspectiveFullTables(Set<String> snapShotTables, Connection connection) throws SQLException {
+		for (String snapshotTable: snapShotTables) {
+			String fullTable = snapshotTable.replaceAll("_s$","_f");
+			StringBuilder insertSQL = new StringBuilder();
+			insertSQL.append(INSERT_INTO).append(fullTable).append(SQL_SELECT).append(snapshotTable);
+			try (PreparedStatement ps = connection.prepareStatement(insertSQL.toString())) {
+				ps.execute();
+			}
+		}
+	}
 }

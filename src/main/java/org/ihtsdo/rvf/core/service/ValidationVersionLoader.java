@@ -109,10 +109,12 @@ public class ValidationVersionLoader {
 			//load prospective version alone now as used to combine with dependency for extension testing
 			uploadReleaseFileIntoDB(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
 		}
-
+		final String schemaName = prospectiveVersion.startsWith(RVF_DB_PREFIX) ? prospectiveVersion : RVF_DB_PREFIX + prospectiveVersion;
 		if (!validationConfig.isRf2DeltaOnly() && !checkDeltaFilesExist(validationConfig.getLocalProspectiveFile())) {
-			final String schemaName = prospectiveVersion.startsWith(RVF_DB_PREFIX) ? prospectiveVersion : RVF_DB_PREFIX + prospectiveVersion;
 			releaseDataManager.insertIntoProspectiveDeltaTables(schemaName, executionConfig);
+		}
+		if (!checkFullFilesExist(validationConfig.getLocalProspectiveFile())) {
+			releaseDataManager.insertIntoProspectiveFullTables(schemaName);
 		}
 
 		statusReport.setTotalRF2FilesLoaded(rf2FilesLoaded.size());
@@ -134,6 +136,24 @@ public class ValidationVersionLoader {
 			}
 		} catch (IOException | IllegalStateException e) {
 			if (e.getMessage().contains("No Delta files found")) {
+				return false;
+			}
+			throw new ReleaseImportException("Error while searching input files.", e);
+		}
+		return false;
+	}
+
+	private boolean checkFullFilesExist(File localProspectiveFile) throws ReleaseImportException {
+		try {
+			String deltaDirectoryPath = new ReleaseImporter().unzipRelease(new FileInputStream(localProspectiveFile), ReleaseImporter.ImportType.FULL).getAbsolutePath();
+			try(Stream<Path> pathStream = Files.find(new File(deltaDirectoryPath).toPath(), 50,
+					(path, basicFileAttributes) -> path.toFile().getName().matches("x?(sct|rel)2_Concept_[^_]*Full_.*.txt"))) {
+				if (pathStream.findFirst().isPresent()) {
+					return true;
+				}
+			}
+		} catch (IOException | IllegalStateException e) {
+			if (e.getMessage().contains("No Full files found")) {
 				return false;
 			}
 			throw new ReleaseImportException("Error while searching input files.", e);
@@ -431,9 +451,9 @@ public class ValidationVersionLoader {
 		if (isExtension(validationConfig)) {
 			try {
 				releaseDataManager.copyTableData(extensionVersion, combinedVersion, DELTA_TABLE, null);
-				releaseDataManager.copyTableData(extensionVersion, combinedVersion,FULL_TABLE, null);
+				releaseDataManager.copyTableData(extensionVersion, combinedVersion, FULL_TABLE, null);
 				releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),
-						extensionVersion, combinedVersion,SNAPSHOT_TABLE, null);
+						extensionVersion, combinedVersion, SNAPSHOT_TABLE, null);
 				resourceLoader.loadResourceData(combinedSchema);
 			} catch (Exception e) {
 				String errorMsg = e.getMessage();
