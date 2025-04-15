@@ -10,7 +10,7 @@ public class RF2FileTableMapper {
 	private static final String TEXT_DEFINITION_FILE_HEADER = "sct2_TextDefinition_";
 	private static final String STATED_RELATIONSHIP_FILE_HEADER = "sct2_StatedRelationship_";
 	private static final String SIMPLE_FILE_HEADER = "der2_Refset_.*Simple";
-	private static final String SIMPLE_MAP_FILE_HEADER = "der2_sRefset_.*SimpleMap";
+	private static final String SIMPLE_MAP_FILE_HEADER = "der2_.*Refset_.*SimpleMap";
 	private static final String RELATIONSHIP_FILE_HEADER = "sct2_Relationship_";
 	private static final String RELATIONSHIP_CONCRETE_VALUES_FILE_HEADER = "sct2_RelationshipConcreteValues";
 	private static final String LANGUAGE_FILE_HEADER = "der2_cRefset_.*Language";
@@ -34,9 +34,9 @@ public class RF2FileTableMapper {
 	private static final String DELTA = ".*Delta.*_*_\\d{8}.txt";
 	private static final String SNAPSHOT = ".*Snapshot.*_*_\\d{8}.txt";
 	private static final String FULL = ".*Full.*_*_\\d{8}.txt";
-	//list of file name regex expressions with RVF table names
+	// list of file name regex expressions with RVF table names
 	static {
-		//Delta
+		// Delta
 		tableNameMap.put(CONCEPT_FILE_HEADER + DELTA, "concept_d");
 		tableNameMap.put(DESCRIPTION_FILE_HEADER + DELTA, "description_d");
 		tableNameMap.put(ASSOCIATION_REFERENCE_FILE_HEADER+ DELTA, "associationrefset_d");
@@ -61,7 +61,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + DELTA, "mrcmdomainrefset_d");
 		tableNameMap.put(DESCRIPTION_TYPE_FILE_HEADER + DELTA, "descriptiontyperefset_d");
 		
-		//Full
+		// Full
 		tableNameMap.put(CONCEPT_FILE_HEADER + FULL, "concept_f");
 		tableNameMap.put(DESCRIPTION_FILE_HEADER + FULL, "description_f");
 		tableNameMap.put(ASSOCIATION_REFERENCE_FILE_HEADER+ FULL, "associationrefset_f");
@@ -86,7 +86,7 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + FULL, "mrcmdomainrefset_f");
 		tableNameMap.put(DESCRIPTION_TYPE_FILE_HEADER + FULL, "descriptiontyperefset_f");
 		
-		//Snapshot
+		// Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
 		tableNameMap.put(DESCRIPTION_FILE_HEADER + SNAPSHOT, "description_s");
 		tableNameMap.put(ASSOCIATION_REFERENCE_FILE_HEADER+ SNAPSHOT, "associationrefset_s");
@@ -111,12 +111,17 @@ public class RF2FileTableMapper {
 		tableNameMap.put(MRCM_DOMAIN_FILE_HEADER + SNAPSHOT, "mrcmdomainrefset_s");
 		tableNameMap.put(DESCRIPTION_TYPE_FILE_HEADER + SNAPSHOT, "descriptiontyperefset_s");
 	}
-	
+
+	private RF2FileTableMapper () {
+		// private constructor
+	}
+
+
 	public static String getLegacyTableName(final String filename) {
 		final String fileName = filename.startsWith("x") ? filename.substring(1) : filename;
-		for(final String regex : tableNameMap.keySet()) {
-			if (Pattern.compile(regex).matcher(fileName).matches()) {
-				return tableNameMap.get(regex);
+		for (final Map.Entry<String, String> entry : tableNameMap.entrySet()) {
+			if (Pattern.compile(entry.getKey()).matcher(fileName).matches()) {
+				return entry.getValue();
 			}
 		}
 		return null;
