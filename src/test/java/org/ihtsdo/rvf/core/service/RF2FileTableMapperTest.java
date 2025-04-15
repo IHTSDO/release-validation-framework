@@ -8,7 +8,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
-public class RF2FileTableMapperTest {
+class RF2FileTableMapperTest {
 	
 	private static final String[] INT_DELTA_FILES = {
 			"der2_cRefset_AssociationReferenceDelta_INT_20150131.txt",
@@ -18,12 +18,8 @@ public class RF2FileTableMapperTest {
 			"der2_iisssccRefset_ExtendedMapDelta_INT_20150131.txt",
 			"der2_iissscRefset_ComplexMapDelta_INT_20150131.txt",
 			"der2_sRefset_SimpleMapDelta_INT_20150131.txt",
-//			"der2_cciRefset_RefsetDescriptorDelta_INT_20150131.txt",
-//			"der2_ciRefset_DescriptionTypeDelta_INT_20150131.txt",
-//			"der2_ssRefset_ModuleDependencyDelta_INT_20150131.txt",
 			"sct2_Concept_Delta_INT_20150131.txt",
 			"sct2_Description_Delta-en_INT_20150131.txt",
-//			"sct2_Identifier_Delta_INT_20150131.txt",
 			"sct2_Relationship_Delta_INT_20150131.txt",
 			"sct2_StatedRelationship_Delta_INT_20150131.txt",
 			"sct2_TextDefinition_Delta-en_INT_20150131.txt",
@@ -36,8 +32,6 @@ public class RF2FileTableMapperTest {
 			"der2_cRefset_AttributeValueSpanishExtensionDelta_INT_20141031.txt",
 			"der2_cRefset_LanguageSpanishExtensionDelta-es_INT_20141031.txt",
 			"der2_Refset_SimpleSpanishExtensionDelta_INT_20141031.txt",
-//			"der2_cciRefset_RefsetDescriptorSpanishExtensionDelta_INT_20141031.txt",
-//			"der2_ssRefset_ModuleDependencySpanishExtensionDelta_INT_20141031.txt",
 			"sct2_Concept_SpanishExtensionDelta_INT_20141031.txt",
 			"sct2_Description_SpanishExtensionDelta-es_INT_20141031.txt",
 			"sct2_Relationship_SpanishExtensionDelta_INT_20141031.txt",
@@ -110,7 +104,7 @@ public class RF2FileTableMapperTest {
 	};
 	
 	@Test
-	public void testInternationalDeltaFiles() {
+	void testInternationalDeltaFiles() {
 		int i = 0;
 		assertEquals(INT_DELTA_FILES.length, INT_EXPECTED_DELTA.length);
 		for (final String fileName : INT_DELTA_FILES) {
@@ -120,19 +114,19 @@ public class RF2FileTableMapperTest {
 	}
 	
 	@Test
-	public void testInternationalSnapshotFiles() {
+	void testInternationalSnapshotFiles() {
 		testSnapshot(INT_DELTA_FILES, INT_EXPECTED_DELTA);
 	}
 
 	
 	@Test
-	public void testInternationalFullFiles() {
+	void testInternationalFullFiles() {
 		testFull(INT_DELTA_FILES, INT_EXPECTED_DELTA);
 	}
 
 
 	@Test
-	public void testSpanishDeltaFiles() {
+	void testSpanishDeltaFiles() {
 
 		assertEquals(SPANISH_DELTA_FILES.length, EXTENSION_EXPECTED_DELTA.length);
 		int i=0;
@@ -143,17 +137,17 @@ public class RF2FileTableMapperTest {
 	}
 	
 	@org.junit.jupiter.api.Test
-	public void testSpanishSnapshotFiles() {
+	void testSpanishSnapshotFiles() {
 		testSnapshot(SPANISH_DELTA_FILES, EXTENSION_EXPECTED_DELTA);
 	}
 	
 	@Test
-	public void testSpanishFullFiles() {
+	void testSpanishFullFiles() {
 		testFull(SPANISH_DELTA_FILES, EXTENSION_EXPECTED_DELTA);
 	}
 	
 	@org.junit.jupiter.api.Test
-	public void testGPFPDeltaFiles() {
+	void testGPFPDeltaFiles() {
 		assertEquals(GPFP_DELTA_FILES.length, GPFP_EXPECTED_DELTA.length);
 		int i=0;
 		for (final String fileName : GPFP_DELTA_FILES) {
@@ -163,17 +157,17 @@ public class RF2FileTableMapperTest {
 	}
 	
 	@org.junit.jupiter.api.Test
-	public void testGPFPSnapshotFiles() {
+	void testGPFPSnapshotFiles() {
 		testSnapshot(GPFP_DELTA_FILES, GPFP_EXPECTED_DELTA);
 	}
 	
 	@Test
-	public void testGPFPFullFiles() {
+	void testGPFPFullFiles() {
 		testFull(GPFP_DELTA_FILES, GPFP_EXPECTED_DELTA);
 	}
 	
 	@Test
-	public void testDenmarkFiles() {
+	void testDenmarkFiles() {
 		String[] dkDeltas = {"sct2_Concept_Delta_DK1000005_20160215.txt"};
 		String[] expected ={"concept_d"};
 		int i=0;
@@ -183,7 +177,7 @@ public class RF2FileTableMapperTest {
 		}
 	}
 	@Test
-	public void tetsTechPreviewFiles() {
+	void testTechPreviewFiles() {
 		assertEquals(INT_PREVIEW_DELTA_FILES.length, EXPECTED_INT_PREVIEW_DELTA.length);
 		int i=0;
 		for (final String fileName : INT_PREVIEW_DELTA_FILES) {
@@ -191,11 +185,22 @@ public class RF2FileTableMapperTest {
 			assertEquals(EXPECTED_INT_PREVIEW_DELTA[i++], tableName);
 		}
 	}
-	
-	private void testSnapshot(final String[] deltatFiles, final String[] expectedDeltaResults) {
-		final String[] snapshotFiles = new String[deltatFiles.length];
+	@Test
+	void testSimpleMapFilenames() {
+		String[] simpleMapFilenames = {
+				"der2_iRefset_SimpleMapDelta_INT_20150131.txt",
+				"der2_sRefset_SimpleMapDelta_INT_20150131.txt"
+		};
+
+		for (String fileName : simpleMapFilenames) {
+			assertEquals("simplemaprefset_d", RF2FileTableMapper.getLegacyTableName(fileName));
+		}
+	}
+
+	private void testSnapshot(final String[] deltaFiles, final String[] expectedDeltaResults) {
+		final String[] snapshotFiles = new String[deltaFiles.length];
 		for (int i=0; i < snapshotFiles.length; i++) {
-			snapshotFiles[i] = deltatFiles[i].replace("Delta", "Snapshot");
+			snapshotFiles[i] = deltaFiles[i].replace("Delta", "Snapshot");
 		}
 		final String[] expected = new String[expectedDeltaResults.length];
 		for (int i=0;i<expected.length;i++) {
@@ -209,10 +214,10 @@ public class RF2FileTableMapperTest {
 		}
 	}
 	
-	private void testFull(final String[] delatFiles, final String[] expectedDeltaResults) {
-		final String[] snapshotFiles = new String[delatFiles.length];
+	private void testFull(final String[] deltaFiles, final String[] expectedDeltaResults) {
+		final String[] snapshotFiles = new String[deltaFiles.length];
 		for (int i=0; i < snapshotFiles.length; i++) {
-			snapshotFiles[i] = delatFiles[i].replace("Delta", "Full");
+			snapshotFiles[i] = deltaFiles[i].replace("Delta", "Full");
 		}
 		final String[] expected = new String[expectedDeltaResults.length];
 		for (int i=0;i<expected.length;i++) {
