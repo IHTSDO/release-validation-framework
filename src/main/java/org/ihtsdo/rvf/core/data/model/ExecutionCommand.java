@@ -18,14 +18,14 @@ public class ExecutionCommand {
 	@GeneratedValue
 	Long id;
 
-	@Column(columnDefinition = "text")
+	@Column(columnDefinition = "longtext")
 	String template = null;
 	@JsonBackReference
 	@OneToOne(fetch = FetchType.EAGER, mappedBy = "command")
 	Test test;
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name="command_statements", joinColumns=@JoinColumn(name="command_id"))
-	@Column(name="statement", columnDefinition = "text")
+	@Column(name="statement", columnDefinition = "longtext")
 	@OrderColumn(name="statement_index")
 	List<String> statements = new ArrayList<>();
 
