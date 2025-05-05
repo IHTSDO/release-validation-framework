@@ -9,12 +9,15 @@ import java.util.StringJoiner;
 public class ValidationStatusResponse {
 	private final Long runId;
 	private final String state;
+
+	private final String storageLocation;
 	private final String username;
 	private final String authenticationToken;
 
 	public ValidationStatusResponse(ValidationRunConfig config, ValidationReportService.State state) {
 		this.runId = config.getRunId();
 		this.state = state.name();
+		this.storageLocation = config.getStorageLocation();
 		this.username = config.getUsername() != null ? config.getUsername() : "";
 		this.authenticationToken = config.getAuthenticationToken() != null ? config.getAuthenticationToken() : "";
 	}
@@ -25,6 +28,10 @@ public class ValidationStatusResponse {
 
 	public String getState() {
 		return state;
+	}
+
+	public String getStorageLocation() {
+		return storageLocation;
 	}
 
 	public String getUsername() {
@@ -40,6 +47,7 @@ public class ValidationStatusResponse {
 		return new StringJoiner(", ", ValidationStatusResponse.class.getSimpleName() + "[", "]")
 				.add("runId=" + runId)
 				.add("state='" + state + "'")
+				.add("storageLocation='" + storageLocation + "'")
 				.add("username='" + username + "'")
 				.add("authenticationToken='" + mask(authenticationToken) + "'").toString();
 	}
