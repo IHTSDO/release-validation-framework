@@ -18,6 +18,9 @@ import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.util.RvfReleaseDbSchemaNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.snomed.module.storage.ModuleMetadata;
+import org.snomed.module.storage.ModuleStorageCoordinator;
+import org.snomed.module.storage.ModuleStorageCoordinatorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
@@ -45,6 +48,9 @@ public class ValidationVersionLoader {
 	private static final String SNAPSHOT_TABLE = "%_s";
 	private static final String DELTA_TABLE = "%_d";
 	private static final String FULL_TABLE = "%_f";
+
+	@Autowired
+	private ModuleStorageCoordinator moduleStorageCoordinator;
 	
 	@Autowired
 	private ValidationJobResourceConfig jobResourceConfig;
@@ -332,30 +338,48 @@ public class ValidationVersionLoader {
 		return manifestInput;
 	}
 
-	public void downloadPreviousReleaseAndDependencyFiles(ValidationRunConfig validationConfig) throws IOException {
+	public void downloadPreviousReleaseAndDependencyFiles(ValidationRunConfig validationConfig) throws IOException, ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException {
+		// Get all releases from MSC
+		Map<String, List<ModuleMetadata>> allReleasesMap = moduleStorageCoordinator.getAllReleases();
+		List<ModuleMetadata> allModuleMetadata = new ArrayList<>();
+		allReleasesMap.values().forEach(allModuleMetadata::addAll);
+
 		if (StringUtils.hasLength(validationConfig.getExtensionDependency())) {
-			InputStream dependencyStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getExtensionDependency());
-			if (dependencyStream != null) {
-				File dependencyFile = File.createTempFile(validationConfig.getRunId() + "_DEPENDENCY_RF2", ZIP_FILE_EXTENSION);
-				try (OutputStream out = new FileOutputStream(dependencyFile)) {
-					IOUtils.copy(dependencyStream, out);
-				} finally {
-					IOUtils.closeQuietly(dependencyStream, null);
+			ModuleMetadata moduleMetadata = allModuleMetadata.stream().filter(item -> item.getFilename().equals(validationConfig.getExtensionDependency())).findFirst().orElse(null);
+			if (moduleMetadata != null) {
+				List<ModuleMetadata> moduleMetadataList = moduleStorageCoordinator.getRelease(moduleMetadata.getCodeSystemShortName(), moduleMetadata.getIdentifyingModuleId(), moduleMetadata.getEffectiveTimeString(), true, false);
+				validationConfig.setLocalDependencyReleaseFile(moduleMetadataList.get(0).getFile());
+			} else {
+				InputStream dependencyStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getExtensionDependency());
+				if (dependencyStream != null) {
+					File dependencyFile = File.createTempFile(validationConfig.getRunId() + "_DEPENDENCY_RF2", ZIP_FILE_EXTENSION);
+					try (OutputStream out = new FileOutputStream(dependencyFile)) {
+						IOUtils.copy(dependencyStream, out);
+					} finally {
+						IOUtils.closeQuietly(dependencyStream, null);
+					}
+					validationConfig.setLocalDependencyReleaseFile(dependencyFile);
 				}
-				validationConfig.setLocalDependencyReleaseFile(dependencyFile);
 			}
+
 		}
 
 		if (StringUtils.hasLength(validationConfig.getPreviousRelease())) {
-			InputStream previousStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getPreviousRelease());
-			if (previousStream != null) {
-				File previousFile = File.createTempFile(validationConfig.getRunId() + "_PREVIOUS_RF2", ZIP_FILE_EXTENSION);
-				try (OutputStream out = new FileOutputStream(previousFile)) {
-					IOUtils.copy(previousStream, out);
-				} finally {
-					IOUtils.closeQuietly(previousStream, null);
+			ModuleMetadata moduleMetadata = allModuleMetadata.stream().filter(item -> item.getFilename().equals(validationConfig.getPreviousRelease())).findFirst().orElse(null);
+			if (moduleMetadata != null) {
+				List<ModuleMetadata> moduleMetadataList = moduleStorageCoordinator.getRelease(moduleMetadata.getCodeSystemShortName(), moduleMetadata.getIdentifyingModuleId(), moduleMetadata.getEffectiveTimeString(), true, false);
+				validationConfig.setLocalPreviousReleaseFile(moduleMetadataList.get(0).getFile());
+			} else {
+				InputStream previousStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getPreviousRelease());
+				if (previousStream != null) {
+					File previousFile = File.createTempFile(validationConfig.getRunId() + "_PREVIOUS_RF2", ZIP_FILE_EXTENSION);
+					try (OutputStream out = new FileOutputStream(previousFile)) {
+						IOUtils.copy(previousStream, out);
+					} finally {
+						IOUtils.closeQuietly(previousStream, null);
+					}
+					validationConfig.setLocalPreviousReleaseFile(previousFile);
 				}
-				validationConfig.setLocalPreviousReleaseFile(previousFile);
 			}
 		}
 	}
