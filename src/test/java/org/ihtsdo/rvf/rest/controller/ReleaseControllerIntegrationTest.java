@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,7 +47,7 @@ public class ReleaseControllerIntegrationTest {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
 		assertNotNull(releaseDataManager);
 		releaseDataManager.uploadPublishedReleaseData(getClass().getResourceAsStream("/SnomedCT_Release_INT_20140131.zip") ,
-				"SnomedCT_Release_INT_20140131.zip", "int","20140131");
+				"SnomedCT_Release_INT_20140131.zip", "int","20140131", Collections.emptyList());
 		assertTrue(releaseDataManager.isKnownRelease("rvf_int_20140131"), "Schema name for release data 20140131 must be known to data manager ");
 		assertTrue(releaseDataManager.getAllKnownReleases().contains("rvf_int_20140131"), "Release 20140131 must exist in all known releases ");
 	}

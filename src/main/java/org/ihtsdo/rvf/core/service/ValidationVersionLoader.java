@@ -1,8 +1,6 @@
 package org.ihtsdo.rvf.core.service;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration.Cloud;
@@ -25,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.naming.ConfigurationException;
@@ -72,9 +71,6 @@ public class ValidationVersionLoader {
 
 	private ResourceManager releaseSourceManager;
 
-	@Resource(name = "dataSource")
-	private BasicDataSource snomedDataSource;
-	
 	@Value("${rvf.generate.mysql.binary.archive}")
 	private boolean generateBinaryArchive;
 
@@ -87,7 +83,7 @@ public class ValidationVersionLoader {
 	
 	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws BusinessServiceException, IOException {
 		if (executionConfig.getPreviousVersion().endsWith(ZIP_FILE_EXTENSION)) {
-			String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion());
+			String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion(), executionConfig.getExcludedRF2Files());
 			executionConfig.setPreviousVersion(rvfDbSchema);
 		} else {
 			throw new BusinessServiceException("Previous release specified is not found: "
@@ -97,7 +93,7 @@ public class ValidationVersionLoader {
 		
 	public void loadDependencyVersion(MysqlExecutionConfig executionConfig) throws IOException, BusinessServiceException {
 		if (executionConfig.getExtensionDependencyVersion().endsWith(ZIP_FILE_EXTENSION)) {
-			String dependencyVersion = loadRelease(executionConfig.getExtensionDependencyVersion());
+			String dependencyVersion = loadRelease(executionConfig.getExtensionDependencyVersion(), executionConfig.getExcludedRF2Files());
 			executionConfig.setExtensionDependencyVersion(dependencyVersion);
 		} else {
 			throw new BusinessServiceException("Dependency release specified is not found "
@@ -113,7 +109,7 @@ public class ValidationVersionLoader {
 			rf2FilesLoaded.addAll(loadProspectiveDeltaAndCombineWithPreviousSnapshotIntoDB(executionConfig, validationConfig, null));
 		} else {
 			//load prospective version alone now as used to combine with dependency for extension testing
-			uploadReleaseFileIntoDB(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded);
+			uploadReleaseFileIntoDB(prospectiveVersion, null, validationConfig.getLocalProspectiveFile(), rf2FilesLoaded, executionConfig.getExcludedRF2Files());
 		}
 		final String schemaName = prospectiveVersion.startsWith(RVF_DB_PREFIX) ? prospectiveVersion : RVF_DB_PREFIX + prospectiveVersion;
 		if (!validationConfig.isRf2DeltaOnly() && !checkDeltaFilesExist(validationConfig.getLocalProspectiveFile())) {
@@ -167,9 +163,17 @@ public class ValidationVersionLoader {
 		return false;
 	}
 
-	private String loadRelease(String releaseVersion) throws IOException, BusinessServiceException {
+	private String loadRelease(String releaseVersion, List<String> excludedRF2Files) throws IOException, BusinessServiceException {
 		if (releaseVersion != null && releaseVersion.endsWith(ZIP_FILE_EXTENSION)) {
 			String schemaName = RvfReleaseDbSchemaNameGenerator.generate(releaseVersion);
+			if (!CollectionUtils.isEmpty(excludedRF2Files)) {
+				if (releaseDataManager.isKnownRelease(schemaName)) {
+					releaseDataManager.dropSchema(schemaName);
+				}
+				releaseDataManager.uploadPublishedReleaseFromStore(releaseVersion, schemaName, excludedRF2Files);
+				return schemaName;
+			}
+
 			long publishedReleaseLastModifiedDate = releaseDataManager.getPublishedReleaseLastModifiedDate(releaseVersion);
 			long binaryArchiveSchemaLastModifiedDate = releaseDataManager.getBinaryArchiveSchemaLastModifiedDate(schemaName);
 
@@ -180,12 +184,12 @@ public class ValidationVersionLoader {
 				if (releaseDataManager.isKnownRelease(schemaName)) {
 					releaseDataManager.dropSchema(schemaName);
 				}
-				uploadPublishedReleaseThenGenerateBinaryArchive(releaseVersion, schemaName);
+				uploadPublishedReleaseThenGenerateBinaryArchive(releaseVersion, schemaName, Collections.emptyList());
 			} else {
 				// Restore schema from binary archive file
 				if (!releaseDataManager.isKnownRelease(schemaName) && !releaseDataManager.restoreReleaseFromBinaryArchive(schemaName)) {
 					logger.info("No existing mysql binary release available.");
-					uploadPublishedReleaseThenGenerateBinaryArchive(releaseVersion, schemaName);
+					uploadPublishedReleaseThenGenerateBinaryArchive(releaseVersion, schemaName, Collections.emptyList());
 				}
 			}
 
@@ -194,8 +198,8 @@ public class ValidationVersionLoader {
 		return releaseVersion;
 	}
 
-	private void uploadPublishedReleaseThenGenerateBinaryArchive(String releaseVersion, String schemaName) throws BusinessServiceException {
-		releaseDataManager.uploadPublishedReleaseFromStore(releaseVersion, schemaName);
+	private void uploadPublishedReleaseThenGenerateBinaryArchive(String releaseVersion, String schemaName, List<String> excludedRF2Files) throws BusinessServiceException {
+		releaseDataManager.uploadPublishedReleaseFromStore(releaseVersion, schemaName, excludedRF2Files);
 		if (generateBinaryArchive) {
 			String archiveFilename = releaseDataManager.generateBinaryArchive(schemaName);
 			logger.info("Release mysql binary archive is generated: {}", archiveFilename);
@@ -208,6 +212,7 @@ public class ValidationVersionLoader {
 							+ "_" + executionConfig.getExecutionId().toString());
 		executionConfig.setGroupNames(validationConfig.getGroupsList());
 		executionConfig.setAssertionExclusionList(validationConfig.getAssertionExclusionList());
+		executionConfig.setExcludedRF2Files(validationConfig.getExcludedRF2Files());
 		executionConfig.setExtensionValidation(isExtension(validationConfig));
 		executionConfig.setFirstTimeRelease(validationConfig.isFirstTimeRelease());
 		executionConfig.setEffectiveTime(validationConfig.getEffectiveTime());
@@ -247,7 +252,7 @@ public class ValidationVersionLoader {
 		List<String> filesLoaded = new ArrayList<>();
 		String prospectiveVersion = executionConfig.getProspectiveVersion();
 		if (validationConfig.isRf2DeltaOnly()) {
-			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, validationConfig.getLocalProspectiveFile());
+			releaseDataManager.loadSnomedData(prospectiveVersion, filesLoaded, executionConfig.getExcludedRF2Files(), validationConfig.getLocalProspectiveFile());
 			//copy snapshot from previous release
 			if (!validationConfig.isFirstTimeRelease()) {
 				releaseDataManager.copyTableData(executionConfig.getPreviousVersion(), prospectiveVersion,SNAPSHOT_TABLE, excludeTableNames);
@@ -417,7 +422,7 @@ public class ValidationVersionLoader {
 	}
 
 	private void uploadReleaseFileIntoDB(final String prospectiveVersion, final String knownVersion, final File tempFile,
-										 final List<String> rf2FilesLoaded) throws ConfigurationException, BusinessServiceException {
+										 final List<String> rf2FilesLoaded, List<String> excludedRF2Files) throws ConfigurationException, BusinessServiceException {
 
 		if (knownVersion != null && !knownVersion.trim().isEmpty()) {
 			logger.info("Baseline version: {} will be combined with prospective release file: {}", knownVersion, tempFile.getName());
@@ -442,13 +447,13 @@ public class ValidationVersionLoader {
 				}
 				logger.info("Start loading release version {} with release file {} and baseline {}", 
 						prospectiveVersion, tempFile.getName(), preLoadedZipFile.getName());
-				releaseDataManager.loadSnomedData(prospectiveVersion,rf2FilesLoaded, tempFile, preLoadedZipFile);
+				releaseDataManager.loadSnomedData(prospectiveVersion, rf2FilesLoaded, excludedRF2Files, tempFile, preLoadedZipFile);
 			} else {
 				throw new ConfigurationException("Can't find the cached release zip file for known version: " + versionDate);
 			}
 		} else {
 			logger.info("Start loading release version {} with release file {}", prospectiveVersion, tempFile.getName());
-			releaseDataManager.loadSnomedData(prospectiveVersion, rf2FilesLoaded, tempFile);
+			releaseDataManager.loadSnomedData(prospectiveVersion, rf2FilesLoaded, excludedRF2Files, tempFile);
 		}
 		logger.info("Completed loading release version {}", prospectiveVersion);
 	}

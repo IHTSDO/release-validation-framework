@@ -42,6 +42,7 @@ public class ValidationRunConfig {
 	private boolean enableChangeNotAtTaskLevelValidation;
 	private String branchPath;
 	private String excludedRefsetDescriptorMembers;
+	private List<String> excludedRF2Files;
 	private String responseQueue;
 	private Long contentHeadTimestamp;
 
@@ -450,6 +451,15 @@ public class ValidationRunConfig {
 
 	public ValidationRunConfig setExcludedRefsetDescriptorMembers(String excludedRefsetDescriptorMembers) {
 		this.excludedRefsetDescriptorMembers = excludedRefsetDescriptorMembers;
+		return this;
+	}
+
+	public List<String> getExcludedRF2Files() {
+		return excludedRF2Files;
+	}
+
+	public ValidationRunConfig setExcludedRF2Files(List<String> excludedRF2Files) {
+		this.excludedRF2Files = excludedRF2Files;
 		return this;
 	}
 
