@@ -14,6 +14,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -37,7 +38,7 @@ public class ReleaseDataManagerIntegrationTest {
 		assertNotNull(inputFile);
 		final String versionName = "20140131";
 		List<String> rf2FilesLoaded = new ArrayList<>();
-		final String schemaName = releaseDataManager.loadSnomedData(versionName, rf2FilesLoaded, inputFile);
+		final String schemaName = releaseDataManager.loadSnomedData(versionName, rf2FilesLoaded, Collections.emptyList(), inputFile);
 		try (
 				Connection connection = dataSource.getConnection();
 				ResultSet catalogs = connection.getMetaData().getCatalogs()) {
@@ -61,7 +62,7 @@ public class ReleaseDataManagerIntegrationTest {
 		assertNotNull(url);
 		final File inputFile = new File(url.toURI());
 		assertNotNull(inputFile);
-		final boolean writeSucess =releaseDataManager.uploadPublishedReleaseData(inputFile, "int", "20140131");
+		final boolean writeSucess =releaseDataManager.uploadPublishedReleaseData(inputFile, "int", "20140131", Collections.emptyList());
 		assertTrue(writeSucess, "Upload must have been successful");
 
 		assertTrue(releaseDataManager.isKnownRelease("rvf_int_20140131"), "Schema name for release 20140131 must be known to data manager ");

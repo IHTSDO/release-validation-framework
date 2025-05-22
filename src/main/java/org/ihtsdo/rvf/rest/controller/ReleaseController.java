@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 
 /**
  * A controller that handles API calls for uploading and checking status of
@@ -38,7 +39,7 @@ public class ReleaseController {
 			@Parameter(description = "The short product name e.g int for international RF2 release") @PathVariable final String product,
 			@Parameter(description = "The release date in yyyymmdd e.g 20170131") @PathVariable final String version) {
 		try {
-			final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), product, version);
+			final boolean result = releaseDataManager.uploadPublishedReleaseData(file.getInputStream(), file.getOriginalFilename(), product, version, Collections.emptyList());
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (final IOException | BusinessServiceException e) {
 			logger.warn("Error getting input stream from upload. Nested exception is : \n"

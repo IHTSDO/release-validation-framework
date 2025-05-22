@@ -75,6 +75,8 @@ public class TestUploadFileController {
 
 	private static final String EXCLUDED_REFSET_DESCRIPTOR_MEMBERS = "excludedRefsetDescriptorMembers";
 
+	private static final String EXCLUDED_RF2_FILES = "excludedRF2Files";
+
 	private static final String PREVIOUS_RELEASE = "previousRelease";
 
 	private static final String DROOLS_RULES_GROUPS = "droolsRulesGroups";
@@ -194,6 +196,7 @@ public class TestUploadFileController {
 			@Parameter(description = "manifest.xml file(optional)") @RequestParam(value = MANIFEST, required = false) final MultipartFile manifestFile,
 			@Parameter(description = "Assertion group names separated by a comma.") @RequestParam(value = GROUPS, required = false) final List<String> groupsList,
 			@Parameter(description = "Assertion exclusion list separated by a comma.") @RequestParam(value = ASSERTION_EXCLUSION_LIST, required = false) final List<String> assertionExclusionList,
+			@Parameter(description = "Excluded RF2 files to be validated.") @RequestParam(value = EXCLUDED_RF2_FILES, required = false) final List<String> excludedRF2Files,
 			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@Parameter(description = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
@@ -245,6 +248,7 @@ public class TestUploadFileController {
 				.setEnableChangeNotAtTaskLevelValidation(enableChangeNotAtTaskLevelValidation)
 				.setBranchPath(branchPath)
 				.setExcludedRefsetDescriptorMembers(excludedRefsetDescriptorMembers)
+				.setExcludedRF2Files(excludedRF2Files)
 				.setContentHeadTimestamp(contentHeadTimestamp)
 				.setContentBaseTimestamp(contentBaseTimestamp)
 				.addResponseQueue(responseQueue)
@@ -277,6 +281,7 @@ public class TestUploadFileController {
 			@Parameter(description = "manifest.xml file path in AWS S3") @RequestParam(name =  "manifestFileS3Path", required = false) final String manifestFileS3Path,
 			@Parameter(description = "Assertion group names") @RequestParam(value = GROUPS, required = false) final List<String> groupsList,
 			@Parameter(description = "Assertion exclusion list separated by a comma.") @RequestParam(value = ASSERTION_EXCLUSION_LIST, required = false) final List<String> assertionExclusionList,
+			@Parameter(description = "Excluded RF2 files to be validated.") @RequestParam(value = EXCLUDED_RF2_FILES, required = false) final List<String> excludedRF2Files,
 			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@Parameter(description = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
@@ -331,6 +336,7 @@ public class TestUploadFileController {
 				.setEnableChangeNotAtTaskLevelValidation(enableChangeNotAtTaskLevelValidation)
 				.setBranchPath(branchPath)
 				.setExcludedRefsetDescriptorMembers(excludedRefsetDescriptorMembers)
+				.setExcludedRF2Files(excludedRF2Files)
 				.setContentHeadTimestamp(contentHeadTimestamp)
 				.setContentBaseTimestamp(contentBaseTimestamp)
 				.addResponseQueue(responseQueue)

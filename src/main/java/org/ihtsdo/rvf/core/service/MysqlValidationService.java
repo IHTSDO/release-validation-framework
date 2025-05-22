@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.sql.SQLException;
@@ -54,20 +55,20 @@ public class MysqlValidationService {
 	
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
 
-	private final Set<String> legacyProspectiveVersions = new HashSet<>();
+	private final Set<String> schemasToRemove = new HashSet<>();
 	
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
 
 	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
 		// Clean up the prospective databases if any
-		for (String legacyProspectiveVersion : this.legacyProspectiveVersions) {
-			this.releaseDataManager.dropSchema(legacyProspectiveVersion);
+		for (String legacyVersion : this.schemasToRemove) {
+			this.releaseDataManager.dropSchema(legacyVersion);
 		}
-		this.legacyProspectiveVersions.clear();
+		this.schemasToRemove.clear();
 		this.releaseDataManager.truncateQAResult();
 
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
-		this.legacyProspectiveVersions.add(executionConfig.getProspectiveVersion());
+		this.schemasToRemove.add(executionConfig.getProspectiveVersion());
 
 		if (!StringUtils.hasLength(validationConfig.getPreviousRelease())) {
 			executionConfig.setPreviousVersion(emptyRf2File);
@@ -84,6 +85,8 @@ public class MysqlValidationService {
 			releaseVersionLoader.loadPreviousVersion(executionConfig);
 			if (releaseVersionLoader.isUnknownVersion(executionConfig.getPreviousVersion())) {
 				statusReport.addFailureMessage("Failed to load previous release " + executionConfig.getPreviousVersion());
+			} else if (!CollectionUtils.isEmpty(executionConfig.getExcludedRF2Files())) {
+				schemasToRemove.add(executionConfig.getPreviousVersion());
 			}
 
 			// load dependency release
@@ -91,7 +94,10 @@ public class MysqlValidationService {
 			lastItemLoadAttempted = "Dependency Release - " + executionConfig.getExtensionDependencyVersion();
 			if (releaseVersionLoader.isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {
 				statusReport.addFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
+			} else if (!CollectionUtils.isEmpty(executionConfig.getExcludedRF2Files())) {
+				schemasToRemove.add(executionConfig.getExtensionDependencyVersion());
 			}
+			
 			// load prospective version
 			lastItemLoadAttempted = "Prospective Release - " + executionConfig.getProspectiveVersion();
 			releaseVersionLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
@@ -142,7 +148,7 @@ public class MysqlValidationService {
 			//loading international snapshot
 			try {
 				releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig, validationConfig);
-				this.legacyProspectiveVersions.add(executionConfig.getProspectiveVersion());
+				this.schemasToRemove.add(executionConfig.getProspectiveVersion());
 			} catch (BusinessServiceException e) {
 				String errMsg = ExceptionUtils.getExceptionCause("Failed to prepare data for extension testing", e);
 				statusReport.addFailureMessage(errMsg);

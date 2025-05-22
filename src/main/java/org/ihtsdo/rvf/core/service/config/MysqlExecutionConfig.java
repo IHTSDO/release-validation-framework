@@ -12,6 +12,7 @@ public class MysqlExecutionConfig {
 	private List<String> assertionExclusionList;
 	private String defaultModuleId;
 	private List<String> includedModules;
+	private List<String> excludedRF2Files;
 	private int failureExportMax = 10;
 	private boolean firstTimeRelease;
 	private boolean standAloneProduct;
@@ -63,6 +64,14 @@ public class MysqlExecutionConfig {
 
 	public List<String> getAssertionExclusionList() {
 		return assertionExclusionList;
+	}
+
+	public void setExcludedRF2Files(List<String> excludedRF2Files) {
+		this.excludedRF2Files = excludedRF2Files;
+	}
+
+	public List<String> getExcludedRF2Files() {
+		return excludedRF2Files;
 	}
 
 	public List<String> getIncludedModules() {

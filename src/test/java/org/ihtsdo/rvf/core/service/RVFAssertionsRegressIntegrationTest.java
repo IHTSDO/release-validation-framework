@@ -85,7 +85,7 @@ public class RVFAssertionsRegressIntegrationTest {
                 assertNotNull(previousReleaseUrl, "Must not be null");
                 File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
                 ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
-                releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
+                releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous", Collections.emptyList());
                 if (testMysqlBinaryArchive) {
                     String archiveFileName = releaseDataManager.generateBinaryArchive("rvf_regression_test_previous");
                     System.out.println("Mysql binary file is archvied at " + archiveFileName);
@@ -97,7 +97,7 @@ public class RVFAssertionsRegressIntegrationTest {
             assertNotNull(prospectiveReleaseUrl, "Must not be null");
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
             ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
-            releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, rf2FilesLoaded, prospectiveFile);
+            releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, rf2FilesLoaded, Collections.emptyList(), prospectiveFile);
             resourceDataLoader.loadResourceData(PROSPECTIVE_RELEASE);
             List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource", true);
             assertNotNull(assertions);

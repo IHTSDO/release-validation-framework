@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.core.service;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -20,8 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -150,7 +150,7 @@ public class ReleaseDataManager {
 	 * for uploading prospective releases since they do not need to be stored for later use.
 	 *
 	 */
-	public boolean uploadPublishedReleaseData(final InputStream inputStream, final String fileName, final String product, final String version) throws BusinessServiceException {
+	public boolean uploadPublishedReleaseData(final InputStream inputStream, final String fileName, final String product, final String version, final List<String> excludedRF2Files) throws BusinessServiceException {
 		// copy release pack zip to data location
 		logger.info(RECEIVING_RELEASE_DATA_INFO_MSG, fileName);
 		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
@@ -170,14 +170,14 @@ public class ReleaseDataManager {
 			logger.info("Release version is already known in RVF and the existing one will be deleted and reloaded: {}", rvfVersion);
 		}
 		List<String> rf2FilesLoaded = new ArrayList<>();
-		String schemaName = loadSnomedData(rvfVersion, rf2FilesLoaded, fileDestination);
+		String schemaName = loadSnomedData(rvfVersion, rf2FilesLoaded, excludedRF2Files, fileDestination);
 		logger.info("schemaName = {}", schemaName);
 		schemaNames.add(schemaName);
 		return true;
 	}
 	
 	
-	public boolean uploadReleaseDataIntoDB(final InputStream inputStream, String fileName, String schemaName) throws BusinessServiceException {
+	public boolean uploadReleaseDataIntoDB(final InputStream inputStream, String fileName, String schemaName, List<String> excludedRF2Files) throws BusinessServiceException {
 		// copy release pack zip to data location
 		logger.info(RECEIVING_RELEASE_DATA_INFO_MSG, fileName);
 		final File fileDestination = new File(sctDataFolder.getAbsolutePath(), fileName);
@@ -197,22 +197,22 @@ public class ReleaseDataManager {
 		}
 		logger.info("Loading data into schema {}", schemaName);
 		List<String> rf2FilesLoaded = new ArrayList<>();
-		loadSnomedData(schemaName, rf2FilesLoaded, fileDestination);
+		loadSnomedData(schemaName, rf2FilesLoaded, excludedRF2Files, fileDestination);
 		logger.info("schemaName = {}", schemaName);
 		return true;
 	}
 
-	public boolean uploadPublishedReleaseData(final File releasePackZip, final String product, final String version) throws BusinessServiceException {
+	public boolean uploadPublishedReleaseData(final File releasePackZip, final String product, final String version, final List<String> excludedRF2Files) throws BusinessServiceException {
 		boolean result = false;
 		try(InputStream inputStream = new FileInputStream(releasePackZip)) {
-			 result = uploadPublishedReleaseData(inputStream, releasePackZip.getName(), product, version);
+			 result = uploadPublishedReleaseData(inputStream, releasePackZip.getName(), product, version, excludedRF2Files);
 		} catch (final IOException e) {
 			logger.error("Error during upload release:" + releasePackZip.getName(), e);
 		}
 		return result;
 	}
 	
-	public String loadSnomedData(final String versionName, List<String> rf2FilesLoaded, final File... zipDataFile) throws BusinessServiceException {
+	public String loadSnomedData(final String versionName, List<String> rf2FilesLoaded, List<String> excludedRF2Files, final File... zipDataFile) throws BusinessServiceException {
 		File outputFolder = null;
 		final String createdSchemaName = versionName.startsWith(RVF_DB_PREFIX) ? versionName : RVF_DB_PREFIX + versionName;
 		final long startTime = Calendar.getInstance().getTimeInMillis();
@@ -232,7 +232,7 @@ public class ReleaseDataManager {
 				ZipFileUtils.extractFilesFromZipToOneFolder(zipFile, outputFolder.getAbsolutePath());
 			}
 			createSchema(createdSchemaName);
-			loadReleaseFilesToDB(outputFolder, rvfDynamicDataSource, rf2FilesLoaded, createdSchemaName);
+			loadReleaseFilesToDB(outputFolder, rvfDynamicDataSource, rf2FilesLoaded, createdSchemaName, excludedRF2Files);
 		} catch (final RVFExecutionException | IOException e) {
 			List<String> fileNames = Arrays.stream(zipDataFile).map(File::getName).toList();
 			final String errorMsg = String.format("Error while loading file %s into version %s", Arrays.toString(fileNames.toArray()), versionName);
@@ -245,16 +245,34 @@ public class ReleaseDataManager {
 		return createdSchemaName;
 	}
 
-	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final RvfDynamicDataSource dataSource, List<String> rf2FilesLoaded, String schemaName) throws RVFExecutionException {
+	private void loadReleaseFilesToDB(final File rf2TextFilesDir, final RvfDynamicDataSource dataSource, List<String> rf2FilesLoaded, String schemaName, List<String> excludedRF2Files) throws RVFExecutionException {
 		if (rf2TextFilesDir != null) {
+			final List<String> allExcludedRF2Files = new ArrayList<>();
+            if (excludedRF2Files != null) {
+                allExcludedRF2Files.addAll(excludedRF2Files);
+				for (String excludedFile : excludedRF2Files) {
+					allExcludedRF2Files.add(excludedFile.replace("Delta_", "Full_").replace("Delta-", "Full-"));
+					allExcludedRF2Files.add(excludedFile.replace("Delta_", "Snapshot_").replace("Delta-", "Snapshot-"));
+				}
+			}
 			final String[] rf2Files = rf2TextFilesDir.list((dir, name) ->
-					name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2") || name.startsWith("xder2") || name.startsWith("xsct2"))
+					name.endsWith(".txt") && (name.startsWith("der2") || name.startsWith("sct2") || name.startsWith("xder2") || name.startsWith("xsct2")) && !isExcludedFile(name, allExcludedRF2Files)
 			);
 			if (rf2Files != null && rf2Files.length > 0) {
 				final ReleaseFileDataLoader dataLoader = new ReleaseFileDataLoader(dataSource, schemaName, new MySqlDataTypeConverter());
 				dataLoader.loadFilesIntoDB(rf2TextFilesDir.getAbsolutePath(), rf2Files, rf2FilesLoaded);
 			}
 		}
+	}
+
+	private boolean isExcludedFile(String name, List<String> allExcludedRF2Files) {
+		if (allExcludedRF2Files == null || allExcludedRF2Files.isEmpty()) return false;
+		String cleanFileName  = name;
+		if (cleanFileName.startsWith("x")) {
+			cleanFileName = name.substring(1);
+		}
+		String filenameToCheck = cleanFileName.replace("sct2", "rel2").replace("der2", "rel2");
+		return allExcludedRF2Files.stream().anyMatch(excludedRF2File -> filenameToCheck.contains(excludedRF2File.replaceAll("_\\d{8}.txt$", "")));
 	}
 
 	public boolean isKnownRelease(String releaseVersion) {
@@ -594,12 +612,12 @@ public class ReleaseDataManager {
 		}
 	}
 
-	public boolean uploadPublishedReleaseFromStore(String releaseFilename, String schemaName) throws BusinessServiceException {
+	public boolean uploadPublishedReleaseFromStore(String releaseFilename, String schemaName, List<String> excludedRF2Files) throws BusinessServiceException {
 		// check local disk first
 		if (!releaseStorageConfig.isUseCloud()) {
 			File uploadedFile = new File(sctDataFolder, releaseFilename);
 			if (uploadedFile.exists() && uploadedFile.canRead()) {
-				loadSnomedData(schemaName, new ArrayList<>(), uploadedFile);
+				loadSnomedData(schemaName, new ArrayList<>(), excludedRF2Files, uploadedFile);
 				return true;
 			}
 		}
@@ -610,7 +628,7 @@ public class ReleaseDataManager {
 		} catch (IOException e) {
 			throw new BusinessServiceException("Failed to read file " + releaseFilename + " via " + releaseStorageConfig.toString(), e);
 		}
-		uploadReleaseDataIntoDB(inputStream, releaseFilename, schemaName);
+		uploadReleaseDataIntoDB(inputStream, releaseFilename, schemaName, excludedRF2Files);
 		return true;
 	}
 

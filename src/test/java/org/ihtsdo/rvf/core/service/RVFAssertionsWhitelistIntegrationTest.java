@@ -75,14 +75,14 @@ public class RVFAssertionsWhitelistIntegrationTest {
             assertNotNull(previousReleaseUrl, "Must not be null");
             File previousFile = new File(previousReleaseUrl.getFile() + "_test.zip");
             ZipFileUtils.zip(previousReleaseUrl.getFile(), previousFile.getAbsolutePath());
-            releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous");
+            releaseDataManager.uploadPublishedReleaseData(previousFile, "regression_test", "previous", Collections.emptyList());
         }
         if (!releaseDataManager.isKnownRelease(PROSPECTIVE_RELEASE)) {
             final URL prospectiveReleaseUrl = RVFAssertionsWhitelistIntegrationTest.class.getResource("/SnomedCT_RegressionTest_20130731");
             assertNotNull(prospectiveReleaseUrl, "Must not be null");
             final File prospectiveFile = new File(prospectiveReleaseUrl.getFile() + "_test.zip");
             ZipFileUtils.zip(prospectiveReleaseUrl.getFile(), prospectiveFile.getAbsolutePath());
-            releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, rf2FilesLoaded, prospectiveFile);
+            releaseDataManager.loadSnomedData(PROSPECTIVE_RELEASE, rf2FilesLoaded, Collections.emptyList(), prospectiveFile);
             resourceDataLoader.loadResourceData(PROSPECTIVE_RELEASE);
             List<Assertion> assertions = assertionService.getAssertionsByKeyWords("resource", true);
             assertNotNull(assertions);
