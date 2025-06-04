@@ -290,7 +290,7 @@ public class DroolsRulesValidationService {
 			Set<String> modules = null;
 			String moduleIdStr = validationConfig.getIncludedModules();
 			if (StringUtils.isNotBlank(moduleIdStr)) {
-				modules = Sets.newHashSet(moduleIdStr.split("\\s*,\\s*"));
+				modules = Sets.newHashSet(Arrays.stream(moduleIdStr.split(",")).map(String::trim).toArray(String[]::new));
 			}
 			// Run validation
 			DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, testResourceManager);
