@@ -287,28 +287,16 @@ public class DroolsRulesValidationService {
 				assertionExclusionList = new HashSet<>(validationConfig.getAssertionExclusionList());
 			}
 
-			// Run validation
-			DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, testResourceManager);
-			invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, CollectionUtils.isEmpty(previousReleaseDirectories) ? null : previousReleaseDirectories, droolsRulesSets, assertionExclusionList, effectiveDate, null, true);
-
-			// Filter the results based on component's module IDs if the package is an extension
+			Set<String> modules = null;
 			String moduleIdStr = validationConfig.getIncludedModules();
 			if (StringUtils.isNotBlank(moduleIdStr)) {
-				Set<String> modules = Sets.newHashSet(moduleIdStr.split(","));
-				if (!modules.isEmpty()) {
-					Map<UUID, Assertion> uuidAssertionMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, Function.identity()));
-					invalidContents = invalidContents.stream().filter(item -> ERROR_COMPONENT_RULE_ID.equals(item.getRuleId())
-							|| WARNING_COMPONENT_RULE_ID.equals(item.getRuleId())
-							|| parseUUID(item.getRuleId()) == null
-							|| (!uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring") &&
-								!uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("int-authoring"))
-							|| ((uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("common-authoring") ||
-								uuidAssertionMap.get(UUID.fromString(item.getRuleId())).getGroups().contains("int-authoring"))
-							&& modules.contains(item.getComponent().getModuleId()))).collect(Collectors.toList());
-				}
+				modules = Sets.newHashSet(moduleIdStr.split("\\s*,\\s*"));
 			}
+			// Run validation
+			DroolsRF2Validator droolsRF2Validator = new DroolsRF2Validator(droolsRuleDirectoryPath, testResourceManager);
+			invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, CollectionUtils.isEmpty(previousReleaseDirectories) ? null : previousReleaseDirectories, droolsRulesSets, assertionExclusionList, effectiveDate, modules, true);
 
-			// Checking whether or not the failures are whitelisted
+			// Checking whether the failures are whitelisted
 			if (!invalidContents.isEmpty() && !whitelistService.isWhitelistDisabled()) {
 				invalidContents = checkAgainstWhiteListedItems(invalidContents);
 			}
