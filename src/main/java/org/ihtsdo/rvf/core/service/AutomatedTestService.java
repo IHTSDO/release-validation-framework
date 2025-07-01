@@ -2,15 +2,20 @@ package org.ihtsdo.rvf.core.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
+import org.ihtsdo.sso.integration.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.stereotype.Service;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -48,6 +53,7 @@ public class AutomatedTestService {
         report.setLeftReportUrl(previousReportUrl);
         report.setRightReportUrl(prospectiveReportUrl);
         report.setStatus(ValidationComparisonReport.Status.RUNNING);
+        report.setAuthenticationToken(SecurityUtil.getAuthenticationToken());
         report.setStartDate(new Date());
         try {
             buildComparisonBlockingQueue.put(report);
@@ -78,8 +84,8 @@ public class AutomatedTestService {
             ValidationComparisonReport report = null;
             try {
                 report = buildComparisonBlockingQueue.take();
-                ValidationStatusReport leftValidationReport = getValidationStatusReport(report.getLeftReportUrl());
-                ValidationStatusReport rightValidationReport = getValidationStatusReport(report.getRightReportUrl());
+                ValidationStatusReport leftValidationReport = getValidationStatusReport(report.getLeftReportUrl(), report.getAuthenticationToken());
+                ValidationStatusReport rightValidationReport = getValidationStatusReport(report.getRightReportUrl(), report.getAuthenticationToken());
                 compareReports(report, leftValidationReport, rightValidationReport);
                 pendingCompareReports.put(report.getCompareId(), report);
             } catch (Exception e) {
@@ -214,13 +220,19 @@ public class AutomatedTestService {
         });
     }
 
-    private ValidationStatusReport getValidationStatusReport(final String url) throws InterruptedException, BusinessServiceException, IOException {
+    private ValidationStatusReport getValidationStatusReport(final String url, String authenticationToken) throws InterruptedException, BusinessServiceException, IOException {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().failOnUnknownProperties(false).build();
         int count = 0;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cookie", authenticationToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
         while (true) {
             Thread.sleep(pollPeriod);
             count += pollPeriod;
-            String validationReportString = rvfRestTemplate.getForObject(url, String.class);
+            ResponseEntity<String> response = rvfRestTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            String validationReportString = response.getBody();
             if (!StringUtils.isEmpty(validationReportString)) {
                 final HighLevelValidationReport highLevelValidationReport = objectMapper.readValue(validationReportString, HighLevelValidationReport.class);
                 if (highLevelValidationReport != null && "COMPLETE".equals(highLevelValidationReport.getStatus())) {

@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.core.data.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +22,9 @@ public class ValidationComparisonReport {
     private String leftReportUrl;
 
     private String rightReportUrl;
+
+    @JsonIgnore
+    private String authenticationToken;
 
     List<ValidationComparisonItem> comparisonItems;
 
@@ -75,6 +80,14 @@ public class ValidationComparisonReport {
 
     public void setRightReportUrl(String rightReportUrl) {
         this.rightReportUrl = rightReportUrl;
+    }
+
+    public String getAuthenticationToken() {
+        return authenticationToken;
+    }
+
+    public void setAuthenticationToken(String authenticationToken) {
+        this.authenticationToken = authenticationToken;
     }
 
     public List<ValidationComparisonItem> getComparisonItems() {
