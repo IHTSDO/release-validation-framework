@@ -73,7 +73,7 @@ public class MysqlValidationService {
 		if (!StringUtils.hasLength(validationConfig.getPreviousRelease())) {
 			executionConfig.setPreviousVersion(emptyRf2File);
 		}
-		if (!StringUtils.hasLength(validationConfig.getExtensionDependency()) || executionConfig.isStandAloneProduct()) {
+		if (validationConfig.getLocalDependencyReleaseFile() == null || executionConfig.isStandAloneProduct()) {
 			executionConfig.setExtensionDependencyVersion(emptyRf2File);
 		}
 
