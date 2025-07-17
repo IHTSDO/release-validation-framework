@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.core.service;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration.Cloud;
@@ -115,9 +116,10 @@ public class ValidationVersionLoader {
 	}
 
 	private boolean checkDeltaFilesExist(File localProspectiveFile) throws ReleaseImportException {
-		try {
-			String deltaDirectoryPath = new ReleaseImporter().unzipRelease(new FileInputStream(localProspectiveFile), ReleaseImporter.ImportType.DELTA).getAbsolutePath();
-			try(Stream<Path> pathStream = Files.find(new File(deltaDirectoryPath).toPath(), 50,
+		File deltaDirectory = null;
+		try (FileInputStream fis = new FileInputStream(localProspectiveFile)){
+			deltaDirectory = new ReleaseImporter().unzipRelease(fis, ReleaseImporter.ImportType.DELTA);
+			try(Stream<Path> pathStream = Files.find(deltaDirectory.toPath(), 50,
 					(path, basicFileAttributes) -> path.toFile().getName().matches("x?(sct|rel)2_Concept_[^_]*Delta_.*.txt"))) {
 				if (pathStream.findFirst().isPresent()) {
 					return true;
@@ -128,14 +130,17 @@ public class ValidationVersionLoader {
 				return false;
 			}
 			throw new ReleaseImportException("Error while searching input files.", e);
+		} finally {
+			deleteDirectory(deltaDirectory);
 		}
 		return false;
 	}
 
 	private boolean checkFullFilesExist(File localProspectiveFile) throws ReleaseImportException {
-		try {
-			String deltaDirectoryPath = new ReleaseImporter().unzipRelease(new FileInputStream(localProspectiveFile), ReleaseImporter.ImportType.FULL).getAbsolutePath();
-			try(Stream<Path> pathStream = Files.find(new File(deltaDirectoryPath).toPath(), 50,
+		File fullDirectory = null;
+		try (FileInputStream fis = new FileInputStream(localProspectiveFile)) {
+			fullDirectory = new ReleaseImporter().unzipRelease(fis, ReleaseImporter.ImportType.FULL);
+			try(Stream<Path> pathStream = Files.find(fullDirectory.toPath(), 50,
 					(path, basicFileAttributes) -> path.toFile().getName().matches("x?(sct|rel)2_Concept_[^_]*Full_.*.txt"))) {
 				if (pathStream.findFirst().isPresent()) {
 					return true;
@@ -146,8 +151,19 @@ public class ValidationVersionLoader {
 				return false;
 			}
 			throw new ReleaseImportException("Error while searching input files.", e);
+		} finally {
+			deleteDirectory(fullDirectory);
 		}
 		return false;
+	}
+
+	private void deleteDirectory(File file) {
+		if (file == null) return;
+		try {
+			FileUtils.deleteDirectory(file);
+		} catch (IOException e) {
+			logger.warn("Failed to remove directory {}", file.getAbsolutePath());
+		}
 	}
 
 	private String loadRelease(String releaseVersion, List<String> excludedRF2Files) throws IOException, BusinessServiceException {
