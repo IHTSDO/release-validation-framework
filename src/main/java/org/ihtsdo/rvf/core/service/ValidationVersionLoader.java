@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.core.service;
 
-import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration.Cloud;
@@ -10,7 +9,6 @@ import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationJobResourceConfig;
-import org.ihtsdo.rvf.core.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.util.RvfReleaseDbSchemaNameGenerator;
@@ -65,21 +63,11 @@ public class ValidationVersionLoader {
 	@Autowired
 	private ResourceDataLoader resourceLoader;
 
-	@Autowired
-	private ValidationReleaseStorageConfig releaseStorageConfig;
-
-	private ResourceManager releaseSourceManager;
-
 	@Value("${rvf.generate.mysql.binary.archive}")
 	private boolean generateBinaryArchive;
 
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
 
-	@PostConstruct
-	public void init() {
-		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
-	}
-	
 	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws BusinessServiceException, IOException {
 		if (executionConfig.getPreviousVersion().endsWith(ZIP_FILE_EXTENSION)) {
 			String rvfDbSchema = loadRelease(executionConfig.getPreviousVersion(), executionConfig.getExcludedRF2Files());
@@ -342,7 +330,7 @@ public class ValidationVersionLoader {
 		return manifestInput;
 	}
 
-	public void downloadPreviousReleaseAndDependencyFiles(ValidationRunConfig validationConfig) throws IOException, ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException {
+	public void downloadPreviousReleaseAndDependencyFiles(ValidationRunConfig validationConfig) throws IOException, ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException {
 		// Get all dependencies from MSC
 		RF2Service rf2Service = new RF2Service();
 		Set<RF2Row> mdrsRows = rf2Service.getMDRS(validationConfig.getLocalProspectiveFile(), validationConfig.isRf2DeltaOnly());
@@ -364,15 +352,20 @@ public class ValidationVersionLoader {
 		}
 
 		if (StringUtils.hasLength(validationConfig.getPreviousRelease())) {
-			InputStream previousStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getPreviousRelease());
-			if (previousStream != null) {
+			// Get all releases from MSC
+			Map<String, List<ModuleMetadata>> allReleasesMap = moduleStorageCoordinator.getAllReleases();
+			List<ModuleMetadata> allModuleMetadata = new ArrayList<>();
+			allReleasesMap.values().forEach(allModuleMetadata::addAll);
+			ModuleMetadata moduleMetadata = allModuleMetadata.stream().filter(item -> item.getFilename().equals(validationConfig.getPreviousRelease())).findFirst().orElse(null);
+			if (moduleMetadata != null) {
 				File previousFile = File.createTempFile(validationConfig.getRunId() + "_PREVIOUS_RF2", ZIP_FILE_EXTENSION);
-				try (OutputStream out = new FileOutputStream(previousFile)) {
-					IOUtils.copy(previousStream, out);
-				} finally {
-					IOUtils.closeQuietly(previousStream, null);
-				}
+				List<ModuleMetadata> moduleMetadataList = moduleStorageCoordinator.getRelease(moduleMetadata.getCodeSystemShortName(), moduleMetadata.getIdentifyingModuleId(), moduleMetadata.getEffectiveTimeString(), true, false);
+				File releaseFile = moduleMetadataList.get(0).getFile();
+				Files.copy(releaseFile.toPath(), previousFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				validationConfig.setLocalPreviousReleaseFile(previousFile);
+				Files.delete(releaseFile.toPath());
+			} else {
+				logger.info("Previous release {} not found from Module Storage Coordinator", validationConfig.getPreviousRelease());
 			}
 		}
 	}
