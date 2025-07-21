@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -70,7 +69,7 @@ public class MysqlValidationService {
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 		this.schemasToRemove.add(executionConfig.getProspectiveVersion());
 
-		if (!StringUtils.hasLength(validationConfig.getPreviousRelease())) {
+		if (validationConfig.getLocalPreviousReleaseFile() == null) {
 			executionConfig.setPreviousVersion(emptyRf2File);
 		}
 		if (validationConfig.getLocalDependencyReleaseFile() == null || executionConfig.isStandAloneProduct()) {

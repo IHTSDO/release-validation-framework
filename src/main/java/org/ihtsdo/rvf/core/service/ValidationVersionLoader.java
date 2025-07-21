@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.core.service;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
@@ -10,6 +11,7 @@ import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationJobResourceConfig;
+import org.ihtsdo.rvf.core.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.util.RvfReleaseDbSchemaNameGenerator;
@@ -64,10 +66,19 @@ public class ValidationVersionLoader {
 	@Autowired
 	private ResourceDataLoader resourceLoader;
 
+	@Autowired
+	private ValidationReleaseStorageConfig releaseStorageConfig;
+	private ResourceManager releaseSourceManager;
+
 	@Value("${rvf.generate.mysql.binary.archive}")
 	private boolean generateBinaryArchive;
 
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
+
+	@PostConstruct
+	public void init() {
+		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
+	}
 
 	public void loadPreviousVersion(MysqlExecutionConfig executionConfig) throws BusinessServiceException, IOException {
 		if (executionConfig.getPreviousVersion().endsWith(ZIP_FILE_EXTENSION)) {
@@ -360,6 +371,10 @@ public class ValidationVersionLoader {
 					File tempFile = File.createTempFile(validationConfig.getRunId() + "_DEPENDENCY_RF2", ZIP_FILE_EXTENSION);
 					Files.copy(dependencyFile.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 					validationConfig.setLocalDependencyReleaseFile(tempFile);
+					validationConfig.setExtensionDependency(dependency.getFilename());
+					logger.info("Dependency {} found from Module Storage Coordinator", dependency.getFilename());
+				} else {
+					logger.info("Other dependency {} found from Module Storage Coordinator", dependency.getFilename());
 				}
 				Files.delete(dependencyFile.toPath());
 			}
@@ -382,6 +397,18 @@ public class ValidationVersionLoader {
 				Files.delete(releaseFile.toPath());
 			} else {
 				logger.info("Previous release {} not found from Module Storage Coordinator", validationConfig.getPreviousRelease());
+
+				// Fallback to the old versioned content bucket
+				InputStream previousStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getPreviousRelease());
+				if (previousStream != null) {
+					File previousFile = File.createTempFile(validationConfig.getRunId() + "_PREVIOUS_RF2", ZIP_FILE_EXTENSION);
+					try (OutputStream out = new FileOutputStream(previousFile)) {
+						IOUtils.copy(previousStream, out);
+					} finally {
+						IOUtils.closeQuietly(previousStream, null);
+					}
+					validationConfig.setLocalPreviousReleaseFile(previousFile);
+				}
 			}
 		}
 	}
