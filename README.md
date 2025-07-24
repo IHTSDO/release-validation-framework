@@ -1,6 +1,6 @@
 # SNOMED CT Release Validation Framework (RVF)
 
-The **Release Validation Framework (RVF)** is a Spring Boot–based web application that executes thousands of automated quality-assurance assertions against prospective **SNOMED CT release packages**. It is used by the SNOMED International tooling ecosystem to gate both daily and production releases before publication.
+The **Release Validation Framework (RVF)** is a Spring Boot–based web application that executes automated quality-assurance assertions against prospective **SNOMED CT release packages**. It is used by the SNOMED International tooling ecosystem to gate both daily and production releases before publication.
 
 RVF integrates with a rich set of backend systems—**MySQL 8** for scalable data-processing, **ActiveMQ** for asynchronous workflows, and cloud storage (e.g. **AWS S3**) for large release archives—while exposing a **REST / WebSocket API** (documented via Swagger-UI) through which UI clients and CI/CD pipelines can trigger and track validations.
 
