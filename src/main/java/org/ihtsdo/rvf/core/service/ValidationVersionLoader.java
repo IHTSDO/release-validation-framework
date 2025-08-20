@@ -17,7 +17,9 @@ import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.util.RvfReleaseDbSchemaNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.snomed.module.storage.*;
+import org.snomed.module.storage.ModuleMetadata;
+import org.snomed.module.storage.ModuleStorageCoordinator;
+import org.snomed.module.storage.ModuleStorageCoordinatorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
@@ -358,35 +360,36 @@ public class ValidationVersionLoader {
 	}
 
 	public void downloadPreviousReleaseAndDependencyFiles(ValidationRunConfig validationConfig) throws IOException, ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException {
-		// Get all dependencies from MSC
-		RF2Service rf2Service = new RF2Service();
-		Set<RF2Row> mdrsRows = rf2Service.getMDRS(validationConfig.getLocalProspectiveFile(), validationConfig.isRf2DeltaOnly());
-		Set<String> uniqueModuleIds = rf2Service.getUniqueModuleIds(validationConfig.getLocalProspectiveFile(), validationConfig.isRf2DeltaOnly());
-		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getRequiredDependencies(mdrsRows, uniqueModuleIds, true);
-		if (!dependencies.isEmpty()) {
-			for (ModuleMetadata dependency : dependencies) {
-				File dependencyFile = dependency.getFile();
-				// At the moment, RVF only allows one dependency. So that the first one will be picked up
-				if (validationConfig.getLocalDependencyReleaseFile() == null) {
-					File tempFile = File.createTempFile(validationConfig.getRunId() + "_DEPENDENCY_RF2", ZIP_FILE_EXTENSION);
-					Files.copy(dependencyFile.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-					validationConfig.setLocalDependencyReleaseFile(tempFile);
-					validationConfig.setExtensionDependency(dependency.getFilename());
-					logger.info("Dependency {} found from Module Storage Coordinator", dependency.getFilename());
-				} else {
-					logger.info("Other dependency {} found from Module Storage Coordinator", dependency.getFilename());
-				}
+		// Get all releases from MSC
+		Map<String, List<ModuleMetadata>> allReleasesMap = moduleStorageCoordinator.getAllReleases();
+		List<ModuleMetadata> allModuleMetadata = new ArrayList<>();
+		allReleasesMap.values().forEach(allModuleMetadata::addAll);
+
+		if (StringUtils.hasLength(validationConfig.getExtensionDependency())) {
+			ModuleMetadata moduleMetadata = allModuleMetadata.stream().filter(item -> item.getFilename().equals(validationConfig.getExtensionDependency())).findFirst().orElse(null);
+			if (moduleMetadata != null) {
+				File tempFile = File.createTempFile(validationConfig.getRunId() + "_DEPENDENCY_RF2", ZIP_FILE_EXTENSION);
+				List<ModuleMetadata> moduleMetadataList = moduleStorageCoordinator.getRelease(moduleMetadata.getCodeSystemShortName(), moduleMetadata.getIdentifyingModuleId(), moduleMetadata.getEffectiveTimeString(), true, false);
+				File dependencyFile = moduleMetadataList.get(0).getFile();
+				Files.copy(dependencyFile.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				validationConfig.setLocalDependencyReleaseFile(tempFile);
 				Files.delete(dependencyFile.toPath());
+			} else {
+				InputStream dependencyStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getExtensionDependency());
+				if (dependencyStream != null) {
+					File dependencyFile = File.createTempFile(validationConfig.getRunId() + "_DEPENDENCY_RF2", ZIP_FILE_EXTENSION);
+					try (OutputStream out = new FileOutputStream(dependencyFile)) {
+						IOUtils.copy(dependencyStream, out);
+					} finally {
+						IOUtils.closeQuietly(dependencyStream, null);
+					}
+					validationConfig.setLocalDependencyReleaseFile(dependencyFile);
+				}
 			}
-		} else {
-			logger.info("No dependency found from Module Storage Coordinator");
 		}
 
 		if (StringUtils.hasLength(validationConfig.getPreviousRelease())) {
 			// Get all releases from MSC
-			Map<String, List<ModuleMetadata>> allReleasesMap = moduleStorageCoordinator.getAllReleases();
-			List<ModuleMetadata> allModuleMetadata = new ArrayList<>();
-			allReleasesMap.values().forEach(allModuleMetadata::addAll);
 			ModuleMetadata moduleMetadata = allModuleMetadata.stream().filter(item -> item.getFilename().equals(validationConfig.getPreviousRelease())).findFirst().orElse(null);
 			if (moduleMetadata != null) {
 				File previousFile = File.createTempFile(validationConfig.getRunId() + "_PREVIOUS_RF2", ZIP_FILE_EXTENSION);
