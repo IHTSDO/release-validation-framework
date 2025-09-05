@@ -545,13 +545,12 @@ public class ValidationVersionLoader {
 
 	/**Current extension is already loaded into the prospective version
 	 * @param executionConfig
-	 * @param validationConfig
 	 * @return
 	 * @throws BusinessServiceException 
 	 * @throws IOException 
 	 * @throws SQLException 
 	 */
-	public void combineCurrentExtensionWithDependencySnapshot(MysqlExecutionConfig executionConfig, ValidationRunConfig validationConfig) throws BusinessServiceException {
+	public void combineCurrentExtensionWithDependencySnapshot(MysqlExecutionConfig executionConfig) throws BusinessServiceException {
 		String extensionVersion = executionConfig.getProspectiveVersion();
 		String combinedVersion = executionConfig.getProspectiveVersion() + COMBINED;
 		executionConfig.setProspectiveVersion(combinedVersion);

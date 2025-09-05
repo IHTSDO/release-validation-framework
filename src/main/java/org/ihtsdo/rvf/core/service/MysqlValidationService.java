@@ -137,7 +137,7 @@ public class MysqlValidationService {
 		if (!executionConfig.isStandAloneProduct()) {
 			//loading international snapshot
 			try {
-				releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig, validationConfig);
+				releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig);
 				this.schemasToRemove.add(executionConfig.getProspectiveVersion());
 			} catch (BusinessServiceException e) {
 				String errMsg = ExceptionUtils.getExceptionCause("Failed to prepare data for extension testing", e);
