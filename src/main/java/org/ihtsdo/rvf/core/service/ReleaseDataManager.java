@@ -10,9 +10,9 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.utils.ZipFileUtils;
+import org.ihtsdo.rvf.core.service.config.ModuleStorageResourceConfig;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationMysqlBinaryStorageConfig;
-import org.ihtsdo.rvf.core.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.core.service.util.MySqlDataTypeConverter;
 import org.ihtsdo.rvf.core.service.util.RF2FileTableMapper;
 import org.slf4j.Logger;
@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -51,7 +52,8 @@ public class ReleaseDataManager {
 
 	static  {
 		FILENAME_PATTERN_TO_EDITION_MAP.put("SpanishExtension.*_INT", "ES");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_NL_[0-9]+\\.txt", "NL");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("SimplexEdition_", "SIMPLEX");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_NL1000146_[0-9]+\\.txt", "NL");
 		FILENAME_PATTERN_TO_EDITION_MAP.put("GB1000000_[0-9]+\\.txt", "UK");
 		FILENAME_PATTERN_TO_EDITION_MAP.put("_AU1000036_[0-9]+\\.txt", "AU");
 		FILENAME_PATTERN_TO_EDITION_MAP.put("_NZ1000210_[0-9]+\\.txt", "NZ");
@@ -64,6 +66,11 @@ public class ReleaseDataManager {
 		FILENAME_PATTERN_TO_EDITION_MAP.put("_NO1000202_[0-9]+\\.txt", "NO");
 		FILENAME_PATTERN_TO_EDITION_MAP.put("_IE1000220_[0-9]+\\.txt", "IE");
 		FILENAME_PATTERN_TO_EDITION_MAP.put("_AT1000234_[0-9]+\\.txt", "AT");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_FR1000315_[0-9]+\\.txt", "FR");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_KR1000267_[0-9]+\\.txt", "KR");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_CH1000195[0-9]+\\.txt", "CH");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_LO1010000_[0-9]+\\.txt", "LOINC");
+		FILENAME_PATTERN_TO_EDITION_MAP.put("_NE1002000_[0-9]+\\.txt", "NUVA");
 		FILENAME_PATTERN_TO_EDITION_MAP.put("_TM_[0-9]+\\.txt", "TM");
 		FILENAME_PATTERN_TO_EDITION_MAP.put("_INT_[0-9]+\\.txt", "INT");
 	}
@@ -92,10 +99,10 @@ public class ReleaseDataManager {
 	private ResourceLoader cloudResourceLoader;
 
 	@Autowired
-	private ValidationReleaseStorageConfig releaseStorageConfig;
-	
-	@Autowired
 	private ValidationMysqlBinaryStorageConfig mysqlBinaryStorageConfig;
+
+	@Autowired
+	private ModuleStorageResourceConfig moduleStorageResourceConfig;
 	
 	
 	@PostConstruct
@@ -316,9 +323,8 @@ public class ReleaseDataManager {
 		logger.info("Combining known versions into {}", combinedVersionName);
 		boolean isFailed = false;
 		//create db schema for the combined version
-		final String schemaName = RVF_DB_PREFIX + combinedVersionName;
 		try {
-			createSchema(schemaName);
+			createSchema(combinedVersionName);
 		} catch (Exception e) {
 			isFailed = true;
 			logger.error(String.format("Failed to create db schema and tables for version: %s due to ", combinedVersionName), e.fillInStackTrace());
@@ -333,7 +339,7 @@ public class ReleaseDataManager {
 			logger.info("Adding known version {} to schema {}", knownSchema, combinedVersionName);
 			for (final String tableName : getValidTableNamesFromSchema(knownSchema, null)) {
 				try {
-					copyData(tableName, knownSchema, schemaName);
+					copyData(tableName, knownSchema, combinedVersionName);
 				} catch (BusinessServiceException e) {
 					logger.error(" Copy data failed.", e);
 					isFailed = true;
@@ -612,24 +618,19 @@ public class ReleaseDataManager {
 		}
 	}
 
-	public boolean uploadPublishedReleaseFromStore(String releaseFilename, String schemaName, List<String> excludedRF2Files) throws BusinessServiceException {
-		// check local disk first
-		if (!releaseStorageConfig.isUseCloud()) {
-			File uploadedFile = new File(sctDataFolder, releaseFilename);
-			if (uploadedFile.exists() && uploadedFile.canRead()) {
-				loadSnomedData(schemaName, new ArrayList<>(), excludedRF2Files, uploadedFile);
-				return true;
+	public void uploadPublishedReleaseFromStore(List<File> localReleaseFiles, String releaseFilename, String schemaName, List<String> excludedRF2Files) throws BusinessServiceException, FileNotFoundException {
+		if (!CollectionUtils.isEmpty(localReleaseFiles)) {
+			File releaseFile = localReleaseFiles.stream().filter(file -> releaseFilename.equals(file.getName())).findFirst().orElse(null);
+			if (releaseFile != null) {
+				uploadReleaseDataIntoDB(new FileInputStream(releaseFile), releaseFilename, schemaName, excludedRF2Files);
+				return;
 			}
 		}
-		InputStream inputStream;
-		try {
-			ResourceManager resourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
-			inputStream = resourceManager.readResourceStream(releaseFilename);
-		} catch (IOException e) {
-			throw new BusinessServiceException("Failed to read file " + releaseFilename + " via " + releaseStorageConfig.toString(), e);
+		// check local disk
+		File uploadedFile = new File(sctDataFolder, releaseFilename);
+		if (uploadedFile.exists() && uploadedFile.canRead()) {
+			loadSnomedData(schemaName, new ArrayList<>(), excludedRF2Files, uploadedFile);
 		}
-		uploadReleaseDataIntoDB(inputStream, releaseFilename, schemaName, excludedRF2Files);
-		return true;
 	}
 
 	private File downloadFile(InputStream input, String outputFilename) {
@@ -701,8 +702,8 @@ public class ReleaseDataManager {
 					snapShotTables.add(rs.getString(3));
 				}
 			}
-			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
-				insertIntoProspectiveDeltaTablesFromDependency(executionConfig, snapShotTables, connection);
+			if (executionConfig.isReleaseAsAnEdition() && executionConfig.isExtensionValidation()) {
+				insertIntoProspectiveDeltaTablesFromDependencies(executionConfig, snapShotTables, connection);
 			}
 			if (executionConfig.isFirstTimeRelease()) {
 				insertIntoProspectiveDeltaTablesForFirstTimeRelease(executionConfig, snapShotTables, connection);
@@ -717,7 +718,7 @@ public class ReleaseDataManager {
 			String insertSQL = INSERT_INTO + snapshotTable.replaceAll("_s$","_d")
 					+ SQL_SELECT + snapshotTable.replaceAll("_s$", "_f") + " a"
 					+ " WHERE (a.effectivetime IS NULL OR cast(a.effectivetime as datetime) > cast('" + executionConfig.getPreviousEffectiveTime() + "' as datetime))";
-			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
+			if (executionConfig.isReleaseAsAnEdition() && executionConfig.isExtensionValidation()) {
 				insertSQL += " AND NOT EXISTS (SELECT id FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " WHERE a.id = id AND a.moduleid = moduleid AND a.effectivetime = effectivetime)";
 			}
 			try (PreparedStatement ps = connection.prepareStatement(insertSQL)) {
@@ -733,7 +734,7 @@ public class ReleaseDataManager {
 			String insertSQL = INSERT_INTO + snapshotTable.replaceAll("_s$", "_d")
 					+ SQL_SELECT + snapshotTable + " a"
 					+ " WHERE (a.effectivetime IS NULL OR a.effectivetime=?)";
-			if (StringUtils.isNotEmpty(executionConfig.getPreviousDependencyEffectiveTime()) && StringUtils.isNotEmpty(executionConfig.getExtensionDependencyVersion())) {
+			if (executionConfig.isReleaseAsAnEdition() && executionConfig.isExtensionValidation()) {
 				insertSQL += " AND NOT EXISTS (SELECT id FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " WHERE a.id = id AND a.moduleid = moduleid AND a.effectivetime = effectivetime)";
 			}
 			try (PreparedStatement ps = connection.prepareStatement(insertSQL)) {
@@ -744,28 +745,36 @@ public class ReleaseDataManager {
 		}
 	}
 
-	private void insertIntoProspectiveDeltaTablesFromDependency(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
-		String insertSQL;
-		String previousDependencyEffectiveTime = executionConfig.getPreviousDependencyEffectiveTime().replace("-", "");
+	private void insertIntoProspectiveDeltaTablesFromDependencies(MysqlExecutionConfig executionConfig, Set<String> snapShotTables, Connection connection) throws SQLException {
+		if (executionConfig.getCurrentDependencyToSchemeMap() != null) {
+			for (Map.Entry<String, String> entry : executionConfig.getCurrentDependencyToSchemeMap().entrySet()) { // release filename - schema
+				String releaseFile = entry.getKey();
+				String schema = entry.getKey();
+				String previousDependencyEffectiveTime = executionConfig.getCurrentDependencyToPreviousEffectiveTimeMap() != null ? executionConfig.getCurrentDependencyToPreviousEffectiveTimeMap().get(releaseFile) : null;
+				insertIntoProspectiveDeltaTablesFromDependency(schema, previousDependencyEffectiveTime, snapShotTables, connection);
+			}
+		}
+	}
+
+	private void insertIntoProspectiveDeltaTablesFromDependency(String dependencyVersion, String previousDependencyEffectiveTime, Set<String> snapShotTables, Connection connection) throws SQLException {
+		StringBuilder insertSQL;
 		for (String snapshotTable : snapShotTables) {
-			insertSQL = INSERT_INTO + snapshotTable.replaceAll("_s$", "_d")
-					+ SQL_SELECT + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " a"
-					+ " WHERE cast(a.effectivetime as datetime) > cast('" + previousDependencyEffectiveTime + "' as datetime)";
-			try (PreparedStatement ps = connection.prepareStatement(insertSQL)) {
-				logger.info(insertSQL);
+			insertSQL = new StringBuilder();
+			insertSQL.append(INSERT_INTO).append(snapshotTable.replaceAll("_s$", "_d"))
+					.append(SQL_SELECT).append(dependencyVersion).append(".").append(snapshotTable.replaceAll("_s$", "_f")).append(" a");
+			if (previousDependencyEffectiveTime != null) {
+				insertSQL.append(" WHERE cast(a.effectivetime as datetime) > cast('").append(previousDependencyEffectiveTime).append("' as datetime)");
+			}
+			String sql = insertSQL.toString();
+			try (PreparedStatement ps = connection.prepareStatement(sql)) {
+				logger.info(sql);
 				ps.execute();
 			}
 		}
 	}
 
-	public long getPublishedReleaseLastModifiedDate(String publishedRelease) {
-		ResourceManager resourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
-        try {
-            return resourceManager.getResourceLastModifiedDate(publishedRelease);
-        } catch (Exception e) {
-            logger.warn("Failed to find the last modified for resource {}", publishedRelease, e);
-			return 0L;
-        }
+	public long getPublishedReleaseLastModifiedDate(Map<String, Long> releaseFileToCreationTimeMap, String publishedRelease) {
+		return releaseFileToCreationTimeMap != null && releaseFileToCreationTimeMap.containsKey(publishedRelease) ? releaseFileToCreationTimeMap.get(publishedRelease) : 0L;
     }
 
 	public long getBinaryArchiveSchemaLastModifiedDate(String schemaName) {

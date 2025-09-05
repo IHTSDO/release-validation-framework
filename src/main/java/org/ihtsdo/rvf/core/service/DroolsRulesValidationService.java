@@ -2,8 +2,8 @@ package org.ihtsdo.rvf.core.service;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.drools.domain.*;
 import org.ihtsdo.drools.response.InvalidContent;
 import org.ihtsdo.drools.response.Severity;
@@ -25,8 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import jakarta.annotation.PostConstruct;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -56,6 +55,9 @@ public class DroolsRulesValidationService {
 
 	@Value("${rvf.assertion.whitelist.batchsize:1000}")
 	private int whitelistBatchSize;
+
+	@Value("${rvf.empty-release-file}")
+	private String emptyRf2Filename;
 
 	@Autowired
 	private ValidationResourceConfig testResourceConfig;
@@ -176,7 +178,7 @@ public class DroolsRulesValidationService {
 	public ValidationStatusReport runDroolsAssertions(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) {
 		try {
 			long timeStart = new Date().getTime();
-			String effectiveDate = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replace("-","") : "";
+			String effectiveDate = StringUtils.hasLength(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replace("-","") : "";
 			// Check if Drools rules assertion group is specified
 			if (validationConfig.getDroolsRulesGroupList() == null || validationConfig.getDroolsRulesGroupList().isEmpty()) {
 				throw new RVFExecutionException("No drools rules assertion group specified");
@@ -289,7 +291,7 @@ public class DroolsRulesValidationService {
 
 			Set<String> modules = null;
 			String moduleIdStr = validationConfig.getIncludedModules();
-			if (StringUtils.isNotBlank(moduleIdStr)) {
+			if (StringUtils.hasLength(moduleIdStr)) {
 				modules = Sets.newHashSet(Arrays.stream(moduleIdStr.split(",")).map(String::trim).toArray(String[]::new));
 			}
 			// Run validation
@@ -314,7 +316,7 @@ public class DroolsRulesValidationService {
 			// Convert to WhitelistItem
 			List<WhitelistItem> whitelistItems = batch.stream()
 					.filter(invalidContent -> !ERROR_COMPONENT_RULE_ID.equals(invalidContent.getRuleId()) && !WARNING_COMPONENT_RULE_ID.equals(invalidContent.getRuleId()))
-					.map(invalidContent -> new WhitelistItem(invalidContent.getRuleId(), StringUtils.isEmpty(invalidContent.getComponentId())? "" : invalidContent.getComponentId(), invalidContent.getConceptId(), getAdditionalFields(invalidContent.getComponent())))
+					.map(invalidContent -> new WhitelistItem(invalidContent.getRuleId(), StringUtils.hasLength(invalidContent.getComponentId()) ? invalidContent.getComponentId() : "", invalidContent.getConceptId(), getAdditionalFields(invalidContent.getComponent())))
 					.toList();
 
 			// Send to Authoring acceptance gateway
@@ -334,35 +336,62 @@ public class DroolsRulesValidationService {
 		try (InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
 			// If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 			if (validationConfig.isRf2DeltaOnly()) {
-				if (StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
-					throw new RVFExecutionException("Drools validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
-				}
 				extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(testedReleaseFileStream, ReleaseImporter.ImportType.DELTA).getAbsolutePath());
-				try (InputStream previousReleaseStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile())) {
-					extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
-				}
 			} else {
 				// If the validation is Snapshot validation, current file must be loaded to snapshot files list
 				extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(testedReleaseFileStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
 			}
 		}
 
+		loadPreviousRelease(validationConfig, extractedRF2FilesDirectories, previousReleaseDirectories);
+		loadDependencyReleases(validationConfig, extractedRF2FilesDirectories);
+	}
+
+	private void loadDependencyReleases(ValidationRunConfig validationConfig, Set<String> extractedRF2FilesDirectories) throws RVFExecutionException, IOException, ReleaseImportException {
 		// Load the dependency package from S3 to snapshot files list before validating if the package is an MS extension and not an edition release
 		// If the package is an MS edition, it is not necessary to load the dependency
-		if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition() && !validationConfig.isStandAloneProduct()) {
-			if (StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
-				throw new RVFExecutionException("Drools validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
+		if (CollectionUtils.isEmpty(validationConfig.getExtensionDependencies()) || validationConfig.isReleaseAsAnEdition() || validationConfig.isStandAloneProduct()) return;
+
+		if (!validationConfig.getExtensionDependencies().stream().allMatch(item -> item.endsWith(EXT_ZIP))) {
+			throw new RVFExecutionException("Drools validation cannot execute when Extension Dependency is not a .zip file: " + validationConfig.getExtensionDependencies());
+		}
+		for (String filename : validationConfig.getExtensionDependencies()) {
+			File localReleaseFile = validationConfig.getLocalReleaseFiles() != null ? validationConfig.getLocalReleaseFiles().stream().filter(file -> file.getName().equals(filename)).findFirst().orElse(null) : null;
+			if (localReleaseFile == null) {
+				throw new RVFExecutionException(String.format("The dependency release file %s was not found from local store", validationConfig.getPreviousRelease()));
 			}
-			verifyLocalFile("extracting dependency file", validationConfig.getLocalDependencyReleaseFile());
-			try (InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyReleaseFile())) {
-				extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(dependencyStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
+			verifyLocalFile("extracting dependency file", localReleaseFile);
+		}
+		for (String filename : validationConfig.getExtensionDependencies()) {
+			File localReleaseFile = validationConfig.getLocalReleaseFiles() != null ? validationConfig.getLocalReleaseFiles().stream().filter(file -> file.getName().equals(filename)).findFirst().orElse(null) : null;
+			if (localReleaseFile != null) {
+				try (InputStream dependencyStream = new FileInputStream(localReleaseFile)) {
+					extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(dependencyStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
+				}
 			}
 		}
+	}
 
-		if (StringUtils.isNotBlank(validationConfig.getPreviousRelease()) && validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
-			verifyLocalFile("extracting previous release file", validationConfig.getLocalPreviousReleaseFile());
-			try (InputStream previousReleaseStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile())) {
-				previousReleaseDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
+	private void loadPreviousRelease(ValidationRunConfig validationConfig, Set<String> extractedRF2FilesDirectories, Set<String> previousReleaseDirectories) throws RVFExecutionException, IOException, ReleaseImportException {
+		// Load previous release
+		if (StringUtils.hasLength(validationConfig.getPreviousRelease())) {
+			if (!validationConfig.getPreviousRelease().endsWith(EXT_ZIP))
+				throw new RVFExecutionException("Drools validation cannot execute when Previous Release is not a .zip file: " + validationConfig.getPreviousRelease());
+
+			if (!emptyRf2Filename.equals(validationConfig.getPreviousRelease())) {
+				File localPrevousReleaseFile = validationConfig.getLocalReleaseFiles() != null ? validationConfig.getLocalReleaseFiles().stream().filter(file -> file.getName().equals(validationConfig.getPreviousRelease())).findFirst().orElse(null) : null;
+				if (localPrevousReleaseFile == null) {
+					throw new RVFExecutionException(String.format("The previous release file %s was not found from local store", validationConfig.getPreviousRelease()));
+				}
+				verifyLocalFile("extracting previous release file", localPrevousReleaseFile);
+				if (validationConfig.isRf2DeltaOnly()) {
+					try (InputStream previousReleaseStream = new FileInputStream(localPrevousReleaseFile)) {
+						extractedRF2FilesDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
+					}
+				}
+				try (InputStream previousReleaseStream = new FileInputStream(localPrevousReleaseFile)) {
+					previousReleaseDirectories.add(new ReleaseImporter().unzipRelease(previousReleaseStream, ReleaseImporter.ImportType.SNAPSHOT).getAbsolutePath());
+				}
 			}
 		}
 	}

@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.config;
 
 import org.ihtsdo.otf.jms.MessagingHelper;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.rvf.core.service.config.ModuleStorageResourceConfig;
 import org.snomed.module.storage.ModuleStorageCoordinator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

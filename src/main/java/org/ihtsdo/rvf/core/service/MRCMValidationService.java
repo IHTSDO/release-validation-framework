@@ -3,7 +3,6 @@ package org.ihtsdo.rvf.core.service;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.otf.sqs.service.dto.ConceptResult;
@@ -21,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,28 +47,35 @@ public class MRCMValidationService {
 	@Value("${rvf.assertion.whitelist.batchsize:1000}")
 	private int whitelistBatchSize;
 
+	@Value("${rvf.empty-release-file}")
+	private String emptyRf2Filename;
+
 	public ValidationStatusReport runMRCMAssertionTests(final ValidationStatusReport statusReport, ValidationRunConfig validationConfig) {
 		Set<String> extractedRF2FilesDirectory = new HashSet<>();
-		try {
-			boolean fullSnapshotRelease = !validationConfig.isRf2DeltaOnly() && StringUtils.isEmpty(validationConfig.getExtensionDependency());
+		try (InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile())) {
+			boolean fullSnapshotRelease = !validationConfig.isRf2DeltaOnly() && CollectionUtils.isEmpty(validationConfig.getExtensionDependencies());
 			int maxFailureExports = validationConfig.getFailureExportMax() != null ? validationConfig.getFailureExportMax() : 100;
-			String effectiveDate = StringUtils.isNotBlank(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replaceAll("-", "") : "";
+			String effectiveDate = StringUtils.hasLength(validationConfig.getEffectiveTime()) ? validationConfig.getEffectiveTime().replace("-", "") : "";
 			final long timeStart = System.currentTimeMillis();
 			ValidationReport report = statusReport.getResultReport();
 			ValidationService validationService = new ValidationService();
 
 			Set<InputStream> snapshotsInputStream = new HashSet<>();
-
-			InputStream testedReleaseFileStream = new FileInputStream(validationConfig.getLocalProspectiveFile());
-
 			InputStream deltaInputStream = null;
 			//If the validation is Delta validation, previous snapshot file must be loaded to snapshot files list.
 			if (validationConfig.isRf2DeltaOnly()) {
-				if (StringUtils.isBlank(validationConfig.getPreviousRelease()) || !validationConfig.getPreviousRelease().endsWith(EXT_ZIP)) {
-					throw new RVFExecutionException("MRCM validation cannot execute when Previous Release is empty or not a .zip file: " + validationConfig.getPreviousRelease());
+				if (StringUtils.hasLength(validationConfig.getPreviousRelease())) {
+					if (!validationConfig.getPreviousRelease().endsWith(EXT_ZIP))
+						throw new RVFExecutionException("MRCM validation cannot execute when Previous Release is not a .zip file: " + validationConfig.getPreviousRelease());
+					if (!emptyRf2Filename.equals(validationConfig.getPreviousRelease())) {
+						File localFile = validationConfig.getLocalReleaseFiles() != null ? validationConfig.getLocalReleaseFiles().stream().filter(file -> file.getName().equals(validationConfig.getPreviousRelease())).findFirst().orElse(null) : null;
+						if (localFile == null) {
+							throw new RVFExecutionException(String.format("The previous release file %s was not found from local store", validationConfig.getPreviousRelease()));
+						}
+						InputStream previousStream = new FileInputStream(localFile);
+						snapshotsInputStream.add(previousStream);
+					}
 				}
-				InputStream previousStream = new FileInputStream(validationConfig.getLocalPreviousReleaseFile());
-				snapshotsInputStream.add(previousStream);
 				deltaInputStream = testedReleaseFileStream;
 			} else {
 				//If the validation is Snapshot validation, current file must be loaded to snapshot files list
@@ -77,18 +84,24 @@ public class MRCMValidationService {
 
 			//Load the dependency package from S3 to snapshot files list before validating if the package is an MS extension and not an edition release
 			//If the package is an MS edition, it is not necessary to load the dependency
-			if (validationConfig.getExtensionDependency() != null && !validationConfig.isReleaseAsAnEdition() && !validationConfig.isStandAloneProduct()) {
-				if (StringUtils.isBlank(validationConfig.getExtensionDependency()) || !validationConfig.getExtensionDependency().endsWith(EXT_ZIP)) {
-					throw new RVFExecutionException("MRCM validation cannot execute when Extension Dependency is empty or not a .zip file: " + validationConfig.getExtensionDependency());
+			if (!CollectionUtils.isEmpty(validationConfig.getExtensionDependencies()) && !validationConfig.isReleaseAsAnEdition() && !validationConfig.isStandAloneProduct()) {
+				if (!validationConfig.getExtensionDependencies().stream().allMatch(item -> item.endsWith(EXT_ZIP))) {
+					throw new RVFExecutionException("MRCM validation cannot execute when Extension Dependency is not a .zip file: " + validationConfig.getExtensionDependencies());
 				}
-				InputStream dependencyStream = new FileInputStream(validationConfig.getLocalDependencyReleaseFile());
-				snapshotsInputStream.add(dependencyStream);
+				for (String dependencyFilename : validationConfig.getExtensionDependencies()) {
+					File localFile = validationConfig.getLocalReleaseFiles() != null ? validationConfig.getLocalReleaseFiles().stream().filter(file -> file.getName().equals(dependencyFilename)).findFirst().orElse(null) : null;
+					if (localFile == null) {
+						throw new RVFExecutionException(String.format("The dependency release file %s was not found from local store", dependencyFilename));
+					}
+					InputStream dependencyStream = new FileInputStream(localFile);
+					snapshotsInputStream.add(dependencyStream);
+				}
 			}
 
 			//Will filter the results based on component's module IDs if the package is an extension only
 			Set<String> moduleIds = null;
 			String moduleIdStr = validationConfig.getIncludedModules();
-			if (StringUtils.isNotBlank(moduleIdStr)) {
+			if (StringUtils.hasLength(moduleIdStr)) {
 				moduleIds = Sets.newHashSet(moduleIdStr.split(","));
 			}
 

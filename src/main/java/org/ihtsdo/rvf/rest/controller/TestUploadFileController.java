@@ -69,8 +69,6 @@ public class TestUploadFileController {
 
 	private static final String DEPENDENCY_RELEASE = "dependencyRelease";
 
-	private static final String PREVIOUS_DEPENDENCY_EFFECTIVE_TIME = "previousDependencyEffectiveTime";
-
 	private static final String BRANCH_PATH = "branchPath";
 
 	private static final String EXCLUDED_REFSET_DESCRIPTOR_MEMBERS = "excludedRefsetDescriptorMembers";
@@ -200,7 +198,6 @@ public class TestUploadFileController {
 			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@Parameter(description = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
-			@Parameter(description = "Required for extension release testing") @RequestParam(value = PREVIOUS_DEPENDENCY_EFFECTIVE_TIME, required = false) final String previousDependencyEffectiveTime,
 			@Parameter(description = "Unique number e.g Timestamp") @RequestParam(value = RUN_ID) final Long runId,
 			@Parameter(description = "Defaults to 10 when not set") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
 			@Parameter(description = "The sub folder for validation reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
@@ -230,8 +227,7 @@ public class TestUploadFileController {
 				.addAssertionExclusionList(assertionExclusionList)
 				.addManifestFile(manifestFile)
 				.addPreviousRelease(previousRelease)
-				.addDependencyRelease(extensionDependency)
-				.addPreviousDependencyEffectiveTime(previousDependencyEffectiveTime)
+				.addExtensionDependency(extensionDependency)
 				.addRunId(runId).addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)
 				.addProspectiveFilesInS3(false)
@@ -285,7 +281,6 @@ public class TestUploadFileController {
 			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
 			@Parameter(description = "Required for extension release testing") @RequestParam(value = DEPENDENCY_RELEASE, required = false) final String extensionDependency,
-			@Parameter(description = "Required for extension release testing") @RequestParam(value = PREVIOUS_DEPENDENCY_EFFECTIVE_TIME, required = false) final String previousDependencyEffectiveTime,
 			@Parameter(description = "Unique run id e.g Timestamp") @RequestParam(value = RUN_ID) final Long runId,
 			@Parameter(description = "Defaults to 10 when not set") @RequestParam(value = FAILURE_EXPORT_MAX, required = false, defaultValue = "10") final Integer exportMax,
 			@Parameter(description = "The sub folder for validation reports") @RequestParam(value = STORAGE_LOCATION) final String storageLocation,
@@ -317,8 +312,7 @@ public class TestUploadFileController {
 				.addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFileFullPath(manifestFileS3Path)
 				.addPreviousRelease(previousRelease)
-				.addDependencyRelease(extensionDependency)
-				.addPreviousDependencyEffectiveTime(previousDependencyEffectiveTime)
+				.addExtensionDependency(extensionDependency)
 				.addRunId(runId)
 				.addStorageLocation(storageLocation)
 				.addFailureExportMax(exportMax)

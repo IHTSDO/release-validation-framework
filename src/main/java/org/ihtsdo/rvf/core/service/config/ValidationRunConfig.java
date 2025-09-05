@@ -3,10 +3,15 @@ package org.ihtsdo.rvf.core.service.config;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.List;
-import java.util.StringJoiner;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.*;
 
-public class ValidationRunConfig {
+public class ValidationRunConfig implements Serializable {
+
+	@Serial
+	private static final long serialVersionUID = 1L;
+
 	private String testFileName;
 	private Long runId;
 	private transient MultipartFile file;
@@ -14,8 +19,7 @@ public class ValidationRunConfig {
 	private transient MultipartFile manifestFile;
 	private List<String> groupsList;
 	private String previousRelease;
-	private String dependencyRelease;
-	private String previousDependencyEffectiveTime;
+	private List<String> dependencyReleases;
 	private String storageLocation;
 	private String url;
 	private Integer failureExportMax;
@@ -24,8 +28,10 @@ public class ValidationRunConfig {
 	private boolean isProspectiveFileInS3;
 	private transient File localProspectiveFile;
 	private transient File localManifestFile;
-	private transient File localDependencyReleaseFile;
-	private transient File localPreviousReleaseFile;
+	private transient List<File> localReleaseFiles;
+	private transient Map<String, Long> releaseFileToCreationTimeMap;
+	private transient Map<String, String> currentDependencyToIdentifyingModuleMap;
+	private transient Map<String, String> previousDependencyEffectiveTimeMap;
 	private boolean isRf2DeltaOnly;
 	private boolean firstTimeRelease;
 	private boolean enableDrools;
@@ -172,8 +178,7 @@ public class ValidationRunConfig {
 				.add("groupsList=" + groupsList)
 				.add("assertionExclusionList=" + assertionExclusionList)
 				.add("previousRelease='" + previousRelease + "'")
-				.add("dependencyRelease='" + dependencyRelease + "'")
-				.add("previousDependencyEffectiveTime='" + previousDependencyEffectiveTime + "'")
+				.add("dependencyRelease='" + dependencyReleases + "'")
 				.add("storageLocation='" + storageLocation + "'")
 				.add("url='" + url + "'")
 				.add("failureExportMax=" + failureExportMax)
@@ -258,20 +263,20 @@ public class ValidationRunConfig {
 		this.isRf2DeltaOnly = isRf2DeltaOnly;
 	}
 
-	public String getExtensionDependency() {
-		return dependencyRelease;
+	public List<String> getExtensionDependencies() {
+		return dependencyReleases;
 	}
 
-	public void setExtensionDependency(String extensionDependency) {
-		this.dependencyRelease = extensionDependency;
+	public void setExtensionDependencies(List<String> extensionDependencies) {
+		this.dependencyReleases = extensionDependencies;
 	}
 
-	public String getPreviousDependencyEffectiveTime() {
-		return previousDependencyEffectiveTime;
-	}
-
-	public void setPreviousDependencyEffectiveTime(String previousDependencyEffectiveTime) {
-		this.previousDependencyEffectiveTime = previousDependencyEffectiveTime;
+	public ValidationRunConfig addExtensionDependency(String extensionDependency) {
+		if (this.dependencyReleases == null) {
+			this.dependencyReleases = new ArrayList<>();
+		}
+		this.dependencyReleases.add(extensionDependency);
+		return this;
 	}
 
 	public boolean isEnableDrools() {
@@ -343,14 +348,6 @@ public class ValidationRunConfig {
 		return this;
 	}
 
-	public ValidationRunConfig addDependencyRelease(String dependencyRelease) {
-		this.dependencyRelease = dependencyRelease;
-		return this;
-	}
-	public ValidationRunConfig addPreviousDependencyEffectiveTime(String previousDependencyEffectiveTime) {
-		this.previousDependencyEffectiveTime = previousDependencyEffectiveTime;
-		return this;
-	}
 	public void setPreviousRelease(String previousRelease) {
 		this.previousRelease = previousRelease;
 	}
@@ -379,20 +376,47 @@ public class ValidationRunConfig {
 		this.localManifestFile = localManifestFile;
 	}
 
-	public void setLocalDependencyReleaseFile(File localDependencyReleaseFile) {
-		this.localDependencyReleaseFile = localDependencyReleaseFile;
+	public void addLocalReleaseFile(File file) {
+		if (this.localReleaseFiles == null) {
+			this.localReleaseFiles = new ArrayList<>();
+		}
+		this.localReleaseFiles.add(file);
 	}
 
-	public File getLocalDependencyReleaseFile() {
-		return localDependencyReleaseFile;
+	public List<File> getLocalReleaseFiles() {
+		return localReleaseFiles;
 	}
 
-	public void setLocalPreviousReleaseFile(File localPreviousReleaseFile) {
-		this.localPreviousReleaseFile = localPreviousReleaseFile;
+	public void addReleaseCreationTime(String filename, Long creationTime) {
+		if (this.releaseFileToCreationTimeMap == null) {
+			this.releaseFileToCreationTimeMap = new HashMap<>();
+		}
+		this.releaseFileToCreationTimeMap.put(filename, creationTime);
 	}
 
-	public File getLocalPreviousReleaseFile() {
-		return localPreviousReleaseFile;
+	public Map<String, Long> getReleaseFileToCreationTimeMap() {
+		return releaseFileToCreationTimeMap;
+	}
+
+	public void addCurrentDependencyToIdentifyingModuleMap(String filename, String moduleId) {
+		if (this.currentDependencyToIdentifyingModuleMap == null) {
+			this.currentDependencyToIdentifyingModuleMap = new HashMap<>();
+		}
+		this.currentDependencyToIdentifyingModuleMap.put(filename, moduleId);
+	}
+	public Map<String, String> getCurrentDependencyToIdentifyingModuleMap() {
+		return currentDependencyToIdentifyingModuleMap;
+	}
+
+	public void addPreviousDependencyEffectiveTime(String moduelId, String effectiveTime) {
+		if (this.previousDependencyEffectiveTimeMap == null) {
+			this.previousDependencyEffectiveTimeMap = new HashMap<>();
+		}
+		this.previousDependencyEffectiveTimeMap.put(moduelId, effectiveTime);
+	}
+
+	public Map<String, String> getPreviousDependencyEffectiveTimeMap() {
+		return previousDependencyEffectiveTimeMap;
 	}
 
 	public ValidationRunConfig addBucketName(String bucketName) {

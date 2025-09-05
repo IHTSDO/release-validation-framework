@@ -10,7 +10,6 @@ import org.ihtsdo.rvf.core.data.model.TestRunItem;
 import org.ihtsdo.rvf.core.data.model.TestType;
 import org.ihtsdo.rvf.core.data.model.ValidationReport;
 import org.ihtsdo.rvf.core.service.ValidationReportService.State;
-import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.pojo.ValidationStatusResponse;
@@ -88,9 +87,10 @@ public class ValidationRunner {
 		try {
 			// Prepare to run validations
 			Calendar startTime = Calendar.getInstance();
-			MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
 			releaseVersionLoader.downloadProspectiveFiles(validationConfig);
-			releaseVersionLoader.downloadPreviousReleaseAndDependencyFiles(validationConfig);
+			releaseVersionLoader.downloadPreviousRelease(validationConfig);
+			releaseVersionLoader.downloadDependencyReleases(validationConfig);
+
 			if (validationConfig.getLocalProspectiveFile() == null) {
 				reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
 				String errorMsg = "Prospective file can't be null " + validationConfig.getLocalProspectiveFile();
@@ -98,7 +98,7 @@ public class ValidationRunner {
 				logger.error(errorMsg);
 			}
 			ValidationReport report = new ValidationReport();
-			report.setExecutionId(executionConfig.getExecutionId());
+			report.setExecutionId(validationConfig.getRunId());
 			report.setReportUrl(validationConfig.getUrl());
 			ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 			statusReport.setResultReport(report);
@@ -129,14 +129,11 @@ public class ValidationRunner {
 			if (validationConfig.getLocalProspectiveFile() != null) {
 				FileUtils.deleteQuietly(validationConfig.getLocalProspectiveFile());
 			}
-			if (validationConfig.getLocalDependencyReleaseFile() != null) {
-				FileUtils.deleteQuietly(validationConfig.getLocalDependencyReleaseFile());
-			}
-			if (validationConfig.getLocalPreviousReleaseFile() != null) {
-				FileUtils.deleteQuietly(validationConfig.getLocalPreviousReleaseFile());
-			}
 			if (validationConfig.getLocalManifestFile() != null) {
 				FileUtils.deleteQuietly(validationConfig.getLocalManifestFile());
+			}
+			if (validationConfig.getLocalReleaseFiles() != null) {
+				validationConfig.getLocalReleaseFiles().forEach(FileUtils::deleteQuietly);
 			}
 		}
 	}
@@ -220,7 +217,7 @@ public class ValidationRunner {
 		
 	}
 	
-	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws NoSuchAlgorithmException, IOException, DecoderException, BusinessServiceException {
+	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws NoSuchAlgorithmException, IOException, DecoderException, BusinessServiceException, RVFExecutionException {
 		logger.info("Started execution with runId {}", validationConfig.getRunId());
 		// load the filename
 		String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
@@ -228,10 +225,13 @@ public class ValidationRunner {
 		String reportStorage = validationConfig.getStorageLocation();
 		reportService.writeProgress(structureTestStartMsg, reportStorage);
 		reportService.writeState(State.RUNNING, reportStorage);
-
+		File localPrevousReleaseFile = validationConfig.getLocalReleaseFiles() != null ? validationConfig.getLocalReleaseFiles().stream().filter(file -> file.getName().equals(validationConfig.getPreviousRelease())).findFirst().orElse(null) : null;
+		if (localPrevousReleaseFile == null) {
+			throw new RVFExecutionException(String.format("The previous release file %s was not found from local store", validationConfig.getPreviousRelease()));
+		}
 		boolean isFailed = structuralTestRunner.verifyZipFileStructure(statusReport.getResultReport(), 
 																		validationConfig.getLocalProspectiveFile(),
-																		validationConfig.getLocalPreviousReleaseFile(),
+																		localPrevousReleaseFile,
 																		validationConfig.getRunId(),
 																		validationConfig.isRf2DeltaOnly(),
 																		validationConfig.getLocalManifestFile(),

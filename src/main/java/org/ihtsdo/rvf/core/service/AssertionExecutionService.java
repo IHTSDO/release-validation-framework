@@ -276,7 +276,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + "prospective release");
 		}
 
-		if (config.isReleaseValidation() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
+		if (config.isRf2DeltaOnly() && !config.isFirstTimeRelease() && previousReleaseSchema == null) {
 			throw new ConfigurationException (FAILED_TO_FIND_RVF_DB_SCHEMA + "previous release");
 		}
 	}

@@ -35,9 +35,6 @@ public class MysqlValidationService {
 	@Value("${rvf.assertion.execution.BatchSize}")
 	private int batchSize;
 
-	@Value("${rvf.empty-release-file}")
-	private String emptyRf2File;
-	
 	@Autowired
 	private ValidationReportService reportService;
 
@@ -67,39 +64,33 @@ public class MysqlValidationService {
 		this.releaseDataManager.truncateQAResult();
 
 		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
-		this.schemasToRemove.add(executionConfig.getProspectiveVersion());
-
-		if (validationConfig.getLocalPreviousReleaseFile() == null) {
-			executionConfig.setPreviousVersion(emptyRf2File);
-		}
-		if (validationConfig.getLocalDependencyReleaseFile() == null || executionConfig.isStandAloneProduct()) {
-			executionConfig.setExtensionDependencyVersion(emptyRf2File);
-		}
-
 		String reportStorage = validationConfig.getStorageLocation();
 		String lastItemLoadAttempted = "Item Unknown";
 		try {
 			// prepare release data for testing
 			lastItemLoadAttempted = "Previous Release - " + executionConfig.getPreviousVersion();
-			releaseVersionLoader.loadPreviousVersion(executionConfig);
+			releaseVersionLoader.loadPreviousVersion(validationConfig.getPreviousRelease(), validationConfig.getReleaseFileToCreationTimeMap(), executionConfig);
 			if (releaseVersionLoader.isUnknownVersion(executionConfig.getPreviousVersion())) {
 				statusReport.addFailureMessage("Failed to load previous release " + executionConfig.getPreviousVersion());
-			} else if (!CollectionUtils.isEmpty(executionConfig.getExcludedRF2Files())) {
+			} else if (!CollectionUtils.isEmpty(executionConfig.getExcludedRF2Files())) { // Keep this schema if there is no changes from the package
 				schemasToRemove.add(executionConfig.getPreviousVersion());
 			}
 
 			// load dependency release
-			releaseVersionLoader.loadDependencyVersion(executionConfig);
+			releaseVersionLoader.loadDependencyVersion(validationConfig.getExtensionDependencies(), validationConfig.getReleaseFileToCreationTimeMap(), executionConfig, schemasToRemove);
 			lastItemLoadAttempted = "Dependency Release - " + executionConfig.getExtensionDependencyVersion();
 			if (releaseVersionLoader.isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {
 				statusReport.addFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
-			} else if (!CollectionUtils.isEmpty(executionConfig.getExcludedRF2Files())) {
-				schemasToRemove.add(executionConfig.getExtensionDependencyVersion());
 			}
 			
 			// load prospective version
 			lastItemLoadAttempted = "Prospective Release - " + executionConfig.getProspectiveVersion();
-			releaseVersionLoader.loadProspectiveVersion(statusReport, executionConfig, validationConfig);
+			releaseVersionLoader.loadProspectiveVersion(validationConfig.getLocalProspectiveFile(), statusReport, executionConfig, validationConfig.getStorageLocation());
+			if (releaseVersionLoader.isUnknownVersion(executionConfig.getProspectiveVersion())) {
+				statusReport.addFailureMessage("Failed to load prospective release " + executionConfig.getProspectiveVersion());
+			} else  {
+				schemasToRemove.add(executionConfig.getProspectiveVersion());
+			}
 		} catch (Exception e) {
 			String errorMsg = String.format("Failed to load data (%s) into MySql", lastItemLoadAttempted);
 			String errorMsgWithCause = ExceptionUtils.getExceptionCause(errorMsg, e);
@@ -108,11 +99,11 @@ public class MysqlValidationService {
 			statusReport.getReportSummary().put(TestType.SQL.name(), errorMsgWithCause);
 			return statusReport;
 		}
-		if (executionConfig.isExtensionValidation()) {
+		if (executionConfig.isExtensionValidation() && !executionConfig.isReleaseAsAnEdition()) {
 			LOGGER.info("Run extension release validation with config {}", executionConfig);
 			runExtensionReleaseValidation(statusReport, validationConfig, executionConfig);
 		} else {
-			LOGGER.info("Run international release validation with config {}", executionConfig);
+			LOGGER.info("Run international/edition release validation with config {}", executionConfig);
 			runAssertionTests(statusReport, executionConfig, reportStorage);
 		}
 		return statusReport;
@@ -142,7 +133,7 @@ public class MysqlValidationService {
 		}
 		LOGGER.debug("Running release-type validations {}", releaseTypeAssertions.size());
 		String reportStorage = validationConfig.getStorageLocation();
-		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage,true);
+		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage);
 		if (!executionConfig.isStandAloneProduct()) {
 			//loading international snapshot
 			try {
@@ -155,7 +146,7 @@ public class MysqlValidationService {
 				statusReport.getReportSummary().put(TestType.SQL.name(), errMsg);
 			}
 		}
-		testItems.addAll(runAssertionTests(executionConfig, noneReleaseTypeAssertions, reportStorage, true));
+		testItems.addAll(runAssertionTests(executionConfig, noneReleaseTypeAssertions, reportStorage));
 		constructTestReport(statusReport, executionConfig, timeStart, testItems, assertions);
 	}
 	
@@ -169,14 +160,12 @@ public class MysqlValidationService {
 	}
 
 	private List<TestRunItem> runAssertionTests(MysqlExecutionConfig executionConfig, List<Assertion> assertions,
-			String reportStorage, boolean runResourceAssertions) throws ExecutionException, InterruptedException {
-		List<TestRunItem> result = new ArrayList<>();
-		if (runResourceAssertions) {
-			final List<Assertion> resourceAssertions = assertionService.getAssertionsByKeyWords("resource", true);
-			LOGGER.info("Found total resource assertions need to be run before test {}", resourceAssertions.size());
-			reportService.writeProgress(START_EXECUTING_ASSERTIONS, reportStorage);
-			result.addAll(executeAssertions(executionConfig, resourceAssertions, reportStorage));
-		}
+			String reportStorage) throws ExecutionException, InterruptedException {
+        final List<Assertion> resourceAssertions = assertionService.getAssertionsByKeyWords("resource", true);
+		LOGGER.info("Found total resource assertions need to be run before test {}", resourceAssertions.size());
+		reportService.writeProgress(START_EXECUTING_ASSERTIONS, reportStorage);
+        List<TestRunItem> result = new ArrayList<>(executeAssertions(executionConfig, resourceAssertions, reportStorage));
+
 		reportService.writeProgress(START_EXECUTING_ASSERTIONS, reportStorage);
 		LOGGER.info("Total assertions to run {}", assertions.size());
 		if (batchSize == 0) {
