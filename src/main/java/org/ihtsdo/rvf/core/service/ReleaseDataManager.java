@@ -749,7 +749,7 @@ public class ReleaseDataManager {
 		if (executionConfig.getCurrentDependencyToSchemeMap() != null) {
 			for (Map.Entry<String, String> entry : executionConfig.getCurrentDependencyToSchemeMap().entrySet()) { // release filename - schema
 				String releaseFile = entry.getKey();
-				String schema = entry.getKey();
+				String schema = entry.getValue();
 				String previousDependencyEffectiveTime = executionConfig.getCurrentDependencyToPreviousEffectiveTimeMap() != null ? executionConfig.getCurrentDependencyToPreviousEffectiveTimeMap().get(releaseFile) : null;
 				insertIntoProspectiveDeltaTablesFromDependency(schema, previousDependencyEffectiveTime, snapShotTables, connection);
 			}

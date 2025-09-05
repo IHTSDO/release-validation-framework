@@ -560,21 +560,19 @@ public class ValidationVersionLoader {
 		if (isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {
 			throw new BusinessServiceException("Extension dependency version is not found in DB:" + executionConfig.getExtensionDependencyVersion());
 		}
-		if (isExtension(validationConfig)) {
-			try {
-				releaseDataManager.copyTableData(extensionVersion, combinedVersion, DELTA_TABLE, null);
-				releaseDataManager.copyTableData(extensionVersion, combinedVersion, FULL_TABLE, null);
-				releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),
-						extensionVersion, combinedVersion, SNAPSHOT_TABLE, null);
-				resourceLoader.loadResourceData(combinedSchema);
-			} catch (Exception e) {
-				String errorMsg = e.getMessage();
-				if (errorMsg == null) {
-					errorMsg = "Failed to combine current extension with the dependency version:" 
-							+ executionConfig.getExtensionDependencyVersion();
-				}
-				throw new BusinessServiceException(errorMsg, e);
+		try {
+			releaseDataManager.copyTableData(extensionVersion, combinedVersion, DELTA_TABLE, null);
+			releaseDataManager.copyTableData(extensionVersion, combinedVersion, FULL_TABLE, null);
+			releaseDataManager.copyTableData(executionConfig.getExtensionDependencyVersion(),
+					extensionVersion, combinedVersion, SNAPSHOT_TABLE, null);
+			resourceLoader.loadResourceData(combinedSchema);
+		} catch (Exception e) {
+			String errorMsg = e.getMessage();
+			if (errorMsg == null) {
+				errorMsg = "Failed to combine current extension with the dependency version:"
+						+ executionConfig.getExtensionDependencyVersion();
 			}
-		} 
+			throw new BusinessServiceException(errorMsg, e);
+		}
 	}
 }
