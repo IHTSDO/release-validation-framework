@@ -425,12 +425,15 @@ public class ValidationVersionLoader {
 	public void downloadDependencyReleases(ValidationRunConfig validationConfig) throws IOException {
 		RF2Service rf2Service = new RF2Service();
 		Set<RF2Row> mdrsRows = rf2Service.getMDRS(validationConfig.getLocalProspectiveFile(), validationConfig.isRf2DeltaOnly());
-		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, true);
+		if (mdrsRows.isEmpty()) {
+			logger.info("No MDRS found from prospective file");
+			return;
+		}
+		Set<ModuleMetadata> dependencies = validationConfig.isRf2DeltaOnly() ? moduleStorageCoordinator.getComposition(mdrsRows, true) : moduleStorageCoordinator.getDependencies(mdrsRows, true);
 		if (!dependencies.isEmpty()) {
 			String localDirectory = createRunningDirectory(validationConfig.getRunId().toString());
 			for (ModuleMetadata dependency : dependencies) {
 				File releaseFile = dependency.getFile();
-				// At the moment, RVF only allows one dependency. So that the first one will be picked up
 				File localDependency = new File (localDirectory + Folder.SEPARATOR + dependency.getFilename());
 				if (localDependency.isFile() && localDependency.exists()) {
 					Files.delete(localDependency.toPath());

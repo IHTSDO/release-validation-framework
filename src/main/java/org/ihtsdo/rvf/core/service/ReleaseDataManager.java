@@ -331,7 +331,7 @@ public class ReleaseDataManager {
 		}
 		//select data from known version schema and insert into the new schema
 		for (String knownSchema : knownVersions) {
-			if (isKnownRelease(knownSchema)) {
+			if (!isKnownRelease(knownSchema)) {
 				isFailed = true;
 				logger.error("Known schema doesn't exist for: {}", knownSchema);
 				break;
