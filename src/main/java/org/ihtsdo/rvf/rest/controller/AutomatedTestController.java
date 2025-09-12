@@ -52,10 +52,6 @@ public class AutomatedTestController {
 
     private static final String FAILURE_EXPORT_MAX = "failureExportMax";
 
-    private static final String RUN_ID = "runId";
-
-    private static final String DEPENDENCY_RELEASE = "dependencyRelease";
-
     private static final String BRANCH_PATH = "branchPath";
 
     private static final String PREVIOUS_REPORT_URL = "previousReportUrl";

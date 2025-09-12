@@ -67,8 +67,6 @@ public class TestUploadFileController {
 
 	private static final String RUN_ID = "runId";
 
-	private static final String DEPENDENCY_RELEASE = "dependencyRelease";
-
 	private static final String BRANCH_PATH = "branchPath";
 
 	private static final String EXCLUDED_REFSET_DESCRIPTOR_MEMBERS = "excludedRefsetDescriptorMembers";
