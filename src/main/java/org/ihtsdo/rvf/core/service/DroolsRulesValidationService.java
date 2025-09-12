@@ -358,7 +358,7 @@ public class DroolsRulesValidationService {
 		for (String filename : validationConfig.getExtensionDependencies()) {
 			File localReleaseFile = validationConfig.getLocalReleaseFiles() != null ? validationConfig.getLocalReleaseFiles().stream().filter(file -> file.getName().equals(filename)).findFirst().orElse(null) : null;
 			if (localReleaseFile == null) {
-				throw new RVFExecutionException(String.format("The dependency release file %s was not found from local store", validationConfig.getPreviousRelease()));
+				throw new RVFExecutionException(String.format("The dependency release file %s was not found from local store", filename));
 			}
 			verifyLocalFile("extracting dependency file", localReleaseFile);
 		}
