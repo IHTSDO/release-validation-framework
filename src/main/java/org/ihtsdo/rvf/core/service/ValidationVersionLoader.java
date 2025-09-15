@@ -429,7 +429,7 @@ public class ValidationVersionLoader {
 			logger.info("No MDRS found from prospective file");
 			return;
 		}
-		Set<ModuleMetadata> dependencies = validationConfig.isRf2DeltaOnly() ? moduleStorageCoordinator.getComposition(mdrsRows, true) : moduleStorageCoordinator.getDependencies(mdrsRows, true);
+		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, true);
 		if (!dependencies.isEmpty()) {
 			String localDirectory = createRunningDirectory(validationConfig.getRunId().toString());
 			for (ModuleMetadata dependency : dependencies) {
