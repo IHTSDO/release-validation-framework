@@ -226,10 +226,7 @@ public class ValidationRunner {
 		reportService.writeProgress(structureTestStartMsg, reportStorage);
 		reportService.writeState(State.RUNNING, reportStorage);
 		File localPrevousReleaseFile = validationConfig.getLocalReleaseFiles() != null ? validationConfig.getLocalReleaseFiles().stream().filter(file -> file.getName().equals(validationConfig.getPreviousRelease())).findFirst().orElse(null) : null;
-		if (localPrevousReleaseFile == null) {
-			throw new RVFExecutionException(String.format("The previous release file %s was not found from local store", validationConfig.getPreviousRelease()));
-		}
-		boolean isFailed = structuralTestRunner.verifyZipFileStructure(statusReport.getResultReport(), 
+		boolean isFailed = structuralTestRunner.verifyZipFileStructure(statusReport.getResultReport(),
 																		validationConfig.getLocalProspectiveFile(),
 																		localPrevousReleaseFile,
 																		validationConfig.getRunId(),
