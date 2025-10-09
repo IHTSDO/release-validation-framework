@@ -217,7 +217,7 @@ public class ValidationRunner {
 		
 	}
 	
-	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws NoSuchAlgorithmException, IOException, DecoderException, BusinessServiceException, RVFExecutionException {
+	private void runRF2StructureTests(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws NoSuchAlgorithmException, IOException, DecoderException, BusinessServiceException {
 		logger.info("Started execution with runId {}", validationConfig.getRunId());
 		// load the filename
 		String structureTestStartMsg = "Start structure testing for release file:" + validationConfig.getTestFileName();
