@@ -10,9 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class ControllerHelper {
@@ -49,9 +49,9 @@ public class ControllerHelper {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         if (params != null) {
-            httpHeaders.setLocation(ServletUriComponentsBuilder.fromHttpUrl(requestUrl).path("/{id}").queryParams(params).buildAndExpand(id).toUri());
+            httpHeaders.setLocation(UriComponentsBuilder.fromUriString(requestUrl).path("/{id}").queryParams(params).buildAndExpand(id).toUri());
         } else {
-            httpHeaders.setLocation(ServletUriComponentsBuilder.fromHttpUrl(requestUrl).path("/{id}").buildAndExpand(id).toUri());
+            httpHeaders.setLocation(UriComponentsBuilder.fromUriString(requestUrl).path("/{id}").buildAndExpand(id).toUri());
         }
         return httpHeaders;
     }
