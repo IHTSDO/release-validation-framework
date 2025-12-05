@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.core.service;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -11,6 +12,7 @@ import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationJobResourceConfig;
+import org.ihtsdo.rvf.core.service.config.ValidationReleaseStorageConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.structure.listing.Folder;
@@ -73,7 +75,17 @@ public class ValidationVersionLoader {
 	@Value("${rvf.empty-release-file}")
 	private String emptyRf2Filename;
 
+	@Autowired
+	private ValidationReleaseStorageConfig releaseStorageConfig;
+
+	private ResourceManager releaseSourceManager;
+
 	private final Logger logger = LoggerFactory.getLogger(ValidationVersionLoader.class);
+
+	@PostConstruct
+	public void init() {
+		releaseSourceManager = new ResourceManager(releaseStorageConfig, cloudResourceLoader);
+	}
 
 	public void loadPreviousVersion(String previousRelease, Map<String, Long> releaseFileToCreationTimeMap, MysqlExecutionConfig executionConfig) throws BusinessServiceException, IOException {
 		String previous = StringUtils.hasLength(previousRelease) ? previousRelease : emptyRf2Filename;
@@ -456,42 +468,90 @@ public class ValidationVersionLoader {
 
 	}
 
-	public void downloadPreviousRelease(ValidationRunConfig validationConfig) throws ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException, IOException {
-		if (!StringUtils.hasLength(validationConfig.getPreviousRelease()) || emptyRf2Filename.equals(validationConfig.getPreviousRelease())) return;
+	public void downloadPreviousRelease(ValidationRunConfig validationConfig) throws ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException, IOException, BusinessServiceException {
+		if (!StringUtils.hasLength(validationConfig.getPreviousRelease()) || emptyRf2Filename.equals(validationConfig.getPreviousRelease())) {
+			return;
+		}
 
-		// Get all releases from MSC
+		ModuleMetadata moduleMetadata = findModuleMetadataByFilename(validationConfig.getPreviousRelease());
+		if (moduleMetadata != null) {
+			downloadPreviousReleaseFromModuleStorageCoordinator(validationConfig, moduleMetadata);
+		} else {
+			downloadPreviousReleaseFromFallbackSource(validationConfig);
+		}
+	}
+
+	private ModuleMetadata findModuleMetadataByFilename(String filename) throws ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException {
 		Map<String, List<ModuleMetadata>> allReleasesMap = moduleStorageCoordinator.getAllReleases();
 		List<ModuleMetadata> allModuleMetadata = new ArrayList<>();
 		allReleasesMap.values().forEach(allModuleMetadata::addAll);
+		return allModuleMetadata.stream()
+				.filter(item -> item.getFilename().equals(filename))
+				.findFirst()
+				.orElse(null);
+	}
 
-		ModuleMetadata moduleMetadata = allModuleMetadata.stream().filter(item -> item.getFilename().equals(validationConfig.getPreviousRelease())).findFirst().orElse(null);
-		if (moduleMetadata != null) {
-			String localDirectory = createRunningDirectory(validationConfig.getRunId().toString());
-			File localPreviousRelease = new File (localDirectory + Folder.SEPARATOR + moduleMetadata.getFilename());
-			if (localPreviousRelease.isFile() && localPreviousRelease.exists()) {
-				Files.delete(localPreviousRelease.toPath());
-			}
-			if (localPreviousRelease.createNewFile()) {
-				List<ModuleMetadata> moduleMetadataList = moduleStorageCoordinator.getRelease(moduleMetadata.getCodeSystemShortName(), moduleMetadata.getIdentifyingModuleId(), moduleMetadata.getEffectiveTimeString(), true, false);
-				File releaseFile = moduleMetadataList.get(0).getFile();
-				Files.copy(releaseFile.toPath(), localPreviousRelease.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				validationConfig.addLocalReleaseFile(localPreviousRelease);
-				validationConfig.addReleaseCreationTime(moduleMetadata.getFilename(), moduleMetadataList.get(0).getFileTimeStamp().getTime());
+	private void downloadPreviousReleaseFromModuleStorageCoordinator(ValidationRunConfig validationConfig, ModuleMetadata moduleMetadata) throws ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException, IOException, ModuleStorageCoordinatorException.OperationFailedException {
+		String localDirectory = createRunningDirectory(validationConfig.getRunId().toString());
+		File localPreviousRelease = prepareLocalFile(localDirectory, moduleMetadata.getFilename());
 
-				RF2Service rf2Service = new RF2Service();
-				Set<RF2Row> mdrsRows = rf2Service.getMDRS(localPreviousRelease, false);
-				Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, false);
-				if (!CollectionUtils.isEmpty(dependencies)) {
-					dependencies.forEach(dependency -> validationConfig.addPreviousDependencyEffectiveTime(dependency.getIdentifyingModuleId(), dependency.getEffectiveTimeString()));
-				}
-				Files.delete(releaseFile.toPath());
-			} else {
-				throw new FileExistsException(FILE_ALREADY_EXISTS_MSG + localPreviousRelease.getAbsolutePath());
-			}
-		} else {
-			String error = String.format("Previous release %s not found from Module Storage Coordinator", validationConfig.getPreviousRelease());
-			logger.error(error);
-			throw new ModuleStorageCoordinatorException.ResourceNotFoundException(error);
+		List<ModuleMetadata> moduleMetadataList = moduleStorageCoordinator.getRelease(
+				moduleMetadata.getCodeSystemShortName(),
+				moduleMetadata.getIdentifyingModuleId(),
+				moduleMetadata.getEffectiveTimeString(),
+				true,
+				false);
+		File releaseFile = moduleMetadataList.get(0).getFile();
+		try {
+			Files.copy(releaseFile.toPath(), localPreviousRelease.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			validationConfig.addLocalReleaseFile(localPreviousRelease);
+			validationConfig.addReleaseCreationTime(moduleMetadata.getFilename(), moduleMetadataList.get(0).getFileTimeStamp().getTime());
+			processDependenciesFromFile(localPreviousRelease, validationConfig);
+		} finally {
+			Files.delete(releaseFile.toPath());
+		}
+	}
+
+	private void downloadPreviousReleaseFromFallbackSource(ValidationRunConfig validationConfig) throws IOException, BusinessServiceException {
+		String warning = String.format("Previous release %s not found from Module Storage Coordinator", validationConfig.getPreviousRelease());
+		logger.warn(warning);
+
+		InputStream previousStream = releaseSourceManager.readResourceStreamOrNullIfNotExists(validationConfig.getPreviousRelease());
+		if (previousStream == null) {
+			throw new BusinessServiceException(String.format("Previous package %s could not be found", validationConfig.getPreviousRelease()));
+		}
+
+		String localDirectory = createRunningDirectory(validationConfig.getRunId().toString());
+		File localPreviousRelease = prepareLocalFile(localDirectory, validationConfig.getPreviousRelease());
+		try (OutputStream out = new FileOutputStream(localPreviousRelease)) {
+			IOUtils.copy(previousStream, out);
+		} finally {
+			IOUtils.closeQuietly(previousStream, null);
+		}
+		validationConfig.addLocalReleaseFile(localPreviousRelease);
+		validationConfig.addReleaseCreationTime(validationConfig.getPreviousRelease(), releaseSourceManager.getResourceLastModifiedDate(validationConfig.getPreviousRelease()));
+		processDependenciesFromFile(localPreviousRelease, validationConfig);
+	}
+
+	private File prepareLocalFile(String localDirectory, String filename) throws IOException {
+		File localFile = new File(localDirectory + Folder.SEPARATOR + filename);
+		if (localFile.isFile() && localFile.exists()) {
+			Files.delete(localFile.toPath());
+		}
+		if (!localFile.createNewFile()) {
+			throw new FileExistsException(FILE_ALREADY_EXISTS_MSG + localFile.getAbsolutePath());
+		}
+		return localFile;
+	}
+
+	private void processDependenciesFromFile(File releaseFile, ValidationRunConfig validationConfig) {
+		RF2Service rf2Service = new RF2Service();
+		Set<RF2Row> mdrsRows = rf2Service.getMDRS(releaseFile, false);
+		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, false);
+		if (!CollectionUtils.isEmpty(dependencies)) {
+			dependencies.forEach(dependency -> validationConfig.addPreviousDependencyEffectiveTime(
+					dependency.getIdentifyingModuleId(),
+					dependency.getEffectiveTimeString()));
 		}
 	}
 
