@@ -5,14 +5,14 @@
 
     <groupId>org.ihtsdo.snomed.rvf</groupId>
     <artifactId>release-validation-framework</artifactId>
-    <version>8.1.0</version>
+    <version>8.1.1</version>
     <packaging>jar</packaging>
     <description>SNOMED Release Validation Framework</description>
 
     <parent>
         <groupId>org.snomed</groupId>
         <artifactId>snomed-parent-bom</artifactId>
-        <version>3.12.0</version>
+        <version>3.12.3</version>
     </parent>
 
     <properties>
