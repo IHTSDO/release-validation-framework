@@ -441,7 +441,11 @@ public class ValidationVersionLoader {
 			logger.info("No MDRS found from prospective file");
 			return;
 		}
-		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, true);
+		Set<String> expectedModules = new HashSet<>();
+		if (validationConfig.getIncludedModules() != null) {
+			expectedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).toList());
+		}
+		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, expectedModules, true);
 		if (!dependencies.isEmpty()) {
 			String localDirectory = createRunningDirectory(validationConfig.getRunId().toString());
 			for (ModuleMetadata dependency : dependencies) {
@@ -465,7 +469,6 @@ public class ValidationVersionLoader {
 		} else {
 			logger.info("No dependency found from Module Storage Coordinator");
 		}
-
 	}
 
 	public void downloadPreviousRelease(ValidationRunConfig validationConfig) throws ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException, IOException, BusinessServiceException {
@@ -506,7 +509,9 @@ public class ValidationVersionLoader {
 			Files.copy(releaseFile.toPath(), localPreviousRelease.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			validationConfig.addLocalReleaseFile(localPreviousRelease);
 			validationConfig.addReleaseCreationTime(moduleMetadata.getFilename(), moduleMetadataList.get(0).getFileTimeStamp().getTime());
-			processDependenciesFromFile(localPreviousRelease, validationConfig);
+			if (validationConfig.isReleaseAsAnEdition()) {
+				processDependenciesFromFile(localPreviousRelease, validationConfig);
+			}
 		} finally {
 			Files.delete(releaseFile.toPath());
 		}
@@ -530,7 +535,9 @@ public class ValidationVersionLoader {
 		}
 		validationConfig.addLocalReleaseFile(localPreviousRelease);
 		validationConfig.addReleaseCreationTime(validationConfig.getPreviousRelease(), releaseSourceManager.getResourceLastModifiedDate(validationConfig.getPreviousRelease()));
-		processDependenciesFromFile(localPreviousRelease, validationConfig);
+		if (validationConfig.isReleaseAsAnEdition()) {
+			processDependenciesFromFile(localPreviousRelease, validationConfig);
+		}
 	}
 
 	private File prepareLocalFile(String localDirectory, String filename) throws IOException {
@@ -547,11 +554,18 @@ public class ValidationVersionLoader {
 	private void processDependenciesFromFile(File releaseFile, ValidationRunConfig validationConfig) {
 		RF2Service rf2Service = new RF2Service();
 		Set<RF2Row> mdrsRows = rf2Service.getMDRS(releaseFile, false);
-		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, false);
+		Set<String> expectedModules = new HashSet<>();
+		if (validationConfig.getIncludedModules() != null) {
+			expectedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).toList());
+		}
+		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, expectedModules, false);
 		if (!CollectionUtils.isEmpty(dependencies)) {
-			dependencies.forEach(dependency -> validationConfig.addPreviousDependencyEffectiveTime(
+			dependencies.forEach(dependency -> {
+				logger.info("Found previous dependency effective time: IdentifyingModuleId {}, EffectiveTime {}", dependency.getIdentifyingModuleId(), dependency.getEffectiveTimeString());
+				validationConfig.addPreviousDependencyEffectiveTime(
 					dependency.getIdentifyingModuleId(),
-					dependency.getEffectiveTimeString()));
+					dependency.getEffectiveTimeString());
+			});
 		}
 	}
 
