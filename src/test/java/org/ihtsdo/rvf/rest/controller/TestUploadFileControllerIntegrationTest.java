@@ -1,7 +1,7 @@
 package org.ihtsdo.rvf.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.ExecutionCommand;
@@ -12,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -31,10 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-@ContextConfiguration(classes = TestConfig.class)
-@WebAppConfiguration
-public class TestUploadFileControllerIntegrationTest {
+public class TestUploadFileControllerIntegrationTest extends IntegrationTest {
 
 	protected MockMvc mockMvc;
 

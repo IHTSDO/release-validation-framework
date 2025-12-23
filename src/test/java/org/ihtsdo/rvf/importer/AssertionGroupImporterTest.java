@@ -9,20 +9,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.repository.AssertionGroupRepository;
 import org.ihtsdo.rvf.core.service.AssertionService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { TestConfig.class })
-class AssertionGroupImporterTest {
+class AssertionGroupImporterTest extends IntegrationTest {
 
 	private static final Map<String, List<String>> groupNameToAssertionsMap;
 
