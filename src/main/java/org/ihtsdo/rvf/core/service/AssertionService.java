@@ -32,6 +32,8 @@ public interface AssertionService {
 
 	Assertion addTest(Assertion assertion, Test test);
 
+	Assertion addTest(Long assertionId, Test test);
+
 	Assertion addTests(Assertion assertion, Collection<Test> tests);
 
 	Assertion deleteTest(Assertion assertion, Test test);

@@ -1,23 +1,19 @@
 package org.ihtsdo.rvf.rest.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.data.model.ValidationComparisonReport;
 import org.ihtsdo.rvf.core.service.AutomatedTestService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {AutomatedTestService.class})
-public class AutomatedTestServiceTest {
+class AutomatedTestServiceTest extends IntegrationTest {
 
     private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().failOnUnknownProperties(false).build();
 

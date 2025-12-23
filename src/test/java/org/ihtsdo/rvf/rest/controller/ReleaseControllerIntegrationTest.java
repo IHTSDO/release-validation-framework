@@ -1,24 +1,19 @@
 package org.ihtsdo.rvf.rest.controller;
 
-import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.service.ReleaseDataManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -27,20 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * A test case for {@link AssertionController}.
  */
-@ExtendWith(SpringExtension.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = TestConfig.class)
-public class ReleaseControllerIntegrationTest {
+class ReleaseControllerIntegrationTest extends IntegrationTest {
 
 	@Autowired
 	private WebApplicationContext ctx;
 	private MockMvc mockMvc;
 	@Autowired
 	private ReleaseDataManager releaseDataManager;
-
-	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
-			MediaType.APPLICATION_JSON.getType(),
-			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 
 	@BeforeEach
 	public void setUp() throws Exception {
@@ -54,21 +42,21 @@ public class ReleaseControllerIntegrationTest {
 
 	@Test
 	public void testGetReleases() throws Exception {
-		mockMvc.perform(get("/releases").accept(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get("/releases").accept(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andDo(print());
+				.andExpect(content().contentType(APPLICATION_JSON)).andDo(print());
 	}
 
 	@Test
 	public void testGetRelease() throws Exception {
-		mockMvc.perform(get("/releases/{version}", "rvf_int_20140131").accept(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get("/releases/{version}", "rvf_int_20140131").accept(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8));
+				.andExpect(content().contentType(APPLICATION_JSON));
 	}
 
 	@Test
 	public void testGetMissingRelease() throws Exception {
-		mockMvc.perform(get("/releases/{version}", "19000131").contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get("/releases/{version}", "19000131").contentType(APPLICATION_JSON))
 				.andExpect(status().isNotFound());
 	}
 }

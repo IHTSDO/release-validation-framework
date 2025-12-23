@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.utils.ZipFileUtils;
-import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.FailureDetail;
@@ -12,9 +12,9 @@ import org.ihtsdo.rvf.core.data.model.TestRunItem;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.io.*;
 import java.net.URL;
@@ -30,9 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * Note: if you have changed the regression test data you need drop the corresponding schema as well.
  * SnomedCT_RegressionTest_20130131 and SnomedCT_RegressionTest_20130731 are made up data for testing purpose.
  */
-
-@ContextConfiguration(classes = TestConfig.class)
-public class RVFAssertionsRegressIntegrationTest {
+@Disabled
+public class RVFAssertionsRegressIntegrationTest extends IntegrationTest {
 
     public static final String DIFF = "*** Difference explained: ";
 

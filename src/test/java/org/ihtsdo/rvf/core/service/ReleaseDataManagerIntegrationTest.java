@@ -1,12 +1,9 @@
 package org.ihtsdo.rvf.core.service;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import jakarta.annotation.Resource;
 import java.io.File;
@@ -20,9 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TestConfig.class})
-public class ReleaseDataManagerIntegrationTest {
+class ReleaseDataManagerIntegrationTest extends IntegrationTest {
 	@Resource(name = "dataSource")
 	private BasicDataSource dataSource;
 	@Autowired
