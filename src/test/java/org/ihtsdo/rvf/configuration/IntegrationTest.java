@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.configuration;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.rvf.App;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mysql.MySQLContainer;
@@ -25,6 +28,7 @@ import java.sql.Connection;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class IntegrationTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationTest.class);
+	protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	@Container
 	public static MySQLContainer mySQLContainer = new TestMySQLContainer();
@@ -50,5 +54,33 @@ public abstract class IntegrationTest {
 
 	protected String getTestcontainersUrl() {
 		return mySQLContainer.getJdbcUrl();
+	}
+
+	protected String getResponseBody(ResultActions resultActions) {
+		try {
+			return resultActions.andReturn().getResponse().getContentAsString();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	protected <T> T getResponseBody(ResultActions resultActions, Class<T> clazz) {
+		try {
+			String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+			return OBJECT_MAPPER.readValue(responseBody, clazz);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	protected <T> T getResponseBody(ResultActions resultActions, TypeReference<T> typeReference) {
+		try {
+			String responseBody = resultActions.andReturn()
+					.getResponse()
+					.getContentAsString();
+			return OBJECT_MAPPER.readValue(responseBody, typeReference);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

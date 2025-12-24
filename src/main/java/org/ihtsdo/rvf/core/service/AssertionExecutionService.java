@@ -148,7 +148,8 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			// execute sql and get result
 			// create a single connection for entire test and close it after running test - avoid creating too many connections
 			try (Connection connection = rvfDynamicDataSource.getConnection(config.getProspectiveVersion())) {
-				executeCommand(assertion, config, command, connection);
+				Long failureCount = executeCommand(assertion, config, command, connection);
+				runItem.setFailureCount(failureCount);
 				long timeEnd = System.currentTimeMillis();
 				runItem.setRunTime((timeEnd - timeStart));
 			} catch (final Exception e) {
@@ -164,9 +165,10 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		return runItem;
 	}
 
-	private void executeCommand(final Assertion assertion, final MysqlExecutionConfig config,
+	private Long executeCommand(final Assertion assertion, final MysqlExecutionConfig config,
 			final ExecutionCommand command, final Connection connection)
 			throws SQLException, ConfigurationException {
+		long failureCount = 0L;
 		String[] parts = splitCommand(command);
 		// parse sql to get select statement
 		final List<String> sqlStatements = transformSql(Arrays.asList(parts), assertion, config);
@@ -184,14 +186,17 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				try (PreparedStatement preparedStatement = connection.prepareStatement(sqlStatement)) {
 					try (ResultSet execResult = preparedStatement.executeQuery()) {
 						try (Connection qaDbConnection = dataSource.getConnection()) {
-							final String insertSQL = "insert into ? (run_id, assertion_id, details) values (?, ?, ?)";
+							//final String insertSQL = "insert into ? (run_id, assertion_id, details) values (?, ?, ?)";
+							final String insertSQL = "INSERT INTO " + qaResulTableName + " (run_id, assertion_id, details) VALUES (?, ?, ?)";
 							try(PreparedStatement insertStatement = qaDbConnection.prepareStatement(insertSQL)) {
 								while (execResult.next()) {
-									insertStatement.setString(1, qaResulTableName);
-									insertStatement.setLong(2, config.getExecutionId());
-									insertStatement.setLong(3, assertion.getAssertionId());
-									insertStatement.setString(4, execResult.getString(3));
+									//insertStatement.setString(1, qaResulTableName);
+									insertStatement.setLong(1, config.getExecutionId());
+									insertStatement.setLong(2, assertion.getAssertionId());
+									insertStatement.setString(3, execResult.getString(3));
 									insertStatement.addBatch();
+
+									failureCount++;
 								}
 								// execute insert statement
 								insertStatement.executeBatch();
@@ -210,6 +215,8 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				executeUpdateStatement(connection, sqlStatement);
 			}
 		}
+
+		return failureCount;
 	}
 
 
@@ -236,7 +243,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String version = (nameParts.length >= 3 ? nameParts[2] : NOT_SUPPLIED);
 
 		String previousReleaseSchema = config.getPreviousVersion();
-		String dependencyReleaseSchema = config.getExtensionDependencyVersion();
+		String dependencyReleaseSchema = config.getExtensionDependencyVersion() == null ? "NULL" : config.getExtensionDependencyVersion();
 		validateSchemas(config, prospectiveSchema, previousReleaseSchema);
 
 		for ( String part : parts) {

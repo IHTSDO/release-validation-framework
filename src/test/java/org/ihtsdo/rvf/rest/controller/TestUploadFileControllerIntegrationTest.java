@@ -7,7 +7,6 @@ import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.ExecutionCommand;
 import org.ihtsdo.rvf.core.data.model.TestType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,12 +17,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import jakarta.servlet.ServletException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -36,9 +35,6 @@ public class TestUploadFileControllerIntegrationTest extends IntegrationTest {
 	@Autowired
 	private WebApplicationContext wac;
 	private final ObjectMapper objectMapper = new ObjectMapper();
-	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
-			MediaType.APPLICATION_JSON.getType(),
-			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 
 	@BeforeEach
 	public void setup() throws ServletException {
@@ -107,7 +103,6 @@ public class TestUploadFileControllerIntegrationTest extends IntegrationTest {
 	}
 
 	@org.junit.jupiter.api.Test
-	@Disabled
 	public void testRunPostTestPackage() throws Exception {
 
 		final Assertion assertion = new Assertion();
@@ -118,7 +113,7 @@ public class TestUploadFileControllerIntegrationTest extends IntegrationTest {
 		// we have to strip the id property added by Jackson since this causes conflicts when Spring tries to convert content into Assertion
 		paramsString = paramsString.replaceAll("\"id\":null,", "");
 		System.out.println("paramsString after = " + paramsString);
-		MvcResult returnedResponse = mockMvc.perform(post("/assertions").content(paramsString).contentType(MediaType.APPLICATION_JSON)).andReturn();
+		MvcResult returnedResponse = mockMvc.perform(post("/assertions").content(paramsString).contentType(APPLICATION_JSON)).andReturn();
 
 		final Assertion assertion2 = objectMapper.readValue(returnedResponse.getResponse().getContentAsString(), Assertion.class);
 		assertNotNull(assertion2, "Returned assertion must not be null");
@@ -149,15 +144,15 @@ public class TestUploadFileControllerIntegrationTest extends IntegrationTest {
 		System.out.println("paramsString = " + paramsString);
 		mockMvc.perform(post("/assertions/{id}/tests", assertionId)
 				.content(paramsString)
-				.contentType(MediaType.APPLICATION_JSON))
+				.contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andDo(print());
 
 		// create assertion group
 		final String name = "Test Assertion Group";
-		returnedResponse = mockMvc.perform(post("/groups").param("name", name).contentType(MediaType.APPLICATION_JSON))
+		returnedResponse = mockMvc.perform(post("/groups").param("name", name).contentType(APPLICATION_JSON))
 				.andExpect(status().isCreated())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(content().contentType(APPLICATION_JSON))
 				.andExpect(jsonPath("id").exists()).andReturn();
 		final AssertionGroup group = objectMapper.readValue(returnedResponse.getResponse().getContentAsString(), AssertionGroup.class);
 		assertNotNull(group, "Returned group must not be null");
@@ -169,9 +164,9 @@ public class TestUploadFileControllerIntegrationTest extends IntegrationTest {
 		System.out.println("paramsString = " + paramsString);
 		mockMvc.perform(post("/groups/{id}/assertions", group.getId())
 				.content(paramsString)
-				.contentType(MediaType.APPLICATION_JSON))
+				.contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(content().contentType(APPLICATION_JSON))
 				.andDo(print());
 
 

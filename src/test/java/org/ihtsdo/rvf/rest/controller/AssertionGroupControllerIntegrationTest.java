@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -45,8 +46,8 @@ public class AssertionGroupControllerIntegrationTest extends IntegrationTest {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
-			MediaType.APPLICATION_JSON.getType(),
-			MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
+			APPLICATION_JSON.getType(),
+			APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 	private AssertionGroup group;
 
 	@BeforeEach
@@ -63,10 +64,10 @@ public class AssertionGroupControllerIntegrationTest extends IntegrationTest {
 
 	@Test
 	public void testGetGroups() throws Exception {
-		mockMvc.perform(get("/groups").accept(MediaType.APPLICATION_JSON)).andDo(print());
-		mockMvc.perform(get("/groups").accept(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get("/groups").accept(APPLICATION_JSON)).andDo(print());
+		mockMvc.perform(get("/groups").accept(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(content().contentType(APPLICATION_JSON))
 				.andExpect(content().string(containsString(group.getName()))).andDo(print());
 	}
 
@@ -74,33 +75,32 @@ public class AssertionGroupControllerIntegrationTest extends IntegrationTest {
 	public void testGetGroup() throws Exception {
 
 		final Long id = group.getId();
-		mockMvc.perform(get("/groups/{id}",id).accept(MediaType.APPLICATION_JSON)).andDo(print());
-		mockMvc.perform(get("/groups/{id}",id).accept(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get("/groups/{id}",id).accept(APPLICATION_JSON)).andDo(print());
+		mockMvc.perform(get("/groups/{id}",id).accept(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(content().contentType(APPLICATION_JSON))
 				.andExpect(jsonPath("id").value(id.intValue()));
 	}
 
 	@Test
-	@Disabled
 	public void testDeleteGroup() throws Exception {
 		final Long id = group.getId();
-		mockMvc.perform(delete("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(delete("/groups/{id}", id).contentType(APPLICATION_JSON))
 				.andExpect(status().isOk()).andDo(print());
 	}
 
 	@org.junit.jupiter.api.Test
 	public void testDeleteMissingGroup() throws Exception {
 		final Long id = 29367234L;
-		mockMvc.perform(delete("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(delete("/groups/{id}", id).contentType(APPLICATION_JSON))
 				.andExpect(status().isNotFound())
-				.andExpect(content().string(containsString("Unable to find org.ihtsdo.rvf.entity.AssertionGroup with id " + id))).andDo(print());
+				.andExpect(content().string(containsString("No entity found with given id " + id))).andDo(print());
 	}
 
 	@Test
 	public void testGetMissingGroup() throws Exception {
 		final Long id = 29367234L;
-		mockMvc.perform(get("/groups/{id}", id).contentType(MediaType.APPLICATION_JSON)).andDo(print())
+		mockMvc.perform(get("/groups/{id}", id).contentType(APPLICATION_JSON)).andDo(print())
 				.andExpect(status().isNotFound())
 				.andExpect(content().string(containsString("No entity found with given id " + id))).andDo(print());
 	}
@@ -109,9 +109,9 @@ public class AssertionGroupControllerIntegrationTest extends IntegrationTest {
 	public void testCreateGroup() throws Exception {
 
 		final String name = "New Test Assertion Group";
-		mockMvc.perform(post("/groups").param("name", name).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(post("/groups").param("name", name).contentType(APPLICATION_JSON))
 				.andExpect(status().isCreated())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(content().contentType(APPLICATION_JSON))
 				.andExpect(jsonPath("id").exists()).andDo(print());
 	}
 
@@ -122,9 +122,9 @@ public class AssertionGroupControllerIntegrationTest extends IntegrationTest {
 		group.setName(updatedName);
 		final String paramsString = objectMapper.writeValueAsString(group);
 		System.out.println("paramsString = " + paramsString);
-		mockMvc.perform(put("/groups/{id}", id).param("name", updatedName).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(put("/groups/{id}", id).param("name", updatedName).contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(content().contentType(APPLICATION_JSON))
 				.andExpect(jsonPath("name").value(updatedName)).andDo(print());
 	}
 
@@ -135,9 +135,9 @@ public class AssertionGroupControllerIntegrationTest extends IntegrationTest {
 		assertionService.addAssertionToGroup(getRandomAssertion(), group);
 		assertionService.addAssertionToGroup(getRandomAssertion(), group);
 
-		mockMvc.perform(get("/groups/{id}/assertions", id).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get("/groups/{id}/assertions", id).contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(content().contentType(APPLICATION_JSON))
 				.andExpect(jsonPath("$", hasSize(2)))
 				.andExpect(jsonPath("$[0].assertionText", is("Test assertion"))).andDo(print());
 	}
@@ -152,14 +152,14 @@ public class AssertionGroupControllerIntegrationTest extends IntegrationTest {
 
 		final String paramsString = objectMapper.writeValueAsString(assertions);
 		System.out.println("paramsString = " + paramsString);
-		mockMvc.perform(post("/groups/{id}/assertions", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(post("/groups/{id}/assertions", id).content(paramsString).contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andDo(print());
+				.andExpect(content().contentType(APPLICATION_JSON)).andDo(print());
 
 		// getting tests for assertion should now contain response with text Random Test
-		mockMvc.perform(get("/groups/{id}/assertions", id).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(get("/groups/{id}/assertions", id).contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8))
+				.andExpect(content().contentType(APPLICATION_JSON))
 				.andExpect(jsonPath("$", hasSize(2)))
 				.andExpect(jsonPath("$[0].assertionText", is("Test assertion")));
 	}
@@ -174,9 +174,9 @@ public class AssertionGroupControllerIntegrationTest extends IntegrationTest {
 
 		final String paramsString = objectMapper.writeValueAsString(assertions);
 		System.out.println("paramsString = " + paramsString);
-		mockMvc.perform(delete("/groups/{id}/assertions", id).content(paramsString).contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(delete("/groups/{id}/assertions", id).content(paramsString).contentType(APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(content().contentType(APPLICATION_JSON_UTF8)).andDo(print());
+				.andExpect(content().contentType(APPLICATION_JSON)).andDo(print());
 	}
 
 
