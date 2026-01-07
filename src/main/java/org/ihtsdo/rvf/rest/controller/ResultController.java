@@ -47,7 +47,7 @@ public class ResultController {
                     responseMap.put(MESSAGE, "Validation is still running.");
                     responseMap.put("Progress", progress);
                 }
-                default -> reportService.recoverResult(responseMap, runId, storageLocation);
+                default -> reportService.recoverResult(responseMap, storageLocation);
             }
 		}
 		return new ResponseEntity<>(responseMap, returnStatus);

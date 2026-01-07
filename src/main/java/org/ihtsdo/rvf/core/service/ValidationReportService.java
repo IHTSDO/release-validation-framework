@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.core.service;
 
+import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,6 +13,7 @@ import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,9 @@ public class ValidationReportService {
 	
 	@Autowired
 	private ResourceLoader cloudResourceLoader;
+	
+	@Value("${rvf.jackson.max-string-length}")
+	private int maxStringLength;
 	
 	private String stateFilePath;
 	private String resultsFilePath;
@@ -122,7 +127,7 @@ public class ValidationReportService {
 		 return progressMsg;
 	 }
 	 
-	 public void recoverResult(final Map<String, Object> responseMap, Long runId, String storageLocation) throws IOException {
+	 public void recoverResult(final Map<String, Object> responseMap, String storageLocation) throws IOException {
 			String filePath = storageLocation + resultsFilePath;
 			try (InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath);
 				InputStreamReader inputStreamReader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
@@ -131,6 +136,12 @@ public class ValidationReportService {
 					logger.warn("Failed to find results file {}, via resource config {}", filePath, jobResourceConfig);
 				} else {
 					ObjectMapper mapper = new ObjectMapper();
+					// Configure stream constraints to allow larger string values (default is 20MB)
+					// Value is configurable via rvf.jackson.max-string-length property (default: Integer.MAX_VALUE)
+					StreamReadConstraints streamReadConstraints = StreamReadConstraints.builder()
+							.maxStringLength(maxStringLength)
+							.build();
+					mapper.getFactory().setStreamReadConstraints(streamReadConstraints);
 					jsonResults  = mapper.readValue(inputStreamReader, Map.class);
 				}
 				if (jsonResults == null) {
