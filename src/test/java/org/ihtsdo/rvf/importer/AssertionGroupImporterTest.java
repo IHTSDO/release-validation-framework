@@ -17,7 +17,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 	private static final Map<String, List<String>> groupNameToAssertionsMap;
 
 	static {
-		groupNameToAssertionsMap = new HashMap<String, List<String>>();
+		groupNameToAssertionsMap = new HashMap<>();
 		groupNameToAssertionsMap.put("file-centric-validation",
 				List.of("82cc38ce-75d6-429e-bf45-551a100bfc52", "50e773f8-072c-4426-a8e3-50b0f942822c",
 						"292b4427-0cce-493d-b63c-27cd249eafea", "3b2c1824-8445-410e-8ae2-d943be01c33f",
@@ -2672,6 +2672,10 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"e2aa5b09-5754-484f-9eb8-bb18732617ef", "645e3292-18d6-41df-b42a-58ba4d7240d5",
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "d5c80582-ad32-4f26-a729-a91fe04a06b2",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+		groupNameToAssertionsMap.put("common-refset",
+				List.of("6a407415-8415-4870-a6ef-b5bc22f73c1f",
+						"0e898ae0-15cb-45f9-b032-041193aa79e8",
+						"fc0f240c-4a07-4995-acf6-52a7f41f2ce6"));
 	}
 
 	@Autowired
