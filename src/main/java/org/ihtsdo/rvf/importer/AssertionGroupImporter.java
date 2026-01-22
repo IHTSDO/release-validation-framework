@@ -53,6 +53,7 @@ public class AssertionGroupImporter {
 		STANDALONE_RELEASE("STANDALONE_RELEASE", "standalone-release"),
 		LOINC_AUTHORING("LOINC", "loinc-authoring"),
 		SIMPLEX_RELEASE("SIMPLEX", "simplex-release"),
+		COMMON_REFSET ("COMMON", "common-refset"),
 		FIRST_TIME_LOINC_VALIDATION ("LOINC", "first-time-loinc-validation"),
 		FIRST_TIME_COMMON_EDITION_VALIDATION ("COMMON", "first-time-common-edition"),
 		LOINC_EDITION ("LOINC", "LoincEdition"),
@@ -348,6 +349,13 @@ public class AssertionGroupImporter {
 			"57ae69cd-26f0-4001-ba2f-ae56129e2e28"
 	};
 
+	private static final String[] COMMON_REFSETS_ASSERTIONS = {
+			"6a407415-8415-4870-a6ef-b5bc22f73c1f",
+			"0e898ae0-15cb-45f9-b032-041193aa79e8",
+			"fc0f240c-4a07-4995-acf6-52a7f41f2ce6"
+
+	};
+
 /* the following were included but feel that they should be validated for project level as well.
 	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
 	"72184790-79b9-11e1-b0c4-0800200c9a66",
@@ -411,6 +419,8 @@ public class AssertionGroupImporter {
 		AssertionGroupName groupName = AssertionGroupName.fromName(assertionGroup.getName());
 		if (groupName != null) {
 			switch (groupName) {
+				case COMMON_REFSET ->
+						addAssertionToCommonRefset(allAssertions, assertionGroup);
 				case FILE_CENTRIC_VALIDATION, RELEASE_TYPE_VALIDATION, COMPONENT_CENTRIC_VALIDATION ->
 						addAssertionsByKeyWord(allAssertions, assertionGroup);
 				case MDRS_VALIDATION, STANDALONE_RELEASE ->
@@ -429,6 +439,14 @@ public class AssertionGroupImporter {
 				case STATED_RELATIONSHIPS_RELEASE_VALIDATION ->
 						addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, true);
 				default -> LOGGER.warn("unrecognized group: {}", assertionGroup.getName());
+			}
+		}
+	}
+
+	private void addAssertionToCommonRefset(List<Assertion> allAssertions, AssertionGroup group) {
+		for (Assertion assertion : allAssertions) {
+			if (Arrays.stream(COMMON_REFSETS_ASSERTIONS).anyMatch(item -> assertion.getUuid().toString().equals(item))) {
+				assertionService.addAssertionToGroup(assertion, group);
 			}
 		}
 	}
