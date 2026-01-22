@@ -17,7 +17,6 @@ import org.ihtsdo.rvf.core.service.config.ValidationResourceConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.whitelist.WhitelistItem;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snomed.otf.script.dao.SimpleStorageResourceLoader;
@@ -157,7 +156,6 @@ public class DroolsRulesValidationService {
 		return line.contains(type);
 	}
 
-	@NotNull
 	private static String buildSeverity(boolean severityWarning, boolean severityError) {
 		Set<String> severities = new HashSet<>();
 		if (severityWarning) severities.add("WARNING");
@@ -309,7 +307,6 @@ public class DroolsRulesValidationService {
 		return invalidContents;
 	}
 
-	@NotNull
 	private List<InvalidContent> checkAgainstWhiteListedItems(List<InvalidContent> invalidContents) throws RestClientException {
 		List<InvalidContent> newInvalidContents = new ArrayList<>();
 		for (List<InvalidContent> batch : Iterables.partition(invalidContents, whitelistBatchSize)) {
