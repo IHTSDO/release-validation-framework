@@ -42,6 +42,13 @@ public abstract class DataResourceConfig {
         basicDataSource.setMaxWait(20000);
         basicDataSource.setValidationQuery("SELECT 1");
         basicDataSource.setDefaultTransactionIsolation(2);
+        
+        // Idle connection eviction settings to prevent stale connections
+        // Evict connections idle for 30 minutes (well before MySQL's 8-hour wait_timeout)
+        basicDataSource.setTimeBetweenEvictionRunsMillis(60000); // Check every 60 seconds
+        basicDataSource.setMinEvictableIdleTimeMillis(1800000); // Evict connections idle for 30 minutes
+        basicDataSource.setNumTestsPerEvictionRun(3); // Test 3 connections per eviction run
+        
         return basicDataSource;
     }
 

@@ -52,6 +52,12 @@ public class RvfDynamicDataSource {
 		newDataSource.setMaxActive(dataSource.getMaxActive());
 		newDataSource.setMaxWait(dataSource.getMaxWait());
 		newDataSource.setDefaultTransactionIsolation(dataSource.getDefaultTransactionIsolation());
+		
+		// Idle connection eviction settings to prevent stale connections (match main datasource)
+		newDataSource.setTimeBetweenEvictionRunsMillis(60000); // Check every 60 seconds
+		newDataSource.setMinEvictableIdleTimeMillis(1800000); // Evict connections idle for 30 minutes
+		newDataSource.setNumTestsPerEvictionRun(3); // Test 3 connections per eviction run
+		
 		return newDataSource;
 	}
 
