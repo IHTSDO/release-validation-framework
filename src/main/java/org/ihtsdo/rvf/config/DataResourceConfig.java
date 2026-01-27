@@ -26,8 +26,36 @@ public abstract class DataResourceConfig {
     @Value("${rvf.master.schema.name}")
     private String rvfMasterSchemaName;
 
+    @Value("${rvf.datasource.maxActive:200}")
+    private int maxActive;
+
+    @Value("${rvf.datasource.maxWait:20000}")
+    private long maxWait;
+
+    @Value("${rvf.datasource.testOnBorrow:true}")
+    private boolean testOnBorrow;
+
+    @Value("${rvf.datasource.testWhileIdle:true}")
+    private boolean testWhileIdle;
+
+    @Value("${rvf.datasource.validationQuery:SELECT 1}")
+    private String validationQuery;
+
+    @Value("${rvf.datasource.defaultTransactionIsolation:2}")
+    private int defaultTransactionIsolation;
+
+    @Value("${rvf.datasource.timeBetweenEvictionRunsMillis:60000}")
+    private long timeBetweenEvictionRunsMillis;
+
+    @Value("${rvf.datasource.minEvictableIdleTimeMillis:1800000}")
+    private long minEvictableIdleTimeMillis;
+
+    @Value("${rvf.datasource.numTestsPerEvictionRun:3}")
+    private int numTestsPerEvictionRun;
+
     @Autowired
     private AssertionsResourceConfig assertionsResourceConfig;
+    
     @Bean(name = "dataSource")
     public BasicDataSource getDataSource() {
         BasicDataSource basicDataSource = new BasicDataSource();
@@ -36,18 +64,18 @@ public abstract class DataResourceConfig {
         basicDataSource.setPassword(password);
         basicDataSource.setDriverClassName(driverClassName);
         basicDataSource.setDefaultCatalog(rvfMasterSchemaName);
-        basicDataSource.setTestOnBorrow(true);
-        basicDataSource.setTestWhileIdle(true);
-        basicDataSource.setMaxActive(200);
-        basicDataSource.setMaxWait(20000);
-        basicDataSource.setValidationQuery("SELECT 1");
-        basicDataSource.setDefaultTransactionIsolation(2);
+        basicDataSource.setTestOnBorrow(testOnBorrow);
+        basicDataSource.setTestWhileIdle(testWhileIdle);
+        basicDataSource.setMaxActive(maxActive);
+        basicDataSource.setMaxWait(maxWait);
+        basicDataSource.setValidationQuery(validationQuery);
+        basicDataSource.setDefaultTransactionIsolation(defaultTransactionIsolation);
         
         // Idle connection eviction settings to prevent stale connections
-        // Evict connections idle for 30 minutes (well before MySQL's 8-hour wait_timeout)
-        basicDataSource.setTimeBetweenEvictionRunsMillis(60000); // Check every 60 seconds
-        basicDataSource.setMinEvictableIdleTimeMillis(1800000); // Evict connections idle for 30 minutes
-        basicDataSource.setNumTestsPerEvictionRun(3); // Test 3 connections per eviction run
+        // Evict connections idle for configured time (default: 30 minutes, well before MySQL's 8-hour wait_timeout)
+        basicDataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+        basicDataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+        basicDataSource.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
         
         return basicDataSource;
     }
