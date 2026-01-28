@@ -2675,7 +2675,9 @@ class AssertionGroupImporterTest extends IntegrationTest {
 		groupNameToAssertionsMap.put("common-refset",
 				List.of("6a407415-8415-4870-a6ef-b5bc22f73c1f",
 						"0e898ae0-15cb-45f9-b032-041193aa79e8",
-						"fc0f240c-4a07-4995-acf6-52a7f41f2ce6"));
+						"fc0f240c-4a07-4995-acf6-52a7f41f2ce6",
+						"1a4e40a9-cf14-4703-b206-9f2fbeb56c7f",
+						"c779d282-3c4d-4c16-a8a6-8d1a621b247d"));
 	}
 
 	@Autowired
