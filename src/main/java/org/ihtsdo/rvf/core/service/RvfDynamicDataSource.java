@@ -1,9 +1,10 @@
 package org.ihtsdo.rvf.core.service;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.rvf.core.service.config.DataSourceProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.Resource;
@@ -22,32 +23,8 @@ public class RvfDynamicDataSource {
 	private final ConcurrentHashMap<String, BasicDataSource> schemaDatasourceMap = new ConcurrentHashMap<>();
 	private final static Logger LOGGER = LoggerFactory.getLogger(RvfDynamicDataSource.class);
 
-	@Value("${rvf.datasource.maxActive:200}")
-	private int maxActive;
-
-	@Value("${rvf.datasource.maxWait:20000}")
-	private long maxWait;
-
-	@Value("${rvf.datasource.testOnBorrow:true}")
-	private boolean testOnBorrow;
-
-	@Value("${rvf.datasource.testWhileIdle:true}")
-	private boolean testWhileIdle;
-
-	@Value("${rvf.datasource.validationQuery:SELECT 1}")
-	private String validationQuery;
-
-	@Value("${rvf.datasource.defaultTransactionIsolation:2}")
-	private int defaultTransactionIsolation;
-
-	@Value("${rvf.datasource.timeBetweenEvictionRunsMillis:60000}")
-	private long timeBetweenEvictionRunsMillis;
-
-	@Value("${rvf.datasource.minEvictableIdleTimeMillis:1800000}")
-	private long minEvictableIdleTimeMillis;
-
-	@Value("${rvf.datasource.numTestsPerEvictionRun:3}")
-	private int numTestsPerEvictionRun;
+	@Autowired
+	private DataSourceProperties dataSourceProperties;
 
 	/**
 	 * Returns a connection for the given schema. It uses an underlying map to store relevant {@link org.apache.commons.dbcp.BasicDataSource}
@@ -60,32 +37,22 @@ public class RvfDynamicDataSource {
 			LOGGER.debug("get connection for schema:" + schema);
 			return schemaDatasourceMap.get(schema).getConnection();
 		}
-		BasicDataSource dataSource = createDataSource(schema);
+		BasicDataSource dataSource = createDataSource(schema, dataSourceProperties);
 		schemaDatasourceMap.putIfAbsent(schema, dataSource);
 		LOGGER.debug("Datasource created for schema:" + schema);
 		return dataSource.getConnection();
 	}
 	
-	public BasicDataSource createDataSource(String schema) {
+	private BasicDataSource createDataSource(String schema, DataSourceProperties dataSourceProperties) {
 		BasicDataSource newDataSource = new BasicDataSource();
 		newDataSource.setUrl(dataSource.getUrl());
 		newDataSource.setUsername(dataSource.getUsername());
 		newDataSource.setPassword(dataSource.getPassword());
 		newDataSource.setDriverClassName(dataSource.getDriverClassName());
 		newDataSource.setDefaultCatalog(schema);
-		newDataSource.setTestOnBorrow(testOnBorrow);
 		newDataSource.setTestOnReturn(true);
-		newDataSource.setTestWhileIdle(testWhileIdle);
-		newDataSource.setValidationQuery(validationQuery);
-		newDataSource.setMaxActive(maxActive);
-		newDataSource.setMaxWait(maxWait);
-		newDataSource.setDefaultTransactionIsolation(defaultTransactionIsolation);
 		
-		// Idle connection eviction settings to prevent stale connections (match main datasource)
-		// Use same configuration properties as main datasource to ensure consistency
-		newDataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
-		newDataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-		newDataSource.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
+		dataSourceProperties.configureDataSource(newDataSource);
 		
 		return newDataSource;
 	}
