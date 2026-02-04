@@ -5,18 +5,17 @@
 
     <groupId>org.ihtsdo.snomed.rvf</groupId>
     <artifactId>release-validation-framework</artifactId>
-    <version>8.1.2</version>
+    <version>8.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>SNOMED Release Validation Framework</description>
 
     <parent>
         <groupId>org.snomed</groupId>
         <artifactId>snomed-parent-bom</artifactId>
-        <version>3.12.4</version>
+        <version>3.13.0-SNAPSHOT</version>
     </parent>
 
     <properties>
-        <skip.integration.tests>true</skip.integration.tests>
         <packageName>rvf-api</packageName>
         <docker.registry>docker.io</docker.registry>
         <docker.allowInsecureRegistries>false</docker.allowInsecureRegistries>
@@ -224,6 +223,14 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-mysql</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -252,44 +259,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.1</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                        <exclude>**/*HarnessForTest.java</exclude>
-                        <exclude>**/*IntegrationTest.java</exclude>
-                        <exclude>**/*IntegrationSpec.java</exclude>
-                    </excludes>
-                    <systemPropertyVariables>
-                        <aws.region>us-east-1</aws.region>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>integration-test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includes>
-                        <include>**/*IT.java</include>
-                        <include>**/*IntegrationTest.java</include>
-                    </includes>
-                    <skipTests>${skip.integration.tests}</skipTests>
-                </configuration>
             </plugin>
 
             <!-- Exec Maven Plugin to run Git commands -->

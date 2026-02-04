@@ -1,16 +1,13 @@
 package org.ihtsdo.rvf.core.validation;
 
-import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.service.structure.listing.ManifestFile;
 import org.ihtsdo.rvf.core.service.structure.resource.TextFileResourceProvider;
 import org.ihtsdo.rvf.core.service.structure.resource.ZipFileResourceProvider;
 import org.ihtsdo.rvf.core.service.structure.validation.StructuralTestRunner;
 import org.ihtsdo.rvf.core.service.structure.validation.TestReportable;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -20,9 +17,7 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TestConfig.class})
-public class StructuralTestRunnerTest {
+class StructuralTestRunnerTest extends IntegrationTest {
 
 	@Autowired
 	private StructuralTestRunner validationRunner;

@@ -70,6 +70,20 @@ public class AssertionServiceImpl implements AssertionService {
 	}
 
 	@Override
+	public Assertion addTest(Long assertionId, final Test test) {
+		Assertion assertion = assertionRepo.findById(assertionId).orElse(null);
+		if (assertion == null) {
+			return null;
+		}
+
+		AssertionTest assertionTest = new AssertionTest();
+		assertionTest.setAssertion(assertion);
+		assertionTest.setTest(test);
+		assertionTestRepo.save(assertionTest);
+		return assertion;
+	}
+
+	@Override
 	public Assertion addTests(final Assertion assertion, final Collection<Test> tests){
 		for ( Test test : tests) {
 			addTest(assertion, test);

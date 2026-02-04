@@ -1,21 +1,15 @@
 package org.ihtsdo.rvf.core.service.util;
 
-import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.service.RvfDynamicDataSource;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.Connection;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TestConfig.class})
-public class RvfDynamicDataSourceTest {
+class RvfDynamicDataSourceTest extends IntegrationTest {
 
 	@Autowired
 	private RvfDynamicDataSource rvfDynamicDataSource;

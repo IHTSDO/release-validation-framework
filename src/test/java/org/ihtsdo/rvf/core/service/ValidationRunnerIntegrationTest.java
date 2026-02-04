@@ -1,20 +1,14 @@
 package org.ihtsdo.rvf.core.service;
 
-import org.ihtsdo.rvf.TestConfig;
-import org.ihtsdo.rvf.core.service.ValidationRunner;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.util.List;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {TestConfig.class})
-public class ValidationRunnerIntegrationTest {
+class ValidationRunnerIntegrationTest extends IntegrationTest {
 	@Autowired
 	ValidationRunner runner;
 	

@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.config;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.rvf.core.service.config.AssertionsResourceConfig;
+import org.ihtsdo.rvf.core.service.config.DataSourceProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,20 +29,18 @@ public abstract class DataResourceConfig {
 
     @Autowired
     private AssertionsResourceConfig assertionsResourceConfig;
+    
     @Bean(name = "dataSource")
-    public BasicDataSource getDataSource() {
+    public BasicDataSource getDataSource(DataSourceProperties dataSourceProperties) {
         BasicDataSource basicDataSource = new BasicDataSource();
         basicDataSource.setUrl(url);
         basicDataSource.setUsername(username);
         basicDataSource.setPassword(password);
         basicDataSource.setDriverClassName(driverClassName);
         basicDataSource.setDefaultCatalog(rvfMasterSchemaName);
-        basicDataSource.setTestOnBorrow(true);
-        basicDataSource.setTestWhileIdle(true);
-        basicDataSource.setMaxActive(200);
-        basicDataSource.setMaxWait(20000);
-        basicDataSource.setValidationQuery("SELECT 1");
-        basicDataSource.setDefaultTransactionIsolation(2);
+        
+        dataSourceProperties.configureDataSource(basicDataSource);
+        
         return basicDataSource;
     }
 

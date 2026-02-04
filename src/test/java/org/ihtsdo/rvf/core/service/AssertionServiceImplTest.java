@@ -1,6 +1,6 @@
 package org.ihtsdo.rvf.core.service;
 
-import org.ihtsdo.rvf.TestConfig;
+import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.AssertionTest;
@@ -11,10 +11,7 @@ import org.ihtsdo.rvf.core.data.repository.TestRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -23,10 +20,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfig.class)
 @Transactional
-public class AssertionServiceImplTest {
+class AssertionServiceImplTest extends IntegrationTest {
 	@Autowired
 	private AssertionService assertionService;
 	
@@ -47,7 +42,7 @@ public class AssertionServiceImplTest {
 	private AssertionTest assertionTest;
 	
 	private org.ihtsdo.rvf.core.data.model.Test test;
-	
+
 	@BeforeEach
 	public void setUp() {
 		assert assertionService != null;
