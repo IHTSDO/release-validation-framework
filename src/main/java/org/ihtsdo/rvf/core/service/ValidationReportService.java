@@ -61,6 +61,10 @@ public class ValidationReportService {
 	}
 	
 	public void writeResults(ValidationStatusReport statusReport, State state, String storageLocation) throws BusinessServiceException {
+		// Backup token and username
+		String backupToken = statusReport.getValidationConfig().getAuthenticationToken();
+		String backupUsername = statusReport.getValidationConfig().getUsername();
+
 		// Ignore token and user name to be persisted to S3
 		statusReport.getValidationConfig().setAuthenticationToken(null);
 		statusReport.getValidationConfig().setUsername(null);
@@ -76,6 +80,9 @@ public class ValidationReportService {
 		} catch (NoSuchAlgorithmException | IOException | DecoderException e) {
 			throw new BusinessServiceException("Failed to write results to file.", e);
 		} finally {
+			// Restore token and username
+			statusReport.getValidationConfig().setAuthenticationToken(backupToken);
+			statusReport.getValidationConfig().setUsername(backupUsername);
 			if (temp != null) {
 				temp.delete();
 			}

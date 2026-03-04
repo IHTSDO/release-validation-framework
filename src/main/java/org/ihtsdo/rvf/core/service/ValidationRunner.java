@@ -75,8 +75,8 @@ public class ValidationRunner {
 			statusReport.addFailureMessage(failureMsg);
 			logger.error("Exception thrown, writing as result",t);
 			try {
-				reportService.writeResults(statusReport, State.FAILED, validationConfig.getStorageLocation());
 				updateRvfState(validationConfig, State.FAILED);
+				reportService.writeResults(statusReport, State.FAILED, validationConfig.getStorageLocation());
 			} catch (final Exception e) {
 				throw new IllegalStateException("Failed to record failure (which was: " + failureMsg + ")", e);
 			}
@@ -120,9 +120,6 @@ public class ValidationRunner {
 			updateRvfState(validationConfig, state);
 			updateExecutionSummary(statusReport, validationConfig);
 
-			// Ignore token and user name to be persisted to S3
-			statusReport.getValidationConfig().setAuthenticationToken(null);
-			statusReport.getValidationConfig().setUsername(null);
 			reportService.writeResults(statusReport, state, validationConfig.getStorageLocation());
 		} finally {
 			// Clean up release package file
@@ -189,7 +186,7 @@ public class ValidationRunner {
 	private void updateRvfState(final ValidationRunConfig config, final State state) throws JsonProcessingException, JMSException {
 		final String responseQueue = config.getResponseQueue();
 		if (responseQueue != null) {
-			logger.info("Updating RVF state to {}}: {}", state, responseQueue);
+			logger.info("Updating RVF state to {}: {}", state, responseQueue);
 			messagingHelper.send(responseQueue, new ValidationStatusResponse(config, state));
 		}
 	}
