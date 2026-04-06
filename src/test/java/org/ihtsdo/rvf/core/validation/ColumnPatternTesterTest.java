@@ -13,11 +13,26 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ColumnPatternTesterTest {
 
 	private ColumnPatternTester tester;
 	private TestReportable testReport;
+
+	@Test
+	void extractPartitionDigits_twoDigitsBeforeCheckDigit() {
+		assertEquals("01", ColumnPatternTester.extractPartitionDigits("3008053018"));
+		assertEquals("02", ColumnPatternTester.extractPartitionDigits("1000000021"));
+		assertEquals("10", ColumnPatternTester.extractPartitionDigits("3961000119101"));
+		assertEquals("10", ColumnPatternTester.extractPartitionDigits("112581000119104"));
+		assertEquals("00", ColumnPatternTester.extractPartitionDigits("703166003"));
+	}
+
+	@Test
+	void extractPartitionDigits_nonSctId_returnsNull() {
+		assertNull(ColumnPatternTester.extractPartitionDigits("12345"));
+	}
 
 	@Test
 	public void testFileNotFound() {

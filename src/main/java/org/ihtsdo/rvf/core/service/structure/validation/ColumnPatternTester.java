@@ -22,7 +22,6 @@ public class ColumnPatternTester {
 	private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
 	private static final Pattern BLANK = Pattern.compile("^$");
 	private static final Pattern NOT_BLANK = Pattern.compile("^(?=\\s*\\S).*$");
-	private static final String UTF_8 = "UTF-8";
 	private static final String FILE_NAME_TEST_TYPE = "FileNameTest";
 	private static final String COLUMN_COUNT_TEST_TYPE = "ColumnCountTest";
 	private static final String ROW_SPACE_TEST_TYPE = "RowSpaceTest";
@@ -31,7 +30,12 @@ public class ColumnPatternTester {
 	private static final String COLUMN_VALUE_TEST_TYPE = "ColumnValuesTest";
 	private static final String COLUMN_DATE_TEST_TYPE = "ColumnDateTest";
 	private static final String COLUMN_BOOLEAN_TEST_TYPE = "ColumnBooleanTest";
+	private static final String SCTID_PARTITION_TEST_TYPE = "SctIdPartitionTest";
 	public static final String COMPLIANT_FILENAME = "RF2 Compliant filename";
+
+	private enum Rf2CoreFileKind {
+		CONCEPT, DESCRIPTION, TEXT_DEFINITION, RELATIONSHIP
+	}
 
 	private final ValidationLog validationLog;
 	private final ResourceProvider resourceManager;
@@ -105,7 +109,7 @@ public class ColumnPatternTester {
 			return linesTested;
 		}
 
-		final boolean releaseInputFile = fileName.startsWith("rel2");
+		final Rf2CoreFileKind coreFileKind = detectCoreFileKind(fileName);
 		List<Field> fields = tableSchema.getFields();
 		if (fields != null) {
 			try (BufferedReader reader = resourceManager.getReader(fileName, StandardCharsets.UTF_8)) {
@@ -137,7 +141,7 @@ public class ColumnPatternTester {
 							// Test header value
 							testHeaderValue(value, column, startTime, fileName, columnIndex);
 						} else {
-							testDataValue(lineNumber + "-" + columnIndex, lineNumber, value, column, startTime, fileName, releaseInputFile);
+							testDataValue(lineNumber + "-" + columnIndex, lineNumber, value, column, startTime, fileName, coreFileKind);
 						}
 						columnIndex++;
 					}
@@ -191,24 +195,104 @@ public class ColumnPatternTester {
 		return true;
 	}
 
-	private void testDataValue(final String id, final long lineNumber, final String value, final Field column, final Date startTime, final String fileName, final boolean isReleaseInputFile) {
+	private void testDataValue(final String id, final long lineNumber, final String value, final Field column, final Date startTime, final String fileName, final Rf2CoreFileKind coreFileKind) {
 
 		final ColumnType columnType = getColumnType(column);
 
 		final PatternTest columnTest = columnTests.get(columnType);
 
 		if (columnTest != null) {
-			if (canBeBlank(value, column) || columnTest.validate(column, lineNumber, value)) {
+			if (canBeBlank(value, column)) {
 				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
 						columnTest.getTestType(), columnTest.getPatternString());
-			} else {
+			} else if (!columnTest.validate(column, lineNumber, value)) {
 				final String testedValue = value.isEmpty() ? "No Value" : value;
 				validationLog.assertionError(columnTest.getMessage(), columnTest.getErrorArgs());
 				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
-						columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue(),lineNumber);
+						columnTest.getTestType(), columnTest.getPatternString(), testedValue, columnTest.getExpectedValue(), lineNumber);
+			} else if (coreFileKind != null && isNumericSctId(value) && !partitionMatchesCoreRf2File(coreFileKind, column, value)) {
+				final String partition = extractPartitionDigits(value);
+				final String expected = expectedPartitionLabel(coreFileKind, column.getName());
+				validationLog.assertionError("SCTID partition identifier does not match RF2 file type on line {}, column '{}': value '{}'", lineNumber, column.getName(), value);
+				testReport.addError(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						SCTID_PARTITION_TEST_TYPE, String.format("partition %s", expected), String.format("partition %s (%s)", partition, value),  expected, lineNumber);
+			} else {
+				testReport.addSuccess(id, startTime, fileName, resourceManager.getFilePath(), column.getName(),
+						columnTest.getTestType(), columnTest.getPatternString());
 			}
 		}
 	}
+
+	private static Rf2CoreFileKind detectCoreFileKind(String fileName) {
+		if (fileName == null) {
+			return null;
+		}
+		String n = fileName;
+		if (n.startsWith("x")) {
+			n = n.substring(1);
+		}
+		if (!(n.startsWith("sct2_") || n.startsWith("rel2_"))) {
+			return null;
+		}
+		if (n.contains("_Concept_")) {
+			return Rf2CoreFileKind.CONCEPT;
+		}
+		if (n.contains("_Description_")) {
+			return Rf2CoreFileKind.DESCRIPTION;
+		}
+		if (n.contains("_TextDefinition_")) {
+			return Rf2CoreFileKind.TEXT_DEFINITION;
+		}
+		if (n.contains("_RelationshipConcreteValues_") || n.contains("_StatedRelationship_") || n.contains("_Relationship_")) {
+			return Rf2CoreFileKind.RELATIONSHIP;
+		}
+		return null;
+	}
+
+	private static boolean isNumericSctId(String value) {
+		return value != null && SCTID_PATTERN.matcher(value).matches();
+	}
+
+	/**
+	 * Two-digit partition: the two digits immediately before the check digit (the final digit of the SCTID).
+	 */
+	public static String extractPartitionDigits(String sctId) {
+		if (!isNumericSctId(sctId) || sctId.length() < 3) {
+			return null;
+		}
+		return sctId.substring(sctId.length() - 3, sctId.length() - 1);
+	}
+
+	private boolean partitionMatchesCoreRf2File(Rf2CoreFileKind kind, Field column, String sctId) {
+		final DataType dataType = column.getType();
+		if (dataType != DataType.SCTID && dataType != DataType.SCTID_OR_UUID) {
+			return true;
+		}
+		if (dataType == DataType.SCTID_OR_UUID && !isNumericSctId(sctId)) {
+			return true;
+		}
+		final String partition = extractPartitionDigits(sctId);
+		if (partition == null) {
+			return true;
+		}
+		final Set<String> allowed = allowedPartitions(kind, column.getName());
+		return allowed.contains(partition);
+	}
+
+	private static Set<String> allowedPartitions(Rf2CoreFileKind kind, String columnName) {
+		final boolean isComponentId = "id".equalsIgnoreCase(columnName);
+		return switch (kind) {
+			case CONCEPT -> Set.of("00", "10");
+			case DESCRIPTION, TEXT_DEFINITION -> isComponentId ? Set.of("01", "11") : Set.of("00", "10");
+			case RELATIONSHIP -> isComponentId ? Set.of("02", "12") : Set.of("00", "10");
+		};
+	}
+
+	private static String expectedPartitionLabel(Rf2CoreFileKind kind, String columnName) {
+		final Set<String> allowed = allowedPartitions(kind, columnName);
+		return "partition " + String.join(" or ", allowed);
+	}
+
 	private boolean canBeBlank(final String value, final Field column) {
 		return !column.isMandatory() && isBlank(value);
 	}
