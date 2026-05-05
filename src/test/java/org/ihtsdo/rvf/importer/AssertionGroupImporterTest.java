@@ -63,7 +63,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"3be8c763-a5bc-404b-af9f-a2cb681f6f3d", "4ba823ce-8ae4-4b2e-beb5-e119b822cfe2",
 						"18a9f6b4-b66f-4af3-8c67-2a07b4655d27", "ad7ae768-d14a-4f15-a5cb-4c56b8b4fed6",
 						"1cd8b7f9-5730-4db9-b508-13575825b28f", "e202807d-915d-4c8a-8f02-c6e4e6f969fc",
-                        "9733ecfe-057d-45e6-a2ca-05f3846e6d43"));
+                        "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("release-type-validation",
 				List.of("b88b9f46-4c33-4d8e-b9ab-ddb87aef3068", "fbfc4fd1-f10d-4fc2-889f-df0e089df4b7",
 						"b7597328-a11d-4910-b677-91aef3bd3aea", "9190473a-29f7-40fc-b879-9ae0d038b681",
@@ -225,7 +225,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("InternationalEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -360,7 +360,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"44916964-5b78-4842-81d8-e8293ee93bea", "f7bd336c-4ced-48e3-881c-b61e23a19530",
 						"618115ab-b5bc-4ed3-aaba-fec8536fe498", "bd27d80a-42f1-4412-8111-fdf72fa32904",
 						"6cd8d840-370d-40d1-b2e8-4539cd05ec11", "ea92a85e-b24a-405f-9dea-579af338a81a",
-						"8e70ea3e-c4dd-4ae3-8b75-f0567e42f690",
+						"8e70ea3e-c4dd-4ae3-8b75-f0567e42f690", "c35167ac-1dfc-4861-ac19-be60f95e3521",
 						"413c91cd-4b1a-47cf-a278-3141bea39fde", "f636b7b0-7e9a-11e1-b0c4-0800200c9a66",
 						"13363e71-60ab-4d1b-975c-f38f7d87d106", "35ec824d-b53d-4567-833e-8ce79774acae",
 						"eb940ee0-7cd6-11e1-b0c4-0800200c9a66", "31f5e2c8-b0b9-42ee-a9bf-87d95edad83b",
@@ -437,7 +437,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"5a83783e-3366-48bd-a50d-8f3a53812174", "46853429-e7ff-41db-a8b3-3b0f738a8117",
 						"eff30fb0-7856-11e1-b0c4-0800200c9a60", "2b166f4e-73ae-4c89-b2bb-bc9ce07fa9d9",
 						"6a7f2569-a5b9-447c-a067-51e894c20c30", "d2727004-cfed-4798-8710-1a088833e775",
-						"b72bc5f4-7afb-4a2e-ac3a-e0f4373b03e6", 
+						"b72bc5f4-7afb-4a2e-ac3a-e0f4373b03e6",
 						"32b41aa0-7d08-11e1-b0c4-0800200c9a66", "48118153-d32a-4d1c-bfbc-23ed953e9991",
 						"2e0eb135-fd7d-4f24-83c1-0cba797ee766", "ddc754ab-0965-4ae2-b95d-6b0f8392e276",
 						"1a4e40a9-cf14-4703-b206-9f2fbeb56c7f", "9fc3995b-f84d-46e1-b7cb-88f0fe8564e2",
@@ -546,7 +546,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "d5c80582-ad32-4f26-a729-a91fe04a06b2",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("int-authoring",
 				List.of("b88b9f46-4c33-4d8e-b9ab-ddb87aef3068", "fbfc4fd1-f10d-4fc2-889f-df0e089df4b7",
 						"9190473a-29f7-40fc-b879-9ae0d038b681", "0bd6a234-58f9-424f-84b4-0dc800e5a70b",
@@ -951,7 +951,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("first-time-loinc-validation",
 				List.of("82cc38ce-75d6-429e-bf45-551a100bfc52", "dfbab5f4-8b72-4cd3-abe9-2cf5b5f76e5b",
 						"18a9f6b4-b66f-4af3-8c67-2a07b4655d27", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1017,7 +1017,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
 						"d5c80582-ad32-4f26-a729-a91fe04a06b2", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("first-time-common-edition",
 				List.of("82cc38ce-75d6-429e-bf45-551a100bfc52", "dfbab5f4-8b72-4cd3-abe9-2cf5b5f76e5b",
 						"18a9f6b4-b66f-4af3-8c67-2a07b4655d27", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1076,7 +1077,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
 						"d5c80582-ad32-4f26-a729-a91fe04a06b2", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("LoincEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1186,7 +1188,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("DanishEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1286,7 +1288,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"e2aa5b09-5754-484f-9eb8-bb18732617ef", "645e3292-18d6-41df-b42a-58ba4d7240d5",
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("SwedishEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1386,7 +1389,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"e2aa5b09-5754-484f-9eb8-bb18732617ef", "645e3292-18d6-41df-b42a-58ba4d7240d5",
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("USEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1496,7 +1500,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("BelgianEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1597,7 +1601,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("NorwegianEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1697,7 +1701,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"e2aa5b09-5754-484f-9eb8-bb18732617ef", "645e3292-18d6-41df-b42a-58ba4d7240d5",
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("SwissEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1797,7 +1802,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"e2aa5b09-5754-484f-9eb8-bb18732617ef", "645e3292-18d6-41df-b42a-58ba4d7240d5",
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("FrenchEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1897,7 +1903,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("IrishEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1997,7 +2003,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"e2aa5b09-5754-484f-9eb8-bb18732617ef", "645e3292-18d6-41df-b42a-58ba4d7240d5",
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("EstonianEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -2097,7 +2104,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"e2aa5b09-5754-484f-9eb8-bb18732617ef", "645e3292-18d6-41df-b42a-58ba4d7240d5",
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("AustrianEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -2197,7 +2205,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("AustralianEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "9190473a-29f7-40fc-b879-9ae0d038b681",
 						"82cc38ce-75d6-429e-bf45-551a100bfc52", "dfbab5f4-8b72-4cd3-abe9-2cf5b5f76e5b",
@@ -2297,7 +2305,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"d5c80582-ad32-4f26-a729-a91fe04a06b2", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"0e898ae0-15cb-45f9-b032-041193aa79e8", "0145fbad-f067-41ff-b700-cf54fc639e21",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("DutchEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -2397,7 +2406,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("GPFP-ICPC2",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -2505,7 +2514,8 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"e2aa5b09-5754-484f-9eb8-bb18732617ef", "645e3292-18d6-41df-b42a-58ba4d7240d5",
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("GMDN",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -2606,7 +2616,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("stated-relationships-validation",
 				List.of("50e809a0-7d08-11e1-b0c4-0800200c9a66"));
 		groupNameToAssertionsMap.put("stated-relationships-release-validation",
@@ -2712,13 +2722,14 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"f39da0c8-2897-4a04-89cd-ec8ca0c6bf93", "d5c80582-ad32-4f26-a729-a91fe04a06b2",
                         "9733ecfe-057d-45e6-a2ca-05f3846e6d43", "c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f",
 						"d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a", "e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b",
-						"02cf4438-170e-4b6b-b5da-624ef730a8e0"));
+						"02cf4438-170e-4b6b-b5da-624ef730a8e0", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("common-refset",
 				List.of("6a407415-8415-4870-a6ef-b5bc22f73c1f",
 						"0e898ae0-15cb-45f9-b032-041193aa79e8",
 						"fc0f240c-4a07-4995-acf6-52a7f41f2ce6",
 						"1a4e40a9-cf14-4703-b206-9f2fbeb56c7f",
-						"c779d282-3c4d-4c16-a8a6-8d1a621b247d"));
+						"c779d282-3c4d-4c16-a8a6-8d1a621b247d",
+						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
 	}
 
 	@Autowired
