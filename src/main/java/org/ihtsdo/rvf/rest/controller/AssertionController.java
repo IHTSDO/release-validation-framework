@@ -5,22 +5,20 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.ihtsdo.rvf.rest.exception.InvalidFormatException;
-import org.ihtsdo.rvf.rest.helper.AssertionHelper;
-import org.ihtsdo.rvf.core.service.AssertionService;
+import jakarta.persistence.EntityNotFoundException;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.Test;
-import org.ihtsdo.rvf.core.service.DroolsRulesValidationService;
-import org.ihtsdo.rvf.core.service.ReleaseDataManager;
-import org.ihtsdo.rvf.core.service.TraceabilityComparisonService;
+import org.ihtsdo.rvf.core.service.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
+import org.ihtsdo.rvf.rest.exception.InvalidFormatException;
+import org.ihtsdo.rvf.rest.helper.AssertionHelper;
+import org.snomed.quality.validator.mrcm.SEPRefsetValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,12 +39,16 @@ public class AssertionController {
 	@Autowired
 	private TraceabilityComparisonService traceabilityComparisonService;
 
+	@Autowired
+	private MRCMValidationService mrcmValidationService;
+
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ResponseBody
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Get all assertions", description = "Retrieves all assertions available in the system.")
 	public List<Assertion> getAssertions(@RequestParam(required = false) final boolean includeDroolsRules,
 										 @RequestParam(required = false) final boolean includeTraceabilityAssertions,
+										 @RequestParam(required = false) final boolean includeSEPAssertions,
 										 @RequestParam(required = false) final boolean ignoreResourceType) {
 		List<Assertion> assertions = getAssertionsAndJoinGroups();
 		if (ignoreResourceType) {
@@ -57,6 +59,12 @@ public class AssertionController {
 		}
 		if (includeTraceabilityAssertions) {
 			assertions.addAll(traceabilityComparisonService.getAssertions());
+		}
+		if (includeSEPAssertions) {
+			SEPRefsetValidationService sepRefsetValidationService = new SEPRefsetValidationService();
+			assertions.addAll(sepRefsetValidationService.getAssertions().stream()
+					.map(AssertionController::toAssertion)
+					.toList());
 		}
 
 		return assertions;
@@ -295,5 +303,13 @@ public class AssertionController {
 			}
 		})));
 		return assertions;
+	}
+
+	public static Assertion toAssertion(org.snomed.quality.validator.mrcm.Assertion mrcmAssertion) {
+		Assertion assertion = new Assertion();
+		assertion.setUuid(UUID.fromString(mrcmAssertion.getUuid().toString()));
+		assertion.setAssertionText(mrcmAssertion.getAssertionText());
+		assertion.setType("SEP");
+		return assertion;
 	}
 }
