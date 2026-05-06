@@ -301,7 +301,7 @@ public class TraceabilityComparisonService {
 				}
 
 				@Override
-				public void newConceptState(String id, String effectiveTime, String active, String moduleId, String s4) {
+				public void newConceptState(String filename, long lineNumber, String id, String effectiveTime, String active, String moduleId, String s4) {
 					if (effectiveTimePredicate.test(effectiveTime)) {
 						concepts.add(id);
 						componentIdToConceptIdMap.put(id, id);
@@ -309,7 +309,7 @@ public class TraceabilityComparisonService {
 				}
 
 				@Override
-				public void newDescriptionState(String id, String effectiveTime, String active, String moduleId, String s4, String s5, String s6, String s7, String s8) {
+				public void newDescriptionState(String filename, long lineNumber, String id, String effectiveTime, String active, String moduleId, String s4, String s5, String s6, String s7, String s8) {
 					if (effectiveTimePredicate.test(effectiveTime)) {
 						descriptions.add(id);
 						componentIdToConceptIdMap.put(id, s4);
@@ -317,7 +317,7 @@ public class TraceabilityComparisonService {
 				}
 
 				@Override
-				public void newRelationshipState(String id, String effectiveTime, String active, String moduleId, String s4, String s5, String s6, String s7, String s8, String s9) {
+				public void newRelationshipState(String filename, long lineNumber, String id, String effectiveTime, String active, String moduleId, String s4, String s5, String s6, String s7, String s8, String s9) {
 					if (effectiveTimePredicate.test(effectiveTime)) {
 						relationships.add(id);
 						componentIdToConceptIdMap.put(id, s4);
@@ -325,7 +325,7 @@ public class TraceabilityComparisonService {
 				}
 
 				@Override
-				public void newConcreteRelationshipState(String id, String effectiveTime, String active, String moduleId, String s4, String s5, String s6, String s7, String s8, String s9) {
+				public void newConcreteRelationshipState(String filename, long lineNumber, String id, String effectiveTime, String active, String moduleId, String s4, String s5, String s6, String s7, String s8, String s9) {
 					if (effectiveTimePredicate.test(effectiveTime)) {
 						concreteRelationships.add(id);
 						componentIdToConceptIdMap.put(id, s4);
@@ -333,7 +333,7 @@ public class TraceabilityComparisonService {
 				}
 
 				@Override
-				public void newReferenceSetMemberState(String filename, String[] fieldNames, String id, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String... otherValues) {
+				public void newReferenceSetMemberState(String filename, long lineNumber, String[] fieldNames, String id, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String... otherValues) {
 					if (effectiveTimePredicate.test(effectiveTime) && !Arrays.asList(refsetsToIgnore).contains(refsetId)) {
 						refsetMembers.add(id);
 						componentIdToConceptIdMap.put(id, referencedComponentId);
@@ -342,7 +342,7 @@ public class TraceabilityComparisonService {
 				}
 
 				@Override
-				public void newIdentifierState(String alternateIdentifier, String effectiveTime, String active, String moduleId, String identifierSchemeId, String referencedComponentId) {
+				public void newIdentifierState(String filename, long lineNumber, String alternateIdentifier, String effectiveTime, String active, String moduleId, String identifierSchemeId, String referencedComponentId) {
 
 				}
 			};
