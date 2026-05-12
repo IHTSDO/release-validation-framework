@@ -123,7 +123,7 @@ public class ColumnPatternTester {
 					int columnIndex = 0;
 					linesTested++;
 					lineNumber++;
-					columnData = line.split("\t");
+					columnData = line.split("\t", -1);
 
 					final int dataColumnCount = columnData.length;
 
@@ -183,8 +183,8 @@ public class ColumnPatternTester {
 			return false;
 		}
 
-		// will catch extra tabs, spaces at the end of a line
-		if (line.endsWith("\t") || line.endsWith(" ")) {
+		// will catch spaces at the end of a line
+		if (line.endsWith(" ")) {
 			// extra spaces lets see if it is at the end, can still continue testing
 			validationLog.assertionError("Extra space at the end of line {}, expected {}, actual {}", lineNumber, line.trim(), line);
 			testReport.addError(lineNumber + "-" + dataColumnCount + 1, startTime, fileName, resourceManager.getFilePath(), "End of Row Space", ROW_SPACE_TEST_TYPE, "", line, line.trim(),lineNumber);
