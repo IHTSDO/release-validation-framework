@@ -104,7 +104,10 @@ public class AssertionGroupImporter {
             return;
         }
         try {
-            Document doc = new SAXBuilder().build(manifestInputStream);
+            SAXBuilder saxBuilder = new SAXBuilder();
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+            Document doc = saxBuilder.build(manifestInputStream);
             XPathFactory xpf = XPathFactory.instance();
             String stratExpr = "//" + AssertionGroupingXml.STRATEGY_ELEMENT;
             XPathExpression<Element> stratPath = xpf.compile(stratExpr, new ElementFilter(AssertionGroupingXml.STRATEGY_ELEMENT));
@@ -153,7 +156,7 @@ public class AssertionGroupImporter {
         if (csv == null || csv.isBlank()) {
             return List.of();
         }
-        return Arrays.stream(csv.split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
+        return Arrays.stream(csv.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
     }
 
     /** UUIDs declared for a policy name in the loaded manifest, or empty if absent. */
@@ -175,28 +178,6 @@ public class AssertionGroupImporter {
     }
 
     /**
-     * Returns true if trimmed {@code assertionKeywords} equals one of the trimmed entries in
-     * {@code tokenList}. Currently unused by grouping rules but kept for keyword-token checks.
-     */
-    private boolean matchesKeywordTokensOnly(String assertionKeywords, List<String> tokenList) {
-        if (assertionKeywords == null || tokenList.isEmpty()) {
-            return false;
-        }
-        Set<String> allowed = new HashSet<>();
-        for (String t : tokenList) {
-            String s = t.trim();
-            if (!s.isEmpty()) {
-                allowed.add(s);
-            }
-        }
-        if (allowed.isEmpty()) {
-            return false;
-        }
-        String kw = assertionKeywords.trim();
-        return allowed.contains(kw);
-    }
-
-    /**
      * Inclusion via {@code includeStandaloneCategories}: after optional default-category shortcut,
      * any remaining token from the group list that appears in assertion keywords (excluding default
      * categories from both sides for the overlap pass) yields a match.
@@ -207,8 +188,8 @@ public class AssertionGroupImporter {
             return false;
         }
         String assertionKeywords = assertion.getKeywords();
-        List<String> assertionKeywordList = splitCsv(assertionKeywords);
-        List<String> tokenList = splitCsv(includeStandaloneCategoriesCsv);
+        List<String> assertionKeywordList = new ArrayList<>(splitCsv(assertionKeywords));
+        List<String> tokenList = new ArrayList<>(splitCsv(includeStandaloneCategoriesCsv));
         for (String t : defaultStandaloneCategories) {
             String s = t.trim();
             if (assertionKeywords.equals(s) && tokenList.contains(s)) {
@@ -258,33 +239,51 @@ public class AssertionGroupImporter {
      * contain any {@code excludeCategories} token.
      */
     private boolean violatesExcludeByPolicy(Assertion assertion, String excludeByPolicyCsv, String excludeAssertionKeywords, String excludeCategories) {
-        String uuid = assertion.getUuid().toString();
-        String text = assertion.getAssertionText();
-        if (StringUtils.hasLength(excludeByPolicyCsv)) {
-            for (String raw : splitCsv(excludeByPolicyCsv)) {
-                String token = raw.trim();
-                if (uuidInPolicyList(token, uuid)) {
-                    return true;
-                }
+        if (uuidExcludedByNamedPolicies(assertion.getUuid().toString(), excludeByPolicyCsv)) {
+            return true;
+        }
+        if (assertionTextMatchesExcludedPhrases(assertion.getAssertionText(), excludeAssertionKeywords)) {
+            return true;
+        }
+        return assertionKeywordsMatchExcludedCategories(assertion, excludeCategories);
+    }
+
+    private boolean uuidExcludedByNamedPolicies(String uuid, String excludeByPolicyCsv) {
+        if (!StringUtils.hasLength(excludeByPolicyCsv)) {
+            return false;
+        }
+        for (String raw : splitCsv(excludeByPolicyCsv)) {
+            String token = raw.trim();
+            if (uuidInPolicyList(token, uuid)) {
+                return true;
             }
         }
-        if (StringUtils.hasLength(excludeAssertionKeywords)) {
-            List<String> excludeAssertionKeywordList = Arrays.stream(excludeAssertionKeywords.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
-            String lower = text.toLowerCase();
-            for (String excludeAssertionKeyword : excludeAssertionKeywordList) {
-                if (lower.contains(excludeAssertionKeyword.toLowerCase())) {
-                    return true;
-                }
+        return false;
+    }
+
+    private boolean assertionTextMatchesExcludedPhrases(String text, String excludeAssertionKeywords) {
+        if (!StringUtils.hasLength(excludeAssertionKeywords)) {
+            return false;
+        }
+        List<String> phrases = Arrays.stream(excludeAssertionKeywords.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
+        String lower = text.toLowerCase();
+        for (String phrase : phrases) {
+            if (lower.contains(phrase.toLowerCase())) {
+                return true;
             }
         }
-        if (StringUtils.hasLength(excludeCategories)) {
-            String assertionKeywords = assertion.getKeywords();
-            List<String> assertionKeywordList = splitCsv(assertionKeywords);
-            for (String raw : splitCsv(excludeCategories)) {
-                String token = raw.trim();
-                if (assertionKeywordList.contains(token)) {
-                    return true;
-                }
+        return false;
+    }
+
+    private boolean assertionKeywordsMatchExcludedCategories(Assertion assertion, String excludeCategories) {
+        if (!StringUtils.hasLength(excludeCategories)) {
+            return false;
+        }
+        List<String> assertionKeywordList = splitCsv(assertion.getKeywords());
+        for (String raw : splitCsv(excludeCategories)) {
+            String token = raw.trim();
+            if (assertionKeywordList.contains(token)) {
+                return true;
             }
         }
         return false;
