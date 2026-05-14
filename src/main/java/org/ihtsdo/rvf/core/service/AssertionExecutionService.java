@@ -3,7 +3,6 @@ package org.ihtsdo.rvf.core.service;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
-import org.ihtsdo.rvf.importer.AssertionGroupImporter.ProductName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -237,7 +236,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String defaultCatalog = dataSource.getDefaultCatalog();
 		String prospectiveSchema = config.getProspectiveVersion();
 		final String[] nameParts = config.getProspectiveVersion().split("_");
-		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : getModuleId(nameParts);
+		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : NOT_SUPPLIED;
 		String includedModules = CollectionUtils.isEmpty(config.getIncludedModules()) ? "NULL" : String.join(",", config.getIncludedModules());
 		String version = (nameParts.length >= 3 ? nameParts[2] : NOT_SUPPLIED);
 
@@ -270,10 +269,6 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			result.add(part);
 		}
 		return result;
-	}
-
-	private static String getModuleId(String[] nameParts) {
-		return nameParts.length >= 2 ? ProductName.toModuleId(nameParts[1]) : NOT_SUPPLIED;
 	}
 
 	private static void validateSchemas(MysqlExecutionConfig config, String prospectiveSchema, String previousReleaseSchema) throws ConfigurationException {
