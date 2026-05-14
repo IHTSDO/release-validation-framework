@@ -1,455 +1,388 @@
 package org.ihtsdo.rvf.importer;
 
-import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
-import org.ihtsdo.rvf.core.service.config.AssertionUuidConfig;
+import org.ihtsdo.rvf.core.service.AssertionService;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.filter.ElementFilter;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.ihtsdo.rvf.importer.AssertionGroupImporter.AssertionGroupName.*;
-
+/**
+ * Imports assertion groups from {@code manifest.xml} by reading the first
+ * {@code assertionGroupingStrategy} block and assigning each {@link Assertion} to zero or more
+ * {@link AssertionGroup}s according to {@code group} element rules.
+ *
+ * <p>Manifest layout (see {@link AssertionGroupingXml} for element and attribute names):
+ * <ul>
+ *   <li>{@code policyValues/policy} &mdash; named lists of assertion UUIDs referenced by
+ *       {@code excludeByPolicy} and {@code includeByPolicy} on each group.</li>
+ *   <li>{@code group} &mdash; one element per group name; groups without a non-blank {@code name}
+ *       are skipped when loading the manifest.</li>
+ * </ul>
+ *
+ * <p>For a given assertion and group definition, membership is decided in order:
+ * <ol>
+ *   <li><strong>Exclusions</strong> &mdash; if any applies, the assertion is not in the group:
+ *       UUID listed under a named policy in {@code excludeByPolicy} (comma-separated policy names);
+ *       assertion text contains any {@code excludeAssertionKeywords} phrase (pipe-separated);
+ *       assertion keywords (comma-separated) contain any token from {@code excludeCategories}.</li>
+ *   <li><strong>{@code includeByPolicy}</strong> &mdash; if the attribute is set and the assertion UUID
+ *       appears in any named policy list, the assertion is included.</li>
+ *   <li><strong>{@code includeStandaloneCategories}</strong> &mdash; overlap between the group's token
+ *       list and the assertion's keyword tokens, with special handling for the default category
+ *       keywords ({@code file-centric-validation}, {@code component-centric-validation},
+ *       {@code release-type-validation}).</li>
+ *   <li><strong>{@code includeCategoryWithCentre}</strong> &mdash; pipe-separated {@code category,centre}
+ *       pairs; a pair matches when both tokens appear in the assertion keywords, the category is one
+ *       of the default three, and the centre token is not one of those defaults.</li>
+ * </ol>
+ * If no inclusion rule matches, the assertion is not added to that group.
+ *
+ * <p>On import, existing groups are cleared of assertions, missing groups are created, and only groups
+ * listed in the manifest are populated; other groups in the database are removed from the working set
+ * for this pass.
+ */
 @Service
 @Transactional
 public class AssertionGroupImporter {
 
-	private static final String PREVIOUS = "previous";
-	private static final String NEW_INACTIVE_STATES_FOLLOW_ACTIVE_STATES = "New inactive states follow active states";
-	public static final String MDRS = "mdrs";
+    private static final Logger LOGGER = LoggerFactory.getLogger(AssertionGroupImporter.class);
 
-	enum AssertionGroupName {
-		FILE_CENTRIC_VALIDATION ("COMMON", "file-centric-validation"),
-		COMPONENT_CENTRIC_VALIDATION ("COMMON", "component-centric-validation"),
-		RELEASE_TYPE_VALIDATION ("COMMON", "release-type-validation"),
-		MDRS_VALIDATION ("mdrs", "mdrs"),
-		SPANISH_EDITION ("ES", "SpanishEdition"),
-		INTERNATIONAL_EDITION ("INT", "InternationalEdition"),
-		COMMON_AUTHORING ("COMMON", "common-authoring"),
-		COMMON_AUTHORING_WITHOUT_LANG_REFSETS ("COMMON_AUTHORING_WITHOUT_LANG_REFSETS", "common-authoring-without-lang-refsets"),
-		COMMON_EDITION("COMMON", "common-edition"),
-		INT_AUTHORING ("INT", "int-authoring"),
-		AT_AUTHORING("AT", "at-authoring"),
-		AU_AUTHORING("AU", "au-authoring"),
-		DK_AUTHORING("DK", "dk-authoring"),
-		SE_AUTHORING ("SE", "se-authoring"),
-		US_AUTHORING ("US", "us-authoring"),
-		BE_AUTHORING("BE", "be-authoring"),
-		NO_AUTHORING("NO", "no-authoring"),
-		CH_AUTHORING("CH", "ch-authoring"),
-		FR_AUTHORING("FR", "fr-authoring"),
-		IE_AUTHORING("IE", "ie-authoring"),
-		EE_AUTHORING("EE", "ee-authoring"),
-		NZ_AUTHORING("NZ", "nz-authoring"),
-		ZH_AUTHORING("ZH", "zh-authoring"),
-        KR_AUTHORING("KR", "kr-authoring"),
-		NL_AUTHORING("NL", "nl-authoring"),
-		STANDALONE_RELEASE("STANDALONE_RELEASE", "standalone-release"),
-		LOINC_AUTHORING("LOINC", "loinc-authoring"),
-		SIMPLEX_RELEASE("SIMPLEX", "simplex-release"),
-		COMMON_REFSET ("COMMON", "common-refset"),
-		FIRST_TIME_LOINC_VALIDATION ("LOINC", "first-time-loinc-validation"),
-		FIRST_TIME_COMMON_EDITION_VALIDATION ("COMMON", "first-time-common-edition"),
-		LOINC_EDITION ("LOINC", "LoincEdition"),
-		DANISH_EDITION("DK", "DanishEdition"),
-		SWEDISH_EDITION("SE", "SwedishEdition"),
-		US_EDITION("US", "USEdition"),
-		BE_EDITION("BE", "BelgianEdition"),
-		NO_EDITION("NO", "NorwegianEdition"),
-		CH_EDITION("CH", "SwissEdition"),
-		FR_EDITION("FR", "FrenchEdition"),
-		IE_EDITION("IE", "IrishEdition"),
-		EE_EDITION("EE", "EstonianEdition"),
-		AT_EDITION("AT", "AustrianEdition"),
-		AU_EDITION("AU", "AustralianEdition"),
-		NL_EDITION("NL", "DutchEdition"),
-		GPFP_ICPC2("GPFP-ICPC2","GPFP-ICPC2"),
-		GMDN("GMDN","GMDN"),
-		STATED_RELATIONSHIPS_VALIDATION("STATED_RELATIONSHIPS","stated-relationships-validation"), //Assertions group that contains only stated relationship for file centric and component centric assertions
-		STATED_RELATIONSHIPS_RELEASE_VALIDATION("STATED_RELATIONSHIPS_RELEASE_TYPE","stated-relationships-release-validation"), //Assertion group that contains full list of stated relationship assertions
-		DERIVATIVE_EDITION("DERIVATIVE","DerivativeEdition");
+    private final AssertionService assertionService;
 
+    private Map<String, List<String>> manifestPolicyOverrides = Map.of();
+    private List<Element> manifestGroupElements = List.of();
+    /** Keyword tokens treated as default "category" dimensions for standalone and centre matching. */
+    private final List<String> defaultStandaloneCategories = List.of("file-centric-validation", "component-centric-validation", "release-type-validation");
 
-		private final String name;
-		private final String releaseCenter;
-		AssertionGroupName(String releaseCenter, String name) {
-			this.releaseCenter = releaseCenter;
-			this.name = name;
-		}
+    /**
+     * @param assertionService persistence and group membership API
+     */
+    @Autowired
+    public AssertionGroupImporter(AssertionService assertionService) {
+        this.assertionService = assertionService;
+    }
 
-		public String getName() {
-			return this.name;
-		}
-		public String getReleaseCenter() {
-			return this.releaseCenter;
-		}
+    /**
+     * Parses {@code assertionGroupingStrategy} from the manifest stream, then rebuilds group
+     * membership in the database for every group defined in the manifest.
+     *
+     * @param manifestInputStream XML manifest; if null or unparsable, policy and group definitions
+     *                            may be empty and the subsequent import step will throw if no
+     *                            groups were loaded
+     */
+    public void importAssertionGroups(InputStream manifestInputStream) {
+        loadManifestConfiguration(manifestInputStream);
+        importAssertionGroupsCore();
+    }
 
-		public static AssertionGroupName fromName(String name) {
-			if (name == null) {
-				throw new IllegalArgumentException("'name' cannot be null.");
-			}
-
-			return Arrays.stream(AssertionGroupName.values()).filter(type -> type.getName().equals(name)).findFirst().orElse(null);
-		}
-
-	}
-
-	public enum ProductName {
-		// TODO FRI-246
-		// add the new edition to FILENAME_PATTERN_TO_EDITION_MAP as well in ReleaseDataManager.
-			INT("INT", "900000000000207008"),
-			AU("AU", "32506021000036107"),
-			BE("BE", "11000172109"),
-			NL("NL", "11000146104"),
-			UK("UK", "999000041000000102"),
-			UKCL("UKCL", "999000011000000103"),
-			US("US", "731000124108"),
-			NZ("NZ", "21000210109"),
-			ES("ES", "450829007"),
-
-			DK("DK", "554471000005108"),
-			SE("SE", "45991000052106"),
-			NO("NO", "51000202101"),
-			CH("CH", "2011000195101"),
-			IE("IE", "11000220105"),
-			EE("EE", "11000181102"),
-			AT("AT", "11000234105"),
-			TM("TM", "895344001"),
-			SV("SNOVET", "332351000009108");
-
-			private final String name;
-			private final String moduleId;
-			ProductName(String name, String moduleId) {
-					this.name = name;
-					this.moduleId = moduleId;
-			}
-
-			public String getName() {
-					return this.name;
-			}
-			public String getModuleId() {
-					return this.moduleId;
-			}
-			static public String toModuleId(String name) {
-				for (ProductName pn: ProductName.values()) {
-					if (name.equalsIgnoreCase(pn.getName())) {
-						return pn.getModuleId();
-					}
-				}
-				return name;
-			}
-	}
-
-	private static final String SIMPLE_MAP = "simple map";
-
-	private final AssertionService assertionService;
-
-	private final AssertionUuidConfig assertionUuidConfig;
-
-	@Autowired
-	public AssertionGroupImporter(AssertionService assertionService, AssertionUuidConfig assertionUuidConfig) {
-		this.assertionService = assertionService;
-		this.assertionUuidConfig = assertionUuidConfig;
-	}
-
-/* the following were included but feel that they should be validated for project level as well.
-	"6b34ab30-79b9-11e1-b0c4-0800200c9a66",
-	"72184790-79b9-11e1-b0c4-0800200c9a66",
-	"77fc7550-79b9-11e1-b0c4-0800200c9a66",
-	"32b41aa0-7d08-11e1-b0c4-0800200c9a66",
-*/
-
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(AssertionGroupImporter.class);
-
-	public boolean isImportRequired() {
-		List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
-		return allGroups == null || allGroups.isEmpty();
-	}
-
-	/*
-	 * Create assertion groups
-	 *
-	 * file-centric-validation
-	 * release-type-validation
-	 * component-centric-validation
-	 * SpanishEdition
-	 * InternationalEdition
-	 * SnapshotContentValidation
-	 */
-
-	public void importAssertionGroups() {
-		List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
-		List<String> existingGroups = new ArrayList<>();
-		// remove all assertions from existing group
-		if (allGroups != null) {
-			for (AssertionGroup group : allGroups) {
-				LOGGER.info("Validation group is already created: {}", group.getName());
-
-				group.removeAllAssertionsFromGroup();
-				existingGroups.add(group.getName());
-			}
-		}
-
-		// create new assertion group if any
-		List<String> allGroupNames = new ArrayList<>();
-		for (AssertionGroupName groupName : AssertionGroupName.values()) {
-			allGroupNames.add(groupName.getName());
-			if (!existingGroups.contains(groupName.getName())) {
-				LOGGER.info("creating assertion group: {}", groupName.getName());
-				AssertionGroup group = new AssertionGroup();
-				group.setName(groupName.getName());
-				allGroups.add(assertionService.createAssertionGroup(group));
-			}
-		}
-
-		// add assertions to assertion group
-		List<Assertion> allAssertions = assertionService.findAll();
-		allGroups = allGroups.stream().filter(assertionGroup -> allGroupNames.contains(assertionGroup.getName())).collect(Collectors.toList());
-		for (AssertionGroup group : allGroups) {
-			addAssertionsToAssertionGroup(group, allAssertions);
-		}
-	}
-
-	private void addAssertionsToAssertionGroup(AssertionGroup assertionGroup, List<Assertion> allAssertions) {
-		AssertionGroupName groupName = AssertionGroupName.fromName(assertionGroup.getName());
-		if (groupName != null) {
-			switch (groupName) {
-				case COMMON_REFSET ->
-						addAssertionToCommonRefset(allAssertions, assertionGroup);
-				case FILE_CENTRIC_VALIDATION, RELEASE_TYPE_VALIDATION, COMPONENT_CENTRIC_VALIDATION ->
-						addAssertionsByKeyWord(allAssertions, assertionGroup);
-				case MDRS_VALIDATION, STANDALONE_RELEASE ->
-						addAllAssertions(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()), assertionGroup);
-				case SIMPLEX_RELEASE, LOINC_EDITION, SPANISH_EDITION, DANISH_EDITION, SWEDISH_EDITION, INTERNATIONAL_EDITION, US_EDITION, BE_EDITION, COMMON_EDITION, NO_EDITION, CH_EDITION, FR_EDITION, IE_EDITION, GMDN, EE_EDITION, AT_EDITION, AU_EDITION, NL_EDITION, GPFP_ICPC2, DERIVATIVE_EDITION ->
-						addAssertionsToReleaseAssertionGroup(allAssertions, assertionGroup);
-				case COMMON_AUTHORING -> addAssertionToCommonSnapshotAssertionGroup(allAssertions, assertionGroup);
-				case COMMON_AUTHORING_WITHOUT_LANG_REFSETS ->
-						addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(allAssertions, assertionGroup);
-				case INT_AUTHORING, AT_AUTHORING, AU_AUTHORING, DK_AUTHORING, SE_AUTHORING, US_AUTHORING, BE_AUTHORING, NO_AUTHORING, CH_AUTHORING, FR_AUTHORING, IE_AUTHORING, NZ_AUTHORING, ZH_AUTHORING, EE_AUTHORING, KR_AUTHORING, NL_AUTHORING ->
-						addAssertionToSnapshotAssertionGroup(assertionGroup);
-				case FIRST_TIME_LOINC_VALIDATION, FIRST_TIME_COMMON_EDITION_VALIDATION ->
-						addAssertionsToFirstTimeReleaseGroup(allAssertions, assertionGroup);
-				case STATED_RELATIONSHIPS_VALIDATION ->
-						addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, false);
-				case STATED_RELATIONSHIPS_RELEASE_VALIDATION ->
-						addAssertionsToStatedRelationshipAssertionGroup(allAssertions, assertionGroup, true);
-				default -> LOGGER.warn("unrecognized group: {}", assertionGroup.getName());
-			}
-		}
-	}
-
-	private void addAssertionToCommonRefset(List<Assertion> allAssertions, AssertionGroup group) {
-		for (Assertion assertion : allAssertions) {
-			if (assertionUuidConfig.getCommonRefsets().contains(assertion.getUuid().toString())) {
-				assertionService.addAssertionToGroup(assertion, group);
-			}
-		}
-	}
-
-	private void addAssertionsToFirstTimeReleaseGroup(List<Assertion> allAssertions, AssertionGroup group) {
-		AssertionGroupName groupName = AssertionGroupName.fromName(group.getName());
-		int counter = 0;
-		String keyWords;
-		for (Assertion assertion : allAssertions) {
-			if (assertionUuidConfig.getFirstTimeCommonAdditionalExclude().contains(assertion.getUuid().toString())) {
-				continue;
-			}
-			keyWords = assertion.getKeywords();
-			//exclude SNOMED RT assertions
-			if (assertionUuidConfig.getSnomedRtIdentifier().contains(assertion.getUuid().toString())) {
-				continue;
-			}
-			// Exclude stated relationship assertions
-			if (assertionUuidConfig.getStatedRelationship().contains(assertion.getUuid().toString())) {
-				continue;
-			}
-
-			if (RELEASE_TYPE_VALIDATION.getName().equals(keyWords) || FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)
-					|| keyWords.contains("," + groupName.getReleaseCenter())) {
-				String assertionText = assertion.getAssertionText();
-				if ( !assertionText.contains(PREVIOUS) && !assertionText.contains(NEW_INACTIVE_STATES_FOLLOW_ACTIVE_STATES) ) {
-					assertionService.addAssertionToGroup(assertion, group);
-					counter++;
-				}
-			}
-		}
-		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
-	}
-
-	private void addAssertionToCommonSnapshotAssertionGroup(List<Assertion> allAssertions, AssertionGroup group) {
-		int counter = 0;
-		for (Assertion assertion : allAssertions) {
-			String keyWords = assertion.getKeywords();
-			 if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
-				 continue;
-			 }
-			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)) {
-				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
-				if (assertionUuidConfig.getSnapshotExclude().contains(assertion.getUuid().toString())) {
-					continue;
-				}
-				//exclude simple map file checking as term server extracts don't contain these
-				if (assertion.getAssertionText().contains(SIMPLE_MAP)) {
-					continue;
-				}
-				// Exclude stated relationship assertions
-				if (assertionUuidConfig.getStatedRelationship().contains(assertion.getUuid().toString())) {
-					continue;
-				}
-				assertionService.addAssertionToGroup(assertion, group);
-				counter++;
-			}
-		}
-		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
-	}
-
-	private void addAssertionToCommonSnapshotWithoutLangRefsetsAssertionGroup(List<Assertion> allAssertions, AssertionGroup group) {
-		int counter = 0;
-		for (Assertion assertion : allAssertions) {
-			String keyWords = assertion.getKeywords();
-			if (keyWords.contains(RELEASE_TYPE_VALIDATION.getName())) {
-				continue;
-			}
-			if (FILE_CENTRIC_VALIDATION.getName().equals(keyWords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keyWords)) {
-				//exclude this from snapshot group as termserver extracts for inferred relationship file doesn't reuse existing ids.
-				if (assertionUuidConfig.getSnapshotExclude().contains(assertion.getUuid().toString())
-					|| assertion.getAssertionText().contains(SIMPLE_MAP)
-					|| assertionUuidConfig.getStatedRelationship().contains(assertion.getUuid().toString())
-					|| assertionUuidConfig.getCommonLanguageRefsets().contains(assertion.getUuid().toString())
-				) {
-					continue;
-				}
-				assertionService.addAssertionToGroup(assertion, group);
-				counter++;
-			}
-		}
-		LOGGER.info("Total assertions added {} for assertion group {}", counter, group.getName() );
-	}
-
-
-	private void addAssertionToSnapshotAssertionGroup(AssertionGroup group) {
-		AssertionGroupName groupName = AssertionGroupName.fromName(group.getName());
-		List<Assertion> allAssertions = assertionService.getAssertionsByKeyWords("," + groupName.getReleaseCenter(), false);
-		List<Assertion> releaseTypeAssertions = assertionService.getAssertionsByKeyWords(RELEASE_TYPE_VALIDATION.getName(), false);
-		if (INT_AUTHORING.equals(groupName)) {
-            allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> assertionUuidConfig.getIntAuthoringInclude().contains(assertion.getUuid().toString())).toList());
-		} else {
-			if (!US_AUTHORING.equals(groupName) && !NL_AUTHORING.equals(groupName) && !AU_AUTHORING.equals(groupName)) {
-				allAssertions.addAll(assertionService.getAssertionsByKeyWords(",EXTENSION", false));
-			}
-			allAssertions.addAll(releaseTypeAssertions.stream().filter(assertion -> assertionUuidConfig.getMsAuthoringInclude().contains(assertion.getUuid().toString())).toList());
+    /**
+     * Loads the first {@code assertionGroupingStrategy} in the document: policy UUID lists and
+     * non-blank {@code group} elements. Parsing errors are logged and leave configuration empty.
+     *
+     * @param manifestInputStream manifest XML stream, may be null
+     */
+    private void loadManifestConfiguration(InputStream manifestInputStream) {
+        manifestPolicyOverrides = new HashMap<>();
+        manifestGroupElements = List.of();
+        if (manifestInputStream == null) {
+            return;
         }
-		for (Assertion assertion : allAssertions) {
-			if (isExcludeAssertionFromSnapshotAssertionGroup(assertion, groupName)) continue;
-			assertionService.addAssertionToGroup(assertion, group);
-		}
-		LOGGER.info("Total assertions added {} for assertion group {}", allAssertions.size(), group.getName() );
-	}
+        try {
+            Document doc = new SAXBuilder().build(manifestInputStream);
+            XPathFactory xpf = XPathFactory.instance();
+            String stratExpr = "//" + AssertionGroupingXml.STRATEGY_ELEMENT;
+            XPathExpression<Element> stratPath = xpf.compile(stratExpr, new ElementFilter(AssertionGroupingXml.STRATEGY_ELEMENT));
+            List<Element> strategies = stratPath.evaluate(doc);
+            if (strategies.isEmpty()) {
+                return;
+            }
+            Element strategy = strategies.get(0);
+            Element policyValuesEl = strategy.getChild(AssertionGroupingXml.POLICY_VALUES_ELEMENT);
+            if (policyValuesEl != null) {
+                for (Element policy : policyValuesEl.getChildren(AssertionGroupingXml.POLICY_ELEMENT)) {
+                    String name = policy.getAttributeValue(AssertionGroupingXml.ATTR_NAME);
+                    String uuids = policy.getAttributeValue(AssertionGroupingXml.ATTR_ASSERTION_UUIDS);
+                    if (name != null && uuids != null && !uuids.isBlank()) {
+                        manifestPolicyOverrides.put(name, parseCommaUuidList(uuids));
+                    }
+                }
+            }
+            List<Element> groups = new ArrayList<>();
+            for (Element g : strategy.getChildren(AssertionGroupingXml.GROUP_ELEMENT)) {
+                String gn = g.getAttributeValue(AssertionGroupingXml.ATTR_NAME);
+                if (gn != null && !gn.isBlank()) {
+                    groups.add(g);
+                }
+            }
+            manifestGroupElements = groups;
+        } catch (JDOMException | IOException e) {
+            LOGGER.warn("Failed to parse assertionGroupingStrategy from manifest: {}", e.getMessage());
+        }
+    }
 
-	private boolean isExcludeAssertionFromSnapshotAssertionGroup(Assertion assertion, AssertionGroupName groupName) {
-		boolean isUSAuthoringExcludedAssertion = (AssertionGroupName.US_AUTHORING.equals(groupName) && assertionUuidConfig.getUsAuthoringExclude().contains(assertion.getUuid().toString()));
-		boolean isAuAuthoringExcludedAssertion = (AssertionGroupName.AU_AUTHORING.equals(groupName) && assertionUuidConfig.getAuAuthoringExclude().contains(assertion.getUuid().toString()));
-		boolean isINTAuthoringExcludedAssertion = (AssertionGroupName.INT_AUTHORING.equals(groupName) && assertionUuidConfig.getIntAuthoringExclude().contains(assertion.getUuid().toString()));
-		boolean isSnapshotExcludedAssertion = (assertionUuidConfig.getSnapshotExclude().contains(assertion.getUuid().toString()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !assertionUuidConfig.getMsAuthoringInclude().contains(assertion.getUuid().toString()))
-				|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !assertionUuidConfig.getIntAuthoringInclude().contains(assertion.getUuid().toString()))));
-		boolean isSimpleMapExcludedAssertion = (assertion.getAssertionText().contains(SIMPLE_MAP) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !assertionUuidConfig.getMsAuthoringInclude().contains(assertion.getUuid().toString()))
-				|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !assertionUuidConfig.getIntAuthoringInclude().contains(assertion.getUuid().toString()))));
-		boolean isStatedRelationshipExcludedAssertion = (assertionUuidConfig.getStatedRelationship().contains(assertion.getUuid().toString()) && !assertionUuidConfig.getMsAuthoringInclude().contains(assertion.getUuid().toString()));
-		boolean isReleaseTypeExcludedAssertion = (assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()) && ((!AssertionGroupName.INT_AUTHORING.equals(groupName) && !assertionUuidConfig.getMsAuthoringInclude().contains(assertion.getUuid().toString()))
-				|| (AssertionGroupName.INT_AUTHORING.equals(groupName) && !assertionUuidConfig.getIntAuthoringInclude().contains(assertion.getUuid().toString()))));
+    /** Splits a comma-separated UUID list from manifest policy definitions. */
+    private static List<String> parseCommaUuidList(String csv) {
+        List<String> out = new ArrayList<>();
+        for (String s : csv.split(",")) {
+            String t = s.trim();
+            if (!t.isEmpty()) {
+                out.add(t);
+            }
+        }
+        return out;
+    }
 
-		return isReleaseTypeExcludedAssertion || isAuAuthoringExcludedAssertion || isStatedRelationshipExcludedAssertion || isSimpleMapExcludedAssertion || isUSAuthoringExcludedAssertion || isINTAuthoringExcludedAssertion || isSnapshotExcludedAssertion;
-	}
+    /** Splits a comma-separated attribute value into trimmed non-empty tokens. */
+    private static List<String> splitCsv(String csv) {
+        if (csv == null || csv.isBlank()) {
+            return List.of();
+        }
+        return Arrays.stream(csv.split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
+    }
 
+    /** UUIDs declared for a policy name in the loaded manifest, or empty if absent. */
+    private List<String> policyUuidsFromManifest(String policyKey) {
+        List<String> fromManifest = manifestPolicyOverrides.get(policyKey);
+        if (fromManifest == null || fromManifest.isEmpty()) {
+            return List.of();
+        }
+        return fromManifest;
+    }
 
-	private List<Assertion> getCommonReleaseAssertions(List<Assertion> allAssertions) {
-		List<Assertion> result = new ArrayList<>();
-		String keywords;
-		for (Assertion assertion : allAssertions) {
-			 keywords = assertion.getKeywords();
-			if (keywords.contains(MDRS) || FILE_CENTRIC_VALIDATION.getName().equals(keywords) || COMPONENT_CENTRIC_VALIDATION.getName().equals(keywords)
-					|| RELEASE_TYPE_VALIDATION.getName().equals(keywords)) {
-				result.add(assertion);
-			}
-		}
-		LOGGER.info("Total common release assertions: {}", result.size());
-		return result;
-	}
+    private static String normalizePolicyToken(String token) {
+        return token == null ? "" : token.trim();
+    }
 
-	private List<Assertion> getReleaseAssertionsByCenter(List<Assertion> allAssertions, String releaseCenter) {
-		List<Assertion> result = new ArrayList<>();
-		for (Assertion assertion : allAssertions) {
-			String keywords = assertion.getKeywords();
-			if (keywords.endsWith("," + releaseCenter) || keywords.contains("," + releaseCenter + ",")) {
-				result.add(assertion);
-			}
-		}
-		LOGGER.info("Total release assertions found :{} for center:{}", result.size(), releaseCenter);
-		return result;
-	}
+    /** @return whether {@code uuid} is listed under the named manifest policy */
+    private boolean uuidInPolicyList(String policyName, String uuid) {
+        return policyUuidsFromManifest(normalizePolicyToken(policyName)).contains(uuid);
+    }
 
-	private void addAssertionsToReleaseAssertionGroup(List<Assertion> allAssertions, AssertionGroup assertionGroup) {
-		//create international assertion group
-		AssertionGroupName groupName = AssertionGroupName.fromName(assertionGroup.getName());
-		List<Assertion> assertionsToBeAdded = getCommonReleaseAssertions(allAssertions);
-		assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, groupName.getReleaseCenter()));
-		boolean isEdition = AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) || AssertionGroupName.US_EDITION.equals(groupName)
-							|| AssertionGroupName.AU_EDITION.equals(groupName) || AssertionGroupName.NL_EDITION.equals(groupName);
-		if (!AssertionGroupName.COMMON_EDITION.equals(groupName) && !isEdition) {
-			assertionsToBeAdded.addAll(getReleaseAssertionsByCenter(allAssertions, "EXTENSION"));
-		}
-		for (Assertion assertion : assertionsToBeAdded) {
-			if ((AssertionGroupName.SPANISH_EDITION.equals(groupName) && assertionUuidConfig.getSpanishExtensionExclude().contains(assertion.getUuid().toString()))
-				|| assertionUuidConfig.getStatedRelationship().contains(assertion.getUuid().toString())
-				|| (AssertionGroupName.INTERNATIONAL_EDITION.equals(groupName) && (assertionUuidConfig.getSnomedRtIdentifier().contains(assertion.getUuid().toString())
-					|| assertionUuidConfig.getIntEditionExclude().contains(assertion.getUuid().toString())))
-				|| (AssertionGroupName.US_EDITION.equals(groupName) && assertionUuidConfig.getUsEditionExclude().contains(assertion.getUuid().toString()))
-				|| (AssertionGroupName.DERIVATIVE_EDITION.equals(groupName) && assertionUuidConfig.getMrcmRefsets().contains(assertion.getUuid().toString()))) {
-				continue;
-			}
-			assertionService.addAssertionToGroup(assertion, assertionGroup);
-		}
-		LOGGER.info("Total assertions added {} for assertion group {}", assertionsToBeAdded.size(), groupName.getName());
-	}
+    /**
+     * Returns true if trimmed {@code assertionKeywords} equals one of the trimmed entries in
+     * {@code tokenList}. Currently unused by grouping rules but kept for keyword-token checks.
+     */
+    private boolean matchesKeywordTokensOnly(String assertionKeywords, List<String> tokenList) {
+        if (assertionKeywords == null || tokenList.isEmpty()) {
+            return false;
+        }
+        Set<String> allowed = new HashSet<>();
+        for (String t : tokenList) {
+            String s = t.trim();
+            if (!s.isEmpty()) {
+                allowed.add(s);
+            }
+        }
+        if (allowed.isEmpty()) {
+            return false;
+        }
+        String kw = assertionKeywords.trim();
+        return allowed.contains(kw);
+    }
 
-	private void addAssertionsByKeyWord(List<Assertion> allAssertions, AssertionGroup group) {
-		for (Assertion assertion : allAssertions) {
-			if (assertion.getKeywords().equals(group.getName())) {
-				assertionService.addAssertionToGroup(assertion, group);
-			}
-		}
-	}
+    /**
+     * Inclusion via {@code includeStandaloneCategories}: after optional default-category shortcut,
+     * any remaining token from the group list that appears in assertion keywords (excluding default
+     * categories from both sides for the overlap pass) yields a match.
+     */
+    private boolean matchesIncludeStandaloneCategories(Assertion assertion, Element group) {
+        String includeStandaloneCategoriesCsv = group.getAttributeValue(AssertionGroupingXml.ATTR_INCLUDE_STANDALONE_CATEGORIES);
+        if (includeStandaloneCategoriesCsv == null || includeStandaloneCategoriesCsv.isBlank()) {
+            return false;
+        }
+        String assertionKeywords = assertion.getKeywords();
+        List<String> assertionKeywordList = splitCsv(assertionKeywords);
+        List<String> tokenList = splitCsv(includeStandaloneCategoriesCsv);
+        for (String t : defaultStandaloneCategories) {
+            String s = t.trim();
+            if (assertionKeywords.equals(s) && tokenList.contains(s)) {
+                return true;
+            }
+        }
+        assertionKeywordList.removeAll(defaultStandaloneCategories);
+        tokenList.removeAll(defaultStandaloneCategories);
+        for (String t : tokenList) {
+            String s = t.trim();
+            if (assertionKeywordList.contains(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	private void addAllAssertions(List<Assertion> allAssertions, AssertionGroup group) {
-		int addedAssertions = 0;
-		for (Assertion assertion : allAssertions) {
-				assertionService.addAssertionToGroup(assertion, group);
-				addedAssertions++;
-		}
-		LOGGER.info("Total assertions added {} for assertion group {}", addedAssertions, group.getName());
-	}
+    /**
+     * Inclusion via {@code includeCategoryWithCentre}: {@code group}'s attribute is a {@code |}-separated
+     * list of {@code category,centre} pairs (comma within each pair). A pair matches when both tokens
+     * appear in the assertion's comma-separated keywords, {@code category} is one of the default
+     * standalone category keywords, and {@code centre} is not one of those defaults.
+     */
+    private boolean matchesConjunctionCentresAndCategories(Assertion assertion, Element group) {
+        String assertionKeywords = assertion.getKeywords();
+        String includeCategoryWithCentreCsv = group.getAttributeValue(AssertionGroupingXml.ATTR_INCLUDE_CATEGORY_WITH_CENTRE);
+        List<String> tokenList = Arrays.stream(includeCategoryWithCentreCsv.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
 
-	private void addAssertionsToStatedRelationshipAssertionGroup(List<Assertion> allAssertions, AssertionGroup group, boolean useFullList) {
-		List<String> statedRelationshipAssertionIds = assertionUuidConfig.getStatedRelationship();
-		int statedRelationshipAssertionCount = statedRelationshipAssertionIds.size();
-		int count = 0;
-		for (Assertion assertion : allAssertions) {
-			if(statedRelationshipAssertionIds.contains(assertion.getUuid().toString())) {
-				if(useFullList || !(assertion.getKeywords().contains(RELEASE_TYPE_VALIDATION.getName()))) {
-					assertionService.addAssertionToGroup(assertion, group);
-				}
-				count++;
-				if(count == statedRelationshipAssertionCount) break;
-			}
-		}
-	}
+        List<String> categoryTokens = splitCsv(assertionKeywords);
+        for (String raw : tokenList) {
+            String t = raw.trim();
+            List<String> categoryWithCentres = splitCsv(t);
+            if (categoryWithCentres.size() == 2
+                    && defaultStandaloneCategories.contains(categoryWithCentres.get(0))
+                    && !defaultStandaloneCategories.contains(categoryWithCentres.get(1))
+                    && new HashSet<>(categoryTokens).containsAll(categoryWithCentres)) {
+                return true;
+            }
+        }
 
+        return false;
+    }
+
+    /**
+     * True if the assertion should be excluded: UUID hits an {@code excludeByPolicy} policy,
+     * assertion text contains any {@code excludeAssertionKeywords} phrase, or assertion keywords
+     * contain any {@code excludeCategories} token.
+     */
+    private boolean violatesExcludeByPolicy(Assertion assertion, String excludeByPolicyCsv, String excludeAssertionKeywords, String excludeCategories) {
+        String uuid = assertion.getUuid().toString();
+        String text = assertion.getAssertionText();
+        if (StringUtils.hasLength(excludeByPolicyCsv)) {
+            for (String raw : splitCsv(excludeByPolicyCsv)) {
+                String token = raw.trim();
+                if (uuidInPolicyList(token, uuid)) {
+                    return true;
+                }
+            }
+        }
+        if (StringUtils.hasLength(excludeAssertionKeywords)) {
+            List<String> excludeAssertionKeywordList = Arrays.stream(excludeAssertionKeywords.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
+            String lower = text.toLowerCase();
+            for (String excludeAssertionKeyword : excludeAssertionKeywordList) {
+                if (lower.contains(excludeAssertionKeyword.toLowerCase())) {
+                    return true;
+                }
+            }
+        }
+        if (StringUtils.hasLength(excludeCategories)) {
+            String assertionKeywords = assertion.getKeywords();
+            List<String> assertionKeywordList = splitCsv(assertionKeywords);
+            for (String raw : splitCsv(excludeCategories)) {
+                String token = raw.trim();
+                if (assertionKeywordList.contains(token)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** True if the assertion UUID appears in any comma-separated named policy from {@code includeByPolicyCsv}. */
+    private boolean matchesIncludeByPolicy(Assertion assertion, String includeByPolicyCsv) {
+        String uuid = assertion.getUuid().toString();
+        for (String raw : splitCsv(includeByPolicyCsv)) {
+            String token = raw.trim();
+            if (uuidInPolicyList(token, uuid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether {@code assertion} belongs in the group described by {@code group}'s XML attributes:
+     * exclusions first, then {@code includeByPolicy}, {@code includeStandaloneCategories}, and
+     * {@code includeCategoryWithCentre} as documented on this class.
+     */
+    private boolean assertionMatchesGroupRule(Assertion assertion, Element group) {
+        if (violatesExcludeByPolicy(assertion, group.getAttributeValue(AssertionGroupingXml.ATTR_EXCLUDE_BY_POLICY), group.getAttributeValue(AssertionGroupingXml.ATTR_ASSERTION_KEYWORDS), group.getAttributeValue(AssertionGroupingXml.ATTR_EXCLUDE_CATEGORIES))) {
+            return false;
+        }
+
+        String includeByPolicyCsv = group.getAttributeValue(AssertionGroupingXml.ATTR_INCLUDE_BY_POLICY);
+        if (StringUtils.hasLength(includeByPolicyCsv) && matchesIncludeByPolicy(assertion, includeByPolicyCsv)) {
+            return true;
+        }
+
+        if (matchesIncludeStandaloneCategories(assertion, group)) {
+            return true;
+        }
+
+        String includeCategoryWithCentreCsv = group.getAttributeValue(AssertionGroupingXml.ATTR_INCLUDE_CATEGORY_WITH_CENTRE);
+        if (StringUtils.hasLength(includeCategoryWithCentreCsv)) {
+            return matchesConjunctionCentresAndCategories(assertion, group);
+        }
+
+        return false;
+    }
+
+    /**
+     * Clears existing manifest-defined groups, creates missing groups, drops assertions from groups
+     * not in the manifest, and repopulates membership from the in-memory group elements loaded
+     * from the manifest.
+     *
+     * @throws IllegalStateException if no group definitions were loaded from the manifest
+     */
+    private void importAssertionGroupsCore() {
+        if (manifestGroupElements.isEmpty()) {
+            throw new IllegalStateException("manifest.xml must define <assertionGroupingStrategy> with one or more <group> elements.");
+        }
+        List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
+        if (allGroups == null) {
+            allGroups = new ArrayList<>();
+        }
+        List<String> existingGroups = new ArrayList<>();
+        for (AssertionGroup group : allGroups) {
+            LOGGER.info("Validation group is already created: {}", group.getName());
+            group.removeAllAssertionsFromGroup();
+            existingGroups.add(group.getName());
+        }
+
+        List<String> allGroupNames = manifestGroupElements.stream().map(ge -> ge.getAttributeValue(AssertionGroupingXml.ATTR_NAME)).collect(Collectors.toCollection(ArrayList::new));
+
+        for (String groupName : allGroupNames) {
+            if (!existingGroups.contains(groupName)) {
+                LOGGER.info("creating assertion group: {}", groupName);
+                AssertionGroup group = new AssertionGroup();
+                group.setName(groupName);
+                allGroups.add(assertionService.createAssertionGroup(group));
+            }
+        }
+
+        List<Assertion> allAssertions = assertionService.findAll();
+        Set<String> nameSet = new LinkedHashSet<>(allGroupNames);
+        allGroups = allGroups.stream().filter(ag -> nameSet.contains(ag.getName())).collect(Collectors.toList());
+
+        Map<String, Element> groupDefByName = manifestGroupElements.stream()
+                .collect(Collectors.toMap(ge -> ge.getAttributeValue(AssertionGroupingXml.ATTR_NAME), ge -> ge, (a, b) -> a));
+
+        for (AssertionGroup group : allGroups) {
+            Element def = groupDefByName.get(group.getName());
+            if (def == null) {
+                LOGGER.warn("Missing <group> definition for name {}", group.getName());
+                continue;
+            }
+            int added = 0;
+            for (Assertion assertion : allAssertions) {
+                if (assertionMatchesGroupRule(assertion, def)) {
+                    assertionService.addAssertionToGroup(assertion, group);
+                    added++;
+                }
+            }
+            LOGGER.info("Total assertions added {} for assertion group {}", added, group.getName());
+        }
+    }
 }
