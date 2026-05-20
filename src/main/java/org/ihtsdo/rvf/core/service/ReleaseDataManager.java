@@ -10,8 +10,8 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.utils.ZipFileUtils;
-import org.ihtsdo.rvf.core.service.config.ModuleStorageResourceConfig;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
+import org.ihtsdo.rvf.core.service.config.Rf2FilenameEditionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationMysqlBinaryStorageConfig;
 import org.ihtsdo.rvf.core.service.util.MySqlDataTypeConverter;
 import org.ihtsdo.rvf.core.service.util.RF2FileTableMapper;
@@ -38,11 +38,11 @@ import java.util.regex.Pattern;
 @Service
 public class ReleaseDataManager {
 
+	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManager.class);
+
 	public static final String RVF_DB_PREFIX = "rvf_";
 	private static final String VERSION_NOT_FOUND = "version not found in RVF database ";
 	private static final String ZIP_FILE_EXTENSION = ".zip";
-	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManager.class);
-	private static final Map<String, String> FILENAME_PATTERN_TO_EDITION_MAP = new HashMap<>();
 	public static final String RECEIVING_RELEASE_DATA_INFO_MSG = "Receiving release data - {}";
 	public static final String RELEASE_FILE_COPIED_TO_INFO_MSG = "Release file copied to : {}";
 	public static final String COPY_RELEASE_FILE_WARNING_MSG = "Error copying release file to %s. Nested exception is : \n";
@@ -50,32 +50,6 @@ public class ReleaseDataManager {
 	public static final String SQL_ALTER_TABLE = "ALTER TABLE ";
 	public static final String INSERT_INTO = "INSERT INTO ";
 
-	static  {
-		FILENAME_PATTERN_TO_EDITION_MAP.put("SpanishExtension.*_INT", "ES");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("SimplexEdition_", "SIMPLEX");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_NL1000146_[0-9]+\\.txt", "NL");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("GB1000000_[0-9]+\\.txt", "UK");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_AU1000036_[0-9]+\\.txt", "AU");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_NZ1000210_[0-9]+\\.txt", "NZ");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_US1000124_[0-9]+\\.txt", "US");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_BE1000172_[0-9]+\\.txt", "BE");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_SE1000052_[0-9]+\\.txt", "SE");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_DK1000005_[0-9]+\\.txt", "DK");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_EE1000181_[0-9]+\\.txt", "EE");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_CH1000195_[0-9]+\\.txt", "CH");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_NO1000202_[0-9]+\\.txt", "NO");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_IE1000220_[0-9]+\\.txt", "IE");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_AT1000234_[0-9]+\\.txt", "AT");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_FR1000315_[0-9]+\\.txt", "FR");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_KR1000267_[0-9]+\\.txt", "KR");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_CH1000195[0-9]+\\.txt", "CH");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_LO1010000_[0-9]+\\.txt", "LOINC");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_NE1002000_[0-9]+\\.txt", "NUVA");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_TM_[0-9]+\\.txt", "TM");
-		FILENAME_PATTERN_TO_EDITION_MAP.put("_INT_[0-9]+\\.txt", "INT");
-	}
-
-	
 	@Value("${rvf.data.folder.location}")
 	private String sctDataLocation;
 	
@@ -90,21 +64,16 @@ public class ReleaseDataManager {
     @Resource(name = "dataSource")
 	private BasicDataSource dataSource;
 	
-	@Autowired
-	private RvfDynamicDataSource rvfDynamicDataSource;
+	private final RvfDynamicDataSource rvfDynamicDataSource;
 	
 	private final Set<String> schemaNames = new HashSet<>();
 	
-	@Autowired
-	private ResourceLoader cloudResourceLoader;
+	private final ResourceLoader cloudResourceLoader;
 
-	@Autowired
-	private ValidationMysqlBinaryStorageConfig mysqlBinaryStorageConfig;
+	private final ValidationMysqlBinaryStorageConfig mysqlBinaryStorageConfig;
 
-	@Autowired
-	private ModuleStorageResourceConfig moduleStorageResourceConfig;
-	
-	
+	private final Rf2FilenameEditionConfig rf2FilenameEditionConfig;
+
 	@PostConstruct
 	public void init() {
 		logger.info("Sct Data Location passed = {}", sctDataLocation);
@@ -117,6 +86,14 @@ public class ReleaseDataManager {
 		}
 		logger.info("Using data location as : {}", sctDataFolder.getAbsolutePath());
 		fetchRvfSchemasFromDb();
+	}
+
+	@Autowired
+	public ReleaseDataManager(RvfDynamicDataSource rvfDynamicDataSource, ResourceLoader cloudResourceLoader, ValidationMysqlBinaryStorageConfig mysqlBinaryStorageConfig, Rf2FilenameEditionConfig rf2FilenameEditionConfig) {
+		this.rvfDynamicDataSource = rvfDynamicDataSource;
+		this.cloudResourceLoader = cloudResourceLoader;
+		this.mysqlBinaryStorageConfig = mysqlBinaryStorageConfig;
+		this.rf2FilenameEditionConfig = rf2FilenameEditionConfig;
 	}
 
 	/**
@@ -675,13 +652,7 @@ public class ReleaseDataManager {
 	}
 
 	private String mapFilenameToEdition(String name) {
-		String edition = "INT";
-		for (Map.Entry<String, String> entry : FILENAME_PATTERN_TO_EDITION_MAP.entrySet()) {
-			if (Pattern.compile(entry.getKey()).matcher(name).find()) {
-				return entry.getValue();
-			}
-		}
-		return edition;
+		return rf2FilenameEditionConfig.mapFilenameToEdition(name);
 	}
 
 	private List<String> getFileList(final File dataFile) throws BusinessServiceException {
