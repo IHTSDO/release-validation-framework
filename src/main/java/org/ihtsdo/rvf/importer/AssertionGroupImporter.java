@@ -23,33 +23,31 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Imports assertion groups from {@code manifest.xml} by reading the first
- * {@code assertionGroupingStrategy} block and assigning each {@link Assertion} to zero or more
- * {@link AssertionGroup}s according to {@code group} element rules.
+ * Imports assertion groups from {@link AssertionGroupingXml#GROUPS_RESOURCE_FILENAME} and
+ * {@link AssertionGroupingXml#POLICIES_RESOURCE_FILENAME}, assigning each {@link Assertion} to zero
+ * or more {@link AssertionGroup}s according to {@code group} element rules.
  *
- * <p>Manifest layout (see {@link AssertionGroupingXml} for element and attribute names):
+ * <p>Layout (see {@link AssertionGroupingXml} for element and attribute names):
  * <ul>
- *   <li>{@code policyValues/policy} &mdash; named lists of assertion UUIDs referenced by
- *       {@code excludeByPolicy} and {@code includeByPolicy} on each group.</li>
- *   <li>{@code group} &mdash; one element per group name; groups without a non-blank {@code name}
- *       are skipped when loading the manifest.</li>
+ *   <li>{@code policies.xml} &mdash; {@code policyValues/policy} named policies with
+ *       {@code assertionUuids}, {@code assertionTextPhrases}, and/or {@code categoryWithCentrePairs}.</li>
+ *   <li>{@code groups.xml} &mdash; {@code assertionGroupingStrategy/group} elements referencing
+ *       policies via {@code excludeByPolicy} and {@code includeByPolicy}.</li>
  * </ul>
  *
  * <p>For a given assertion and group definition, membership is decided in order:
  * <ol>
  *   <li><strong>Exclusions</strong> &mdash; if any applies, the assertion is not in the group:
- *       UUID listed under a named policy in {@code excludeByPolicy} (comma-separated policy names);
- *       assertion text contains any {@code excludeAssertionKeywords} phrase (pipe-separated);
+ *       UUID listed under a named policy in {@code excludeByPolicy}, or assertion text matches a
+ *       named {@code assertionTextPhrases} policy (comma-separated policy names);
  *       assertion keywords (comma-separated) contain any token from {@code excludeCategories}.</li>
- *   <li><strong>{@code includeByPolicy}</strong> &mdash; if the attribute is set and the assertion UUID
- *       appears in any named policy list, the assertion is included.</li>
+ *   <li><strong>{@code includeByPolicy}</strong> &mdash; assertion is included when any named policy
+ *       matches by UUID list, or by {@code categoryWithCentrePairs} (category and centre both present
+ *       in assertion keywords, category is a default validation category, centre is not).</li>
  *   <li><strong>{@code includeStandaloneCategories}</strong> &mdash; overlap between the group's token
  *       list and the assertion's keyword tokens, with special handling for the default category
  *       keywords ({@code file-centric-validation}, {@code component-centric-validation},
  *       {@code release-type-validation}).</li>
- *   <li><strong>{@code includeCategoryWithCentre}</strong> &mdash; pipe-separated {@code category,centre}
- *       pairs; a pair matches when both tokens appear in the assertion keywords, the category is one
- *       of the default three, and the centre token is not one of those defaults.</li>
  * </ol>
  * If no inclusion rule matches, the assertion is not added to that group.
  *
@@ -65,7 +63,9 @@ public class AssertionGroupImporter {
 
     private final AssertionService assertionService;
 
-    private Map<String, List<String>> manifestPolicyOverrides = Map.of();
+    private Map<String, List<String>> manifestPolicyUuids = Map.of();
+    private Map<String, List<String>> manifestPolicyTextPhrases = Map.of();
+    private Map<String, List<List<String>>> manifestPolicyCategoryCentrePairs = Map.of();
     private List<Element> manifestGroupElements = List.of();
     /** Keyword tokens treated as default "category" dimensions for standalone and centre matching. */
     private final List<String> defaultStandaloneCategories = List.of("file-centric-validation", "component-centric-validation", "release-type-validation");
@@ -79,53 +79,90 @@ public class AssertionGroupImporter {
     }
 
     /**
-     * Parses {@code assertionGroupingStrategy} from the manifest stream, then rebuilds group
-     * membership in the database for every group defined in the manifest.
+     * Loads policies and groups from the assertions package XML files, then rebuilds group
+     * membership in the database.
      *
-     * @param manifestInputStream XML manifest; if null or unparsable, policy and group definitions
-     *                            may be empty and the subsequent import step will throw if no
-     *                            groups were loaded
+     * @param groupsInputStream {@link AssertionGroupingXml#GROUPS_RESOURCE_FILENAME} content
+     * @param policiesInputStream {@link AssertionGroupingXml#POLICIES_RESOURCE_FILENAME} content
      */
-    public void importAssertionGroups(InputStream manifestInputStream) {
-        loadManifestConfiguration(manifestInputStream);
+    public void importAssertionGroups(InputStream groupsInputStream, InputStream policiesInputStream) {
+        manifestPolicyUuids = new HashMap<>();
+        manifestPolicyTextPhrases = new HashMap<>();
+        manifestPolicyCategoryCentrePairs = new HashMap<>();
+        manifestGroupElements = List.of();
+        loadPoliciesConfiguration(policiesInputStream);
+        loadGroupsConfiguration(groupsInputStream);
         importAssertionGroupsCore();
     }
 
-    /**
-     * Loads the first {@code assertionGroupingStrategy} in the document: policy UUID lists and
-     * non-blank {@code group} elements. Parsing errors are logged and leave configuration empty.
-     *
-     * @param manifestInputStream manifest XML stream, may be null
-     */
-    private void loadManifestConfiguration(InputStream manifestInputStream) {
-        manifestPolicyOverrides = new HashMap<>();
-        manifestGroupElements = List.of();
-        if (manifestInputStream == null) {
+    private SAXBuilder createSecureSaxBuilder() {
+        SAXBuilder saxBuilder = new SAXBuilder();
+        saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        return saxBuilder;
+    }
+
+    private void loadPoliciesConfiguration(InputStream policiesInputStream) {
+        if (policiesInputStream == null) {
             return;
         }
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            Document doc = createSecureSaxBuilder().build(policiesInputStream);
+            Element policyValuesEl = doc.getRootElement();
+            if (!AssertionGroupingXml.POLICY_VALUES_ELEMENT.equals(policyValuesEl.getName())) {
+                XPathFactory xpf = XPathFactory.instance();
+                String expr = "//" + AssertionGroupingXml.POLICY_VALUES_ELEMENT;
+                XPathExpression<Element> path = xpf.compile(expr, new ElementFilter(AssertionGroupingXml.POLICY_VALUES_ELEMENT));
+                List<Element> found = path.evaluate(doc);
+                if (found.isEmpty()) {
+                    LOGGER.warn("No {} element in {}", AssertionGroupingXml.POLICY_VALUES_ELEMENT,
+                            AssertionGroupingXml.POLICIES_RESOURCE_FILENAME);
+                    return;
+                }
+                policyValuesEl = found.get(0);
+            }
+            loadPoliciesFromElement(policyValuesEl);
+        } catch (JDOMException | IOException e) {
+            LOGGER.warn("Failed to parse policies from {}: {}", AssertionGroupingXml.POLICIES_RESOURCE_FILENAME, e.getMessage());
+        }
+    }
 
-            Document doc = saxBuilder.build(manifestInputStream);
+    private void loadPoliciesFromElement(Element policyValuesEl) {
+        for (Element policy : policyValuesEl.getChildren(AssertionGroupingXml.POLICY_ELEMENT)) {
+            String name = policy.getAttributeValue(AssertionGroupingXml.ATTR_NAME);
+            if (name == null || name.isBlank()) {
+                continue;
+            }
+            String uuids = policy.getAttributeValue(AssertionGroupingXml.ATTR_ASSERTION_UUIDS);
+            if (uuids != null && !uuids.isBlank()) {
+                manifestPolicyUuids.put(name, parseCommaUuidList(uuids));
+            }
+            String textPhrases = policy.getAttributeValue(AssertionGroupingXml.ATTR_ASSERTION_TEXT_PHRASES);
+            if (textPhrases != null && !textPhrases.isBlank()) {
+                manifestPolicyTextPhrases.put(name, parsePipeSeparatedPhrases(textPhrases));
+            }
+            String categoryCentrePairs = policy.getAttributeValue(AssertionGroupingXml.ATTR_CATEGORY_WITH_CENTRE_PAIRS);
+            if (categoryCentrePairs != null && !categoryCentrePairs.isBlank()) {
+                manifestPolicyCategoryCentrePairs.put(name, parseCategoryWithCentrePairs(categoryCentrePairs));
+            }
+        }
+    }
+
+    private void loadGroupsConfiguration(InputStream groupsInputStream) {
+        if (groupsInputStream == null) {
+            return;
+        }
+        try {
+            Document doc = createSecureSaxBuilder().build(groupsInputStream);
             XPathFactory xpf = XPathFactory.instance();
             String stratExpr = "//" + AssertionGroupingXml.STRATEGY_ELEMENT;
             XPathExpression<Element> stratPath = xpf.compile(stratExpr, new ElementFilter(AssertionGroupingXml.STRATEGY_ELEMENT));
             List<Element> strategies = stratPath.evaluate(doc);
             if (strategies.isEmpty()) {
+                LOGGER.warn("No {} element in {}", AssertionGroupingXml.STRATEGY_ELEMENT,
+                        AssertionGroupingXml.GROUPS_RESOURCE_FILENAME);
                 return;
             }
             Element strategy = strategies.get(0);
-            Element policyValuesEl = strategy.getChild(AssertionGroupingXml.POLICY_VALUES_ELEMENT);
-            if (policyValuesEl != null) {
-                for (Element policy : policyValuesEl.getChildren(AssertionGroupingXml.POLICY_ELEMENT)) {
-                    String name = policy.getAttributeValue(AssertionGroupingXml.ATTR_NAME);
-                    String uuids = policy.getAttributeValue(AssertionGroupingXml.ATTR_ASSERTION_UUIDS);
-                    if (name != null && uuids != null && !uuids.isBlank()) {
-                        manifestPolicyOverrides.put(name, parseCommaUuidList(uuids));
-                    }
-                }
-            }
             List<Element> groups = new ArrayList<>();
             for (Element g : strategy.getChildren(AssertionGroupingXml.GROUP_ELEMENT)) {
                 String gn = g.getAttributeValue(AssertionGroupingXml.ATTR_NAME);
@@ -135,7 +172,7 @@ public class AssertionGroupImporter {
             }
             manifestGroupElements = groups;
         } catch (JDOMException | IOException e) {
-            LOGGER.warn("Failed to parse assertionGroupingStrategy from manifest: {}", e.getMessage());
+            LOGGER.warn("Failed to parse groups from {}: {}", AssertionGroupingXml.GROUPS_RESOURCE_FILENAME, e.getMessage());
         }
     }
 
@@ -161,7 +198,40 @@ public class AssertionGroupImporter {
 
     /** UUIDs declared for a policy name in the loaded manifest, or empty if absent. */
     private List<String> policyUuidsFromManifest(String policyKey) {
-        List<String> fromManifest = manifestPolicyOverrides.get(policyKey);
+        List<String> fromManifest = manifestPolicyUuids.get(policyKey);
+        if (fromManifest == null || fromManifest.isEmpty()) {
+            return List.of();
+        }
+        return fromManifest;
+    }
+
+    /** Pipe-separated phrases declared for a policy name, or empty if absent. */
+    private List<String> policyTextPhrasesFromManifest(String policyKey) {
+        List<String> fromManifest = manifestPolicyTextPhrases.get(policyKey);
+        if (fromManifest == null || fromManifest.isEmpty()) {
+            return List.of();
+        }
+        return fromManifest;
+    }
+
+    private static List<String> parsePipeSeparatedPhrases(String pipeSeparated) {
+        return Arrays.stream(pipeSeparated.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
+    }
+
+    /** Each entry is a [category, centre] pair from a pipe-separated {@code category,centre} list. */
+    private static List<List<String>> parseCategoryWithCentrePairs(String pipeSeparated) {
+        List<List<String>> pairs = new ArrayList<>();
+        for (String raw : pipeSeparated.split("\\|")) {
+            List<String> pair = splitCsv(raw.trim());
+            if (pair.size() == 2) {
+                pairs.add(pair);
+            }
+        }
+        return pairs;
+    }
+
+    private List<List<String>> policyCategoryCentrePairsFromManifest(String policyKey) {
+        List<List<String>> fromManifest = manifestPolicyCategoryCentrePairs.get(policyKey);
         if (fromManifest == null || fromManifest.isEmpty()) {
             return List.of();
         }
@@ -207,65 +277,56 @@ public class AssertionGroupImporter {
         return false;
     }
 
-    /**
-     * Inclusion via {@code includeCategoryWithCentre}: {@code group}'s attribute is a {@code |}-separated
-     * list of {@code category,centre} pairs (comma within each pair). A pair matches when both tokens
-     * appear in the assertion's comma-separated keywords, {@code category} is one of the default
-     * standalone category keywords, and {@code centre} is not one of those defaults.
-     */
-    private boolean matchesConjunctionCentresAndCategories(Assertion assertion, Element group) {
-        String assertionKeywords = assertion.getKeywords();
-        String includeCategoryWithCentreCsv = group.getAttributeValue(AssertionGroupingXml.ATTR_INCLUDE_CATEGORY_WITH_CENTRE);
-        List<String> tokenList = Arrays.stream(includeCategoryWithCentreCsv.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
-
-        List<String> categoryTokens = splitCsv(assertionKeywords);
-        for (String raw : tokenList) {
-            String t = raw.trim();
-            List<String> categoryWithCentres = splitCsv(t);
-            if (categoryWithCentres.size() == 2
-                    && defaultStandaloneCategories.contains(categoryWithCentres.get(0))
+    private boolean matchesCategoryCentrePolicy(Assertion assertion, String policyName) {
+        List<List<String>> pairs = policyCategoryCentrePairsFromManifest(policyName);
+        if (pairs.isEmpty()) {
+            return false;
+        }
+        List<String> categoryTokens = splitCsv(assertion.getKeywords());
+        for (List<String> categoryWithCentres : pairs) {
+            if (defaultStandaloneCategories.contains(categoryWithCentres.get(0))
                     && !defaultStandaloneCategories.contains(categoryWithCentres.get(1))
                     && new HashSet<>(categoryTokens).containsAll(categoryWithCentres)) {
                 return true;
             }
         }
-
         return false;
     }
 
     /**
-     * True if the assertion should be excluded: UUID hits an {@code excludeByPolicy} policy,
-     * assertion text contains any {@code excludeAssertionKeywords} phrase, or assertion keywords
-     * contain any {@code excludeCategories} token.
+     * True if the assertion should be excluded: a named {@code excludeByPolicy} matches by UUID or
+     * assertion text phrase, or assertion keywords contain any {@code excludeCategories} token.
      */
-    private boolean violatesExcludeByPolicy(Assertion assertion, String excludeByPolicyCsv, String excludeAssertionKeywords, String excludeCategories) {
-        if (uuidExcludedByNamedPolicies(assertion.getUuid().toString(), excludeByPolicyCsv)) {
-            return true;
-        }
-        if (assertionTextMatchesExcludedPhrases(assertion.getAssertionText(), excludeAssertionKeywords)) {
+    private boolean violatesExcludeByPolicy(Assertion assertion, String excludeByPolicyCsv, String excludeCategories) {
+        if (excludedByNamedPolicies(assertion, excludeByPolicyCsv)) {
             return true;
         }
         return assertionKeywordsMatchExcludedCategories(assertion, excludeCategories);
     }
 
-    private boolean uuidExcludedByNamedPolicies(String uuid, String excludeByPolicyCsv) {
+    private boolean excludedByNamedPolicies(Assertion assertion, String excludeByPolicyCsv) {
         if (!StringUtils.hasLength(excludeByPolicyCsv)) {
             return false;
         }
+        String uuid = assertion.getUuid().toString();
+        String assertionText = assertion.getAssertionText();
         for (String raw : splitCsv(excludeByPolicyCsv)) {
-            String token = raw.trim();
-            if (uuidInPolicyList(token, uuid)) {
+            String policyName = raw.trim();
+            if (uuidInPolicyList(policyName, uuid)) {
+                return true;
+            }
+            if (assertionTextMatchesPolicyPhrases(assertionText, policyName)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean assertionTextMatchesExcludedPhrases(String text, String excludeAssertionKeywords) {
-        if (!StringUtils.hasLength(excludeAssertionKeywords)) {
+    private boolean assertionTextMatchesPolicyPhrases(String text, String policyName) {
+        List<String> phrases = policyTextPhrasesFromManifest(policyName);
+        if (phrases.isEmpty()) {
             return false;
         }
-        List<String> phrases = Arrays.stream(excludeAssertionKeywords.split("\\|")).map(String::trim).filter(s -> !s.isEmpty()).toList();
         String lower = text.toLowerCase();
         for (String phrase : phrases) {
             if (lower.contains(phrase.toLowerCase())) {
@@ -289,12 +350,15 @@ public class AssertionGroupImporter {
         return false;
     }
 
-    /** True if the assertion UUID appears in any comma-separated named policy from {@code includeByPolicyCsv}. */
+    /** True if any named {@code includeByPolicy} matches by UUID or category-with-centre pairs. */
     private boolean matchesIncludeByPolicy(Assertion assertion, String includeByPolicyCsv) {
         String uuid = assertion.getUuid().toString();
         for (String raw : splitCsv(includeByPolicyCsv)) {
-            String token = raw.trim();
-            if (uuidInPolicyList(token, uuid)) {
+            String policyName = raw.trim();
+            if (uuidInPolicyList(policyName, uuid)) {
+                return true;
+            }
+            if (matchesCategoryCentrePolicy(assertion, policyName)) {
                 return true;
             }
         }
@@ -303,11 +367,10 @@ public class AssertionGroupImporter {
 
     /**
      * Whether {@code assertion} belongs in the group described by {@code group}'s XML attributes:
-     * exclusions first, then {@code includeByPolicy}, {@code includeStandaloneCategories}, and
-     * {@code includeCategoryWithCentre} as documented on this class.
+     * exclusions first, then {@code includeByPolicy} and {@code includeStandaloneCategories}.
      */
     private boolean assertionMatchesGroupRule(Assertion assertion, Element group) {
-        if (violatesExcludeByPolicy(assertion, group.getAttributeValue(AssertionGroupingXml.ATTR_EXCLUDE_BY_POLICY), group.getAttributeValue(AssertionGroupingXml.ATTR_ASSERTION_KEYWORDS), group.getAttributeValue(AssertionGroupingXml.ATTR_EXCLUDE_CATEGORIES))) {
+        if (violatesExcludeByPolicy(assertion, group.getAttributeValue(AssertionGroupingXml.ATTR_EXCLUDE_BY_POLICY), group.getAttributeValue(AssertionGroupingXml.ATTR_EXCLUDE_CATEGORIES))) {
             return false;
         }
 
@@ -316,16 +379,7 @@ public class AssertionGroupImporter {
             return true;
         }
 
-        if (matchesIncludeStandaloneCategories(assertion, group)) {
-            return true;
-        }
-
-        String includeCategoryWithCentreCsv = group.getAttributeValue(AssertionGroupingXml.ATTR_INCLUDE_CATEGORY_WITH_CENTRE);
-        if (StringUtils.hasLength(includeCategoryWithCentreCsv)) {
-            return matchesConjunctionCentresAndCategories(assertion, group);
-        }
-
-        return false;
+        return matchesIncludeStandaloneCategories(assertion, group);
     }
 
     /**
@@ -337,7 +391,8 @@ public class AssertionGroupImporter {
      */
     private void importAssertionGroupsCore() {
         if (manifestGroupElements.isEmpty()) {
-            throw new IllegalStateException("manifest.xml must define <assertionGroupingStrategy> with one or more <group> elements.");
+            throw new IllegalStateException(AssertionGroupingXml.GROUPS_RESOURCE_FILENAME
+                    + " must define <assertionGroupingStrategy> with one or more <group> elements.");
         }
         List<AssertionGroup> allGroups = assertionService.getAllAssertionGroups();
         if (allGroups == null) {
