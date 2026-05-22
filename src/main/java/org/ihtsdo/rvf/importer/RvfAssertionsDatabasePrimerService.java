@@ -42,9 +42,11 @@ public class RvfAssertionsDatabasePrimerService {
 				// import content
 				dbImporter.importAssertionsFromManifest(manifestInputStream, scriptsDir);
 				LOGGER.info("Assertions imported");
-				// Create assertion groups (fresh manifest stream; DB importer consumed the first)
-				try (InputStream manifestForGroups = assertionResourceManager.readResourceStream("manifest.xml")) {
-					assertionGroupImporter.importAssertionGroups(manifestForGroups);
+				try (InputStream policiesStream = assertionResourceManager.readResourceStream(
+								AssertionGroupingXml.POLICIES_RESOURCE_FILENAME);
+						InputStream groupsStream = assertionResourceManager.readResourceStream(
+								AssertionGroupingXml.GROUPS_RESOURCE_FILENAME)) {
+					assertionGroupImporter.importAssertionGroups(groupsStream, policiesStream);
 				}
 			} else {
 				LOGGER.info("Assertions and assertion groups exist already.");
