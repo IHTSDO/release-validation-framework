@@ -16,6 +16,7 @@
     </parent>
 
     <properties>
+        <java.version>25</java.version>
         <packageName>rvf-api</packageName>
         <docker.registry>docker.io</docker.registry>
         <docker.allowInsecureRegistries>false</docker.allowInsecureRegistries>
