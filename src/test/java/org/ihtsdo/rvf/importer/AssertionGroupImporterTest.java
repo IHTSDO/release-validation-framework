@@ -1018,8 +1018,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
 						"d5c80582-ad32-4f26-a729-a91fe04a06b2", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
-						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("first-time-common-edition",
 				List.of("82cc38ce-75d6-429e-bf45-551a100bfc52", "dfbab5f4-8b72-4cd3-abe9-2cf5b5f76e5b",
 						"18a9f6b4-b66f-4af3-8c67-2a07b4655d27", "6614ff12-fca2-42b7-a5da-ea26353979fe",
@@ -1079,8 +1078,7 @@ class AssertionGroupImporterTest extends IntegrationTest {
 						"645e3292-18d6-41df-b42a-58ba4d7240d5", "f39da0c8-2897-4a04-89cd-ec8ca0c6bf93",
 						"d5c80582-ad32-4f26-a729-a91fe04a06b2", "9733ecfe-057d-45e6-a2ca-05f3846e6d43",
 						"c1d2e3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f", "d2e3f4a5-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
-						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "02cf4438-170e-4b6b-b5da-624ef730a8e0",
-						"c35167ac-1dfc-4861-ac19-be60f95e3521"));
+						"e3f4a5b6-7c8d-9e0f-1a2b-3c4d5e6f7a8b", "c35167ac-1dfc-4861-ac19-be60f95e3521"));
 		groupNameToAssertionsMap.put("LoincEdition",
 				List.of("ba182e91-1bf2-4fef-a63c-4493a91e8d39", "18a9f6b4-b66f-4af3-8c67-2a07b4655d27",
 						"7d105b20-ce21-49c2-b16d-b49df13fdfea", "6614ff12-fca2-42b7-a5da-ea26353979fe",
