@@ -122,29 +122,29 @@ public class MRCMValidationService {
 			ValidationRun validationRunnerInferredForm = getValidationRunGivenForm(effectiveDate, validationRunner, fullSnapshotRelease, moduleIds, ContentType.INFERRED);
 			ValidationRun validationRunnerInStatedForm = getValidationRunGivenForm(effectiveDate, validationRunner, fullSnapshotRelease, moduleIds, ContentType.STATED);
 
-			ExecutorService executorService = Executors.newCachedThreadPool();
-			List<Future<Void>> tasks = new ArrayList<>();
-			tasks.add(executorService.submit (() -> {
-				validationService.validateRelease(extractedRF2FilesDirectory, validationRunnerInferredForm);
-				return null;
-			}));
-			tasks.add(executorService.submit (() -> {
-				validationService.validateRelease(extractedRF2FilesDirectory, validationRunnerInStatedForm);
-				return null;
-			}));
-			for (Future<Void> task : tasks) {
-				task.get(); // Use Future.get to receive any exceptions throwing from Thread
-			}
+			try (ExecutorService executorService = Executors.newCachedThreadPool()) {
+				List<Future<Void>> tasks = new ArrayList<>();
+				tasks.add(executorService.submit(() -> {
+					validationService.validateRelease(extractedRF2FilesDirectory, validationRunnerInferredForm);
+					return null;
+				}));
+				tasks.add(executorService.submit(() -> {
+					validationService.validateRelease(extractedRF2FilesDirectory, validationRunnerInStatedForm);
+					return null;
+				}));
+				for (Future<Void> task : tasks) {
+					task.get(); // Use Future.get to receive any exceptions throwing from Thread
+				}
 
-			if (!whitelistService.isWhitelistDisabled()) {
-				checkWhitelistItems(validationRunnerInferredForm);
-				checkWhitelistItems(validationRunnerInStatedForm);
-			}
+				if (!whitelistService.isWhitelistDisabled()) {
+					checkWhitelistItems(validationRunnerInferredForm);
+					checkWhitelistItems(validationRunnerInStatedForm);
+				}
 
-			extractTestResults(maxFailureExports, report, validationRunnerInferredForm, ContentType.INFERRED);
-			extractTestResults(maxFailureExports, report, validationRunnerInStatedForm, ContentType.STATED);
-			report.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
-			executorService.shutdown();
+				extractTestResults(maxFailureExports, report, validationRunnerInferredForm, ContentType.INFERRED);
+				extractTestResults(maxFailureExports, report, validationRunnerInStatedForm, ContentType.STATED);
+				report.addTimeTaken((System.currentTimeMillis() - timeStart) / 1000);
+			}
 		} catch (Exception ex) {
 			String message = "MRCM validation has stopped";
 			LOGGER.error(message, ex);

@@ -139,48 +139,48 @@ public class ValidationRunner {
 		runRF2StructureTests(validationConfig, statusReport);
 
 		Map<String, Future<ValidationStatusReport>> taskMap = new HashMap<>();
-		ExecutorService executorService = Executors.newFixedThreadPool(5);
-		StringBuilder statusMessages = new StringBuilder();
+		try (ExecutorService executorService = Executors.newFixedThreadPool(5)) {
+			StringBuilder statusMessages = new StringBuilder();
 
-		if (!CollectionUtils.isEmpty(validationConfig.getGroupsList())) {
-			statusMessages.append("RVF assertions validation started");
-			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
-			ValidationStatusReport mysqlValidationStatusReport = new ValidationStatusReport(validationConfig);
-			mysqlValidationStatusReport.setResultReport(new ValidationReport());
-			taskMap.put("SQL Assertions", executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
-		}
+			if (!CollectionUtils.isEmpty(validationConfig.getGroupsList())) {
+				statusMessages.append("RVF assertions validation started");
+				reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
+				ValidationStatusReport mysqlValidationStatusReport = new ValidationStatusReport(validationConfig);
+				mysqlValidationStatusReport.setResultReport(new ValidationReport());
+				taskMap.put("SQL Assertions", executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
+			}
 
-		if (validationConfig.isEnableDrools()) {
-			statusMessages.append(statusMessages.isEmpty() ? "" : "\n").append("Drools rules validation started");
-			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
-			ValidationStatusReport droolsValidationStatusReport = new ValidationStatusReport(validationConfig);
-			droolsValidationStatusReport.setResultReport(new ValidationReport());
-			taskMap.put("Drools Assertions", executorService.submit(() -> droolsValidationService.runDroolsAssertions(validationConfig, droolsValidationStatusReport)));
-		}
+			if (validationConfig.isEnableDrools()) {
+				statusMessages.append(statusMessages.isEmpty() ? "" : "\n").append("Drools rules validation started");
+				reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
+				ValidationStatusReport droolsValidationStatusReport = new ValidationStatusReport(validationConfig);
+				droolsValidationStatusReport.setResultReport(new ValidationReport());
+				taskMap.put("Drools Assertions", executorService.submit(() -> droolsValidationService.runDroolsAssertions(validationConfig, droolsValidationStatusReport)));
+			}
 
-		if (validationConfig.isEnableMRCMValidation()) {
-			statusMessages.append(statusMessages.isEmpty() ? "" : "\n").append("MRCM validation started");
-			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
-			ValidationStatusReport mrcmValidationStatusReport = new ValidationStatusReport(validationConfig);
-			mrcmValidationStatusReport.setResultReport(new ValidationReport());
-			taskMap.put("MRCM Validation", executorService.submit(() -> mrcmValidationService.runMRCMAssertionTests(mrcmValidationStatusReport, validationConfig)));
-		}
+			if (validationConfig.isEnableMRCMValidation()) {
+				statusMessages.append(statusMessages.isEmpty() ? "" : "\n").append("MRCM validation started");
+				reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
+				ValidationStatusReport mrcmValidationStatusReport = new ValidationStatusReport(validationConfig);
+				mrcmValidationStatusReport.setResultReport(new ValidationReport());
+				taskMap.put("MRCM Validation", executorService.submit(() -> mrcmValidationService.runMRCMAssertionTests(mrcmValidationStatusReport, validationConfig)));
+			}
 
-		if (validationConfig.isEnableTraceabilityValidation()) {
-			statusMessages.append(statusMessages.isEmpty() ? "" : "\n").append("Traceability comparison validation started");
-			reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
-			ValidationStatusReport traceabilityComparisonReport = new ValidationStatusReport(validationConfig);
-			traceabilityComparisonReport.setResultReport(new ValidationReport());
-			taskMap.put("Traceability Comparison", executorService.submit(() -> {
-				traceabilityComparisonService.runTraceabilityComparison(traceabilityComparisonReport, validationConfig);
-				return traceabilityComparisonReport;
-			}));
-		}
+			if (validationConfig.isEnableTraceabilityValidation()) {
+				statusMessages.append(statusMessages.isEmpty() ? "" : "\n").append("Traceability comparison validation started");
+				reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
+				ValidationStatusReport traceabilityComparisonReport = new ValidationStatusReport(validationConfig);
+				traceabilityComparisonReport.setResultReport(new ValidationReport());
+				taskMap.put("Traceability Comparison", executorService.submit(() -> {
+					traceabilityComparisonService.runTraceabilityComparison(traceabilityComparisonReport, validationConfig);
+					return traceabilityComparisonReport;
+				}));
+			}
 
-		for (Map.Entry<String, Future<ValidationStatusReport>> entry : taskMap.entrySet()) {
-			mergeValidationStatusReports(statusReport, entry.getValue().get());
+			for (Map.Entry<String, Future<ValidationStatusReport>> entry : taskMap.entrySet()) {
+				mergeValidationStatusReports(statusReport, entry.getValue().get());
+			}
 		}
-		executorService.shutdown();
 	}
 
 	private void updateRvfState(final ValidationRunConfig config, final State state) throws JsonProcessingException, JMSException {

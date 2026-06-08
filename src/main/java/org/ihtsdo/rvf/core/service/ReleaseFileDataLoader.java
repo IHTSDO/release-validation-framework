@@ -50,46 +50,47 @@ public class ReleaseFileDataLoader {
 	public void loadFilesIntoDB(final String rf2TextFileRootPath, final String[] rf2Files, List<String> rf2FilesLoaded) throws RVFExecutionException {
 		final long start = System.currentTimeMillis();
 		// Use fixed thread pool size to avoid reaching too many mysql connections
-		ExecutorService executorService =  Executors.newFixedThreadPool(MAX_THREAD_POOL_SIZE);
-		List<Future<String>> tasks = new ArrayList<>();
-		for (final String rf2FileName : rf2Files) {
-			final String rvfTableName = RF2FileTableMapper.getLegacyTableName(rf2FileName);
-			if( rvfTableName == null) {
-				LOGGER.warn("No matching table name found for RF2 file:" + rf2FileName);
-				continue;
-			}
-			final Future<String> future = executorService.submit(() -> {
-				final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
-				final String disableIndex = "ALTER TABLE " + rvfTableName + " DISABLE KEYS;";
-				final String enableIndex = "ALTER TABLE " + rvfTableName + " ENABLE KEYS;";
-				final String loadFile = "load data local infile '" + rf2TextFileRootPath + "/" + rf2FileName + "' into table " + rvfTableName
-						+ " columns terminated by '\\t' "
-						+ " lines terminated by '\\r\\n' "
-						+ " ignore 1 lines";
-				LOGGER.info(loadFile);
-
-				try (Connection connection = dataSource.getConnection(schemaName);
-					Statement statement = connection.createStatement()) {
-					statement.execute(configStr);
-					statement.execute(disableIndex);
-					statement.execute(loadFile);
-					statement.execute(enableIndex);
+		try (ExecutorService executorService =  Executors.newFixedThreadPool(MAX_THREAD_POOL_SIZE)) {
+			List<Future<String>> tasks = new ArrayList<>();
+			for (final String rf2FileName : rf2Files) {
+				final String rvfTableName = RF2FileTableMapper.getLegacyTableName(rf2FileName);
+				if (rvfTableName == null) {
+					LOGGER.warn("No matching table name found for RF2 file:" + rf2FileName);
+					continue;
 				}
-				return rf2FileName;
-			});
-			tasks.add(future);
-		}
-		for (Future<String> task : tasks) {
-			try {
-				rf2FilesLoaded.add(task.get());
-			} catch (InterruptedException | ExecutionException e) {
-				String errorMsg = "Thread interrupted while waiting for get rf2 file loading result.";
-				LOGGER.error(errorMsg, e.fillInStackTrace());
-				throw new RVFExecutionException(errorMsg, e);
+				final Future<String> future = executorService.submit(() -> {
+					final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
+					final String disableIndex = "ALTER TABLE " + rvfTableName + " DISABLE KEYS;";
+					final String enableIndex = "ALTER TABLE " + rvfTableName + " ENABLE KEYS;";
+					final String loadFile = "load data local infile '" + rf2TextFileRootPath + "/" + rf2FileName + "' into table " + rvfTableName
+							+ " columns terminated by '\\t' "
+							+ " lines terminated by '\\r\\n' "
+							+ " ignore 1 lines";
+					LOGGER.info(loadFile);
+
+					try (Connection connection = dataSource.getConnection(schemaName);
+					     Statement statement = connection.createStatement()) {
+						statement.execute(configStr);
+						statement.execute(disableIndex);
+						statement.execute(loadFile);
+						statement.execute(enableIndex);
+					}
+					return rf2FileName;
+				});
+				tasks.add(future);
 			}
+			for (Future<String> task : tasks) {
+				try {
+					rf2FilesLoaded.add(task.get());
+				} catch (InterruptedException | ExecutionException e) {
+					String errorMsg = "Thread interrupted while waiting for get rf2 file loading result.";
+					LOGGER.error(errorMsg, e.fillInStackTrace());
+					throw new RVFExecutionException(errorMsg, e);
+				}
+			}
+			final long end = System.currentTimeMillis();
+			LOGGER.info("Time taken to load in seconds " + (end - start) / 1000);
 		}
-		final long end = System.currentTimeMillis();
-		LOGGER.info("Time taken to load in seconds " + (end-start)/1000);
 	}
 
 	private String createTable(final TableSchema tableSchema) throws SQLException {

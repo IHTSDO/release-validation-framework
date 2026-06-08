@@ -61,25 +61,26 @@ public class ColumnPatternTester {
 		// for each config file (should only the one)
 		final List<String> fileNames = resourceManager.getFileNames();
 		final SchemaFactory schemaFactory = new SchemaFactory();
-		ExecutorService executor = Executors.newCachedThreadPool();
-		List<Future<Long>> tasks = new ArrayList<>();
-		for (final String fileName : fileNames) {
-			Future<Long> task = executor.submit(() -> runTestForFile(fileName, schemaFactory));
-			tasks.add(task);
-		}
-		
-		for (Future<Long> task : tasks) {
-			try {
-				long totalLines = task.get();
-				if (totalLines > 0) {
-					filesTested++;
-					linesTested += totalLines;
-				}
-			} catch (InterruptedException | ExecutionException e) {
-				logger.error("Error occurred when executing column validations", e);
+		try (ExecutorService executor = Executors.newCachedThreadPool()) {
+			List<Future<Long>> tasks = new ArrayList<>();
+			for (final String fileName : fileNames) {
+				Future<Long> task = executor.submit(() -> runTestForFile(fileName, schemaFactory));
+				tasks.add(task);
 			}
+
+			for (Future<Long> task : tasks) {
+				try {
+					long totalLines = task.get();
+					if (totalLines > 0) {
+						filesTested++;
+						linesTested += totalLines;
+					}
+				} catch (InterruptedException | ExecutionException e) {
+					logger.error("Error occurred when executing column validations", e);
+				}
+			}
+			validationLog.info("{} files and {} lines tested in {} milliseconds.", filesTested, linesTested, (new Date().getTime() - startTime.getTime()));
 		}
-		validationLog.info("{} files and {} lines tested in {} milliseconds.", filesTested, linesTested, (new Date().getTime() - startTime.getTime()));
 	}
 
 	private long runTestForFile(String fileName, SchemaFactory schemaFactory) {

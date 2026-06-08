@@ -43,21 +43,22 @@ public class RF2FileStructureTester {
 	public void runTests(){
 		startTime = new Date();
 		List<String> fileNames = resourceManager.getFileNames();
-		ExecutorService executorService = Executors.newCachedThreadPool();
-		List<Future<Boolean>> futures = new ArrayList<>();
-		for (final String fileName : fileNames) {
-			if (!fileName.endsWith(".txt")) {
-				continue;
+		try (ExecutorService executorService = Executors.newCachedThreadPool()) {
+			List<Future<Boolean>> futures = new ArrayList<>();
+			for (final String fileName : fileNames) {
+				if (!fileName.endsWith(".txt")) {
+					continue;
+				}
+				Future<Boolean> task = executorService.submit(() -> runTestForFile(fileName));
+				futures.add(task);
 			}
-			Future<Boolean> task = executorService.submit(() -> runTestForFile(fileName));
-			futures.add(task);
-		}
-		for (Future<Boolean> task : futures) {
-			try {
-				task.get();
-			} catch (InterruptedException | ExecutionException e) {
-				LOGGER.error("Task failed when structure testing due to:", e);
-				validationLog.executionError("Error", "Failed to check file due to:" + e.fillInStackTrace());
+			for (Future<Boolean> task : futures) {
+				try {
+					task.get();
+				} catch (InterruptedException | ExecutionException e) {
+					LOGGER.error("Task failed when structure testing due to:", e);
+					validationLog.executionError("Error", "Failed to check file due to:" + e.fillInStackTrace());
+				}
 			}
 		}
 	}
