@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.core.service;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.otf.RF2Constants;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.slf4j.Logger;
@@ -33,8 +34,6 @@ public class AssertionExecutionService {
 	private RvfDynamicDataSource rvfDynamicDataSource;
 	@Value("${rvf.qa.result.table.name}")
 	private String qaResulTableName;
-	@Value("${rvf.validation.international.modules}")
-	private String internationalModules;
 	private static final String DELTA_TABLE_SUFFIX = "d";
 	private static final String SNAPSHOT_TABLE_SUFFIX = "s";
 	private static final String FULL_TABLE_SUFFIX = "f";
@@ -236,7 +235,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		String defaultCatalog = dataSource.getDefaultCatalog();
 		String prospectiveSchema = config.getProspectiveVersion();
 		final String[] nameParts = config.getProspectiveVersion().split("_");
-		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : NOT_SUPPLIED;
+		String defaultModuleId = StringUtils.hasLength(config.getDefaultModuleId()) ? config.getDefaultModuleId() : RF2Constants.SCTID_CORE_MODULE;
 		String includedModules = CollectionUtils.isEmpty(config.getIncludedModules()) ? "NULL" : String.join(",", config.getIncludedModules());
 		String version = (nameParts.length >= 3 ? nameParts[2] : NOT_SUPPLIED);
 
@@ -258,7 +257,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 			part = part.replace("qa_result", defaultCatalog+ "." + qaResulTableName);
 			part = part.replace("<PROSPECTIVE>", prospectiveSchema);
 			part = part.replace("<TEMP>", prospectiveSchema);
-			part = part.replace("<INTERNATIONAL_MODULES>", internationalModules);
+			part = part.replace("<INTERNATIONAL_MODULES>", RF2Constants.SCTID_CORE_MODULE);
 			part = part.replace("<PREVIOUS>", previousReleaseSchema);
 			part = part.replace("<DEPENDENCY>", dependencyReleaseSchema);
 			part = part.replace("<DELTA>", DELTA_TABLE_SUFFIX);
