@@ -36,6 +36,9 @@ public class QAResult implements Serializable {
 	@Column(name ="table_name")
 	private String tableName;
 
+	@Column(name ="skip_module_check")
+	private Boolean skipModuleCheck = false;
+
 	public String getDetails() {
 		return details;
 	}
@@ -82,5 +85,13 @@ public class QAResult implements Serializable {
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
+	}
+
+	public Boolean getSkipModuleCheck() {
+		return skipModuleCheck;
+	}
+
+	public void setSkipModuleCheck(Boolean skipModuleCheck) {
+		this.skipModuleCheck = skipModuleCheck;
 	}
 }

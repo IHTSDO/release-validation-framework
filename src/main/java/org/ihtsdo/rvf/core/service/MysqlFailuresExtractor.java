@@ -101,7 +101,7 @@ public class MysqlFailuresExtractor {
                     // filter by the extension modules only
                     if (belongToCommonAuthoringOrCommonEditionGroup && config.isExtensionValidation() && !CollectionUtils.isEmpty(config.getIncludedModules())) {
                         int totalBatchFailures = failureDetails.size();
-                        failureDetails = failureDetails.stream().filter(failure -> config.getIncludedModules().contains(failure.getModuleId())).toList();
+                        failureDetails = failureDetails.stream().filter(failure -> Boolean.TRUE.equals(failure.getSkipModuleCheck()) || config.getIncludedModules().contains(failure.getModuleId())).toList();
                         totalFilteredOutFailures += (totalBatchFailures - failureDetails.size());
                     }
 
@@ -189,7 +189,7 @@ public class MysqlFailuresExtractor {
 
     private List<FailureDetail> fetchFailureDetails(Connection connection, Long executionId, Long assertionId, int failureExportMax, Integer offset, Integer rowCount)
             throws SQLException {
-        String resultSQL = "select concept_id, details, component_id, table_name from " + dataSource.getDefaultCatalog() + "." + qaResultTableName +
+        String resultSQL = "select concept_id, details, component_id, table_name, skip_module_check from " + dataSource.getDefaultCatalog() + "." + qaResultTableName +
                 " where assertion_id = ? and run_id = ?";
         if (offset != null && rowCount != null) {
             resultSQL += " limit ?,?";
@@ -212,7 +212,7 @@ public class MysqlFailuresExtractor {
                 while (resultSet.next()) {
                     // only get first N failed results
                     if (failureExportMax < 0 || counter < failureExportMax) {
-                        FailureDetail detail = new FailureDetail(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4));
+                        FailureDetail detail = new FailureDetail(resultSet.getString(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getBoolean(5));
                         firstNInstances.add(detail);
                     }
                     counter++;
