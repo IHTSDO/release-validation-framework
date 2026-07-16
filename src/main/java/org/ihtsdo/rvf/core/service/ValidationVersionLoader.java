@@ -445,7 +445,14 @@ public class ValidationVersionLoader {
 		if (validationConfig.getIncludedModules() != null) {
 			expectedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).toList());
 		}
-		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, expectedModules, true);
+
+		Set<ModuleMetadata> dependencies;
+		try {
+			dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, expectedModules, true);
+		} catch (ModuleStorageCoordinatorException e) {
+			throw new IOException("Failed to load dependencies via given MDRS", e);
+		}
+
 		if (!dependencies.isEmpty()) {
 			String localDirectory = createRunningDirectory(validationConfig.getRunId().toString());
 			for (ModuleMetadata dependency : dependencies) {
@@ -471,7 +478,7 @@ public class ValidationVersionLoader {
 		}
 	}
 
-	public void downloadPreviousRelease(ValidationRunConfig validationConfig) throws ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException, IOException, BusinessServiceException {
+	public void downloadPreviousRelease(ValidationRunConfig validationConfig) throws ModuleStorageCoordinatorException, IOException, BusinessServiceException {
 		if (!StringUtils.hasLength(validationConfig.getPreviousRelease()) || emptyRf2Filename.equals(validationConfig.getPreviousRelease())) {
 			return;
 		}
@@ -484,7 +491,7 @@ public class ValidationVersionLoader {
 		}
 	}
 
-	private ModuleMetadata findModuleMetadataByFilename(String filename) throws ModuleStorageCoordinatorException.OperationFailedException, ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException {
+	private ModuleMetadata findModuleMetadataByFilename(String filename) throws ModuleStorageCoordinatorException {
 		Map<String, List<ModuleMetadata>> allReleasesMap = moduleStorageCoordinator.getAllReleases();
 		List<ModuleMetadata> allModuleMetadata = new ArrayList<>();
 		allReleasesMap.values().forEach(allModuleMetadata::addAll);
@@ -494,7 +501,7 @@ public class ValidationVersionLoader {
 				.orElse(null);
 	}
 
-	private void downloadPreviousReleaseFromModuleStorageCoordinator(ValidationRunConfig validationConfig, ModuleMetadata moduleMetadata) throws ModuleStorageCoordinatorException.ResourceNotFoundException, ModuleStorageCoordinatorException.InvalidArgumentsException, IOException, ModuleStorageCoordinatorException.OperationFailedException {
+	private void downloadPreviousReleaseFromModuleStorageCoordinator(ValidationRunConfig validationConfig, ModuleMetadata moduleMetadata) throws ModuleStorageCoordinatorException, IOException {
 		String localDirectory = createRunningDirectory(validationConfig.getRunId().toString());
 		File localPreviousRelease = prepareLocalFile(localDirectory, moduleMetadata.getFilename());
 
@@ -536,7 +543,11 @@ public class ValidationVersionLoader {
 		validationConfig.addLocalReleaseFile(localPreviousRelease);
 		validationConfig.addReleaseCreationTime(validationConfig.getPreviousRelease(), releaseSourceManager.getResourceLastModifiedDate(validationConfig.getPreviousRelease()));
 		if (validationConfig.isReleaseAsAnEdition()) {
-			processDependenciesFromFile(localPreviousRelease, validationConfig);
+			try {
+				processDependenciesFromFile(localPreviousRelease, validationConfig);
+			} catch (ModuleStorageCoordinatorException e) {
+				throw new BusinessServiceException("Failed to load dependencies via given MDRS", e);
+			}
 		}
 	}
 
@@ -551,7 +562,7 @@ public class ValidationVersionLoader {
 		return localFile;
 	}
 
-	private void processDependenciesFromFile(File releaseFile, ValidationRunConfig validationConfig) {
+	private void processDependenciesFromFile(File releaseFile, ValidationRunConfig validationConfig) throws ModuleStorageCoordinatorException {
 		RF2Service rf2Service = new RF2Service();
 		Set<RF2Row> mdrsRows = rf2Service.getMDRS(releaseFile, false);
 		Set<String> expectedModules = new HashSet<>();
