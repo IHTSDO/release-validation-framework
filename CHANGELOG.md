@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 9.0.0
+
+### Breaking
+- Update to Java 25.
+
 ## 6.5.0 / 7.0.0
 
 ### Breaking

@@ -3,7 +3,7 @@
 This document will detail how to get started.
 
 ## Prerequisites
-- Java 17
+- Java 25
 - Maven 3
 
 ## Dependencies

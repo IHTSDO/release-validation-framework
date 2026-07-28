@@ -90,7 +90,7 @@ Additional documentation:
 
 ### 4.1  Prerequisites
 
-1. **JDK 17** (aligned with the parent BOM)
+1. **JDK 25** (aligned with the parent BOM)
 2. **Maven 3.8+** (wrapper provided)
 3. **MySQL 8** running on `localhost:3306` with a database called `rvf`.
 4. **ActiveMQ 5.x** (an embedded broker starts automatically for local dev, but external brokers are recommended for JMS testing).
