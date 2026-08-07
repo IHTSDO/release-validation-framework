@@ -208,7 +208,12 @@ public class DroolsRulesValidationService {
 				}
 
 				//Run validation
-				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, CollectionUtils.isEmpty(previousReleaseDirectories) ? null : previousReleaseDirectories, droolsRulesSets, effectiveDate, null, true);
+				// 5.7.0 inserted an assertionExclusionList parameter in 4th position. We pass
+				// null: this fork filters by module below, after the call, using its own
+				// common-authoring group logic rather than the validator's module parameter.
+				Set<String> assertionExclusionList = null;
+				Set<String> modulesForValidator = null;
+				invalidContents = droolsRF2Validator.validateRF2Files(extractedRF2FilesDirectories, CollectionUtils.isEmpty(previousReleaseDirectories) ? null : previousReleaseDirectories, droolsRulesSets, assertionExclusionList, effectiveDate, modulesForValidator, true);
 
 				// Filter the results based on component's module IDs if the package is an extension
 				String moduleIdStr = validationConfig.getIncludedModules();
