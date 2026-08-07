@@ -1,0 +1,490 @@
+repo_name: IHTSDO/release-validation-framework
+report_id: 91012131d2e7324800a0b7a27e1c792d
+version: 0.1
+repo_type: Public
+timestamp: '2024-03-21T12:56:37+00:00'
+requested_by: dmcgihtsdo
+provider: github
+branch: master
+detected_tools_count: 39
+tools:
+- name: Java
+  description: A concurrent, class-based, object-oriented, language specifically designed
+    to have as few implementation dependencies as possible
+  website_url: https://www.java.com
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/995/K85ZWV2F.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework
+  detection_source: Repo Metadata
+- name: SQL
+  description: It is a domain-specific language used in programming
+  website_url: https://en.wikipedia.org/wiki/SQL
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/2271/default_068d33483bba6b81ee13fbd4dc7aab9780896a54.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/src/main/resources/sql/create-resource-tables.sql
+  detection_source: src/main/resources/sql/create-resource-tables.sql
+  last_updated_by: Jim Cornmell
+  last_updated_on: 2023-02-09 14:56:32.000000000 Z
+- name: Spring Framework
+  description: An application framework and inversion of control container for the
+    Java platform
+  website_url: https://spring.io/projects/spring-framework
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Frameworks (Full Stack)
+  image_url: https://img.stackshare.io/service/2006/spring-framework-project-logo.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-15 17:25:36.000000000 Z
+- name: guava
+  description: Google Core Libraries for Java 6+
+  website_url: https://github.com/google/guava
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Java Tools
+  image_url: https://img.stackshare.io/service/2970/wBjKn0ol.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Jim Cornmell
+  last_updated_on: 2023-02-09 14:56:32.000000000 Z
+- name: ActiveMQ
+  description: A message broker written in Java together with a full JMS client
+  website_url: http://activemq.apache.org/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Data Stores
+  sub_category: Message Queue
+  image_url: https://img.stackshare.io/service/1062/default_08edb6f82e2c79424efc1e297ab096e50acd8e0b.jpg
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 15:44:30.000000000 Z
+- name: Cloud DB for Mysql
+  description: Easily setup and manage the MySQL database service
+  website_url: https://www.ncloud.com/product/database/cloudDbMysql
+  open_source: false
+  hosted_saas: true
+  category: Data Stores
+  sub_category: SQL Database as a Service
+  image_url: https://img.stackshare.io/service/21275/default_078eb0ae2b56280a937ed073a3ba4332291f9ba8.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/docker-compose.yml
+  detection_source: docker-compose.yml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-02-28 15:52:18.000000000 Z
+- name: H2 Database
+  description: A relational database management system written in Java
+  website_url: http://www.h2database.com/
+  open_source: false
+  hosted_saas: false
+  category: Data Stores
+  sub_category: Databases
+  image_url: https://img.stackshare.io/service/3105/h2-logo_square_400x400.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-08-08 14:05:25.000000000 Z
+- name: MyBatis
+  description: SQL Mapper Framework for Java
+  website_url: http://www.mybatis.org/mybatis-3/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Data Stores
+  sub_category: Object Relational Mapper (ORM)
+  image_url: https://img.stackshare.io/service/5582/1483254.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Jim Cornmell
+  last_updated_on: 2023-02-09 14:56:32.000000000 Z
+- name: MySQL
+  description: The world's most popular open source database
+  website_url: http://www.mysql.com
+  version: '5.7'
+  open_source: true
+  hosted_saas: false
+  category: Data Stores
+  sub_category: Databases
+  image_url: https://img.stackshare.io/service/1025/logo-mysql-170x170.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/docker-compose.yml
+  detection_source: docker-compose.yml
+  last_updated_by: Rory Davidson
+  last_updated_on: 2019-04-10 13:26:41.000000000 Z
+- name: Apache Maven
+  description: Apache build manager for Java projects.
+  website_url: http://maven.apache.org/
+  version: 3.6.0
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Java Build Tools
+  image_url: https://img.stackshare.io/package_manager/977/default_9833f2ef0bbc2a946b4cc5e9307264033361076b.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/Dockerfile
+  detection_source: Dockerfile
+  last_updated_by: Jim Cornmell
+  last_updated_on: 2023-08-31 14:21:04.000000000 Z
+- name: Docker
+  description: Enterprise Container Platform for High-Velocity Innovation.
+  website_url: https://www.docker.com/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Virtual Machine Platforms & Containers
+  image_url: https://img.stackshare.io/service/586/n4u37v9t_400x400.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework
+  detection_source: Repo Metadata
+- name: Git
+  description: Fast, scalable, distributed revision control system
+  website_url: http://git-scm.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Version Control System
+  image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework
+  detection_source: Repo Metadata
+- name: Apache Camel
+  description: A versatile open source integration framework
+  website_url: https://camel.apache.org/
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Application Hosting
+  sub_category: Platform as a Service
+  image_url: https://img.stackshare.io/service/3276/xWt1RFo6_400x400.jpg
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/src/main/resources/application.properties
+  detection_source: src/main/resources/application.properties
+  last_updated_by: Jay Kola
+  last_updated_on: 2014-10-16 08:16:03.000000000 Z
+- name: Shell
+  description: A shell is a text-based terminal, used for manipulating programs and
+    files. Shell scripts typically manage program execution.
+  website_url: https://en.wikipedia.org/wiki/Shell_script
+  open_source: false
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/4631/default_c2062d40130562bdc836c13dbca02d318205a962.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework
+  detection_source: Repo Metadata
+- name: com.fasterxml.jackson.core:jackson-annotations
+  description: Core annotations used for value types
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 10:38:34.000000000 Z
+- name: com.fasterxml.jackson.core:jackson-databind
+  description: 'General data-binding functionality for Jackson: works on core streaming
+    API'
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 10:38:34.000000000 Z
+- name: com.google.code.gson:gson
+  description: Gson JSON library
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 10:38:34.000000000 Z
+- name: com.google.guava:guava
+  description: Guava is a suite of core and expanded libraries that include utility
+    classes
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 10:38:34.000000000 Z
+- name: com.h2database:h2
+  description: H2 Database Engine
+  license: MIT-feh
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 10:38:34.000000000 Z
+- name: commons-dbcp:commons-dbcp
+  description: Commons Database Connection Pooling
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Jim Cornmell
+  last_updated_on: 2023-02-09 14:56:32.000000000 Z
+- name: commons-io:commons-io
+  description: The Apache Commons IO library contains utility classes
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Jim Cornmell
+  last_updated_on: 2023-02-09 14:56:32.000000000 Z
+- name: commons-lang:commons-lang
+  description: Commons Lang
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-08-08 14:05:25.000000000 Z
+- name: javax.xml.bind:jaxb-api
+  description: JAXB
+  license: CDDL-1.1,CNRI-Python-GPL-Compatible
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Jim Cornmell
+  last_updated_on: 2023-08-15 14:17:51.000000000 Z
+- name: jaxen:jaxen
+  description: Jaxen is a universal XPath engine for Java
+  license: DSDP
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: Jim Cornmell
+  last_updated_on: 2023-02-09 14:56:32.000000000 Z
+- name: org.antlr:antlr4-runtime
+  description: The ANTLR 4 Runtime
+  version: 4.7.1
+  license: BSD-3-Clause
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 15:44:30.000000000 Z
+- name: org.apache.activemq:activemq-broker
+  description: The ActiveMQ Message Broker implementation
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 15:44:30.000000000 Z
+- name: org.apache.commons:commons-digester3
+  description: The Apache Commons Digester package lets you configure an XML to Java
+    object mapping module which triggers certain actions called rules whenever a particular
+    pattern of nested X...
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 15:44:30.000000000 Z
+- name: org.apache.commons:commons-lang3
+  description: Apache Commons Lang
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 15:44:30.000000000 Z
+- name: org.javassist:javassist
+  description: Javassist
+  license: LGPL-2.1,Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 15:44:30.000000000 Z
+- name: org.jdom:jdom2
+  description: A complete
+  license: zlib-acknowledgement
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 15:44:30.000000000 Z
+- name: org.mybatis:mybatis
+  description: The MyBatis SQL mapper framework makes it easier to use a relational
+    database with object-oriented applications
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-10 15:44:30.000000000 Z
+- name: org.springframework.boot:spring-boot
+  description: Spring Boot
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-15 17:25:36.000000000 Z
+- name: org.springframework.boot:spring-boot-autoconfigure
+  description: Spring Boot AutoConfigure
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-15 17:25:36.000000000 Z
+- name: org.springframework.boot:spring-boot-configuration-processor
+  description: Spring Boot Configuration Processor
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-15 17:25:36.000000000 Z
+- name: org.springframework.boot:spring-boot-starter
+  description: Core starter
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-15 17:25:36.000000000 Z
+- name: org.springframework.boot:spring-boot-starter-data-jpa
+  description: Starter for using Spring Data JPA with Hibernate
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-15 17:25:36.000000000 Z
+- name: org.springframework.boot:spring-boot-starter-test
+  description: Starter for testing Spring Boot applications with libraries including
+    JUnit
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-15 17:25:36.000000000 Z
+- name: org.springframework.boot:spring-boot-starter-web
+  description: Starter for building web, including RESTful, applications using Spring
+    MVC
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-15 17:25:36.000000000 Z
+- name: org.springframework:spring-jms
+  description: Spring JMS
+  license: Apache-2.0
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: Maven Packages
+  image_url: https://img.stackshare.io/package/maven/image.png
+  detection_source_url: https://github.com/IHTSDO/release-validation-framework/blob/master/pom.xml
+  detection_source: pom.xml
+  last_updated_by: CoderMChu
+  last_updated_on: 2023-11-15 17:25:36.000000000 Z
