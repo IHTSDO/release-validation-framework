@@ -18,6 +18,13 @@
     <properties>
         <skip.integration.tests>true</skip.integration.tests>
         <packageName>rvf-api</packageName>
+        <!-- Override snomed-parent-bom 2.0.0's pin of snomed-drools 4.0.0.
+             The snomed-drools-rules content RVF loads at runtime calls methods
+             that only exist from 5.7.0 (isInactiveConceptSameAs,
+             isSemanticTagCompatibleWithinHierarchy). Against 4.0.0 the rules
+             fail to compile, Drools contributes no results, and the build
+             still reports success. -->
+        <snomed-drools.version>5.7.0</snomed-drools.version>
     </properties>
 
     <scm>
