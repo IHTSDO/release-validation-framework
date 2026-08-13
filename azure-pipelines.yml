@@ -11,6 +11,14 @@ pool:
 variables:
   mavenCache: $(Pipeline.Workspace)/.m2/repository
   mavenOptions: '-Dmaven.repo.local=$(mavenCache)'
+  # Only the production branch may publish `latest` - that is the tag
+  # values.yaml pins, so anything else pushing it silently replaces what the
+  # nightly runs. Every other branch publishes under its own name, which is
+  # also what the :catchup image needs.
+  ${{ if eq(variables['Build.SourceBranchName'], 'groups-api-fix') }}:
+    imageTag: 'latest'
+  ${{ else }}:
+    imageTag: $(Build.SourceBranchName)
 
 stages:
   - stage: build
@@ -38,7 +46,7 @@ stages:
             displayName: Build and verify
             inputs:
               mavenPomFile: 'pom.xml'
-              options: '-Ddocker.image.prefix=$(acr_repo)'
+              options: '-Ddocker.image.prefix=$(acr_repo) -Ddocker.image.tag=$(imageTag)'
               mavenOptions: '$(mavenOptions)'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '1.17'

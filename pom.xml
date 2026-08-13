@@ -18,6 +18,8 @@
     <properties>
         <skip.integration.tests>true</skip.integration.tests>
         <packageName>rvf-api</packageName>
+        <!-- Overridden per branch by azure-pipelines.yml. See dockerfile-maven-plugin below. -->
+        <docker.image.tag>latest</docker.image.tag>
         <!-- Override snomed-parent-bom 2.0.0's pin of snomed-drools 4.0.0.
              The snomed-drools-rules content RVF loads at runtime calls methods
              that only exist from 5.7.0 (isInactiveConceptSameAs,
@@ -299,6 +301,14 @@
                 <version>1.4.13</version>
                 <configuration>
                     <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                    <!-- Without an explicit tag this plugin defaults to `latest`, so
+                         EVERY build - including a one-off queued against an
+                         experimental branch - overwrites the tag the Helm chart
+                         pulls. That is not hypothetical: on 2026-08-10 two builds
+                         from abandoned branches replaced production's image in
+                         succession. The pipeline sets this per branch; the default
+                         here keeps a bare `mvn dockerfile:push` behaving as before. -->
+                    <tag>${docker.image.tag}</tag>
                     <buildArgs>
                         <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
