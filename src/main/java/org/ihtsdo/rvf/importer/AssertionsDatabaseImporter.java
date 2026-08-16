@@ -233,24 +233,34 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			assertionService.addTests(assertion, tests);
 		}
 
-		private Map<String, String> getRvfSchemaMapping(String ratSchema){
+		// Package-private for AssertionsDatabaseImporterTest. Every whitespace
+		// token of every assertion passes through here, so its edge cases are
+		// worth testing directly rather than through a database.
+		Map<String, String> getRvfSchemaMapping(String ratSchema){
 			String rvfSchema = "";
 			ratSchema = ratSchema.trim();
 			final String originalRatSchema = ratSchema;
 			boolean currOrPrevFound = false;
+			// Whether a RAT schema prefix was recognised at all. Without this the
+			// release-type suffix block below runs on tokens that never named a
+			// schema, and builds a qualifier with nothing in front of the dot.
+			boolean schemaPrefixFound = false;
 			if (ratSchema.startsWith("curr_")){
 				rvfSchema = "<PROSPECTIVE>";
 				// we strip the prefix - note we don't include _ in length since strings are 0 indexed
 				ratSchema = ratSchema.substring("curr_".length());
 				currOrPrevFound = true;
+				schemaPrefixFound = true;
 			} else if (ratSchema.startsWith("prev_")){
 				rvfSchema = "<PREVIOUS>";
 				// we strip the prefix - note we don't include _ in length since strings are 0 indexed
 				ratSchema = ratSchema.substring("prev_".length());
 				currOrPrevFound = true;
+				schemaPrefixFound = true;
 			} else if (ratSchema.startsWith("dependency_")){
 				rvfSchema = "<DEPENDENCY>";
 				ratSchema = ratSchema.substring("dependency_".length());
+				schemaPrefixFound = true;
 			} else if (ratSchema.startsWith("v_")){
 				// finally process token that represents temp tables - starts with v_
 				ratSchema = ratSchema.substring("v_".length());
@@ -260,13 +270,34 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			if (currOrPrevFound && ratSchema.endsWith(")")){
 				ratSchema = ratSchema.substring(0, ratSchema.lastIndexOf(")"));
 			}
-			// now process for release type suffix
-			if (ratSchema.endsWith("_s")){
-				rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<SNAPSHOT>";
-			} else if (ratSchema.endsWith("_d")){
-				rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<DELTA>";
-			} else if (ratSchema.endsWith("_f")){
-				rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<FULL>";
+			// Now process for release type suffix, but ONLY for a token that
+			// actually carried a schema prefix.
+			//
+			// Unprefixed tokens used to land here too, and since rvfSchema was
+			// still "" the result was a qualifier with an empty schema:
+			//
+			//   relationship_s  ->  "" + "." + "relationship" + "_<SNAPSHOT>"
+			//                   ->  .relationship_s
+			//
+			// which is a syntax error wherever it is substituted, and it defeated
+			// the isEmpty() guard below by making rvfSchema non-empty. Three
+			// assertions have failed to execute on every run since at least May
+			// 2025 for exactly this reason - the stored procedures that retrieve
+			// ancestors and descendants, and the LOINC expression validation -
+			// because they name relationship_s, stated_relationship_s and
+			// expressionassociationrefset_s without a curr_ prefix.
+			//
+			// Unqualified is already correct: the connection is opened with
+			// setDefaultCatalog(prospectiveVersion), so a bare table name resolves
+			// in the prospective schema. Leaving the token alone is the fix.
+			if (schemaPrefixFound) {
+				if (ratSchema.endsWith("_s")){
+					rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<SNAPSHOT>";
+				} else if (ratSchema.endsWith("_d")){
+					rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<DELTA>";
+				} else if (ratSchema.endsWith("_f")){
+					rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<FULL>";
+				}
 			}
 			if (!rvfSchema.isEmpty()) {
 				final Map<String, String> map = new HashMap<>();
