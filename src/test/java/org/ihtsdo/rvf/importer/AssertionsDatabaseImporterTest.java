@@ -80,6 +80,21 @@ class AssertionsDatabaseImporterTest {
     }
 
     /**
+     * A quoted table name that whitespace-splitting broke apart keeps its
+     * leading quote, because the caller only strips quotes when BOTH ends are
+     * quoted. Such a fragment does not start with "curr_", so no schema is
+     * recognised - and it used to be rewritten to
+     * ".'curr_stated_relationship_&lt;SNAPSHOT&gt;", which is the reported
+     * failure of "The current stated relationship snapshot file is an accurate
+     * derivative...".
+     */
+    @Test
+    void quoteFragmentsAreLeftAlone() {
+        assertTrue(importer.getRvfSchemaMapping("'curr_stated_relationship_s").isEmpty(),
+                "a fragment starting with a quote names no schema this method can see");
+    }
+
+    /**
      * Tokens that are not table references at all reach this method too: the
      * caller splits every statement on whitespace and passes each token in.
      */
