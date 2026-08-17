@@ -119,7 +119,18 @@ public class ColumnPatternTester {
 					int columnIndex = 0;
 					linesTested++;
 					lineNumber++;
-					columnData = line.split("\t");
+					// The -1 limit is load-bearing. String.split(regex) discards
+					// TRAILING empty strings, so an RF2 row whose last column is
+					// legitimately empty is counted one column short and reported
+					// as malformed. On AU 20260831 that produced 45 false
+					// ColumnCountTest failures across the three MRCMDomain files
+					// (Delta 2, Snapshot 19, Full 24), every one a row with an
+					// empty `guideURL`: those rows end `...}` 0x09 0x0D 0x0A, so the
+					// field is present and empty and the row does have all 13
+					// columns. This test asks how many columns a row has, not
+					// whether the last one is populated - which the field-level
+					// tests below cover separately.
+					columnData = line.split("\t", -1);
 
 					final int dataColumnCount = columnData.length;
 
