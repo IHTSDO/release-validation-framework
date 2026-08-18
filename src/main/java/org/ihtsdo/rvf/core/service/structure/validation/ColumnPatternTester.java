@@ -119,7 +119,18 @@ public class ColumnPatternTester {
 					int columnIndex = 0;
 					linesTested++;
 					lineNumber++;
-					columnData = line.split("\t");
+					// The -1 limit is load-bearing. String.split(regex) discards
+					// TRAILING empty strings, so an RF2 row whose last column is
+					// legitimately empty is counted one column short and reported
+					// as malformed. On AU 20260831 that produced 45 false
+					// ColumnCountTest failures across the three MRCMDomain files
+					// (Delta 2, Snapshot 19, Full 24), every one a row with an
+					// empty `guideURL`: those rows end `...}` 0x09 0x0D 0x0A, so the
+					// field is present and empty and the row does have all 13
+					// columns. This test asks how many columns a row has, not
+					// whether the last one is populated - which the field-level
+					// tests below cover separately.
+					columnData = line.split("\t", -1);
 
 					final int dataColumnCount = columnData.length;
 
@@ -179,8 +190,23 @@ public class ColumnPatternTester {
 			return false;
 		}
 
-		// will catch extra tabs, spaces at the end of a line
-		if (line.endsWith("\t") || line.endsWith(" ")) {
+		// Trailing SPACES are a real finding. A trailing TAB is not: it is the
+		// delimiter of a final column that is present and empty, which RF2
+		// permits - MRCMDomain's `guideURL` is the common case, and on AU
+		// 20260831 flagging it produced 45 false failures across the three
+		// MRCMDomain files, the same 45 rows that `split("\t", -1)` above stops
+		// being miscounted.
+		//
+		// A stray extra tab cannot reach here, which is what makes dropping it
+		// from this check safe rather than merely convenient: an extra tab puts
+		// the field count past configColumnCount and the column-count test above
+		// has already reported it and returned false. So by this line the row is
+		// known to have exactly the right number of columns, and a trailing tab
+		// can only be the empty final one. `rel2_Refset_SimpleDelta_INT_20140428`
+		// line 17 is the counter-example that proves the split: six populated
+		// values plus a stray tab is seven fields on a six-column file, so it is
+		// caught above as a column-count error and never gets this far.
+		if (line.endsWith(" ")) {
 			// extra spaces lets see if it is at the end, can still continue testing
 			validationLog.assertionError("Extra space at the end of line {}, expected {}, actual {}", lineNumber, line.trim(), line);
 			testReport.addError(lineNumber + "-" + dataColumnCount + 1, startTime, fileName, resourceManager.getFilePath(), "End of Row Space", ROW_SPACE_TEST_TYPE, "", line, line.trim(),lineNumber);
