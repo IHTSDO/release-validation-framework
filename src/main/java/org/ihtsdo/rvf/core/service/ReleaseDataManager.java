@@ -115,7 +115,8 @@ public class ReleaseDataManager {
 	public void dropSchema(String schemaName) throws BusinessServiceException{
 		logger.info("Dropping schema {}", schemaName);
 		//clean database
-		try (Statement statement = dataSource.getConnection().createStatement()) {
+		try (Connection connection = dataSource.getConnection();
+			 Statement statement = connection.createStatement()) {
 			String dropStr = "drop database if exists " + schemaName + ";";
 			statement.execute(dropStr);
 			schemaNames.remove(schemaName);
@@ -481,7 +482,8 @@ public class ReleaseDataManager {
 		String schemaName = version.startsWith(RVF_DB_PREFIX) ? version : RVF_DB_PREFIX + version;
 		logger.info("Creating db schema {}", schemaName);
 		//clean and create database
-		try (Statement statement = dataSource.getConnection().createStatement()) {
+		try (Connection connection = dataSource.getConnection();
+			 Statement statement = connection.createStatement()) {
 			String dropStr = "drop database if exists " + schemaName + ";";
 			String createDbStr = "create database if not exists "+ schemaName + ";";
 			statement.execute(dropStr);
@@ -491,9 +493,10 @@ public class ReleaseDataManager {
 		}
 
 		try {
-			try (Statement statement = rvfDynamicDataSource.getConnection(schemaName).createStatement()) {
+			try (Connection connection = rvfDynamicDataSource.getConnection(schemaName);
+				 Statement statement = connection.createStatement()) {
 				statement.execute("use " + schemaName + ";");
-			} 
+			}
 			try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream("/sql/create-tables-mysql.sql"));
 				 Connection connection = rvfDynamicDataSource.getConnection(schemaName)) {
 				ScriptRunner runner = new ScriptRunner(connection);
