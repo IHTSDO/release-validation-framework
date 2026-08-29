@@ -213,40 +213,83 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			assertionService.addTests(assertion, tests);
 		}
 
-		private Map<String, String> getRvfSchemaMapping(String ratSchema){
+		// Package-private for AssertionsDatabaseImporterTest. Every whitespace
+		// token of every assertion passes through here, so its edge cases are
+		// worth testing directly rather than through a database.
+		Map<String, String> getRvfSchemaMapping(String ratSchema){
 			String rvfSchema = "";
 			ratSchema = ratSchema.trim();
 			final String originalRatSchema = ratSchema;
 			boolean currOrPrevFound = false;
+			// Whether a RAT schema prefix was recognised at all. Without this the
+			// release-type suffix block below runs on tokens that never named a
+			// schema, and builds a qualifier with an empty schema.
+			boolean schemaPrefixFound = false;
 			if (ratSchema.startsWith("curr_")){
 				rvfSchema = "<PROSPECTIVE>";
 				// we strip the prefix - note we don't include _ in length since strings are 0 indexed
 				ratSchema = ratSchema.substring("curr_".length());
 				currOrPrevFound = true;
+				schemaPrefixFound = true;
 			} else if (ratSchema.startsWith("prev_")){
 				rvfSchema = "<PREVIOUS>";
 				// we strip the prefix - note we don't include _ in length since strings are 0 indexed
 				ratSchema = ratSchema.substring("prev_".length());
 				currOrPrevFound = true;
+				schemaPrefixFound = true;
 			} else if (ratSchema.startsWith("dependency_")){
 				rvfSchema = "<DEPENDENCY>";
 				ratSchema = ratSchema.substring("dependency_".length());
+				schemaPrefixFound = true;
 			} else if (ratSchema.startsWith("v_")){
 				// finally process token that represents temp tables - starts with v_
 				ratSchema = ratSchema.substring("v_".length());
 				rvfSchema = "<TEMP>" + "." + ratSchema;
+				// Deliberately NOT a schema prefix: <TEMP> has already produced a
+				// complete qualifier here, and appending a release-type suffix to
+				// it would corrupt a name that is already right.
 			}
 			// clean up conditions where tokenization produces schema mappings with ')' at the end
 			if (currOrPrevFound && ratSchema.endsWith(")")){
 				ratSchema = ratSchema.substring(0, ratSchema.lastIndexOf(")"));
 			}
-			// now process for release type suffix
-			if (ratSchema.endsWith("_s")){
-				rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<SNAPSHOT>";
-			} else if (ratSchema.endsWith("_d")){
-				rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<DELTA>";
-			} else if (ratSchema.endsWith("_f")){
-				rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<FULL>";
+			// Now process for release type suffix, but ONLY for a token that
+			// actually carried a schema prefix.
+			//
+			// Unprefixed tokens used to land here too, and since rvfSchema was
+			// still "" the result was a qualifier with an empty schema:
+			//
+			//   langrefset_s  ->  "" + "." + "langrefset" + "_<SNAPSHOT>"
+			//                 ->  .langrefset_<SNAPSHOT>
+			//
+			// which is a syntax error wherever it is substituted, and it defeated
+			// the isEmpty() guard below by making rvfSchema non-empty.
+			//
+			// Measured against the corpus pinned in checkout-resources.sh: five
+			// scripts name a table with a release-type suffix and no schema
+			// prefix, and four of those five are manifest-declared, so RVF runs
+			// them -
+			//
+			//   mrcm-attribute-range-refset-validate-concept-ids  mrcmattributerangerefset_s
+			//   mrcm-domain-refset-validate-concept-ids           mrcmdomainrefset_s
+			//   changes-are-in-exepected-modules-edition-proc     moduledependencyrefset_d
+			//   changes-are-in-exepected-modules-extension-proc   moduledependencyrefset_d
+			//
+			// the fifth, description-without-language-refset (langrefset_s), is
+			// one of the corpus scripts no manifest declares, so it never ran on
+			// either engine.
+			//
+			// Unqualified is already correct: the connection is opened with
+			// setDefaultCatalog(prospectiveVersion), so a bare table name resolves
+			// in the prospective schema. Leaving the token alone is the fix.
+			if (schemaPrefixFound) {
+				if (ratSchema.endsWith("_s")){
+					rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<SNAPSHOT>";
+				} else if (ratSchema.endsWith("_d")){
+					rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<DELTA>";
+				} else if (ratSchema.endsWith("_f")){
+					rvfSchema = rvfSchema + "." + scripSuffix(ratSchema) + "_<FULL>";
+				}
 			}
 			if (!rvfSchema.isEmpty()) {
 				final Map<String, String> map = new HashMap<>();
