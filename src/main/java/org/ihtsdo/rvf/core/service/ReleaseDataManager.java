@@ -49,6 +49,7 @@ public class ReleaseDataManager {
 	public static final String SQL_SELECT = " SELECT * FROM ";
 	public static final String SQL_ALTER_TABLE = "ALTER TABLE ";
 	public static final String INSERT_INTO = "INSERT INTO ";
+	private static final String IDENTIFIER_TABLE_PREFIX = "identifier_";
 
 	@Value("${rvf.data.folder.location}")
 	private String sctDataLocation;
@@ -330,7 +331,8 @@ public class ReleaseDataManager {
 	}
 	
 
-	/** Combine data from source schema A and B into target schema. Choose the most recent when both source schema A and B share the same ids.
+	/** Combine data from source schema A and B into target schema. Choose the most recent when both source schema A and B share the same key
+	 * (see {@link #keyMatch}).
 	 * @param tableName the table name to copy from source to target schema
 	 * @param sourceSchemaA 
 	 * @param sourceSchemaB
@@ -341,15 +343,15 @@ public class ReleaseDataManager {
 		final String disableIndex = SQL_ALTER_TABLE + tableName + " DISABLE KEYS";
 		final String enableIndex = SQL_ALTER_TABLE + tableName + " ENABLE KEYS";
 		String selectAFrom = "select a.* from ";
-		String selectDataFromASql = selectAFrom + sourceSchemaA + "." + tableName + " a where not exists ( select c.id from " + sourceSchemaB + "."
-				+ tableName + " c where a.id=c.id)";
-		String latestDataFromASelectSql = selectAFrom + sourceSchemaA + "." + tableName + " a where exists ( select b.id from " + sourceSchemaB + "." + tableName
-					+ " b where a.id=b.id and cast(a.effectivetime as datetime) >= cast(b.effectivetime as datetime))";
+		String selectDataFromASql = selectAFrom + sourceSchemaA + "." + tableName + " a where not exists ( select 1 from " + sourceSchemaB + "."
+				+ tableName + " c where " + keyMatch(tableName, "a", "c") + ")";
+		String latestDataFromASelectSql = selectAFrom + sourceSchemaA + "." + tableName + " a where exists ( select 1 from " + sourceSchemaB + "." + tableName
+					+ " b where " + keyMatch(tableName, "a", "b") + " and cast(a.effectivetime as datetime) >= cast(b.effectivetime as datetime))";
 		
-		String selectDataFromBSql = selectAFrom + sourceSchemaB + "." + tableName + " a where not exists ( select c.id from " + sourceSchemaA + "."
-				+ tableName + " c where a.id=c.id)";
-		String latestDataFromBSelectSql = selectAFrom + sourceSchemaB + "." + tableName + " a where exists ( select b.id from " + sourceSchemaA + "." + tableName
-					+ " b where a.id=b.id and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime))";
+		String selectDataFromBSql = selectAFrom + sourceSchemaB + "." + tableName + " a where not exists ( select 1 from " + sourceSchemaA + "."
+				+ tableName + " c where " + keyMatch(tableName, "a", "c") + ")";
+		String latestDataFromBSelectSql = selectAFrom + sourceSchemaB + "." + tableName + " a where exists ( select 1 from " + sourceSchemaA + "." + tableName
+					+ " b where " + keyMatch(tableName, "a", "b") + " and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime))";
 		
 		final String insertSql = INSERT_INTO + targetSchema + "." + tableName  + " ";
 		logger.debug("Copying table {}", tableName);
@@ -438,7 +440,7 @@ public class ReleaseDataManager {
 			String snapshotTbl = deltaTbl.replace("_d", "_s");
 			try (Connection connection = rvfDynamicDataSource.getConnection(schema);
 					Statement statement = connection.createStatement() ) {
-				final String deleteSql = "delete a.* from " + schema + "." + snapshotTbl + " a where exists ( select b.id from " + schema + "." + deltaTbl + " b where a.id=b.id)";
+				final String deleteSql = "delete a.* from " + schema + "." + snapshotTbl + " a where exists ( select 1 from " + schema + "." + deltaTbl + " b where " + keyMatch(deltaTbl, "a", "b") + ")";
 				logger.debug("Delete data from snapshot table sql: {}", deleteSql);
 				final String insertSql = "insert into " + schema + "." + snapshotTbl  + SQL_SELECT + schema + "." + deltaTbl;
 				logger.debug("Insert delta into snapshot table sql: {}", insertSql);
@@ -467,11 +469,25 @@ public class ReleaseDataManager {
 		if (!errorMsg.isEmpty()) {
 			throw new BusinessServiceException(errorMsg.toString());
 		}
+		List<String> tablesInB = getValidTableNamesFromSchema(sourceSchemaB, tableNamePattern);
 		for (String tableName : getValidTableNamesFromSchema(sourceSchemaA, tableNamePattern)) {
 			if (excludeTableNames != null && excludeTableNames.contains(tableName)) {
 				continue;
 			}
-			copyData(tableName, sourceSchemaA, sourceSchemaB, destinationSchema);
+			if (tablesInB.remove(tableName)) {
+				copyData(tableName, sourceSchemaA, sourceSchemaB, destinationSchema);
+			} else {
+				logger.info("{} has no table {}, so it is copied from {} alone", sourceSchemaB, tableName, sourceSchemaA);
+				copyData(tableName, sourceSchemaA, destinationSchema);
+			}
+		}
+		// Tables that only B has, typically because schema A was built before they were added
+		for (String tableName : tablesInB) {
+			if (excludeTableNames != null && excludeTableNames.contains(tableName)) {
+				continue;
+			}
+			logger.info("{} has no table {}, so it is copied from {} alone", sourceSchemaA, tableName, sourceSchemaB);
+			copyData(tableName, sourceSchemaB, destinationSchema);
 		}
 		final long endTime = System.currentTimeMillis();
 		logger.info("Copy data with table name like {} from {} {} into {} completed in seconds {} ", 
@@ -693,7 +709,7 @@ public class ReleaseDataManager {
 					+ SQL_SELECT + snapshotTable.replaceAll("_s$", "_f") + " a"
 					+ " WHERE (a.effectivetime IS NULL OR cast(a.effectivetime as datetime) > cast('" + executionConfig.getPreviousEffectiveTime() + "' as datetime))";
 			if (executionConfig.isReleaseAsAnEdition() && executionConfig.isExtensionValidation()) {
-				insertSQL += " AND NOT EXISTS (SELECT id FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " WHERE a.id = id AND a.moduleid = moduleid AND a.effectivetime = effectivetime)";
+				insertSQL += notInDependencyFullClause(executionConfig, snapshotTable, connection);
 			}
 			try (PreparedStatement ps = connection.prepareStatement(insertSQL)) {
 				logger.info(insertSQL);
@@ -709,7 +725,7 @@ public class ReleaseDataManager {
 					+ SQL_SELECT + snapshotTable + " a"
 					+ " WHERE (a.effectivetime IS NULL OR a.effectivetime=?)";
 			if (executionConfig.isReleaseAsAnEdition() && executionConfig.isExtensionValidation()) {
-				insertSQL += " AND NOT EXISTS (SELECT id FROM " + executionConfig.getExtensionDependencyVersion() + "." + snapshotTable.replaceAll("_s$", "_f") + " WHERE a.id = id AND a.moduleid = moduleid AND a.effectivetime = effectivetime)";
+				insertSQL += notInDependencyFullClause(executionConfig, snapshotTable, connection);
 			}
 			try (PreparedStatement ps = connection.prepareStatement(insertSQL)) {
 				ps.setString(1, effectiveTime);
@@ -733,9 +749,14 @@ public class ReleaseDataManager {
 	private void insertIntoProspectiveDeltaTablesFromDependency(String dependencyVersion, String previousDependencyEffectiveTime, Set<String> snapShotTables, Connection connection) throws SQLException {
 		StringBuilder insertSQL;
 		for (String snapshotTable : snapShotTables) {
+			String fullTable = snapshotTable.replaceAll("_s$", "_f");
+			if (!tableExists(connection, dependencyVersion, fullTable)) {
+				logger.info("Dependency schema {} has no table {}, so there are no dependency rows to add to {}", dependencyVersion, fullTable, snapshotTable.replaceAll("_s$", "_d"));
+				continue;
+			}
 			insertSQL = new StringBuilder();
 			insertSQL.append(INSERT_INTO).append(snapshotTable.replaceAll("_s$", "_d"))
-					.append(SQL_SELECT).append(dependencyVersion).append(".").append(snapshotTable.replaceAll("_s$", "_f")).append(" a");
+					.append(SQL_SELECT).append(dependencyVersion).append(".").append(fullTable).append(" a");
 			if (previousDependencyEffectiveTime != null) {
 				insertSQL.append(" WHERE cast(a.effectivetime as datetime) > cast('").append(previousDependencyEffectiveTime).append("' as datetime)");
 			}
@@ -745,6 +766,45 @@ public class ReleaseDataManager {
 				ps.execute();
 			}
 		}
+	}
+
+	/**
+	 * The clause that excludes rows of the prospective full table aliased {@code a}
+	 * which the dependency's full table already holds, or "" when the dependency
+	 * schema predates the table and so holds none of its rows.
+	 */
+	private static String notInDependencyFullClause(MysqlExecutionConfig executionConfig, String snapshotTable, Connection connection) throws SQLException {
+		String dependencyVersion = executionConfig.getExtensionDependencyVersion();
+		String fullTable = snapshotTable.replaceAll("_s$", "_f");
+		if (!tableExists(connection, dependencyVersion, fullTable)) {
+			logger.info("Dependency schema {} has no table {}, so no rows of it are excluded from the prospective delta", dependencyVersion, fullTable);
+			return "";
+		}
+		return " AND NOT EXISTS (SELECT 1 FROM " + dependencyVersion + "." + fullTable + " d WHERE "
+				+ keyMatch(snapshotTable, "a", "d") + " AND a.moduleid = d.moduleid AND a.effectivetime = d.effectivetime)";
+	}
+
+	private static boolean tableExists(Connection connection, String schema, String table) throws SQLException {
+		try (PreparedStatement ps = connection.prepareStatement("select 1 from information_schema.tables where table_schema = ? and table_name = ?")) {
+			ps.setString(1, schema);
+			ps.setString(2, table);
+			try (ResultSet resultSet = ps.executeQuery()) {
+				return resultSet.next();
+			}
+		}
+	}
+
+	/**
+	 * The condition that matches rows of {@code tableName} aliased {@code a} and
+	 * {@code b} on the table's key. Every RF2 table is keyed on {@code id} except
+	 * the Identifier file, which has no id column and is keyed on
+	 * (identifierSchemeId, alternateIdentifier).
+	 */
+	private static String keyMatch(String tableName, String a, String b) {
+		if (tableName.startsWith(IDENTIFIER_TABLE_PREFIX)) {
+			return a + ".identifierschemeid=" + b + ".identifierschemeid and " + a + ".alternateidentifier=" + b + ".alternateidentifier";
+		}
+		return a + ".id=" + b + ".id";
 	}
 
 	public long getPublishedReleaseLastModifiedDate(Map<String, Long> releaseFileToCreationTimeMap, String publishedRelease) {

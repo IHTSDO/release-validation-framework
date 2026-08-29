@@ -85,4 +85,73 @@ class AssertionsDatabaseImporterTest {
     void splitSql_ShouldNotReportTrailingCommentAsUnterminatedStatement() {
         assertEquals("", AssertionsDatabaseImporter.splitSql("select 1; -- Core Module").unterminatedTail());
     }
+
+    /**
+     * A token with a RAT schema prefix still gets its schema and its release
+     * type suffix. These are the mappings the assertions rely on.
+     */
+    @Test
+    void prefixedTokensStillMapToASchemaQualifiedTable() {
+        assertEquals("<PROSPECTIVE>.relationship_<SNAPSHOT>",
+                importer.getRvfSchemaMapping("curr_relationship_s").get("curr_relationship_s"));
+        assertEquals("<PREVIOUS>.concept_<FULL>",
+                importer.getRvfSchemaMapping("prev_concept_f").get("prev_concept_f"));
+        assertEquals("<DEPENDENCY>.description_<DELTA>",
+                importer.getRvfSchemaMapping("dependency_description_d").get("dependency_description_d"));
+    }
+
+    /**
+     * An unprefixed token ending _s/_d/_f used to be rewritten to a qualifier
+     * with an empty schema, ".langrefset_&lt;SNAPSHOT&gt;", which MySQL 8.4 rejects
+     * as a syntax error. These tokens must be left alone: the execution
+     * connection's default catalog is the prospective schema, so the bare name
+     * already resolves.
+     */
+    @Test
+    void unprefixedTokensAreLeftAlone() {
+        for (String token : new String[]{
+                "langrefset_s",
+                "relationship_s",
+                "concept_d",
+                "description_f"}) {
+            assertTrue(importer.getRvfSchemaMapping(token).isEmpty(),
+                    token + " names no schema, so it must not be rewritten to '."
+                            + token.substring(0, token.length() - 2) + "_<...>'");
+        }
+    }
+
+    /**
+     * A quoted table name that whitespace-splitting broke apart keeps its
+     * leading quote, because the caller only strips quotes when both ends are
+     * quoted. Such a fragment does not start with "curr_", so no schema is
+     * recognised, and it must not be rewritten to
+     * ".'curr_stated_relationship_&lt;SNAPSHOT&gt;".
+     */
+    @Test
+    void quoteFragmentsAreLeftAlone() {
+        assertTrue(importer.getRvfSchemaMapping("'curr_stated_relationship_s").isEmpty(),
+                "a fragment starting with a quote names no schema this method can see");
+    }
+
+    /**
+     * Tokens that are not table references at all reach this method too: the
+     * caller splits every statement on whitespace and passes each token in.
+     */
+    @Test
+    void nonTableTokensProduceNoMapping() {
+        for (String token : new String[]{"SELECT", "FROM", "WHERE", "1", "active", ""}) {
+            assertTrue(importer.getRvfSchemaMapping(token).isEmpty(),
+                    "'" + token + "' is not a table reference");
+        }
+    }
+
+    /**
+     * v_ tokens name a temp table and carry their own qualifier. The suffix
+     * block must not append a second one on top.
+     */
+    @Test
+    void tempTableTokensKeepASingleQualifier() {
+        assertEquals("<TEMP>.attributedescription_s",
+                importer.getRvfSchemaMapping("v_attributedescription_s").get("v_attributedescription_s"));
+    }
 }

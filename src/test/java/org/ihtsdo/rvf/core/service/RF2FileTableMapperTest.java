@@ -197,6 +197,19 @@ class RF2FileTableMapperTest {
 		}
 	}
 
+	@Test
+	void testIdentifierExtendedAssociationAndAttributeValueMapFilenames() {
+		for (String type : new String[]{"Delta", "Snapshot", "Full"}) {
+			String suffix = "_" + Character.toLowerCase(type.charAt(0));
+			assertEquals("identifier" + suffix, RF2FileTableMapper.getLegacyTableName(
+					"sct2_Identifier_" + type + "_INT_20250101.txt"));
+			assertEquals("extendedassociation" + suffix, RF2FileTableMapper.getLegacyTableName(
+					"der2_ccRefset_ExtendedAssociation" + type + "_INT_20250101.txt"));
+			assertEquals("attributevaluemap" + suffix, RF2FileTableMapper.getLegacyTableName(
+					"der2_csRefset_AttributeValueMap" + type + "_INT_20250101.txt"));
+		}
+	}
+
 	private void testSnapshot(final String[] deltaFiles, final String[] expectedDeltaResults) {
 		final String[] snapshotFiles = new String[deltaFiles.length];
 		for (int i=0; i < snapshotFiles.length; i++) {
