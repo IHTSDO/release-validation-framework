@@ -41,7 +41,7 @@ public class RF2FileStructureTester {
 	
 	public void runTests(){
 		startTime = new Date();
-		List<String> fileNames = resourceManager.getFileNames();
+		List<String> fileNames = resourceManager.getFileNamesLargestFirst();
 		try (ExecutorService executorService = Executors.newCachedThreadPool()) {
 			List<Future<Boolean>> futures = new ArrayList<>();
 			for (final String fileName : fileNames) {

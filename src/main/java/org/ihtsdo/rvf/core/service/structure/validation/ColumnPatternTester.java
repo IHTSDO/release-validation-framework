@@ -33,6 +33,137 @@ public class ColumnPatternTester {
 	private static final String SCTID_PARTITION_TEST_TYPE = "SctIdPartitionTest";
 	public static final String COMPLIANT_FILENAME = "RF2 Compliant filename";
 
+	/**
+	 * A hand-written equivalent of one of the patterns above, or null when there
+	 * is none and the regex engine must be used.
+	 *
+	 * <p>Why this exists: on the 1,039MB relationship file of a real edition
+	 * (92,283,780 fields) the per-field work costs 11.33s, and reading plus
+	 * splitting the same file costs 3.37s. **The regex engine is the entire
+	 * difference** - the same checks written as character loops cost 3.80s, so
+	 * 2.98x. {@code split("\t", -1)} is not the problem and is left alone.
+	 *
+	 * <p>Each of these must accept EXACTLY the strings its pattern accepts.
+	 * {@code ColumnPatternFastPathTest} asserts that against the patterns
+	 * themselves over adversarial and random input, so a mistake here fails the
+	 * build rather than silently changing what RVF reports.
+	 */
+	private interface FastPath {
+		boolean matches(String value);
+	}
+
+	/**
+	 * The fast path for a pattern, or null.
+	 *
+	 * <p>Keyed on the pattern instance rather than its text: these are the only
+	 * seven patterns in this class, and identity keeps the mapping unambiguous if
+	 * a future pattern happens to share text with a different flag set.
+	 */
+	private static FastPath fastPathFor(final Pattern pattern) {
+		if (pattern == SCTID_PATTERN) {
+			// ^\d{6,18}$
+			return v -> v.length() >= 6 && v.length() <= 18 && asciiDigits(v);
+		}
+		if (pattern == DATE_PATTERN) {
+			// ^\d{8}$
+			return v -> v.length() == 8 && asciiDigits(v);
+		}
+		if (pattern == INTEGER_PATTERN) {
+			// \d+ under matches(), so one or more digits and nothing else
+			return v -> !v.isEmpty() && asciiDigits(v);
+		}
+		if (pattern == BOOLEAN_PATTERN) {
+			// [0-1] under matches(), so exactly one character
+			return v -> v.length() == 1 && (v.charAt(0) == '0' || v.charAt(0) == '1');
+		}
+		if (pattern == BLANK) {
+			return String::isEmpty;
+		}
+		if (pattern == UUID_PATTERN) {
+			return ColumnPatternTester::isUuid;
+		}
+		if (pattern == NOT_BLANK) {
+			return ColumnPatternTester::isNotBlankPattern;
+		}
+		return null;
+	}
+
+	/** {@code \d} without UNICODE_CHARACTER_CLASS is exactly [0-9]. */
+	private static boolean asciiDigits(final String v) {
+		for (int i = 0; i < v.length(); i++) {
+			final char c = v.charAt(i);
+			if (c < '0' || c > '9') {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/** ^[0-9a-fA-F]{8}-{4}-{4}-{4}-{12}$ */
+	private static boolean isUuid(final String v) {
+		if (v.length() != 36) {
+			return false;
+		}
+		for (int i = 0; i < 36; i++) {
+			final char c = v.charAt(i);
+			if (i == 8 || i == 13 || i == 18 || i == 23) {
+				if (c != '-') {
+					return false;
+				}
+			} else if (!isHex(c)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static boolean isHex(final char c) {
+		return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+	}
+
+	/**
+	 * {@code ^(?=\s*\S).*$} under {@code matches()}, which is subtler than "not
+	 * blank" and is reproduced rather than approximated:
+	 *
+	 * <ul>
+	 * <li>the lookahead needs some ASCII whitespace (which is what {@code \s} is
+	 *     without UNICODE_CHARACTER_CLASS: space, tab, LF, VT, FF, CR) followed by
+	 *     a character that is not ASCII whitespace;</li>
+	 * <li>{@code .} does not match a line terminator, so {@code .*$} additionally
+	 *     requires the value to contain none. A non-blank value holding a newline
+	 *     therefore does NOT match, and {@code String.isBlank()} would disagree.</li>
+	 * </ul>
+	 *
+	 * Values here come from splitting a line that {@code readLine} already broke
+	 * on terminators, so in practice they hold none - but equivalence should not
+	 * depend on that.
+	 */
+	private static boolean isNotBlankPattern(final String v) {
+		int i = 0;
+		while (i < v.length() && isAsciiSpace(v.charAt(i))) {
+			i++;
+		}
+		if (i == v.length()) {
+			return false;
+		}
+		for (int j = 0; j < v.length(); j++) {
+			if (isLineTerminator(v.charAt(j))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/** {@code \s} = [ \t\n\x0B\f\r] */
+	private static boolean isAsciiSpace(final char c) {
+		return c == ' ' || c == '\t' || c == '\n' || c == 0x0B || c == '\f' || c == '\r';
+	}
+
+	/** What {@code .} refuses to match without DOTALL. */
+	private static boolean isLineTerminator(final char c) {
+		return c == '\n' || c == '\r' || c == '\u0085' || c == '\u2028' || c == '\u2029';
+	}
+
 	private enum Rf2CoreFileKind {
 		CONCEPT, DESCRIPTION, TEXT_DEFINITION, RELATIONSHIP
 	}
@@ -63,7 +194,7 @@ public class ColumnPatternTester {
 		final SchemaFactory schemaFactory = new SchemaFactory();
 		try (ExecutorService executor = Executors.newCachedThreadPool()) {
 			List<Future<Long>> tasks = new ArrayList<>();
-			for (final String fileName : fileNames) {
+			for (final String fileName : resourceManager.getFileNamesLargestFirst()) {
 				Future<Long> task = executor.submit(() -> runTestForFile(fileName, schemaFactory));
 				tasks.add(task);
 			}
@@ -251,7 +382,9 @@ public class ColumnPatternTester {
 	}
 
 	private static boolean isNumericSctId(String value) {
-		return value != null && SCTID_PATTERN.matcher(value).matches();
+		// Same test as SCTID_PATTERN (^\d{6,18}$) without the regex engine: this
+		// runs on the success path for every field of every row.
+		return value != null && value.length() >= 6 && value.length() <= 18 && asciiDigits(value);
 	}
 
 	/**
@@ -351,12 +484,17 @@ public class ColumnPatternTester {
 	}
 
 	public boolean isBlank(final String value) {
-		return BLANK.matcher(value).matches();
+		// BLANK is ^$ under matches(), which is exactly isEmpty(). Called per
+		// field, so it does not need the regex engine.
+		return value.isEmpty();
 	}
 
 	private class PatternTest {
 
 		protected final Pattern[] patterns;
+		/** Parallel to {@link #patterns}; an entry is null when only the regex will do. */
+		protected final FastPath[] fastPaths;
+		private final String patternString;
 		protected final String methodName;
 		protected String errorMessage;
 		protected Object[] errorArgs;
@@ -365,22 +503,42 @@ public class ColumnPatternTester {
 		public PatternTest(final String methodName, final String errorMessage, final Pattern... patterns) {
 			this.methodName = methodName;
 			this.patterns = patterns;
+			this.fastPaths = new FastPath[patterns.length];
+			for (int i = 0; i < patterns.length; i++) {
+				this.fastPaths[i] = fastPathFor(patterns[i]);
+			}
 			this.errorMessage = errorMessage;
-			this.expectedValue = getPatternString();
+			this.patternString = buildPatternString();
+			this.expectedValue = this.patternString;
 		}
 
 		public boolean validate(final Field column, final long lineNumber, final String value) {
-			errorArgs = new String[]{lineNumber + "", column.getName(), value};
-
 			// ignore a null value if this is the case
 			if ((column.getType() == DataType.SCTID_OR_UUID) && isBlank(value)) return true;
 
-			for (final Pattern pattern : patterns) {
-				if (pattern.matcher(value).matches()) {
+			if (anyPatternMatches(value)) {
+				return true;
+			}
+			// Built here rather than on entry: getErrorArgs() is only read after
+			// this returns false, and building it up front allocated a String[]
+			// and a String for every field of every line.
+			errorArgs = new String[]{lineNumber + "", column.getName(), value};
+			validationLog.assertionError(errorMessage, lineNumber, column.getName(), value);
+			return false;
+		}
+
+		/**
+		 * Whether any of this test's patterns accepts the value, using the
+		 * hand-written equivalent where one exists and the regex engine where it
+		 * does not.
+		 */
+		protected boolean anyPatternMatches(final String value) {
+			for (int i = 0; i < patterns.length; i++) {
+				final FastPath fastPath = fastPaths[i];
+				if (fastPath != null ? fastPath.matches(value) : patterns[i].matcher(value).matches()) {
 					return true;
 				}
 			}
-			validationLog.assertionError(errorMessage, lineNumber, column.getName(), value);
 			return false;
 		}
 
@@ -404,7 +562,15 @@ public class ColumnPatternTester {
 			this.expectedValue = expectedValue;
 		}
 
+		/**
+		 * Built once in the constructor. It used to be rebuilt on every call, and
+		 * the success path calls it per field.
+		 */
 		public String getPatternString() {
+			return patternString;
+		}
+
+		private String buildPatternString() {
 			final StringBuilder builder = new StringBuilder();
 			builder.append(patterns[0].toString());
 			if (patterns.length > 1) {
@@ -427,13 +593,10 @@ public class ColumnPatternTester {
 
 		@Override
 		public boolean validate(final Field column, final long lineNumber, final String value) {
-			errorArgs = new String[]{lineNumber + "", "1 or 2", value};
-
-			for (final Pattern pattern : patterns) {
-				if (pattern.matcher(value).matches()) {
-					return true;
-				}
+			if (anyPatternMatches(value)) {
+				return true;
 			}
+			errorArgs = new String[]{lineNumber + "", "1 or 2", value};
 			validationLog.assertionError(errorMessage, lineNumber, "1 or 2", value);
 			return false;
 		}
@@ -452,8 +615,9 @@ public class ColumnPatternTester {
 
 		@Override
 		public boolean validate(final Field column, final long lineNumber, final String value) {
-			// Date Stamp
-			if (!DATE_PATTERN.matcher(value).matches()) {
+			// Date Stamp. Via anyPatternMatches so it takes the same fast path as
+			// every other column: effectiveTime is one field on every single row.
+			if (!anyPatternMatches(value)) {
 				errorArgs = new String[]{lineNumber + "", column.getName(), value};
 				return false;
 			}
