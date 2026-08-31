@@ -82,9 +82,12 @@ public class ColumnPatternTester {
 		if (pattern == UUID_PATTERN) {
 			return ColumnPatternTester::isUuid;
 		}
-		if (pattern == NOT_BLANK) {
-			return ColumnPatternTester::isNotBlankPattern;
-		}
+		// NOT_BLANK deliberately has no fast path. Its equivalent is subtle - the
+		// lookahead, and the fact that '.' rejects five line-terminator characters
+		// so String.isBlank() is NOT equivalent - and measured on 2,246,130 real
+		// term values it is worth only 1.55x (0.439s to 0.284s). The regex earns
+		// its keep here; see ColumnPatternFastPathTest.notBlankIsNotSimplyIsBlank
+		// for the trap that makes a hand-written version harder than it looks.
 		return null;
 	}
 
@@ -121,48 +124,8 @@ public class ColumnPatternTester {
 		return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 	}
 
-	/**
-	 * {@code ^(?=\s*\S).*$} under {@code matches()}, which is subtler than "not
-	 * blank" and is reproduced rather than approximated:
-	 *
-	 * <ul>
-	 * <li>the lookahead needs some ASCII whitespace (which is what {@code \s} is
-	 *     without UNICODE_CHARACTER_CLASS: space, tab, LF, VT, FF, CR) followed by
-	 *     a character that is not ASCII whitespace;</li>
-	 * <li>{@code .} does not match a line terminator, so {@code .*$} additionally
-	 *     requires the value to contain none. A non-blank value holding a newline
-	 *     therefore does NOT match, and {@code String.isBlank()} would disagree.</li>
-	 * </ul>
-	 *
-	 * Values here come from splitting a line that {@code readLine} already broke
-	 * on terminators, so in practice they hold none - but equivalence should not
-	 * depend on that.
-	 */
-	private static boolean isNotBlankPattern(final String v) {
-		int i = 0;
-		while (i < v.length() && isAsciiSpace(v.charAt(i))) {
-			i++;
-		}
-		if (i == v.length()) {
-			return false;
-		}
-		for (int j = 0; j < v.length(); j++) {
-			if (isLineTerminator(v.charAt(j))) {
-				return false;
-			}
-		}
-		return true;
-	}
 
-	/** {@code \s} = [ \t\n\x0B\f\r] */
-	private static boolean isAsciiSpace(final char c) {
-		return c == ' ' || c == '\t' || c == '\n' || c == 0x0B || c == '\f' || c == '\r';
-	}
 
-	/** What {@code .} refuses to match without DOTALL. */
-	private static boolean isLineTerminator(final char c) {
-		return c == '\n' || c == '\r' || c == '\u0085' || c == '\u2028' || c == '\u2029';
-	}
 
 	private enum Rf2CoreFileKind {
 		CONCEPT, DESCRIPTION, TEXT_DEFINITION, RELATIONSHIP
