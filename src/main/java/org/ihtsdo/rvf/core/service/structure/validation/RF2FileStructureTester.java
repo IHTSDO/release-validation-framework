@@ -135,6 +135,7 @@ public class RF2FileStructureTester {
 		long endOfLastCrlf = 0;
 		boolean pendingCarriageReturn = false;
 		boolean lineHasContent = false;
+		boolean firstSegmentEmpty = false;
 		String lastTerminator = "";
 		int read;
 		while ((read = reader.read(buffer)) != -1) {
@@ -146,6 +147,11 @@ public class RF2FileStructureTester {
 					if (c == '\n') {
 						totalLine++;
 						crlfCount++;
+						if (charsRead == 2) {
+							// The very first two characters, so the segment before
+							// this delimiter is empty.
+							firstSegmentEmpty = true;
+						}
 						endOfLastCrlf = charsRead;
 						lastTerminator = RF2_LINE_SEPARATOR;
 						lineHasContent = false;
@@ -178,7 +184,38 @@ public class RF2FileStructureTester {
 			totalLine++;
 			lastTerminator = "";
 		}
-		int tokens = crlfCount + (charsRead > endOfLastCrlf ? 1 : 0);
-		return new FileScan(totalLine, tokens, lastTerminator);
+		return new FileScan(totalLine, scannerTokens(crlfCount, charsRead, endOfLastCrlf, firstSegmentEmpty),
+				lastTerminator);
+	}
+
+	/**
+	 * The token count {@code Scanner.useDelimiter("\r\n")} would produce, which
+	 * is what the previous implementation compared against the line count.
+	 *
+	 * <p>Its rule is NOT "one token per delimiter". Splitting on every CRLF gives
+	 * {@code crlfCount + 1} segments, and Scanner returns all of them except an
+	 * empty FIRST segment and an empty LAST one:
+	 *
+	 * <pre>
+	 *   "a\r\nb\r\n"       -&gt; a, b, ""       -&gt; ["a", "b"]      2
+	 *   "a\r\n\r\nb\r\n"   -&gt; a, "", b, ""   -&gt; ["a", "", "b"]  3   interior empties KEPT
+	 *   "\r\n"            -&gt; "", ""         -&gt; []              0   both dropped
+	 *   "\r\n\r\n"        -&gt; "", "", ""     -&gt; [""]            1
+	 * </pre>
+	 *
+	 * <p>Getting this wrong is not academic: a file whose first line is empty
+	 * would report 1 token against 1 line and lose the line-terminator error it
+	 * should have raised. Verified against a real {@code Scanner} over fourteen
+	 * shapes covering every arrangement of leading, interior and trailing
+	 * delimiters, and pinned by RF2FileStructureTesterScanTest.
+	 */
+	private static int scannerTokens(final int crlfCount, final long charsRead,
+			final long endOfLastCrlf, final boolean firstSegmentEmpty) {
+		if (crlfCount == 0) {
+			return charsRead == 0 ? 0 : 1;
+		}
+		final int segments = crlfCount + 1;
+		final boolean lastSegmentEmpty = charsRead == endOfLastCrlf;
+		return segments - (firstSegmentEmpty ? 1 : 0) - (lastSegmentEmpty ? 1 : 0);
 	}
 }

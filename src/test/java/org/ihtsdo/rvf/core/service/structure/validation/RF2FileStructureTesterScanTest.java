@@ -82,6 +82,29 @@ class RF2FileStructureTesterScanTest {
 	}
 
 	@Test
+	void leadingTerminatorSoTheFirstLineIsEmpty() {
+		// Scanner drops an empty FIRST segment as well as an empty last one, so
+		// this returns 0 tokens against 1 line - which is the whole point of the
+		// comparison. An earlier version of scan() got this wrong and would have
+		// silently stopped reporting the error for such a file.
+		assertAgrees("\r\n");
+	}
+
+	@Test
+	void onlyTerminators() {
+		assertAgrees("\r\n\r\n");
+		assertAgrees("\r\n\r\n\r\n");
+	}
+
+	@Test
+	void leadingTerminatorThenContent() {
+		assertAgrees("\r\na");
+		assertAgrees("\r\n\r\na");
+		assertAgrees("\r\nb\r\n");
+		assertAgrees("\r\n\r\nb");
+	}
+
+	@Test
 	void manyLines() {
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < 500; i++) {
