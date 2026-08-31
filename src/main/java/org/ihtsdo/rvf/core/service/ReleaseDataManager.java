@@ -786,4 +786,56 @@ public class ReleaseDataManager {
 			}
 		}
 	}
+
+	/**
+	 * VAL-439: Computes MySQL table checksums for all full (*_f) tables in the given schema.
+	 *
+	 * <p>Uses {@code CHECKSUM TABLE} which reads the live table data. Two schemas whose
+	 * full tables have identical row content will produce the same checksum, allowing
+	 * release-type-full-validation assertions to be safely skipped.</p>
+	 *
+	 * @param schema the MySQL schema name (e.g. {@code rvf_AT1000234_20260415_1234567890})
+	 * @return map of table name (e.g. {@code concept_f}) → MySQL checksum value;
+	 *         empty map on error or if no full tables are found
+	 */
+	public Map<String, Long> computeFullTableChecksums(String schema) {
+		Map<String, Long> checksums = new LinkedHashMap<>();
+		if (schema == null || schema.isBlank()) {
+			return checksums;
+		}
+		try (Connection conn = dataSource.getConnection()) {
+			List<String> fullTables = new ArrayList<>();
+			try (PreparedStatement ps = conn.prepareStatement(
+					"SELECT table_name FROM information_schema.tables WHERE table_schema = ? AND table_name LIKE '%\\_f'")) {
+				ps.setString(1, schema);
+				try (ResultSet rs = ps.executeQuery()) {
+					while (rs.next()) {
+						fullTables.add(rs.getString(1));
+					}
+				}
+			}
+			if (fullTables.isEmpty()) {
+				logger.debug("computeFullTableChecksums: no *_f tables found in schema '{}'", schema);
+				return checksums;
+			}
+			String tableList = fullTables.stream()
+					.map(t -> "`" + schema + "`.`" + t + "`")
+					.collect(java.util.stream.Collectors.joining(", "));
+			try (Statement st = conn.createStatement();
+				 ResultSet rs = st.executeQuery("CHECKSUM TABLE " + tableList)) {
+				while (rs.next()) {
+					String fullTableName = rs.getString("Table"); // schema.tablename
+					long checksum = rs.getLong("Checksum");
+					String tableName = fullTableName.contains(".")
+							? fullTableName.substring(fullTableName.lastIndexOf('.') + 1)
+							: fullTableName;
+					checksums.put(tableName, checksum);
+				}
+			}
+			logger.debug("computeFullTableChecksums: computed {} checksums for schema '{}'", checksums.size(), schema);
+		} catch (SQLException e) {
+			logger.error("Failed to compute full table checksums for schema '{}'", schema, e);
+		}
+		return checksums;
+	}
 }

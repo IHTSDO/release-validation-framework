@@ -31,7 +31,7 @@ public class MysqlValidationService {
 
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;
-	
+
 	@Value("${rvf.assertion.execution.BatchSize}")
 	private int batchSize;
 
@@ -40,7 +40,7 @@ public class MysqlValidationService {
 
 	@Autowired
 	private MysqlFailuresExtractor mysqlFailuresExtractor;
-	
+
 	@Autowired
 	private ValidationVersionLoader releaseVersionLoader;
 
@@ -48,12 +48,38 @@ public class MysqlValidationService {
 	private ReleaseDataManager releaseDataManager;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MysqlValidationService.class);
-	
+
 	private static final String RELEASE_TYPE_VALIDATION = "release-type-validation";
 
 	private final Set<String> schemasToRemove = new HashSet<>();
-	
+
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
+
+	// VAL-439: maps assertion UUID → MySQL full table name (from manifest.xml assertion SQL files).
+	// Used by computeChecksumSkipUuids to decide which assertions can be skipped when their
+	// underlying full table is unchanged between the previous and prospective schemas.
+	private static final Map<String, String> ASSERTION_UUID_TO_FULL_TABLE = new LinkedHashMap<>();
+	static {
+		ASSERTION_UUID_TO_FULL_TABLE.put("84f5edda-1249-4d79-87da-e248e61f06a6", "concept_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("492bacf0-7d88-45ba-ab26-974150ed9541", "description_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("433adc93-fdd5-462a-b1fa-11fb4045a9ec", "textdefinition_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("fd8ed390-94e9-4fd9-9e20-902a24273dca", "stated_relationship_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("b46ec8df-1bfd-4825-be49-f09ed8a0076b", "relationship_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("7d105b20-ce21-49c2-b16d-b49df13fdfea", "relationship_concrete_values_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("3d4342fe-4698-4c6d-b519-d8d649c842e0", "owlexpressionrefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("653ce147-780e-4b3d-8afe-bd8d116c8c17", "associationrefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("1f6b5876-7714-4362-a065-3906d059a122", "attributevaluerefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("673cf38a-a913-4e0e-be32-356ac433ede8", "simplerefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("c19b9008-bbc9-4209-a3d7-896d414df565", "simplemaprefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("f0b4c712-781a-4ca5-872e-883cf1949f12", "langrefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("5c37bee7-62ad-41f9-93e3-12eb4803e613", "extendedmaprefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("6c37bee7-62ad-41f9-93e3-12eb4803e618", "expressionassociationrefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("7c37bee7-62ad-41f9-93e3-12eb4803e618", "mapcorrelationoriginrefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("87af4df0-c506-41ed-9089-6a359f16b34f", "mrcmdomainrefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("4fdf8c6a-8b58-4bf7-a8b5-71176ede7ac0", "mrcmattributedomainrefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("becfbeaa-5eab-4a4a-90ca-7c893b7495b2", "mrcmattributerangerefset_f");
+		ASSERTION_UUID_TO_FULL_TABLE.put("0f7b6979-7a9d-45d4-956b-972d452f1638", "mrcmmodulescoperefset_f");
+	}
 
 	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
 		// Clean up the prospective databases if any
@@ -82,7 +108,7 @@ public class MysqlValidationService {
 			if (releaseVersionLoader.isUnknownVersion(executionConfig.getExtensionDependencyVersion())) {
 				statusReport.addFailureMessage("Failed to load dependency release " + executionConfig.getExtensionDependencyVersion());
 			}
-			
+
 			// load prospective version
 			lastItemLoadAttempted = "Prospective Release - " + executionConfig.getProspectiveVersion();
 			releaseVersionLoader.loadProspectiveVersion(validationConfig.getLocalProspectiveFile(), statusReport, executionConfig, validationConfig.getStorageLocation());
@@ -131,9 +157,38 @@ public class MysqlValidationService {
 				noneReleaseTypeAssertions.add(assertion);
 			}
 		}
-		LOGGER.debug("Running release-type validations {}", releaseTypeAssertions.size());
+
+		// VAL-439: skip full-validation assertions whose underlying MySQL full tables are unchanged
+		Map<String, Long> prevChecksums = releaseDataManager.computeFullTableChecksums(executionConfig.getPreviousVersion());
+		Map<String, Long> currChecksums = releaseDataManager.computeFullTableChecksums(executionConfig.getProspectiveVersion());
+		List<String> skipUuids = computeChecksumSkipUuids(releaseTypeAssertions, prevChecksums, currChecksums);
+		Set<String> skipSet = new HashSet<>(skipUuids);
+
+		List<Assertion> releaseTypeToRun = new ArrayList<>();
+		List<TestRunItem> checksumSkippedItems = new ArrayList<>();
+		for (Assertion assertion : releaseTypeAssertions) {
+			if (skipSet.contains(assertion.getUuid().toString())) {
+				TestRunItem skipped = new TestRunItem();
+				skipped.setAssertionUuid(assertion.getUuid());
+				skipped.setAssertionText(assertion.getAssertionText());
+				skipped.setTestCategory(assertion.getKeywords());
+				skipped.setSeverity(assertion.getSeverity());
+				skipped.setTestType(TestType.SQL);
+				skipped.setFailureCount(0L);
+				skipped.setRunTime(0L);
+				checksumSkippedItems.add(skipped);
+			} else {
+				releaseTypeToRun.add(assertion);
+			}
+		}
+		if (!checksumSkippedItems.isEmpty()) {
+			LOGGER.info("Checksum skip: {} release-type-full-validation assertions skipped", checksumSkippedItems.size());
+			statusReport.getResultReport().addSkippedAssertions(checksumSkippedItems);
+		}
+
+		LOGGER.debug("Running release-type validations {}", releaseTypeToRun.size());
 		String reportStorage = validationConfig.getStorageLocation();
-		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeAssertions,reportStorage);
+		List<TestRunItem> testItems = runAssertionTests(executionConfig, releaseTypeToRun, reportStorage);
 		if (!executionConfig.isStandAloneProduct()) {
 			//loading international snapshot
 			try {
@@ -149,7 +204,70 @@ public class MysqlValidationService {
 		testItems.addAll(runAssertionTests(executionConfig, noneReleaseTypeAssertions, reportStorage));
 		constructTestReport(statusReport, executionConfig, timeStart, testItems, assertions);
 	}
-	
+
+	/**
+	 * VAL-439: Given a list of assertions and checksum maps for the previous and current schemas,
+	 * returns the UUIDs of assertions that can safely be skipped because their underlying
+	 * full table has an identical checksum in both schemas.
+	 *
+	 * @param assertions    candidate assertions to evaluate (typically release-type assertions)
+	 * @param prevChecksums table → checksum for the previous release schema
+	 * @param currChecksums table → checksum for the prospective/current release schema
+	 * @return list of assertion UUID strings that can be skipped
+	 */
+	public List<String> computeChecksumSkipUuids(List<Assertion> assertions,
+			Map<String, Long> prevChecksums, Map<String, Long> currChecksums) {
+		List<String> skipUuids = new ArrayList<>();
+		for (Assertion assertion : assertions) {
+			String uuidStr = assertion.getUuid().toString();
+			String table = ASSERTION_UUID_TO_FULL_TABLE.get(uuidStr);
+			if (table == null) {
+				continue; // not a full-validation assertion, must run
+			}
+			Long prevCk = prevChecksums.get(table);
+			Long currCk = currChecksums.get(table);
+			if (prevCk != null && currCk != null && prevCk.equals(currCk)) {
+				LOGGER.info("Checksum skip: '{}' ({}) — table '{}' unchanged (checksum {})",
+						assertion.getAssertionText(), uuidStr, table, currCk);
+				skipUuids.add(uuidStr);
+			}
+		}
+		LOGGER.info("Checksum skip: {} of {} assertions can be skipped", skipUuids.size(), assertions.size());
+		return skipUuids;
+	}
+
+	/**
+	 * VAL-439: Computes which assertions in the given list can be skipped due to unchanged full tables,
+	 * registers the skipped items on the status report, and returns them so callers can exclude them
+	 * from execution.
+	 */
+	private List<TestRunItem> applyChecksumSkip(ValidationStatusReport statusReport,
+			MysqlExecutionConfig executionConfig, List<Assertion> assertions) {
+		Map<String, Long> prevChecksums = releaseDataManager.computeFullTableChecksums(executionConfig.getPreviousVersion());
+		Map<String, Long> currChecksums = releaseDataManager.computeFullTableChecksums(executionConfig.getProspectiveVersion());
+		List<String> skipUuids = computeChecksumSkipUuids(assertions, prevChecksums, currChecksums);
+		Set<String> skipSet = new HashSet<>(skipUuids);
+		List<TestRunItem> skippedItems = new ArrayList<>();
+		for (Assertion assertion : assertions) {
+			if (skipSet.contains(assertion.getUuid().toString())) {
+				TestRunItem skipped = new TestRunItem();
+				skipped.setAssertionUuid(assertion.getUuid());
+				skipped.setAssertionText(assertion.getAssertionText());
+				skipped.setTestCategory(assertion.getKeywords());
+				skipped.setSeverity(assertion.getSeverity());
+				skipped.setTestType(TestType.SQL);
+				skipped.setFailureCount(0L);
+				skipped.setRunTime(0L);
+				skippedItems.add(skipped);
+			}
+		}
+		if (!skippedItems.isEmpty()) {
+			LOGGER.info("Checksum skip: {} assertions skipped (full tables unchanged)", skippedItems.size());
+			statusReport.getResultReport().addSkippedAssertions(skippedItems);
+		}
+		return skippedItems;
+	}
+
 	private List<Assertion> getAssertions(List<String> groupNames) {
 		final List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(groupNames);
 		final Set<Assertion> assertions = new HashSet<>();
@@ -176,7 +294,7 @@ public class MysqlValidationService {
 		return result;
 	}
 
-	private void runAssertionTests( ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, String reportStorage) throws ExecutionException, InterruptedException {
+	private void runAssertionTests(ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig, String reportStorage) throws ExecutionException, InterruptedException {
 		long timeStart = System.currentTimeMillis();
 		List<AssertionGroup> groups = assertionService.getAssertionGroupsByNames(executionConfig.getGroupNames());
 		//execute common resources for assertions before executing group in the future we should run tests concurrently
@@ -188,14 +306,20 @@ public class MysqlValidationService {
 		for (final AssertionGroup group : groups) {
 			assertions.addAll(group.getAssertions());
 		}
-		LOGGER.info("Total assertions to run {}", assertions.size());
+
+		// VAL-439: skip full-validation assertions whose underlying MySQL full tables are unchanged
+		List<TestRunItem> skippedItems = applyChecksumSkip(statusReport, executionConfig, new ArrayList<>(assertions));
+		List<Assertion> assertionsToRun = assertions.stream()
+				.filter(a -> skippedItems.stream().noneMatch(s -> s.getAssertionUuid().equals(a.getUuid())))
+				.toList();
+
+		LOGGER.info("Total assertions to run {}", assertionsToRun.size());
 		if (batchSize == 0) {
-			items.addAll(executeAssertions(executionConfig, assertions, reportStorage));
+			items.addAll(executeAssertions(executionConfig, assertionsToRun, reportStorage));
 		} else {
-			items.addAll(executeAssertionsConcurrently(executionConfig, assertions, batchSize, reportStorage));
+			items.addAll(executeAssertionsConcurrently(executionConfig, assertionsToRun, batchSize, reportStorage));
 		}
 		constructTestReport(statusReport, executionConfig, timeStart, items, new ArrayList<>(assertions));
-		
 	}
 
 	private List<TestRunItem> executeAssertionsConcurrently(MysqlExecutionConfig executionConfig, Collection<Assertion> assertions,
@@ -225,7 +349,7 @@ public class MysqlValidationService {
 			}
 			counter++;
 		}
-		
+
 		// Wait for all concurrent tasks to finish
 		for (Future<Collection<TestRunItem>> task : tasks) {
 			results.addAll(task.get());
@@ -234,7 +358,7 @@ public class MysqlValidationService {
 	}
 
 	private List<TestRunItem> executeAssertions(MysqlExecutionConfig executionConfig, Collection<Assertion> assertions, String reportStorage) {
-		
+
 		List<TestRunItem> results = new ArrayList<>();
 		int counter = 1;
 		for (Assertion assertion: assertions) {
@@ -255,7 +379,7 @@ public class MysqlValidationService {
 		reportService.writeProgress(String.format("[%1s] of [%2s] assertions are completed.", counter, assertions.size()), reportStorage);
 		return results;
 	}
-	
+
 	private void constructTestReport(ValidationStatusReport statusReport, MysqlExecutionConfig executionConfig,
 									 long timeStart, List<TestRunItem> items, List<Assertion> assertions) {
 		ValidationReport report = statusReport.getResultReport();
