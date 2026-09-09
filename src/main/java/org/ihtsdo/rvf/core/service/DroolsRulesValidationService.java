@@ -59,7 +59,7 @@ public class DroolsRulesValidationService {
 	@Value("${rvf.empty-release-file}")
 	private String emptyRf2Filename;
 
-	@Value("${spring.cloud.aws.region.static:us-east-1}")
+	@Value("${spring.cloud.aws.region.static}")
 	private String awsRegion;
 
 	@Autowired

@@ -40,4 +40,23 @@ class AssertionsDatabaseImporterTest {
         assertTrue(expectedUuids.contains("84f5edda-1249-4d79-87da-e248e61f06a6"));
         assertTrue(expectedUuids.contains("1be975bb-2a1b-4c21-ae61-6e9fcd556718"));
     }
+
+    @Test
+    void splitSqlStatements_ShouldRespectQuotesCommentsAndTerminators() {
+        List<String> statements = AssertionsDatabaseImporter.splitSqlStatements(
+                "select 1; -- comment; still comment\n" +
+                "select ';'; /* block; comment */ select 2; select '''';");
+        assertEquals(List.of(
+                "select 1",
+                "-- comment; still comment\nselect ';'",
+                "/* block; comment */ select 2",
+                "select ''''"
+        ), statements);
+    }
+
+    @Test
+    void splitSqlStatements_ShouldReturnEmptyForBlankInput() {
+        assertTrue(AssertionsDatabaseImporter.splitSqlStatements(null).isEmpty());
+        assertTrue(AssertionsDatabaseImporter.splitSqlStatements("   ").isEmpty());
+    }
 }

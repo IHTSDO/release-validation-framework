@@ -18,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -220,7 +219,7 @@ public class AutomatedTestService {
         });
     }
 
-    private ValidationStatusReport getValidationStatusReport(final String url, String authenticationToken) throws InterruptedException, BusinessServiceException, IOException {
+    private ValidationStatusReport getValidationStatusReport(final String url, String authenticationToken) throws InterruptedException, BusinessServiceException {
         JsonMapper objectMapper = JsonMapper.builder()
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .build();

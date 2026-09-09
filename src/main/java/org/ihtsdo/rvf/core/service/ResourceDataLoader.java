@@ -32,7 +32,7 @@ public class ResourceDataLoader {
 	@Autowired
 	private ValidationResourceConfig testResourceConfig;
 
-	@Value("${spring.cloud.aws.region.static:us-east-1}")
+	@Value("${spring.cloud.aws.region.static}")
 	private String awsRegion;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResourceDataLoader.class);

@@ -205,77 +205,149 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 		 * Replaces Presto StatementSplitter, which is incompatible with Hibernate's ANTLR runtime.
 		 */
 		static List<String> splitSqlStatements(String sql) {
-			List<String> statements = new ArrayList<>();
 			if (sql == null || sql.isBlank()) {
+				return new ArrayList<>();
+			}
+			return new SqlStatementSplitter(sql).split();
+		}
+
+		/**
+		 * Stateful scanner that walks SQL character-by-character without mutating a for-loop index.
+		 */
+		private static final class SqlStatementSplitter {
+			private final String sql;
+			private final StringBuilder current = new StringBuilder();
+			private final List<String> statements = new ArrayList<>();
+			private int index;
+			private boolean inSingleQuote;
+			private boolean inDoubleQuote;
+			private boolean inLineComment;
+			private boolean inBlockComment;
+
+			private SqlStatementSplitter(String sql) {
+				this.sql = sql;
+			}
+
+			private List<String> split() {
+				while (index < sql.length()) {
+					consumeNext();
+				}
+				flushCurrentStatement();
 				return statements;
 			}
-			StringBuilder current = new StringBuilder();
-			boolean inSingleQuote = false;
-			boolean inDoubleQuote = false;
-			boolean inLineComment = false;
-			boolean inBlockComment = false;
-			for (int i = 0; i < sql.length(); i++) {
-				char c = sql.charAt(i);
-				char next = i + 1 < sql.length() ? sql.charAt(i + 1) : '\0';
+
+			private void consumeNext() {
 				if (inLineComment) {
-					current.append(c);
-					if (c == '\n') {
-						inLineComment = false;
-					}
-					continue;
+					consumeLineCommentChar();
+					return;
 				}
 				if (inBlockComment) {
-					current.append(c);
-					if (c == '*' && next == '/') {
-						current.append(next);
-						i++;
-						inBlockComment = false;
-					}
-					continue;
+					consumeBlockCommentChar();
+					return;
 				}
-				if (!inSingleQuote && !inDoubleQuote) {
-					if (c == '-' && next == '-') {
-						current.append(c).append(next);
-						i++;
-						inLineComment = true;
-						continue;
-					}
-					if (c == '/' && next == '*') {
-						current.append(c).append(next);
-						i++;
-						inBlockComment = true;
-						continue;
-					}
-					if (c == ';') {
-						String statement = current.toString().trim();
-						if (!statement.isEmpty()) {
-							statements.add(statement);
-						}
-						current.setLength(0);
-						continue;
-					}
+				if (!inSingleQuote && !inDoubleQuote && tryStartCommentOrStatementEnd()) {
+					return;
 				}
+				if (tryConsumeQuote()) {
+					return;
+				}
+				appendAndAdvance(currentChar());
+			}
+
+			private void consumeLineCommentChar() {
+				char c = currentChar();
+				appendAndAdvance(c);
+				if (c == '\n') {
+					inLineComment = false;
+				}
+			}
+
+			private void consumeBlockCommentChar() {
+				char c = currentChar();
+				char next = peekNext();
+				if (c == '*' && next == '/') {
+					appendAndAdvance(c);
+					appendAndAdvance(next);
+					inBlockComment = false;
+					return;
+				}
+				appendAndAdvance(c);
+			}
+
+			private boolean tryStartCommentOrStatementEnd() {
+				char c = currentChar();
+				char next = peekNext();
+				if (c == '-' && next == '-') {
+					appendAndAdvance(c);
+					appendAndAdvance(next);
+					inLineComment = true;
+					return true;
+				}
+				if (c == '/' && next == '*') {
+					appendAndAdvance(c);
+					appendAndAdvance(next);
+					inBlockComment = true;
+					return true;
+				}
+				if (c == ';') {
+					flushCurrentStatement();
+					index++;
+					return true;
+				}
+				return false;
+			}
+
+			private boolean tryConsumeQuote() {
+				char c = currentChar();
+				char next = peekNext();
 				if (!inDoubleQuote && c == '\'' && !inSingleQuote) {
 					inSingleQuote = true;
-				} else if (inSingleQuote && c == '\'') {
+					appendAndAdvance(c);
+					return true;
+				}
+				if (inSingleQuote && c == '\'') {
 					if (next == '\'') {
-						current.append(c).append(next);
-						i++;
-						continue;
+						appendAndAdvance(c);
+						appendAndAdvance(next);
+						return true;
 					}
 					inSingleQuote = false;
-				} else if (!inSingleQuote && c == '"' && !inDoubleQuote) {
-					inDoubleQuote = true;
-				} else if (inDoubleQuote && c == '"') {
-					inDoubleQuote = false;
+					appendAndAdvance(c);
+					return true;
 				}
+				if (!inSingleQuote && c == '"' && !inDoubleQuote) {
+					inDoubleQuote = true;
+					appendAndAdvance(c);
+					return true;
+				}
+				if (inDoubleQuote && c == '"') {
+					inDoubleQuote = false;
+					appendAndAdvance(c);
+					return true;
+				}
+				return false;
+			}
+
+			private void flushCurrentStatement() {
+				String statement = current.toString().trim();
+				if (!statement.isEmpty()) {
+					statements.add(statement);
+				}
+				current.setLength(0);
+			}
+
+			private char currentChar() {
+				return sql.charAt(index);
+			}
+
+			private char peekNext() {
+				return index + 1 < sql.length() ? sql.charAt(index + 1) : '\0';
+			}
+
+			private void appendAndAdvance(char c) {
 				current.append(c);
+				index++;
 			}
-			String trailing = current.toString().trim();
-			if (!trailing.isEmpty()) {
-				statements.add(trailing);
-			}
-			return statements;
 		}
 
 		private void uploadTest (Assertion assertion, String originalSql, List<String> sqlStatements) {

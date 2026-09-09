@@ -33,7 +33,7 @@ public class TraceabilityServiceClient {
         headers.add("Cookie", authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
         restTemplate = new RestTemplateBuilder()
-                .rootUri(this.traceabilityServiceUrl)
+                .baseUri(this.traceabilityServiceUrl)
                 .additionalMessageConverters(new GsonHttpMessageConverter())
                 .errorHandler(new ExpressiveErrorHandler())
                 .build();
