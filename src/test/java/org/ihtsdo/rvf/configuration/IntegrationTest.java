@@ -1,7 +1,5 @@
 package org.ihtsdo.rvf.configuration;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.rvf.App;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +12,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.mysql.MySQLContainer;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.sql.DataSource;
 
@@ -25,7 +25,7 @@ import java.sql.Connection;
 @WebAppConfiguration
 public abstract class IntegrationTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(IntegrationTest.class);
-	protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	protected static final JsonMapper OBJECT_MAPPER = JsonMapper.builder().build();
 
 	public static final MySQLContainer mySQLContainer = new TestMySQLContainer();
 

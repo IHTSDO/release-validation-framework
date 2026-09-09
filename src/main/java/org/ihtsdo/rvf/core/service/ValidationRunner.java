@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.core.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.jms.JMSException;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
@@ -183,7 +182,7 @@ public class ValidationRunner {
 		}
 	}
 
-	private void updateRvfState(final ValidationRunConfig config, final State state) throws JsonProcessingException, JMSException {
+	private void updateRvfState(final ValidationRunConfig config, final State state) throws JMSException {
 		final String responseQueue = config.getResponseQueue();
 		if (responseQueue != null) {
 			logger.info("Updating RVF state to {}: {}", state, responseQueue);

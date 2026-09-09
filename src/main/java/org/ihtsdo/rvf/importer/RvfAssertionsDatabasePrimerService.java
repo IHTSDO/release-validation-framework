@@ -39,22 +39,31 @@ public class RvfAssertionsDatabasePrimerService {
 		try (InputStream manifestInputStream = assertionResourceManager.readResourceStream("manifest.xml")) {
 			if (dbImporter.isAssertionImportRequired()) {
 				LOGGER.info("No assertions exist and start importing...");
-				// import content
 				dbImporter.importAssertionsFromManifest(manifestInputStream, scriptsDir);
 				LOGGER.info("Assertions imported");
-				try (InputStream policiesStream = assertionResourceManager.readResourceStream(
-								AssertionGroupingXml.POLICIES_RESOURCE_FILENAME);
-						InputStream groupsStream = assertionResourceManager.readResourceStream(
-								AssertionGroupingXml.GROUPS_RESOURCE_FILENAME)) {
-					assertionGroupImporter.importAssertionGroups(groupsStream, policiesStream);
-				}
+				importAssertionGroups();
 			} else {
 				LOGGER.info("Assertions and assertion groups exist already.");
 			}
 		} catch (FileNotFoundException e) {
-			LOGGER.error("Failed to import assertions and assertion groups due to no manifest.xml found", e);
+			LOGGER.error("Failed to import assertions due to no manifest.xml found", e);
 			throw new IOException("No manifest.xml file found in the assertions directory.", e);
 		}
+	}
 
+	private void importAssertionGroups() {
+		try (InputStream policiesStream = assertionResourceManager.readResourceStream(
+				AssertionGroupingXml.POLICIES_RESOURCE_FILENAME);
+			 InputStream groupsStream = assertionResourceManager.readResourceStream(
+					 AssertionGroupingXml.GROUPS_RESOURCE_FILENAME)) {
+			assertionGroupImporter.importAssertionGroups(groupsStream, policiesStream);
+		} catch (FileNotFoundException e) {
+			LOGGER.warn("Skipping assertion group import; {} or {} not found: {}",
+					AssertionGroupingXml.POLICIES_RESOURCE_FILENAME,
+					AssertionGroupingXml.GROUPS_RESOURCE_FILENAME,
+					e.getMessage());
+		} catch (IOException e) {
+			LOGGER.warn("Skipping assertion group import due to error reading grouping resources", e);
+		}
 	}
 }

@@ -2,7 +2,7 @@ package org.ihtsdo.rvf.core.messaging;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQPrefetchPolicy;
-import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQConnectionFactoryCustomizer;
+import org.springframework.boot.activemq.autoconfigure.ActiveMQConnectionFactoryCustomizer;
 
 public class ActiveMQConnectionFactoryPrefetchCustomizer implements ActiveMQConnectionFactoryCustomizer {
 	

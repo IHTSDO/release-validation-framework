@@ -69,7 +69,9 @@ class ReleaseTypeFullDeltaValidationLanguageRefsetIntegrationTest extends MySQLA
 		// given
 		String previous = createCodeSystemVersion("SNOMEDCT/2026-01-01");
 		String current = createCodeSystemVersion("SNOMEDCT/2026-02-01");
-		insertReferenceSetMember(current, Schema.Full.ReferenceSetMember.LANGUAGE, UUID.randomUUID().toString(), "20260201", 1, RF2.Module.CORE, RF2.Refset.SAME_AS, 100000001L, RF2.Column.ACCEPTABILITY_ID, RF2.Concept.ACCEPTABILITY_PREFERRED);
+		String memberId = UUID.randomUUID().toString();
+		insertReferenceSetMember(previous, Schema.Full.ReferenceSetMember.LANGUAGE, memberId, "20260101", 1, RF2.Module.CORE, RF2.Refset.SAME_AS, 100000001L, RF2.Column.ACCEPTABILITY_ID, RF2.Concept.ACCEPTABILITY_PREFERRED);
+		insertReferenceSetMember(current, Schema.Full.ReferenceSetMember.LANGUAGE, memberId, "20260101", 1, RF2.Module.CORE, RF2.Refset.SAME_AS, 100000001L, RF2.Column.ACCEPTABILITY_ID, RF2.Concept.ACCEPTABILITY_PREFERRED);
 
 		// when
 		long failureCount = validate(ASSERTION_UUID, current, previous);

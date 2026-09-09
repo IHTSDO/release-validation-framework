@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.importer;
 
-import com.facebook.presto.sql.parser.StatementSplitter;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.rvf.core.data.model.Assertion;
@@ -144,14 +143,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 		public void addSqlTestToAssertion(final Assertion assertion, final String sql){
 
 			final List<String> statements = new ArrayList<>();
-			final StatementSplitter splitter = new StatementSplitter(sql);
-			if (splitter.getCompleteStatements() == null || splitter.getCompleteStatements().isEmpty()) {
+			final List<String> splitStatements = splitSqlStatements(sql);
+			if (splitStatements.isEmpty()) {
 				logger.warn("SQL statements not ending with ; {}", sql);
 			}
 			final StringBuilder storedProcedureSql = new StringBuilder();
 			boolean storedProcedureFound = false;
-			for (final StatementSplitter.Statement statement : splitter.getCompleteStatements()) {
-				String cleanedSql = statement.statement();
+			for (String cleanedSql : splitStatements) {
+				cleanedSql = cleanedSql.trim();
+				if (cleanedSql.isEmpty()) {
+					continue;
+				}
 				logger.debug("cleaning sql for assertion uuid {}", assertion.getUuid());
 				logger.debug("sql to be cleaned:");
 				logger.debug(cleanedSql);
@@ -196,6 +198,84 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 				logger.debug("Stored procedure found {}", storedProcedureSql);
 			}
 			uploadTest(assertion, sql, statements);
+		}
+
+		/**
+		 * Splits SQL on statement terminators while ignoring semicolons inside quotes or comments.
+		 * Replaces Presto StatementSplitter, which is incompatible with Hibernate's ANTLR runtime.
+		 */
+		static List<String> splitSqlStatements(String sql) {
+			List<String> statements = new ArrayList<>();
+			if (sql == null || sql.isBlank()) {
+				return statements;
+			}
+			StringBuilder current = new StringBuilder();
+			boolean inSingleQuote = false;
+			boolean inDoubleQuote = false;
+			boolean inLineComment = false;
+			boolean inBlockComment = false;
+			for (int i = 0; i < sql.length(); i++) {
+				char c = sql.charAt(i);
+				char next = i + 1 < sql.length() ? sql.charAt(i + 1) : '\0';
+				if (inLineComment) {
+					current.append(c);
+					if (c == '\n') {
+						inLineComment = false;
+					}
+					continue;
+				}
+				if (inBlockComment) {
+					current.append(c);
+					if (c == '*' && next == '/') {
+						current.append(next);
+						i++;
+						inBlockComment = false;
+					}
+					continue;
+				}
+				if (!inSingleQuote && !inDoubleQuote) {
+					if (c == '-' && next == '-') {
+						current.append(c).append(next);
+						i++;
+						inLineComment = true;
+						continue;
+					}
+					if (c == '/' && next == '*') {
+						current.append(c).append(next);
+						i++;
+						inBlockComment = true;
+						continue;
+					}
+					if (c == ';') {
+						String statement = current.toString().trim();
+						if (!statement.isEmpty()) {
+							statements.add(statement);
+						}
+						current.setLength(0);
+						continue;
+					}
+				}
+				if (!inDoubleQuote && c == '\'' && !inSingleQuote) {
+					inSingleQuote = true;
+				} else if (inSingleQuote && c == '\'') {
+					if (next == '\'') {
+						current.append(c).append(next);
+						i++;
+						continue;
+					}
+					inSingleQuote = false;
+				} else if (!inSingleQuote && c == '"' && !inDoubleQuote) {
+					inDoubleQuote = true;
+				} else if (inDoubleQuote && c == '"') {
+					inDoubleQuote = false;
+				}
+				current.append(c);
+			}
+			String trailing = current.toString().trim();
+			if (!trailing.isEmpty()) {
+				statements.add(trailing);
+			}
+			return statements;
 		}
 
 		private void uploadTest (Assertion assertion, String originalSql, List<String> sqlStatements) {

@@ -1,7 +1,8 @@
 package org.ihtsdo.rvf.core.service;
 
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.StreamReadConstraints;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.databind.json.JsonMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.DecoderException;
@@ -142,13 +143,12 @@ public class ValidationReportService {
 				if (is == null) {
 					logger.warn("Failed to find results file {}, via resource config {}", filePath, jobResourceConfig);
 				} else {
-					ObjectMapper mapper = new ObjectMapper();
-					// Configure stream constraints to allow larger string values (default is 20MB)
-					// Value is configurable via rvf.jackson.max-string-length property (default: Integer.MAX_VALUE)
-					StreamReadConstraints streamReadConstraints = StreamReadConstraints.builder()
-							.maxStringLength(maxStringLength)
+					JsonFactory jsonFactory = JsonFactory.builder()
+							.streamReadConstraints(StreamReadConstraints.builder()
+									.maxStringLength(maxStringLength)
+									.build())
 							.build();
-					mapper.getFactory().setStreamReadConstraints(streamReadConstraints);
+					JsonMapper mapper = JsonMapper.builder(jsonFactory).build();
 					jsonResults  = mapper.readValue(inputStreamReader, Map.class);
 				}
 				if (jsonResults == null) {

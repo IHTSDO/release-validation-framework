@@ -26,11 +26,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
-import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -58,6 +59,9 @@ public class DroolsRulesValidationService {
 	@Value("${rvf.empty-release-file}")
 	private String emptyRf2Filename;
 
+	@Value("${spring.cloud.aws.region.static:us-east-1}")
+	private String awsRegion;
+
 	@Autowired
 	private ValidationResourceConfig testResourceConfig;
 
@@ -77,7 +81,7 @@ public class DroolsRulesValidationService {
 
 	@PostConstruct
 	public void init() {
-		S3Client s3Client = S3Client.builder().region(DefaultAwsRegionProviderChain.builder().build().getRegion())
+		S3Client s3Client = S3Client.builder().region(Region.of(awsRegion))
 				.credentialsProvider(AnonymousCredentialsProvider.create()).build();
 		testResourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(s3Client), s3Client);
 		loadAndConvertDroolsRulesToAssertions();
@@ -165,8 +169,9 @@ public class DroolsRulesValidationService {
 
 
 	private String getAssertionGroup(String absolutePath) {
-		String relativePath = absolutePath.substring(droolsRuleDirectoryPath.length() + 1);
-		return relativePath.substring(0, relativePath.indexOf("/"));
+		Path basePath = Path.of(droolsRuleDirectoryPath).toAbsolutePath().normalize();
+		Path relativePath = basePath.relativize(Path.of(absolutePath).toAbsolutePath().normalize());
+		return relativePath.getNameCount() > 0 ? relativePath.getName(0).toString() : relativePath.toString();
 	}
 
 	public List<Assertion> getAssertions() {

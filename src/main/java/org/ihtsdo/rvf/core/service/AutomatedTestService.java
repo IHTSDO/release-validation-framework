@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.core.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
@@ -14,9 +13,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.util.*;
@@ -221,7 +221,9 @@ public class AutomatedTestService {
     }
 
     private ValidationStatusReport getValidationStatusReport(final String url, String authenticationToken) throws InterruptedException, BusinessServiceException, IOException {
-        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().failOnUnknownProperties(false).build();
+        JsonMapper objectMapper = JsonMapper.builder()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .build();
         int count = 0;
 
         HttpHeaders headers = new HttpHeaders();

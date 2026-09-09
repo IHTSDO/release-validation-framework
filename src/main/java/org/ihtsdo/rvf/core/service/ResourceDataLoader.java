@@ -10,9 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snomed.otf.script.dao.SimpleStorageResourceLoader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
-import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.io.*;
@@ -30,6 +31,9 @@ public class ResourceDataLoader {
 	
 	@Autowired
 	private ValidationResourceConfig testResourceConfig;
+
+	@Value("${spring.cloud.aws.region.static:us-east-1}")
+	private String awsRegion;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ResourceDataLoader.class);
 	private File localResourceDir;
@@ -46,7 +50,7 @@ public class ResourceDataLoader {
 			throw new BusinessServiceException(errorMsg, e);
 		}
 		try {
-			S3Client s3Client = S3Client.builder().region(DefaultAwsRegionProviderChain.builder().build().getRegion())
+			S3Client s3Client = S3Client.builder().region(Region.of(awsRegion))
 					.credentialsProvider(AnonymousCredentialsProvider.create()).build();
 			ResourceManager resourceManager = new ResourceManager(testResourceConfig, new SimpleStorageResourceLoader(s3Client), s3Client);
 			File localMapFile = new File (localResourceDir, US_TO_GB_TERMS_MAP_FILENAME);

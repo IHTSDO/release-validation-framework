@@ -1,6 +1,6 @@
 package org.ihtsdo.rvf.rest.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
@@ -43,7 +43,7 @@ class AssertionGroupControllerIntegrationTest extends IntegrationTest {
 	@Autowired
 	private AssertionGroupRepository assertionGroupRepo;
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final JsonMapper objectMapper = JsonMapper.builder().build();
 	private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
 			APPLICATION_JSON.getType(),
 			APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);

@@ -1,12 +1,12 @@
 package org.ihtsdo.rvf.rest.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.data.model.ValidationComparisonReport;
 import org.ihtsdo.rvf.core.service.AutomatedTestService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +15,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AutomatedTestServiceTest extends IntegrationTest {
 
-    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().failOnUnknownProperties(false).build();
+    private final JsonMapper objectMapper = JsonMapper.builder()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .build();
 
     @Autowired
     private AutomatedTestService automatedTestService;

@@ -1,7 +1,5 @@
 package org.ihtsdo.rvf.rest.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import tools.jackson.databind.json.JsonMapper;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -34,7 +33,7 @@ public class AssertionGroupController {
 
 	@Autowired
 	private AssertionHelper assertionHelper;
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final JsonMapper objectMapper = JsonMapper.builder().build();
 	private final Logger logger = LoggerFactory.getLogger(AssertionGroupController.class);
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
@@ -62,7 +61,7 @@ public class AssertionGroupController {
 	@ResponseBody
 	@Operation(summary = "Add assertions to a group", description = "Adds assertions to the assertion group identified by the group id.")
 	public AssertionGroup addAssertionsToGroup(@PathVariable final Long id,
-			@RequestBody(required = false) final List<String> assertionsList, final HttpServletResponse response) throws JsonProcessingException {
+			@RequestBody(required = false) final List<String> assertionsList, final HttpServletResponse response) {
 
 		final AssertionGroup group = assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 		// Do we have anything to add?
@@ -176,7 +175,7 @@ public class AssertionGroupController {
 		return assertionHelper.assertAssertions(group.getAssertions(), config);
 	}
 
-	private List<Assertion> getAssertions(final List<String> items) throws JsonProcessingException {
+	private List<Assertion> getAssertions(final List<String> items) {
 		final List<Assertion> assertions = new ArrayList<>();
 		for (final String item : items) {
 			if (item.matches("\\d+")) {
