@@ -36,7 +36,7 @@ public class AcceptanceGatewayClient {
         headers.add("Cookie", authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
         restTemplate = new RestTemplateBuilder()
-                .rootUri(this.acceptanceGatewayServiceUrl)
+                .baseUri(this.acceptanceGatewayServiceUrl)
                 .additionalMessageConverters(new GsonHttpMessageConverter())
                 .errorHandler(new ExpressiveErrorHandler())
                 .build();
