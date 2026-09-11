@@ -223,10 +223,14 @@ public class MysqlFailuresExtractor {
     }
 
     private List<Assertion> getAssertionsAndJoinGroups() {
-        List<Assertion> assertions = assertionService.findAll();
+        // Same two changes as AssertionController, for the same reason. This
+        // caller does not append, so the copy is not load-bearing here today -
+        // it is what stops the next caller inheriting the assumption.
+        List<Assertion> assertions = new ArrayList<>(assertionService.findAll());
         List<AssertionGroup> assertionGroups = assertionService.getAllAssertionGroups();
         assertionGroups.forEach(assertionGroup -> assertionGroup.getAssertions().forEach(a -> assertions.forEach(b -> {
-            if (a.getUuid().toString().equals(b.getUuid().toString())) {
+            if (a.getUuid().toString().equals(b.getUuid().toString())
+                    && (b.getGroups() == null || !b.getGroups().contains(assertionGroup.getName()))) {
                 b.addGroup(assertionGroup.getName());
             }
         })));

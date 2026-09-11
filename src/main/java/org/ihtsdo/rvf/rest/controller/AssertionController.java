@@ -295,10 +295,24 @@ public class AssertionController {
 	}
 
 	private List<Assertion> getAssertionsAndJoinGroups() {
-		List<Assertion> assertions = assertionService.findAll();
+		// Own the list rather than the one findAll() handed back. The callers of
+		// this method append to it, and whether that is safe depends entirely on
+		// which AssertionService is wired in: a Spring Data repository returns a
+		// fresh list every call, so appending is harmless, but an implementation
+		// that holds the corpus and returns it - loaded once, shared, immutable -
+		// answers HTTP 500 from an addAll three frames from anything that mentions
+		// a list. One allocation of a few hundred references per request buys
+		// independence from that.
+		List<Assertion> assertions = new ArrayList<>(assertionService.findAll());
 		List<AssertionGroup> assertionGroups = assertionService.getAllAssertionGroups();
+		// And write to an assertion only when the group is actually missing, which
+		// makes the join a pure read wherever membership is already correct. The
+		// objects reached here can be shared between requests under the same kind
+		// of implementation, and two concurrent requests mutating one group set is
+		// a data race for no gain.
 		assertionGroups.forEach(assertionGroup -> assertionGroup.getAssertions().forEach(a -> assertions.forEach(b -> {
-			if (a.getUuid().toString().equals(b.getUuid().toString())) {
+			if (a.getUuid().toString().equals(b.getUuid().toString())
+					&& (b.getGroups() == null || !b.getGroups().contains(assertionGroup.getName()))) {
 				b.addGroup(assertionGroup.getName());
 			}
 		})));
