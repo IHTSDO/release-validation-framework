@@ -223,11 +223,16 @@ public class MysqlFailuresExtractor {
     }
 
     private List<Assertion> getAssertionsAndJoinGroups() {
-        // Same two changes as AssertionController, for the same reason. This
-        // caller does not append, so the copy is not load-bearing here today -
-        // it is what stops the next caller inheriting the assumption.
+		// Own the list rather than the one findAll() handed back. This was fine for a JPA
+		// findAll result, but implemented with a different engine that returns an immutable
+		// list caused an error. This is a safe precaution.
         List<Assertion> assertions = new ArrayList<>(assertionService.findAll());
         List<AssertionGroup> assertionGroups = assertionService.getAllAssertionGroups();
+		// Write to an assertion only when the group is actually missing, which
+		// makes the join a pure read wherever membership is already correct. The
+		// objects reached here can be shared between requests under the same kind
+		// of implementation, and two concurrent requests mutating one group set is
+		// a data race for no gain.
         assertionGroups.forEach(assertionGroup -> assertionGroup.getAssertions().forEach(a -> assertions.forEach(b -> {
             if (a.getUuid().toString().equals(b.getUuid().toString())
                     && (b.getGroups() == null || !b.getGroups().contains(assertionGroup.getName()))) {
