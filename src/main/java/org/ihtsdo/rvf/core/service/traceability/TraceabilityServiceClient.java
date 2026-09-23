@@ -14,6 +14,7 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URISyntaxException;
@@ -32,8 +33,12 @@ public class TraceabilityServiceClient {
         headers = new HttpHeaders();
         headers.add("Cookie", authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
+        // RestTemplate's own handler encodes with URI_COMPONENT; baseUri() would install a
+        // DefaultUriBuilderFactory defaulting to TEMPLATE_AND_VALUES, changing how URIs are encoded.
+        DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory(this.traceabilityServiceUrl);
+        uriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.URI_COMPONENT);
         restTemplate = new RestTemplateBuilder()
-                .baseUri(this.traceabilityServiceUrl)
+                .uriTemplateHandler(uriBuilderFactory)
                 .additionalMessageConverters(new GsonHttpMessageConverter())
                 .errorHandler(new ExpressiveErrorHandler())
                 .build();

@@ -51,19 +51,19 @@ public class RvfAssertionsDatabasePrimerService {
 		}
 	}
 
-	private void importAssertionGroups() {
+	// Must not be swallowed: assertions are already committed by this point, so isAssertionImportRequired()
+	// returns false on the next startup and a skipped group import would never be retried.
+	private void importAssertionGroups() throws IOException {
 		try (InputStream policiesStream = assertionResourceManager.readResourceStream(
 				AssertionGroupingXml.POLICIES_RESOURCE_FILENAME);
 			 InputStream groupsStream = assertionResourceManager.readResourceStream(
 					 AssertionGroupingXml.GROUPS_RESOURCE_FILENAME)) {
 			assertionGroupImporter.importAssertionGroups(groupsStream, policiesStream);
 		} catch (FileNotFoundException e) {
-			LOGGER.warn("Skipping assertion group import; {} or {} not found: {}",
+			// Rethrown as plain IOException so the caller does not report this as a missing manifest.xml.
+			throw new IOException(String.format("No %s or %s file found in the assertions directory.",
 					AssertionGroupingXml.POLICIES_RESOURCE_FILENAME,
-					AssertionGroupingXml.GROUPS_RESOURCE_FILENAME,
-					e.getMessage());
-		} catch (IOException e) {
-			LOGGER.warn("Skipping assertion group import due to error reading grouping resources", e);
+					AssertionGroupingXml.GROUPS_RESOURCE_FILENAME), e);
 		}
 	}
 }

@@ -137,19 +137,20 @@ public class ValidationReportService {
 	 
 	 public void recoverResult(final Map<String, Object> responseMap, String storageLocation) throws IOException {
 			String filePath = storageLocation + resultsFilePath;
-			try (InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath);
-				InputStreamReader inputStreamReader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+			try (InputStream is = resourceManager.readResourceStreamOrNullIfNotExists(filePath)) {
 				Object jsonResults = null;
 				if (is == null) {
 					logger.warn("Failed to find results file {}, via resource config {}", filePath, jobResourceConfig);
 				} else {
-					JsonFactory jsonFactory = JsonFactory.builder()
-							.streamReadConstraints(StreamReadConstraints.builder()
-									.maxStringLength(maxStringLength)
-									.build())
-							.build();
-					JsonMapper mapper = JsonMapper.builder(jsonFactory).build();
-					jsonResults  = mapper.readValue(inputStreamReader, Map.class);
+					try (InputStreamReader inputStreamReader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+						JsonFactory jsonFactory = JsonFactory.builder()
+								.streamReadConstraints(StreamReadConstraints.builder()
+										.maxStringLength(maxStringLength)
+										.build())
+								.build();
+						JsonMapper mapper = JsonMapper.builder(jsonFactory).build();
+						jsonResults = mapper.readValue(inputStreamReader, Map.class);
+					}
 				}
 				if (jsonResults == null) {
 					jsonResults = "Failed to recover results in " + filePath;

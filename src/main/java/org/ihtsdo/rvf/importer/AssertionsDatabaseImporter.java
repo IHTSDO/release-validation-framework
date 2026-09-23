@@ -143,9 +143,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 		public void addSqlTestToAssertion(final Assertion assertion, final String sql){
 
 			final List<String> statements = new ArrayList<>();
-			final List<String> splitStatements = splitSqlStatements(sql);
-			if (splitStatements.isEmpty()) {
-				logger.warn("SQL statements not ending with ; {}", sql);
+			final SplitSql splitSql = splitSql(sql);
+			final List<String> splitStatements = splitSql.statements();
+			if (!splitSql.unterminatedTail().isEmpty()) {
+				logger.warn("Ignoring SQL not ending with ; for assertion uuid {}: {}", assertion.getUuid(), splitSql.unterminatedTail());
 			}
 			final StringBuilder storedProcedureSql = new StringBuilder();
 			boolean storedProcedureFound = false;
@@ -204,12 +205,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 		 * Splits SQL on statement terminators while ignoring semicolons inside quotes or comments.
 		 * Replaces Presto StatementSplitter, which is incompatible with Hibernate's ANTLR runtime.
 		 */
-		static List<String> splitSqlStatements(String sql) {
+		static SplitSql splitSql(String sql) {
 			if (sql == null || sql.isBlank()) {
-				return new ArrayList<>();
+				return new SplitSql(new ArrayList<>(), "");
 			}
 			return new SqlStatementSplitter(sql).split();
 		}
+
+		/**
+		 * @param unterminatedTail content after the last {@code ;}, which is not a runnable statement.
+		 */
+		record SplitSql(List<String> statements, String unterminatedTail) {}
 
 		/**
 		 * Stateful scanner that walks SQL character-by-character without mutating a for-loop index.
@@ -223,17 +229,19 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			private boolean inDoubleQuote;
 			private boolean inLineComment;
 			private boolean inBlockComment;
+			private boolean executableContent;
 
 			private SqlStatementSplitter(String sql) {
 				this.sql = sql;
 			}
 
-			private List<String> split() {
+			private SplitSql split() {
 				while (index < sql.length()) {
 					consumeNext();
 				}
-				flushCurrentStatement();
-				return statements;
+				// Content after the final ';' is not a statement; Presto's StatementSplitter discarded it too.
+				String tail = executableContent ? current.toString().trim() : "";
+				return new SplitSql(statements, tail);
 			}
 
 			private void consumeNext() {
@@ -278,15 +286,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 				char c = currentChar();
 				char next = peekNext();
 				if (c == '-' && next == '-') {
+					inLineComment = true;
 					appendAndAdvance(c);
 					appendAndAdvance(next);
-					inLineComment = true;
 					return true;
 				}
 				if (c == '/' && next == '*') {
+					inBlockComment = true;
 					appendAndAdvance(c);
 					appendAndAdvance(next);
-					inBlockComment = true;
 					return true;
 				}
 				if (c == ';') {
@@ -330,10 +338,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 			private void flushCurrentStatement() {
 				String statement = current.toString().trim();
-				if (!statement.isEmpty()) {
+				// A comment-only segment is not runnable; MySQL rejects it with "Query was empty".
+				if (executableContent && !statement.isEmpty()) {
 					statements.add(statement);
 				}
 				current.setLength(0);
+				executableContent = false;
 			}
 
 			private char currentChar() {
@@ -345,6 +355,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 			}
 
 			private void appendAndAdvance(char c) {
+				if (!inLineComment && !inBlockComment && !Character.isWhitespace(c)) {
+					executableContent = true;
+				}
 				current.append(c);
 				index++;
 			}
