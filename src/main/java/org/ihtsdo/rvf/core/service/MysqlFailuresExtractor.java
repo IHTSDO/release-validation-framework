@@ -184,18 +184,7 @@ public class MysqlFailuresExtractor {
     }
 
     private void populateConceptFsns(Connection connection, List<TestRunItem> items, MysqlExecutionConfig config) {
-        Map<String, List<FailureDetail>> failuresByConceptId = new HashMap<>();
-        for (TestRunItem item : items) {
-            if (item.getFirstNInstances() == null) {
-                continue;
-            }
-            for (FailureDetail failure : item.getFirstNInstances()) {
-                String conceptId = failure.getConceptId();
-                if (!StringUtils.hasLength(failure.getConceptFsn()) && SnomedUtilsBase.isSctid(conceptId) && conceptId.length() <= MAX_SCTID_LENGTH && SnomedUtilsBase.isConceptSctid(conceptId)) {
-                    failuresByConceptId.computeIfAbsent(conceptId, k -> new ArrayList<>()).add(failure);
-                }
-            }
-        }
+        Map<String, List<FailureDetail>> failuresByConceptId = groupFailuresMissingFsnByConceptId(items);
         int batchSize = Math.max(1, fsnLookupBatchSize);
         for (String schema : getFsnLookupSchemas(config)) {
             if (failuresByConceptId.isEmpty()) {
@@ -212,6 +201,29 @@ public class MysqlFailuresExtractor {
                 });
             }
         }
+    }
+
+    private Map<String, List<FailureDetail>> groupFailuresMissingFsnByConceptId(List<TestRunItem> items) {
+        Map<String, List<FailureDetail>> failuresByConceptId = new HashMap<>();
+        for (TestRunItem item : items) {
+            if (item.getFirstNInstances() == null) {
+                continue;
+            }
+            for (FailureDetail failure : item.getFirstNInstances()) {
+                if (needsConceptFsnLookup(failure)) {
+                    failuresByConceptId.computeIfAbsent(failure.getConceptId(), k -> new ArrayList<>()).add(failure);
+                }
+            }
+        }
+        return failuresByConceptId;
+    }
+
+    private boolean needsConceptFsnLookup(FailureDetail failure) {
+        String conceptId = failure.getConceptId();
+        return !StringUtils.hasLength(failure.getConceptFsn())
+                && SnomedUtilsBase.isSctid(conceptId)
+                && conceptId.length() <= MAX_SCTID_LENGTH
+                && SnomedUtilsBase.isConceptSctid(conceptId);
     }
 
     private Set<String> getFsnLookupSchemas(MysqlExecutionConfig config) {
