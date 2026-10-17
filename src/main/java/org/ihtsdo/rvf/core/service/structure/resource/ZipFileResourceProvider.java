@@ -50,6 +50,13 @@ public class ZipFileResourceProvider implements ResourceProvider {
 		return new ArrayList<>(filenames.keySet());
 	}
 
+	@Override
+	public long getFileSize(String name) {
+		ZipEntry entry = zipFile.getEntry(name);
+		// The central directory already holds this, so it costs no I/O.
+		return entry != null ? entry.getSize() : -1L;
+	}
+
 	public ZipEntry getEntry(String name) {
 		return filenames.get(name);
 	}
