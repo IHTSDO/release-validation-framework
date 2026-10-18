@@ -153,6 +153,35 @@ public class ColumnPatternTesterTest {
 		assertEquals(3, testReport.getNumErrors(), "1 row contains a tab a the end + 1 row contains 2 spaces at end + the last column of the row with spaces will fail column pattern test ");
 	}
 
+	/**
+	 * An RF2 row whose FINAL column is legitimately empty ends with a tab, and
+	 * that trailing tab must not be reported as trailing whitespace.
+	 * <p>
+	 * Rows taken verbatim from AU 20260831's MRCMDomain snapshot, where
+	 * {@code guideURL} is the empty 13th column. Before this was fixed the same
+	 * 45 rows failed twice over for one underlying reason: first ColumnCountTest,
+	 * because {@code String.split(regex)} drops trailing empty fields and counted
+	 * 12 of 13 columns, and then - once the {@code -1} limit fixed the count -
+	 * RowSpaceTest, because the row ends with a tab. Fixing only the first swaps
+	 * one false failure for another, which is exactly what arm E measured: 45
+	 * ColumnCountTest became 45 RowSpaceTest, no net change.
+	 * <p>
+	 * The fix distinguishes a delimiter from whitespace; it does not stop looking
+	 * for whitespace. Trailing SPACES are still reported - {@link
+	 * #testSpacesAtEnd()} pins that, and it also pins that a stray extra tab is
+	 * still caught, having moved from RowSpaceTest to the column-count test where
+	 * it belongs.
+	 */
+	@Test
+	public void testEmptyFinalColumnIsNotTrailingWhitespace() throws Exception {
+		final String filename = "/der2_sssssssRefset_MRCMDomainDelta_INT_20260831.txt";
+		executeRun(filename, false);
+
+		assertEquals(0, testReport.getNumErrors(),
+				"a present-and-empty final column is valid RF2: these rows have all "
+						+ "13 columns and nothing to report");
+	}
+
 	@Test
 	public void testTabsInBetween() throws Exception {
 		final String filename = "/rel2_Refset_SimpleDelta_INT_20140428.txt";

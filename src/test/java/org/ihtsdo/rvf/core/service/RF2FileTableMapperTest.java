@@ -185,16 +185,30 @@ class RF2FileTableMapperTest {
 			assertEquals(EXPECTED_INT_PREVIEW_DELTA[i++], tableName);
 		}
 	}
+	/**
+	 * DELIBERATE DIVERGENCE FROM IHTSDO.
+	 *
+	 * <p>Upstream maps both SimpleMap variants to one table, using the single
+	 * pattern {@code der2_.*Refset_.*SimpleMap}, and asserts both yield
+	 * {@code simplemaprefset_d}. This fork keeps them separate, because the two
+	 * tables are not interchangeable: {@code maptarget} is {@code varchar(32)}
+	 * in {@code simplemaprefset_d} and {@code bigint(20)} in
+	 * {@code isimplemaprefset_d}.
+	 *
+	 * <p>Collapsing them routes the integer simple map into the varchar table.
+	 * On the AU daily build {@code isimplemaprefset_active} carries 51,791
+	 * rows, so this is live content rather than a theoretical case.
+	 *
+	 * <p>If this test is ever "corrected" back to upstream's expectation, check
+	 * first whether the two tables still differ. If they have been unified,
+	 * upstream is right and the mapper should follow.
+	 */
 	@Test
 	void testSimpleMapFilenames() {
-		String[] simpleMapFilenames = {
-				"der2_iRefset_SimpleMapDelta_INT_20150131.txt",
-				"der2_sRefset_SimpleMapDelta_INT_20150131.txt"
-		};
-
-		for (String fileName : simpleMapFilenames) {
-			assertEquals("simplemaprefset_d", RF2FileTableMapper.getLegacyTableName(fileName));
-		}
+		assertEquals("isimplemaprefset_d",
+				RF2FileTableMapper.getLegacyTableName("der2_iRefset_SimpleMapDelta_INT_20150131.txt"));
+		assertEquals("simplemaprefset_d",
+				RF2FileTableMapper.getLegacyTableName("der2_sRefset_SimpleMapDelta_INT_20150131.txt"));
 	}
 
 	private void testSnapshot(final String[] deltaFiles, final String[] expectedDeltaResults) {
