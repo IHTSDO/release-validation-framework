@@ -1,6 +1,6 @@
 package org.ihtsdo.rvf.rest.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
@@ -34,7 +34,7 @@ class TestUploadFileControllerIntegrationTest extends IntegrationTest {
 
 	@Autowired
 	private WebApplicationContext wac;
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final JsonMapper objectMapper = JsonMapper.builder().build();
 
 	@BeforeEach
 	public void setup() throws ServletException {

@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.importer;
 
-import com.facebook.presto.sql.parser.StatementSplitter;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.rvf.core.data.model.Assertion;
@@ -144,14 +143,18 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 		public void addSqlTestToAssertion(final Assertion assertion, final String sql){
 
 			final List<String> statements = new ArrayList<>();
-			final StatementSplitter splitter = new StatementSplitter(sql);
-			if (splitter.getCompleteStatements() == null || splitter.getCompleteStatements().isEmpty()) {
-				logger.warn("SQL statements not ending with ; {}", sql);
+			final SplitSql splitSql = splitSql(sql);
+			final List<String> splitStatements = splitSql.statements();
+			if (!splitSql.unterminatedTail().isEmpty()) {
+				logger.warn("Ignoring SQL not ending with ; for assertion uuid {}: {}", assertion.getUuid(), splitSql.unterminatedTail());
 			}
 			final StringBuilder storedProcedureSql = new StringBuilder();
 			boolean storedProcedureFound = false;
-			for (final StatementSplitter.Statement statement : splitter.getCompleteStatements()) {
-				String cleanedSql = statement.statement();
+			for (String cleanedSql : splitStatements) {
+				cleanedSql = cleanedSql.trim();
+				if (cleanedSql.isEmpty()) {
+					continue;
+				}
 				logger.debug("cleaning sql for assertion uuid {}", assertion.getUuid());
 				logger.debug("sql to be cleaned:");
 				logger.debug(cleanedSql);
@@ -196,6 +199,168 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 				logger.debug("Stored procedure found {}", storedProcedureSql);
 			}
 			uploadTest(assertion, sql, statements);
+		}
+
+		/**
+		 * Splits SQL on statement terminators while ignoring semicolons inside quotes or comments.
+		 * Replaces Presto StatementSplitter, which is incompatible with Hibernate's ANTLR runtime.
+		 */
+		static SplitSql splitSql(String sql) {
+			if (sql == null || sql.isBlank()) {
+				return new SplitSql(new ArrayList<>(), "");
+			}
+			return new SqlStatementSplitter(sql).split();
+		}
+
+		/**
+		 * @param unterminatedTail content after the last {@code ;}, which is not a runnable statement.
+		 */
+		record SplitSql(List<String> statements, String unterminatedTail) {}
+
+		/**
+		 * Stateful scanner that walks SQL character-by-character without mutating a for-loop index.
+		 */
+		private static final class SqlStatementSplitter {
+			private final String sql;
+			private final StringBuilder current = new StringBuilder();
+			private final List<String> statements = new ArrayList<>();
+			private int index;
+			private boolean inSingleQuote;
+			private boolean inDoubleQuote;
+			private boolean inLineComment;
+			private boolean inBlockComment;
+			private boolean executableContent;
+
+			private SqlStatementSplitter(String sql) {
+				this.sql = sql;
+			}
+
+			private SplitSql split() {
+				while (index < sql.length()) {
+					consumeNext();
+				}
+				// Content after the final ';' is not a statement; Presto's StatementSplitter discarded it too.
+				String tail = executableContent ? current.toString().trim() : "";
+				return new SplitSql(statements, tail);
+			}
+
+			private void consumeNext() {
+				if (inLineComment) {
+					consumeLineCommentChar();
+					return;
+				}
+				if (inBlockComment) {
+					consumeBlockCommentChar();
+					return;
+				}
+				if (!inSingleQuote && !inDoubleQuote && tryStartCommentOrStatementEnd()) {
+					return;
+				}
+				if (tryConsumeQuote()) {
+					return;
+				}
+				appendAndAdvance(currentChar());
+			}
+
+			private void consumeLineCommentChar() {
+				char c = currentChar();
+				appendAndAdvance(c);
+				if (c == '\n') {
+					inLineComment = false;
+				}
+			}
+
+			private void consumeBlockCommentChar() {
+				char c = currentChar();
+				char next = peekNext();
+				if (c == '*' && next == '/') {
+					appendAndAdvance(c);
+					appendAndAdvance(next);
+					inBlockComment = false;
+					return;
+				}
+				appendAndAdvance(c);
+			}
+
+			private boolean tryStartCommentOrStatementEnd() {
+				char c = currentChar();
+				char next = peekNext();
+				if (c == '-' && next == '-') {
+					inLineComment = true;
+					appendAndAdvance(c);
+					appendAndAdvance(next);
+					return true;
+				}
+				if (c == '/' && next == '*') {
+					inBlockComment = true;
+					appendAndAdvance(c);
+					appendAndAdvance(next);
+					return true;
+				}
+				if (c == ';') {
+					flushCurrentStatement();
+					index++;
+					return true;
+				}
+				return false;
+			}
+
+			private boolean tryConsumeQuote() {
+				char c = currentChar();
+				char next = peekNext();
+				if (!inDoubleQuote && c == '\'' && !inSingleQuote) {
+					inSingleQuote = true;
+					appendAndAdvance(c);
+					return true;
+				}
+				if (inSingleQuote && c == '\'') {
+					if (next == '\'') {
+						appendAndAdvance(c);
+						appendAndAdvance(next);
+						return true;
+					}
+					inSingleQuote = false;
+					appendAndAdvance(c);
+					return true;
+				}
+				if (!inSingleQuote && c == '"' && !inDoubleQuote) {
+					inDoubleQuote = true;
+					appendAndAdvance(c);
+					return true;
+				}
+				if (inDoubleQuote && c == '"') {
+					inDoubleQuote = false;
+					appendAndAdvance(c);
+					return true;
+				}
+				return false;
+			}
+
+			private void flushCurrentStatement() {
+				String statement = current.toString().trim();
+				// A comment-only segment is not runnable; MySQL rejects it with "Query was empty".
+				if (executableContent && !statement.isEmpty()) {
+					statements.add(statement);
+				}
+				current.setLength(0);
+				executableContent = false;
+			}
+
+			private char currentChar() {
+				return sql.charAt(index);
+			}
+
+			private char peekNext() {
+				return index + 1 < sql.length() ? sql.charAt(index + 1) : '\0';
+			}
+
+			private void appendAndAdvance(char c) {
+				if (!inLineComment && !inBlockComment && !Character.isWhitespace(c)) {
+					executableContent = true;
+				}
+				current.append(c);
+				index++;
+			}
 		}
 
 		private void uploadTest (Assertion assertion, String originalSql, List<String> sqlStatements) {

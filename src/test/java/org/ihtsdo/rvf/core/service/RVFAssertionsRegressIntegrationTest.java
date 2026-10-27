@@ -1,6 +1,6 @@
 package org.ihtsdo.rvf.core.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.google.gson.Gson;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.utils.ZipFileUtils;
@@ -57,7 +57,7 @@ public class RVFAssertionsRegressIntegrationTest extends IntegrationTest {
     private URL componentCentrilExpected;
     private URL fileCentricExpected;
     private MysqlExecutionConfig config;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final JsonMapper mapper = JsonMapper.builder().build();
     private final List<String> rf2FilesLoaded = new ArrayList<>();
     private boolean isRunFirstTime = true;
 

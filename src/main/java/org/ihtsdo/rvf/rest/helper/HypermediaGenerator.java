@@ -1,8 +1,8 @@
 package org.ihtsdo.rvf.rest.helper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class HypermediaGenerator {
 
 	@Autowired
-	private ObjectMapper objectMapper;
+	private JsonMapper objectMapper;
 
 	public List<Map<String, Object>> getEntityCollectionHypermedia(
 			Collection<?> entities, HttpServletRequest request,

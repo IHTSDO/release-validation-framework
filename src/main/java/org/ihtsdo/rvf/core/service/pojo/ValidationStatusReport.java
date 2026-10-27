@@ -13,6 +13,7 @@ public class ValidationStatusReport {
 	private Map<String,String> reportSummary;
 	private List<String> failureMessages;
 	@SerializedName("TestResult")
+	@JsonProperty("TestResult")
 	private ValidationReport resultReport;
 
 	@JsonIgnore

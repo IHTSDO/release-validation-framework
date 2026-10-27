@@ -16,7 +16,7 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 public class SecurityConfig {
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http) {
 		http.csrf(AbstractHttpConfigurer::disable);
 		http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		http.addFilterBefore(new RequestHeaderAuthenticationDecorator(), AuthorizationFilter.class);

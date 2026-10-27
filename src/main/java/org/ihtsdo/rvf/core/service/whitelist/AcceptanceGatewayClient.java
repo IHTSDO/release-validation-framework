@@ -5,7 +5,7 @@ import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.rest.client.ims.IMSRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -35,8 +36,12 @@ public class AcceptanceGatewayClient {
         headers = new HttpHeaders();
         headers.add("Cookie", authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
+        // RestTemplate's own handler encodes with URI_COMPONENT; baseUri() would install a
+        // DefaultUriBuilderFactory defaulting to TEMPLATE_AND_VALUES, changing how URIs are encoded.
+        DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory(this.acceptanceGatewayServiceUrl);
+        uriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.URI_COMPONENT);
         restTemplate = new RestTemplateBuilder()
-                .rootUri(this.acceptanceGatewayServiceUrl)
+                .uriTemplateHandler(uriBuilderFactory)
                 .additionalMessageConverters(new GsonHttpMessageConverter())
                 .errorHandler(new ExpressiveErrorHandler())
                 .build();

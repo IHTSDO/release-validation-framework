@@ -75,16 +75,44 @@ public class ValidationReport {
 		return assertionsSkipped;
 	}
 
+	public void setAssertionsSkipped(List<TestRunItem> assertionsSkipped) {
+		this.assertionsSkipped.clear();
+		if (assertionsSkipped != null) {
+			this.assertionsSkipped.addAll(assertionsSkipped);
+		}
+	}
+
 	public List<TestRunItem> getAssertionsFailed() {
 		return assertionsFailed;
+	}
+
+	public void setAssertionsFailed(List<TestRunItem> assertionsFailed) {
+		this.assertionsFailed.clear();
+		if (assertionsFailed != null) {
+			this.assertionsFailed.addAll(assertionsFailed);
+		}
 	}
 
 	public List<TestRunItem> getAssertionsPassed() {
 		return assertionsPassed;
 	}
 
+	public void setAssertionsPassed(List<TestRunItem> assertionsPassed) {
+		this.assertionsPassed.clear();
+		if (assertionsPassed != null) {
+			this.assertionsPassed.addAll(assertionsPassed);
+		}
+	}
+
 	public List<TestRunItem> getAssertionsWarning() {
 		return assertionsWarning;
+	}
+
+	public void setAssertionsWarning(List<TestRunItem> assertionsWarning) {
+		this.assertionsWarning.clear();
+		if (assertionsWarning != null) {
+			this.assertionsWarning.addAll(assertionsWarning);
+		}
 	}
 
 	public void setTotalTestsRun(int totalTestsRun) {

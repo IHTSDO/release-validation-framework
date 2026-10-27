@@ -1,7 +1,9 @@
 package org.ihtsdo.rvf.core.service;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.otf.RF2Constants;
 import org.ihtsdo.otf.rest.client.RestClientException;
+import org.ihtsdo.otf.utils.SnomedUtilsBase;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.FailureDetail;
@@ -30,6 +32,8 @@ public class MysqlFailuresExtractor {
 
     private final Logger logger = LoggerFactory.getLogger(MysqlFailuresExtractor.class);
 
+    private static final int MAX_SCTID_LENGTH = 18;
+
     @Resource(name = "dataSource")
     private BasicDataSource dataSource;
 
@@ -39,11 +43,17 @@ public class MysqlFailuresExtractor {
     @Value("${rvf.assertion.whitelist.batchsize:1000}")
     private int whitelistBatchSize;
 
+    @Value("${rvf.validation.fsn-lookup-batch-size:1000}")
+    private int fsnLookupBatchSize;
+
     @Autowired
     private WhitelistService whitelistService;
 
     @Autowired
     private AssertionService assertionService;
+
+    @Autowired
+    private ReleaseDataManager releaseDataManager;
 
     public void extractTestResults(final List<TestRunItem> items, final MysqlExecutionConfig config, List<Assertion> assertions) throws SQLException, RestClientException {
         Map<UUID, Long> uuidToAssertionIdMap = assertions.stream().collect(Collectors.toMap(Assertion::getUuid, Assertion::getAssertionId));
@@ -54,6 +64,7 @@ public class MysqlFailuresExtractor {
             } else {
                 validateFailuresAndExtractTestResults(connection, items, config, uuidToAssertionIdMap, assertionIdToTotalFailureMap);
             }
+            populateConceptFsns(connection, items, config);
         }
     }
 
@@ -170,6 +181,81 @@ public class MysqlFailuresExtractor {
         } catch (SQLException exception) {
             logger.error("Error retrieving additional fields for component id {} against table {}", failureDetail.getComponentId(), failureDetail.getTableName());
         }
+    }
+
+    private void populateConceptFsns(Connection connection, List<TestRunItem> items, MysqlExecutionConfig config) {
+        Map<String, List<FailureDetail>> failuresByConceptId = groupFailuresMissingFsnByConceptId(items);
+        int batchSize = Math.max(1, fsnLookupBatchSize);
+        for (String schema : getFsnLookupSchemas(config)) {
+            if (failuresByConceptId.isEmpty()) {
+                return;
+            }
+            List<String> conceptIds = new ArrayList<>(failuresByConceptId.keySet());
+            for (int i = 0; i < conceptIds.size(); i += batchSize) {
+                List<String> batch = conceptIds.subList(i, Math.min(i + batchSize, conceptIds.size()));
+                fetchConceptFsns(connection, schema, batch).forEach((conceptId, fsn) -> {
+                    List<FailureDetail> failures = failuresByConceptId.remove(conceptId);
+                    if (failures != null) {
+                        failures.forEach(failure -> failure.setConceptFsn(fsn));
+                    }
+                });
+            }
+        }
+    }
+
+    private Map<String, List<FailureDetail>> groupFailuresMissingFsnByConceptId(List<TestRunItem> items) {
+        Map<String, List<FailureDetail>> failuresByConceptId = new HashMap<>();
+        for (TestRunItem item : items) {
+            if (item.getFirstNInstances() == null) {
+                continue;
+            }
+            for (FailureDetail failure : item.getFirstNInstances()) {
+                if (needsConceptFsnLookup(failure)) {
+                    failuresByConceptId.computeIfAbsent(failure.getConceptId(), k -> new ArrayList<>()).add(failure);
+                }
+            }
+        }
+        return failuresByConceptId;
+    }
+
+    private boolean needsConceptFsnLookup(FailureDetail failure) {
+        String conceptId = failure.getConceptId();
+        return !StringUtils.hasLength(failure.getConceptFsn())
+                && SnomedUtilsBase.isSctid(conceptId)
+                && conceptId.length() <= MAX_SCTID_LENGTH
+                && SnomedUtilsBase.isConceptSctid(conceptId);
+    }
+
+    private Set<String> getFsnLookupSchemas(MysqlExecutionConfig config) {
+        Set<String> schemas = new LinkedHashSet<>();
+        for (String schema : Arrays.asList(config.getProspectiveVersion(), config.getExtensionDependencyVersion(), config.getPreviousVersion())) {
+            if (releaseDataManager.isKnownRelease(schema)) {
+                schemas.add(schema);
+            }
+        }
+        return schemas;
+    }
+
+    private Map<String, String> fetchConceptFsns(Connection connection, String schema, List<String> conceptIds) {
+        Map<String, String> conceptIdToFsn = new HashMap<>();
+        // Prefer the active, English, most recent FSN when a concept has several
+        String sql = "select conceptid, term from " + schema + ".description_s" +
+                " where typeid = " + RF2Constants.SCTID_FSN +
+                " and conceptid in (" + String.join(",", Collections.nCopies(conceptIds.size(), "?")) + ")" +
+                " order by active desc, languagecode = 'en' desc, effectivetime desc";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            for (int i = 0; i < conceptIds.size(); i++) {
+                preparedStatement.setLong(i + 1, Long.parseLong(conceptIds.get(i)));
+            }
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    conceptIdToFsn.putIfAbsent(resultSet.getString(1), resultSet.getString(2));
+                }
+            }
+        } catch (SQLException exception) {
+            logger.error("Error retrieving concept FSNs from {}", schema, exception);
+        }
+        return conceptIdToFsn;
     }
 
     private Map<String, Integer> getAssertionIdToTotalFailureMap(Connection connection, MysqlExecutionConfig config) throws SQLException {

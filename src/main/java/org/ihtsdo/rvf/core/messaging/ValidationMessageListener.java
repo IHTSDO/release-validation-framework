@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.core.messaging;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.ihtsdo.otf.jms.MessagingHelper;
@@ -70,7 +69,7 @@ public class ValidationMessageListener implements Closeable {
 				try {
 					LOGGER.info("Updating RVF state to running: {}", responseQueue);
 					messagingHelper.send(responseQueue, new ValidationStatusResponse(config, ValidationReportService.State.RUNNING));
-				} catch (JsonProcessingException | JMSException e) {
+				} catch (JMSException e) {
 					throw new RuntimeException("Error occurred while trying to update the RVF state to running.", e);
 				}
 			}

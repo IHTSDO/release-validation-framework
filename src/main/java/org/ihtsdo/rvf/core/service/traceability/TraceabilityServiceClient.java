@@ -4,7 +4,7 @@ import org.ihtsdo.otf.rest.client.ExpressiveErrorHandler;
 import org.ihtsdo.otf.rest.client.ims.IMSRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -14,9 +14,9 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class TraceabilityServiceClient {
@@ -33,8 +33,12 @@ public class TraceabilityServiceClient {
         headers = new HttpHeaders();
         headers.add("Cookie", authToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
+        // RestTemplate's own handler encodes with URI_COMPONENT; baseUri() would install a
+        // DefaultUriBuilderFactory defaulting to TEMPLATE_AND_VALUES, changing how URIs are encoded.
+        DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory(this.traceabilityServiceUrl);
+        uriBuilderFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.URI_COMPONENT);
         restTemplate = new RestTemplateBuilder()
-                .rootUri(this.traceabilityServiceUrl)
+                .uriTemplateHandler(uriBuilderFactory)
                 .additionalMessageConverters(new GsonHttpMessageConverter())
                 .errorHandler(new ExpressiveErrorHandler())
                 .build();
@@ -53,7 +57,7 @@ public class TraceabilityServiceClient {
             PreAuthenticatedAuthenticationToken decoratedAuthentication = new PreAuthenticatedAuthenticationToken(username, token);
             SecurityContextHolder.getContext().setAuthentication(decoratedAuthentication);
             return new TraceabilityServiceClient(traceabilityServiceUrl, token);
-        } catch (IOException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             logger.error("Error while trying to login. Message: {}", e.getMessage());
         }
         return null;

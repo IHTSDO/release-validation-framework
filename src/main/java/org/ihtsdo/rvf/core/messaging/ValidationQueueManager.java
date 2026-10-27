@@ -1,6 +1,5 @@
 package org.ihtsdo.rvf.core.messaging;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import org.apache.commons.codec.DecoderException;
 import org.ihtsdo.otf.jms.MessagingHelper;
@@ -90,14 +89,14 @@ public class ValidationQueueManager {
 			if (responseMap.containsKey(FAILURE_MESSAGE)) {
 				try {
 					updateRvfStateTo(config, State.FAILED);
-				} catch (JsonProcessingException | JMSException e) {
+				} catch (JMSException e) {
 					LOGGER.error(e.getMessage());
 				}
 			}
 		}
 	}
 
-	private void updateRvfStateTo(final ValidationRunConfig config, final State state) throws JsonProcessingException, JMSException {
+	private void updateRvfStateTo(final ValidationRunConfig config, final State state) throws JMSException {
 		final String responseQueue = config.getResponseQueue();
 		if (responseQueue != null) {
 			LOGGER.info("Updating RVF state to queued: {}", responseQueue);
