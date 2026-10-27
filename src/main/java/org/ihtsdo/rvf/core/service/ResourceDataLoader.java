@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 @Service
 public class ResourceDataLoader {
-	private static final String US_TO_GB_TERMS_MAP_FILENAME = "us-to-gb-terms-map.txt";
+	private static final String US_TO_GB_TERMS_MAP_FILENAME = "us-to-gb-preferred-terms-map.txt";
 	private static final String UTF_8 = "UTF-8";
 	
 	@Autowired
