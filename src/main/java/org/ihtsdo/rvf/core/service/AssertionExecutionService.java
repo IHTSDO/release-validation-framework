@@ -204,9 +204,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				}
 			}
 			else {
-				if (sqlStatement.startsWith("create table")
-					// only add engine if we do not create using a like statement
-					&& (!(sqlStatement.contains("like") || sqlStatement.contains("as")))){
+				if (needsMyIsamEngine(sqlStatement)) {
 					sqlStatement = sqlStatement + " ENGINE = MyISAM";
 				}
 				executeUpdateStatement(connection, sqlStatement);
@@ -214,6 +212,28 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		}
 
 		return failureCount;
+	}
+
+	/**
+	 * Whether a statement needs {@code ENGINE = MyISAM} appended.
+	 *
+	 * <p>Not if it creates using a {@code like} or {@code as} form, and NOT if it
+	 * already names an engine: appending a second {@code ENGINE} clause is a
+	 * syntax error, the statement fails, and the table is never created.
+	 *
+	 * <p>{@code scripts/resource/res-table-edited-concept.sql} does name one -
+	 * {@code ... key idx_conceptid (conceptid)) ENGINE=MEMORY} - and it is
+	 * manifest-declared, so it runs. Unguarded it became
+	 * {@code ... ENGINE=MEMORY ENGINE = MyISAM}, so {@code res_concepts_edited}
+	 * was never created and every assertion selecting from it failed.
+	 *
+	 * <p>Package-private so it can be tested as the string predicate it is,
+	 * rather than through a database connection.
+	 */
+	static boolean needsMyIsamEngine(String sqlStatement) {
+		return sqlStatement.startsWith("create table")
+				&& !sqlStatement.toUpperCase().contains(" ENGINE")
+				&& !(sqlStatement.contains("like") || sqlStatement.contains("as"));
 	}
 
 
