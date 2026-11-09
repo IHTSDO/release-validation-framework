@@ -10,6 +10,7 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.utils.ZipFileUtils;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.Rf2FilenameEditionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationMysqlBinaryStorageConfig;
@@ -36,6 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@ConditionalOnMysqlEngine
 public class ReleaseDataManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseDataManager.class);

@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.importer;
 
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.ExecutionCommand;
 import org.ihtsdo.rvf.core.data.model.Test;
@@ -34,6 +35,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 	 */
 	@Service
 	@Transactional
+	@ConditionalOnMysqlEngine
 	public class AssertionsDatabaseImporter {
 
 		private static final String CREATE_PROCEDURE = "CREATE PROCEDURE";

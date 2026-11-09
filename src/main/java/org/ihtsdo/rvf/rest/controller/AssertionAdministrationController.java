@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.Test;
@@ -31,6 +32,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/assertions")
 @Tag(name = "Assertions")
+@ConditionalOnMysqlEngine
 public class AssertionAdministrationController {
 
 	private final AssertionService assertionService;

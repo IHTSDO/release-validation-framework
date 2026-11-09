@@ -3,6 +3,7 @@ package org.ihtsdo.rvf.rest.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.repository.AssertionGroupRepository;
@@ -30,6 +31,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/groups")
 @Tag(name = "Assertions Groups")
+@ConditionalOnMysqlEngine
 public class AssertionGroupAdministrationController {
 
 	@Autowired

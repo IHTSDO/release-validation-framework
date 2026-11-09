@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.rest.helper;
 
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.TestRunItem;
 import org.ihtsdo.rvf.core.service.AssertionExecutionService;
@@ -11,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Component
+@ConditionalOnMysqlEngine
 public class AssertionHelper {
 	@Autowired
 	private AssertionExecutionService assertionExecutionService;

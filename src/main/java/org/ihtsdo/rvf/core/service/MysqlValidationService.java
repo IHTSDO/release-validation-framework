@@ -4,6 +4,7 @@ package org.ihtsdo.rvf.core.service;
 import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.utils.ExceptionUtils;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
@@ -23,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Service
+@ConditionalOnMysqlEngine
 public class MysqlValidationService implements SqlAssertionValidationService {
 
 	public static final String START_EXECUTING_ASSERTIONS = "Start executing assertions...";

@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.importer;
 
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.service.AssertionService;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@ConditionalOnMysqlEngine
 public class AssertionGroupImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionGroupImporter.class);

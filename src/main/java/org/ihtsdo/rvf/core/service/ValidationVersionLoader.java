@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.snomedboot.ReleaseImportException;
 import org.ihtsdo.otf.snomedboot.ReleaseImporter;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
 import org.ihtsdo.rvf.core.service.util.RvfReleaseDbSchemaNameGenerator;
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
 import static org.ihtsdo.rvf.core.service.ReleaseDataManager.RVF_DB_PREFIX;
 
 @Service
+@ConditionalOnMysqlEngine
 public class ValidationVersionLoader {
 
 	private static final String COMBINED = "_combined";
