@@ -7,6 +7,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,7 +36,7 @@ class DuckStoreTest {
 			  "aaa-1": {"file": "one.sql", "sha256": "aaaaaaaaaaaaaaaa", "text": "Assertion one",
 			            "keywords": "component-centric", "severity": "WARNING",
 			            "statements": ["select 1", "select 2"]},
-			  "bbb-2": {"file": "two.sql", "statements": ["select 3"]}
+			  "bbb-2": {"file": "two.sql", "statements": ["select 3"], "groups": ["g1", "g2"]}
 			 }
 			}
 			""";
@@ -61,6 +62,14 @@ class DuckStoreTest {
 		assertEquals("", b.keywords());
 		assertEquals("", b.severity());
 		assertEquals("", b.sha256());
+	}
+
+	@Test
+	void groupsAreNullUnlessAMergeRecordedThem() throws IOException {
+		// Null means the store's own grouping files decide; an empty list would mean "in no group".
+		DuckStore store = DuckStore.parse(STORE);
+		assertNull(store.assertions().get("aaa-1").groups());
+		assertEquals(List.of("g1", "g2"), store.assertions().get("bbb-2").groups());
 	}
 
 	@Test
@@ -107,6 +116,7 @@ class DuckStoreTest {
 		assertTrue(store.identity().isEmpty());
 		assertEquals("", store.corpusRef());
 		assertEquals(List.of(), store.provenance());
+		assertEquals(List.of(), store.packs());
 	}
 
 	@Test

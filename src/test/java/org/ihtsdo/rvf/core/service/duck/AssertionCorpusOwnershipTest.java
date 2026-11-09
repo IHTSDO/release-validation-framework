@@ -32,7 +32,7 @@ class AssertionCorpusOwnershipTest {
 						"component-centric-validation", "INSERT INTO qa_result SELECT 2")
 				.store();
 		return new DuckAssertionService(
-				new DuckAssertionService.Corpus(store, DuckAssertionSource.from(store)));
+				new DuckAssertionService.Corpus(store, DuckAssertionSource.from(store), List.of()));
 	}
 
 	@Test

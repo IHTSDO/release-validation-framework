@@ -28,14 +28,14 @@ class DuckAssertionSourceLookupTest {
 	@TempDir
 	Path temp;
 
-	/** Through the production constructor: a locator over a store file. */
+	/** Through the production constructor: a locator over a store file, no packs. */
 	private DuckAssertionService service() {
 		Path store = TestStores.builder()
 				.assertion(PRESENT, "a-check.sql", "SELECT 1;\n", "A check that something holds",
 						"component-centric-validation",
 						"INSERT INTO qa_result SELECT 1", "SELECT 2")
 				.write(temp.resolve("store.json"));
-		return new DuckAssertionService(new DuckStoreLocator(store.toString()));
+		return new DuckAssertionService(new DuckStoreLocator(store.toString()), List.of(), List.of());
 	}
 
 	@Test

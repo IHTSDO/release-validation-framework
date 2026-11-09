@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -142,7 +143,27 @@ class DuckAssertionSourceTest {
 	}
 
 	@Test
-	void aStoreWithoutGroupingFilesIsRefused() {
+	void groupsAMergeRecordedWinOverTheGroupingFiles() throws IOException {
+		DuckStore store = corpus().groups(EXAMPLE, "merged-group").store();
+		DuckAssertionSource source = DuckAssertionSource.from(store);
+		assertEquals(Set.of("merged-group"), source.groupsOf(UUID.fromString(EXAMPLE)));
+		assertEquals(List.of(EXAMPLE), uuids(source.getAssertionsInGroups(List.of("merged-group"))));
+		assertEquals(Set.of("OtherEdition"), source.groupsOf(UUID.fromString(OTHER)),
+				"assertions without recorded groups still use the grouping files");
+	}
+
+	@Test
+	void aMergedStoreNeedsNoGroupingFiles() throws IOException {
+		DuckStore store = TestStores.builder().noGrouping()
+				.assertion(EXAMPLE, "example.sql", "select 2;", "Example", "file-centric-validation")
+				.groups(EXAMPLE, "g1", "g2")
+				.store();
+		Map<String, Set<String>> groups = DuckAssertionSource.resolveGroups(store);
+		assertEquals(Map.of(EXAMPLE, Set.of("g1", "g2")), groups);
+	}
+
+	@Test
+	void aStoreWithNeitherGroupingFilesNorRecordedGroupsIsRefused() {
 		// Otherwise no group would select anything and every run would pass.
 		DuckStore store = TestStores.builder().noGrouping()
 				.assertion(EXAMPLE, "example.sql", "select 2;", "Example", "file-centric-validation")

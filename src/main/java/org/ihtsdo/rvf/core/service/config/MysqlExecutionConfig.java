@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.core.service.config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ public class MysqlExecutionConfig {
 	private final Long executionId;
 	private List<String> groupNames;
 	private List<String> assertionExclusionList;
+	/** Assertion packs this run pins, empty for the deployment's default; DuckDB engine only. */
+	private List<String> assertionPacks = new ArrayList<>();
 	private String defaultModuleId;
 	private List<String> includedModules;
 	private List<String> excludedRF2Files;
@@ -68,6 +71,14 @@ public class MysqlExecutionConfig {
 
 	public List<String> getAssertionExclusionList() {
 		return assertionExclusionList;
+	}
+
+	public void setAssertionPacks(List<String> assertionPacks) {
+		this.assertionPacks = assertionPacks == null ? new ArrayList<>() : assertionPacks;
+	}
+
+	public List<String> getAssertionPacks() {
+		return assertionPacks;
 	}
 
 	public void setExcludedRF2Files(List<String> excludedRF2Files) {

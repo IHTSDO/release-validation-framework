@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * How the engine configures every DuckDB connection it opens.
  *
- * <p>Assertion statements execute on these connections.
+ * <p>Assertion statements, including those of assertion packs, execute on these connections.
  * {@link #lockDown} restricts them to the files a run needs, so a statement cannot read or
  * write anything else on the server, fetch over the network or install an extension.
  */

@@ -119,5 +119,6 @@ class DuckDbEngineContextTest {
 		assertEquals(bundled.digest(), pack.get("digest"));
 		assertEquals(bundled.corpusRef(), pack.get("corpusRef"));
 		assertEquals(bundled.assertions(), pack.get("assertions"));
+		assertEquals(false, body.get("pendingRefresh"));
 	}
 }

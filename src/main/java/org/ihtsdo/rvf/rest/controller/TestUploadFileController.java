@@ -11,6 +11,7 @@ import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.messaging.ValidationQueueManager;
 import org.ihtsdo.rvf.core.service.AssertionService;
 import org.ihtsdo.rvf.core.service.ValidationRunner;
+import org.ihtsdo.rvf.core.service.duck.AssertionPackChannels;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.core.service.structure.listing.ManifestFile;
 import org.ihtsdo.rvf.core.service.structure.resource.ResourceProvider;
@@ -80,6 +81,13 @@ public class TestUploadFileController {
 	private static final String GROUPS = "groups";
 
 	private static final String ASSERTION_EXCLUSION_LIST = "assertionExclusionList";
+
+	private static final String ASSERTION_PACKS = "assertionPacks";
+
+	private static final String ASSERTION_PACKS_DESCRIPTION = "DuckDB engine only. Assertion packs to merge with the "
+			+ "base store for this run, instead of the deployment's rvf.assertion.packs: each name@version, for a "
+			+ "pack a configured channel (rvf.assertion.channels) serves. Repeat the parameter for several packs. "
+			+ "Anything else (a full pack spec, uri=, file:, authHeader) is refused with 400.";
 
 	private static final String MANIFEST = "manifest";
 
@@ -192,6 +200,7 @@ public class TestUploadFileController {
 			@Parameter(description = "manifest.xml file(optional)") @RequestParam(value = MANIFEST, required = false) final MultipartFile manifestFile,
 			@Parameter(description = "Assertion group names separated by a comma.") @RequestParam(value = GROUPS, required = false) final List<String> groupsList,
 			@Parameter(description = "Assertion exclusion list separated by a comma.") @RequestParam(value = ASSERTION_EXCLUSION_LIST, required = false) final List<String> assertionExclusionList,
+			@Parameter(description = ASSERTION_PACKS_DESCRIPTION) @RequestParam(value = ASSERTION_PACKS, required = false) final List<String> assertionPacks,
 			@Parameter(description = "Excluded RF2 files to be validated.") @RequestParam(value = EXCLUDED_RF2_FILES, required = false) final List<String> excludedRF2Files,
 			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
@@ -216,12 +225,16 @@ public class TestUploadFileController {
 			@Parameter(description = "Authentication token.") @RequestParam(value = AUTH_TOKEN, required = false) final String authenticationToken,
 			UriComponentsBuilder uriComponentsBuilder
 			) throws IOException {
-
+		List<String> invalidPacks = AssertionPackChannels.invalidRunPins(assertionPacks);
+		if (!invalidPacks.isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("failureMessage", AssertionPackChannels.runPinMessage(invalidPacks)));
+		}
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
 		String urlPrefix = URI.create(uriComponentsBuilder.toUriString()).toURL().toString();
 		vrConfig.addFile(file).addRF2DeltaOnly(isRf2DeltaOnly)
 				.addWriteSucceses(writeSucceses).addGroupsList(groupsList).addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addAssertionExclusionList(assertionExclusionList)
+				.addAssertionPacks(assertionPacks)
 				.addManifestFile(manifestFile)
 				.addPreviousRelease(previousRelease)
 				.addRunId(runId).addStorageLocation(storageLocation)
@@ -273,6 +286,7 @@ public class TestUploadFileController {
 			@Parameter(description = "manifest.xml file path in AWS S3") @RequestParam(name =  "manifestFileS3Path", required = false) final String manifestFileS3Path,
 			@Parameter(description = "Assertion group names") @RequestParam(value = GROUPS, required = false) final List<String> groupsList,
 			@Parameter(description = "Assertion exclusion list separated by a comma.") @RequestParam(value = ASSERTION_EXCLUSION_LIST, required = false) final List<String> assertionExclusionList,
+			@Parameter(description = ASSERTION_PACKS_DESCRIPTION) @RequestParam(value = ASSERTION_PACKS, required = false) final List<String> assertionPacks,
 			@Parameter(description = "Excluded RF2 files to be validated.") @RequestParam(value = EXCLUDED_RF2_FILES, required = false) final List<String> excludedRF2Files,
 			@Parameter(description = "Drools rules group names") @RequestParam(value = DROOLS_RULES_GROUPS, required = false) final List<String> droolsRulesGroupsList,
 			@Parameter(description = "Required for non-first time international release testing") @RequestParam(value = PREVIOUS_RELEASE, required = false) final String previousRelease,
@@ -296,6 +310,10 @@ public class TestUploadFileController {
 			@Parameter(description = "User name.") @RequestParam(value = USER_NAME, required = false) final String username,
 			@Parameter(description = "Authentication token.") @RequestParam(value = AUTH_TOKEN, required = false) final String authenticationToken,
 			UriComponentsBuilder uriComponentsBuilder) throws IOException {
+		List<String> invalidPacks = AssertionPackChannels.invalidRunPins(assertionPacks);
+		if (!invalidPacks.isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("failureMessage", AssertionPackChannels.runPinMessage(invalidPacks)));
+		}
 		ValidationRunConfig vrConfig = new ValidationRunConfig();
 		String urlPrefix = URI.create(uriComponentsBuilder.toUriString()).toURL().toString();
 		vrConfig.addBucketName(bucketName)
@@ -304,6 +322,7 @@ public class TestUploadFileController {
 				.addWriteSucceses(writeSucceses)
 				.addGroupsList(groupsList)
 				.addAssertionExclusionList(assertionExclusionList)
+				.addAssertionPacks(assertionPacks)
 				.addDroolsRulesGroupList(droolsRulesGroupsList)
 				.addManifestFileFullPath(manifestFileS3Path)
 				.addPreviousRelease(previousRelease)

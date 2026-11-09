@@ -116,7 +116,8 @@ public final class DuckStore {
 	/**
 	 * This store's own identity, or empty for a store published without one.
 	 *
-	 * <p>The declared digest is recomputed rather than trusted, so an edited store cannot claim
+	 * <p>Distinct from {@link #packs()}, which lists what a merged store was assembled from.
+	 * The declared digest is recomputed rather than trusted, so an edited store cannot claim
 	 * the identity of the one that was published.
 	 *
 	 * @throws IOException if the declared digest does not match the store's content
@@ -190,6 +191,15 @@ public final class DuckStore {
 		}
 	}
 
+	/**
+	 * The store as JSON, for merging packs.
+	 *
+	 * <p>The parsed tree's own serialisation: a merged store has no source string.
+	 */
+	public String toJson() {
+		return root.toString();
+	}
+
 	JsonNode tree() {
 		return root;
 	}
@@ -224,23 +234,100 @@ public final class DuckStore {
 	}
 
 	/**
-	 * A store's identity: its name, version and digest, the assertion corpus commit it was
-	 * published from (empty when the publisher did not know it) and its size.
+	 * One pack: its identity, the assertion corpus commit it was published from (empty when
+	 * the publisher did not know it) and its size.
 	 */
 	public record PackRecord(String name, String version, String digest, String corpusRef, int assertions) {
 	}
 
+	/** The packs this store was assembled from, empty for an unmerged one. */
+	public List<PackRecord> packs() {
+		List<PackRecord> out = new ArrayList<>();
+		for (JsonNode node : root.path("packs")) {
+			out.add(new PackRecord(
+					node.path("name").asString(""),
+					node.path("version").asString(""),
+					node.path("digest").asString(""),
+					node.path("corpusRef").asString(""),
+					node.path("assertions").asInt(0)));
+		}
+		return Collections.unmodifiableList(out);
+	}
+
 	/**
-	 * What produced this store: its {@link #identity()}, or nothing for a store published
-	 * without one. This is what a validation report records.
+	 * One thing this pack requires of another pack in the same merge.
+	 *
+	 * <p>{@code atLeast} is a version floor; {@code digest} is an exact match.
+	 */
+	public record Requirement(String pack, Kind kind, String value) {
+
+		public enum Kind { AT_LEAST, DIGEST }
+
+		/** How this requirement reads in a refusal. */
+		public String describe() {
+			return pack + (kind == Kind.AT_LEAST ? " at least " : " at digest ") + value;
+		}
+	}
+
+	/**
+	 * What this pack requires of the rest of a merge.
+	 *
+	 * <p>A pack whose SQL calls a macro another pack defines can state that, so an
+	 * incompatible combination is refused at merge rather than failing at run time.
+	 * An entry with an unknown key is refused rather than ignored: an ignored requirement
+	 * would read as a checked combination.
+	 */
+	public List<Requirement> requirements() throws IOException {
+		List<Requirement> out = new ArrayList<>();
+		for (JsonNode node : root.path("requires")) {
+			String pack = node.path("pack").asString("");
+			if (pack.isBlank()) {
+				throw new IOException("a requires entry names no pack: " + node);
+			}
+			List<String> unknown = new ArrayList<>();
+			for (String field : node.propertyNames()) {
+				if (!List.of("pack", "atLeast", "digest", "reason").contains(field)) {
+					unknown.add(field);
+				}
+			}
+			if (!unknown.isEmpty()) {
+				throw new IOException("the requires entry for " + pack + " uses "
+						+ unknown + ", which this runtime does not understand");
+			}
+			boolean atLeast = node.hasNonNull("atLeast");
+			boolean digest = node.hasNonNull("digest");
+			if (atLeast == digest) {
+				throw new IOException("the requires entry for " + pack + " must have "
+						+ "exactly one of atLeast or digest, and has "
+						+ (atLeast ? "both" : "neither") + ": " + node);
+			}
+			out.add(new Requirement(pack,
+					atLeast ? Requirement.Kind.AT_LEAST : Requirement.Kind.DIGEST,
+					atLeast ? node.path("atLeast").asString("") : node.path("digest").asString("")));
+		}
+		return Collections.unmodifiableList(out);
+	}
+
+	/**
+	 * What produced this store: the packs it was merged from, or for an unmerged store its
+	 * own {@link #identity()}. This is what a validation report records.
 	 */
 	public List<PackRecord> provenance() throws IOException {
+		List<PackRecord> merged = packs();
+		if (!merged.isEmpty()) {
+			return merged;
+		}
 		return identity().map(List::of).orElseGet(List::of);
 	}
 
-	/** One assertion's precompiled statements and the metadata to report it. */
+	/**
+	 * One assertion's precompiled statements and the metadata to report it.
+	 *
+	 * @param groups the groups a merge resolved for this assertion, or null when the store's
+	 *               own {@link #grouping()} decides
+	 */
 	public record StoredAssertion(String uuid, String file, String sha256, String text,
-			String keywords, String severity, List<String> statements) {
+			String keywords, String severity, List<String> statements, List<String> groups) {
 	}
 
 	/**
@@ -263,10 +350,12 @@ public final class DuckStore {
 		JsonNode node = root.path("assertions");
 		for (String uuid : node.propertyNames()) {
 			JsonNode a = node.path(uuid);
+			JsonNode groups = a.path("groups");
 			out.put(uuid, new StoredAssertion(uuid, a.path("file").asString(""),
 					a.path("sha256").asString(""),
 					a.path("text").asString(""), a.path("keywords").asString(""),
-					a.path("severity").asString(""), strings(a.path("statements"))));
+					a.path("severity").asString(""), strings(a.path("statements")),
+					groups.isArray() ? strings(groups) : null));
 		}
 		return Collections.unmodifiableMap(out);
 	}
@@ -307,7 +396,10 @@ public final class DuckStore {
 	public record GroupingFile(String file, String sha256, String text) {
 	}
 
-	/** The corpus's group rules, by file name. */
+	/**
+	 * The corpus's group rules, by file name; empty for a merged store, whose assertions
+	 * carry the groups the merge resolved instead.
+	 */
 	public Map<String, GroupingFile> grouping() {
 		Map<String, GroupingFile> out = new LinkedHashMap<>();
 		for (JsonNode node : root.path("grouping")) {
