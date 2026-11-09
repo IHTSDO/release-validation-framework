@@ -15,7 +15,7 @@ artefact rather than something regenerated invisibly on every run.
 
 | | |
 |---|---|
-| assertion corpus | a checkout of `snomed-release-validation-assertions` (`./checkout-resources.sh` clones `develop` for a SNAPSHOT build, `master` for a release): `scripts/` and `manifest.xml` |
+| assertion corpus | a checkout of `snomed-release-validation-assertions` (`./checkout-resources.sh` clones `develop` for a SNAPSHOT build, `master` for a release): `scripts/`, `manifest.xml`, `groups.xml` and `policies.xml` |
 | DDL | `src/main/resources/sql/create-tables-mysql.sql` - table names, columns and types come from here, nowhere else |
 | output | `src/main/resources/duck/store.json` |
 
@@ -66,7 +66,8 @@ rather than being checked in.
 ## Republishing
 
 Republish when the corpus or the DDL changes and the bundled store should
-follow it. From the
+follow it, and whenever a file in this directory changes (the bundled-store test
+checks the store was produced by this publisher; see below). From the
 repository root:
 
     ./checkout-resources.sh
@@ -76,8 +77,8 @@ repository root:
       --ddl           src/main/resources/sql/create-tables-mysql.sql \
       --out           src/main/resources/duck/store.json
 
-At assertions `develop` 0160dd2 with the current DDL this reports
-`assertions 360`, `statements 779 (+0 pre-requisite)`, `ports 2` and 93
+At assertions `develop` c3a6fb27 (2026-10-13) with the current DDL this reports
+`assertions 361`, `statements 791 (+0 pre-requisite)`, `ports 2` and 93
 scripts "not in manifest, skipped". sqlglot prints `Unsupported property
 charactersetproperty` / `collateproperty` for MySQL table options it drops; that
 is expected.
@@ -112,8 +113,9 @@ Then check the result:
 | `tableColumns` | DuckDB column definitions per DDL table, so the engine can create an empty table for a file the release does not ship |
 | `ports` | DuckDB setup statements run once before any assertion |
 | `prerequisites` | precompiled pre-requisite scripts; empty for the international corpus |
+| `grouping` | the corpus's `groups.xml` and `policies.xml`, verbatim, with their source `sha256`; RVF resolves group membership from these with `AssertionGroupImporter`'s own rules, so the store alone says which assertions a group selects |
 | `pack` | name, version (corpus commit date, or `--pack-version`), corpus commit, digest |
-| `generator` | sqlglot and Python versions |
+| `generator` | sqlglot and Python versions, and `publisher`: SHA-256 over the sorted `name<TAB>sha256` lines of this directory's `*.py` and `requirements.txt` |
 
 ### Ports
 
@@ -127,13 +129,20 @@ into plain SQL at publish time, over the fixed DDL table set.
 
 `pack.digest` is SHA-256 over the sorted `uuid<TAB>sha256` lines of every
 assertion, then `\n--\n`, then the sorted `file<TAB>sha256` lines of every
-pre-requisite (none for the international corpus). It identifies *which
-assertions, from which source text*. It deliberately does not cover the
-statements, ports, `tableColumns` or generator: the same corpus republished
-with another sqlglot keeps its digest. RVF recomputes the digest on load and
-refuses a store whose declared digest does not match; the bundled-store test
-compares each assertion's `sha256` with the corpus checkout, so a stale store
-fails the build.
+pre-requisite (none for the international corpus), then `\n--\n`, then the
+sorted `file<TAB>sha256` lines of the grouping files. It identifies *which
+assertions, from which source text, selected by which group rules*. It
+deliberately does not cover the statements, ports, `tableColumns` or generator:
+the same corpus republished with another sqlglot keeps its digest. RVF
+recomputes the digest on load and refuses a store whose declared digest does
+not match.
+
+The bundled-store test (`BundledStoreTest`) checks that the store is internally
+consistent and that `generator.publisher` and `generator.sqlglot` match this
+directory and its `requirements.txt`. It does not compare the store with the
+corpus checkout: the corpus is cloned from a moving branch, and a corpus commit
+must not fail an RVF build. RVF reports that difference at startup and on
+`GET /assertions/packs` instead (`docs/duckdb-engine.md`).
 
 ## Other corpora
 

@@ -50,6 +50,48 @@ import rvfsql                                                    # noqa: E402
 PREREQUISITES_SQL = "pre-requisites.sql"
 FORMAT_VERSION = 1
 
+# The corpus files RVF reads assertion-group membership from. Carried verbatim,
+# so the runtime applies AssertionGroupImporter's own rules to them instead of a
+# second implementation of those rules living here.
+GROUPING_FILES = ("groups.xml", "policies.xml")
+
+
+def grouping(manifest_root: pathlib.Path):
+    """groups.xml and policies.xml from the corpus root, verbatim.
+
+    Without them the store holds assertions no group selects, and a run that
+    selects nothing reports a clean pass, so a missing file is fatal.
+    """
+    out = []
+    for name in GROUPING_FILES:
+        path = manifest_root / name
+        if not path.is_file():
+            raise SystemExit(f"FATAL: {path} not found. The store carries the "
+                             "corpus's group rules; without them no run selects "
+                             "any of its assertions.")
+        text = path.read_text(errors="replace")
+        out.append({"file": name,
+                    "sha256": hashlib.sha256(text.encode()).hexdigest()[:16],
+                    "text": text})
+    return out
+
+
+def publisher_identity():
+    """sha256 over this publisher's own sources and pins.
+
+    The sorted `name<TAB>sha256` lines of every *.py beside this file and of
+    requirements.txt. RVF's bundled-store test recomputes it over
+    tools/duck-publisher, so a store not produced by the publisher in the same
+    commit fails the build.
+    """
+    here = pathlib.Path(__file__).resolve().parent
+    files = sorted([p for p in here.glob("*.py")] + [here / "requirements.txt"],
+                   key=lambda p: p.name)
+    material = "\n".join(f"{p.name}\t{hashlib.sha256(p.read_bytes()).hexdigest()}"
+                         for p in files)
+    return "sha256:" + hashlib.sha256(material.encode()).hexdigest()
+
+
 
 # A table a pre-requisites script creates is a real table at run time, so
 # `schema.thattable.column` is schema.table.column and NOT a schema-qualified
@@ -295,6 +337,7 @@ def build(scripts_dir, prereq_dir, ddl_path, manifest_root, ports_sql=()):
         "generator": {
             "sqlglot": sqlglot.__version__,
             "python": sys.version.split()[0],
+            "publisher": publisher_identity(),
         },
         # Everything a binder must substitute, as data. Order matters: it is the
         # order transform() applies, and overlapping tokens depend on it.
@@ -315,6 +358,9 @@ def build(scripts_dir, prereq_dir, ddl_path, manifest_root, ports_sql=()):
         # Empty unless --prerequisites is given. Kept as a key either way: the
         # pack digest covers it (see pack_identity).
         "prerequisites": prerequisites,
+        # Group membership rules, so the store alone answers which assertions
+        # a run's groups select. Covered by the pack digest.
+        "grouping": grouping(manifest_root),
         "assertions": assertions,
     }
     for name, missing in unresolved_tables(store).items():
@@ -324,7 +370,7 @@ def build(scripts_dir, prereq_dir, ddl_path, manifest_root, ports_sql=()):
     return store, failures, unlisted
 
 
-def pack_identity(name, version, corpus_root, assertions, prerequisites):
+def pack_identity(name, version, corpus_root, assertions, prerequisites, grouping_files):
     """This store's own identity: what it is, and what it was built from.
 
     Both fields are derived, not stamped:
@@ -334,10 +380,11 @@ def pack_identity(name, version, corpus_root, assertions, prerequisites):
       the same corpus a new identity on every build - and dates are orderable,
       which a "requires at least" comparison needs and a commit sha cannot give.
     * DIGEST is over the (uuid, source hash) pairs, sorted, then the
-      (pre-requisite file, source hash) pairs. It answers "the same assertions,
-      from the same text", independent of JSON key order, publisher formatting,
-      or which sqlglot compiled it. RVF recomputes it on load and refuses a
-      store whose declared digest does not match.
+      (pre-requisite file, source hash) pairs, then the (grouping file, source
+      hash) pairs. It answers "the same assertions, from the same text, selected
+      by the same group rules", independent of JSON key order, publisher
+      formatting, or which sqlglot compiled it. RVF recomputes it on load and
+      refuses a store whose declared digest does not match.
 
     Refuses to invent a version. A store whose identity is guessed is worse than
     one with none.
@@ -364,12 +411,16 @@ def pack_identity(name, version, corpus_root, assertions, prerequisites):
     # Over everything the store would EXECUTE from the corpus, not only its
     # assertions: pre-requisites build tables assertions read, so a changed
     # pre-requisites script runs differently while the assertion set is
-    # untouched. The "\n--\n" separator is present even with no pre-requisites;
-    # RVF's DuckStore computes the same material.
+    # untouched; and the group rules decide which assertions a run selects.
+    # Each "\n--\n" separator is present even when its section is empty; RVF's
+    # DuckStore computes the same material.
     material = "\n".join(f"{uuid}\t{a['sha256']}"
                           for uuid, a in sorted(assertions.items()))
     material += "\n--\n" + "\n".join(
         f"{p['file']}\t{p['sha256']}" for p in sorted(prerequisites,
+                                                     key=lambda x: x["file"]))
+    material += "\n--\n" + "\n".join(
+        f"{g['file']}\t{g['sha256']}" for g in sorted(grouping_files,
                                                      key=lambda x: x["file"]))
     digest = hashlib.sha256(material.encode()).hexdigest()
     return {"name": name, "version": date, "corpusRef": ref,
@@ -446,7 +497,8 @@ def main():
     if a.stamp:
         store["generator"]["stamp"] = a.stamp
     store["pack"] = pack_identity(a.pack_name, a.pack_version, root,
-                                  store["assertions"], store["prerequisites"])
+                                  store["assertions"], store["prerequisites"],
+                                  store["grouping"])
     if a.requires:
         store["requires"] = requirements(a.requires)
 
@@ -470,6 +522,7 @@ def main():
     print(f"assertions   {len(store['assertions'])}")
     print(f"statements   {n_stmt} (+{n_pre} pre-requisite)")
     print(f"ports        {len(store['ports'])}")
+    print(f"grouping     {', '.join(g['file'] for g in store['grouping'])}")
     print(f"knownTables  {len(store['knownTables'])}")
     print(f"procPorts    {len(procedures.REGISTRY)} stored procedures unrolled")
     if procedures.UNPORTED:
