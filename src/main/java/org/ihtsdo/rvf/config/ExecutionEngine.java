@@ -18,14 +18,13 @@ public final class ExecutionEngine {
 	/** Property that selects the engine. */
 	public static final String PROPERTY = "rvf.execution.engine";
 
-	/** MySQL: the default, and the only engine this build provides. */
+	/** MySQL: the default. */
 	public static final String MYSQL = "mysql";
 
 	/**
-	 * DuckDB: an engine that needs no relational database. The value is
-	 * reserved here so that the condition and the auto-configuration exclusions
-	 * can be expressed; a build without a DuckDB implementation of
-	 * {@code SqlAssertionValidationService} refuses to start with it.
+	 * DuckDB: executes the SQL assertions from a precompiled assertion store against
+	 * the release files, with no relational database. Its beans carry
+	 * {@link ConditionalOnDuckDbEngine}.
 	 */
 	public static final String DUCKDB = "duckdb";
 

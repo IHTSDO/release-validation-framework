@@ -83,6 +83,7 @@ Additional documentation:
 * [Importing Assertions](docs/importing-assertions.md)
 * [Configuration Guide](docs/configuration-guide.md)
 * [Download Published Releases](docs/download-published-releases.md)
+* [The DuckDB engine](docs/duckdb-engine.md)
 
 ---
 

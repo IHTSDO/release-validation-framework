@@ -19,6 +19,18 @@ public class ValidationReport {
 	private final List<TestRunItem> assertionsSkipped;
 	private final List<TestRunItem> assertionsPassed;
 
+	/**
+	 * The assertion packs that produced this report: name, version, digest, the assertion
+	 * corpus commit it was published from, and assertion count of each. Recorded by the DuckDB
+	 * engine from the store it executed; empty on the MySQL engine.
+	 */
+	private List<AssertionPackRecord> assertionPacks = new ArrayList<>();
+
+	/** One assertion pack's identity, as a report records it. */
+	public record AssertionPackRecord(String name, String version, String digest, String corpusRef,
+			int assertions) {
+	}
+
 	public ValidationReport() {
 		assertionsFailed = new ArrayList<>();
 		assertionsWarning = new ArrayList<>();
@@ -49,6 +61,14 @@ public class ValidationReport {
 
 	public void setReportUrl(String reportUrl) {
 		this.reportUrl = reportUrl;
+	}
+
+	public List<AssertionPackRecord> getAssertionPacks() {
+		return assertionPacks;
+	}
+
+	public void setAssertionPacks(List<AssertionPackRecord> assertionPacks) {
+		this.assertionPacks = assertionPacks == null ? new ArrayList<>() : assertionPacks;
 	}
 
 	public int getTotalTestsRun() {

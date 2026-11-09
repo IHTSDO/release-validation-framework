@@ -198,7 +198,18 @@ public class ValidationRunner {
 		mainResult.getAssertionsWarning().addAll(taskResult.getAssertionsWarning());
 		mainResult.getAssertionsSkipped().addAll(taskResult.getAssertionsSkipped());
 		mainResult.getAssertionsPassed().addAll(taskResult.getAssertionsPassed());
-		
+
+		// Only the SQL-assertion phase records which assertion packs it executed. Phases that
+		// recorded different packs would make the report's provenance a guess.
+		if (!taskResult.getAssertionPacks().isEmpty()) {
+			if (!mainResult.getAssertionPacks().isEmpty()
+					&& !mainResult.getAssertionPacks().equals(taskResult.getAssertionPacks())) {
+				throw new IllegalStateException("Validation phases reported different assertion packs: "
+						+ mainResult.getAssertionPacks() + " and " + taskResult.getAssertionPacks());
+			}
+			mainResult.setAssertionPacks(List.copyOf(taskResult.getAssertionPacks()));
+		}
+
 		mainResult.setTotalTestsRun(mainResult.getTotalTestsRun() + taskResult.getTotalTestsRun());
 		mainResult.setTotalFailures(mainResult.getTotalFailures() + taskResult.getTotalFailures());
 		mainResult.setTotalWarnings(mainResult.getTotalWarnings() + taskResult.getTotalWarnings());

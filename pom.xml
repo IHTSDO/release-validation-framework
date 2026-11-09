@@ -23,6 +23,8 @@
         <docker.image.tag>latest</docker.image.tag>
         <docker.base-image>amazoncorretto:25</docker.base-image>
         <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
+        <!-- Same DuckDB release as the store publisher's duckdb==1.5.5 (tools/duck-publisher/requirements.txt). -->
+        <duckdb.version>1.5.5.1</duckdb.version>
     </properties>
 
     <scm>
@@ -53,6 +55,11 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.duckdb</groupId>
+            <artifactId>duckdb_jdbc</artifactId>
+            <version>${duckdb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -279,7 +286,33 @@
                             </arguments>
                         </configuration>
                     </execution>
+                    <!-- The test JVM's java.io.tmpdir; see maven-surefire-plugin below. -->
+                    <execution>
+                        <id>test-tmpdir</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mkdir</executable>
+                            <arguments>
+                                <argument>-p</argument>
+                                <argument>${project.build.directory}/tmp</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- The DuckDB JDBC driver extracts its native library to java.io.tmpdir and
+                         loads it from there, so a host whose /tmp is mounted noexec would fail
+                         every DuckDB test. -->
+                    <argLine>-Djava.io.tmpdir=${project.build.directory}/tmp</argLine>
+                </configuration>
             </plugin>
 
             <!-- Docker Image Build -->
