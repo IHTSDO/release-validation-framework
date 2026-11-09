@@ -127,15 +127,20 @@ into plain SQL at publish time, over the fixed DDL table set.
 
 ### What the digest covers
 
-`pack.digest` is SHA-256 over the sorted `uuid<TAB>sha256` lines of every
-assertion, then `\n--\n`, then the sorted `file<TAB>sha256` lines of every
-pre-requisite (none for the international corpus), then `\n--\n`, then the
-sorted `file<TAB>sha256` lines of the grouping files. It identifies *which
-assertions, from which source text, selected by which group rules*. It
-deliberately does not cover the statements, ports, `tableColumns` or generator:
-the same corpus republished with another sqlglot keeps its digest. RVF
-recomputes the digest on load and refuses a store whose declared digest does
-not match.
+`pack.digest` is SHA-256 over the sorted
+`uuid<TAB>sha256<TAB>keywords<TAB>severity<TAB>text` lines of every assertion,
+then `\n--\n`, then the sorted `file<TAB>sha256` lines of every pre-requisite
+(none for the international corpus), then `\n--\n`, then the sorted
+`file<TAB>sha256` lines of the grouping files. It identifies *which
+assertions, from which source text, with which manifest text, category and
+severity, selected by which group rules*. It deliberately does not cover the
+statements, ports, `tableColumns` or generator: the same corpus republished
+with another sqlglot keeps its digest. RVF recomputes the digest on load and
+refuses a store whose declared digest does not match, so an edit to any field
+the digest covers is refused; an edit to a statement, a port or
+`tableColumns` is not (`pack_smoke.py` executes the bundled store's statements,
+and RVF's `AssertionCorpusDigestTest` records what each finds on its regression
+fixture).
 
 The bundled-store test (`BundledStoreTest`) checks that the store is internally
 consistent and that `generator.publisher` and `generator.sqlglot` match this

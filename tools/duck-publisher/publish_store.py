@@ -379,12 +379,14 @@ def pack_identity(name, version, corpus_root, assertions, prerequisites, groupin
       inputs therefore produces the same version - a wall-clock stamp would give
       the same corpus a new identity on every build - and dates are orderable,
       which a "requires at least" comparison needs and a commit sha cannot give.
-    * DIGEST is over the (uuid, source hash) pairs, sorted, then the
-      (pre-requisite file, source hash) pairs, then the (grouping file, source
-      hash) pairs. It answers "the same assertions, from the same text, selected
+    * DIGEST is over the per-assertion lines (uuid, source hash, keywords,
+      severity, text), sorted, then the (pre-requisite file, source hash)
+      pairs, then the (grouping file, source hash) pairs. It answers "the same
+      assertions, from the same text, with the same manifest metadata, selected
       by the same group rules", independent of JSON key order, publisher
       formatting, or which sqlglot compiled it. RVF recomputes it on load and
-      refuses a store whose declared digest does not match.
+      refuses a store whose declared digest does not match, so an edit to any
+      of those fields is refused; an edit to the statements is not.
 
     Refuses to invent a version. A store whose identity is guessed is worse than
     one with none.
@@ -412,10 +414,14 @@ def pack_identity(name, version, corpus_root, assertions, prerequisites, groupin
     # assertions: pre-requisites build tables assertions read, so a changed
     # pre-requisites script runs differently while the assertion set is
     # untouched; and the group rules decide which assertions a run selects.
+    # An assertion's keywords and text are what those rules match on, its
+    # severity decides failure or warning, and its text is what a report says.
+    # Text last on its line, so a tab inside it cannot shift another field.
     # Each "\n--\n" separator is present even when its section is empty; RVF's
     # DuckStore computes the same material.
-    material = "\n".join(f"{uuid}\t{a['sha256']}"
-                          for uuid, a in sorted(assertions.items()))
+    material = "\n".join(
+        f"{uuid}\t{a['sha256']}\t{a['keywords']}\t{a['severity']}\t{a['text']}"
+        for uuid, a in sorted(assertions.items()))
     material += "\n--\n" + "\n".join(
         f"{p['file']}\t{p['sha256']}" for p in sorted(prerequisites,
                                                      key=lambda x: x["file"]))
