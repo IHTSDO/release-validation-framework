@@ -238,6 +238,35 @@ def test_find_ancestors_ignores_inactive_and_non_isa():
           con.execute("select parents from ancestors").fetchone()[0], "")
 
 
+def test_find_ancestors_with_named_tables():
+    """findAncestors(conceptIdsTable, ancestorsTable): reads the DISTINCT
+    non-null concept ids of the first table, (re)creates the second, and leaves
+    the no-argument form's `ancestors` table alone."""
+    con = _ancestor_fixture([(1, 2), (2, 3), (7, 8)])
+    con.execute("CREATE TABLE tmp_ids(concept_id BIGINT)")
+    con.execute("INSERT INTO tmp_ids VALUES (1), (1), (NULL), (7), (9)")
+    con.execute("CREATE TABLE tmp_anc AS SELECT 'stale' AS x")
+    run(con, procedures.expand("call findAncestors('tmp_ids', 'tmp_anc')", {}, CTX))
+    rows = con.execute("select concept_id, parents from tmp_anc "
+                       "order by concept_id").fetchall()
+    check("one row per distinct non-null concept id",
+          [r[0] for r in rows], [1, 7, 9])
+    check("each with its ancestors, comma-led",
+          [(r[0], sorted(r[1].split(","))) for r in rows],
+          [(1, ["", "2", "3"]), (7, ["", "8"]), (9, [""])])
+    check("the caller's LIKE probe matches an ancestor",
+          con.execute("select count(*) from tmp_anc where concept_id = 1 "
+                      "and concat(parents, ',') like '%,3,%'").fetchone()[0], 1)
+    check("the no-argument output table is not touched",
+          con.execute("select count(*) from information_schema.tables "
+                      "where table_name = 'ancestors'").fetchone()[0], 0)
+    try:
+        procedures.find_ancestors({}, CTX, "tmp_ids", "x; drop table y")
+        check("a non-identifier table name is refused", False, True)
+    except ValueError:
+        check("a non-identifier table name is refused", True, True)
+
+
 # ------------------------------------------------------ generation-time rules
 
 def test_identifier_table_is_skipped():
