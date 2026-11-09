@@ -260,7 +260,7 @@ def validate_inactivated_component_module(tables, ctx, prospective_dbname,
 # ---------------------------------------------------------------------------
 # Graph walks: MySQL fixpoint loops -> one recursive CTE.
 
-def find_ancestors(tables, ctx):
+def find_ancestors(tables, ctx, concept_ids_table=None, ancestors_table=None):
     """MySQL walks IS-A upward one row at a time and accumulates a comma-joined
     string per concept, which the caller then probes with LIKE '%<id>%'.
 
@@ -280,10 +280,27 @@ def find_ancestors(tables, ctx):
       * MySQL's accumulator is VARCHAR(1000) and truncates silently past ~55
         ancestors; and a cyclic IS-A would spin its WHILE loop forever. UNION in
         a recursive CTE terminates and does not truncate.
+
+    Two signatures, because the corpus has both. The original findAncestors()
+    reads v_attributedescription_and_attributetype_concept_ids and writes
+    `ancestors`. Since VAL-529 it is findAncestors(conceptIdsTable,
+    ancestorsTable): it reads the DISTINCT non-null concept_id of the first
+    table and (re)creates the second. Both names are resolved unqualified, as
+    MySQL's dynamic SQL resolves them in the session's database.
     """
     p = ctx["prospective"]
-    seed = f"{ctx['temp']}.attributedescription_and_attributetype_concept_ids"
-    return [f"""create or replace table ancestors as
+    if concept_ids_table is None:
+        seed = f"{ctx['temp']}.attributedescription_and_attributetype_concept_ids"
+        target = "ancestors"
+    else:
+        for name in (concept_ids_table, ancestors_table):
+            # Spliced into SQL as identifiers; anything else is not a table name.
+            if not name or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+                raise ValueError(f"findAncestors: {name!r} is not a table name")
+        seed = (f"(select distinct concept_id from {concept_ids_table} "
+                f"where concept_id is not null)")
+        target = ancestors_table
+    return [f"""create or replace table {target} as
 with recursive chain(concept_id, ancestor_id) as (
     select c.concept_id, r.destinationid
     from {seed} c
