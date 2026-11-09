@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DuckStoreLocatorTest {
 
@@ -16,6 +17,14 @@ class DuckStoreLocatorTest {
 
 	@TempDir
 	Path dir;
+
+	@Test
+	void loadsTheBundledStoreWhenNothingIsConfigured() throws IOException {
+		// A built artefact needs no configuration; this fails if the resource is not in the build.
+		DuckStore store = new DuckStoreLocator("").load();
+		assertTrue(store.assertions().size() > 300,
+				"bundled store looks truncated: " + store.assertions().size() + " assertions");
+	}
 
 	@Test
 	void aConfiguredStoreWinsOverTheBundledOne() throws IOException {

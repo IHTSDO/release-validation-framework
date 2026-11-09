@@ -80,9 +80,8 @@ def publisher_identity():
     """sha256 over this publisher's own sources and pins.
 
     The sorted `name<TAB>sha256` lines of every *.py beside this file and of
-    requirements.txt. RVF's bundled-store test recomputes it over
-    tools/duck-publisher, so a store not produced by the publisher in the same
-    commit fails the build.
+    requirements.txt, recorded as generator.publisher, so a store or a pack
+    names the publisher that built it.
     """
     here = pathlib.Path(__file__).resolve().parent
     files = sorted([p for p in here.glob("*.py")] + [here / "requirements.txt"],
