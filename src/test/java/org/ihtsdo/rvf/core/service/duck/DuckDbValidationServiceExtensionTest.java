@@ -274,7 +274,7 @@ class DuckDbValidationServiceExtensionTest {
 		DuckAssertionService assertionService;
 		try {
 			assertionService = new DuckAssertionService(
-					new DuckAssertionService.Corpus(store, DuckAssertionSource.from(store)));
+					new DuckAssertionService.Corpus(store, DuckAssertionSource.from(store), List.of()));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

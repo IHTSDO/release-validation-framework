@@ -60,7 +60,8 @@ import java.util.zip.ZipFile;
  * <li>Releases are unpacked from the files {@link ReleaseAcquisitionService} acquired and
  *     materialised into a DuckDB database file created for this run and deleted after it,
  *     so there are no schemas to drop between runs and no shared qa_result to truncate.
- * <li>The assertions come from {@link DuckAssertionService}'s corpus, the assertion store.
+ * <li>The assertions come from {@link DuckAssertionService}'s corpus, captured once at the
+ *     start of the run, so a reload during a run does not change what it executes.
  * <li>A statement that needs a previous or dependency release the run does not have is
  *     skipped rather than run against an empty schema; see {@link DuckBinder#bind}. A
  *     first-time release has an empty previous release, as on MySQL.
@@ -378,9 +379,12 @@ public class DuckDbValidationService implements SqlAssertionValidationService {
 	private ValidationStatusReport run(Connection connection, MysqlExecutionConfig executionConfig,
 			ReleaseDirectories releases, Path runDirectory, String reportStorage, ValidationStatusReport statusReport,
 			long timeStart) throws IOException {
-		DuckAssertionService.Corpus corpus = assertionService.currentCorpus();
+		// Once per run: a reload during the run must not change what it executes.
+		DuckAssertionService.Corpus corpus = assertionService.corpusFor(executionConfig.getAssertionPacks());
 		DuckStore store = corpus.store();
-		LOGGER.info("DuckDB assertion store: {}", store.generatorDescription());
+		LOGGER.info("DuckDB assertion store: {}{}", store.generatorDescription(),
+				corpus.packs().isEmpty() ? "" : " with packs "
+						+ corpus.packs().stream().map(DuckStorePacks.Pack::label).toList());
 
 		String lastItemLoadAttempted = "Item Unknown";
 		try {

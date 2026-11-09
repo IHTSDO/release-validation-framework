@@ -77,6 +77,7 @@ public class ReleaseAcquisitionService {
 		MysqlExecutionConfig executionConfig = new MysqlExecutionConfig(validationConfig.getRunId(), validationConfig.isFirstTimeRelease());
 		executionConfig.setGroupNames(validationConfig.getGroupsList());
 		executionConfig.setAssertionExclusionList(validationConfig.getAssertionExclusionList());
+		executionConfig.setAssertionPacks(validationConfig.getAssertionPacks());
 		executionConfig.setExcludedRF2Files(validationConfig.getExcludedRF2Files());
 		executionConfig.setExtensionValidation(isExtension(validationConfig));
 		executionConfig.setFirstTimeRelease(validationConfig.isFirstTimeRelease());

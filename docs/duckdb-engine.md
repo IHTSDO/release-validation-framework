@@ -39,6 +39,8 @@ Classes, in `org.ihtsdo.rvf.core.service.duck`:
 - `DuckBinder`, `DuckDbAssertionExecutionService`: binding a run's values into a statement,
   and executing an assertion's statements.
 - `DuckReleaseCache`: optional cache of materialised previous/dependency releases.
+- `DuckStorePacks`, `AssertionPackFetcher`, `AssertionPackChannels`: assertion packs; see
+  [assertion-packs.md](assertion-packs.md).
 
 ### What differs from MySQL by design
 
@@ -68,7 +70,8 @@ Classes, in `org.ihtsdo.rvf.core.service.duck`:
   `autoload_known_extensions=false`, `lock_configuration=true`. Assertions cannot read
   other runs' files or the release cache, write outside the run's directory, reach the
   network or load extensions. A release-cache build is confined to the release directory it
-  reads and the cache directory.
+  reads and the cache directory. The connection that executes a pack set against empty
+  tables is locked down with no directory allowed before the packs' table shapes reach it.
 - **Extension combine failures abort the SQL pass**, where MySQL logs them and runs the
   remaining assertions against a partly combined schema.
 - **RF2 files are matched to columns by their header** when the header names exactly the
@@ -87,6 +90,7 @@ Classes, in `org.ihtsdo.rvf.core.service.duck`:
 | `rvf.duck.memory.limit` | blank | e.g. `8GB`; must carry a unit (checked at startup). Blank keeps DuckDB's default of 80% of host RAM, which ignores container limits. Applies to runs and to release-cache builds |
 | `rvf.duck.cache.max-gb` | `0` | size of the cache of materialised previous/dependency releases; `0` disables it |
 | `rvf.duck.cache.directory` | `<work directory>/release-cache` | |
+| `rvf.assertion.packs`, `rvf.assertion.channels` | blank | see [assertion-packs.md](assertion-packs.md) |
 
 `rvf.assertion.resource.local.path` (the corpus checkout) is not read in this mode. The
 previous and dependency releases are acquired by file name, through the Module Storage
@@ -163,7 +167,7 @@ store executions are configured not to skip, so the store is still generated fro
 checkout.
 
 `rvf.duck.store` replaces the bundled store with a store file, for example one published
-by hand as `tools/duck-publisher/README.md` describes.
+by hand as [assertion-packs.md](assertion-packs.md) describes.
 
 ## Checks
 

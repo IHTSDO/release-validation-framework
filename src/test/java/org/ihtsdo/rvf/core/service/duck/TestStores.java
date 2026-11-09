@@ -16,7 +16,7 @@ import java.util.List;
  * <p>Each assertion's {@code sha256} is the publisher's: the first 16 hex characters of the
  * sha256 of its source script. Grouping files are carried verbatim, and a store given a
  * {@link Builder#pack pack identity} declares the digest its content hashes to, so it
- * verifies.
+ * verifies and can be merged.
  */
 final class TestStores {
 
@@ -111,6 +111,15 @@ final class TestStores {
 			return this;
 		}
 
+		/** Records an assertion's groups as a merge does, overriding the grouping files. */
+		Builder groups(String uuid, String... groups) {
+			ArrayNode out = ((ObjectNode) assertions.get(uuid)).putArray("groups");
+			for (String group : groups) {
+				out.add(group);
+			}
+			return this;
+		}
+
 		/** Declares a table, adding it to {@code knownTables} and {@code tableColumns}. */
 		Builder table(String name, String columns) {
 			((ArrayNode) root.get("knownTables")).add(name);
@@ -124,7 +133,7 @@ final class TestStores {
 			return this;
 		}
 
-		/** A store carrying no grouping files. */
+		/** A store carrying no grouping files, as a merged one does. */
 		Builder noGrouping() {
 			return grouping(null, null);
 		}

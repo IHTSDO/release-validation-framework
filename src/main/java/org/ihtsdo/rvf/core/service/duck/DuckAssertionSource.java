@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@code groups.xml} would run a set of assertions neither commit describes. A store carries
  * its corpus's {@code groups.xml} and {@code policies.xml}, and
  * {@link AssertionGroupImporter#resolveGroups} applies the same rules the MySQL importer
- * does.
+ * does. A merged store carries each assertion's groups as resolved by the pack it came from.
  *
  * <p>Keyed on assertion UUID. The numeric {@code assertionId} is assigned by the MySQL
  * import, which does not happen in this mode, so it is left null rather than synthesised.
@@ -78,26 +78,51 @@ public final class DuckAssertionSource {
 	}
 
 	/**
-	 * {@code uuid -> group names} for every assertion in the store, by the store's own
-	 * grouping files.
+	 * {@code uuid -> group names} for every assertion in the store.
 	 *
-	 * @throws IOException if the store has no grouping files
+	 * <p>An assertion with groups recorded by a merge keeps them; every other assertion is
+	 * resolved with the store's own grouping files.
+	 *
+	 * @throws IOException if an assertion has no recorded groups and the store has no grouping files
 	 */
+	static Map<String, Set<String>> resolveGroups(DuckStore store) throws IOException {
+		List<Assertion> assertions = new ArrayList<>();
+		for (DuckStore.StoredAssertion stored : store.assertions().values()) {
+			assertions.add(toAssertion(stored));
+		}
+		return resolveGroups(store, assertions);
+	}
+
 	private static Map<String, Set<String>> resolveGroups(DuckStore store, List<Assertion> assertions)
 			throws IOException {
+		Map<String, DuckStore.StoredAssertion> stored = store.assertions();
+		Map<String, Set<String>> out = new LinkedHashMap<>();
+		List<Assertion> unresolved = new ArrayList<>();
+		for (Assertion assertion : assertions) {
+			List<String> recorded = stored.get(assertion.getUuid().toString()).groups();
+			if (recorded != null) {
+				out.put(assertion.getUuid().toString(), new LinkedHashSet<>(recorded));
+			} else {
+				unresolved.add(assertion);
+			}
+		}
+		if (unresolved.isEmpty()) {
+			return out;
+		}
 		Map<String, DuckStore.GroupingFile> grouping = store.grouping();
 		DuckStore.GroupingFile groups = grouping.get(GROUPS_XML);
 		DuckStore.GroupingFile policies = grouping.get(POLICIES_XML);
 		if (groups == null || policies == null) {
 			throw new IOException("The assertion store carries no " + GROUPS_XML + " and "
-					+ POLICIES_XML + ", so no group would select its assertions. Republish the store "
-					+ "with tools/duck-publisher.");
+					+ POLICIES_XML + " for " + unresolved.size() + " of its assertions, so no "
+					+ "group would select them. Republish the store with tools/duck-publisher.");
 		}
 		try (InputStream groupsXml = utf8(groups.text()); InputStream policiesXml = utf8(policies.text())) {
-			return AssertionGroupImporter.resolveGroups(groupsXml, policiesXml, assertions);
+			out.putAll(AssertionGroupImporter.resolveGroups(groupsXml, policiesXml, unresolved));
 		} catch (IllegalStateException e) {
 			throw new IOException("The assertion store's group rules cannot be applied: " + e.getMessage(), e);
 		}
+		return out;
 	}
 
 	private static InputStream utf8(String text) {

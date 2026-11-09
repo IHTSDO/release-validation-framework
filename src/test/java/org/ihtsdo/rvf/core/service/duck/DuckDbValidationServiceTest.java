@@ -697,7 +697,7 @@ class DuckDbValidationServiceTest {
 		DuckAssertionService assertionService;
 		try {
 			assertionService = new DuckAssertionService(
-					new DuckAssertionService.Corpus(store, DuckAssertionSource.from(store)));
+					new DuckAssertionService.Corpus(store, DuckAssertionSource.from(store), List.of()));
 		} catch (java.io.IOException e) {
 			throw new java.io.UncheckedIOException(e);
 		}

@@ -36,7 +36,7 @@ class BundledStoreTest {
 	@Test
 	void theDeclaredIdentityVerifies() throws IOException {
 		DuckStore.PackRecord identity = store.identity().orElseThrow(
-				() -> new AssertionError("the bundled store has no pack identity, so reports cannot name it"));
+				() -> new AssertionError("the bundled store has no pack identity, so it cannot be merged with packs"));
 		assertEquals(store.assertionDigest(), identity.digest());
 		assertFalse(identity.name().isBlank());
 		assertFalse(identity.version().isBlank());

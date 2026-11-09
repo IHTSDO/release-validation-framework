@@ -42,6 +42,8 @@ public class ValidationRunConfig implements Serializable {
 	private String includedModules;
 	private List<String> droolsRulesGroupList;
 	private List<String> assertionExclusionList;
+	/** Assertion packs this run pins, empty for the deployment's default; DuckDB engine only. */
+	private List<String> assertionPacks;
 	private String bucketName;
 	private boolean enableMRCMValidation;
 	private boolean enableTraceabilityValidation;
@@ -92,6 +94,15 @@ public class ValidationRunConfig implements Serializable {
 
 	public ValidationRunConfig addAssertionExclusionList(final List<String> assertionExclusionList) {
 		this.assertionExclusionList = assertionExclusionList;
+		return this;
+	}
+
+	public List<String> getAssertionPacks() {
+		return assertionPacks;
+	}
+
+	public ValidationRunConfig addAssertionPacks(final List<String> assertionPacks) {
+		this.assertionPacks = assertionPacks;
 		return this;
 	}
 	public ValidationRunConfig addDroolsRulesGroupList(final List<String> droolsRulesGroupList) {
@@ -177,6 +188,11 @@ public class ValidationRunConfig implements Serializable {
 				.add("runId=" + runId)
 				.add("groupsList=" + groupsList)
 				.add("assertionExclusionList=" + assertionExclusionList)
+				// A request can only pin name@version, but a queued config is logged before the
+				// engine refuses anything else, so a credential is never written out.
+				.add("assertionPacks=" + (assertionPacks == null ? null : assertionPacks.stream()
+						.map(pin -> pin == null ? null : pin.replaceAll("(?i)(authHeader=)[^;]*", "$1<redacted>"))
+						.toList()))
 				.add("previousRelease='" + previousRelease + "'")
 				.add("dependencyRelease='" + dependencyReleases + "'")
 				.add("storageLocation='" + storageLocation + "'")
