@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Python 3.12. Exact pins: the published statements are sqlglot's output byte for
+# byte, and duckdb is what the checks execute against. pins.py makes every entry
+# point refuse to start unless each package below is installed at exactly this
+# version.
+duckdb==1.5.5
+sqlglot==30.18.0
+defusedxml==0.7.1
