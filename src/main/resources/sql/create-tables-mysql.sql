@@ -11,7 +11,8 @@ key idx_id(id),
 key idx_effectivetime(effectivetime),
 key idx_active(active),
 key idx_moduleid(moduleid),
-key idx_definitionstatusid(definitionstatusid)
+key idx_definitionstatusid(definitionstatusid),
+key idx_id_active(id, active)
 ) engine=myisam default charset=utf8;
 
 
@@ -33,7 +34,9 @@ key idx_moduleid(moduleid),
 key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
-key idx_casesignificanceid(casesignificanceid)
+key idx_casesignificanceid(casesignificanceid),
+key idx_active_conceptid(active, conceptid),
+key idx_active_casesignificanceid(active, casesignificanceid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists textdefinition_f;
@@ -54,7 +57,9 @@ key idx_moduleid(moduleid),
 key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
-key idx_casesignificanceid(casesignificanceid)
+key idx_casesignificanceid(casesignificanceid),
+key idx_active_conceptid(active, conceptid),
+key idx_active_casesignificanceid(active, casesignificanceid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists relationship_f;
@@ -78,7 +83,8 @@ key idx_destinationid(destinationid),
 key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
-key idx_modifierid(modifierid)
+key idx_modifierid(modifierid),
+key idx_sourceid_active_typeid(sourceid, active, typeid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists stated_relationship_f;
@@ -102,7 +108,8 @@ key idx_destinationid(destinationid),
 key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
-key idx_modifierid(modifierid)
+key idx_modifierid(modifierid),
+key idx_sourceid_active_typeid(sourceid, active, typeid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists relationship_concrete_values_f;
@@ -143,7 +150,8 @@ key idx_active(active),
 key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
-key idx_acceptabilityid(acceptabilityid)
+key idx_acceptabilityid(acceptabilityid),
+key idx_active_referencedcomponentid(active, referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists associationrefset_f;
@@ -161,7 +169,8 @@ key idx_active(active),
 key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
-key idx_targetcomponentid(targetcomponentid)
+key idx_targetcomponentid(targetcomponentid),
+key idx_active_refsetid_targetcomponentid(active, refsetid, targetcomponentid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists attributevaluerefset_f;
@@ -420,7 +429,8 @@ key idx_id(id),
 key idx_effectivetime(effectivetime),
 key idx_active(active),
 key idx_moduleid(moduleid),
-key idx_definitionstatusid(definitionstatusid)
+key idx_definitionstatusid(definitionstatusid),
+key idx_id_active(id, active)
 ) engine=myisam default charset=utf8;
 
 
@@ -442,7 +452,9 @@ key idx_moduleid(moduleid),
 key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
-key idx_casesignificanceid(casesignificanceid)
+key idx_casesignificanceid(casesignificanceid),
+key idx_active_conceptid(active, conceptid),
+key idx_active_casesignificanceid(active, casesignificanceid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists textdefinition_s;
@@ -463,7 +475,9 @@ key idx_moduleid(moduleid),
 key idx_conceptid(conceptid),
 key idx_languagecode(languagecode),
 key idx_typeid(typeid),
-key idx_casesignificanceid(casesignificanceid)
+key idx_casesignificanceid(casesignificanceid),
+key idx_active_conceptid(active, conceptid),
+key idx_active_casesignificanceid(active, casesignificanceid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists relationship_s;
@@ -487,7 +501,8 @@ key idx_destinationid(destinationid),
 key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
-key idx_modifierid(modifierid)
+key idx_modifierid(modifierid),
+key idx_sourceid_active_typeid(sourceid, active, typeid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists stated_relationship_s;
@@ -511,7 +526,8 @@ key idx_destinationid(destinationid),
 key idx_relationshipgroup(relationshipgroup),
 key idx_typeid(typeid),
 key idx_characteristictypeid(characteristictypeid),
-key idx_modifierid(modifierid)
+key idx_modifierid(modifierid),
+key idx_sourceid_active_typeid(sourceid, active, typeid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists relationship_concrete_values_s;
@@ -552,7 +568,8 @@ key idx_active(active),
 key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
-key idx_acceptabilityid(acceptabilityid)
+key idx_acceptabilityid(acceptabilityid),
+key idx_active_referencedcomponentid(active, referencedcomponentid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists associationrefset_s;
@@ -570,7 +587,8 @@ key idx_active(active),
 key idx_moduleid(moduleid),
 key idx_refsetid(refsetid),
 key idx_referencedcomponentid(referencedcomponentid),
-key idx_targetcomponentid(targetcomponentid)
+key idx_targetcomponentid(targetcomponentid),
+key idx_active_refsetid_targetcomponentid(active, refsetid, targetcomponentid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists attributevaluerefset_s;
