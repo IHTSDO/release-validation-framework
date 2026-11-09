@@ -45,6 +45,9 @@ public class MysqlValidationService {
 	private ValidationVersionLoader releaseVersionLoader;
 
 	@Autowired
+	private ReleaseAcquisitionService releaseAcquisitionService;
+
+	@Autowired
 	private ReleaseDataManager releaseDataManager;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MysqlValidationService.class);
@@ -63,7 +66,7 @@ public class MysqlValidationService {
 		this.schemasToRemove.clear();
 		this.releaseDataManager.truncateQAResult();
 
-		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseAcquisitionService.createExecutionConfig(validationConfig);
 		String reportStorage = validationConfig.getStorageLocation();
 		String lastItemLoadAttempted = "Item Unknown";
 		try {

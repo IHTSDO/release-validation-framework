@@ -41,7 +41,7 @@ public class ValidationRunner {
 	private ValidationReportService reportService;
 	
 	@Autowired
-	private ValidationVersionLoader releaseVersionLoader;
+	private ReleaseAcquisitionService releaseAcquisitionService;
 	
 	@Autowired 
 	private DroolsRulesValidationService droolsValidationService;
@@ -86,9 +86,9 @@ public class ValidationRunner {
 		try {
 			// Prepare to run validations
 			Calendar startTime = Calendar.getInstance();
-			releaseVersionLoader.downloadProspectiveFiles(validationConfig);
-			releaseVersionLoader.downloadPreviousRelease(validationConfig);
-			releaseVersionLoader.downloadDependencyReleases(validationConfig);
+			releaseAcquisitionService.downloadProspectiveFiles(validationConfig);
+			releaseAcquisitionService.downloadPreviousRelease(validationConfig);
+			releaseAcquisitionService.downloadDependencyReleases(validationConfig);
 
 			if (validationConfig.getLocalProspectiveFile() == null) {
 				reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
