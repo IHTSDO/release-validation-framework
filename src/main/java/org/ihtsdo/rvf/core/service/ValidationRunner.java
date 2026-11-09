@@ -47,7 +47,7 @@ public class ValidationRunner {
 	private DroolsRulesValidationService droolsValidationService;
 	
 	@Autowired
-	private MysqlValidationService mysqlValidationService;
+	private SqlAssertionValidationService sqlAssertionValidationService;
 
 	@Autowired
 	private MRCMValidationService mrcmValidationService;
@@ -144,9 +144,9 @@ public class ValidationRunner {
 			if (!CollectionUtils.isEmpty(validationConfig.getGroupsList())) {
 				statusMessages.append("RVF assertions validation started");
 				reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
-				ValidationStatusReport mysqlValidationStatusReport = new ValidationStatusReport(validationConfig);
-				mysqlValidationStatusReport.setResultReport(new ValidationReport());
-				taskMap.put("SQL Assertions", executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
+				ValidationStatusReport sqlValidationStatusReport = new ValidationStatusReport(validationConfig);
+				sqlValidationStatusReport.setResultReport(new ValidationReport());
+				taskMap.put("SQL Assertions", executorService.submit(() -> sqlAssertionValidationService.runRF2Validations(validationConfig, sqlValidationStatusReport)));
 			}
 
 			if (validationConfig.isEnableDrools()) {

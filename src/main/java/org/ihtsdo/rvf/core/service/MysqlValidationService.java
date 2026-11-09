@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Service
-public class MysqlValidationService {
+public class MysqlValidationService implements SqlAssertionValidationService {
 
 	public static final String START_EXECUTING_ASSERTIONS = "Start executing assertions...";
 	@Autowired
@@ -58,7 +58,8 @@ public class MysqlValidationService {
 	
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
+	@Override
+	public ValidationStatusReport runRF2Validations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
 		// Clean up the prospective databases if any
 		for (String legacyVersion : this.schemasToRemove) {
 			this.releaseDataManager.dropSchema(legacyVersion);
