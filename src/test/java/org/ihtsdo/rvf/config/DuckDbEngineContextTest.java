@@ -12,6 +12,7 @@ import org.ihtsdo.rvf.core.service.SqlAssertionValidationService;
 import org.ihtsdo.rvf.core.service.ValidationRunner;
 import org.ihtsdo.rvf.core.service.duck.DuckAssertionService;
 import org.ihtsdo.rvf.core.service.duck.DuckDbValidationService;
+import org.ihtsdo.rvf.core.service.duck.DuckStore;
 import org.ihtsdo.rvf.importer.RvfAssertionsDatabasePrimerService;
 import org.ihtsdo.rvf.rest.controller.AssertionAdministrationController;
 import org.ihtsdo.rvf.rest.controller.AssertionController;
@@ -25,12 +26,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.repository.Repository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.sql.DataSource;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -87,5 +95,29 @@ class DuckDbEngineContextTest {
 		assertEquals(0, context.getBeanNamesForType(AssertionAdministrationController.class).length);
 		assertEquals(0, context.getBeanNamesForType(AssertionGroupAdministrationController.class).length);
 		assertEquals(0, context.getBeanNamesForType(ReleaseController.class).length);
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	void thePacksEndpointReportsTheBundledStoresIdentity() throws Exception {
+		DuckStore.PackRecord bundled;
+		try (InputStream in = DuckStore.class.getResourceAsStream("/duck/store.json")) {
+			assertNotNull(in, "the bundled store is on the classpath");
+			bundled = DuckStore.parse(new String(in.readAllBytes(), StandardCharsets.UTF_8)).identity().orElseThrow();
+		}
+
+		ResponseEntity<Map<String, Object>> response = context.getBean(AssertionPackController.class).getPacks();
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		Map<String, Object> body = response.getBody();
+		assertEquals(bundled.assertions(), body.get("assertions"));
+		List<Map<String, Object>> packs = (List<Map<String, Object>>) body.get("packs");
+		assertEquals(1, packs.size(), packs.toString());
+		Map<String, Object> pack = packs.get(0);
+		assertEquals("international", pack.get("name"));
+		assertEquals(bundled.version(), pack.get("version"));
+		assertEquals(bundled.digest(), pack.get("digest"));
+		assertEquals(bundled.corpusRef(), pack.get("corpusRef"));
+		assertEquals(bundled.assertions(), pack.get("assertions"));
 	}
 }

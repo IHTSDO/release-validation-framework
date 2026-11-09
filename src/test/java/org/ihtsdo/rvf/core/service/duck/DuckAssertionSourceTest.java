@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,7 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * The assertions a DuckDB run executes and their group membership, from the store alone.
  *
- * <p>Synthetic grouping files pin this class's behaviour.
+ * <p>The synthetic grouping files pin this class's behaviour; the bundled store's own
+ * grouping files pin that the importer's rules still select what an edition run expects.
  */
 class DuckAssertionSourceTest {
 
@@ -153,6 +155,31 @@ class DuckAssertionSourceTest {
 	void groupingFilesWithNoGroupsAreRefused() {
 		DuckStore store = corpus().grouping("<assertionGroupingStrategy/>", POLICIES).store();
 		assertThrows(IOException.class, () -> DuckAssertionSource.from(store));
+	}
+
+	@Test
+	void theBundledGroupingFilesSelectWhatAnEditionRunExpects() throws IOException {
+		DuckStore bundled = new DuckStoreLocator("").load();
+		String groups = bundled.grouping().get(DuckAssertionSource.GROUPS_XML).text();
+		String policies = bundled.grouping().get(DuckAssertionSource.POLICIES_XML).text();
+		String international = "66666666-6666-6666-6666-666666666666";
+		String irish = "77777777-7777-7777-7777-777777777777";
+		DuckAssertionSource source = DuckAssertionSource.from(TestStores.builder()
+				.assertion(STATED, "stated.sql", "select 1;", "Stated", "file-centric-validation,INT")
+				.assertion(international, "int.sql", "select 2;", "International", "file-centric-validation,INT")
+				.assertion(irish, "ie.sql", "select 3;", "Irish", "file-centric-validation,extension-only,IE")
+				.grouping(groups, policies)
+				.store());
+
+		assertTrue(source.groupsOf(UUID.fromString(international)).contains("InternationalEdition"));
+		assertTrue(source.groupsOf(UUID.fromString(irish)).contains("IrishEdition"));
+		assertFalse(source.groupsOf(UUID.fromString(irish)).contains("InternationalEdition"),
+				"an extension-only assertion must not run in the International Edition");
+		// This uuid is in the shipped stated-relationship policy, so the exclusion is read
+		// from the bundled file and not from a fixture.
+		assertFalse(source.groupsOf(UUID.fromString(STATED)).contains("InternationalEdition"));
+		assertTrue(source.groupsOf(UUID.fromString(STATED)).contains("stated-relationships-release-validation"),
+				"a group without that exclusion still selects it");
 	}
 
 	private static List<String> uuids(List<Assertion> assertions) {

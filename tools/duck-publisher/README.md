@@ -1,8 +1,9 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # DuckDB assertion store publisher
 
-Builds `src/main/resources/duck/store.json`: the SQL assertion corpus,
-transpiled once from MySQL to DuckDB, for RVF's DuckDB execution engine.
+Builds the assertion store, `store.json`: the SQL assertion corpus, transpiled
+once from MySQL to DuckDB, for RVF's DuckDB execution engine. RVF's Maven build
+runs it on every build, over the corpus it has just checked out (below).
 
 Transpilation is the only part of that engine that needs Python. sqlglot parses
 each MySQL assertion, rewrites it and prints DuckDB; everything after that is
@@ -17,7 +18,7 @@ artefact rather than something regenerated invisibly on every run.
 |---|---|
 | assertion corpus | a checkout of `snomed-release-validation-assertions` (`./checkout-resources.sh` clones `develop` for a SNAPSHOT build, `master` for a release): `scripts/`, `manifest.xml`, `groups.xml` and `policies.xml` |
 | DDL | `src/main/resources/sql/create-tables-mysql.sql` - table names, columns and types come from here, nowhere else |
-| output | `src/main/resources/duck/store.json` |
+| output | `--out`; in RVF's build `target/generated-resources/duck/store.json`, packaged as `duck/store.json` |
 
 Only scripts `manifest.xml` declares are published, under the manifest's uuid,
 text, category and severity. The international corpus also ships ~93 `.sql`
@@ -29,10 +30,10 @@ as skipped.
 
 Python 3.12 with the exact versions in `requirements.txt` (duckdb 1.5.5,
 sqlglot 30.18.0, defusedxml 0.7.1). `pins.require()` refuses any other Python
-minor version:
+minor version. The build creates it as `target/duck-publisher-venv`; by hand:
 
-    uv venv --python 3.12 /tmp/duckenv
-    uv pip install --python /tmp/duckenv/bin/python -r tools/duck-publisher/requirements.txt
+    uv venv --python 3.12 target/duck-publisher-venv
+    uv pip install --python target/duck-publisher-venv/bin/python -r tools/duck-publisher/requirements.txt
 
 The published statements are sqlglot's output byte for byte, so a different
 sqlglot changes statements no corpus change asked for; duckdb is what the checks
@@ -52,30 +53,53 @@ unconditionally, so not even a direct import of the module can run without it.
 The only fallback is for a statement sqlglot cannot *parse*;
 `precompile_parity.py` and `pack_smoke.py` report those, nothing hides them.
 
-### Building in CI
+## In RVF's build
+
+The store is not checked in. `pom.xml` runs `build-store.sh` in
+`generate-resources`, right after `checkout-resources.sh` has cloned the corpus,
+so the store in the jar and the container image is always built from the
+corpus commit the MySQL engine imports. The script
+
+1. creates, or reuses, the pinned environment in `target/duck-publisher-venv`
+   (`uv venv --no-python-downloads --python 3.12` when `uv` is installed,
+   otherwise `python3.12 -m venv`; then `requirements.txt`);
+2. deletes any previous store and runs `publish_store.py` over the checkout and
+   the DDL into `target/generated-resources/duck/store.json`, which the build
+   packages as `duck/store.json`.
+
+**The build needs Python 3.12.** With neither `python3.12` nor `uv` with a 3.12
+installed, the script stops the build with a message saying so; there is no
+checked-in store to fall back to. A failed publish (an assertion that does not
+transpile, or reads a table nothing provides) fails the build too, so a corpus
+commit the DuckDB engine cannot run is found when RVF is built, not at run
+time.
 
 The publisher needs only the corpus checkout, the DDL and the pinned
 environment: it opens no network connection (traced: zero `socket`/`connect`
 calls in a full publish, including the `git log` it runs on the corpus to date
 the pack) and writes only `--out` (plus Python's `__pycache__` unless
-`PYTHONDONTWRITEBYTECODE=1`). A full publish of the international corpus takes
-about 4 s wall (2.8 s CPU) and peaks at about 40 MB RSS. It exits non-zero on
-any failure, so it can run in an image build after `checkout-resources.sh`
-rather than being checked in.
+`PYTHONDONTWRITEBYTECODE=1`, which the script sets). A full publish of the
+international corpus takes about 4 s wall (2.8 s CPU) and peaks at about 40 MB
+RSS; creating the environment the first time downloads the pinned packages.
+The version is the corpus commit's date, so a rebuild of the same corpus
+produces the same identity.
 
-## Republishing
+The build also publishes a second store, from the fixed corpus commit
+`duck.digest.corpus.ref` in `pom.xml` (`--ref`, into `target/duck-digest/`),
+for RVF's `AssertionCorpusDigestTest`, whose per-assertion recording must not
+move with every corpus commit.
 
-Republish when the corpus or the DDL changes and the bundled store should
-follow it, and whenever a file in this directory changes (the bundled-store test
-checks the store was produced by this publisher; see below). From the
-repository root:
+## Running it by hand
+
+To publish a pack from another corpus, or to look at a store outside the build,
+from the repository root:
 
     ./checkout-resources.sh
-    /tmp/duckenv/bin/python tools/duck-publisher/publish_store.py \
+    target/duck-publisher-venv/bin/python tools/duck-publisher/publish_store.py \
       --scripts       snomed-release-validation-assertions/scripts \
       --manifest-root snomed-release-validation-assertions \
       --ddl           src/main/resources/sql/create-tables-mysql.sql \
-      --out           src/main/resources/duck/store.json
+      --out           /tmp/store.json
 
 At assertions `develop` c3a6fb27 (2026-10-13) with the current DDL this reports
 `assertions 361`, `statements 791 (+0 pre-requisite)`, `ports 2` and 93
@@ -90,9 +114,9 @@ and an empty store reports no findings and therefore passes every validation.
 
 Then check the result:
 
-    P=/tmp/duckenv/bin/python; T=tools/duck-publisher; S=snomed-release-validation-assertions/scripts
-    $P $T/verify_store.py src/main/resources/duck/store.json --scripts $S --ddl src/main/resources/sql/create-tables-mysql.sql
-    $P $T/pack_smoke.py src/main/resources/duck/store.json
+    P=target/duck-publisher-venv/bin/python; T=tools/duck-publisher; S=snomed-release-validation-assertions/scripts
+    $P $T/verify_store.py /tmp/store.json --scripts $S --ddl src/main/resources/sql/create-tables-mysql.sql
+    $P $T/pack_smoke.py /tmp/store.json
     $P $T/precompile_parity.py --assertions $S
     $P $T/procedures_selftest.py
 
@@ -138,16 +162,12 @@ statements, ports, `tableColumns` or generator: the same corpus republished
 with another sqlglot keeps its digest. RVF recomputes the digest on load and
 refuses a store whose declared digest does not match, so an edit to any field
 the digest covers is refused; an edit to a statement, a port or
-`tableColumns` is not (`pack_smoke.py` executes the bundled store's statements,
-and RVF's `AssertionCorpusDigestTest` records what each finds on its regression
-fixture).
+`tableColumns` is not (`pack_smoke.py` executes a store's statements, and RVF's
+`AssertionCorpusDigestTest` records what each finds on its regression fixture).
 
-The bundled-store test (`BundledStoreTest`) checks that the store is internally
-consistent and that `generator.publisher` and `generator.sqlglot` match this
-directory and its `requirements.txt`. It does not compare the store with the
-corpus checkout: the corpus is cloned from a moving branch, and a corpus commit
-must not fail an RVF build. RVF reports that difference at startup and on
-`GET /assertions/packs` instead (`docs/duckdb-engine.md`).
+RVF's `BundledStoreTest` checks that the bundled store is internally consistent
+and records the corpus commit checked out beside the project, which is what
+the build published it from.
 
 ## Other corpora
 
@@ -172,6 +192,7 @@ otherwise surface only at run time as "Table with name ... does not exist".
 
 | file | |
 |---|---|
+| `build-store.sh` | RVF's build step: pinned environment, then `publish_store.py` over the checkout |
 | `publish_store.py` | entry point: corpus + DDL -> store.json |
 | `rvfsql.py` | RVF's import/transform pipeline ported, plus the MySQL -> DuckDB dialect pass; `precompile()`/`bind()` and the reference `prepare()` |
 | `procedures.py` | host-language ports of the corpus's stored procedures, as SQL generators |
