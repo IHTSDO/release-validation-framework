@@ -10,11 +10,13 @@ import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
  * assertions, Drools, MRCM and traceability. Four of them work off the RF2
  * files and need no database. The SQL-assertion pass is the only one whose
  * implementation depends on where the release data is held, so it is the only
- * one behind an interface; {@link MysqlValidationService} is the implementation.
+ * one behind an interface. Exactly one implementation is registered per engine:
+ * {@link MysqlValidationService}, or
+ * {@link org.ihtsdo.rvf.core.service.duck.DuckDbValidationService}.
  *
  * <p>Implementations acquire their own inputs from the run configuration,
  * because an engine decides for itself how to read the package (MySQL loads it
- * into a schema).
+ * into a schema; DuckDB materialises the unpacked files into a per-run database).
  */
 public interface SqlAssertionValidationService {
 
