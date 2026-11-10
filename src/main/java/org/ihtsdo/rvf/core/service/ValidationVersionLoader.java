@@ -448,7 +448,7 @@ public class ValidationVersionLoader {
 
 		Set<ModuleMetadata> dependencies;
 		try {
-			dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, expectedModules, true);
+			dependencies = findDependencies(mdrsRows, expectedModules, true);
 		} catch (ModuleStorageCoordinatorException e) {
 			throw new IOException("Failed to load dependencies via given MDRS", e);
 		}
@@ -492,7 +492,14 @@ public class ValidationVersionLoader {
 	}
 
 	private ModuleMetadata findModuleMetadataByFilename(String filename) throws ModuleStorageCoordinatorException {
-		Map<String, List<ModuleMetadata>> allReleasesMap = moduleStorageCoordinator.getAllReleases();
+		Map<String, List<ModuleMetadata>> allReleasesMap;
+		try {
+			allReleasesMap = moduleStorageCoordinator.getAllReleases();
+		} catch (RuntimeException e) {
+			// An absent module store directory makes the listing throw (File.listFiles() returns null)
+			logger.warn("Module Storage Coordinator could not list releases ({}); falling back to release storage for {}", e.toString(), filename);
+			return null;
+		}
 		List<ModuleMetadata> allModuleMetadata = new ArrayList<>();
 		allReleasesMap.values().forEach(allModuleMetadata::addAll);
 		return allModuleMetadata.stream()
@@ -569,7 +576,7 @@ public class ValidationVersionLoader {
 		if (validationConfig.getIncludedModules() != null) {
 			expectedModules.addAll(Arrays.stream(validationConfig.getIncludedModules().split(",")).map(String::trim).toList());
 		}
-		Set<ModuleMetadata> dependencies = moduleStorageCoordinator.getDependencies(mdrsRows, expectedModules, false);
+		Set<ModuleMetadata> dependencies = findDependencies(mdrsRows, expectedModules, false);
 		if (!CollectionUtils.isEmpty(dependencies)) {
 			dependencies.forEach(dependency -> {
 				logger.info("Found previous dependency effective time: IdentifyingModuleId {}, EffectiveTime {}", dependency.getIdentifyingModuleId(), dependency.getEffectiveTimeString());
@@ -577,6 +584,16 @@ public class ValidationVersionLoader {
 					dependency.getIdentifyingModuleId(),
 					dependency.getEffectiveTimeString());
 			});
+		}
+	}
+
+	private Set<ModuleMetadata> findDependencies(Set<RF2Row> mdrsRows, Set<String> expectedModules, boolean download) throws ModuleStorageCoordinatorException {
+		try {
+			return moduleStorageCoordinator.getDependencies(mdrsRows, expectedModules, download);
+		} catch (RuntimeException e) {
+			// An absent module store directory makes the listing throw (File.listFiles() returns null)
+			logger.warn("Module Storage Coordinator could not list releases ({}); resolving no dependencies from it", e.toString());
+			return Collections.emptySet();
 		}
 	}
 
