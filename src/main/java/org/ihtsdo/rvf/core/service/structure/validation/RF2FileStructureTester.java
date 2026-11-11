@@ -53,14 +53,21 @@ public class RF2FileStructureTester {
 			for (Future<?> task : futures) {
 				try {
 					task.get();
-				} catch (InterruptedException | ExecutionException e) {
-					LOGGER.error("Task failed when structure testing due to:", e);
-					validationLog.executionError("Error", "Failed to check file due to:" + e.fillInStackTrace());
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					logTaskFailure(e);
+				} catch (ExecutionException e) {
+					logTaskFailure(e);
 				}
 			}
 		}
 	}
 	
+	private void logTaskFailure(Exception e) {
+		LOGGER.error("Task failed when structure testing due to:", e);
+		validationLog.executionError("Error", "Failed to check file due to:" + e.fillInStackTrace());
+	}
+
 	private void runTestForFile(String fileName) {
 		FileScan scan;
 		try (BufferedReader reader = resourceManager.getReader(fileName, StandardCharsets.UTF_8)) {
@@ -120,7 +127,7 @@ public class RF2FileStructureTester {
 	 * the three because it tokenises with the regex engine.
 	 *
 	 * <p>The token count is reproduced exactly rather than approximated; see
-	 * {@link #scannerTokens} for the rule.
+	 * {@link TerminatorScanner#scannerTokens} for the rule.
 	 */
 	static FileScan scan(java.io.Reader reader) throws java.io.IOException {
 		char[] buffer = new char[8192];
@@ -191,39 +198,37 @@ public class RF2FileStructureTester {
 				// A final line with no terminator at all.
 				endLine("");
 			}
-			return new FileScan(totalLine, scannerTokens(crlfCount, charsRead, endOfLastCrlf, firstSegmentEmpty),
-					lastTerminator);
+			return new FileScan(totalLine, scannerTokens(), lastTerminator);
 		}
-	}
 
-	/**
-	 * The token count {@code Scanner.useDelimiter("\r\n")} would produce, which
-	 * is what the previous implementation compared against the line count.
-	 *
-	 * <p>Its rule is NOT "one token per delimiter". Splitting on every CRLF gives
-	 * {@code crlfCount + 1} segments, and Scanner returns all of them except an
-	 * empty FIRST segment and an empty LAST one:
-	 *
-	 * <pre>
-	 *   "a\r\nb\r\n"       -&gt; a, b, ""       -&gt; ["a", "b"]      2
-	 *   "a\r\n\r\nb\r\n"   -&gt; a, "", b, ""   -&gt; ["a", "", "b"]  3   interior empties KEPT
-	 *   "\r\n"            -&gt; "", ""         -&gt; []              0   both dropped
-	 *   "\r\n\r\n"        -&gt; "", "", ""     -&gt; [""]            1
-	 * </pre>
-	 *
-	 * <p>Getting this wrong is not academic: a file whose first line is empty
-	 * would report 1 token against 1 line and lose the line-terminator error it
-	 * should have raised. RF2FileStructureTesterScanTest checks this against a
-	 * real {@code Scanner}, as part of the previous three-pass logic, for leading,
-	 * interior and trailing delimiters.
-	 */
-	private static int scannerTokens(final int crlfCount, final long charsRead,
-			final long endOfLastCrlf, final boolean firstSegmentEmpty) {
-		if (crlfCount == 0) {
-			return charsRead == 0 ? 0 : 1;
+		/**
+		 * The token count {@code Scanner.useDelimiter("\r\n")} would produce, which
+		 * is what the previous implementation compared against the line count.
+		 *
+		 * <p>Its rule is NOT "one token per delimiter". Splitting on every CRLF gives
+		 * {@code crlfCount + 1} segments, and Scanner returns all of them except an
+		 * empty FIRST segment and an empty LAST one:
+		 *
+		 * <pre>
+		 *   "a\r\nb\r\n"       -&gt; a, b, ""       -&gt; ["a", "b"]      2
+		 *   "a\r\n\r\nb\r\n"   -&gt; a, "", b, ""   -&gt; ["a", "", "b"]  3   interior empties KEPT
+		 *   "\r\n"            -&gt; "", ""         -&gt; []              0   both dropped
+		 *   "\r\n\r\n"        -&gt; "", "", ""     -&gt; [""]            1
+		 * </pre>
+		 *
+		 * <p>Getting this wrong is not academic: a file whose first line is empty
+		 * would report 1 token against 1 line and lose the line-terminator error it
+		 * should have raised. RF2FileStructureTesterScanTest checks this against a
+		 * real {@code Scanner}, as part of the previous three-pass logic, for leading,
+		 * interior and trailing delimiters.
+		 */
+		private int scannerTokens() {
+			if (crlfCount == 0) {
+				return charsRead == 0 ? 0 : 1;
+			}
+			final int segments = crlfCount + 1;
+			final boolean lastSegmentEmpty = charsRead == endOfLastCrlf;
+			return segments - (firstSegmentEmpty ? 1 : 0) - (lastSegmentEmpty ? 1 : 0);
 		}
-		final int segments = crlfCount + 1;
-		final boolean lastSegmentEmpty = charsRead == endOfLastCrlf;
-		return segments - (firstSegmentEmpty ? 1 : 0) - (lastSegmentEmpty ? 1 : 0);
 	}
 }
