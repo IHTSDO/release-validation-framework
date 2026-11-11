@@ -43,15 +43,14 @@ public class RF2FileStructureTester {
 		startTime = new Date();
 		List<String> fileNames = resourceManager.getFileNames();
 		try (ExecutorService executorService = Executors.newCachedThreadPool()) {
-			List<Future<Boolean>> futures = new ArrayList<>();
+			List<Future<?>> futures = new ArrayList<>();
 			for (final String fileName : fileNames) {
 				if (!fileName.endsWith(".txt")) {
 					continue;
 				}
-				Future<Boolean> task = executorService.submit(() -> runTestForFile(fileName));
-				futures.add(task);
+				futures.add(executorService.submit(() -> runTestForFile(fileName)));
 			}
-			for (Future<Boolean> task : futures) {
+			for (Future<?> task : futures) {
 				try {
 					task.get();
 				} catch (InterruptedException | ExecutionException e) {
@@ -62,13 +61,13 @@ public class RF2FileStructureTester {
 		}
 	}
 	
-	private boolean runTestForFile(String fileName) {
+	private void runTestForFile(String fileName) {
 		FileScan scan;
 		try (BufferedReader reader = resourceManager.getReader(fileName, StandardCharsets.UTF_8)) {
 			scan = scan(reader);
 		} catch (Exception e) {
 			validationLog.executionError("Error", "Failed to read file:" + fileName);
-			return true;
+			return;
 		}
 
 		if (scan.totalLine() == 0) {
@@ -92,7 +91,6 @@ public class RF2FileStructureTester {
 			testReport.addError(scan.totalLine() + "-0", startTime, fileName, resourceManager.getFilePath(), fileName + " ast line terminator",TEST_TYPE, null,
 					actualResult.toString(), "the last line is terminated with CR+LF",null);
 		}
-		return true;
 	}
 
 	/**
@@ -126,63 +124,76 @@ public class RF2FileStructureTester {
 	 */
 	static FileScan scan(java.io.Reader reader) throws java.io.IOException {
 		char[] buffer = new char[8192];
-		int totalLine = 0;
-		int crlfCount = 0;
-		long charsRead = 0;
-		long endOfLastCrlf = 0;
-		boolean pendingCarriageReturn = false;
-		boolean lineHasContent = false;
-		boolean firstSegmentEmpty = false;
-		String lastTerminator = "";
+		TerminatorScanner scanner = new TerminatorScanner();
 		int read;
 		while ((read = reader.read(buffer)) != -1) {
 			for (int i = 0; i < read; i++) {
-				char c = buffer[i];
-				charsRead++;
-				if (pendingCarriageReturn) {
-					pendingCarriageReturn = false;
-					if (c == '\n') {
-						totalLine++;
-						crlfCount++;
-						if (charsRead == 2) {
-							// The very first two characters, so the segment before
-							// this delimiter is empty.
-							firstSegmentEmpty = true;
-						}
-						endOfLastCrlf = charsRead;
-						lastTerminator = RF2_LINE_SEPARATOR;
-						lineHasContent = false;
-						continue;
-					}
-					// A lone CR ended that line; fall through and treat c as the
-					// first character of the next one.
-					totalLine++;
-					lastTerminator = "\r";
-					lineHasContent = false;
-				}
-				if (c == '\r') {
-					pendingCarriageReturn = true;
-				} else if (c == '\n') {
-					totalLine++;
-					lastTerminator = "\n";
-					lineHasContent = false;
-				} else {
-					lineHasContent = true;
-				}
+				scanner.accept(buffer[i]);
 			}
 		}
-		if (pendingCarriageReturn) {
+		return scanner.finish();
+	}
+
+	private static final class TerminatorScanner {
+		private int totalLine;
+		private int crlfCount;
+		private long charsRead;
+		private long endOfLastCrlf;
+		private boolean pendingCarriageReturn;
+		private boolean lineHasContent;
+		private boolean firstSegmentEmpty;
+		private String lastTerminator = "";
+
+		void accept(char c) {
+			charsRead++;
+			if (pendingCarriageReturn) {
+				pendingCarriageReturn = false;
+				if (c == '\n') {
+					endCrlfLine();
+					return;
+				}
+				// A lone CR ended that line; fall through and treat c as the
+				// first character of the next one.
+				endLine("\r");
+			}
+			if (c == '\r') {
+				pendingCarriageReturn = true;
+			} else if (c == '\n') {
+				endLine("\n");
+			} else {
+				lineHasContent = true;
+			}
+		}
+
+		private void endCrlfLine() {
+			crlfCount++;
+			if (charsRead == 2) {
+				// The very first two characters, so the segment before
+				// this delimiter is empty.
+				firstSegmentEmpty = true;
+			}
+			endOfLastCrlf = charsRead;
+			endLine(RF2_LINE_SEPARATOR);
+		}
+
+		private void endLine(String terminator) {
 			totalLine++;
-			lastTerminator = "\r";
+			lastTerminator = terminator;
 			lineHasContent = false;
 		}
-		if (lineHasContent) {
-			// A final line with no terminator at all.
-			totalLine++;
-			lastTerminator = "";
+
+		FileScan finish() {
+			if (pendingCarriageReturn) {
+				pendingCarriageReturn = false;
+				endLine("\r");
+			}
+			if (lineHasContent) {
+				// A final line with no terminator at all.
+				endLine("");
+			}
+			return new FileScan(totalLine, scannerTokens(crlfCount, charsRead, endOfLastCrlf, firstSegmentEmpty),
+					lastTerminator);
 		}
-		return new FileScan(totalLine, scannerTokens(crlfCount, charsRead, endOfLastCrlf, firstSegmentEmpty),
-				lastTerminator);
 	}
 
 	/**
