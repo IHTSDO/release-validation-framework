@@ -84,7 +84,7 @@ public class MysqlValidationService {
 			}
 			
 			// load prospective version
-			lastItemLoadAttempted = "Prospective Release - " + executionConfig.getProspectiveVersion();
+			lastItemLoadAttempted = "Prospective Release - " + (validationConfig.getLocalProspectiveFile() != null ? validationConfig.getLocalProspectiveFile().getName() : null);
 			releaseVersionLoader.loadProspectiveVersion(validationConfig.getLocalProspectiveFile(), statusReport, executionConfig, validationConfig.getStorageLocation());
 			if (releaseVersionLoader.isUnknownVersion(executionConfig.getProspectiveVersion())) {
 				statusReport.addFailureMessage("Failed to load prospective release " + executionConfig.getProspectiveVersion());
@@ -92,6 +92,11 @@ public class MysqlValidationService {
 				schemasToRemove.add(executionConfig.getProspectiveVersion());
 			}
 		} catch (Exception e) {
+			// The prospective schema is created per run (its name ends with the execution id), so a partially loaded one
+			// must be dropped too, otherwise every failed run leaves a full snapshot copy on the MySQL disk.
+			if (executionConfig.getProspectiveVersion() != null) {
+				schemasToRemove.add(executionConfig.getProspectiveVersion());
+			}
 			String errorMsg = String.format("Failed to load data (%s) into MySql", lastItemLoadAttempted);
 			String errorMsgWithCause = ExceptionUtils.getExceptionCause(errorMsg, e);
 			LOGGER.error(errorMsgWithCause, e);
@@ -138,12 +143,14 @@ public class MysqlValidationService {
 			//loading international snapshot
 			try {
 				releaseVersionLoader.combineCurrentExtensionWithDependencySnapshot(executionConfig);
-				this.schemasToRemove.add(executionConfig.getProspectiveVersion());
 			} catch (BusinessServiceException e) {
 				String errMsg = ExceptionUtils.getExceptionCause("Failed to prepare data for extension testing", e);
 				statusReport.addFailureMessage(errMsg);
 				LOGGER.error(errMsg, e);
 				statusReport.getReportSummary().put(TestType.SQL.name(), errMsg);
+			} finally {
+				// The combined schema name is set before the copy starts, so drop it even when the combine fails part way
+				this.schemasToRemove.add(executionConfig.getProspectiveVersion());
 			}
 		}
 		testItems.addAll(runAssertionTests(executionConfig, noneReleaseTypeAssertions, reportStorage));
