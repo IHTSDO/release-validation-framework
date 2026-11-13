@@ -37,6 +37,8 @@ public class AssertionExecutionService {
 	private static final String DELTA_TABLE_SUFFIX = "d";
 	private static final String SNAPSHOT_TABLE_SUFFIX = "s";
 	private static final String FULL_TABLE_SUFFIX = "f";
+	// The ENGINE table option, not a column whose name merely contains "engine"
+	private static final Pattern ENGINE_OPTION = Pattern.compile("\\bengine\\s*=", Pattern.CASE_INSENSITIVE);
 
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -204,9 +206,7 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 				}
 			}
 			else {
-				if (sqlStatement.startsWith("create table")
-					// only add engine if we do not create using a like statement
-					&& (!(sqlStatement.contains("like") || sqlStatement.contains("as")))){
+				if (needsMyIsamEngine(sqlStatement)) {
 					sqlStatement = sqlStatement + " ENGINE = MyISAM";
 				}
 				executeUpdateStatement(connection, sqlStatement);
@@ -214,6 +214,30 @@ public List<TestRunItem> executeAssertionsConcurrently(List<Assertion> assertion
 		}
 
 		return failureCount;
+	}
+
+	/**
+	 * Whether a statement needs {@code ENGINE = MyISAM} appended.
+	 *
+	 * <p>Not if it creates using a {@code like} or {@code as} form, and not if it
+	 * already has an {@code ENGINE=} option (any case, optional spaces around
+	 * {@code =}; every engine named in the assertions corpus is written so).
+	 * MySQL accepts a repeated {@code ENGINE} option and the last one wins, so
+	 * appending ours would silently override the engine the script asked for.
+	 *
+	 * <p>{@code scripts/resource/res-table-edited-concept.sql} names one -
+	 * {@code ... key idx_conceptid (conceptid)) ENGINE=MEMORY}, after raising
+	 * {@code max_heap_table_size} for it - and it is manifest-declared. Unguarded
+	 * it became {@code ... ENGINE=MEMORY ENGINE = MyISAM}, which creates
+	 * {@code res_concepts_edited} as MyISAM.
+	 *
+	 * <p>Package-private so it can be tested as the string predicate it is,
+	 * rather than through a database connection.
+	 */
+	static boolean needsMyIsamEngine(String sqlStatement) {
+		return sqlStatement.startsWith("create table")
+				&& !ENGINE_OPTION.matcher(sqlStatement).find()
+				&& !(sqlStatement.contains("like") || sqlStatement.contains("as"));
 	}
 
 
