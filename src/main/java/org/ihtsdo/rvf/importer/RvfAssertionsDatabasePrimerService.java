@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.importer;
 
 
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.service.AssertionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 
 @Service
 @ConditionalOnProperty(name = "rvf.import.assertions.on-startup", havingValue = "true")
+@ConditionalOnMysqlEngine
 public class RvfAssertionsDatabasePrimerService {
 	@Autowired
 	private AssertionsDatabaseImporter dbImporter;

@@ -41,13 +41,13 @@ public class ValidationRunner {
 	private ValidationReportService reportService;
 	
 	@Autowired
-	private ValidationVersionLoader releaseVersionLoader;
+	private ReleaseAcquisitionService releaseAcquisitionService;
 	
 	@Autowired 
 	private DroolsRulesValidationService droolsValidationService;
 	
 	@Autowired
-	private MysqlValidationService mysqlValidationService;
+	private SqlAssertionValidationService sqlAssertionValidationService;
 
 	@Autowired
 	private MRCMValidationService mrcmValidationService;
@@ -86,9 +86,9 @@ public class ValidationRunner {
 		try {
 			// Prepare to run validations
 			Calendar startTime = Calendar.getInstance();
-			releaseVersionLoader.downloadProspectiveFiles(validationConfig);
-			releaseVersionLoader.downloadPreviousRelease(validationConfig);
-			releaseVersionLoader.downloadDependencyReleases(validationConfig);
+			releaseAcquisitionService.downloadProspectiveFiles(validationConfig);
+			releaseAcquisitionService.downloadPreviousRelease(validationConfig);
+			releaseAcquisitionService.downloadDependencyReleases(validationConfig);
 
 			if (validationConfig.getLocalProspectiveFile() == null) {
 				reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
@@ -144,9 +144,9 @@ public class ValidationRunner {
 			if (!CollectionUtils.isEmpty(validationConfig.getGroupsList())) {
 				statusMessages.append("RVF assertions validation started");
 				reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
-				ValidationStatusReport mysqlValidationStatusReport = new ValidationStatusReport(validationConfig);
-				mysqlValidationStatusReport.setResultReport(new ValidationReport());
-				taskMap.put("SQL Assertions", executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
+				ValidationStatusReport sqlValidationStatusReport = new ValidationStatusReport(validationConfig);
+				sqlValidationStatusReport.setResultReport(new ValidationReport());
+				taskMap.put("SQL Assertions", executorService.submit(() -> sqlAssertionValidationService.runRF2Validations(validationConfig, sqlValidationStatusReport)));
 			}
 
 			if (validationConfig.isEnableDrools()) {
@@ -198,7 +198,18 @@ public class ValidationRunner {
 		mainResult.getAssertionsWarning().addAll(taskResult.getAssertionsWarning());
 		mainResult.getAssertionsSkipped().addAll(taskResult.getAssertionsSkipped());
 		mainResult.getAssertionsPassed().addAll(taskResult.getAssertionsPassed());
-		
+
+		// Only the SQL-assertion phase records which assertion packs it executed. Phases that
+		// recorded different packs would make the report's provenance a guess.
+		if (!taskResult.getAssertionPacks().isEmpty()) {
+			if (!mainResult.getAssertionPacks().isEmpty()
+					&& !mainResult.getAssertionPacks().equals(taskResult.getAssertionPacks())) {
+				throw new IllegalStateException("Validation phases reported different assertion packs: "
+						+ mainResult.getAssertionPacks() + " and " + taskResult.getAssertionPacks());
+			}
+			mainResult.setAssertionPacks(List.copyOf(taskResult.getAssertionPacks()));
+		}
+
 		mainResult.setTotalTestsRun(mainResult.getTotalTestsRun() + taskResult.getTotalTestsRun());
 		mainResult.setTotalFailures(mainResult.getTotalFailures() + taskResult.getTotalFailures());
 		mainResult.setTotalWarnings(mainResult.getTotalWarnings() + taskResult.getTotalWarnings());

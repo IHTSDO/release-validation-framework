@@ -1,5 +1,7 @@
 package org.ihtsdo.rvf.core.data.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +23,13 @@ public class TestRunItem implements Comparable<TestRunItem>{
 	private String failureMessage;
 	private List<FailureDetail> firstNInstances;
 	private Long extractResultInMillis;
+
+	/**
+	 * What a reader of this result needs to know that is not a failure. The DuckDB engine
+	 * records here that some of an assertion's statements were not run. Absent otherwise.
+	 */
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private String note;
 
 	/**
 	 * Empty constructor for IOC
@@ -136,6 +145,14 @@ public class TestRunItem implements Comparable<TestRunItem>{
 
 	public void setExtractResultInMillis(Long extractResultInMillis) {
 		this.extractResultInMillis = extractResultInMillis;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
 	}
 
 	@Override

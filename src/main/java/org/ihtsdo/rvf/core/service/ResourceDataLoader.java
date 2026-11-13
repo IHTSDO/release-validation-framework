@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.ihtsdo.otf.resourcemanager.ResourceManager;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.service.config.ValidationResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 @Service
+@ConditionalOnMysqlEngine
 public class ResourceDataLoader {
 	private static final String US_TO_GB_TERMS_MAP_FILENAME = "us-to-gb-preferred-terms-map.txt";
 	private static final String UTF_8 = "UTF-8";

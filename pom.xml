@@ -23,6 +23,14 @@
         <docker.image.tag>latest</docker.image.tag>
         <docker.base-image>amazoncorretto:25</docker.base-image>
         <jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
+        <!-- Same DuckDB release as the store publisher's duckdb==1.5.5 (tools/duck-publisher/requirements.txt). -->
+        <duckdb.version>1.5.5.1</duckdb.version>
+        <!-- The assertion corpus commit AssertionCorpusDigestTest's recording
+             (src/test/resources/duck/assertion-digests.tsv) was made against. -->
+        <duck.digest.corpus.ref>c3a6fb27b2193925be7bce94ec1c4b4b03c8764f</duck.digest.corpus.ref>
+        <skipTests>false</skipTests>
+        <!-- Skips the digest test's store; true with -DskipTests or -Dmaven.test.skip (profile below). -->
+        <duck.digest.store.skip>${skipTests}</duck.digest.store.skip>
     </properties>
 
     <scm>
@@ -53,6 +61,11 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.duckdb</groupId>
+            <artifactId>duckdb_jdbc</artifactId>
+            <version>${duckdb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -233,6 +246,16 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <!-- duck/store.json, generated below from the corpus checkout. -->
+            <resource>
+                <directory>${project.build.directory}/generated-resources/duck</directory>
+                <targetPath>duck</targetPath>
+            </resource>
+        </resources>
         <plugins>
             <!--
                 Add the Add-Opens to the manifest file to allow snomed-owl-toolkit to work with java 17
@@ -279,7 +302,88 @@
                             </arguments>
                         </configuration>
                     </execution>
+                    <!-- The DuckDB engine's assertion store, published from the corpus just
+                         checked out, so both engines run the same assertion commit. Needs
+                         Python 3.12. skip=false: -Dexec.skip=true skips the clone (and the
+                         test-tmpdir mkdir below), not this. -->
+                    <execution>
+                        <id>duck-assertion-store</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <executable>bash</executable>
+                            <arguments>
+                                <argument>tools/duck-publisher/build-store.sh</argument>
+                                <argument>--venv</argument>
+                                <argument>${project.build.directory}/duck-publisher-venv</argument>
+                                <argument>--corpus</argument>
+                                <argument>snomed-release-validation-assertions</argument>
+                                <argument>--ddl</argument>
+                                <argument>src/main/resources/sql/create-tables-mysql.sql</argument>
+                                <argument>--out</argument>
+                                <argument>${project.build.directory}/generated-resources/duck/store.json</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- AssertionCorpusDigestTest's store: the same publisher over a fixed
+                         corpus commit, so its recording moves with the engine and the
+                         publisher, not with every corpus commit. -->
+                    <execution>
+                        <id>duck-digest-store</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <skip>${duck.digest.store.skip}</skip>
+                            <executable>bash</executable>
+                            <arguments>
+                                <argument>tools/duck-publisher/build-store.sh</argument>
+                                <argument>--venv</argument>
+                                <argument>${project.build.directory}/duck-publisher-venv</argument>
+                                <argument>--corpus</argument>
+                                <argument>snomed-release-validation-assertions</argument>
+                                <argument>--ref</argument>
+                                <argument>${duck.digest.corpus.ref}</argument>
+                                <argument>--checkout</argument>
+                                <argument>${project.build.directory}/duck-digest/corpus</argument>
+                                <argument>--ddl</argument>
+                                <argument>src/main/resources/sql/create-tables-mysql.sql</argument>
+                                <argument>--out</argument>
+                                <argument>${project.build.directory}/duck-digest/store.json</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!-- The test JVM's java.io.tmpdir; see maven-surefire-plugin below. -->
+                    <execution>
+                        <id>test-tmpdir</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mkdir</executable>
+                            <arguments>
+                                <argument>-p</argument>
+                                <argument>${project.build.directory}/tmp</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- The DuckDB JDBC driver extracts its native library to java.io.tmpdir and
+                         loads it from there, so a host whose /tmp is mounted noexec would fail
+                         every DuckDB test. -->
+                    <argLine>-Djava.io.tmpdir=${project.build.directory}/tmp</argLine>
+                </configuration>
             </plugin>
 
             <!-- Docker Image Build -->
@@ -414,6 +518,19 @@
     </build>
 
     <profiles>
+        <!-- No tests to run, so no store for AssertionCorpusDigestTest. -->
+        <profile>
+            <id>duck-digest-store-skip</id>
+            <activation>
+                <property>
+                    <name>maven.test.skip</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <duck.digest.store.skip>true</duck.digest.store.skip>
+            </properties>
+        </profile>
         <profile>
             <id>docker-amd64</id>
             <build>
