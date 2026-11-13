@@ -385,6 +385,23 @@ public class ReleaseDataManager {
 	}
 
 	private List<String> getValidTableNamesFromSchema(String schemaName, String tableNamePattern) {
+		try {
+			return findValidTableNamesInSchema(schemaName, tableNamePattern);
+		} catch (SQLException e) {
+			logger.error(String.format("Failed to select table name from db schema: %s due to ",schemaName), e.fillInStackTrace());
+			return new ArrayList<>();
+		}
+	}
+
+	private List<String> listValidTableNamesOrFail(String schemaName, String tableNamePattern) throws BusinessServiceException {
+		try {
+			return findValidTableNamesInSchema(schemaName, tableNamePattern);
+		} catch (SQLException e) {
+			throw new BusinessServiceException("Failed to list the tables in schema " + schemaName, e);
+		}
+	}
+
+	private List<String> findValidTableNamesInSchema(String schemaName, String tableNamePattern) throws SQLException {
 		List<String> result = new ArrayList<>();
 		Collection<String> mappedTables = RF2FileTableMapper.getAllTableNames();
 		String sql = "select table_name from INFORMATION_SCHEMA.TABLES WHERE table_schema =?";
@@ -404,8 +421,6 @@ public class ReleaseDataManager {
 					result.add(tableName);
 				}
 			}
-		} catch (SQLException e) {
-			logger.error(String.format("Failed to select table name from db schema: %s due to ",schemaName), e.fillInStackTrace());
 		}
 		return result;
 	}
@@ -469,8 +484,10 @@ public class ReleaseDataManager {
 		if (!errorMsg.isEmpty()) {
 			throw new BusinessServiceException(errorMsg.toString());
 		}
-		List<String> tablesInB = getValidTableNamesFromSchema(sourceSchemaB, tableNamePattern);
-		for (String tableName : getValidTableNamesFromSchema(sourceSchemaA, tableNamePattern)) {
+		// An empty list for either schema would silently copy every table from the other alone.
+		List<String> tablesInA = listValidTableNamesOrFail(sourceSchemaA, tableNamePattern);
+		List<String> tablesInB = listValidTableNamesOrFail(sourceSchemaB, tableNamePattern);
+		for (String tableName : tablesInA) {
 			if (excludeTableNames != null && excludeTableNames.contains(tableName)) {
 				continue;
 			}

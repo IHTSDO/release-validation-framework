@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.core.service;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.configuration.IntegrationTest;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.junit.jupiter.api.AfterEach;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * The merge paths that combine schemas - extension with dependency, delta into
@@ -83,6 +85,26 @@ class ReleaseDataManagerMergeIntegrationTest extends IntegrationTest {
 		releaseDataManager.copyTableData(dependency, extension, combined, "%_s", null);
 
 		assertEquals(List.of("C 20210131 1"), identifiers(combined, "identifier_s"));
+	}
+
+	/**
+	 * A schema whose tables cannot be listed must fail the merge rather than be
+	 * treated as empty, which would copy every table from the other schema alone.
+	 */
+	@Test
+	void mergeFailsWhenEitherSchemasTablesCannotBeListed() throws Exception {
+		String unreachable = "rvf_merge_unreachable";
+		releaseDataManager.getAllKnownReleases().add(unreachable);
+		schemas.add(unreachable);
+		String reachable = schema("merge_reachable");
+		String combined = schema("merge_combined");
+		insertLanguageRefset(reachable, "langrefset_s", "22222222-2222-2222-2222-222222222222");
+
+		assertThrows(BusinessServiceException.class,
+				() -> releaseDataManager.copyTableData(unreachable, reachable, combined, "%_s", null));
+		assertThrows(BusinessServiceException.class,
+				() -> releaseDataManager.copyTableData(reachable, unreachable, combined, "%_s", null));
+		assertEquals(0, count(combined, "langrefset_s"));
 	}
 
 	/**
