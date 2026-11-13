@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.core.service;
 
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.repository.AssertionGroupRepository;
 import org.ihtsdo.rvf.core.data.repository.AssertionRepository;
 import org.ihtsdo.rvf.core.data.repository.AssertionTestRepository;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @Service
 @Transactional
+@ConditionalOnMysqlEngine
 public class AssertionServiceImpl implements AssertionService {
 
 	@Autowired

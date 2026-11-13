@@ -4,6 +4,7 @@ package org.ihtsdo.rvf.core.service;
 import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.otf.utils.ExceptionUtils;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
@@ -23,7 +24,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Service
-public class MysqlValidationService {
+@ConditionalOnMysqlEngine
+public class MysqlValidationService implements SqlAssertionValidationService {
 
 	public static final String START_EXECUTING_ASSERTIONS = "Start executing assertions...";
 	@Autowired
@@ -45,6 +47,9 @@ public class MysqlValidationService {
 	private ValidationVersionLoader releaseVersionLoader;
 
 	@Autowired
+	private ReleaseAcquisitionService releaseAcquisitionService;
+
+	@Autowired
 	private ReleaseDataManager releaseDataManager;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MysqlValidationService.class);
@@ -55,7 +60,8 @@ public class MysqlValidationService {
 	
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-	public ValidationStatusReport runRF2MysqlValidations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
+	@Override
+	public ValidationStatusReport runRF2Validations(ValidationRunConfig validationConfig, ValidationStatusReport statusReport) throws BusinessServiceException, ExecutionException, InterruptedException {
 		// Clean up the prospective databases if any
 		for (String legacyVersion : this.schemasToRemove) {
 			this.releaseDataManager.dropSchema(legacyVersion);
@@ -63,7 +69,7 @@ public class MysqlValidationService {
 		this.schemasToRemove.clear();
 		this.releaseDataManager.truncateQAResult();
 
-		MysqlExecutionConfig executionConfig = releaseVersionLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseAcquisitionService.createExecutionConfig(validationConfig);
 		String reportStorage = validationConfig.getStorageLocation();
 		String lastItemLoadAttempted = "Item Unknown";
 		try {

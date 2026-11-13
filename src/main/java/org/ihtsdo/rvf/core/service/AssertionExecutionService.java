@@ -2,6 +2,7 @@ package org.ihtsdo.rvf.core.service;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.otf.RF2Constants;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.*;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 
 
 @Service
+@ConditionalOnMysqlEngine
 public class AssertionExecutionService {
 
 	private static final String FAILED_TO_FIND_RVF_DB_SCHEMA = "Failed to find rvf db schema for ";

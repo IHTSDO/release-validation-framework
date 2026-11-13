@@ -1,5 +1,6 @@
 package org.ihtsdo.rvf.importer;
 
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.service.AssertionService;
@@ -57,6 +58,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@ConditionalOnMysqlEngine
 public class AssertionGroupImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AssertionGroupImporter.class);
@@ -93,6 +95,47 @@ public class AssertionGroupImporter {
         loadPoliciesConfiguration(policiesInputStream);
         loadGroupsConfiguration(groupsInputStream);
         importAssertionGroupsCore();
+    }
+
+    /**
+     * Resolves group membership from the packaged XML alone, touching no database.
+     *
+     * <p>{@link #importAssertionGroups} applies exactly these rules and then writes the result
+     * through {@link AssertionService}; this returns it instead. Anything that executes
+     * assertions without RVF's assertion tables still has to know which assertions a named
+     * group selects, and the decision is otherwise only observable as a database side effect.
+     *
+     * <p>Static, and evaluated on an instance of its own, so it neither needs this bean nor
+     * shares the per-import state of the one that exists.
+     *
+     * @param groupsInputStream {@link AssertionGroupingXml#GROUPS_RESOURCE_FILENAME} content
+     * @param policiesInputStream {@link AssertionGroupingXml#POLICIES_RESOURCE_FILENAME} content
+     * @return assertion UUID to the names of the groups containing it, in {@code assertions} order
+     * @throws IllegalStateException if no group definitions are found, as on import
+     */
+    public static Map<String, Set<String>> resolveGroups(InputStream groupsInputStream,
+            InputStream policiesInputStream, Collection<Assertion> assertions) {
+        AssertionGroupImporter rules = new AssertionGroupImporter(null);
+        rules.manifestPolicyUuids = new HashMap<>();
+        rules.manifestPolicyTextPhrases = new HashMap<>();
+        rules.manifestPolicyCategoryCentrePairs = new HashMap<>();
+        rules.loadPoliciesConfiguration(policiesInputStream);
+        rules.loadGroupsConfiguration(groupsInputStream);
+        if (rules.manifestGroupElements.isEmpty()) {
+            throw new IllegalStateException(AssertionGroupingXml.GROUPS_RESOURCE_FILENAME
+                    + " must define <assertionGroupingStrategy> with one or more <group> elements.");
+        }
+        Map<String, Set<String>> groupsByAssertion = new LinkedHashMap<>();
+        for (Assertion assertion : assertions) {
+            Set<String> groups = new LinkedHashSet<>();
+            for (Element group : rules.manifestGroupElements) {
+                if (rules.assertionMatchesGroupRule(assertion, group)) {
+                    groups.add(group.getAttributeValue(AssertionGroupingXml.ATTR_NAME));
+                }
+            }
+            groupsByAssertion.put(assertion.getUuid().toString(), groups);
+        }
+        return groupsByAssertion;
     }
 
     private SAXBuilder createSecureSaxBuilder() {
