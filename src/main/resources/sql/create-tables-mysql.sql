@@ -424,15 +424,15 @@ create table attributevaluemap_f(
     moduleid bigint(20) not null,
     refsetid bigint(20) not null,
     referencedcomponentid bigint(20) not null,
-    maptarget varchar(32) not null,
-    value varchar(32) not null,
+    maptype varchar(32) not null,
+    targetsnomedctsubstance varchar(32) not null,
     key idx_id(id),
     key idx_effectivetime(effectivetime),
     key idx_active(active),
     key idx_moduleid(moduleid),
     key idx_refsetid(refsetid),
     key idx_referencedcomponentid(referencedcomponentid),
-    key idx_maptarget(maptarget)
+    key idx_maptype(maptype)
 ) engine=myisam default charset=utf8;
 
 drop table if exists extendedassociation_f;
@@ -443,16 +443,16 @@ create table extendedassociation_f(
     moduleid bigint(20) not null,
     refsetid bigint(20) not null,
     referencedcomponentid bigint(20) not null,
-    targetcomponentid bigint(20) not null,
-    value varchar(32) not null,
+    targetadministeredform bigint(20) not null,
+    targetmanufacturedform varchar(32) not null,
     key idx_id(id),
     key idx_effectivetime(effectivetime),
     key idx_active(active),
     key idx_moduleid(moduleid),
     key idx_refsetid(refsetid),
     key idx_referencedcomponentid(referencedcomponentid),
-    key idx_targetcomponentid(targetcomponentid),
-    key idx_value(value)
+    key idx_targetadministeredform(targetadministeredform),
+    key idx_targetmanufacturedform(targetmanufacturedform)
 ) engine=myisam default charset=utf8;
 
 drop table if exists identifier_f;
@@ -896,15 +896,15 @@ create table attributevaluemap_s(
     moduleid bigint(20) not null,
     refsetid bigint(20) not null,
     referencedcomponentid bigint(20) not null,
-    maptarget varchar(32) not null,
-    value varchar(32) not null,
+    maptype varchar(32) not null,
+    targetsnomedctsubstance varchar(32) not null,
     key idx_id(id),
     key idx_effectivetime(effectivetime),
     key idx_active(active),
     key idx_moduleid(moduleid),
     key idx_refsetid(refsetid),
     key idx_referencedcomponentid(referencedcomponentid),
-    key idx_maptarget(maptarget)
+    key idx_maptype(maptype)
 ) engine=myisam default charset=utf8;
 
 drop table if exists extendedassociation_s;
@@ -915,16 +915,16 @@ create table extendedassociation_s(
     moduleid bigint(20) not null,
     refsetid bigint(20) not null,
     referencedcomponentid bigint(20) not null,
-    targetcomponentid bigint(20) not null,
-    value varchar(32) not null,
+    targetadministeredform bigint(20) not null,
+    targetmanufacturedform varchar(32) not null,
     key idx_id(id),
     key idx_effectivetime(effectivetime),
     key idx_active(active),
     key idx_moduleid(moduleid),
     key idx_refsetid(refsetid),
     key idx_referencedcomponentid(referencedcomponentid),
-    key idx_targetcomponentid(targetcomponentid),
-    key idx_value(value)
+    key idx_targetadministeredform(targetadministeredform),
+    key idx_targetmanufacturedform(targetmanufacturedform)
 ) engine=myisam default charset=utf8;
 
 drop table if exists identifier_s;
@@ -1569,15 +1569,15 @@ create table attributevaluemap_d(
     moduleid bigint(20) not null,
     refsetid bigint(20) not null,
     referencedcomponentid bigint(20) not null,
-    maptarget varchar(32) not null,
-    value varchar(32) not null,
+    maptype varchar(32) not null,
+    targetsnomedctsubstance varchar(32) not null,
     key idx_id(id),
     key idx_effectivetime(effectivetime),
     key idx_active(active),
     key idx_moduleid(moduleid),
     key idx_refsetid(refsetid),
     key idx_referencedcomponentid(referencedcomponentid),
-    key idx_maptarget(maptarget)
+    key idx_maptype(maptype)
 ) engine=myisam default charset=utf8;
 
 drop table if exists extendedassociation_d;
@@ -1588,16 +1588,16 @@ create table extendedassociation_d(
     moduleid bigint(20) not null,
     refsetid bigint(20) not null,
     referencedcomponentid bigint(20) not null,
-    targetcomponentid bigint(20) not null,
-    value varchar(32) not null,
+    targetadministeredform bigint(20) not null,
+    targetmanufacturedform varchar(32) not null,
     key idx_id(id),
     key idx_effectivetime(effectivetime),
     key idx_active(active),
     key idx_moduleid(moduleid),
     key idx_refsetid(refsetid),
     key idx_referencedcomponentid(referencedcomponentid),
-    key idx_targetcomponentid(targetcomponentid),
-    key idx_value(value)
+    key idx_targetadministeredform(targetadministeredform),
+    key idx_targetmanufacturedform(targetmanufacturedform)
 ) engine=myisam default charset=utf8;
 
 drop table if exists identifier_d;

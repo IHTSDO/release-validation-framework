@@ -105,4 +105,43 @@ class ReleaseDataManagerIntegrationTest extends IntegrationTest {
 			FileUtils.deleteQuietly(dir);
 		}
 	}
+
+	/**
+	 * The columns follow the headers of the SNOMED CT-AU files these tables were added for.
+	 */
+	@Test
+	public void testExtendedAssociationAndAttributeValueMapAreLoadedIntoNamedColumns() throws Exception {
+		File dir = Files.createTempDirectory("rvf-au-refsets").toFile();
+		File zip = new File(dir, "SnomedCT_RefsetTest_AU1000036_20260930.zip");
+		String root = "SnomedCT_RefsetTest_AU1000036_20260930/Snapshot/Refset/";
+		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zip))) {
+			out.putNextEntry(new ZipEntry(root + "Content/der2_ccRefset_ExtendedAssociationSnapshot_AU1000036_20260930.txt"));
+			out.write(("id\teffectiveTime\tactive\tmoduleId\trefsetId\treferencedComponentId\ttargetAdministeredForm\ttargetManufacturedForm\r\n"
+					+ "11111111-1111-1111-1111-111111111111\t20260930\t1\t32506021000036107\t810501000168103\t21000168102\t31000168104\t41000168107\r\n").getBytes(StandardCharsets.UTF_8));
+			out.closeEntry();
+			out.putNextEntry(new ZipEntry(root + "Map/der2_csRefset_AttributeValueMapSnapshot_AU1000036_20260930.txt"));
+			out.write(("id\teffectiveTime\tactive\tmoduleId\trefsetId\treferencedComponentId\tmapType\ttargetSnomedCtSubstance\r\n"
+					+ "22222222-2222-2222-2222-222222222222\t20260930\t1\t32506021000036107\t281000036105\t51000168100\t291000036107\t10020007\r\n").getBytes(StandardCharsets.UTF_8));
+			out.closeEntry();
+		}
+		String schemaName = releaseDataManager.loadSnomedData("au_refset_load_test", new ArrayList<>(), Collections.emptyList(), zip);
+		try (Connection connection = dataSource.getConnection();
+			 Statement statement = connection.createStatement()) {
+			try (ResultSet resultSet = statement.executeQuery("select targetadministeredform, targetmanufacturedform from "
+					+ schemaName + ".extendedassociation_s")) {
+				assertTrue(resultSet.next(), "the ExtendedAssociation row must be loaded");
+				assertEquals("31000168104", resultSet.getString(1));
+				assertEquals("41000168107", resultSet.getString(2));
+			}
+			try (ResultSet resultSet = statement.executeQuery("select maptype, targetsnomedctsubstance from "
+					+ schemaName + ".attributevaluemap_s")) {
+				assertTrue(resultSet.next(), "the AttributeValueMap row must be loaded");
+				assertEquals("291000036107", resultSet.getString(1));
+				assertEquals("10020007", resultSet.getString(2));
+			}
+		} finally {
+			releaseDataManager.dropSchema(schemaName);
+			FileUtils.deleteQuietly(dir);
+		}
+	}
 }
