@@ -1,11 +1,13 @@
 package org.ihtsdo.rvf.core.service;
 
+import org.ihtsdo.rvf.core.service.util.MyIsamIndexHelper;
 import org.ihtsdo.rvf.core.service.util.MySqlDataTypeConverter;
 import org.ihtsdo.rvf.core.service.util.RF2FileTableMapper;
 import org.ihtsdo.snomed.util.rf2.schema.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -23,6 +25,9 @@ import java.util.concurrent.Future;
 public class ReleaseFileDataLoader {
 
 	private static final int MAX_THREAD_POOL_SIZE = 100;
+	private static final long MIN_BULK_INSERT_BUFFER_BYTES = 8L * 1024 * 1024;
+	private static final long MIN_SORT_BUFFER_BYTES = 64L * 1024 * 1024;
+	private static final long MAX_LOAD_BUFFER_BYTES = 256L * 1024 * 1024;
 	public static final String TERM = "term";
 	private final MySqlDataTypeConverter dataTypeConverter;
 	private Connection connection;
@@ -59,9 +64,15 @@ public class ReleaseFileDataLoader {
 					continue;
 				}
 				final Future<String> future = executorService.submit(() -> {
-					final String configStr = "SET bulk_insert_buffer_size= 1024 * 1024 * 256;";
+					final File rf2File = new File(rf2TextFileRootPath, rf2FileName);
+					final long bulkInsertBuffer = bufferSize(rf2File.length(), MIN_BULK_INSERT_BUFFER_BYTES);
+					// Sort buffer must be large enough that ENABLE KEYS repairs by sort.
+					// The 8MB default falls back to the shared key cache, which fails a
+					// 25MB file when other tables are rebuilding indexes at the same time.
+					final long sortBuffer = bufferSize(rf2File.length(), MIN_SORT_BUFFER_BYTES);
+					final String configStr = "SET SESSION bulk_insert_buffer_size = " + bulkInsertBuffer
+							+ ", SESSION myisam_sort_buffer_size = " + sortBuffer;
 					final String disableIndex = "ALTER TABLE " + rvfTableName + " DISABLE KEYS;";
-					final String enableIndex = "ALTER TABLE " + rvfTableName + " ENABLE KEYS;";
 					final String loadFile = "load data local infile '" + rf2TextFileRootPath + "/" + rf2FileName + "' into table " + rvfTableName
 							+ " columns terminated by '\\t' "
 							+ " lines terminated by '\\r\\n' "
@@ -73,7 +84,7 @@ public class ReleaseFileDataLoader {
 						statement.execute(configStr);
 						statement.execute(disableIndex);
 						statement.execute(loadFile);
-						statement.execute(enableIndex);
+						MyIsamIndexHelper.enableKeys(statement, rvfTableName);
 					}
 					return rf2FileName;
 				});
@@ -91,6 +102,10 @@ public class ReleaseFileDataLoader {
 			final long end = System.currentTimeMillis();
 			LOGGER.info("Time taken to load in seconds " + (end - start) / 1000);
 		}
+	}
+
+	private static long bufferSize(long fileBytes, long minimumBytes) {
+		return Math.min(Math.max(fileBytes, minimumBytes), MAX_LOAD_BUFFER_BYTES);
 	}
 
 	private String createTable(final TableSchema tableSchema) throws SQLException {

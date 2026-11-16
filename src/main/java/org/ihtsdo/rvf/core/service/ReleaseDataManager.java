@@ -13,6 +13,7 @@ import org.ihtsdo.otf.utils.ZipFileUtils;
 import org.ihtsdo.rvf.core.service.config.MysqlExecutionConfig;
 import org.ihtsdo.rvf.core.service.config.Rf2FilenameEditionConfig;
 import org.ihtsdo.rvf.core.service.config.ValidationMysqlBinaryStorageConfig;
+import org.ihtsdo.rvf.core.service.util.MyIsamIndexHelper;
 import org.ihtsdo.rvf.core.service.util.MySqlDataTypeConverter;
 import org.ihtsdo.rvf.core.service.util.RF2FileTableMapper;
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ public class ReleaseDataManager {
 	public static final String INSERT_INTO = "INSERT INTO ";
 	private static final String SQL_A_WHERE_EXISTS = " a where exists ( select 1 from ";
 	private static final String SQL_B_WHERE = " b where ";
+	private static final String PREPARE_MYISAM_KEY_REBUILD = "SET SESSION myisam_sort_buffer_size = 268435456";
 	private static final String IDENTIFIER_TABLE_PREFIX = "identifier_";
 
 	@Value("${rvf.data.folder.location}")
@@ -343,7 +345,6 @@ public class ReleaseDataManager {
 	 */
 	private void copyData(String tableName, String sourceSchemaA, String sourceSchemaB, String targetSchema) throws BusinessServiceException {
 		final String disableIndex = SQL_ALTER_TABLE + tableName + " DISABLE KEYS";
-		final String enableIndex = SQL_ALTER_TABLE + tableName + " ENABLE KEYS";
 		String selectAFrom = "select a.* from ";
 		String selectDataFromASql = selectAFrom + sourceSchemaA + "." + tableName + " a where not exists ( select 1 from " + sourceSchemaB + "."
 				+ tableName + " c where " + keyMatch(tableName, "a", "c") + ")";
@@ -359,31 +360,38 @@ public class ReleaseDataManager {
 		logger.debug("Copying table {}", tableName);
 		try (Connection connection = rvfDynamicDataSource.getConnection(targetSchema);
 			Statement statement = connection.createStatement() ) {
+			statement.execute(PREPARE_MYISAM_KEY_REBUILD);
 			statement.execute(disableIndex);
 			statement.execute(insertSql + selectDataFromASql);
 			statement.execute(insertSql + selectDataFromBSql);
 			statement.execute(insertSql + latestDataFromASelectSql);
 			statement.execute(insertSql + latestDataFromBSelectSql);
-			statement.execute(enableIndex);
+			MyIsamIndexHelper.enableKeys(statement, tableName);
 		} catch (final SQLException e) {
 			throw new BusinessServiceException("Failed to insert data to table: " + tableName, e);
+		} catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new BusinessServiceException("Interrupted while rebuilding indexes for table: " + tableName, e);
 		}
 	}
 
 	private void copyData(String tableName, String sourceSchema, String targetSchema) throws BusinessServiceException {
 		final String disableIndex = SQL_ALTER_TABLE + tableName + " DISABLE KEYS";
-		final String enableIndex = SQL_ALTER_TABLE + tableName + " ENABLE KEYS";
 		final String sql = "insert into " + targetSchema + "." + tableName  + SQL_SELECT + sourceSchema + "." + tableName;
 		logger.debug("Copying table {} with sql {} ", tableName, sql);
 		try (Connection connection = rvfDynamicDataSource.getConnection(targetSchema);
 			Statement statement = connection.createStatement() ) {
+			statement.execute(PREPARE_MYISAM_KEY_REBUILD);
 			statement.execute(disableIndex);
 			statement.execute(sql);
-			statement.execute(enableIndex);
+			MyIsamIndexHelper.enableKeys(statement, tableName);
 		} catch (final SQLException e) {
 			String msg = "Failed to insert data to table: " + tableName;
 			throw new BusinessServiceException(msg, e);
-		}		
+		} catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new BusinessServiceException("Interrupted while rebuilding indexes for table: " + tableName, e);
+		}
 	}
 
 	private List<String> getValidTableNamesFromSchema(String schemaName, String tableNamePattern) {
@@ -451,7 +459,7 @@ public class ReleaseDataManager {
 				tableNamePattern, sourceVersion, destinationVersion, (endTime-startTime)/1000);
 	}
 
-	public void updateSnapshotTableWithDataFromDelta(String schema) {
+	public void updateSnapshotTableWithDataFromDelta(String schema) throws BusinessServiceException {
 		List<String> deltaTableNames = getValidTableNamesFromSchema(schema, "%_d");
 		for (String deltaTbl : deltaTableNames) {
 			String snapshotTbl = deltaTbl.replace("_d", "_s");
@@ -464,7 +472,8 @@ public class ReleaseDataManager {
 				statement.execute(deleteSql);
 				statement.execute(insertSql);
 			} catch (final SQLException e) {
-				logger.error("Failed to update table {} with data from {}  due to {} ", snapshotTbl, deltaTbl, e.getMessage(), e);
+				// Fail the run here rather than letting every assertion that reads this table fail later
+				throw new BusinessServiceException("Failed to update table " + snapshotTbl + " with data from " + deltaTbl, e);
 			}
 		}
 		
