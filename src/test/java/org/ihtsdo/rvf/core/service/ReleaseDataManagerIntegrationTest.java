@@ -32,7 +32,7 @@ class ReleaseDataManagerIntegrationTest extends IntegrationTest {
 	private ReleaseDataManager releaseDataManager;
 
 	@Test
-	public void testLoadSctData() throws Exception {
+	void testLoadSctData() throws Exception {
 		assert dataSource != null;
 
 		URL url = getClass().getResource("/SnomedCT_Release_INT_20140131.zip");
@@ -59,7 +59,7 @@ class ReleaseDataManagerIntegrationTest extends IntegrationTest {
 	}
 
 	@org.junit.jupiter.api.Test
-	public void testUploadSctData() throws Exception {
+	void testUploadSctData() throws Exception {
 		assert dataSource != null;
 		URL url = getClass().getResource("/SnomedCT_Release_INT_20140131.zip");
 		assertNotNull(url);
@@ -79,7 +79,7 @@ class ReleaseDataManagerIntegrationTest extends IntegrationTest {
 	 * alternateIdentifier, effectiveTime, active, moduleId, identifierSchemeId, referencedComponentId.
 	 */
 	@Test
-	public void testIdentifierFileIsLoadedIntoItsColumns() throws Exception {
+	void testIdentifierFileIsLoadedIntoItsColumns() throws Exception {
 		File dir = Files.createTempDirectory("rvf-identifier").toFile();
 		File zip = new File(dir, "SnomedCT_IdentifierTest_INT_20250131.zip");
 		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zip))) {
@@ -110,7 +110,7 @@ class ReleaseDataManagerIntegrationTest extends IntegrationTest {
 	 * The columns follow the headers of the SNOMED CT-AU files these tables were added for.
 	 */
 	@Test
-	public void testExtendedAssociationAndAttributeValueMapAreLoadedIntoNamedColumns() throws Exception {
+	void testExtendedAssociationAndAttributeValueMapAreLoadedIntoNamedColumns() throws Exception {
 		File dir = Files.createTempDirectory("rvf-au-refsets").toFile();
 		File zip = new File(dir, "SnomedCT_RefsetTest_AU1000036_20260930.zip");
 		String root = "SnomedCT_RefsetTest_AU1000036_20260930/Snapshot/Refset/";

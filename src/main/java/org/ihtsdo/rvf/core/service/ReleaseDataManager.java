@@ -45,10 +45,12 @@ public class ReleaseDataManager {
 	private static final String ZIP_FILE_EXTENSION = ".zip";
 	public static final String RECEIVING_RELEASE_DATA_INFO_MSG = "Receiving release data - {}";
 	public static final String RELEASE_FILE_COPIED_TO_INFO_MSG = "Release file copied to : {}";
-	public static final String COPY_RELEASE_FILE_WARNING_MSG = "Error copying release file to %s. Nested exception is : \n";
+	public static final String COPY_RELEASE_FILE_WARNING_MSG = "Error copying release file to {}. Nested exception is : \n";
 	public static final String SQL_SELECT = " SELECT * FROM ";
 	public static final String SQL_ALTER_TABLE = "ALTER TABLE ";
 	public static final String INSERT_INTO = "INSERT INTO ";
+	private static final String SQL_A_WHERE_EXISTS = " a where exists ( select 1 from ";
+	private static final String SQL_B_WHERE = " b where ";
 	private static final String IDENTIFIER_TABLE_PREFIX = "identifier_";
 
 	@Value("${rvf.data.folder.location}")
@@ -144,7 +146,7 @@ public class ReleaseDataManager {
 			IOUtils.copy(inputStream, out);
 			logger.info(RELEASE_FILE_COPIED_TO_INFO_MSG, fileDestination.getAbsolutePath());
 		} catch (final IOException e) {
-			logger.warn(String.format(COPY_RELEASE_FILE_WARNING_MSG, sctDataFolder), e.fillInStackTrace());
+			logger.warn(COPY_RELEASE_FILE_WARNING_MSG, sctDataFolder, e);
 			return false;
 			
 		} finally {
@@ -171,7 +173,7 @@ public class ReleaseDataManager {
 			IOUtils.copy(inputStream, out);
 			logger.info(RELEASE_FILE_COPIED_TO_INFO_MSG, fileDestination.getAbsolutePath());
 		} catch (final IOException e) {
-			logger.warn(String.format(COPY_RELEASE_FILE_WARNING_MSG, sctDataFolder), e.fillInStackTrace());
+			logger.warn(COPY_RELEASE_FILE_WARNING_MSG, sctDataFolder, e);
 			return false;
 			
 		} finally {
@@ -306,7 +308,7 @@ public class ReleaseDataManager {
 			createSchema(combinedVersionName);
 		} catch (Exception e) {
 			isFailed = true;
-			logger.error(String.format("Failed to create db schema and tables for version: %s due to ", combinedVersionName), e.fillInStackTrace());
+			logger.error("Failed to create db schema and tables for version: {} due to ", combinedVersionName, e);
 		}
 		//select data from known version schema and insert into the new schema
 		for (String knownSchema : knownVersions) {
@@ -345,13 +347,13 @@ public class ReleaseDataManager {
 		String selectAFrom = "select a.* from ";
 		String selectDataFromASql = selectAFrom + sourceSchemaA + "." + tableName + " a where not exists ( select 1 from " + sourceSchemaB + "."
 				+ tableName + " c where " + keyMatch(tableName, "a", "c") + ")";
-		String latestDataFromASelectSql = selectAFrom + sourceSchemaA + "." + tableName + " a where exists ( select 1 from " + sourceSchemaB + "." + tableName
-					+ " b where " + keyMatch(tableName, "a", "b") + " and cast(a.effectivetime as datetime) >= cast(b.effectivetime as datetime))";
+		String latestDataFromASelectSql = selectAFrom + sourceSchemaA + "." + tableName + SQL_A_WHERE_EXISTS + sourceSchemaB + "." + tableName
+					+ SQL_B_WHERE + keyMatch(tableName, "a", "b") + " and cast(a.effectivetime as datetime) >= cast(b.effectivetime as datetime))";
 		
 		String selectDataFromBSql = selectAFrom + sourceSchemaB + "." + tableName + " a where not exists ( select 1 from " + sourceSchemaA + "."
 				+ tableName + " c where " + keyMatch(tableName, "a", "c") + ")";
-		String latestDataFromBSelectSql = selectAFrom + sourceSchemaB + "." + tableName + " a where exists ( select 1 from " + sourceSchemaA + "." + tableName
-					+ " b where " + keyMatch(tableName, "a", "b") + " and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime))";
+		String latestDataFromBSelectSql = selectAFrom + sourceSchemaB + "." + tableName + SQL_A_WHERE_EXISTS + sourceSchemaA + "." + tableName
+					+ SQL_B_WHERE + keyMatch(tableName, "a", "b") + " and cast(a.effectivetime as datetime) > cast(b.effectivetime as datetime))";
 		
 		final String insertSql = INSERT_INTO + targetSchema + "." + tableName  + " ";
 		logger.debug("Copying table {}", tableName);
@@ -388,7 +390,7 @@ public class ReleaseDataManager {
 		try {
 			return findValidTableNamesInSchema(schemaName, tableNamePattern);
 		} catch (SQLException e) {
-			logger.error(String.format("Failed to select table name from db schema: %s due to ",schemaName), e.fillInStackTrace());
+			logger.error("Failed to select table name from db schema: {} due to ", schemaName, e);
 			return new ArrayList<>();
 		}
 	}
@@ -455,7 +457,7 @@ public class ReleaseDataManager {
 			String snapshotTbl = deltaTbl.replace("_d", "_s");
 			try (Connection connection = rvfDynamicDataSource.getConnection(schema);
 					Statement statement = connection.createStatement() ) {
-				final String deleteSql = "delete a.* from " + schema + "." + snapshotTbl + " a where exists ( select 1 from " + schema + "." + deltaTbl + " b where " + keyMatch(deltaTbl, "a", "b") + ")";
+				final String deleteSql = "delete a.* from " + schema + "." + snapshotTbl + SQL_A_WHERE_EXISTS + schema + "." + deltaTbl + SQL_B_WHERE + keyMatch(deltaTbl, "a", "b") + ")";
 				logger.debug("Delete data from snapshot table sql: {}", deleteSql);
 				final String insertSql = "insert into " + schema + "." + snapshotTbl  + SQL_SELECT + schema + "." + deltaTbl;
 				logger.debug("Insert delta into snapshot table sql: {}", insertSql);
@@ -653,7 +655,7 @@ public class ReleaseDataManager {
 			logger.info(RELEASE_FILE_COPIED_TO_INFO_MSG, fileDestination.getAbsolutePath());
 			return fileDestination;
 		} catch (final IOException e) {
-			logger.warn(String.format(COPY_RELEASE_FILE_WARNING_MSG, sctDataFolder), e.fillInStackTrace());
+			logger.warn(COPY_RELEASE_FILE_WARNING_MSG, sctDataFolder, e);
 			return null;
 		} finally {
 			IOUtils.closeQuietly(input, null);
@@ -767,12 +769,13 @@ public class ReleaseDataManager {
 		StringBuilder insertSQL;
 		for (String snapshotTable : snapShotTables) {
 			String fullTable = snapshotTable.replaceAll("_s$", "_f");
+			String deltaTable = snapshotTable.replaceAll("_s$", "_d");
 			if (!tableExists(connection, dependencyVersion, fullTable)) {
-				logger.info("Dependency schema {} has no table {}, so there are no dependency rows to add to {}", dependencyVersion, fullTable, snapshotTable.replaceAll("_s$", "_d"));
+				logger.info("Dependency schema {} has no table {}, so there are no dependency rows to add to {}", dependencyVersion, fullTable, deltaTable);
 				continue;
 			}
 			insertSQL = new StringBuilder();
-			insertSQL.append(INSERT_INTO).append(snapshotTable.replaceAll("_s$", "_d"))
+			insertSQL.append(INSERT_INTO).append(deltaTable)
 					.append(SQL_SELECT).append(dependencyVersion).append(".").append(fullTable).append(" a");
 			if (previousDependencyEffectiveTime != null) {
 				insertSQL.append(" WHERE cast(a.effectivetime as datetime) > cast('").append(previousDependencyEffectiveTime).append("' as datetime)");
