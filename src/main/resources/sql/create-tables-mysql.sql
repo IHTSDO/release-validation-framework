@@ -455,6 +455,50 @@ create table extendedassociation_f(
     key idx_targetmanufacturedform(targetmanufacturedform)
 ) engine=myisam default charset=utf8;
 
+drop table if exists componentannotationstringvaluerefset_f;
+create table componentannotationstringvaluerefset_f(
+    id varchar(36) not null,
+    effectivetime char(8) not null,
+    active char(1) not null,
+    moduleid bigint(20) not null,
+    refsetid bigint(20) not null,
+    referencedcomponentid bigint(20) not null,
+    languagedialectcode varchar(255) not null,
+    typeid bigint(20) not null,
+    value text not null,
+    key idx_id(id),
+    key idx_effectivetime(effectivetime),
+    key idx_active(active),
+    key idx_moduleid(moduleid),
+    key idx_refsetid(refsetid),
+    key idx_referencedcomponentid(referencedcomponentid),
+    key idx_languagedialectcode(languagedialectcode),
+    key idx_typeid(typeid)
+) engine=myisam default charset=utf8;
+
+drop table if exists memberannotationstringvaluerefset_f;
+create table memberannotationstringvaluerefset_f(
+    id varchar(36) not null,
+    effectivetime char(8) not null,
+    active char(1) not null,
+    moduleid bigint(20) not null,
+    refsetid bigint(20) not null,
+    referencedcomponentid bigint(20) not null,
+    referencedmemberid varchar(36) not null,
+    languagedialectcode varchar(255) not null,
+    typeid bigint(20) not null,
+    value text not null,
+    key idx_id(id),
+    key idx_effectivetime(effectivetime),
+    key idx_active(active),
+    key idx_moduleid(moduleid),
+    key idx_refsetid(refsetid),
+    key idx_referencedcomponentid(referencedcomponentid),
+    key idx_referencedmemberid(referencedmemberid),
+    key idx_languagedialectcode(languagedialectcode),
+    key idx_typeid(typeid)
+) engine=myisam default charset=utf8;
+
 drop table if exists identifier_f;
 create table identifier_f(
   alternateidentifier varchar(36) not null,
@@ -925,6 +969,50 @@ create table extendedassociation_s(
     key idx_referencedcomponentid(referencedcomponentid),
     key idx_targetadministeredform(targetadministeredform),
     key idx_targetmanufacturedform(targetmanufacturedform)
+) engine=myisam default charset=utf8;
+
+drop table if exists componentannotationstringvaluerefset_s;
+create table componentannotationstringvaluerefset_s(
+    id varchar(36) not null,
+    effectivetime char(8) not null,
+    active char(1) not null,
+    moduleid bigint(20) not null,
+    refsetid bigint(20) not null,
+    referencedcomponentid bigint(20) not null,
+    languagedialectcode varchar(255) not null,
+    typeid bigint(20) not null,
+    value text not null,
+    key idx_id(id),
+    key idx_effectivetime(effectivetime),
+    key idx_active(active),
+    key idx_moduleid(moduleid),
+    key idx_refsetid(refsetid),
+    key idx_referencedcomponentid(referencedcomponentid),
+    key idx_languagedialectcode(languagedialectcode),
+    key idx_typeid(typeid)
+) engine=myisam default charset=utf8;
+
+drop table if exists memberannotationstringvaluerefset_s;
+create table memberannotationstringvaluerefset_s(
+    id varchar(36) not null,
+    effectivetime char(8) not null,
+    active char(1) not null,
+    moduleid bigint(20) not null,
+    refsetid bigint(20) not null,
+    referencedcomponentid bigint(20) not null,
+    referencedmemberid varchar(36) not null,
+    languagedialectcode varchar(255) not null,
+    typeid bigint(20) not null,
+    value text not null,
+    key idx_id(id),
+    key idx_effectivetime(effectivetime),
+    key idx_active(active),
+    key idx_moduleid(moduleid),
+    key idx_refsetid(refsetid),
+    key idx_referencedcomponentid(referencedcomponentid),
+    key idx_referencedmemberid(referencedmemberid),
+    key idx_languagedialectcode(languagedialectcode),
+    key idx_typeid(typeid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists identifier_s;
@@ -1598,6 +1686,50 @@ create table extendedassociation_d(
     key idx_referencedcomponentid(referencedcomponentid),
     key idx_targetadministeredform(targetadministeredform),
     key idx_targetmanufacturedform(targetmanufacturedform)
+) engine=myisam default charset=utf8;
+
+drop table if exists componentannotationstringvaluerefset_d;
+create table componentannotationstringvaluerefset_d(
+    id varchar(36) not null,
+    effectivetime char(8) not null,
+    active char(1) not null,
+    moduleid bigint(20) not null,
+    refsetid bigint(20) not null,
+    referencedcomponentid bigint(20) not null,
+    languagedialectcode varchar(255) not null,
+    typeid bigint(20) not null,
+    value text not null,
+    key idx_id(id),
+    key idx_effectivetime(effectivetime),
+    key idx_active(active),
+    key idx_moduleid(moduleid),
+    key idx_refsetid(refsetid),
+    key idx_referencedcomponentid(referencedcomponentid),
+    key idx_languagedialectcode(languagedialectcode),
+    key idx_typeid(typeid)
+) engine=myisam default charset=utf8;
+
+drop table if exists memberannotationstringvaluerefset_d;
+create table memberannotationstringvaluerefset_d(
+    id varchar(36) not null,
+    effectivetime char(8) not null,
+    active char(1) not null,
+    moduleid bigint(20) not null,
+    refsetid bigint(20) not null,
+    referencedcomponentid bigint(20) not null,
+    referencedmemberid varchar(36) not null,
+    languagedialectcode varchar(255) not null,
+    typeid bigint(20) not null,
+    value text not null,
+    key idx_id(id),
+    key idx_effectivetime(effectivetime),
+    key idx_active(active),
+    key idx_moduleid(moduleid),
+    key idx_refsetid(refsetid),
+    key idx_referencedcomponentid(referencedcomponentid),
+    key idx_referencedmemberid(referencedmemberid),
+    key idx_languagedialectcode(languagedialectcode),
+    key idx_typeid(typeid)
 ) engine=myisam default charset=utf8;
 
 drop table if exists identifier_d;

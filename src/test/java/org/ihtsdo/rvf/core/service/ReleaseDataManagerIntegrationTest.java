@@ -144,4 +144,49 @@ class ReleaseDataManagerIntegrationTest extends IntegrationTest {
 			FileUtils.deleteQuietly(dir);
 		}
 	}
+
+	/**
+	 * Annotation refsets are loaded by position. Component files are
+	 * languageDialectCode, typeId, value. Member files insert referencedMemberId
+	 * ahead of those three columns.
+	 */
+	@Test
+	void testAnnotationRefsetsAreLoadedIntoNamedColumns() throws Exception {
+		File dir = Files.createTempDirectory("rvf-annotation-refsets").toFile();
+		File zip = new File(dir, "SnomedCT_AnnotationTest_INT_20231201.zip");
+		String root = "SnomedCT_AnnotationTest_INT_20231201/Snapshot/Refset/Metadata/";
+		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zip))) {
+			out.putNextEntry(new ZipEntry(root + "der2_scsRefset_ComponentAnnotationStringValueSnapshot_INT_20231201.txt"));
+			out.write(("id\teffectiveTime\tactive\tmoduleId\trefsetId\treferencedComponentId\tlanguageDialectCode\ttypeId\tvalue\r\n"
+					+ "11111111-1111-1111-1111-111111111111\t20231201\t1\t900000000000207008\t1292992004\t138875005\ten\t1295447006\tcomponent note\r\n").getBytes(StandardCharsets.UTF_8));
+			out.closeEntry();
+			out.putNextEntry(new ZipEntry(root + "der2_sscsRefset_MemberAnnotationStringValueSnapshot_INT_20231201.txt"));
+			out.write(("id\teffectiveTime\tactive\tmoduleId\trefsetId\treferencedComponentId\treferencedMemberId\tlanguageDialectCode\ttypeId\tvalue\r\n"
+					+ "22222222-2222-2222-2222-222222222222\t20231201\t1\t900000000000207008\t1292995002\t138875005\t33333333-3333-3333-3333-333333333333\t\t1295447006\tmember note\r\n").getBytes(StandardCharsets.UTF_8));
+			out.closeEntry();
+		}
+		String schemaName = releaseDataManager.loadSnomedData("annotation_refset_load_test", new ArrayList<>(), Collections.emptyList(), zip);
+		try (Connection connection = dataSource.getConnection();
+			 Statement statement = connection.createStatement()) {
+			try (ResultSet resultSet = statement.executeQuery("select referencedcomponentid, languagedialectcode, typeid, value from "
+					+ schemaName + ".componentannotationstringvaluerefset_s")) {
+				assertTrue(resultSet.next(), "the component annotation row must be loaded");
+				assertEquals(138875005L, resultSet.getLong(1));
+				assertEquals("en", resultSet.getString(2));
+				assertEquals(1295447006L, resultSet.getLong(3));
+				assertEquals("component note", resultSet.getString(4));
+			}
+			try (ResultSet resultSet = statement.executeQuery("select referencedmemberid, languagedialectcode, typeid, value from "
+					+ schemaName + ".memberannotationstringvaluerefset_s")) {
+				assertTrue(resultSet.next(), "the member annotation row must be loaded");
+				assertEquals("33333333-3333-3333-3333-333333333333", resultSet.getString(1));
+				assertEquals("", resultSet.getString(2));
+				assertEquals(1295447006L, resultSet.getLong(3));
+				assertEquals("member note", resultSet.getString(4));
+			}
+		} finally {
+			releaseDataManager.dropSchema(schemaName);
+			FileUtils.deleteQuietly(dir);
+		}
+	}
 }

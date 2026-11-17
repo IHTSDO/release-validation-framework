@@ -33,6 +33,8 @@ public class RF2FileTableMapper {
 	private static final String ATTRIBUTE_VALUE_MAP_FILE_HEADER = "der2_csRefset_.*AttributeValueMap";
 	private static final String EXTENDED_ASSOCIATION_FILE_HEADER = "der2_ccRefset_.*ExtendedAssociation";
 	private static final String IDENTIFIER_FILE_HEADER = "sct2_Identifier_";
+	private static final String COMPONENT_ANNOTATION_FILE_HEADER = "der2_scsRefset_.*ComponentAnnotationStringValue";
+	private static final String MEMBER_ANNOTATION_FILE_HEADER = "der2_sscsRefset_.*MemberAnnotationStringValue";
 
 	private static final Map<String,String> tableNameMap = new LinkedHashMap<>();
 	private static final String DELTA = ".*Delta.*_*_\\d{8}.txt";
@@ -67,6 +69,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(ATTRIBUTE_VALUE_MAP_FILE_HEADER + DELTA, "attributevaluemap_d");
 		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + DELTA, "extendedassociation_d");
 		tableNameMap.put(IDENTIFIER_FILE_HEADER + DELTA, "identifier_d");
+		tableNameMap.put(COMPONENT_ANNOTATION_FILE_HEADER + DELTA, "componentannotationstringvaluerefset_d");
+		tableNameMap.put(MEMBER_ANNOTATION_FILE_HEADER + DELTA, "memberannotationstringvaluerefset_d");
 		
 		// Full
 		tableNameMap.put(CONCEPT_FILE_HEADER + FULL, "concept_f");
@@ -95,6 +99,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(ATTRIBUTE_VALUE_MAP_FILE_HEADER + FULL, "attributevaluemap_f");
 		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + FULL, "extendedassociation_f");
 		tableNameMap.put(IDENTIFIER_FILE_HEADER + FULL, "identifier_f");
+		tableNameMap.put(COMPONENT_ANNOTATION_FILE_HEADER + FULL, "componentannotationstringvaluerefset_f");
+		tableNameMap.put(MEMBER_ANNOTATION_FILE_HEADER + FULL, "memberannotationstringvaluerefset_f");
 		
 		// Snapshot
 		tableNameMap.put(CONCEPT_FILE_HEADER + SNAPSHOT, "concept_s");
@@ -123,6 +129,8 @@ public class RF2FileTableMapper {
 		tableNameMap.put(ATTRIBUTE_VALUE_MAP_FILE_HEADER + SNAPSHOT, "attributevaluemap_s");
 		tableNameMap.put(EXTENDED_ASSOCIATION_FILE_HEADER + SNAPSHOT, "extendedassociation_s");
 		tableNameMap.put(IDENTIFIER_FILE_HEADER + SNAPSHOT, "identifier_s");
+		tableNameMap.put(COMPONENT_ANNOTATION_FILE_HEADER + SNAPSHOT, "componentannotationstringvaluerefset_s");
+		tableNameMap.put(MEMBER_ANNOTATION_FILE_HEADER + SNAPSHOT, "memberannotationstringvaluerefset_s");
 	}
 
 	private RF2FileTableMapper () {
