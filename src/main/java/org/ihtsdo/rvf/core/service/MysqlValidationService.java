@@ -28,29 +28,33 @@ import java.util.concurrent.Future;
 public class MysqlValidationService implements SqlAssertionValidationService {
 
 	public static final String START_EXECUTING_ASSERTIONS = "Start executing assertions...";
-	@Autowired
-	private AssertionService assertionService;
+	private final AssertionService assertionService;
+	private final AssertionExecutionService assertionExecutionService;
+	private final int batchSize;
+	private final ValidationReportService reportService;
+	private final MysqlFailuresExtractor mysqlFailuresExtractor;
+	private final ValidationVersionLoader releaseVersionLoader;
+	private final ReleaseAcquisitionService releaseAcquisitionService;
+	private final ReleaseDataManager releaseDataManager;
 
 	@Autowired
-	private AssertionExecutionService assertionExecutionService;
-	
-	@Value("${rvf.assertion.execution.BatchSize}")
-	private int batchSize;
-
-	@Autowired
-	private ValidationReportService reportService;
-
-	@Autowired
-	private MysqlFailuresExtractor mysqlFailuresExtractor;
-	
-	@Autowired
-	private ValidationVersionLoader releaseVersionLoader;
-
-	@Autowired
-	private ReleaseAcquisitionService releaseAcquisitionService;
-
-	@Autowired
-	private ReleaseDataManager releaseDataManager;
+	public MysqlValidationService(AssertionService assertionService,
+			AssertionExecutionService assertionExecutionService,
+			@Value("${rvf.assertion.execution.BatchSize}") int batchSize,
+			ValidationReportService reportService,
+			MysqlFailuresExtractor mysqlFailuresExtractor,
+			ValidationVersionLoader releaseVersionLoader,
+			ReleaseAcquisitionService releaseAcquisitionService,
+			ReleaseDataManager releaseDataManager) {
+		this.assertionService = assertionService;
+		this.assertionExecutionService = assertionExecutionService;
+		this.batchSize = batchSize;
+		this.reportService = reportService;
+		this.mysqlFailuresExtractor = mysqlFailuresExtractor;
+		this.releaseVersionLoader = releaseVersionLoader;
+		this.releaseAcquisitionService = releaseAcquisitionService;
+		this.releaseDataManager = releaseDataManager;
+	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MysqlValidationService.class);
 	

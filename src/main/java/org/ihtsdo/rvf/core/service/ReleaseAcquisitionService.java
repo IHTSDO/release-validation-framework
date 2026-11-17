@@ -2,7 +2,6 @@ package org.ihtsdo.rvf.core.service;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.FileExistsException;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.ihtsdo.otf.resourcemanager.ManualResourceConfiguration;
 import org.ihtsdo.otf.resourcemanager.ResourceConfiguration.Cloud;
@@ -48,22 +47,26 @@ public class ReleaseAcquisitionService {
 	private static final String ZIP_FILE_EXTENSION = ".zip";
 	public static final String FILE_ALREADY_EXISTS_MSG = "File already exists: ";
 
-	@Autowired
-	private ModuleStorageCoordinator moduleStorageCoordinator;
-
-	@Autowired
-	private ValidationJobResourceConfig jobResourceConfig;
-
-	@Autowired
-	private ResourceLoader cloudResourceLoader;
-
-	@Value("${rvf.empty-release-file}")
-	private String emptyRf2Filename;
-
-	@Autowired
-	private ValidationReleaseStorageConfig releaseStorageConfig;
+	private final ModuleStorageCoordinator moduleStorageCoordinator;
+	private final ValidationJobResourceConfig jobResourceConfig;
+	private final ResourceLoader cloudResourceLoader;
+	private final String emptyRf2Filename;
+	private final ValidationReleaseStorageConfig releaseStorageConfig;
 
 	private ResourceManager releaseSourceManager;
+
+	@Autowired
+	public ReleaseAcquisitionService(ModuleStorageCoordinator moduleStorageCoordinator,
+			ValidationJobResourceConfig jobResourceConfig,
+			ResourceLoader cloudResourceLoader,
+			@Value("${rvf.empty-release-file}") String emptyRf2Filename,
+			ValidationReleaseStorageConfig releaseStorageConfig) {
+		this.moduleStorageCoordinator = moduleStorageCoordinator;
+		this.jobResourceConfig = jobResourceConfig;
+		this.cloudResourceLoader = cloudResourceLoader;
+		this.emptyRf2Filename = emptyRf2Filename;
+		this.releaseStorageConfig = releaseStorageConfig;
+	}
 
 	private final Logger logger = LoggerFactory.getLogger(ReleaseAcquisitionService.class);
 

@@ -51,8 +51,7 @@ public class AssertionAdministrationController {
 		this.releaseDataManager = releaseDataManager;
 	}
 
-	@RequestMapping(value = "{id}/tests", method = RequestMethod.POST)
-	@ResponseBody
+	@PostMapping("{id}/tests")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Add tests to an assertion", description = "Add one or more tests to an assertion identified by the id which can be the assertion id or uuid.")
 	public Assertion addTestsForAssertion(@PathVariable final String id,
@@ -68,8 +67,7 @@ public class AssertionAdministrationController {
 		return assertion;
 	}
 
-	@RequestMapping(value = "{id}/tests", method = RequestMethod.DELETE)
-	@ResponseBody
+	@DeleteMapping("{id}/tests")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Delete tests from an assertion", description = "Delete tests for a given assertion. Note: This doesn't delete the assertion.")
 	public Assertion deleteTestsForAssertion(
@@ -93,7 +91,7 @@ public class AssertionAdministrationController {
 		return assertion;
 	}
 
-	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
+	@DeleteMapping("{id}")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Delete an assertion", description = "Delete an assertion identified by the id.")
 	public ResponseEntity<Assertion> deleteAssertion(@Parameter(description = "Assertion id or uuid") @PathVariable final String id) {
@@ -110,8 +108,7 @@ public class AssertionAdministrationController {
 		return new ResponseEntity<>(assertion, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "", method = RequestMethod.POST)
-	@ResponseBody
+	@PostMapping("")
 	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(summary = "Create an assertion", description = "Create an assertion with values provided. The assertion id is not required as it will be auto generated. "
 			+ "The uuid field is optional as a random uuid will be assigned when this is not set.")
@@ -138,8 +135,7 @@ public class AssertionAdministrationController {
 		return new ResponseEntity<>(newAssertion, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
-	@ResponseBody
+	@PutMapping("{id}")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Update an assertion", description = "Updates the assertion text,keywords and uuid property for the existing assertion identified by the assertion id or uuid.")
 	public Assertion updateAssertion(
@@ -157,8 +153,7 @@ public class AssertionAdministrationController {
 		return assertionService.save(assertion);
 	}
 
-	@RequestMapping(value = "{id}/tests", method = RequestMethod.PUT)
-	@ResponseBody
+	@PutMapping("{id}/tests")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Update a specific test for a given assertion", description = "Updates a specific test for a given assertion.")
 	public Assertion updateTest(
@@ -173,8 +168,7 @@ public class AssertionAdministrationController {
 		return existing;
 	}
 
-	@RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
-	@ResponseBody
+	@PostMapping("/{id}/run")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Execute tests of an assertion", description = "Executes tests for the assertion specified by the id (assertion id or uuid).")
 	public ResponseEntity<Map<String, Object>> executeTest(

@@ -10,6 +10,7 @@ import org.ihtsdo.rvf.core.service.TraceabilityComparisonService;
 import org.ihtsdo.rvf.rest.helper.AssertionHelper;
 import org.ihtsdo.rvf.rest.helper.AssertionLookup;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.lang.reflect.Constructor;
@@ -132,7 +133,7 @@ class AssertionControllerSplitTest {
 		String prefix = controller.getAnnotation(RequestMapping.class).value()[0];
 		Set<String> endpoints = new TreeSet<>();
 		for (Method method : controller.getDeclaredMethods()) {
-			RequestMapping mapping = method.getAnnotation(RequestMapping.class);
+			RequestMapping mapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
 			if (mapping == null) {
 				continue;
 			}

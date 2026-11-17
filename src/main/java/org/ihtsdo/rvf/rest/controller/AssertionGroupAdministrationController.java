@@ -34,18 +34,21 @@ import java.util.*;
 @ConditionalOnMysqlEngine
 public class AssertionGroupAdministrationController {
 
-	@Autowired
-	private AssertionService assertionService;
-
-	@Autowired
-	private AssertionGroupRepository assertionGroupRepository;
-
-	@Autowired
-	private AssertionHelper assertionHelper;
+	private final AssertionService assertionService;
+	private final AssertionGroupRepository assertionGroupRepository;
+	private final AssertionHelper assertionHelper;
 	private final JsonMapper objectMapper = JsonMapper.builder().build();
 
-	@RequestMapping(value = "{id}/assertions", method = RequestMethod.GET)
-	@ResponseBody
+	@Autowired
+	public AssertionGroupAdministrationController(AssertionService assertionService,
+			AssertionGroupRepository assertionGroupRepository,
+			AssertionHelper assertionHelper) {
+		this.assertionService = assertionService;
+		this.assertionGroupRepository = assertionGroupRepository;
+		this.assertionHelper = assertionHelper;
+	}
+
+	@GetMapping("{id}/assertions")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Get all assertions for a given assertion group", description = "Retrieves all assertions for a given assertion group identified by the group id.")
 	public List<Assertion> getAssertionsForGroup(@Parameter(description = "Assertion group id") @PathVariable final Long id) {
@@ -53,8 +56,7 @@ public class AssertionGroupAdministrationController {
 		return new ArrayList<>(group.getAssertions());
 	}
 
-	@RequestMapping(value = "{id}/assertions", method = RequestMethod.POST)
-	@ResponseBody
+	@PostMapping("{id}/assertions")
 	@Operation(summary = "Add assertions to a group", description = "Adds assertions to the assertion group identified by the group id.")
 	public AssertionGroup addAssertionsToGroup(@PathVariable final Long id,
 			@RequestBody(required = false) final List<String> assertionsList, final HttpServletResponse response) {
@@ -73,8 +75,7 @@ public class AssertionGroupAdministrationController {
 		return group;
 	}
 
-	@RequestMapping(value = "{id}/addAllAssertions", method = RequestMethod.PUT)
-	@ResponseBody
+	@PutMapping("{id}/addAllAssertions")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Add all assertions available in the system to a group", description = "Adds all assertions available in the system to a group."
 			+ " This api may only be used when user desires to add all assertion found in the system to an assertion group"
@@ -86,8 +87,7 @@ public class AssertionGroupAdministrationController {
 		return assertionGroupRepository.save(group);
 	}
 
-	@RequestMapping(value = "{id}/assertions", method = RequestMethod.DELETE)
-	@ResponseBody
+	@DeleteMapping("{id}/assertions")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Delete assertions from a group", description = "Removes supplied assertions from a given assertion group")
 	public AssertionGroup removeAssertionsFromGroup(
@@ -100,8 +100,7 @@ public class AssertionGroupAdministrationController {
 		return group;
 	}
 
-	@RequestMapping(value = "{id}/assertions", method = RequestMethod.PUT)
-	@ResponseBody
+	@PutMapping("{id}/assertions")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Add supplied assertions to an assertion group", description = "Replaces existing assertions of an assertion group with supplied assertions")
 	public AssertionGroup setAsAssertionsInGroup(@PathVariable final Long id,
@@ -113,16 +112,14 @@ public class AssertionGroupAdministrationController {
 		return assertionGroupRepository.save(group);
 	}
 
-	@RequestMapping(value = "{id}", method = RequestMethod.GET)
-	@ResponseBody
+	@GetMapping("{id}")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Get an assertion group", description = "Retrieves an assertion group for a given id")
 	public AssertionGroup getAssertionGroup(@PathVariable final Long id) {
 		return assertionGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(id));
 	}
 
-	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
-	@ResponseBody
+	@DeleteMapping("{id}")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Delete an assertion group", description = "Deletes an assertion group from the system")
 	public AssertionGroup deleteAssertionGroup(@Parameter(description = "Assertion group id") @PathVariable final Long id) {
@@ -132,8 +129,7 @@ public class AssertionGroupAdministrationController {
 		return group;
 	}
 
-	@RequestMapping(value = "", method = RequestMethod.POST)
-	@ResponseBody
+	@PostMapping("")
 	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(summary = "Create an assertion group with specified name", description = "Creates an assertion group with specified name")
 	public AssertionGroup createAssertionGroupWithName(@RequestParam final String name) {
@@ -142,8 +138,7 @@ public class AssertionGroupAdministrationController {
 		return assertionGroupRepository.save(group);
 	}
 
-	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
-	@ResponseBody
+	@PutMapping("{id}")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Update an assertion group", description = "Updates the group name for the assertion group identified by the group id.")
 	public AssertionGroup updateAssertionGroup(@PathVariable final Long id,
@@ -153,8 +148,7 @@ public class AssertionGroupAdministrationController {
 		return assertionGroupRepository.save(group);
 	}
 
-	@RequestMapping(value = "/{id}/run", method = RequestMethod.POST)
-	@ResponseBody
+	@PostMapping("/{id}/run")
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "Execute all tests for a given assertion group", description = "Executes all tests for the assertion group identified by the group id.")
 	public Map<String, Object> executeAssertions(

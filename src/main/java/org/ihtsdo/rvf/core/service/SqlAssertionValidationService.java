@@ -1,7 +1,10 @@
 package org.ihtsdo.rvf.core.service;
 
+import org.ihtsdo.otf.rest.exception.BusinessServiceException;
 import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.ihtsdo.rvf.core.service.pojo.ValidationStatusReport;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * The SQL-assertion pass of a validation, whichever engine executes it.
@@ -21,15 +24,14 @@ public interface SqlAssertionValidationService {
 	/**
 	 * Runs the SQL assertions and returns {@code statusReport}, filled in.
 	 *
-	 * <p>Declares {@code throws Exception} so that an implementation keeps its
-	 * own checked exceptions. {@link ValidationRunner} submits this as a
-	 * {@code Callable}, so a thrown exception surfaces from
-	 * {@code Future.get()}.
+	 * <p>{@link ValidationRunner} submits this as a {@code Callable}, so a
+	 * thrown exception surfaces from {@code Future.get()}.
 	 *
 	 * @param statusReport carries an empty {@code ValidationReport} that the
 	 *                     implementation fills in rather than replaces; the
 	 *                     runner merges it with the other passes' reports
 	 */
 	ValidationStatusReport runRF2Validations(ValidationRunConfig validationConfig,
-			ValidationStatusReport statusReport) throws Exception;
+			ValidationStatusReport statusReport)
+			throws BusinessServiceException, ExecutionException, InterruptedException;
 }

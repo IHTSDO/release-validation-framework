@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ReleaseAcquisitionServiceTest {
 
-	private final ReleaseAcquisitionService service = new ReleaseAcquisitionService();
+	private final ReleaseAcquisitionService service = new ReleaseAcquisitionService(null, null, null, null, null);
 
 	@Test
 	void copiesTheRunRequestOntoTheExecutionConfig() {
