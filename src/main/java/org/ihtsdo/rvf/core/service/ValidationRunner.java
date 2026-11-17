@@ -41,13 +41,13 @@ public class ValidationRunner {
 	private ValidationReportService reportService;
 	
 	@Autowired
-	private ValidationVersionLoader releaseVersionLoader;
+	private ReleaseAcquisitionService releaseAcquisitionService;
 	
 	@Autowired 
 	private DroolsRulesValidationService droolsValidationService;
 	
 	@Autowired
-	private MysqlValidationService mysqlValidationService;
+	private SqlAssertionValidationService sqlAssertionValidationService;
 
 	@Autowired
 	private MRCMValidationService mrcmValidationService;
@@ -86,9 +86,9 @@ public class ValidationRunner {
 		try {
 			// Prepare to run validations
 			Calendar startTime = Calendar.getInstance();
-			releaseVersionLoader.downloadProspectiveFiles(validationConfig);
-			releaseVersionLoader.downloadPreviousRelease(validationConfig);
-			releaseVersionLoader.downloadDependencyReleases(validationConfig);
+			releaseAcquisitionService.downloadProspectiveFiles(validationConfig);
+			releaseAcquisitionService.downloadPreviousRelease(validationConfig);
+			releaseAcquisitionService.downloadDependencyReleases(validationConfig);
 
 			if (validationConfig.getLocalProspectiveFile() == null) {
 				reportService.writeState(State.FAILED, validationConfig.getStorageLocation());
@@ -144,9 +144,9 @@ public class ValidationRunner {
 			if (!CollectionUtils.isEmpty(validationConfig.getGroupsList())) {
 				statusMessages.append("RVF assertions validation started");
 				reportService.writeProgress(statusMessages.toString(), validationConfig.getStorageLocation());
-				ValidationStatusReport mysqlValidationStatusReport = new ValidationStatusReport(validationConfig);
-				mysqlValidationStatusReport.setResultReport(new ValidationReport());
-				taskMap.put("SQL Assertions", executorService.submit(() -> mysqlValidationService.runRF2MysqlValidations(validationConfig, mysqlValidationStatusReport)));
+				ValidationStatusReport sqlValidationStatusReport = new ValidationStatusReport(validationConfig);
+				sqlValidationStatusReport.setResultReport(new ValidationReport());
+				taskMap.put("SQL Assertions", executorService.submit(() -> sqlAssertionValidationService.runRF2Validations(validationConfig, sqlValidationStatusReport)));
 			}
 
 			if (validationConfig.isEnableDrools()) {

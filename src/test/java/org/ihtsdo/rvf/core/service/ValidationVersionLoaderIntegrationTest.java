@@ -30,6 +30,9 @@ public class ValidationVersionLoaderIntegrationTest extends IntegrationTest {
 	
 	@Autowired
 	private ValidationVersionLoader dataLoader;
+
+	@Autowired
+	private ReleaseAcquisitionService releaseAcquisitionService;
 	private String prospectiveVersion;
 	private ValidationRunConfig validationConfig;
 	
@@ -60,7 +63,7 @@ public class ValidationVersionLoaderIntegrationTest extends IntegrationTest {
 		validationConfig.addExtensionDependency("int_20160131");
 		validationConfig.addPreviousRelease("dk_20160215");
 		validationConfig.setRf2DeltaOnly(true);
-		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseAcquisitionService.createExecutionConfig(validationConfig);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		dataLoader.loadProspectiveVersion(null, statusReport, executionConfig, null);
 		assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
@@ -69,7 +72,7 @@ public class ValidationVersionLoaderIntegrationTest extends IntegrationTest {
 	@Test
 	public void testProspectiveVersion() throws Exception {
 		prospectiveVersion = validationConfig.getRunId().toString();
-		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseAcquisitionService.createExecutionConfig(validationConfig);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		dataLoader.loadProspectiveVersion(null, statusReport, executionConfig, null);
 		assertTrue(releaseDataManager.isKnownRelease(prospectiveVersion));
@@ -80,7 +83,7 @@ public class ValidationVersionLoaderIntegrationTest extends IntegrationTest {
 		prospectiveVersion = validationConfig.getRunId().toString();
 		validationConfig.addExtensionDependency("int_20160131");
 		validationConfig.addPreviousRelease("dk_20160215");
-		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseAcquisitionService.createExecutionConfig(validationConfig);
 		executionConfig.setRf2DeltaOnly(false);
 		ValidationStatusReport statusReport = new ValidationStatusReport(validationConfig);
 		dataLoader.loadProspectiveVersion(null, statusReport, executionConfig, null);
@@ -90,7 +93,7 @@ public class ValidationVersionLoaderIntegrationTest extends IntegrationTest {
 	@Test
 	public void testLoadPreviousVersion() throws Exception {
 		validationConfig.setPreviousRelease("SnomedCT_RF2Release_INT_20130131.zip");
-		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseAcquisitionService.createExecutionConfig(validationConfig);
 		Map<String, Object> responseMap = new HashMap<>();
 		dataLoader.loadPreviousVersion( validationConfig.getPreviousRelease(), null, executionConfig);
 		System.out.println(responseMap.get(FAILURE_MESSAGE));
@@ -102,7 +105,7 @@ public class ValidationVersionLoaderIntegrationTest extends IntegrationTest {
 		
 		validationConfig.addExtensionDependency("int_20160131");
 		validationConfig.setPreviousRelease("SnomedCT_GPFPICPC2_Production_INT_20160731.zip");
-		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseAcquisitionService.createExecutionConfig(validationConfig);
 		Map<String, Object> responseMap = new HashMap<>();
 		dataLoader.loadPreviousVersion(validationConfig.getPreviousRelease(), null, executionConfig);
 		System.out.println(responseMap.get(FAILURE_MESSAGE));
@@ -114,7 +117,7 @@ public class ValidationVersionLoaderIntegrationTest extends IntegrationTest {
 	public void testLoadPreviousExtensionVersion() throws Exception {
 		validationConfig.addExtensionDependency("int_20160131");
 		validationConfig.setPreviousRelease("SnomedCT_RF2Release_SE1000052_20160531.zip");
-		MysqlExecutionConfig executionConfig = dataLoader.createExecutionConfig(validationConfig);
+		MysqlExecutionConfig executionConfig = releaseAcquisitionService.createExecutionConfig(validationConfig);
 		dataLoader.loadPreviousVersion(validationConfig.getPreviousRelease(), null, executionConfig);
 	}
 	

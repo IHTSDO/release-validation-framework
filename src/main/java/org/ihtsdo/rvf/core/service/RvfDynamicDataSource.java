@@ -1,6 +1,7 @@
 package org.ihtsdo.rvf.core.service;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.service.config.DataSourceProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * A wrapper around {@link org.apache.commons.dbcp.BasicDataSource} that handles dynamic schema changes
  */
 @Service
+@ConditionalOnMysqlEngine
 public class RvfDynamicDataSource {
 
 	@Resource(name = "dataSource")

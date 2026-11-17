@@ -31,6 +31,7 @@ public abstract class DataResourceConfig {
     private AssertionsResourceConfig assertionsResourceConfig;
     
     @Bean(name = "dataSource")
+    @ConditionalOnMysqlEngine
     public BasicDataSource getDataSource(DataSourceProperties dataSourceProperties) {
         BasicDataSource basicDataSource = new BasicDataSource();
         basicDataSource.setUrl(url);

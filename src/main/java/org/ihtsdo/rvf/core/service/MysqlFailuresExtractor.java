@@ -4,6 +4,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.ihtsdo.otf.RF2Constants;
 import org.ihtsdo.otf.rest.client.RestClientException;
 import org.ihtsdo.otf.utils.SnomedUtilsBase;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.data.model.Assertion;
 import org.ihtsdo.rvf.core.data.model.AssertionGroup;
 import org.ihtsdo.rvf.core.data.model.FailureDetail;
@@ -28,6 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@ConditionalOnMysqlEngine
 public class MysqlFailuresExtractor {
 
     private final Logger logger = LoggerFactory.getLogger(MysqlFailuresExtractor.class);

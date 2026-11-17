@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.ihtsdo.otf.rest.exception.BusinessServiceException;
+import org.ihtsdo.rvf.config.ConditionalOnMysqlEngine;
 import org.ihtsdo.rvf.core.service.ReleaseDataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import java.util.Collections;
 @RestController
 @RequestMapping("/releases")
 @Tag(name = "Published Releases")
+@ConditionalOnMysqlEngine
 public class ReleaseController {
 
 	private static final Logger logger = LoggerFactory.getLogger(ReleaseController.class);
