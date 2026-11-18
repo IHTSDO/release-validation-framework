@@ -76,9 +76,11 @@ class AssertionGroupResolveTest {
 	@Test
 	void noGroupDefinitionsIsAnErrorAsOnImport() {
 		InputStream noGroups = stream("<assertionGroupingStrategy/>");
+		InputStream policies = stream(POLICIES);
+		List<Assertion> assertions = List.of(editionA);
 
 		assertThrows(IllegalStateException.class,
-				() -> AssertionGroupImporter.resolveGroups(noGroups, stream(POLICIES), List.of(editionA)));
+				() -> AssertionGroupImporter.resolveGroups(noGroups, policies, assertions));
 	}
 
 	@Test

@@ -278,7 +278,7 @@ class DuckDbValidationServiceExtensionTest {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		new DuckDbValidationService(reportService, whitelistService, new ReleaseAcquisitionService(),
+		new DuckDbValidationService(reportService, whitelistService, new ReleaseAcquisitionService(null, null, null, null, null),
 				assertionService, work.toString(), EMPTY_RELEASE, "qa_result", 0, "", "", 0, 1000, 1000)
 				.runValidations(config, releases, "storage/", status);
 		return status;

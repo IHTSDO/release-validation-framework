@@ -701,7 +701,7 @@ class DuckDbValidationServiceTest {
 		} catch (java.io.IOException e) {
 			throw new java.io.UncheckedIOException(e);
 		}
-		return new DuckDbValidationService(reportService, whitelistService, new ReleaseAcquisitionService(),
+		return new DuckDbValidationService(reportService, whitelistService, new ReleaseAcquisitionService(null, null, null, null, null),
 				assertionService, work.toString(), EMPTY_RELEASE, "qa_result", 0, memoryLimit,
 				cacheDirectory == null ? "" : cacheDirectory.toString(), cacheMaxGb, 1000, 1000);
 	}

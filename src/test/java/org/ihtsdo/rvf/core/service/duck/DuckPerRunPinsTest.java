@@ -308,7 +308,7 @@ class DuckPerRunPinsTest {
 		ValidationRunConfig runConfig = new ValidationRunConfig();
 		runConfig.setRunId(config.getExecutionId());
 		ValidationStatusReport status = new ValidationStatusReport(runConfig);
-		new DuckDbValidationService(reportService, whitelistService, new ReleaseAcquisitionService(), service(),
+		new DuckDbValidationService(reportService, whitelistService, new ReleaseAcquisitionService(null, null, null, null, null), service(),
 				work.toString(), "empty-rf2-snapshot.zip", "qa_result", 0, "", "", 0, 1000, 1000)
 				.runValidations(config, new DuckDbValidationService.ReleaseDirectories(prospective, null, null),
 						"storage/", status);
