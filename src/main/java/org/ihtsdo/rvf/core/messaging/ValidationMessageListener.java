@@ -10,6 +10,7 @@ import org.ihtsdo.rvf.core.service.config.ValidationRunConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ValidationMessageListener implements Closeable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidationMessageListener.class);
+
+	static final String SHADOW_STORAGE_SUFFIX = "-duck";
 	
 	private static final AtomicBoolean isRunning = new AtomicBoolean(false);
 
@@ -36,7 +39,10 @@ public class ValidationMessageListener implements Closeable {
 
 	@Autowired
 	private MessagingHelper messagingHelper;
-	
+
+	@Value("${rvf.validation.shadow:false}")
+	private boolean shadow;
+
 	@JmsListener(destination = "${rvf.validation.queue.name}")
 	public void processMessage(TextMessage incomingMessage) {
 		isRunning.set(true);
@@ -55,11 +61,22 @@ public class ValidationMessageListener implements Closeable {
 			throw new RuntimeException("Error occurred while trying to convert the incoming message.", e);
 		}
 		if (config != null) {
+			if (shadow) {
+				shadow(config);
+			}
 			updateRvfStateToRunningAsync(config);
 			runner.run(config);
 		} else {
 			LOGGER.error("Null validation config found for message: {}", incomingMessage);
 		}
+	}
+
+	// Must run before anything reads responseQueue or storageLocation: the caller is owed status
+	// only by the worker that owns the run, and its reports must not be overwritten.
+	private static void shadow(ValidationRunConfig config) {
+		config.addResponseQueue(null);
+		config.setStorageLocation(config.getStorageLocation() + SHADOW_STORAGE_SUFFIX);
+		LOGGER.info("Shadow run {}: no status to the response queue, reports to {}", config.getRunId(), config.getStorageLocation());
 	}
 
 	private void updateRvfStateToRunningAsync(final ValidationRunConfig config) {

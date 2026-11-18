@@ -97,6 +97,30 @@ previous and dependency releases are acquired by file name, through the Module S
 Coordinator or release storage, as on the MySQL engine. `/releases`, which manages loaded
 MySQL schemas, is not available.
 
+### Running alongside the MySQL engine (shadow worker)
+
+To compare the engines on the same validations, a DuckDB worker can run copies of the
+validations the MySQL workers own. The build packages it as `rvf-api-duck`, so it installs
+next to `rvf-api` (`/opt/rvf-api-duck/`, user `rvf-api-duck`, supervisor program
+`rvf-api-duck`). The message broker copies each validation queue onto the worker's queue,
+e.g. an ActiveMQ composite queue with `forwardOnly="false"`, and the worker runs with
+
+    rvf.execution.engine=duckdb
+    rvf.execution.isWorker=true
+    rvf.validation.queue.name=<its own queue>
+    rvf.validation.shadow=true
+
+With `rvf.validation.shadow=true`, on receiving a message the worker clears the run's
+`responseQueue`, so the caller gets status only from the worker that owns the run, and
+appends `-duck` to its `storageLocation`. The run id and the prospective file are unchanged.
+The two reports are then at
+
+    /api/result/{runId}?storageLocation=<storageLocation>
+    /api/result/{runId}?storageLocation=<storageLocation>-duck
+
+A shadow run has no QUEUED state: until the worker picks the copy up, its location has no
+state at all.
+
 ### The native library and `java.io.tmpdir`
 
 The DuckDB JDBC driver (`org.duckdb:duckdb_jdbc` 1.5.5.1) carries its native library
