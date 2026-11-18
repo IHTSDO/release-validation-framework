@@ -16,7 +16,7 @@
     </parent>
 
     <properties>
-        <packageName>rvf-api</packageName>
+        <packageName>rvf-api-duck</packageName>
         <docker.registry>docker.io</docker.registry>
         <docker.allowInsecureRegistries>false</docker.allowInsecureRegistries>
         <docker.image.prefix>snomedinternational</docker.image.prefix>

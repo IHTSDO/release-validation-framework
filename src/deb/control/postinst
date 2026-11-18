@@ -6,11 +6,14 @@ echo $*
 
 APP_NAME=[[packageName]]
 
-VERSION_DIR=/opt/rvf-api/data/
+VERSION_DIR=/opt/$APP_NAME/data/
 VERSION_FILE=$VERSION_DIR/version.txt
 
 #make sure VERSION_DIR exists
 test -d $VERSION_DIR || mkdir -p $VERSION_DIR
+
+# java.io.tmpdir (DuckDB extracts its native library there) and the DuckDB work directory
+install -d -o $APP_NAME -g $APP_NAME -m 0750 /var/opt/$APP_NAME/tmp /var/opt/$APP_NAME/work
 
 # Record package version number
 echo [[version]] > $VERSION_FILE
